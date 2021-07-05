@@ -23,11 +23,8 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
-import { PageTitleService } from 'services/page-title.service';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -41,16 +38,10 @@ describe('Collection player page directive', function() {
   let $rootScope = null;
   let $http = null;
   let $httpBackend = null;
-  let $timeout = null;
   let directive = null;
-  let $uibModal = null;
-  let $q = null;
-  let undoRedoService: UndoRedoService = null;
-  let loaderService: LoaderService = null;
   let alertsService: AlertsService = null;
   let guestCollectionProgressService:
     GuestCollectionProgressService = null;
-  let pageTitleService: PageTitleService = null;
   let readOnlyCollectionBackendApiService:
     ReadOnlyCollectionBackendApiService = null;
   let userService: UserService = null;
@@ -96,14 +87,9 @@ describe('Collection player page directive', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
-    undoRedoService = $injector.get('UndoRedoService');
-    loaderService = $injector.get('LoaderService');
     alertsService = $injector.get('AlertsService');
     userService = $injector.get('UserService');
     urlService = $injector.get('UrlService');
@@ -140,7 +126,7 @@ describe('Collection player page directive', function() {
         title: 'Test Title'
       }
     };
-  
+
     sampleCollectionBackendObject = {
       id: 'collectionId',
       title: 'title',
@@ -163,7 +149,7 @@ describe('Collection player page directive', function() {
         completed_exploration_ids: ['expId2']
       }
     };
-  
+
     collectionNodesList = [
       {
         thumbnailIconUrl: '/inverted_subjects/Algebra.svg',
@@ -202,7 +188,7 @@ describe('Collection player page directive', function() {
         thumbnailBgColor: '#cd672b'
       }
     ];
-  
+
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
@@ -229,7 +215,7 @@ describe('Collection player page directive', function() {
     spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
       setTimeout(() =>{
         ctrl.explorationCardIsShown = true;
-        handler()
+        handler();
       });
     });
     $httpBackend.expect('GET', '/collection_handler/data/collectionId')
@@ -239,7 +225,8 @@ describe('Collection player page directive', function() {
           meta_description: 'meta_description'
         }
       });
-    $httpBackend.expect('GET', '/collectionsummarieshandler/data' +
+    $httpBackend.expect(
+      'GET', '/collectionsummarieshandler/data' +
       '?stringified_collection_ids='
       + encodeURI(JSON.stringify(['collectionId']))).respond({
       data: {
@@ -287,8 +274,8 @@ describe('Collection player page directive', function() {
         }
       });
     $httpBackend.expect('GET', '/collectionsummarieshandler/data' +
-      '?stringified_collection_ids='
-      + encodeURI(JSON.stringify(['collectionId']))).respond(500);
+      '?stringified_collection_ids=' +
+      encodeURI(JSON.stringify(['collectionId']))).respond(500);
 
     ctrl.$onInit();
     $scope.$apply();
@@ -312,7 +299,7 @@ describe('Collection player page directive', function() {
 
     expect(eventSpy.stopPropagation).toHaveBeenCalled();
   });
-  
+
   it('should close exploration card on clicking outside', () => {
     ctrl.explorationCardIsShown = true;
     ctrl.closeOnClickingOutside();
@@ -464,7 +451,7 @@ describe('Collection player page directive', function() {
       .and.returnValue('imageUrl');
     let url = ctrl.getStaticImageUrl('/imagepath');
 
-    expect(urlInterpolationSpy ).toHaveBeenCalledWith('/imagepath');
+    expect(urlInterpolationSpy).toHaveBeenCalledWith('/imagepath');
     expect(url).toBe('imageUrl');
   });
 
@@ -495,7 +482,7 @@ describe('Collection player page directive', function() {
     expect(result).toEqual(sampleCollection.nodes[0]);
   });
 
-  it('should update exploration preview card  when calling ' +
+  it('should update exploration preview card when calling ' +
     '\'updateExplorationPreview\'', function() {
     ctrl.explorationCardIsShown = false;
 
@@ -504,12 +491,11 @@ describe('Collection player page directive', function() {
 
     expect(ctrl.explorationCardIsShown).toBe(true);
     expect(ctrl.currentExplorationId).toBe('exp_id');
-
   });
 
   it('should show warning message if we try to ' +
     'load a collection with invalid id', function() {
-    ctrl.collection = sampleCollection
+    ctrl.collection = sampleCollection;
     ctrl.getCollectionNodeForExplorationId('invalidId');
 
     expect(alertsSpy).toHaveBeenCalledWith(
@@ -534,7 +520,8 @@ describe('Collection player page directive', function() {
     expect(result).toEqual(sampleCollection.nodes[0]);
   }));
 
-  it('should return non recommended collection nodes count', fakeAsync(function() {
+  it('should return non recommended collection node ' +
+    'count', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
     // Loading collections.
