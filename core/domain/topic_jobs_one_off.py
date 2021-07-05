@@ -21,7 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
+import os
 
+import python_utils
 from constants import constants
 from core import jobs
 from core.domain import fs_domain
@@ -103,8 +105,9 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
      """
 
     _DELETED_KEY = 'topic_deleted'
-    _ERROR_KEY = 'update_error'
-    _SUCCESS_KEY = 'thumbnail_size_updated'
+    _ERROR_KEY = 'thumbnail_size_update_error'
+    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_updated'
+    _NEW_SUCCESS_KEY = 'thumbnail_size_new_updated'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -127,9 +130,10 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             if fs.isfile(filepath):
                 item.thumbnail_size_in_bytes = len(fs.get(filepath))
+                item.update_timestamps(update_last_updated_time=False)
                 item.put()
                 yield (
-                    PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
+                    PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
             else:
                 yield (
                     PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY,
@@ -140,11 +144,13 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             # The attribute thumbnail_size_in_bytes is already updated.
             yield (
-                PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY, 1)
+                PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
-        if key == PopulateTopicThumbnailSizeOneOffJob._SUCCESS_KEY:
+        if key == PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY:
+            yield (key, len(values))
+        elif key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY:
             yield (key, len(values))
         else:
             yield (key, values)

@@ -22,10 +22,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
-from core.domain import topic_domain
+from constants import constants
+from core.domain import topic_domain, fs_services, fs_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
+from core.domain.topic_domain import Topic
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -198,4 +200,111 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         expected = [[u'validation_error',
                      [u'Topic topic_id failed validation: '
                       'Invalid language code: invalid_language_code']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    def setUp(self):
+        super(PopulateTopicThumbnailSizeOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = 'topic_id'
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_thumbnail_size_job_thumbnail_size_is_none(self):
+        """Tests that PopulateTopicThumbnailSizeOneOffJob job results error
+        key if the thumbnail_size_in_bytes is None and thumbnail_filename
+        does not exist in the filesystem.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the topic thumbnail_filename
+        # not present in filesystem is resulting in error key.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = (
+            [u'thumbnail_size_update_error',
+             [u'Thumbnail None for topic topic_id not found on the'
+              u' filesystem']])
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_thumbnail_size_job_thumbnail_size_is_not_none(self):
+        """Tests that PopulateTopicThumbnailSizeOneOffJob job results existing
+        success key when the thumbnail_size_in_bytes is not None.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+
+        # Retrieve the model and add dummy data for thumbnail_filename and
+        # thumbnail_size_in_bytes
+        topic_model = topic_models.get(self.TOPIC_ID)
+        topic_model.thumbnail_filename = 'test_svg.svg'
+        topic_model.thumbnail_size_in_bytes = 21131
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the topic thumbnail_filename
+        # is present in filesystem is resulting in existing success key.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [u'thumbnail_size_already_updated', 1]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_thumbnail_size_job_thumbnail_size_updated(self):
+        """Tests that PopulateTopicThumbnailSizeOneOffJob job results new
+        update success key when the thumbnail_size_in_bytes is not None.
+        """
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID, 'A name', 'abbrev', 'description')
+
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, topic.id))
+
+        filepath = '%s/%s' % (
+            constants.FILENAME_PREFIX_THUMBNAIL, 'abc.svg')
+
+        # Commit dummy thumbnail onto filesystem
+        fs.commit(filepath, 'dummy_thumbnail_file_contents')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the topic
+        # thumbnail_size_in_bytes is updated resulting in new update success
+        # key.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [u'thumbnail_size_new_updated', 1]
+
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
