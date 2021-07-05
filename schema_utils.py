@@ -454,7 +454,7 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_at_least(obj, min_value):
-        # type: (float, float) -> bool
+        # type: (float, int) -> bool
         """Ensures that `obj` (an int/float) is at least `min_value`.
 
         Args:
@@ -468,7 +468,7 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_at_most(obj, max_value):
-        # type: (float, float) -> bool
+        # type: (float, int) -> bool
         """Ensures that `obj` (an int/float) is at most `max_value`.
 
         Args:
