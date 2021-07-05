@@ -31,6 +31,7 @@ export class AboutPageRootComponent {
   ) {}
 
   ngOnInit(): void {
+    // Update default title and meta tags.
     this.pageTitleService.setPageTitle('About | Oppia');
     this.metaTagCustomizationService.addOrReplaceMetaTags([
       {
