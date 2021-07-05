@@ -22,12 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import os
 
-import python_utils
 from constants import constants
-from core.domain import topic_domain, fs_domain
+from core.domain import fs_domain
+from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -869,13 +870,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
 
         with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_TOPIC, self.topic_id))
-        fs.commit('thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
+        fs.commit(
+            'thumbnail/new_image.svg', raw_image, mimetype='image/svg+xml')
         self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')

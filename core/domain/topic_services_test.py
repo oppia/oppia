@@ -21,9 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
-import python_utils
 from constants import constants
-from core.domain import exp_services, fs_domain
+from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -37,8 +37,8 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
+import python_utils
 
 (
     topic_models, suggestion_models
@@ -411,10 +411,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'Title')
 
-        # Store a dummy image in filesystem
+        # Store a dummy image in filesystem.
         with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-                encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(

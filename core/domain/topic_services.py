@@ -44,6 +44,7 @@ import utils
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
 
+
 def _create_topic(committer_id, topic, commit_message, commit_cmds):
     """Creates a new topic, and ensures that rights for a new topic
     are saved first.
