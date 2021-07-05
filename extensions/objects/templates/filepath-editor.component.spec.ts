@@ -288,6 +288,8 @@ describe('FilepathEditor', () => {
     savedImageUrl: 'assets/images'
   };
 
+  // This is used to generate a mock Image file from the data URI
+  // present above.
   let localConvertImageDataToImageFile = (dataURI) => {
     var byteString = atob(dataURI.split(',')[1]);
     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
@@ -462,7 +464,7 @@ describe('FilepathEditor', () => {
     };
   });
 
-  it('should initialize component correctly', () => {
+  it('should set component properties on initialization', () => {
     component.ngOnInit();
 
     expect(component.CROP_CURSORS[component.MOUSE_TOP_LEFT])
@@ -499,7 +501,8 @@ describe('FilepathEditor', () => {
     expect(component.entityType).toBe('question');
   });
 
-  it('should change on mouseup event', () => {
+  it('should stop resizing and dragging on when user releases ' +
+  'the mouse button', () => {
     component.userIsDraggingCropArea = true;
     component.userIsResizingCropArea = true;
 
@@ -509,7 +512,7 @@ describe('FilepathEditor', () => {
     expect(component.userIsResizingCropArea).toBe(false);
   });
 
-  it('should reset component', () => {
+  it('should retrieve existing graph when user edits an old graph', () => {
     component.value = 'file_1';
     spyOn(imagePreloaderService, 'getDimensionsOfImage')
       .and.returnValue(dimensionsOfImage);
@@ -527,13 +530,15 @@ describe('FilepathEditor', () => {
     });
   });
 
+  // This only returns if the image file has been saved or not.
   it('should validate that the Image file is saved', () => {
     component.data.mode = 3;
 
     expect(component.validate(component.data)).toBe(true);
   });
 
-  it('should reset file path editor and delete file if present', () => {
+  it('should reset file path editor and delete file when user clicks' +
+  '\'Delete this image\'', () => {
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
