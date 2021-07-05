@@ -892,14 +892,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.normalized_request.get('exp_id')
-        try:
-            exp_version = int(
-                self.normalized_request.get('exp_version'))
-        except ValueError:
-            raise self.InvalidInputException(
-                'Version %s cannot be converted to int.'
-                % self.normalized_request.get('exp_version')
-            )
+        self.normalized_request.get('exp_version'))
 
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
@@ -909,7 +902,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
                 % (exp_id, self.normalized_request.get('exp_version')))
 
         state_name = self.normalized_request.get('state_name')
-        num_answers = int(self.normalized_request.get('num_answers'))
+        num_answers = self.normalized_request.get('num_answers')
 
         if state_name not in exploration.states:
             raise self.InvalidInputException(
