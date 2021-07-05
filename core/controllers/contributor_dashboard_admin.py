@@ -30,7 +30,9 @@ class ContributorDashboardAdminPage(base.BaseHandler):
     """Handler for the contributor dashboard admin page."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self):
