@@ -802,7 +802,10 @@ def install_mypy_prerequisites():
     Returns:
         int. The return code from installing prerequisites.
     """
-    cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
+    cmd = [
+        PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH,
+        '--target', os.path.join('third_party', 'python_libs')
+    ]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     return process
