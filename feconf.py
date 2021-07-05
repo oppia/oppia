@@ -165,6 +165,7 @@ ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
 ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
 ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 
+ENTITY_TYPE_BLOG_POST = 'blog_post'
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
@@ -768,6 +769,11 @@ TASK_URL_DEFERRED = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+BLOG_ADMIN_PAGE_URL = '/blog-admin'
+BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
+BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+BLOG_DASHBOARD_URL = '/blog-dashboard'
+BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
@@ -841,7 +847,6 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -1029,13 +1034,17 @@ ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
 ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
+ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_ADMIN = 'ADMIN'
+ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
+ROLE_ID_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR'
 
 ALLOWED_USER_ROLES = [
     ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
     ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
     ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
-    ROLE_ID_ADMIN]
+    ROLE_ID_ADMIN, ROLE_ID_BLOG_ADMIN, ROLE_ID_BLOG_POST_EDITOR,
+    ROLE_ID_VOICEOVER_ADMIN]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.

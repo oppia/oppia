@@ -55,6 +55,7 @@ import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
@@ -245,7 +246,7 @@ import { ContentTranslationManagerService } from 'pages/exploration-player-page/
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
-import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -259,7 +260,6 @@ import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-pag
 import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
@@ -361,12 +361,17 @@ import { CollectionLinearizerService } from 'pages/collection-editor-page/servic
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
-import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation-service';
+import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
+import { OppiaRteParserService } from './oppia-rte-parser.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
+import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
+import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
+import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
+  ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],
   ['AdminTaskManagerService', AdminTaskManagerService],
@@ -465,6 +470,8 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
+  ['ExplorationInitStateNameService', ExplorationInitStateNameService],
+  ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
@@ -475,6 +482,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
+  ['ExplorationTagsService', ExplorationTagsService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],
@@ -482,8 +490,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExtensionTagAssemblerService', ExtensionTagAssemblerService],
   ['ExternalRteSaveService', ExternalRteSaveService],
   ['ExternalSaveService', ExternalSaveService],
-  ['ExtractImageFilenamesFromStateService',
-    ExtractImageFilenamesFromStateService],
+  ['ExtractImageFilenamesFromModelService',
+    ExtractImageFilenamesFromModelService],
   ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
@@ -566,8 +574,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
-  ['NotificationsDashboardPageBackendApiService',
-    NotificationsDashboardPageBackendApiService],
   ['NumberAttemptsService', NumberAttemptsService],
   ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
@@ -578,6 +584,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
+  ['OppiaRteParserService', OppiaRteParserService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],

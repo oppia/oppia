@@ -22,7 +22,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import {
   HttpClient,
   HttpXhrBackend,
-  // eslint-disable-next-line camelcase
+  // eslint-disable-next-line camelcase, oppia/disallow-flags
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
@@ -1136,9 +1136,7 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService']);
     upgradedServices['UserBackendApiService'] =
       new UserBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['WindowRef'],
-        upgradedServices['Title']);
+        upgradedServices['HttpClient']);
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
