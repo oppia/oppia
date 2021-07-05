@@ -23,7 +23,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -73,7 +73,7 @@ export class UserService {
     }
 
     async setProfileImageDataUrlAsync(
-        newProfileImageDataUrl: string): Promise<Object> {
+        newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
       return this.userBackendApiService.setProfileImageDataUrlAsync(
         newProfileImageDataUrl);
     }
