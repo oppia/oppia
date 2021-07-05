@@ -143,9 +143,9 @@ describe('StateTopAnswersStatsService', () => {
   it('should identify unaddressed issues', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 5},
-      {answer: 'adios', frequency: 3},
-      {answer: 'ciao', frequency: 1},
+      {answer: 'hola', frequency: 5, is_addressed: false},
+      {answer: 'adios', frequency: 3, is_addressed: false},
+      {answer: 'ciao', frequency: 1, is_addressed: false},
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
@@ -160,9 +160,9 @@ describe('StateTopAnswersStatsService', () => {
   it('should order results by frequency', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 7},
-      {answer: 'adios', frequency: 4},
-      {answer: 'ciao', frequency: 2},
+      {answer: 'hola', frequency: 7, is_addressed: false},
+      {answer: 'adios', frequency: 4, is_addressed: false},
+      {answer: 'ciao', frequency: 2, is_addressed: false},
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
@@ -178,9 +178,9 @@ describe('StateTopAnswersStatsService', () => {
   it('should throw when stats for state do not exist', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 7},
-      {answer: 'adios', frequency: 4},
-      {answer: 'ciao', frequency: 2},
+      {answer: 'hola', frequency: 7, is_addressed: false},
+      {answer: 'adios', frequency: 4, is_addressed: false},
+      {answer: 'ciao', frequency: 2, is_addressed: false},
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
@@ -193,7 +193,7 @@ describe('StateTopAnswersStatsService', () => {
   it('should have stats for state provided by backend', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'hola', frequency: 3}]);
+      'Hola', [{answer: 'hola', frequency: 3, is_addressed: false}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromiseAsync();
@@ -285,7 +285,7 @@ describe('StateTopAnswersStatsService', () => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'adios', frequency: 3}]);
+      'Hola', [{answer: 'adios', frequency: 3, is_addressed: false}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromiseAsync();
@@ -317,7 +317,7 @@ describe('StateTopAnswersStatsService', () => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'hola', frequency: 3}]);
+      'Hola', [{answer: 'hola', frequency: 3, is_addressed: false}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
     await stateTopAnswersStatsService.getInitPromiseAsync();

@@ -28,7 +28,7 @@ import { PlatformParameterRule } from
   'domain/platform_feature/platform-parameter-rule.model';
 
 describe('PlatformFeatureAdminBackendApiService', () => {
-  let featureAdminService: PlatformFeatureAdminBackendApiService = null;
+  let featureAdminService: PlatformFeatureAdminBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
