@@ -125,13 +125,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
-        'message': 'In tests, please use \'angular.mock.inject\' instead of '
-                   '\'inject\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
@@ -147,37 +140,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': re.compile(r'toThrow[(]'),
-        'message': 'Please use \'toThrowError\' instead of '
-                   '\'toThrow\'',
-        'excluded_files': (
-            # Note to developers: In the excluded_files below,
-            # we use custom errors which cannot be caught by regex.
-            # The Logic Proof interaction which uses these custom errors
-            # will be deprecated soon (see #9198).
-            'extensions/interactions/LogicProof/static/js/student.spec.ts',
-            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
-            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(
-            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-            r'throw\s\b(\bError|\bTypeError|\bRangeError'
-            r'\bSyntaxError|\bDimensionError)\('),
-        'message': 'Please use \'throw new\' instead of \'throw\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(
-            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})throw\s\'.*\';'),
-        'message': 'Please use '
-                   '\'throw new Error\' instead of \'throw\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
@@ -190,35 +152,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/Polyfills.ts',
             'core/templates/filters/translate.pipe.spec.ts',
             'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts',
+            'ck-editor-copy-content.service.spec.ts',
             'core/templates/tests/unit-test-utils.ajs.ts',
             'core/templates/directives/mathjax.directive.ts',
             'extensions/objects/templates/' +
             'math-expression-content-editor.component.ts',
             'rte-output-display.component.spec.ts'),
         'excluded_dirs': ('core/tests/',)
-    },
-    {
-        'regexp': re.compile(
-            r'eslint-(disable|enable)(-next-line)? camelcase'),
-        'message': (
-            'Please do not use eslint disable for camelcase. '
-            'If you are using this statement to define properties '
-            'in an interface for a backend dict. Wrap the property '
-            'name in single quotes instead.'),
-        'excluded_files': (
-            'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
-            'core/templates/services/UpgradedServices.ts'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'no-explicit-any'),
-        'message': (
-            'Please do not define "any" types. You can refer '
-            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
-            'if you\'re having trouble declaring types.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'import (\{.*\}|\_) from \'lodash\''),

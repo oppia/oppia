@@ -22,7 +22,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import {
   HttpClient,
   HttpXhrBackend,
-  // eslint-disable-next-line camelcase
+  // eslint-disable-next-line camelcase, oppia/disallow-flags
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';
 
@@ -73,7 +73,7 @@ import { BrowserCheckerService } from
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
+  'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { ClassifierDataBackendApiService } from
   'services/classifier-data-backend-api.service';
 import { ClassroomBackendApiService } from

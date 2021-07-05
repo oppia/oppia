@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for for CollectionSummaryTileComponent.
+ * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
  */
 
 import { async, ComponentFixture, TestBed } from
@@ -65,12 +65,12 @@ describe('Learner Story Summary Tile Component', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-title',
       all_node_dicts: [],
+      topic_name: 'Topic',
       classroom_url_fragment: 'math',
       topic_url_fragment: 'topic'
     };
     component.storySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict);
-    component.topicTitle = 'Title';
     fixture.detectChanges();
   });
 
@@ -97,6 +97,7 @@ describe('Learner Story Summary Tile Component', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-title',
       all_node_dicts: [],
+      topic_name: 'Topic',
       classroom_url_fragment: null,
       topic_url_fragment: 'topic'
     };
@@ -109,5 +110,16 @@ describe('Learner Story Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(urlSpy).not.toHaveBeenCalled();
+  });
+
+  it('should get static image url', () => {
+    const urlSpy = spyOn(
+      urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('/assets/images/learner_dashboard/star.svg');
+
+    component.getStaticImageUrl('/learner_dashboard/star.svg');
+    fixture.detectChanges();
+
+    expect(urlSpy).toHaveBeenCalled();
   });
 });
