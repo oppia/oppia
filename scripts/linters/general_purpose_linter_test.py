@@ -67,10 +67,6 @@ INVALID_TO_THROW_FILEPATH = os.path.join(
 INVALID_THROW_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_throw.ts')
 INVALID_THROW_WITH_STRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_throw_with_string.ts')
-INVALID_ESLINT_CAMELCASE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_eslint_camelcase.ts')
-INVALID_ESLINT_ANY_TYPE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_eslint_any_type.ts')
 INVALID_BROADCAST_USE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_broadcast_use.ts')
 INVALID_LODASH_GENERAL_IMPORT_FILEPATH = os.path.join(
@@ -237,30 +233,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 27: Please use \'throw new Error\' instead of '
             '\'throw\''], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_eslint_camelcase_comment(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_ESLINT_CAMELCASE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 24: Please do not use eslint disable for camelcase. If '
-            'you are using this statement to define properties in an '
-            'interface for a backend dict. Wrap the property name in '
-            'single quotes instead.'], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_eslint_no_explicit_any_comment(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_ESLINT_ANY_TYPE_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 21: Please do not define "any" types. You can refer '
-             'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
-             'if you\'re having trouble declaring types.'],
-            lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
