@@ -75,6 +75,12 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         whitelisted_usernames = [self.EDITOR_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
+        # Check that it is possible to access a page.
+        self.get_json(
+            '%s/%s' % (
+                feconf.COLLECTION_DATA_URL_PREFIX,
+                self.COLLECTION_ID))
+
         # Check that non-editors cannot access the editor page. This is due
         # to them not being whitelisted.
         self.get_html_response(
