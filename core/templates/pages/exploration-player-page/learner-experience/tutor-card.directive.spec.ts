@@ -260,7 +260,7 @@ describe('Tutor Card directive', function() {
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(currentInteractionService, 'registerPresubmitHook')
       .and.callFake((cb) => {
-        cb(); 
+        cb();
       });
 
     directive = $injector.get('tutorCardDirective')[0];

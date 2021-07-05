@@ -227,8 +227,8 @@ describe('Collection player page directive', function() {
       });
     $httpBackend.expect(
       'GET', '/collectionsummarieshandler/data' +
-      '?stringified_collection_ids='
-      + encodeURI(JSON.stringify(['collectionId']))).respond({
+      '?stringified_collection_ids=' +
+      encodeURI(JSON.stringify(['collectionId']))).respond({
       data: {
         summaries: []
       }
@@ -239,7 +239,7 @@ describe('Collection player page directive', function() {
     tick();
 
     expect(ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX).toBe(220);
-    expect(ctrl.ODD_SVG_HEIGHT_OFFSET_PX ).toBe(150);
+    expect(ctrl.ODD_SVG_HEIGHT_OFFSET_PX).toBe(150);
     expect(ctrl.ICON_Y_INITIAL_PX).toBe(35);
     expect(ctrl.ICON_Y_INCREMENT_PX).toBe(110);
     expect(ctrl.ICON_X_MIDDLE_PX).toBe(225);
@@ -273,7 +273,8 @@ describe('Collection player page directive', function() {
           meta_description: 'meta_description'
         }
       });
-    $httpBackend.expect('GET', '/collectionsummarieshandler/data' +
+    $httpBackend.expect(
+      'GET', '/collectionsummarieshandler/data' +
       '?stringified_collection_ids=' +
       encodeURI(JSON.stringify(['collectionId']))).respond(500);
 
