@@ -4817,6 +4817,10 @@ export default {
     "description": "français (French)",
     "direction": "ltr"
   }, {
+    "code": "lg",
+    "description": "Luganda (Ganda)",
+    "direction": "ltr"
+  }, {
     "code": "de",
     "description": "Deutsch (German)",
     "direction": "ltr"
@@ -4867,6 +4871,10 @@ export default {
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
+    "direction": "ltr"
+  }, {
+    "code": "mr",
+    "description": "मराठी (Marathi)",
     "direction": "ltr"
   }, {
     "code": "no",
@@ -5103,6 +5111,11 @@ export default {
     "relatedLanguages": ["fr"],
     "direction": "ltr"
   }, {
+    "id": "lg",
+    "description": "Ganda",
+    "relatedLanguages": ["lg"],
+    "direction": "ltr"
+  }, {
     "id": "de",
     "description": "German",
     "relatedLanguages": ["de"],
@@ -5171,6 +5184,11 @@ export default {
     "id": "lt",
     "description": "Lithuanian",
     "relatedLanguages": ["lt"],
+    "direction": "ltr"
+  }, {
+    "id": "mr",
+    "description": "Marathi",
+    "relatedLanguages": ["mr"],
     "direction": "ltr"
   }, {
     "id": "no",
