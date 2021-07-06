@@ -182,7 +182,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'Updated thumbnail filename.')
 
         self.assertEqual(story.thumbnail_filename, 'image.svg')
-        self.assertEqual(story.thumbnail_size_in_bytes, None)       
+        self.assertEqual(story.thumbnail_size_in_bytes, None)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
