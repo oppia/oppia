@@ -19,15 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 from jobs import base_jobs
 from jobs.io import ndb_io
-from jobs.types import blog_validation_errors
+from jobs import blog_validation_error
 
 import apache_beam as beam
 (blog_models) = models.Registry.import_models([models.NAMES.blog])
 
 
-class BlogTitleUniquenessJob(base_jobs.JobBase):
+class BlogPostTitleUniquenessJob(base_jobs.JobBase):
 
     def run(self):
         blog_model_pcoll = (
@@ -56,7 +57,7 @@ class BlogTitleUniquenessJob(base_jobs.JobBase):
         )
 
 
-class BlogUrlUniquenessJob(base_jobs.JobBase):
+class BlogPostUrlUniquenessJob(base_jobs.JobBase):
 
     def run(self):
         blog_model_pcoll = (
@@ -77,6 +78,64 @@ class BlogUrlUniquenessJob(base_jobs.JobBase):
 
         return (
             blogs_with_duplicate_url_fragment
+            | 'Flatten models into a list of errors' >> beam.FlatMap(
+                lambda models: [
+                    blog_validation_errors.DuplicateBlogUrlError(model)
+                    for model in models
+                ])
+        )
+
+
+class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
+
+    def run(self):
+        blog_summary_model_pcoll = (
+            self.pipeline
+            | 'Get every Blog Summary Model' >> (
+                ndb_io.GetModels(blog_models.BlogPostSummaryModel.query()))
+        )
+
+        blog_summary_with_duplicate_titles = (
+            blog_summary_model_pcoll
+            | 'Generate (title, model) key value pairs' >> (
+                beam.WithKeys(lambda blog_model: blog_model.title))
+            | 'Group pairs by their title' >> beam.GroupByKey()
+            | 'Discard keys' >> beam.Values()
+            | 'Discard models with unique titles' >> (
+                beam.Filter(lambda models: len(models) > 1))
+        )
+
+        return (
+            blog_summary_with_duplicate_titles
+            | 'Flatten models into a list of errors' >> beam.FlatMap(
+                lambda models: [
+                    blog_validation_errors.DuplicateBlogTitleError(model)
+                    for model in models
+                ])
+        )
+
+
+class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
+
+    def run(self):
+        blog_summary_model_pcoll = (
+            self.pipeline
+            | 'Get every Blog Post Summary Model' >> (
+                ndb_io.GetModels(blog_models.BlogPostSummaryModel.query()))
+        )
+
+        blog_summary_with_duplicate_url_fragment = (
+            blog_summary_model_pcoll
+            | 'Generate (url, model) key value pairs' >> (
+                beam.WithKeys(lambda blog_summary_model: blog_model.url_fragment))
+            | 'Group pairs by their url fragment' >> beam.GroupByKey()
+            | 'Discard keys' >> beam.Values()
+            | 'Discard models with unique urls' >> (
+                beam.Filter(lambda models: len(models) > 1))
+        )
+
+        return (
+            blog_summary_with_duplicate_url_fragment
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)

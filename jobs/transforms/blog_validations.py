@@ -57,30 +57,6 @@ class ValidateBlogModelDomainObjectsInstances(
         return VALIDATION_MODES.non_strict
 
 
-@validation_decorators.AuditsExisting(blog_models.BlogPostModel)
-class ValidateTitleMatchesSummaryModelTitle(beam.DoFn):
-    """DoFn to validate that both blog post model title and summary model
-    title are same."""
-
-    def process(self, input_model):
-        """Function that checks if the title of the model and the title of 
-        corresponding summary model is unique.
-
-        Args:
-            input_model: BlogPostModel to validate.
-
-        Yields:
-            InvalidTitleError. Error for models with mismatch in title.
-        """
-        item = job_utils.clone_model(input_model)
-        if item.title != '':
-            blog_post_summary_title = (
-                blog_models.BlogPostSummaryModel.get_by_id(item.id).title)
-            if blog_post_summary_title != item.title:
-                yield blog_validation_errors.ValidateTitleMatchesSummaryTitleError(
-                    model)
-
-
 @validation_decorators.RelationshipsOf(blog_models.BlogPostModel)
 def blog_post_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
