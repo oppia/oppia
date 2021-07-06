@@ -333,9 +333,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_models.BlogPostRightsModel.get_multi_draft_models_by_user(
                 self.USER_ID_NEW, 1), [blog_post_rights_draft_model])
 
-    def get_multi_draft_models_by_user_when_no_limit_is_set(self):
-        """Test fetching all rights model for draft models by user id."""
-
+    def test_get_multi_draft_models_by_user_when_no_limit_is_set(self):
         blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
             id='blog_post_two',
             editor_ids=[self.USER_ID_NEW],
