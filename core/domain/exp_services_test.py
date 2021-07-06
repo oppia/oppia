@@ -6010,7 +6010,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_create_or_update_draft_when_older_draft_exists(self):
         exp_services.create_or_update_draft(
-            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 2,
+            self.EXP_ID1, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME)
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID1)
@@ -6019,7 +6019,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)
         self.assertEqual(
             exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 2)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
         self.assertEqual(exp_user_data.draft_change_list_id, 3)
 
     def test_create_or_update_draft_when_newer_draft_exists(self):
@@ -6038,7 +6038,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_create_or_update_draft_when_draft_does_not_exist(self):
         exp_services.create_or_update_draft(
-            self.EXP_ID3, self.USER_ID, self.NEW_CHANGELIST, 1,
+            self.EXP_ID3, self.USER_ID, self.NEW_CHANGELIST, 5,
             self.NEWER_DATETIME)
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID3)
@@ -6047,7 +6047,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)
         self.assertEqual(
             exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
 
     def test_get_exp_with_draft_applied_when_draft_exists(self):

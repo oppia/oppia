@@ -731,6 +731,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             self.user, exploration_rights)
         can_voiceover = rights_manager.check_can_voiceover_activity(
             self.user, exploration_rights)
+
         try:
             if can_edit:
                 exp_services.create_or_update_draft(
@@ -747,11 +748,8 @@ class EditorAutosaveHandler(ExplorationHandler):
         exp_user_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
         # If the draft_change_list_id is False, have the user discard the draft
-        # changes. We save the draft to the datastore only when the changes are
-        # mergeable even if the version is invalid and if they are not mergeable
-        # we discard them and show them in the frontend discard changes modal
-        # and give an option to the user to export them so that it is available
-        # for recovery later.
+        # changes. We save the draft to the datastore even if the changes are
+        # not mergeable, so that it is available for recovery later.
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
