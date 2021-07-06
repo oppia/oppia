@@ -342,12 +342,12 @@ class BaseHandler(webapp2.RequestHandler):
         for arg in self.request.arguments():
             if arg == 'csrf_token':
                 continue
-            if arg == 'source':
+            elif arg == 'source':
                 source_url = self.request.get('source')
                 if not isinstance(source_url, python_utils.BASESTRING):
                     raise self.InvalidInputException(
                     'Expected string, received %s' % source_url)
-            if arg == 'payload':
+            elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
                     payload_arg_keys = payload_args.keys()
