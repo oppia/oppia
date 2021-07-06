@@ -30,7 +30,6 @@ import json
 import re
 import string
 
-from core.domain import email_manager
 from constants import constants
 from core.domain import change_domain
 from core.domain import param_domain
@@ -2788,7 +2787,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in
-                                    PROPERTIES_RELATED_TO_CUST_ARGS) and
+                                    self.PROPERTIES_RELATED_TO_CUST_ARGS) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -2802,7 +2801,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in
-                                    PROPERTIES_RELATED_TO_ANSWER_GROUPS) and
+                                    self.PROPERTIES_RELATED_TO_ANSWER_GROUPS) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -2852,7 +2851,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                             if (all(property not in
                                     changed_properties[old_state_name]
                                     for property in
-                                    PROPERTIES_RELATED_TO_SOLUTION) and
+                                    self.PROPERTIES_RELATED_TO_SOLUTION) and
                                     change.property_name not in
                                     changed_translations[old_state_name]):
                                 change_is_mergeable = True
@@ -2877,7 +2876,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                         if all(property not in
                                changed_properties[old_state_name]
                                for property in
-                               PROPERTIES_RELATED_TO_VOICEOVERS):
+                               self.PROPERTIES_RELATED_TO_VOICEOVERS):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
