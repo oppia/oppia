@@ -100,6 +100,7 @@
 
 # Blog project
 /core/domain/blog*.py @iamprayush
+/core/controllers/blog_dashboard*.py @iamprayush
 
 
 # Collection project.
@@ -490,8 +491,6 @@
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
-/core/templates/base-components/i18n-language-selector.component.ts @nithusha21
-/core/templates/base-components/i18n-language-selector.component.html @nithusha21
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
@@ -529,10 +528,12 @@
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
+/core/controllers/blog_admin*.py @iamprayush
 /core/controllers/moderator*.py @DubeySandeep
 /core/controllers/recent_commits*.py @DubeySandeep
 /core/domain/moderator_services*.py @DubeySandeep
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
+/core/templates/domain/blog-admin/ @iamprayush
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
 
@@ -551,7 +552,7 @@
 /core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @DubeySandeep @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681
@@ -684,6 +685,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/controllers/android_e2e_config*.py @BenHenning
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /core/templates/karma.module.ts @nithusha21
 # TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
