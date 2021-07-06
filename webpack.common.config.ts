@@ -476,7 +476,7 @@ module.exports = {
       filename: 'oppia-root.mainpage.html',
       meta: defaultMeta,
       template:
-          commonPrefix + '/pages/oppia-root/index.html',
+          commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
