@@ -140,6 +140,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME,
+                'old_value': None,
+                'new_value': 'test_svg.svg'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
                 'property_name': (
                     story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR),
                 'old_value': None,
@@ -159,30 +165,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
-        self.assertEqual(story.thumbnail_filename, 'image.svg')
+        self.assertEqual(story.thumbnail_filename, 'test_svg.svg')
         self.assertEqual(story.thumbnail_size_in_bytes, None)
         self.assertEqual(
             story.thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])
         self.assertEqual(story.version, 3)
         self.assertEqual(story.meta_tag_content, 'new story meta tag content')
-
-        # Test whether an admin can update dummy thumbnail image for a topic.
-        changelist = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-            'property_name': story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME,
-            'old_value': None,
-            'new_value': 'thumbnail.svg'
-        })]
-        with self.assertRaisesRegexp(Exception, (
-            'The thumbnail thumbnail.svg for topic with id '
-            '%s does not exist in the filesystem.' % self.STORY_ID)):
-            story_services.update_story(
-                self.USER_ID, self.STORY_ID, changelist,
-                'Updated thumbnail filename.')
-
-        self.assertEqual(story.thumbnail_filename, 'image.svg')
-        self.assertEqual(story.thumbnail_size_in_bytes, None)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.title, 'New Title')
