@@ -66,12 +66,7 @@ describe('Expression syntax tree service', () => {
     let exprUndefinedVarError: ExprUndefinedVarError;
 
     it('should extend ExpressionError class', () => {
-      const exampleVar = undefined;
-      // This throws "Argument of type 'undefined' is not assignable
-      // to parameter of type 'string'." We need to suppress this
-      // error because of the need to test validations when the
-      // variable is not defined.
-      // @ts-ignore
+      const exampleVar = '';
       exprUndefinedVarError = new ExprUndefinedVarError(exampleVar, []);
 
       expect(exprUndefinedVarError.name).toBe('ExprUndefinedVarError');
@@ -94,12 +89,7 @@ describe('Expression syntax tree service', () => {
     let exprWrongArgTypeError: ExprWrongArgTypeError;
 
     it('should extend ExpressionError class', () => {
-      // This throws "Argument of type 'undefined' is not assignable
-      // to parameter of type 'string | number'." We need to suppress
-      // this error because of the need to test validations when the
-      // argument is not defined.
-      // @ts-ignore
-      exprWrongArgTypeError = new ExprWrongArgTypeError(undefined, '0', '1');
+      exprWrongArgTypeError = new ExprWrongArgTypeError('I', '0', '1');
 
       expect(exprWrongArgTypeError.name).toBe('ExprWrongArgTypeError');
       expect(exprWrongArgTypeError instanceof ExpressionError).toBe(true);

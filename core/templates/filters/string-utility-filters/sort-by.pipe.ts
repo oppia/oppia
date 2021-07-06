@@ -35,10 +35,6 @@ export class SortByPipe implements PipeTransform {
   transform<T>(
       value: T[], isDescending: boolean,
       sortKey?: string): T[] {
-    if (!value) {
-      return value;
-    }
-
     if (sortKey === 'default') {
       return value.reverse();
     }
