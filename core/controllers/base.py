@@ -174,9 +174,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.current_user_is_super_admin = False
         self.normalized_request = None
         self.normalized_payload = None
-        self.handler_args = {}
-        self.payload_arg_keys = []
-        self.request_arg_keys = []
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -276,58 +273,35 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
-        try:
-            # If user opens a new tab during signup process, the user_id
-            # parameter is set to None and this causes the signup session
-            # to expire. The code here checks if user is on the signup
-            # page and the user_id is None, if that is the case an exception
-            # is raised which is handled by the frontend by showing a
-            # continue to registration modal.
-            if 'signup' in self.request.uri and not self.user_id:
-                raise self.UnauthorizedUserException(
-                    'Registration session expired.')
+        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+            try:
+                # If user opens a new tab during signup process, the user_id
+                # parameter is set to None and this causes the signup session
+                # to expire. The code here checks if user is on the signup
+                # page and the user_id is None, if that is the case an exception
+                # is raised which is handled by the frontend by showing a
+                # continue to registration modal.
+                if 'signup' in self.request.uri and not self.user_id:
+                    raise self.UnauthorizedUserException(
+                        'Registration session expired.')
+                csrf_token = self.request.get('csrf_token')
+                if not csrf_token:
+                    raise self.UnauthorizedUserException(
+                        'Missing CSRF token. Changes were not saved. '
+                        'Please report this bug.')
 
-            session_expired_error_msg = (
-                'Your session has expired, and unfortunately your '
-                'changes cannot be saved. Please refresh the page.')
-            missing_csrf_token_error_msg = (
-                'Missing CSRF token. Changes were not saved. '
-                'Please report this bug.')
+                is_csrf_token_valid = CsrfTokenManager.is_csrf_token_valid(
+                    self.user_id, csrf_token)
 
-            for arg in self.request.arguments():
-                if arg == 'csrf_token':
-                    csrf_token = self.request.get(arg)
-                    if not csrf_token:
-                        raise self.UnauthorizedUserException(
-                            missing_csrf_token_error_msg)
+                if not is_csrf_token_valid:
+                    raise self.UnauthorizedUserException(
+                        'Your session has expired, and unfortunately your '
+                        'changes cannot be saved. Please refresh the page.')
+            except Exception as e:
+                logging.exception('%s: payload %s', e, self.payload)
 
-                    is_csrf_token_valid = (
-                        CsrfTokenManager.is_csrf_token_valid(
-                            self.user_id, csrf_token))
-
-                    if not is_csrf_token_valid:
-                        raise self.UnauthorizedUserException(
-                            session_expired_error_msg)
-                elif arg == 'source':
-                    source_url = self.request.get(arg)
-
-                    if not isinstance(source_url, python_utils.BASESTRING):
-                        raise self.InvalidInputException(
-                            'Expected \'source\' to be string, received %s'
-                            % source_url)
-                elif arg == 'payload':
-                    payload_args = self.payload
-                    if payload_args is not None:
-                        self.payload_arg_keys = payload_args.keys()
-                        self.handler_args.update(payload_args)
-                else:
-                    self.request_arg_keys.append(arg)
-                    self.handler_args[arg] = self.request.get(arg)
-        except Exception as e:
-            logging.exception('%s: payload %s', e, self.payload)
-
-            self.handle_exception(e, self.app.debug)
-            return
+                self.handle_exception(e, self.app.debug)
+                return
 
         schema_validation_succeeded = True
         try:
@@ -361,6 +335,26 @@ class BaseHandler(webapp2.RequestHandler):
 
         if handler_class_name in handler_class_names_with_no_schema:
             return
+
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg == 'csrf_token':
+                continue
+            if arg == 'source':
+                source_url = self.request.get('source')
+                if not isinstance(source_url, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                    'Expected string, received %s' % source_url)
+            if arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = payload_args.keys()
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
+                handler_args[arg] = self.request.get(arg)
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
@@ -399,15 +393,16 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        normalized_value, errors = payload_validator.validate(
-            self.handler_args, schema_for_request_method,
-            extra_args_are_allowed)
+        normalized_value, errors = (
+            payload_validator.validate(
+                handler_args, schema_for_request_method, extra_args_are_allowed)
+        )
 
         self.normalized_payload = {
-            arg: normalized_value.get(arg) for arg in self.payload_arg_keys
+            arg: normalized_value.get(arg) for arg in payload_arg_keys
         }
         self.normalized_request = {
-            arg: normalized_value.get(arg) for arg in self.request_arg_keys
+            arg: normalized_value.get(arg) for arg in request_arg_keys
         }
 
         if errors:
