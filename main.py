@@ -22,7 +22,10 @@ from constants import constants
 
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import blog_admin
+from core.controllers import blog_dashboard
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
@@ -835,6 +838,19 @@ URLS = MAPREDUCE_HANDLERS + [
         improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
+        r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+        blog_admin.BlogAdminRolesHandler),
+    get_redirect_route(
+        r'/blogadminhandler', blog_admin.BlogAdminHandler),
+
+    get_redirect_route(
+        r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
+        blog_dashboard.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
+        blog_dashboard.BlogDashboardDataHandler),
+
+    get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
 
     get_redirect_route(
@@ -874,6 +890,12 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
                 custom_landing_pages.TopicLandingPage))
+
+if constants.DEV_MODE:
+    URLS.append(
+        get_redirect_route(
+            r'/initialize_android_test_data',
+            android_e2e_config.InitializeAndroidTestDataHandler))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
