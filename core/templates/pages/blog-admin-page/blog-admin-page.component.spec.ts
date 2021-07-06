@@ -169,7 +169,9 @@ describe('Blog Admin Page component ', () => {
 
       expect(startTaskSpy).toHaveBeenCalled();
       expect(component.statusMessage).toBe('Updating User Role');
+
       flushMicrotasks();
+
       expect(component.statusMessage).toBe(
         'Role of username successfully updated to BLOG_ADMIN');
       expect(finishTaskSpy).toHaveBeenCalled();
@@ -202,7 +204,9 @@ describe('Blog Admin Page component ', () => {
 
         expect(startTaskSpy).toHaveBeenCalled();
         expect(component.statusMessage).toBe('Updating User Role');
+
         flushMicrotasks();
+
         expect(component.statusMessage).toBe(
           'Server error: Internal Server Error.');
         expect(finishTaskSpy).toHaveBeenCalled();
@@ -214,22 +218,27 @@ describe('Blog Admin Page component ', () => {
         tick();
         component.formData.updateRole.newRole = 'BLOG_ADMIN';
         component.formData.updateRole.username = '';
+
         expect(component.formData.updateRole.isValid()).toBe(false);
 
         component.formData.updateRole.newRole = 'BLOG';
         component.formData.updateRole.username = 'username';
+
         expect(component.formData.updateRole.isValid()).toBe(false);
 
         component.formData.updateRole.newRole = 'ADMIN';
         component.formData.updateRole.newRole = '';
+
         expect(component.formData.updateRole.isValid()).toBe(false);
 
         component.formData.updateRole.newRole = null;
         component.formData.updateRole.username = 'username';
+
         expect(component.formData.updateRole.isValid()).toBe(false);
 
         component.formData.updateRole.newRole = 'BLOG_ADMIN';
         component.formData.updateRole.username = null;
+
         expect(component.formData.updateRole.isValid()).toBe(false);
       }));
 
@@ -239,6 +248,7 @@ describe('Blog Admin Page component ', () => {
         tick();
         component.formData.updateRole.newRole = 'BLOG_POST_EDITOR';
         component.formData.updateRole.username = 'username';
+
         expect(component.formData.updateRole.isValid()).toBe(true);
       }));
   });
@@ -255,7 +265,9 @@ describe('Blog Admin Page component ', () => {
 
       expect(startTaskSpy).toHaveBeenCalled();
       expect(component.statusMessage).toBe('Processing query...');
+
       flushMicrotasks();
+
       expect(component.statusMessage).toBe('Success.');
       expect(finishTaskSpy).toHaveBeenCalled();
     }));
@@ -287,7 +299,9 @@ describe('Blog Admin Page component ', () => {
 
         expect(startTaskSpy).toHaveBeenCalled();
         expect(component.statusMessage).toBe('Processing query...');
+
         flushMicrotasks();
+
         expect(component.statusMessage).toBe(
           'Server error: Internal Server Error.');
         expect(finishTaskSpy).toHaveBeenCalled();
@@ -298,6 +312,7 @@ describe('Blog Admin Page component ', () => {
         component.ngOnInit();
         tick();
         component.formData.removeEditorRole.username = '';
+
         expect(component.formData.removeEditorRole.isValid()).toBe(false);
       }));
 
@@ -306,6 +321,7 @@ describe('Blog Admin Page component ', () => {
         component.ngOnInit();
         tick();
         component.formData.removeEditorRole.username = 'username';
+
         expect(component.formData.removeEditorRole.isValid()).toBe(true);
       }));
   });
