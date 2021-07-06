@@ -104,8 +104,8 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     _DELETED_KEY = 'story_deleted'
     _ERROR_KEY = 'update_error'
-    _NEW_SUCCESS_KEY = 'new_thumbnail_size'
-    _EXISTING_SUCCESS_KEY = 'existing_thumbnail_size'
+    _NEW_SUCCESS_KEY = 'thumbnail_size_newly_added'
+    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_exists'
 
     @classmethod
     def entity_classes_to_map_over(cls):
