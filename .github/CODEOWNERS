@@ -685,6 +685,7 @@
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/controllers/android_e2e_config*.py @BenHenning
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /core/templates/karma.module.ts @nithusha21
 # TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
