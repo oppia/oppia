@@ -120,7 +120,7 @@ RERUN_POLICIES = {
     'adminpage': RERUN_POLICY_NEVER,
     'classroompage': RERUN_POLICY_NEVER,
     'classroompagefileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'collections': RERUN_POLICY_KNOWN_FLAKES,
+    'collections': RERUN_POLICY_NEVER,
     'contributordashboard': RERUN_POLICY_ALWAYS,
     'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
