@@ -27,7 +27,7 @@ import { ExplorationEditorPageConstants } from
   providedIn: 'root'
 })
 export class TranslationTabActiveModeService {
-  private activeMode: string = null;
+  private activeMode!: string;
 
   activateVoiceoverMode(): void {
     this.activeMode = ExplorationEditorPageConstants.VOICEOVER_MODE;

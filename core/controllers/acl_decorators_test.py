@@ -24,6 +24,7 @@ import json
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
@@ -1141,6 +1142,398 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json('/release-coordinator')
 
         self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_access_blog_admin_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessBlogAdminPageDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.set_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/blog-admin', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_blog_admin_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access blog admin page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_blog_admin_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_blog_post_editor_cannot_access_blog_admin_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access blog admin page.')
+        self.logout()
+
+    def test_blog_admin_can_access_blog_admin_page(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blog-admin')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_manage_blog_post_editors
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanManageBlogPostEditorsDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.set_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/blogadminrolehandler', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_manage_blog_post_editors(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blogadminrolehandler', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to add or remove blog post editors.')
+        self.logout()
+
+    def test_guest_user_cannot_manage_blog_post_editors(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blogadminrolehandler', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_blog_post_editors_cannot_manage_blog_post_editors(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blogadminrolehandler', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to add or remove blog post editors.')
+        self.logout()
+
+    def test_blog_admin_can_manage_blog_editors(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blogadminrolehandler')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_access_blog_dashboard
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessBlogDashboardDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+
+        self.set_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/blog-dashboard', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_blog_dashboard(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-dashboard', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access blog dashboard page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_blog_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-dashboard', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_blog_editors_can_access_blog_dashboard(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blog-dashboard')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_blog_admins_can_access_blog_dashboard(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blog-dashboard')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanDeleteBlogPostTests(test_utils.GenericTestBase):
+    """Tests for can_delete_blog_post decorator."""
+
+    username = 'userone'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'unicode'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_delete_blog_post
+        def get(self, blog_post_id):
+            self.render_json({'blog_id': blog_post_id})
+
+    def setUp(self):
+        super(CanDeleteBlogPostTests, self).setUp()
+        self.signup(self.user_email, self.username)
+
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+
+        self.set_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.set_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_delete_blog_post/<blog_post_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        self.blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
+        self.blog_post_id = blog_post.id
+
+    def test_guest_can_not_delete_blog_post(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_blog_editor_can_delete_owned_blog_post(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_admin_can_delete_any_blog_post(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_editor_cannot_delete_not_owned_blog_post(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'User %s does not have permissions to delete blog post %s'
+                % (self.user_id, self.blog_post_id))
+        self.logout()
+
+
+class CanEditBlogPostTests(test_utils.GenericTestBase):
+    """Tests for can_edit_blog_post decorator."""
+
+    username = 'userone'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'unicode'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_edit_blog_post
+        def get(self, blog_post_id):
+            self.render_json({'blog_id': blog_post_id})
+
+    def setUp(self):
+        super(CanEditBlogPostTests, self).setUp()
+        self.signup(
+            self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.set_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.set_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_edit_blog_post/<blog_post_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+        self.blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
+        self.blog_post_id = blog_post.id
+
+    def test_guest_can_not_edit_blog_post(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_blog_editor_can_edit_owned_blog_post(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_admin_can_edit_any_blog_post(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_editor_cannot_edit_not_owned_blog_post(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'User %s does not have permissions to edit blog post %s'
+                % (self.user_id, self.blog_post_id))
         self.logout()
 
 

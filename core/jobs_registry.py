@@ -28,7 +28,6 @@ from core.domain import skill_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
-from core.domain import user_jobs_continuous
 import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
@@ -60,7 +59,6 @@ AUDIT_JOB_MANAGERS = [
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
-    user_jobs_continuous.UserStatsAggregator,
 ]
 
 
