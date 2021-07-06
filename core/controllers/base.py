@@ -149,17 +149,6 @@ class BaseHandler(webapp2.RequestHandler):
     URL_PATH_ARGS_SCHEMAS = None
     HANDLER_ARGS_SCHEMAS = None
 
-    # This list only includes those args which do not need schema validation.
-    # Reason behind adding every argument is given below.
-    # csrf_token: 'csrf_token' is already going to be validated by
-    #     is_csrf_token_valid method, so no need to validate its schema again.
-    # source: 'source' contains the parent url from which the request is made.
-    #     For example, from '/create/' url we are making a request to
-    #     '/createhandler/rights/' url, thus /create/ is a parent url. Since a
-    #     'source' is not a part of payload we need not to validate it by
-    #     schema validation architecture.
-    ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token', 'source']
-
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -351,9 +340,13 @@ class BaseHandler(webapp2.RequestHandler):
         payload_arg_keys = []
         request_arg_keys = []
         for arg in self.request.arguments():
-            if arg in self.ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION:
+            if arg == 'csrf_token':
                 continue
-            if arg == 'payload':
+            elif arg == 'source':
+                obj = self.request.get('source')
+                assert isinstance(obj, python_utils.BASESTRING), (
+                    'Expected string, received %s' % obj)
+            elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
                     payload_arg_keys = payload_args.keys()
