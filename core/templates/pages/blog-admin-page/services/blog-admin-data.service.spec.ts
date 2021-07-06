@@ -16,14 +16,11 @@
  * @fileoverview Tests for BlogAdminDataService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { BlogAdminDataService } from
-  'pages/blog-admin-page/services/blog-admin-data.service';
-import { BlogAdminPageData, BlogAdminPageDataBackendDict } from
-  'domain/blog-admin/blog-admin-backend-api.service';
+import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
+import { BlogAdminPageData, BlogAdminPageDataBackendDict } from 'domain/blog-admin/blog-admin-backend-api.service';
 
 describe('Blog Admin Data Service', () => {
   let blogAdminDataService: BlogAdminDataService = null;

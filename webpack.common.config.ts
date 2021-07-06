@@ -192,7 +192,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['blog_admin'],
       filename: 'blog-admin-page.mainpage.html',
-      hybrid: true,
+      hybrid: false,
       meta: {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on ' +

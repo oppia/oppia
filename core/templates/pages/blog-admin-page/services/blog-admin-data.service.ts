@@ -19,10 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import {
-  BlogAdminPageData,
-  BlogAdminBackendApiService,
-} from 'domain/blog-admin/blog-admin-backend-api.service';
+import { BlogAdminPageData, BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
 
 @Injectable({
   providedIn: 'root'

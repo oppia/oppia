@@ -55,8 +55,8 @@ describe('Blog Admin navbar component', () => {
   it('should initialize component properties correctly', () => {
     expect(component.profilePictureDataUrl).toBe(userProfileImage);
     expect(component.username).toBe('username1');
-    expect(component.profileUrl).toEqual(profileUrl);
-    expect(component.logoutUrl).toEqual('/logout');
+    expect(component.profileUrl).toBe(profileUrl);
+    expect(component.logoutUrl).toBe('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
   });
 
