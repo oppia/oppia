@@ -25,6 +25,7 @@ import { LostChange, LostChangeObjectFactory } from
 
 import { LostChangesModalComponent } from './lost-changes-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
+
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
   template: ''

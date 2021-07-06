@@ -2559,7 +2559,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.INVALID_CHANGELIST,
-                'version': 1,
+                'version': 2,
             }, csrf_token=self.csrf_token,
             expected_status_int=400)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
@@ -2586,8 +2586,9 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
+        self.assertTrue(response['changes_are_mergeable'])
 
-    def test_draft_does_not_updated_version_invalid(self):
+    def test_draft_updated_version_invalid(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
             'version': 10,
@@ -2597,10 +2598,11 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
-        self.assertEqual(exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
+        self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
-        self.assertEqual(response['draft_change_list_id'], 1)
+        self.assertFalse(response['changes_are_mergeable'])
+        self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):
         self.post_json(

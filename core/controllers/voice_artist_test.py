@@ -268,9 +268,10 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             '%s.%s' % (self.voice_artist_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
-        self.assertEqual(response['draft_change_list_id'], 1)
+        self.assertFalse(response['changes_are_mergeable'])
+        self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):
         self.post_json(

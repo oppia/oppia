@@ -1310,25 +1310,6 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cls._get_active_realtime_index(), entity_id)
 
     @classmethod
-    def get_multi_active_realtime_layer_ids(cls, entity_ids):
-        """Returns a list of IDs of elements in the currently active realtime
-        datastore layer corresponding to the given entity ids.
-
-        Args:
-            entity_ids: str. Collection of unique identifiers for entities.
-
-        Returns:
-            list(str). Unique identifiers for each given entity for storage in
-            the currently active realtime layer.
-        """
-        realtime_datastore_class = cls._get_realtime_datastore_class()
-        active_realtime_index = cls._get_active_realtime_index()
-        return [
-            realtime_datastore_class.get_realtime_id(
-                active_realtime_index, entity_id
-            ) for entity_id in entity_ids]
-
-    @classmethod
     def _switch_active_realtime_class(cls):
         """Switches the currently-active realtime layer for this continuous
         computation.
@@ -1797,35 +1778,21 @@ def get_continuous_computations_info(cc_classes):
 
     result = []
     for ind, model in enumerate(cc_models):
-        if model is None:
-            cc_dict = {
-                'computation_type': cc_classes[ind].__name__,
-                'status_code': 'never_started',
-                'last_started_msec': None,
-                'last_finished_msec': None,
-                'last_stopped_msec': None,
-                'active_realtime_layer_index': None,
-                'is_startable': True,
-                'is_stoppable': False,
-            }
-        else:
-            cc_dict = {
-                'computation_type': cc_classes[ind].__name__,
-                'status_code': model.status_code,
-                'last_started_msec': model.last_started_msec,
-                'last_finished_msec': model.last_finished_msec,
-                'last_stopped_msec': model.last_stopped_msec,
-                'active_realtime_layer_index': (
-                    model.active_realtime_layer_index),
-                # TODO(sll): If a job is stopping, can it be started while it
-                # is in the process of stopping?
-                'is_startable': model.status_code == (
-                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE),
-                'is_stoppable': model.status_code == (
-                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING),
-            }
-
-        result.append(cc_dict)
+        result.append({
+            'computation_type': cc_classes[ind].__name__,
+            'status_code': model.status_code,
+            'last_started_msec': model.last_started_msec,
+            'last_finished_msec': model.last_finished_msec,
+            'last_stopped_msec': model.last_stopped_msec,
+            'active_realtime_layer_index': (
+                model.active_realtime_layer_index),
+            # TODO(sll): If a job is stopping, can it be started while it
+            # is in the process of stopping?
+            'is_startable': model.status_code == (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE),
+            'is_stoppable': model.status_code == (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING),
+        })
 
     return result
 

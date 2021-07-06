@@ -32,25 +32,29 @@ import { StorySummary } from 'domain/story/story-summary.model';
   templateUrl: 'story-summary-tile.component.html'
 })
 export class StorySummaryTileComponent implements OnInit {
-  @Input() classroomUrlFragment: string;
-  @Input() storySummary: StorySummary;
-  @Input() topicUrlFragment: string;
-  initialCount: number;
-  chaptersDisplayed: number;
-  nodeCount: number;
-  completedStoriesCount: number;
-  storyProgress: number;
-  thumbnailUrl: string;
-  showButton: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and component interactions, therefore we need to do non-null assertion,
+  // for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() classroomUrlFragment!: string;
+  @Input() storySummary!: StorySummary;
+  @Input() topicUrlFragment!: string;
+  initialCount!: number;
+  chaptersDisplayed!: number;
+  nodeCount!: number;
+  completedStoriesCount!: number;
+  storyProgress!: number;
+  storyTitle!: string;
+  strokeDashArrayValues!: string | number;
+  completedStrokeDashArrayValues!: string;
+  thumbnailBgColor!: string;
+  nodeTitles!: string[];
+  storyLink!: string;
+  thumbnailUrl: string | null = null;
+  showButton: boolean = false;
   circumference = (20 * 2 * Math.PI);
   gapLength = 5;
   EXPLORE_PAGE_PREFIX = '/explore/';
-  storyLink: string;
-  storyTitle: string;
-  strokeDashArrayValues: string | number;
-  completedStrokeDashArrayValues: string;
-  thumbnailBgColor: string;
-  nodeTitles: string[];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -65,12 +69,16 @@ export class StorySummaryTileComponent implements OnInit {
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
       return '#';
     }
-    return this.urlInterpolationService.interpolateUrl(
+    let storyLink = this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
         classroom_url_fragment: this.classroomUrlFragment,
         story_url_fragment: this.storySummary.getUrlFragment(),
         topic_url_fragment: this.topicUrlFragment
       });
+    if (storyLink === null) {
+      return '#';
+    }
+    return storyLink;
   }
 
   isChapterCompleted(title: string): boolean {

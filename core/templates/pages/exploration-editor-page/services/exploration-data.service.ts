@@ -34,7 +34,7 @@ import { ExplorationDataBackendApiService } from './exploration-data-backend-api
 export interface DraftAutoSaveResponse {
   'draft_change_list_id': number;
   'is_version_of_draft_valid': boolean;
-  'are_changes_mergeable': boolean;
+  'changes_are_mergeable': boolean;
 }
 @Injectable({
   providedIn: 'root'

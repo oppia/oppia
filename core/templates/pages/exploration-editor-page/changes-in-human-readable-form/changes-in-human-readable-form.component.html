@@ -195,7 +195,7 @@
           </div>
           <div *ngSwitchCase="'language_code'">
             <div *ngIf="!lostChange.isNewValueEmpty()">
-              <strong>New language code: </strong >{{lostChange.newValue}}
+              <strong>New language code: </strong >{{lostChange.getLanguage()}}
             </div>
             <div *ngIf="lostChange.isNewValueEmpty()">
               <strong>Removed language code</strong>
@@ -203,10 +203,7 @@
           </div>
           <div *ngSwitchCase="'init_state_name'">
             <div *ngIf="!lostChange.isNewValueEmpty()">
-              <strong>New initiating state name: </strong>{{lostChange.newValue}}
-            </div>
-            <div *ngIf="lostChange.isNewValueEmpty()">
-              <strong>Removed initiating state name</strong>
+              <strong>New name of first card: </strong>{{lostChange.newValue}}
             </div>
           </div>
           <div *ngSwitchCase="'tags'">
@@ -223,7 +220,7 @@
         <strong>Change in translation</strong>
         <div class="sub-edit">
           <div class="language_code">
-            <i>Language Code: </i> {{lostChange.languageCode}}
+            <i>Language Code: </i> {{lostChange.getLanguage()}}
           </div>
           <div class="content_id">
             <i>Content id: </i> {{lostChange.contentId}}
