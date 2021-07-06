@@ -22,6 +22,7 @@ from constants import constants
 
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import android_e2e_config
 from core.controllers import base
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
@@ -889,6 +890,12 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
                 custom_landing_pages.TopicLandingPage))
+
+if constants.DEV_MODE:
+    URLS.append(
+        get_redirect_route(
+            r'/initialize_android_test_data',
+            android_e2e_config.InitializeAndroidTestDataHandler))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
