@@ -52,25 +52,24 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def post(self):
-        """This method generates the following structures:
+        """Generates structures for Android end-to-end tests.
+
+        This handler generates structures for Android end-to-end tests in
+        order to evaluate the integration of network requests from the
+        Android client to the backend. This handler should only be called
+        once (or otherwise raises an exception), and can only be used in
+        development mode (this handler is unavailable in production).
+
+        Note that the handler outputs an empty JSON dict when the request is
+        successful.
+
+        The specific structures that are generated:
             Topic: A topic with both a test story and a subtopic.
             Story: A story with 'android_interactions' as a exploration
                 node.
             Exploration: 'android_interactions' from the local assets.
             Subtopic: A dummy subtopic to validate the topic.
             Skill: A dummy skill to validate the subtopic.
-
-            All these structures are used for Android end-to-end testing, the
-            purpose is to test the network requests in android by fetching the
-            topic from the dev server.
-
-            This handler can only be used in the dev server, It gives a
-            500 error in the production server.
-
-            Returns a empty json - {}, when the request is successful.
-
-            This is only called once and raises a exception if the topic is
-            already created or published.
 
         Raises:
             Exception. When used in production mode.
