@@ -23,6 +23,7 @@ import re
 import zipfile
 
 from constants import constants
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -824,8 +825,8 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/delete-account')
             self.assertIn(
-                '<oppia-delete-account-page></oppia-delete-account-page>',
-                response.body)
+                '<oppia-delete-account-page-root>' +
+                '</oppia-delete-account-page-root>', response.body)
 
     def test_get_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
@@ -949,6 +950,15 @@ class DeleteAccountTests(test_utils.GenericTestBase):
         self.testapp_swap_2 = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
 
+        def _mock_send_mail_to_admin(unused_email_subject, unused_email_body):
+            """Mocks email_manager.send_mail_to_admin()"""
+            pass
+
+        self.send_mail_to_admin_swap_1 = self.swap(
+            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.send_mail_to_admin_swap_2 = self.swap(
+            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
     def _run_account_deletion(self):
         """Execute complete deletion for the user that is logged in."""
         with self.enable_deletion_swap:
@@ -959,11 +969,15 @@ class DeleteAccountTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         with self.testapp_swap_1:
             self.get_html_response('/cron/users/user_deletion')
-        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.send_mail_to_admin_swap_1:
+            self.process_and_flush_pending_tasks()
 
         with self.testapp_swap_2:
             self.get_html_response('/cron/users/fully_complete_user_deletion')
-        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.send_mail_to_admin_swap_2:
+            self.process_and_flush_pending_tasks()
         self.logout()
 
     def test_delete_account_without_activities(self):

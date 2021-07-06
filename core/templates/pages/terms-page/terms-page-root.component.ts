@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. eslint @typescript-eslint no explicit any
- * is not allowed to use.
+ * @fileoverview Root component for Terms Page.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let a: any;
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'oppia-terms-page-root',
+  templateUrl: './terms-page-root.component.html'
+})
+export class TermsPageRootComponent {}
