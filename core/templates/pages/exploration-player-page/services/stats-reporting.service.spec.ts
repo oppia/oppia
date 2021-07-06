@@ -153,7 +153,7 @@ describe('Stats reporting service ', () => {
   it('should not send request to backend when an exploration ' +
     'it is about to start and already recorded', () => {
     let postStatsSpy = spyOn(statsReportingBackendApiService, 'postsStatsAsync')
-    .and.returnValue(Promise.resolve({}));
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationIsComplete = true;
     statsReportingService.recordExplorationStarted('firstState', {});
 
