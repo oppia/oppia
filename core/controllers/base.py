@@ -341,6 +341,9 @@ class BaseHandler(webapp2.RequestHandler):
         request_arg_keys = []
         for arg in self.request.arguments():
             if arg == 'csrf_token':
+                # 'csrf_token' is already going to be validated by the
+                # is_csrf_token_valid() in dispatch method, so no need to
+                # validate its schema again.
                 continue
             elif arg == 'source':
                 source_url = self.request.get('source')
