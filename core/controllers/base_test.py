@@ -377,8 +377,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/mock_iframed', expected_status_int=500)
 
         self.assertIn(
-            'Uh-oh! The Oppia exploration you requested may have been removed '
-            'or deleted.', response.body)
+            '<oppia-error-iframed-page-root></oppia-error-iframed-page-root>', response.body)
 
     def test_dev_mode_cannot_be_true_on_production(self):
         # We need to delete the existing module else the re-importing
