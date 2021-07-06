@@ -744,7 +744,8 @@ NOT_FULLY_COVERED_FILES = [
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
 # TODO(#13113): Change mypy command to mypy path after Python3 migration.
 MYPY_CMD = 'mypy'
-MYPY_REQUIREMENTS_PATH = os.path.join('.', 'mypy_requirements.txt')
+MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
+MYPY_TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools', 'mypy_requirements')
 PYTHON3_CMD = 'python3'
 
 
@@ -802,7 +803,10 @@ def install_mypy_prerequisites():
     Returns:
         int. The return code from installing prerequisites.
     """
-    cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
+    cmd = [
+        PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_FILE_PATH,
+        '--target', MYPY_TOOLS_DIR, '--upgrade'
+    ]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     return process
@@ -833,7 +837,17 @@ def main(args=None):
 
     python_utils.PRINT('Starting Mypy type checks.')
     cmd = get_mypy_cmd(getattr(parsed_args, 'files'))
-    process = subprocess.call(cmd, stdin=subprocess.PIPE)
+
+    _paths_to_insert = [
+        MYPY_TOOLS_DIR,
+        os.path.join(MYPY_TOOLS_DIR, 'bin'),
+    ]
+    env = os.environ.copy()
+    for path in _paths_to_insert:
+        env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
+    env['PYTHONPATH'] = MYPY_TOOLS_DIR
+
+    process = subprocess.call(cmd, stdin=subprocess.PIPE, env=env)
 
     if process == 0:
         python_utils.PRINT('Mypy type checks successful.')
