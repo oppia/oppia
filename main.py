@@ -413,7 +413,8 @@ URLS = MAPREDUCE_HANDLERS + [
         learner_playlist.LearnerPlaylistHandler),
 
     get_redirect_route(
-        r'%s/<author_username>' % feconf.BLOG_AUTHORS_PAGE_URL_PREFIX,
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
         blog_homepage.AuthorsPageHandler),
     get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,

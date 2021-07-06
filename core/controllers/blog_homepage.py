@@ -107,7 +107,7 @@ class BlogPostHandler(base.BaseHandler):
         blog_post_summaries = (
             blog_services.get_published_blog_post_summaries_by_user_id(
                 blog_post.author_id,
-                feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_POST_PAGE))
+                feconf.MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST))
         blog_post_summary_dicts = (
             _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
 
