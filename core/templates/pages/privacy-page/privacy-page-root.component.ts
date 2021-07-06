@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file use parent property which is not allowed.
+ * @fileoverview Root component for Privacy Page.
  */
 
-var ParentCtrl = function($scope) {
-  $scope.cities = ['NY', 'Amsterdam', 'Barcelona'];
-};
+import { Component } from '@angular/core';
 
-var ChildCtrl = function($scope) {
-  $scope.parentcities = $scope.$parent.cities; // Use of parent is not allowed.
-};
+@Component({
+  selector: 'oppia-privacy-page-root',
+  templateUrl: './privacy-page-root.component.html'
+})
+export class PrivacyPageRootComponent {}
