@@ -162,22 +162,8 @@ class AdminHandler(base.BaseHandler):
                 'schema': {
                     'type': 'list',
                     'items': {
-                        'type': 'dict',
-                        'properties': [{
-                            'name': 'value_when_matched',
-                            'schema': {
-                                'type': 'bool'
-                            }
-                        }, {
-                            'name': 'filters',
-                            'schema': {
-                                'type': 'list',
-                                'items': {
-                                    'type': 'object_dict',
-                                    'object_class': parameter_domain.PlatformParameterFilter # pylint: disable=line-too-long
-                                }
-                            }
-                        }]
+                        'type': 'object_dict',
+                        'object_class': parameter_domain.PlatformParameterRule
                     }
                 },
                 'default_value': None

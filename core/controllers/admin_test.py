@@ -669,7 +669,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
-            'Schema validation for \'feature_name\' failed: Expected unicode '
+            'Schema validation for \'feature_name\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
 
@@ -692,7 +692,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
         error_msg = (
             'Schema validation for \'commit_message\' failed: Expected '
-            'unicode string, received 123')
+            'string, received 123')
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -734,8 +734,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
-            'Schema validation for \'new_rules\' failed: '
-            'Expected dict, received 1')
+            'Schema validation for \'new_rules\' failed: \'int\' '
+            'object has no attribute \'__getitem__\'')
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -1409,7 +1409,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         self.assertEqual(
             response['error'], 'Schema validation for \'new_username\' failed:'
-            ' Expected unicode string, received 123')
+            ' Expected string, received 123')
 
     def test_update_username_with_non_string_old_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1423,7 +1423,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
         error_msg = (
             'Schema validation for \'old_username\' failed: Expected'
-            ' unicode string, received 123')
+            ' string, received 123')
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_long_new_username(self):
