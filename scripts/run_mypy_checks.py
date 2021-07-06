@@ -32,6 +32,7 @@ from scripts import install_third_party_libs
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
+    'mypy_requirements/',
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
