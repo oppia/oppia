@@ -74,8 +74,6 @@ export class SaveVersionMismatchModalComponent
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
     elem.click();
-    this.explorationDataService.discardDraftAsync().then(() => {
-      this._refreshPage(this.MSECS_TO_REFRESH);
-    });
+    this.discardChanges();
   }
 }

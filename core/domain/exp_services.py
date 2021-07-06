@@ -1938,11 +1938,12 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             # exploration id to the admin, so that we can look into the
             # situations and can figure out the way if it’s possible to
             # handle these cases.
-            if feconf.CAN_SEND_EMAILS:
-                email_manager.send_not_mergeable_change_list_to_admin_for_review_email( # pylint: disable=line-too-long
+            (
+                email_manager
+                .send_not_mergeable_change_list_to_admin_for_review(
                     exp_id, frontend_version,
                     backend_version_exploration.version,
-                    change_list_dict)
+                    change_list_dict))
             return False
 
         changes_are_mergeable = False
@@ -1978,11 +1979,12 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     # that the changes related to state renames can be
                     # reviewed and the proper conditions can be written
                     # to handle those cases.
-                    if feconf.CAN_SEND_EMAILS:
-                        email_manager.send_not_mergeable_change_list_to_admin_for_review_email( # pylint: disable=line-too-long
+                    (
+                        email_manager
+                        .send_not_mergeable_change_list_to_admin_for_review(
                             exp_id, frontend_version,
                             backend_version_exploration.version,
-                            change_list_dict)
+                            change_list_dict))
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
@@ -2142,11 +2144,12 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                     # that the changes related to state renames can be
                     # reviewed and the proper conditions can be written
                     # to handle those cases.
-                    if feconf.CAN_SEND_EMAILS:
-                        email_manager.send_not_mergeable_change_list_to_admin_for_review_email( # pylint: disable=line-too-long
+                    (
+                        email_manager
+                        .send_not_mergeable_change_list_to_admin_for_review(
                             exp_id, frontend_version,
                             backend_version_exploration.version,
-                            change_list_dict)
+                            change_list_dict))
                     return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
