@@ -155,7 +155,7 @@ class AuthorsPageHandler(base.BaseHandler):
         if blog_post_summaries:
             blog_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_homepage(
-                    blog_post_summaries))    
+                    blog_post_summaries))
 
         self.values.update({
             'author_name': author_username,
