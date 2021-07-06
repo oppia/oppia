@@ -32,11 +32,11 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
     """Creates summary dicts for use in blog homepage.
 
     Args:
-        summaries: list(BlogPostSummaries). List of blog post summary
+        summaries: list(BlogPostSummary). List of blog post summary
             domain objects.
 
     Returns:
-        list(BlogPostSummaryDicts). The list of blog post summary dicts.
+        list(BlogPostSummaryDict). The list of blog post summary dicts.
     """
     summary_dicts = []
     for summary in summaries:
