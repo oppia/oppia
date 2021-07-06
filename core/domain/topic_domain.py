@@ -1276,7 +1276,7 @@ class Topic(python_utils.OBJECT):
             feconf.ENTITY_TYPE_TOPIC, self.id))
 
         filepath = '%s/%s' % (
-            constants.FILENAME_PREFIX_THUMBNAIL, new_thumbnail_filename)
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
         if fs.isfile(filepath):
             self.thumbnail_filename = new_thumbnail_filename
             self.thumbnail_size_in_bytes = len(fs.get(filepath))

@@ -126,7 +126,7 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.ENTITY_TYPE_TOPIC, topic_model.id))
 
             filepath = '%s/%s' % (
-                constants.FILENAME_PREFIX_THUMBNAIL,
+                constants.ASSET_TYPE_THUMBNAIL,
                 topic_model.thumbnail_filename)
 
             if fs.isfile(filepath):
