@@ -188,7 +188,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
     def test_get_authors_page_data(self):
         self.login(self.user_email)
         json_response = self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
             )
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
@@ -199,14 +199,14 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
 
         blog_services.unpublish_blog_post(self.blog_post.id)
         json_response = self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
             )
         self.assertIsNone(json_response['summary_dicts'])
 
     def test_get_authors_data_raises_exception_if_user_deleted_account(self):
         self.login(self.user_email)
         json_response = self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
             )
         self.assertEqual(
             self.BLOG_ADMIN_USERNAME,
@@ -217,15 +217,15 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         blog_admin_model.update_timestamps()
         blog_admin_model.put()
         self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)
 
     def test_raise_exception_if_username_provided_is_not_of_author(self):
         self.login(self.user_email)
         self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
             )
         self.set_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_ADMIN)
         self.get_json(
-            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL, self.BLOG_ADMIN_USERNAME),
+            '%s/%s' % (feconf.BLOG_AUTHORS_PAGE_URL_PREFIX, self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)
