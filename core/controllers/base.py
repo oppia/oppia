@@ -152,7 +152,7 @@ class BaseHandler(webapp2.RequestHandler):
     # This list only includes those args which do not need schema validation.
     # Reason behind adding every argument is given below.
     # csrf_token & source: Validated in the dispatch method, so no need to
-    # validate their schemas again.
+    # validate again by schema validation architecture.
     ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token', 'source']
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
@@ -307,7 +307,8 @@ class BaseHandler(webapp2.RequestHandler):
                 source_url = self.request.get('source')
                 if not isinstance(source_url, python_utils.BASESTRING):
                     raise self.InvalidInputException(
-                        'Expected string, received %s' % source_url)
+                        'Expected \'source\' to be string, received %s'
+                        % source_url)
             except Exception as e:
                 logging.exception('%s: payload %s', e, self.payload)
 
