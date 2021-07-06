@@ -123,6 +123,9 @@ const componentMap = {
     component_class: NoninteractiveVideo,
   }
 };
+
+let firstLoad = false;
+
 @Component({
   selector: 'oppia-angular-root',
   templateUrl: './oppia-angular-root.component.html'
@@ -167,15 +170,18 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private urlService: UrlService,
     private injector: Injector
   ) {
-    for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
-      const rteElement = createCustomElement(
-        componentMap[rteKey].component_class,
-        {injector: this.injector});
-      customElements.define(
-        'oppia-noninteractive-ckeditor-' +
-        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
-        rteElement
-      );
+    if (!firstLoad) {
+      for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
+        const rteElement = createCustomElement(
+          componentMap[rteKey].component_class,
+          {injector: this.injector});
+        customElements.define(
+          'oppia-noninteractive-ckeditor-' +
+          ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
+          rteElement
+        );
+      }
+      firstLoad = true;
     }
   }
 
@@ -262,7 +268,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           }
         }
         this.documentAttributeCustomizationService.addAttribute('lang', code);
-        this.changeDetectorRef.detectChanges();
+        // this.changeDetectorRef.detectChanges();
       }
     );
     this.translateCacheService.init();

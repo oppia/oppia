@@ -228,12 +228,7 @@ const toastrConfig = {
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
+    }
   ],
 
   declarations: [
