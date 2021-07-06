@@ -344,7 +344,8 @@ class BaseHandler(webapp2.RequestHandler):
                 continue
             elif arg == 'source':
                 obj = self.request.get('source')
-                assert isinstance(obj, python_utils.BASESTRING), (
+                if not isinstance(obj, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
                     'Expected string, received %s' % obj)
             elif arg == 'payload':
                 payload_args = self.payload
