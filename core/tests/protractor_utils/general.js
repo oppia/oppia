@@ -154,10 +154,8 @@ var ensurePageHasNoTranslationIds = async function() {
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
-  let promiseValue = await browser.executeScript(() => {
-    return document.getElementsByClassName(
-      'protractor-test-base-container')[0].innerHTML;
-  });
+  let promiseValue = await browser.executeScript(
+    'return arguments[0].innerHTML;', oppiaBaseContainer);
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
