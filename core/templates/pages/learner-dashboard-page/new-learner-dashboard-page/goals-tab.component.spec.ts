@@ -248,8 +248,8 @@ describe('Goals tab Component', () => {
     () => {
       component.learntToPartiallyLearntTopics = ['topic', 'topic2', 'topic3'];
 
-      let topicBelongsTo = component.topicBelongToLearntToPartiallyLearntTopics(
-        'topic');
+      let topicBelongsTo = (
+        component.doesTopicBelongToLearntToPartiallyLearntTopics('topic'));
       fixture.detectChanges();
 
       expect(topicBelongsTo).toEqual(true);
