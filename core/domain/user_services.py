@@ -2247,3 +2247,35 @@ def update_roles_and_banned_fields(user_settings_model):
     user_settings_model.roles = [
         feconf.ROLE_ID_EXPLORATION_EDITOR, user_settings_model.role]
     user_settings_model.banned = False
+
+
+def get_dashboard_stats(user_id):
+    """Returns the dashboard stats associated with the given user_id.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        dict. Has the keys:
+            total_plays: int. Number of times the user's explorations were
+                played.
+            num_ratings: int. Number of times the explorations have been
+                rated.
+            average_ratings: float. Average of average ratings across all
+                explorations.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        total_plays = 0
+        num_ratings = 0
+        average_ratings = None
+    else:
+        total_plays = user_stats_model.total_plays
+        num_ratings = user_stats_model.num_ratings
+        average_ratings = user_stats_model.average_ratings
+
+    return {
+        'total_plays': total_plays,
+        'num_ratings': num_ratings,
+        'average_ratings': average_ratings
+    }
