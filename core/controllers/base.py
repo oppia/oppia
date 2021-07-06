@@ -151,13 +151,8 @@ class BaseHandler(webapp2.RequestHandler):
 
     # This list only includes those args which do not need schema validation.
     # Reason behind adding every argument is given below.
-    # csrf_token: 'csrf_token' is already going to be validated by
-    #     is_csrf_token_valid method, so no need to validate its schema again.
-    # source: 'source' contains the parent url from which the request is made.
-    #     For example, from '/create/' url we are making a request to
-    #     '/createhandler/rights/' url, thus /create/ is a parent url. Since a
-    #     url is always validated before reaching a handler class, thus the
-    #     'source' need not to be validated by schema validation architecture.
+    # csrf_token & source: Validated in the dispatch method, so no need to
+    # validate their schemas again.
     ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token', 'source']
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
@@ -308,6 +303,11 @@ class BaseHandler(webapp2.RequestHandler):
                     raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
+
+                source_url = self.request.get('source')
+                if not isinstance(source_url, python_utils.BASESTRING):
+                    raise self.InvalidInputException(
+                        'Expected string, received %s' % source_url)
             except Exception as e:
                 logging.exception('%s: payload %s', e, self.payload)
 
@@ -353,7 +353,7 @@ class BaseHandler(webapp2.RequestHandler):
         for arg in self.request.arguments():
             if arg in self.ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION:
                 continue
-            if arg == 'payload':
+            elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
                     payload_arg_keys = payload_args.keys()
