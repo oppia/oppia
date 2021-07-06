@@ -550,10 +550,9 @@ class BaseHandler(webapp2.RequestHandler):
                 for route in constants.FRONTEND_ROUTES.values():
                     if self.request.path == '/' + route:
                         is_frontend_route = True
-                if is_frontend_route:
-                    self.render_template('oppia-root.mainpage.html')
-                else:
-                    self.render_template('error-page-404.mainpage.html')
+                if not is_frontend_route:
+                    self.response.set_status(404)
+                self.render_template('oppia-root.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])

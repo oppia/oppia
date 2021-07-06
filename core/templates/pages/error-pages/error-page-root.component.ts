@@ -38,10 +38,5 @@ export class ErrorPageRootComponent {
       this.windowRef.nativeWindow.document.getElementsByTagName('body'));
     this.statusCode = bodyTag[0].getAttribute('errorCode') ?
       bodyTag[0].getAttribute('errorCode') : '404';
-
-    if (this.statusCode === '404') {
-      console.error(
-        'GET ' + this.windowRef.nativeWindow.location.href + ' 404');
-    }
   }
 }
