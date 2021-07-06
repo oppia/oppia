@@ -214,7 +214,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
-    def test_thumbnail_size_job_thumbnail_size_already_updated(self):
+    def test_job_skips_thumbnail_size_already_updated(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results in
         existing update success key when the thumbnail_size_in_bytes is to
         be updated.
@@ -237,7 +237,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         output = (
             topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
                 job_id))
-        expected = [[u'thumbnail_size_already_updated', 1]]
+        expected = [[u'thumbnail_size_already_exists', 1]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
@@ -272,3 +272,25 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+    def test_thumbnail_size_job_skips_deleted_topic(self):
+        """Tests that PopulateThumbnailSizeOneOffJob skips deleted topics"""
+        self.save_new_topic(self.TOPIC_ID, self.albert_id)
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'topic_deleted', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

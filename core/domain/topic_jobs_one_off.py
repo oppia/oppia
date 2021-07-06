@@ -104,8 +104,8 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     _DELETED_KEY = 'topic_deleted'
     _ERROR_KEY = 'thumbnail_size_update_error'
-    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_updated'
-    _NEW_SUCCESS_KEY = 'thumbnail_size_new_updated'
+    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_exists'
+    _NEW_SUCCESS_KEY = 'thumbnail_size_newly_added'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -114,7 +114,7 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1)
+            yield PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1
             return
 
         topic_model = topic_models.TopicModel.get(item.id)
@@ -149,9 +149,10 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if key == PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY:
-            yield (key, len(values))
-        elif key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY:
+        if (key == PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY or
+            key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
+            key == PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY
+        ):
             yield (key, len(values))
         else:
             yield (key, values)
