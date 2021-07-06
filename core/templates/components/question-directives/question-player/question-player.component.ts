@@ -309,7 +309,7 @@ angular.module('oppia').component('questionPlayer', {
           QUESTION_PLAYER_MODE.PASS_FAIL_MODE);
       };
 
-      ctrl.createScorePerSkillMapping = function() {
+      var createScorePerSkillMapping = function() {
         var scorePerSkillMapping = {};
         if (ctrl.questionPlayerConfig.skillList) {
           for (var i = 0;
@@ -327,7 +327,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.scorePerSkillMapping = scorePerSkillMapping;
       };
 
-      ctrl.createMasteryPerSkillMapping = function() {
+      var createMasteryPerSkillMapping = function() {
         var masteryPerSkillMapping = {};
         if (ctrl.questionPlayerConfig.skillList) {
           for (var i = 0;
@@ -339,7 +339,7 @@ angular.module('oppia').component('questionPlayer', {
         ctrl.masteryPerSkillMapping = masteryPerSkillMapping;
       };
 
-      ctrl.createMasteryChangePerQuestion = function(questionData) {
+      var createMasteryChangePerQuestion = function(questionData) {
         var masteryChangePerQuestion = {};
         for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
           var skillId = questionData.linkedSkillIds[i];
@@ -350,7 +350,7 @@ angular.module('oppia').component('questionPlayer', {
       };
 
       ctrl.calculateScores = function(questionStateData) {
-        ctrl.createScorePerSkillMapping();
+        createScorePerSkillMapping();
         $scope.resultsLoaded = false;
         var totalQuestions = Object.keys(questionStateData).length;
         for (var question in questionStateData) {
@@ -394,7 +394,7 @@ angular.module('oppia').component('questionPlayer', {
         $scope.resultsLoaded = true;
       };
 
-      ctrl.getMasteryChangeForWrongAnswers = function(
+      var getMasteryChangeForWrongAnswers = function(
           answers, masteryChangePerQuestion) {
         answers.forEach(function(answer) {
           if (!answer.isCorrect) {
@@ -415,7 +415,7 @@ angular.module('oppia').component('questionPlayer', {
         return masteryChangePerQuestion;
       };
 
-      ctrl.updateMasteryPerSkillMapping = function(
+      var updateMasteryPerSkillMapping = function(
           masteryChangePerQuestion) {
         for (var skillId in masteryChangePerQuestion) {
           if (!(skillId in ctrl.masteryPerSkillMapping)) {
@@ -429,7 +429,7 @@ angular.module('oppia').component('questionPlayer', {
       };
 
       ctrl.calculateMasteryDegrees = function(questionStateData) {
-        ctrl.createMasteryPerSkillMapping();
+        createMasteryPerSkillMapping();
 
         for (var question in questionStateData) {
           var questionData = questionStateData[question];
@@ -437,7 +437,7 @@ angular.module('oppia').component('questionPlayer', {
             continue;
           }
           var masteryChangePerQuestion =
-          ctrl.createMasteryChangePerQuestion(questionData);
+          createMasteryChangePerQuestion(questionData);
 
           if (questionData.viewedSolution) {
             for (var skillId in masteryChangePerQuestion) {
@@ -453,11 +453,11 @@ angular.module('oppia').component('questionPlayer', {
               }
             }
             if (questionData.answers) {
-              masteryChangePerQuestion = ctrl.getMasteryChangeForWrongAnswers(
+              masteryChangePerQuestion = getMasteryChangeForWrongAnswers(
                 questionData.answers, masteryChangePerQuestion);
             }
           }
-          ctrl.updateMasteryPerSkillMapping(masteryChangePerQuestion);
+          updateMasteryPerSkillMapping(masteryChangePerQuestion);
         }
 
         SkillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
