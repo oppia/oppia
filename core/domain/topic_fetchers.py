@@ -478,10 +478,11 @@ def get_canonical_story_dicts(user_id, topic):
         in canonical_story_ids]
     canonical_story_dicts = []
     for story_summary in canonical_story_summaries:
-        all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-            user_id, story_summary.id)['all_nodes']
-        pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-            user_id, story_summary.id)['pending_nodes']
+        pending_and_all_nodes_in_story = (
+            story_fetchers.get_pending_and_all_nodes_in_story(
+                user_id, story_summary.id))
+        all_nodes = pending_and_all_nodes_in_story['all_nodes']
+        pending_nodes = pending_and_all_nodes_in_story['pending_nodes']
         pending_node_titles = [node.title for node in pending_nodes]
         completed_node_titles = utils.compute_list_difference(
             story_summary.node_titles, pending_node_titles)

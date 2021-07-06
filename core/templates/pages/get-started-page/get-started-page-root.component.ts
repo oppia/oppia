@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid .ts file with $broadcast, used by scripts/linters/
- * general_purpose_linter.py.
+ * @fileoverview Root component for get started page.
  */
 
-angular.module('oppia').directive('sampleDirective', [
-  function() {
-    return {
-      controllerAs: '$ctrl',
-      controller: ['$rootScope',
-        function($rootScope) {
-          $rootScope.$broadcast('sampleEvent');
-        }
-      ]
-    };
-  }]);
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'oppia-get-started-page-root',
+  templateUrl: './get-started-page-root.component.html'
+})
+export class GetStartedPageRootComponent {}

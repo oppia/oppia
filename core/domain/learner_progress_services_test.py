@@ -1502,7 +1502,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
 
-    def test_get_all_and_new_topic_ids(self):
+    def test_get_all_and_untracked_topic_ids(self):
         # Add topics to config_domain.
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -1535,12 +1535,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_ids_to_learn = (
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.user_id))
-        all_topics, new_topics = (
-            learner_progress_services.get_all_and_new_topic_ids_for_user(
+        all_topics, untracked_topics = (
+            learner_progress_services.get_all_and_untracked_topic_ids_for_user(
                 partially_learnt_topic_ids, learnt_topic_ids,
                 topic_ids_to_learn))
         self.assertEqual(len(all_topics), 2)
-        self.assertEqual(len(new_topics), 2)
+        self.assertEqual(len(untracked_topics), 2)
 
         # Mark one topic as partially learnt.
         learner_progress_services.record_topic_started(
@@ -1554,12 +1554,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_ids_to_learn = (
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.user_id))
-        all_topics, new_topics = (
-            learner_progress_services.get_all_and_new_topic_ids_for_user(
+        all_topics, untracked_topics = (
+            learner_progress_services.get_all_and_untracked_topic_ids_for_user(
                 partially_learnt_topic_ids, learnt_topic_ids,
                 topic_ids_to_learn))
         self.assertEqual(len(all_topics), 2)
-        self.assertEqual(len(new_topics), 1)
+        self.assertEqual(len(untracked_topics), 1)
 
         # Mark one topic as learnt.
         learner_progress_services.mark_topic_as_learnt(
@@ -1573,12 +1573,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_ids_to_learn = (
             learner_goals_services.get_all_topic_ids_to_learn(
                 self.user_id))
-        all_topics, new_topics = (
-            learner_progress_services.get_all_and_new_topic_ids_for_user(
+        all_topics, untracked_topics = (
+            learner_progress_services.get_all_and_untracked_topic_ids_for_user(
                 partially_learnt_topic_ids, learnt_topic_ids,
                 topic_ids_to_learn))
         self.assertEqual(len(all_topics), 2)
-        self.assertEqual(len(new_topics), 0)
+        self.assertEqual(len(untracked_topics), 0)
 
     def test_unpublishing_incomplete_collection_filters_it_out(self):
         # Add collections to the incomplete list.
@@ -2075,8 +2075,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             activity_progress[0].topics_to_learn_summaries)
         all_topic_summaries = (
             activity_progress[0].all_topic_summaries)
-        new_topic_summaries = (
-            activity_progress[0].new_topic_summaries)
+        untracked_topic_summaries = (
+            activity_progress[0].untracked_topic_summaries)
         exploration_playlist_summaries = (
             activity_progress[0].exploration_playlist_summaries)
         collection_playlist_summaries = (
@@ -2091,7 +2091,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(len(learnt_topic_summaries), 1)
         self.assertEqual(len(topics_to_learn_summaries), 1)
         self.assertEqual(len(all_topic_summaries), 1)
-        self.assertEqual(len(new_topic_summaries), 1)
+        self.assertEqual(len(untracked_topic_summaries), 1)
         self.assertEqual(len(exploration_playlist_summaries), 1)
         self.assertEqual(len(collection_playlist_summaries), 1)
 
@@ -2112,7 +2112,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             topics_to_learn_summaries[0].name, 'topic 2')
         self.assertEqual(
-            new_topic_summaries[0].name, 'topic 3')
+            untracked_topic_summaries[0].name, 'topic 3')
         self.assertEqual(
             all_topic_summaries[0].name, 'topic 3')
         self.assertEqual(

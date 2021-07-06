@@ -472,36 +472,6 @@ class JobRegistryTests(test_utils.GenericTestBase):
         for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             klass.create_new()
 
-    def test_validity_of_each_continuous_computation_class(self):
-        for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-            self.assertTrue(
-                issubclass(klass, jobs.BaseContinuousComputationManager))
-
-            event_types_listened_to = klass.get_event_types_listened_to()
-            self.assertTrue(isinstance(event_types_listened_to, list))
-            for event_type in event_types_listened_to:
-                self.assertTrue(
-                    isinstance(event_type, python_utils.BASESTRING))
-                self.assertTrue(issubclass(
-                    event_services.Registry.get_event_class_by_type(
-                        event_type),
-                    event_services.BaseEventHandler))
-
-            rdc = klass._get_realtime_datastore_class()  # pylint: disable=protected-access
-            self.assertTrue(issubclass(
-                rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
-
-            # The list of allowed base classes. This can be extended as the
-            # need arises, though we may also want to implement
-            # _get_continuous_computation_class() and
-            # entity_created_before_job_queued() for other base classes
-            # that are added to this list.
-            allowed_base_batch_job_classes = [
-                jobs.BaseMapReduceJobManagerForContinuousComputations]
-            self.assertTrue(any([
-                issubclass(klass._get_batch_job_manager_class(), superclass)  # pylint: disable=protected-access
-                for superclass in allowed_base_batch_job_classes]))
-
 
 class BaseMapReduceJobManagerForContinuousComputationsTests(
         test_utils.GenericTestBase):
