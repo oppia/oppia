@@ -63,7 +63,7 @@ interface LearnerDashboardDataBackendDict {
   'partially_learnt_topics_list': LearnerTopicSummaryBackendDict[];
   'topics_to_learn_list': LearnerTopicSummaryBackendDict[];
   'all_topics_list': LearnerTopicSummaryBackendDict[];
-  'new_topics_list': LearnerTopicSummaryBackendDict[];
+  'untracked_topics_list': LearnerTopicSummaryBackendDict[];
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];
@@ -85,7 +85,7 @@ interface LearnerDashboardData {
   partiallyLearntTopicsList: LearnerTopicSummary[];
   topicsToLearnList: LearnerTopicSummary[];
   allTopicsList: LearnerTopicSummary[];
-  newTopicsList: LearnerTopicSummary[];
+  untrackedTopicsList: LearnerTopicSummary[];
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
   completedToIncompleteCollections: string[];
@@ -161,8 +161,8 @@ export class LearnerDashboardBackendApiService {
             dashboardData.all_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
-          newTopicsList: (
-            dashboardData.new_topics_list.map(
+          untrackedTopicsList: (
+            dashboardData.untracked_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
