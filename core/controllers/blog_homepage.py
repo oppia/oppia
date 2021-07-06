@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the blog homepage page"""
+"""Controllers for the blog homepage."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -32,11 +32,11 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
     """Creates summary dicts for use in blog homepage.
 
     Args:
-        summaries: BlogPostSummaries. List of blog post summary
+        summaries: list(BlogPostSummaries). List of blog post summary
             domain objects.
 
     Returns:
-        BlogPostSummaryDicts. The list of blog post summary dicts.
+        list(BlogPostSummaryDicts). The list of blog post summary dicts.
     """
     summary_dicts = []
     for summary in summaries:
@@ -139,32 +139,29 @@ class AuthorsPageHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = (
             user_services.get_user_settings_from_username(author_username))
-        if user_settings:
-            if user_settings.role != (BLOG_ADMIN or BLOG_POST_EDITOR):
-                raise self.PageNotFoundException(
-                    Exception(
-                        'The given user is not a blog post author.'))
-            blog_post_summaries = (
-                blog_services.get_published_blog_post_summaries_by_user_id(
-                    user_settings.user_id,
-                    feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE))
-            if blog_post_summaries:
-                blog_post_summary_dicts = (
-                    _get_blog_card_summary_dicts_for_homepage(
-                        blog_post_summaries))
-            else:
-                blog_post_summary_dicts = None
-
-            self.values.update({
-                'author_name': author_username,
-                'profile_picture_data_url': (
-                    user_settings.profile_picture_data_url),
-                'author_bio': user_settings.user_bio,
-                'summary_dicts': blog_post_summary_dicts
-            })
-            self.render_json(self.values)
-
-        else:
+        if user_settings is None:
             raise self.PageNotFoundException(
                 Exception(
                     'User with given username does not exist'))
+        if user_settings.role not in [BLOG_ADMIN, BLOG_POST_EDITOR]:
+            raise self.PageNotFoundException(
+                Exception(
+                    'The given user is not a blog post author.'))
+        blog_post_summaries = (
+            blog_services.get_published_blog_post_summaries_by_user_id(
+                user_settings.user_id,
+                feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE))
+        blog_post_summary_dicts = []
+        if blog_post_summaries:
+            blog_post_summary_dicts = (
+                _get_blog_card_summary_dicts_for_homepage(
+                    blog_post_summaries))    
+
+        self.values.update({
+            'author_name': author_username,
+            'profile_picture_data_url': (
+                user_settings.profile_picture_data_url),
+            'author_bio': user_settings.user_bio,
+            'summary_dicts': blog_post_summary_dicts
+        })
+        self.render_json(self.values)

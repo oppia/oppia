@@ -205,7 +205,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
                 feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
                 self.BLOG_ADMIN_USERNAME),
             )
-        self.assertIsNone(json_response['summary_dicts'])
+        self.assertEqual(json_response['summary_dicts'], [])
 
     def test_get_authors_data_raises_exception_if_user_deleted_account(self):
         self.login(self.user_email)
