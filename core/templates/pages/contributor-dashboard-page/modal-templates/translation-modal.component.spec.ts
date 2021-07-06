@@ -22,7 +22,7 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -468,25 +468,18 @@ describe('Translation Modal Component', () => {
       });
     });
 
-    describe('when translation is not completed', () => {
-      it('should not submit the translation', () => {
-        component.textToTranslate = '<p>First para</p><p>Second para</p>';
-        component.activeWrittenTranslation.html = '<p>New First para</p>';
-        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
-
-        component.suggestTranslatedText();
-
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
-      });
-    });
-
     describe('when translation elements are not matching with the elements ' +
         'of the text to translate', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<p>First para</p><p>Second para</p>';
-        component.activeWrittenTranslation.html = '<p>New First para</p><div>' +
-          '</div>';
+        // Original text contains math and skillreview custom tags.
+        component.textToTranslate = (
+          '<p>First para</p><p>Second para</p><oppia-noninteractive-math>' +
+          '</oppia-noninteractive-math><oppia-noninteractive-skillreview>' +
+          '</oppia-noninteractive-skillreview>');
+        // Translated text contains only math custom tag.
+        component.activeWrittenTranslation.html = (
+          '<p>First para</p>' +
+          '<p><oppia-noninteractive-math></oppia-noninteractive-math></p>');
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();
