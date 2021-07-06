@@ -306,7 +306,7 @@ var ExplorationEditorPage = function() {
     await action.click('Save prompt Save button', savePromptSaveButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-save-prompt-modal')), 
-      'Save prompt modal does not disappear.');
+      'Save Prompt modal does not disappear.');
     await waitFor.visibilityOf(
       element(by.css('.protractor-test-exploration-save-modal')),
       'Exploration Save Modal taking too long to appear');
