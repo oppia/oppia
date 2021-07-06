@@ -38,7 +38,6 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'admin-roles-tab.component.ts',
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
     'answer-group-editor.directive.ts',
@@ -74,7 +73,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'coord-two-dim-editor.component.ts',
     'current-interaction.service.ts',
     'drag-and-drop-positive-int-editor.component.ts',
-    'exploration-creation.service.ts',
     'exploration-footer.component.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',
@@ -93,7 +91,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-editor.component.ts',
     'graph-input-validation.service.ts',
     'graph-property-editor.component.ts',
-    'graph-viz.component.ts',
     'hint-editor.directive.ts',
     'html-editor.component.ts',
     'html-select.directive.ts',
@@ -185,7 +182,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'question-editor.directive.ts',
     'question-player.directive.ts',
     'question-update.service.ts',
-    'questions-list.directive.ts',
     'random-selector.directive.ts',
     'real-editor.component.ts',
     'refresher-exploration-confirmation-modal.service.ts',
@@ -257,7 +253,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'summarize-nonnegative-number.pipe.ts',
     'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
     'teacher.ts',

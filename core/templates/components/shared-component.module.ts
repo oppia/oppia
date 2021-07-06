@@ -60,7 +60,6 @@ import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audi
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
 import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
 import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
-import { LearnerStorySummaryTileComponent } from './summary-tile/learner-story-summary-tile.component';
 import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
 import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
@@ -233,7 +232,6 @@ const toastrConfig = {
     AlertMessageComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
@@ -249,7 +247,6 @@ const toastrConfig = {
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
-    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
@@ -301,7 +298,6 @@ const toastrConfig = {
     AlertMessageComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
@@ -310,7 +306,6 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
-    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     BaseContentComponent,
     SharingLinksComponent,
@@ -375,7 +370,6 @@ const toastrConfig = {
     AttributionGuideComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
@@ -390,7 +384,6 @@ const toastrConfig = {
     DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
-    LearnerStorySummaryTileComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
