@@ -41,7 +41,7 @@ export class SortByPipe implements PipeTransform {
 
     let numberArray = [];
     let stringArray = [];
-  
+
     if (!sortKey) {
       numberArray = value.filter(item => typeof item === 'number').sort();
       stringArray = value.filter(item => typeof item === 'string').sort();
