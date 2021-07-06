@@ -183,8 +183,8 @@ describe('Blog Admin Page component ', () => {
         tick();
         component.formData.updateRole.newRole = 'BLOG_ADMIN';
         component.formData.updateRole.username = 'username';
-
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+        
         component.submitUpdateRoleForm(component.formData.updateRole);
 
         expect(startTaskSpy).not.toHaveBeenCalled();
@@ -277,8 +277,8 @@ describe('Blog Admin Page component ', () => {
       component.ngOnInit();
       tick();
       component.formData.removeEditorRole.username = 'username';
-
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+
       component.submitRemoveEditorRoleForm(component.formData.updateRole);
 
       expect(startTaskSpy).not.toHaveBeenCalled();
@@ -295,6 +295,7 @@ describe('Blog Admin Page component ', () => {
             error: { error: 'Internal Server Error.'}
           }));
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
+
         component.submitRemoveEditorRoleForm(component.formData.updateRole);
 
         expect(startTaskSpy).toHaveBeenCalled();
