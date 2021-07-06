@@ -35,7 +35,9 @@ class CollectionPage(base.BaseHandler):
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_collection
     def get(self, _):
