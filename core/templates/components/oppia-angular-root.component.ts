@@ -268,7 +268,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           }
         }
         this.documentAttributeCustomizationService.addAttribute('lang', code);
-        // this.changeDetectorRef.detectChanges();
       }
     );
     this.translateCacheService.init();
