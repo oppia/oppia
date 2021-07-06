@@ -274,7 +274,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
     def test_thumbnail_size_job_skips_deleted_topic(self):
-        """Tests that PopulateThumbnailSizeOneOffJob skips deleted topics"""
+        """Tests that PopulateThumbnailSizeOneOffJob skips deleted topics."""
         self.save_new_topic(self.TOPIC_ID, self.albert_id)
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 

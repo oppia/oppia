@@ -150,9 +150,9 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         if (key == PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY or
-            key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
-            key == PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY
-        ):
+                key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
+                key == PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY
+           ):
             yield (key, len(values))
         else:
             yield (key, values)
