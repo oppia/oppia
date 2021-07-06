@@ -252,8 +252,8 @@ def get_story_id_linked_to_exploration(exp_id):
         str|None. The ID of the story if the exploration is linked to some
         story, otherwise None.
     """
-    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
-        exp_id)
+    exploration_context_model = exp_models.ExplorationContextModel.get(
+        exp_id, strict=False)
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
@@ -1625,7 +1625,7 @@ def get_number_of_ratings(ratings):
     Returns:
         int. The total number of ratings given.
     """
-    return sum(ratings.values())
+    return sum(ratings.values()) if ratings else 0
 
 
 def get_average_rating(ratings):
