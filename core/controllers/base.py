@@ -23,8 +23,8 @@ import hmac
 import json
 import logging
 import os
-import time
 import re
+import time
 
 from core.controllers import payload_validator
 from core.domain import auth_domain
@@ -38,7 +38,6 @@ import utils
 
 import backports.functools_lru_cache
 import webapp2
-
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -348,8 +347,7 @@ class BaseHandler(webapp2.RequestHandler):
             elif arg == 'source':
                 source_url = self.request.get('source')
                 regex_pattern = (
-                    'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]'
-                    '|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
                 )
                 regex_verified_url = re.findall(regex_pattern, source_url)
                 if not regex_verified_url:
