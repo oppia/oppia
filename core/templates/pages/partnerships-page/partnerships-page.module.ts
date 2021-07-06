@@ -63,4 +63,3 @@
   bootstrap: [PartnershipsPageRootComponent]
 })
 export class PartnershipsPageModule {}
- 
