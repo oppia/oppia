@@ -303,9 +303,21 @@ var ExplorationEditorPage = function() {
   };
 
   this.saveChangesAfterPrompt = async function(commitMessage) {
-    await action.waitForAutosave();
-    await action.click('Save prompt Save Draft button', savePromptSaveButton);
-    this.saveChanges(commitMessage);
+    await action.click('Save prompt Save button', savePromptSaveButton);
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-exploration-save-modal')),
+      'Exploration Save Modal taking too long to appear');
+    if (commitMessage) {
+      await action.sendKeys(
+        'Commit message input', commitMessageInput, commitMessage);
+    }
+    await action.click('Save draft button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      saveDraftButtonTextContainer, 'Save Draft',
+      'Changes could not be saved');
   };
 
   // ---- NAVIGATION ----

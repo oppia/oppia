@@ -760,9 +760,11 @@ describe('Full exploration editor', function() {
         'Save Changes Recommendation Modal taking too long to appear');
       explorationEditorPage.saveChangesAfterPrompt(
         'Changed Content so many times');
-      await explorationEditorMainTab.setContent(async function(richTextEditor) {
-        await richTextEditor.appendPlainText('Content 50');
-      });
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('Content 50');
+        }
+      );
 
       await users.logout();
     });
