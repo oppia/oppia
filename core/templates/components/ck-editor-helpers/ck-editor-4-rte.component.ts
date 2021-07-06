@@ -14,6 +14,26 @@
 
 /**
  * @fileoverview Directive for CK Editor.
+ * NOTE: The way we show rich text components in CKEditor is by using Web
+ * components. We don't create an angular view inside ckeditor. In our case,
+ * the web components can't have the same selector as the angular component even
+ * though they are literally the same component and use the same class. This is
+ * because using the same selector is causing issues in the angular view as
+ * angular creates a component instance and adds it to the view. When adding to
+ * the view, it will also create a node with the selector we have specified.
+ * Usually, this has no effect as there is no element in the web-browser
+ * registered by the selector. But in our case, we did it to show rte components
+ * in the ck-editor view.
+ *
+ * In order to overcome this situation, ck-editor uses the same component but we
+ * register it with a different selector. The selector prefix is now
+ * oppia-noninteractive-ckeditor-* instead of oppia-noninteractive we have for
+ * the angular counterpart. This just an internal representation and the value
+ * emitted to the parent component doesn't have oppia-noninteractive-ckeditor-*
+ * tags, They have the normal oppia-noninteractive tags in them. Similarly, for
+ * the value that's passed in, we don't expect oppia-noninteractive-ckeditor-*
+ * tags. We expect the normal angular version of our tags and that is converted
+ * on the fly.
  */
 
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
@@ -21,7 +41,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
-import { CkEditorCopyContentService } from './ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 
 interface UiConfig {
   (): UiConfig;
@@ -35,7 +55,7 @@ interface UiConfig {
   selector: 'ck-editor-4-rte',
   template: '<div><div></div>' +
             '<div contenteditable="true" ' +
-            'class="oppia-rte-resizer oppia-rte">' +
+            'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
             '</div></div>',
   styleUrls: []
 })
@@ -132,6 +152,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    let value = this.value;
+    value = value.replace(
+      /<oppia-noninteractive-/g,
+      '<oppia-noninteractive-ckeditor-'
+    );
+    value = value.replace(
+      /<\/oppia-noninteractive-/g,
+      '</oppia-noninteractive-ckeditor-'
+    );
+    this.value = value;
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
@@ -175,7 +205,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
        */
     // Whitelist the component tags with any attributes and classes.
     var componentRule = names.map((name) => {
-      return 'oppia-noninteractive-' + name;
+      return 'oppia-noninteractive-ckeditor-' + name;
     }).join(' ') + '(*)[*];';
       // Whitelist the inline component wrapper, which is a
       // span with a "type" attribute.
@@ -241,7 +271,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
 
     // A RegExp for matching rich text components.
     var componentRe = (
-      /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
+      /(<(oppia-noninteractive-ckeditor-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
     );
 
     /**
@@ -341,8 +371,17 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
           break;
         }
       }
-      this.valueChange.emit(elt.html());
-      this.value = elt.html();
+      let html = elt.html();
+      this.value = html;
+      html = html.replace(
+        /<oppia-noninteractive-ckeditor-/g,
+        '<oppia-noninteractive-'
+      );
+      html = html.replace(
+        /<\/oppia-noninteractive-ckeditor-/g,
+        '</oppia-noninteractive-'
+      );
+      this.valueChange.emit(html);
     });
     ck.setData(this.value);
     this.ck = ck;

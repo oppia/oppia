@@ -22,7 +22,7 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -306,12 +306,13 @@ describe('Translation Modal Component', () => {
         target_id: '1',
         target_version_at_submission: 1,
         change: {
-          cmd: 'add_translation',
+          cmd: 'add_written_translation',
           content_id: 'contentId1',
           state_name: 'stateName1',
           language_code: 'es',
           content_html: 'text1',
-          translation_html: 'texto1'
+          translation_html: 'texto1',
+          data_format: 'html'
         }
       };
       component.ngOnInit();
@@ -504,12 +505,13 @@ describe('Translation Modal Component', () => {
           target_id: '1',
           target_version_at_submission: 1,
           change: {
-            cmd: 'add_translation',
+            cmd: 'add_written_translation',
             content_id: 'contentId2',
             state_name: 'stateName2',
             language_code: 'es',
             content_html: 'text2',
-            translation_html: 'texto2'
+            translation_html: 'texto2',
+            data_format: 'html'
           }
         };
         component.skipActiveTranslation();

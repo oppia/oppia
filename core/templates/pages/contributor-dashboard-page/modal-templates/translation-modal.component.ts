@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AlertsService } from 'services/alerts.service';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -99,6 +99,7 @@ export class TranslationModalComponent {
   hadCopyParagraphError = false;
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
+  editorIsShown = true;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -151,6 +152,15 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection())
       }
     };
+  }
+
+  // TODO(#13221): Remove this method completely after the change detection
+  // issues in schema-based-editor have been resolved. The current workaround
+  // used is to destroy and re-render the component in the view.
+  resetEditor(): void {
+    this.editorIsShown = false;
+    this.changeDetectorRef.detectChanges();
+    this.editorIsShown = true;
   }
 
   close(): void {
@@ -207,6 +217,7 @@ export class TranslationModalComponent {
     this.moreAvailable = textAndAvailability.more;
     this.activeStatus = textAndAvailability.status;
     this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+    this.resetEditor();
   }
 
   isSubmitted(): boolean {
@@ -220,6 +231,7 @@ export class TranslationModalComponent {
     this.moreAvailable = true;
     this.activeStatus = textAndAvailability.status;
     this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+    this.resetEditor();
   }
 
   getElementAttributeTexts(elements: HTMLElement[], type: string): string[] {
@@ -361,8 +373,10 @@ export class TranslationModalComponent {
             this.activeStatus = textAndAvailability.status;
             this.activeWrittenTranslation.html = (
               textAndAvailability.translationHtml);
+            this.resetEditor();
           } else {
             this.activeWrittenTranslation.html = '';
+            this.resetEditor();
           }
         }, () => {
           this.contextService.resetImageSaveDestination();

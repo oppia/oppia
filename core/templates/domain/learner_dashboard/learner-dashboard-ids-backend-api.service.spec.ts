@@ -38,6 +38,12 @@ describe('Learner Dashboard Backend API Service', () => {
       exploration_playlist_ids: [],
       completed_collection_ids: [],
       incomplete_exploration_ids: [],
+      completed_story_ids: [],
+      learnt_topic_ids: [],
+      partially_learnt_topic_ids: [],
+      topic_ids_to_learn: [],
+      all_topic_ids: [],
+      untracked_topic_ids: [],
       collection_playlist_ids: [],
       incomplete_collection_ids: []
     },

@@ -47,13 +47,13 @@ import feconf
 import python_utils
 
 (
-    app_feedback_report_models, auth_models, collection_models, config_models,
-    email_models, exp_models, feedback_models, improvements_models,
-    question_models, skill_models, story_models,
-    subtopic_models, suggestion_models, topic_models,
+    app_feedback_report_models, auth_models, blog_models,
+    collection_models, config_models, email_models, exp_models,
+    feedback_models, improvements_models, question_models, skill_models,
+    story_models, subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.app_feedback_report, models.NAMES.auth, models.NAMES.blog,
     models.NAMES.collection, models.NAMES.config, models.NAMES.email,
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
     models.NAMES.question, models.NAMES.skill, models.NAMES.story,
@@ -255,10 +255,23 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             email_preferences.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
-        wipeout_service.pre_delete_user(self.user_1_id)
+        observed_log_messages = []
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.info()."""
+            observed_log_messages.append(msg % args)
+
+        with self.swap(logging, 'info', _mock_logging_function):
+            wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
         email_preferences = user_services.get_email_preferences(self.user_1_id)
+        self.assertItemsEqual(
+            observed_log_messages,
+            ['Email ID %s permanently deleted from bulk email provider\'s db. '
+             'Cannot access API, since this is a dev environment'
+             % self.USER_1_EMAIL, 'Updated status of email ID %s\'s bulk email '
+             'preference in the service provider\'s db to False. Cannot access '
+             'API, since this is a dev environment.' % self.USER_1_EMAIL])
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
@@ -561,7 +574,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
-            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
 
         email_content = (
@@ -4190,10 +4204,15 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         user_models.CompletedActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_2_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
@@ -4233,10 +4252,15 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )[0].user_id
 
         user_models.CompletedActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.profile_user_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
@@ -4262,6 +4286,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )
         self.assertIsNotNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
+        self.assertIsNotNone(
+            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
@@ -4276,6 +4302,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id))
 
     def test_delete_user_for_full_user_and_its_profiles_is_successful(self):
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -4295,6 +4323,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel.get_by_id(
                 self.profile_user_id))
         self.assertIsNotNone(
+            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id))
+        self.assertIsNotNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
         self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
@@ -4310,6 +4340,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(
                 self.profile_user_id))
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.profile_user_id))
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
         self.assertIsNone(
@@ -4446,6 +4478,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.user_2_id))
         self.assertIsNotNone(
+            user_models.LearnerGoalsModel.get_by_id(self.user_2_id))
+        self.assertIsNotNone(
             user_models.LearnerPlaylistModel.get_by_id(self.user_2_id))
 
         wipeout_service.delete_user(
@@ -4457,6 +4491,8 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(self.user_2_id))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(self.user_2_id))
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.user_2_id))
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.user_2_id))
 
@@ -4556,10 +4592,15 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
         user_models.CompletedActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.user_2_id, exploration_ids=[], collection_ids=[]
+            id=self.user_2_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_2_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
@@ -4580,10 +4621,15 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             wipeout_service.verify_user_deleted(self.profile_user_id))
 
         user_models.CompletedActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
         ).put()
         user_models.IncompleteActivitiesModel(
-            id=self.profile_user_id, exploration_ids=[], collection_ids=[]
+            id=self.profile_user_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.profile_user_id, topic_ids_to_learn=[]
         ).put()
         user_models.LearnerPlaylistModel(
             id=self.profile_user_id, exploration_ids=[], collection_ids=[]
@@ -4613,3 +4659,392 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
+
+
+class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the deletion part of wipeout service."""
+
+    BLOG_1_ID = 'blog_1_id'
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    NUMBER_OF_MODELS = 150
+    NONEXISTENT_USER_ID = 'id_x'
+    CONTENT = 'Dummy Content'
+    SUMMARY = 'Dummy Content'
+    TITLE = 'Dummy Title'
+    TAGS = ['tag1', 'tag2', 'tag3']
+    THUMBNAIL = 'xyzabc'
+
+    def setUp(self):
+        super(WipeoutServiceDeleteBlogPostModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.blog_post_model = blog_models.BlogPostModel(
+            id=self.BLOG_1_ID,
+            author_id=self.user_1_id,
+            content=self.CONTENT,
+            title=self.TITLE,
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=self.TAGS,
+            thumbnail_filename=self.THUMBNAIL
+        )
+        self.blog_post_model.update_timestamps()
+        self.blog_post_model.put()
+        self.blog_post_summary_model = blog_models.BlogPostSummaryModel(
+            id=self.BLOG_1_ID,
+            author_id=self.user_1_id,
+            summary=self.SUMMARY,
+            title=self.TITLE,
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=self.TAGS,
+            thumbnail_filename=self.THUMBNAIL
+        )
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
+
+        self.blog_post_rights_model = blog_models.BlogPostRightsModel(
+            id=self.BLOG_1_ID,
+            editor_ids=[self.user_1_id],
+            blog_post_is_published=True,
+        )
+        self.blog_post_rights_model.update_timestamps()
+        self.blog_post_rights_model.put()
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_one_blog_post_model_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Verify user is pseudonymized.
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
+        )
+        blog_post_model = (
+            blog_models.BlogPostModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        self.assertEqual(
+            blog_post_model.author_id,
+            pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+        blog_post_summary_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        self.assertEqual(
+            blog_post_summary_model.author_id,
+            pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+
+        # Verify that the user id is removed from the list of editor ids in
+        # BlogPostRights model.
+        blog_post_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(
+                self.BLOG_1_ID))
+        self.assertTrue(self.user_1_id not in blog_post_rights_model.editor_ids)
+
+    def test_one_blog_when_the_deletion_is_repeated_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Return blog post model to the original user ID.
+        blog_post_model = (
+            blog_models.BlogPostModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        blog_post_model.author_id = self.user_1_id
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+
+        blog_post_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+
+        blog_post_rights_model.editor_ids.append(self.user_1_id)
+        blog_post_rights_model.update_timestamps()
+        blog_post_rights_model.put()
+
+        # Run the user deletion again.
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        # Verify that both the blog post and the blog post summary have the same
+        # pseudonymous user ID.
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
+        )
+        new_blog_post_model = (
+            blog_models.BlogPostModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        self.assertEqual(
+            new_blog_post_model.author_id,
+            pseudonymizable_user_id_mapping[self.BLOG_1_ID]
+        )
+
+        # Verify that the user id is removed from the list of editor ids in
+        # BlogPostRights model.
+        blog_post_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(
+                self.BLOG_1_ID))
+        self.assertTrue(self.user_1_id not in blog_post_rights_model.editor_ids)
+
+    def test_multiple_blog_post_models_are_pseudonymized(self):
+        blog_post_models_list = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            blog_post_models_list.append(
+                blog_models.BlogPostModel(
+                    id='blogmodel-%s' % i,
+                    author_id=self.user_1_id,
+                    content=self.CONTENT,
+                    title=self.TITLE,
+                    published_on=datetime.datetime.utcnow(),
+                    url_fragment='sample-url-fragment',
+                    tags=self.TAGS,
+                    thumbnail_filename=self.THUMBNAIL
+                )
+            )
+            blog_models.BlogPostModel.update_timestamps_multi(
+                blog_post_models_list)
+        blog_post_summary_models_list = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            blog_post_summary_models_list.append(
+                blog_models.BlogPostSummaryModel(
+                    id='blogmodel-%s' % i,
+                    author_id=self.user_1_id,
+                    summary=self.SUMMARY,
+                    title=self.TITLE,
+                    published_on=datetime.datetime.utcnow(),
+                    url_fragment='sample-url-fragment',
+                    tags=self.TAGS,
+                    thumbnail_filename=self.THUMBNAIL
+                )
+            )
+            blog_models.BlogPostSummaryModel.update_timestamps_multi(
+                blog_post_summary_models_list)
+
+        blog_post_rights_models_list = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            blog_post_rights_models_list.append(
+                blog_models.BlogPostRightsModel(
+                    id='blogmodel-%s' % i,
+                    editor_ids=[self.user_1_id],
+                    blog_post_is_published=True,
+                )
+            )
+            blog_models.BlogPostRightsModel.update_timestamps_multi(
+                blog_post_rights_models_list)
+
+        datastore_services.put_multi(
+            blog_post_models_list + blog_post_summary_models_list +
+            blog_post_rights_models_list)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        pseudonymizable_user_id_mapping = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
+        )
+
+        pseudonymized_blog_post_models = (
+            blog_models.BlogPostModel.get_multi(
+                [model.id for model in blog_post_models_list]
+            )
+        )
+        for blog_post_model in pseudonymized_blog_post_models:
+            self.assertEqual(
+                blog_post_model.author_id,
+                pseudonymizable_user_id_mapping[blog_post_model.id]
+            )
+
+        pseudonymized_blog_post_summary_models = (
+            blog_models.BlogPostSummaryModel.get_multi(
+                [model.id for model in blog_post_summary_models_list]
+            )
+        )
+        for blog_post_summary_model in pseudonymized_blog_post_summary_models:
+            self.assertEqual(
+                blog_post_summary_model.author_id,
+                pseudonymizable_user_id_mapping[blog_post_summary_model.id]
+            )
+
+        # Verify that user id is removed from the list of editor ids in all
+        # BlogPostRights models.
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_multi(
+                [model.id for model in blog_post_rights_models_list]
+            )
+        )
+        for blog_post_rights_model in blog_post_rights_models:
+            self.assertTrue(
+                self.user_1_id not in blog_post_rights_model.editor_ids)
+
+
+class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
+    """Provides testing for the delete users pending to be deleted taskqueue
+    service methods of wipeout service."""
+
+    USER_1_EMAIL = 'a@example.com'
+    USER_1_USERNAME = 'a'
+
+    def setUp(self):
+        super(PendingUserDeletionTaskServiceTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
+        ).put()
+        user_models.IncompleteActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_1_id, topic_ids_to_learn=[]
+        ).put()
+        user_models.LearnerPlaylistModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        self.email_subjects = []
+        self.email_bodies = []
+        def _mock_send_mail_to_admin(email_subject, email_body):
+            """Mocks email_manager.send_mail_to_admin() as it's not possible to
+            send mail with self.testapp_swap, i.e with the URLs defined in
+            main_cron.
+            """
+            self.email_subjects.append(email_subject)
+            self.email_bodies.append(email_body)
+
+        self.send_mail_to_admin_swap = self.swap(
+            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
+    def test_repeated_deletion_is_successful(self):
+        with self.send_mail_to_admin_swap:
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertIn('SUCCESS', self.email_bodies[0])
+            self.assertIn(self.user_1_id, self.email_bodies[0])
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertIn('ALREADY DONE', self.email_bodies[1])
+            self.assertIn(self.user_1_id, self.email_bodies[1])
+
+    def test_regular_deletion_is_successful(self):
+        with self.send_mail_to_admin_swap:
+            wipeout_service.delete_users_pending_to_be_deleted()
+        self.assertIn('SUCCESS', self.email_bodies[0])
+        self.assertIn(self.user_1_id, self.email_bodies[0])
+
+        self.assertIsNone(
+            user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.IncompleteActivitiesModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.user_1_id))
+        self.assertIsNone(
+            user_models.LearnerPlaylistModel.get_by_id(self.user_1_id))
+
+        pending_deletion_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+        self.assertTrue(pending_deletion_model.deletion_complete)
+
+
+class CheckCompletionOfUserDeletionTaskServiceTests(
+        test_utils.GenericTestBase):
+    """Provides testing for the check completion of user deletion taskqueue
+    service methods of wipeout service.
+    """
+
+    USER_1_EMAIL = 'a@example.com'
+    USER_1_USERNAME = 'a'
+
+    def setUp(self):
+        super(CheckCompletionOfUserDeletionTaskServiceTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
+        ).put()
+        user_models.IncompleteActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], partially_learnt_topic_ids=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.user_1_id, topic_ids_to_learn=[]
+        ).put()
+        user_models.LearnerPlaylistModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[]
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+
+        self.email_subjects = []
+        self.email_bodies = []
+        def _mock_send_mail_to_admin(email_subject, email_body):
+            """Mocks email_manager.send_mail_to_admin() as it's not possible to
+            send mail with self.testapp_swap, i.e with the URLs defined in
+            main_cron.
+            """
+            self.email_subjects.append(email_subject)
+            self.email_bodies.append(email_body)
+
+        self.send_mail_to_admin_swap = self.swap(
+            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
+    def test_verification_when_user_is_not_deleted(self):
+        with self.send_mail_to_admin_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertIn('NOT DELETED', self.email_bodies[0])
+        self.assertIn(self.user_1_id, self.email_bodies[0])
+
+    def test_verification_when_user_is_deleted_is_successful(self):
+        pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(pending_deletion_request)
+        pending_deletion_request.deletion_complete = True
+        wipeout_service.save_pending_deletion_requests(
+            [pending_deletion_request])
+
+        with self.send_mail_to_admin_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertIn('SUCCESS', self.email_bodies[0])
+        self.assertIn(self.user_1_id, self.email_bodies[0])
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+
+    def test_verification_when_user_is_wrongly_deleted_fails(self):
+        pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(pending_deletion_request)
+        pending_deletion_request.deletion_complete = True
+        wipeout_service.save_pending_deletion_requests(
+            [pending_deletion_request])
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
+        ).put()
+
+        with self.send_mail_to_admin_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertIn('FAILURE', self.email_bodies[-1])
+        self.assertIn(self.user_1_id, self.email_bodies[-1])

@@ -33,17 +33,12 @@ import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
   providedIn: 'root'
 })
 export class ChangeListService implements OnInit {
-  // TODO(sll): Implement undo, redo functionality. Show a message on each
-  // step saying what the step is doing.
-  // TODO(sll): Allow the user to view the list of changes made so far, as
-  // well as the list of changes in the undo stack.
-
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
-
+  undoneChangeStack: ExplorationChange[] = [];
   // Stack for storing undone changes. The last element is the most recently
   // undone change.
-  undoneChangeStack: ExplorationChange[] = [];
+  ndoneChangeStack = [];
   loadingMessage: string = '';
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
@@ -268,6 +263,43 @@ export class ChangeListService implements OnInit {
       cmd: 'rename_state',
       new_state_name: newStateName,
       old_state_name: oldStateName
+    });
+  }
+
+  addWrittenTranslation(
+      contentId: string, dataFormat: string, languageCode: string,
+      stateName: string, translationHtml: string): void {
+  // Written translations submitted via the translation tab in the
+  // exploration editor need not pass content_html because
+  // translations submitted via this method do not undergo a review. The
+  // content_html is only required when submitting translations via
+  // the contributor dashboard because such translation suggestions
+  // undergo a manual review process where the reviewer will need to look
+  // at the corresponding original content at the time of submission.
+    this.addChange({
+      cmd: 'add_written_translation',
+      content_id: contentId,
+      data_format: dataFormat,
+      language_code: languageCode,
+      state_name: stateName,
+      content_html: 'N/A',
+      translation_html: translationHtml
+    });
+  }
+
+  /**
+   * Saves a change dict that represents marking a translation as needing
+   * update.
+   *
+   * @param {string} contentId - The content id of the translated content.
+   * @param {string} languageCode - The language code.
+   * @param {string} stateName - The current state name.
+   */
+  markTranslationsAsNeedingUpdate(contentId: string, stateName: string): void {
+    this.addChange({
+      cmd: 'mark_written_translations_as_needing_update',
+      content_id: contentId,
+      state_name: stateName
     });
   }
 

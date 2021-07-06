@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for ParameterMetadataService.
  */
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('pages/exploration-editor-page/services/parameter-metadata.service');
 require('expressions/expression-interpolation.service.ts');
