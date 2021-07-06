@@ -38,18 +38,6 @@ describe('Stats reporting service ', () => {
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
 
-  let recordExplorationStartedSpy;
-  let recordExplorationActuallyStartedSpy;
-  let recordSolutionHitSpy;
-  let recordLeaveForRefresherExpSpy;
-  let recordStateHitSpy;
-  let recordStateCompletedSpy;
-  let recordExplorationCompletedSpy;
-  let recordAnswerSubmittedSpy;
-  let recordMaybeLeaveEventSpy;
-  let recordAnswerSubmitActionSpy;
-  let postStatsSpy;
-
   let explorationId = 'expId';
   let explorationTitle = 'expTitle';
   let explorationVersion = 2;
@@ -72,38 +60,6 @@ describe('Stats reporting service ', () => {
   });
 
   beforeEach(() => {
-    recordExplorationStartedSpy = spyOn(
-      statsReportingBackendApiService, 'recordExpStartedAsync')
-      .and.returnValue(Promise.resolve({}));
-    postStatsSpy = spyOn(statsReportingBackendApiService, 'postsStatsAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordExplorationActuallyStartedSpy = spyOn(
-      statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordSolutionHitSpy = spyOn(
-      statsReportingBackendApiService, 'recordSolutionHitAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordLeaveForRefresherExpSpy = spyOn(
-      statsReportingBackendApiService, 'recordLeaveForRefresherExpAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordStateHitSpy = spyOn(
-      statsReportingBackendApiService, 'recordStateHitAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordStateCompletedSpy = spyOn(
-      statsReportingBackendApiService, 'recordStateCompletedAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordExplorationCompletedSpy = spyOn(
-      statsReportingBackendApiService, 'recordExplorationCompletedAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordAnswerSubmittedSpy = spyOn(
-      statsReportingBackendApiService, 'recordAnswerSubmittedAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordMaybeLeaveEventSpy = spyOn(
-      statsReportingBackendApiService, 'recordMaybeLeaveEventAsync')
-      .and.returnValue(Promise.resolve({}));
-    recordAnswerSubmitActionSpy = spyOn(
-      playthroughService, 'recordAnswerSubmitAction')
-      .and.returnValue(null);
     spyOn(messengerService, 'sendMessage').and.returnValue(null);
     spyOn(siteAnalyticsService, 'registerNewCard').and.returnValue(null);
     spyOn(siteAnalyticsService, 'registerStartExploration')
@@ -161,6 +117,10 @@ describe('Stats reporting service ', () => {
   }));
 
   it('should record exploration\'s stats when it is about to start', () => {
+    let recordExplorationStartedSpy = spyOn(
+      statsReportingBackendApiService, 'recordExpStartedAsync')
+      .and.returnValue(Promise.resolve({}));
+
     let sampleStats = {
       total_answers_count: 1,
       useful_feedback_count: 1,
@@ -181,6 +141,9 @@ describe('Stats reporting service ', () => {
 
   it('should not again record exploration\'s stats when ' +
     'it is about to start and already recorded', () => {
+    let recordExplorationStartedSpy = spyOn(
+      statsReportingBackendApiService, 'recordExpStartedAsync')
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationStarted = true;
     statsReportingService.recordExplorationStarted('firstState', {});
 
@@ -189,6 +152,8 @@ describe('Stats reporting service ', () => {
 
   it('should not send request to backend when an exploration ' +
     'it is about to start and already recorded', () => {
+    let postStatsSpy = spyOn(statsReportingBackendApiService, 'postsStatsAsync')
+    .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationIsComplete = true;
     statsReportingService.recordExplorationStarted('firstState', {});
 
@@ -196,6 +161,9 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record exploration\'s stats when it is actually started', () => {
+    let recordExplorationActuallyStartedSpy = spyOn(
+      statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
+      .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.currentStateName).toBe(null);
     expect(statsReportingService.explorationActuallyStarted).toBe(false);
 
@@ -208,6 +176,9 @@ describe('Stats reporting service ', () => {
 
   it('should not again record exploration\'s stats when ' +
     'it is actually started and already recorded', () => {
+    let recordExplorationActuallyStartedSpy = spyOn(
+      statsReportingBackendApiService, 'recordExplorationActuallyStartedAsync')
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.explorationActuallyStarted = true;
     statsReportingService.recordExplorationActuallyStarted('firstState');
 
@@ -215,12 +186,18 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats status of solution', () => {
+    let recordSolutionHitSpy = spyOn(
+      statsReportingBackendApiService, 'recordSolutionHitAsync')
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.recordSolutionHit('firstState');
 
     expect(recordSolutionHitSpy).toHaveBeenCalled();
   });
 
   it('should record stats when refresher exploration is opened', () => {
+    let recordLeaveForRefresherExpSpy = spyOn(
+      statsReportingBackendApiService, 'recordLeaveForRefresherExpAsync')
+      .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.nextExpId).toBe(null);
     statsReportingService.recordLeaveForRefresherExp(
       'firstState', 'refresherExp');
@@ -230,6 +207,9 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when state is changed', () => {
+    let recordStateHitSpy = spyOn(
+      statsReportingBackendApiService, 'recordStateHitAsync')
+      .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.statesVisited.size).toBe(0);
     // First transition.
     statsReportingService.recordStateTransition(
@@ -248,6 +228,9 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when a card in exploration is finished', () => {
+    let recordStateCompletedSpy = spyOn(
+      statsReportingBackendApiService, 'recordStateCompletedAsync')
+      .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.currentStateName).toBe(null);
     statsReportingService.recordStateCompleted('firstState');
 
@@ -256,6 +239,9 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when an exploration is finished', () => {
+    let recordExplorationCompletedSpy = spyOn(
+      statsReportingBackendApiService, 'recordExplorationCompletedAsync')
+      .and.returnValue(Promise.resolve({}));
     expect(statsReportingService.explorationIsComplete).toBe(false);
     statsReportingService.recordExplorationCompleted('firstState', {});
 
@@ -264,12 +250,18 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when a leave event is triggered', () => {
+    let recordMaybeLeaveEventSpy = spyOn(
+      statsReportingBackendApiService, 'recordMaybeLeaveEventAsync')
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.recordMaybeLeaveEvent('firstState', {});
 
     expect(recordMaybeLeaveEventSpy).toHaveBeenCalled();
   });
 
   it('should record stats when an answer submit button is clicked', () => {
+    let recordAnswerSubmitActionSpy = spyOn(
+      playthroughService, 'recordAnswerSubmitAction')
+      .and.returnValue(null);
     statsReportingService.recordAnswerSubmitAction(
       'oldState', 'newState', 'expId', 'answer', 'feedback');
 
@@ -277,6 +269,9 @@ describe('Stats reporting service ', () => {
   });
 
   it('should record stats when an answer is actually submitted', () => {
+    let recordAnswerSubmittedSpy = spyOn(
+      statsReportingBackendApiService, 'recordAnswerSubmittedAsync')
+      .and.returnValue(Promise.resolve({}));
     statsReportingService.recordAnswerSubmitted(
       'firstState', {}, 'answer', 0, 0, 'category', true);
 
