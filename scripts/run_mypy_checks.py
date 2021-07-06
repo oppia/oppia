@@ -805,7 +805,8 @@ def install_mypy_prerequisites():
     """
     cmd = [
         PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_FILE_PATH,
-        '--target', MYPY_TOOLS_DIR, '--upgrade'
+        '--target', MYPY_TOOLS_DIR, '--upgrade', '--user', '--prefix=',
+        '--system'
     ]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
