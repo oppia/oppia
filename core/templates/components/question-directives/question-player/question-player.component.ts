@@ -130,8 +130,7 @@ angular.module('oppia').component('questionPlayer', {
   bindings: {
     getQuestionPlayerConfig: '&playerConfig',
   },
-  templateUrl: require('./question-player.component.html'),
-  controllerAs: '$ctrl',
+  template: require('./question-player.component.html'),
   controller: [
     '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
     '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
