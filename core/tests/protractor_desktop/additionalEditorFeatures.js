@@ -758,7 +758,7 @@ describe('Full exploration editor', function() {
       await waitFor.visibilityOf(
         element(by.css('.protractor-test-save-prompt-modal')),
         'Save Prompt Modal taking too long to appear');
-      explorationEditorPage.saveChangesAfterPrompt(
+      await explorationEditorPage.saveChangesAfterPrompt(
         'Changed Content so many times');
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
