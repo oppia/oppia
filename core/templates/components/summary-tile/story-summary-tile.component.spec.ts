@@ -404,6 +404,7 @@ describe('StorySummaryTileComponent', () => {
   });
 
   it('should show all chapters when user click on \'View All\' button', () => {
+    spyOn(wds, 'getWidth').and.returnValue(790);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -433,6 +434,7 @@ describe('StorySummaryTileComponent', () => {
 
   it('should hide extra chapters when user click on \'View less\'' +
     ' button', () => {
+    spyOn(wds, 'getWidth').and.returnValue(790);
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
