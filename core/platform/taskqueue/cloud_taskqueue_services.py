@@ -59,7 +59,7 @@ def create_http_task(
     # Construct the request body.
     task = {
         # Specify the type of request.
-        'app_engine_http_request': { 
+        'app_engine_http_request': {
             'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
             'relative_uri': url,
         }

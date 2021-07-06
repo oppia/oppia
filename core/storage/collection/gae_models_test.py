@@ -124,15 +124,15 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     COLLECTION_ID_2 = '2'
     COLLECTION_ID_3 = '3'
     COLLECTION_ID_4 = '4'
-    # Related to all three collections
+    # Related to all three collections.
     USER_ID_1 = 'id_1'
-    # Related to a subset of the three collections
+    # Related to a subset of the three collections.
     USER_ID_2 = 'id_2'
-    # Related to no collections
+    # Related to no collections.
     USER_ID_3 = 'id_3'
-    # Related to one collection and then removed from it
+    # Related to one collection and then removed from it.
     USER_ID_4 = 'id_4'
-    # User id used in commits
+    # User id used in commits.
     USER_ID_COMMITTER = 'id_5'
     USER_ID_4_OLD = 'id_4_old'
     USER_ID_4_NEW = 'id_4_new'
@@ -352,7 +352,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
     USER_ID_3 = 'id_3'
-    # User id used in commits
+    # User id used in commits.
     USER_ID_COMMITTER = 'id_4'
 
     def setUp(self):
