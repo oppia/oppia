@@ -19,8 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -36,6 +39,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import python_utils
 
 (
     topic_models, suggestion_models
@@ -597,6 +601,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
             self.TOPIC_ID)
 
+        # Save a dummy image on filesystem, to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit(
+            '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         # Test whether an admin can edit a topic.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -613,6 +629,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'property_name': topic_domain.TOPIC_PROPERTY_URL_FRAGMENT,
             'old_value': '',
             'new_value': 'url-name'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+            'old_value': '',
+            'new_value': 'thumbnail.svg'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -644,26 +665,26 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short-name')
         self.assertEqual(topic.url_fragment, 'url-name')
-        self.assertEqual(topic.thumbnail_filename, 'topic.svg')
-        self.assertEqual(topic.thumbnail_size_in_bytes, 21131)
+        self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic.thumbnail_size_in_bytes, len(raw_image))
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic.practice_tab_is_displayed, True)
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic_summary.version, 3)
-        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
+        self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
 
-        # Test whether an admin can update dummy thumbnail image for a topic.
+        # Test whether a topic_manager can update a dummy thumbnail_filename.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
             'old_value': '',
-            'new_value': 'thumbnail.svg'
+            'new_value': 'dummy_thumbnail.svg'
         })]
         with self.assertRaisesRegexp(Exception, (
-            'The thumbnail thumbnail.svg for topic with id '
+            'The thumbnail dummy_thumbnail.svg for topic with id '
             '%s does not exist in the filesystem.' % self.TOPIC_ID)):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id_admin, self.TOPIC_ID, changelist,

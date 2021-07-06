@@ -118,7 +118,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         # Save the dummy image to the filesystem to be used as thumbnail.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-                'rb', encoding=None) as f:
+            'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
