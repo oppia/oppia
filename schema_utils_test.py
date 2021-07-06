@@ -1009,8 +1009,8 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         mappings = [('test1', 'test1'), ('test2', 'test2')]
         invalid_values_with_error_messages = [
-            (12, 'Expected unicode string, received 12'),
-            (None, 'Expected unicode string, received None')]
+            (12, 'Expected string, received 12'),
+            (None, 'Expected string, received None')]
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
