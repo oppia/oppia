@@ -115,13 +115,13 @@ RERUN_POLICY_ALWAYS = 'always'
 
 RERUN_POLICIES = {
     'accessibility': RERUN_POLICY_NEVER,
-    'additionaleditorfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'additionalplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'additionaleditorfeatures': RERUN_POLICY_ALWAYS,
+    'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
     'adminpage': RERUN_POLICY_NEVER,
     'classroompage': RERUN_POLICY_NEVER,
     'classroompagefileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'collections': RERUN_POLICY_KNOWN_FLAKES,
-    'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'contributordashboard': RERUN_POLICY_ALWAYS,
     'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
     'emaildashboard': RERUN_POLICY_ALWAYS,
