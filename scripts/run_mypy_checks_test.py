@@ -47,12 +47,12 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE)
         def mock_popen_success(
-                unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
+                unused_cmd, stdout=None, stdin=None, stderr=None, env=None):  # pylint: disable=unused-argument
             return process_success
 
         process_failure = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_popen_failure(
-                unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
+                unused_cmd, stdout=None, stdin=None, stderr=None, env=None):  # pylint: disable=unused-argument
             return process_failure
 
         self.popen_swap_success = self.swap(
@@ -108,7 +108,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_install_mypy_prerequisites_with_wrong_script(self):
         with self.popen_swap_failure:
             with self.swap(
-                run_mypy_checks, 'MYPY_REQUIREMENTS_PATH', 'scripts.wrong'):
+                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH', 'scripts.wrong'):
                 code = run_mypy_checks.install_mypy_prerequisites()
                 self.assertEqual(code, 1)
 
