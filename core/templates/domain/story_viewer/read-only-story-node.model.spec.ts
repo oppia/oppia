@@ -22,7 +22,7 @@ import { LearnerExplorationSummary } from
   'domain/summary/learner-exploration-summary.model';
 
 describe('Read only story node model', () => {
-  var _sampleStoryNode = null;
+  var _sampleStoryNode: ReadOnlyStoryNode;
 
   beforeEach(() => {
     var sampleReadOnlyStoryNodeBackendDict = {

@@ -23,11 +23,12 @@ import { StoryEditorNavigationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Story editor navigation service', () => {
-  let windowRef: WindowRef = null;
-  let sens: StoryEditorNavigationService = null;
+  let windowRef: WindowRef;
+  let sens: StoryEditorNavigationService;
   let sampleHash = '/chapter_editor/node_1';
   let pathname = '/chapter_editor';
-  let mockLocation = null;
+  let mockLocation:
+   Pick<Location, 'hash' | 'href' | 'origin' | 'pathname' | 'search'>;
   let origin = 'http://sample.com';
 
   beforeEach(() => {
