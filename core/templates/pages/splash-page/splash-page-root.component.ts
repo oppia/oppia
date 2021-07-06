@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file is using throw which is not allowed.
+ * @fileoverview Root component for Splash Page.
  */
 
-angular.module('oppia').directive('codemirrorMergeview', [
-  function() {
-    return {
-      restrict: 'E',
-      link: function(scope, element, attrs) {
-        // Require CodeMirror
-        if (angular.isUndefined(window.CodeMirror)) {
-          throw 'CodeMirror not found.'; // Use of throw is not allowed.
-        }
-      }
-    };
-  }]
-);
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'oppia-splash-page-root',
+  templateUrl: './splash-page-root.component.html'
+})
+export class SplashPageRootComponent {}
