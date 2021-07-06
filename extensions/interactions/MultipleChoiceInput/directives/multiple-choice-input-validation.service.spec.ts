@@ -187,10 +187,6 @@ describe('MultipleChoiceInputValidationService', () => {
       // default outcome.
       goodAnswerGroups[0].rules.splice(1, 1);
       warnings = validatorService.getAllWarnings(
-        // This throws "Type 'null' is not assignable to type 'Outcome'
-        // ." We need to suppress this error because of the need to test
-        // validations when the outcome is not defined.
-        // @ts-ignore
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,

@@ -90,10 +90,6 @@ describe('EndExplorationValidationService', () => {
   it('should not have warnings for no answer groups or no default outcome',
     () => {
       var warnings = validatorService.getAllWarnings(
-        // This throws "Type 'null' is not assignable to type 'Outcome'
-        // ." We need to suppress this error because of the need to test
-        // validations if no default outcome is defined.
-        // @ts-ignore
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([]);
     });
@@ -131,10 +127,6 @@ describe('EndExplorationValidationService', () => {
   it('should not have warnings for 0 or 8 recommendations', () => {
     customizationArguments.recommendedExplorationIds.value = [];
     var warnings = validatorService.getAllWarnings(
-      // This throws "Type 'null' is not assignable to type 'Outcome'
-      // ." We need to suppress this error because of the need to test
-      // validations with the outcome not defined.
-      // @ts-ignore
       currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
 
@@ -143,10 +135,6 @@ describe('EndExplorationValidationService', () => {
       'ExpID4', 'ExpID5', 'ExpID6', 'ExpID7'
     ];
     warnings = validatorService.getAllWarnings(
-      // This throws "Type 'null' is not assignable to type 'Outcome'
-      // ." We need to suppress this error because of the need to test
-      // validations with the outcome not defined.
-      // @ts-ignore
       currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
   });
@@ -159,10 +147,6 @@ describe('EndExplorationValidationService', () => {
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
-      // This throws "Type 'null' is not assignable to type 'Outcome'
-      // ." We need to suppress this error because of the need to test
-      // validations with the outcome not defined.
-      // @ts-ignore
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
@@ -178,10 +162,6 @@ describe('EndExplorationValidationService', () => {
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(
-      // This throws "Type 'null' is not assignable to type 'Outcome'
-      // ." We need to suppress this error because of the need to test
-      // validations with the outcome not defined.
-      // @ts-ignore
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,

@@ -199,10 +199,6 @@ describe('ImageClickInputValidationService', () => {
   it('should expect a non-confusing and non-null default outcome',
     () => {
       var warnings = validatorService.getAllWarnings(
-      // This throws "Argument of type 'null' is not assignable to parameter."
-      // We need to suppress this error because of the need to test the warnings
-      // if an outcome is not sepcified.
-      // @ts-ignore
         currentState, customizationArguments, goodAnswerGroups, null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
