@@ -184,7 +184,7 @@ describe('Blog Admin Page component ', () => {
         component.formData.updateRole.newRole = 'BLOG_ADMIN';
         component.formData.updateRole.username = 'username';
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-        
+
         component.submitUpdateRoleForm(component.formData.updateRole);
 
         expect(startTaskSpy).not.toHaveBeenCalled();
