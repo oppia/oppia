@@ -44,6 +44,7 @@
         "core.controllers.topics_and_skills_dashboard_test",
         "extensions.value_generators.models.generators_test",
         "core.controllers.admin_test",
+        "core.controllers.android_e2e_config_test",
         "core.controllers.release_coordinator_test",
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",

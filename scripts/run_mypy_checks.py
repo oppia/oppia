@@ -49,6 +49,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/acl_decorators_test.py',
     'core/controllers/admin.py',
     'core/controllers/admin_test.py',
+    'core/controllers/android_e2e_config.py',
+    'core/controllers/android_e2e_config_test.py',
     'core/controllers/base.py',
     'core/controllers/base_test.py',
     'core/controllers/blog_admin.py',
