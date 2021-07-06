@@ -88,7 +88,7 @@ export class baseInteractionValidationService {
   }
 
   getDefaultOutcomeWarnings(
-      defaultOutcome: Outcome, stateName: string): Warning[] {
+      defaultOutcome: Outcome | null, stateName: string): Warning[] {
     var partialWarningsList = [];
     if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
       partialWarningsList.push({

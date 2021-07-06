@@ -521,6 +521,7 @@
     "extensions/interactions/SetInput/directives/set-input-validation.service.spec.ts",
     "extensions/interactions/TextInput/directives/text-input-rules.service.ts",
     "extensions/interactions/TextInput/directives/text-input-rules.service.spec.ts",
+    "extensions/interactions/base-interaction-validation.service.ts",
     "extensions/interactions/answer-defs.ts",
     "extensions/interactions/customization-args-defs.ts",
     "extensions/interactions/interactions-extension.constants.ts",
