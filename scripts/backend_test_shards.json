@@ -198,7 +198,6 @@
         "core.domain.caching_services_test",
         "core.domain.email_manager_test",
         "core.domain.classifier_domain_test",
-        "core.domain.user_jobs_continuous_test",
         "core.domain.wipeout_domain_test",
         "core.domain.learner_playlist_services_test",
         "core.domain.state_domain_test",

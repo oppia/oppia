@@ -406,8 +406,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/translation_validators_test.py',
     'core/domain/user_domain.py',
     'core/domain/user_domain_test.py',
-    'core/domain/user_jobs_continuous.py',
-    'core/domain/user_jobs_continuous_test.py',
     'core/domain/user_jobs_one_off.py',
     'core/domain/user_jobs_one_off_test.py',
     'core/domain/user_query_domain.py',
