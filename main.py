@@ -837,8 +837,7 @@ URLS = MAPREDUCE_HANDLERS + [
         improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
-        r'%s' % feconf.BLOG_ADMIN_PAGE_URL,
-        blog_admin.BlogAdminPage),
+        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
     get_redirect_route(
         r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
         blog_admin.BlogAdminRolesHandler),
