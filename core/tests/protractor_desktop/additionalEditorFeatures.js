@@ -756,8 +756,8 @@ describe('Full exploration editor', function() {
       });
       await action.waitForAutosave();
       await waitFor.visibilityOf(
-        element(by.css('.modal-content')),
-        'Save Changes Recommendation Modal taking too long to appear');
+        element(by.css('.protractor-test-save-prompt-modal')),
+        'Save Prompt Modal taking too long to appear');
       explorationEditorPage.saveChangesAfterPrompt(
         'Changed Content so many times');
       await explorationEditorMainTab.expectContentToMatch(
