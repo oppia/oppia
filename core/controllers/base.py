@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import time
+import re
 
 from core.controllers import payload_validator
 from core.domain import auth_domain
@@ -341,15 +342,19 @@ class BaseHandler(webapp2.RequestHandler):
         request_arg_keys = []
         for arg in self.request.arguments():
             if arg == 'csrf_token':
-                # 'csrf_token' is already going to be validated by the
-                # is_csrf_token_valid() in dispatch method, so no need to
-                # validate its schema again.
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
                 continue
             elif arg == 'source':
                 source_url = self.request.get('source')
-                if not isinstance(source_url, python_utils.BASESTRING):
+                regex_pattern = (
+                    'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]'
+                    '|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
                     raise self.InvalidInputException(
-                    'Expected string, received %s' % source_url)
+                        'Not a valid source url.')
             elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
