@@ -189,16 +189,14 @@ var PreferencesPage = function() {
     await waitFor.visibilityOf(
       audioLanguageSelector,
       'audio language selector taking too long to appear.');
-    expect(await audioLanguageSelector.getText())
-      .toEqual(language);
+    expect(await audioLanguageSelector.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageNotToBe = async function(language) {
     await waitFor.visibilityOf(
       audioLanguageSelector,
       'audio language selector taking too long to appear.');
-    expect(await audioLanguageSelector.getText())
-      .not.toEqual(language);
+    expect(await audioLanguageSelector.getText()).not.toEqual(language);
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {
