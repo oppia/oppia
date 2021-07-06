@@ -19,7 +19,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  * @fileoverview Unit tests for QuestionPlayerComponent.
  */
 
-fdescribe('QuestionPlayerComponent', () => {
+describe('QuestionPlayerComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -56,10 +56,6 @@ fdescribe('QuestionPlayerComponent', () => {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-
-  beforeEach(() => {
-    // TestBed
-  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     mockWindow = {
@@ -235,9 +231,11 @@ fdescribe('QuestionPlayerComponent', () => {
 
   it('should get html for action button icon', () => {
     expect(ctrl.getActionButtonIconHtml('BOOST_SCORE').toString())
-      .toBe('&#10;          &#10;          &#10;          <img alt="" ' +
+      .toBe(
+        '&#10;          &#10;          &#10;          <img alt="" ' +
         'class="action-button-icon" src="/assets/images/icons/' +
-        'rocket@2x.png">&#10;          ');
+        'rocket@2x.png">&#10;          '
+      );
     expect(ctrl.getActionButtonIconHtml('RETRY_SESSION').toString())
       .toBe('<i class="material-icons md-36 action-button-icon">&#58837;</i>');
     expect(ctrl.getActionButtonIconHtml('DASHBOARD').toString())
@@ -252,7 +250,7 @@ fdescribe('QuestionPlayerComponent', () => {
       skillIds = options.resolve.skillIds();
       return {
         result: $q.resolve()
-      }
+      };
     });
     ctrl.scorePerSkillMapping = {
       skill1: {
@@ -508,7 +506,7 @@ fdescribe('QuestionPlayerComponent', () => {
       userIsLoggedIn = options.resolve.userIsLoggedIn();
       return {
         result: $q.resolve()
-      }
+      };
     });
 
     ctrl.openSkillMasteryModal('skillId1');
@@ -528,7 +526,7 @@ fdescribe('QuestionPlayerComponent', () => {
     spyOn($uibModal, 'open').and.callFake((options) => {
       return {
         result: $q.reject()
-      }
+      };
     });
 
     ctrl.openSkillMasteryModal('skillId1');
