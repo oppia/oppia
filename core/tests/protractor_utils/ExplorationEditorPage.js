@@ -305,7 +305,7 @@ var ExplorationEditorPage = function() {
   this.saveChangesAfterPrompt = async function(commitMessage) {
     await action.click('Save prompt Save button', savePromptSaveButton);
     await waitFor.invisibilityOf(
-      element(by.css('.protractor-test-save-prompt-modal')), 
+      element(by.css('.protractor-test-save-prompt-modal')),
       'Save Prompt modal does not disappear.');
     await waitFor.visibilityOf(
       element(by.css('.protractor-test-exploration-save-modal')),
