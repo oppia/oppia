@@ -537,6 +537,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
 
         method = self.request.environ['REQUEST_METHOD']
+        self.response.set_status(values['status_code'])
 
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
@@ -550,8 +551,8 @@ class BaseHandler(webapp2.RequestHandler):
                 for route in constants.FRONTEND_ROUTES.values():
                     if self.request.path == '/' + route:
                         is_frontend_route = True
-                if not is_frontend_route:
-                    self.response.set_status(404)
+                if is_frontend_route:
+                    self.response.set_status(200)
                 self.render_template('oppia-root.mainpage.html')
             else:
                 self.render_template(
