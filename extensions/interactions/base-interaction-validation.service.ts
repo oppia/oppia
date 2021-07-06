@@ -111,7 +111,7 @@ export class baseInteractionValidationService {
   }
 
   getAllOutcomeWarnings(
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null,
       stateName: string): Warning[] {
     return (
       this.getAnswerGroupWarnings(answerGroups, stateName).concat(
