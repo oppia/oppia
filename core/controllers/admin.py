@@ -887,7 +887,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
         if exploration is None:
             raise self.InvalidInputException(
                 'Entity for exploration with id %s and version %s not found.'
-                % (exp_id, self.normalized_request.get('exp_version')))
+                % (exp_id, exp_version))
 
         state_name = self.normalized_request.get('state_name')
         num_answers = self.normalized_request.get('num_answers')
