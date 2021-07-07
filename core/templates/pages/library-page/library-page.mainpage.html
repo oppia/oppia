@@ -7,21 +7,12 @@
       html, body {
         background-color: #afd2eb;
       }
-      @media(max-width: 1125px) {
-      .protractor-library-page-search-bar {
-          display: none;
-        }
-      }
     </style>
   </head>
   <body>
     <oppia-root>
       <div ng-controller="Base" dir="<[direction]>">
         <oppia-base-content>
-          <navbar-breadcrumb>
-            <search-bar class="protractor-library-page-search-bar" enable-dropup="false"></search-bar>
-          </navbar-breadcrumb>
-
           <content>
             <library-page></library-page>
           </content>

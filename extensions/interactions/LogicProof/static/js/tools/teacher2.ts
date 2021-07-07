@@ -775,6 +775,7 @@ var logicProofTeacher2 = (function() {
           controlFunctionStrings[i].LHS, controlFunctionStrings[i].RHS,
           controlFunctionStrings[i].description, controlLanguage);
       } catch (err) {
+        // eslint-disable-next-line no-throw-literal
         throw {
           message: logicProofShared.renderError(
             err, logicProofTeacher.TEACHER_ERROR_MESSAGES,

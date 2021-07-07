@@ -1542,6 +1542,10 @@ class GenericTestBase(AppEngineTestBase):
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
     ADMIN_USERNAME = 'adm'
+    BLOG_ADMIN_EMAIL = 'blogadmin@example.com'
+    BLOG_ADMIN_USERNAME = 'blogadm'
+    BLOG_EDITOR_EMAIL = 'blogeditor@example.com'
+    BLOG_EDITOR_USERNAME = 'blogeditor'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
     RELEASE_COORDINATOR_EMAIL = 'releasecoordinator@example.com'
@@ -1554,6 +1558,8 @@ class GenericTestBase(AppEngineTestBase):
     TOPIC_MANAGER_USERNAME = 'topicmanager'
     VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
     VOICE_ARTIST_USERNAME = 'voiceartist'
+    VOICEOVER_ADMIN_EMAIL = 'voiceoveradm@example.com'
+    VOICEOVER_ADMIN_USERNAME = 'voiceoveradm'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -2040,6 +2046,15 @@ title: Title
         for name in moderator_usernames:
             self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
 
+    def set_voiceover_admin(self, voiceover_admin_username):
+        """Sets role of given users as VOICEOVER ADMIN.
+
+        Args:
+            voiceover_admin_username: list(str). List of usernames.
+        """
+        for name in voiceover_admin_username:
+            self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
     def set_banned_users(self, banned_usernames):
         """Sets role of given users as BANNED_USER.
 
@@ -2243,13 +2258,16 @@ title: Title
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, data, headers=None, csrf_token=None, expected_status_int=200,
-            upload_files=None, use_payload=True):
+            self, url, data, headers=None, csrf_token=None,
+            expected_status_int=200, upload_files=None, use_payload=True,
+            source=None):
+
         """Post an object to the server by JSON; return the received object.
 
         Args:
             url: str. The URL to send the POST request to.
             data: dict. The dictionary that acts as the body of the request.
+            headers: dict. The headers set in the request.
             csrf_token: str. The csrf token to identify the user.
             expected_status_int: int. Expected return status of the POST
                 request.
@@ -2263,6 +2281,7 @@ title: Title
                 false, the dict in 'data' is directly passed as the body of the
                 request. For all requests called from the frontend, this should
                 be set to 'true'.
+            source: unicode. The url from which the post call is requested.
 
         Returns:
             dict. The JSON response for the request in dict form.
@@ -2271,6 +2290,8 @@ title: Title
             data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
+        if source:
+            data['source'] = source
 
         expect_errors = expected_status_int >= 400
 
