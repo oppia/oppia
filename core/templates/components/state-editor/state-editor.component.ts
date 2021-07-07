@@ -72,7 +72,7 @@ require(
 
 import { Subscription } from 'rxjs';
 
-angular.module('oppia').component('stateEditor',  {
+angular.module('oppia').component('stateEditor', {
   bindings: {
     addState: '=',
     getStateContentPlaceholder: '&stateContentPlaceholder',
@@ -195,4 +195,4 @@ angular.module('oppia').component('stateEditor',  {
       };
     }
   ]
-  });
+});
