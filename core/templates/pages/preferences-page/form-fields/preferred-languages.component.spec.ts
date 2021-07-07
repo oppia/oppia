@@ -19,6 +19,7 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'modules/material.module';
 import { PreferredLanguagesComponent } from './preferred-languages.component';
 
@@ -29,6 +30,7 @@ describe('Preferred Languages Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         ReactiveFormsModule
