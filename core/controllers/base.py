@@ -39,7 +39,6 @@ import utils
 import backports.functools_lru_cache
 import webapp2
 
-
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
@@ -348,7 +347,7 @@ class BaseHandler(webapp2.RequestHandler):
             elif arg == 'source':
                 source_url = self.request.get('source')
                 regex_pattern = (
-                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
                 )
                 regex_verified_url = re.findall(regex_pattern, source_url)
                 if not regex_verified_url:
