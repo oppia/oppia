@@ -2278,8 +2278,7 @@ title: Title
                 false, the dict in 'data' is directly passed as the body of the
                 request. For all requests called from the frontend, this should
                 be set to 'true'.
-            source: unicode. The url from which the post request is
-                performed.
+            source: unicode. The url from which the post call is requested.
 
         Returns:
             dict. The JSON response for the request in dict form.
