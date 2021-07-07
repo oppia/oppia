@@ -33,6 +33,7 @@ from core.domain import config_services
 from core.domain import user_services
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 import backports.functools_lru_cache
