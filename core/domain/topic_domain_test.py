@@ -828,8 +828,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         # Test exception when thumbnail is not found on filesystem.
         with self.assertRaisesRegexp(
             Exception,
-            'The thumbnail img.svg for topic with id topic_id does not exist'
-            ' in the filesystem.'):
+            'The thumbnail img.svg for topic with id %s does not exist'
+            ' in the filesystem.' % (self.topic_id)):
             self.topic.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
