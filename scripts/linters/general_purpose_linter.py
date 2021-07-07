@@ -125,13 +125,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
-        'message': 'In tests, please use \'angular.mock.inject\' instead of '
-                   '\'inject\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
@@ -147,46 +140,10 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object' +
-                   'for this purpose.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'require\(.*\.\..*\);'),
         'message': 'Please, don\'t use relative imports in require().',
         'excluded_files': (),
         'excluded_dirs': ('core/tests/',)
-    },
-    {
-        'regexp': re.compile(r'innerHTML'),
-        'message': 'Please do not use innerHTML property.',
-        'excluded_files': (
-            'core/templates/Polyfills.ts',
-            'core/templates/filters/translate.pipe.spec.ts',
-            'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts',
-            'core/templates/tests/unit-test-utils.ajs.ts',
-            'core/templates/directives/mathjax.directive.ts',
-            'extensions/objects/templates/' +
-            'math-expression-content-editor.component.ts',
-            'rte-output-display.component.spec.ts'),
-        'excluded_dirs': ('core/tests/',)
-    },
-    {
-        'regexp': re.compile(r'\$broadcast'),
-        'message': (
-            'Please do not use $broadcast/$on for propagating events. '
-            'Use @Input/@Output instead.'),
-        'excluded_files': (
-            'core/templates/pages/exploration-editor-page/translation-tab/'
-            'audio-translation-bar/audio-translation-bar.directive.spec.ts',
-            'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts',
-            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
-        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'import (\{.*\}|\_) from \'lodash\''),
