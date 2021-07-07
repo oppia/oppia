@@ -271,7 +271,7 @@ def get_published_blog_post_summaries_by_user_id(user_id, max_limit):
         blog posts assigned to given user.
     """
     blog_rights_models = (
-        blog_models.BlogPostRightsModel.get_multi_published_models_by_user(
+        blog_models.BlogPostRightsModel.get_published_models_by_user(
             user_id, max_limit))
     if not blog_rights_models:
         return None
@@ -600,7 +600,7 @@ def get_published_blog_post_summaries(offset=0):
         list(BlogPostSummaries) | None . These are sorted in order of the date
         published. None if no blog post is published.
     """
-    max_limit = feconf.MAX_LIMIT_FOR_CARDS_ON_HOMEPAGE_PAGE
+    max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
     blog_post_rights_models = blog_models.BlogPostRightsModel.query(
         blog_models.BlogPostRightsModel.blog_post_is_published == True).order( # pylint: disable=singleton-comparison
             -blog_models.BlogPostRightsModel.last_updated).fetch(

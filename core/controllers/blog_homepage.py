@@ -150,12 +150,12 @@ class AuthorsPageHandler(base.BaseHandler):
         blog_post_summaries = (
             blog_services.get_published_blog_post_summaries_by_user_id(
                 user_settings.user_id,
-                feconf.MAX_LIMIT_FOR_CARDS_ON_BLOG_AUTHORS_PAGE))
+                feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE)) #pylint: disable=line-too-long
         blog_post_summary_dicts = []
         if blog_post_summaries:
             blog_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_homepage(
-                    blog_post_summaries))    
+                    blog_post_summaries))
 
         self.values.update({
             'author_name': author_username,

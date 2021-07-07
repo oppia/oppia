@@ -334,50 +334,49 @@ class BlogPostRightsModel(base_models.BaseModel):
             cls.editor_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
-    def get_multi_published_models_by_user(cls, user_id, limit=None):
+    def get_published_models_by_user(cls, user_id, limit=None):
         """Retrieves the blog post rights objects for published blog posts for
-        which the given user is an editor .
+        which the given user is an editor.
 
         Args:
             user_id: str. ID of the author of the blog post.
-            limit: int|None. Number of BlogPostRightsModel to be fetched.If
+            limit: int|None. Number of BlogPostRightsModel to be fetched. If
                 None, all existing published models by user will be fetched.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
-            in which the given user is an editor.
+            in which the given user is an editor. The list will be ordered
+            according to last updated.
         """
+        query = cls.query(
+            cls.editor_ids == user_id, cls.blog_post_is_published == True # pylint: disable=singleton-comparison
+        ).order(-cls.last_updated)
         if limit is not None:
-            return cls.query(
-                cls.editor_ids == user_id,
-                cls.blog_post_is_published == True # pylint: disable=singleton-comparison
-            ).order(-cls.last_updated).fetch(limit)
-        return cls.query(
-            cls.editor_ids == user_id,
-            cls.blog_post_is_published == True).fetch() # pylint: disable=singleton-comparison
+            return query.fetch(limit)
+        return query.fetch()
 
     @classmethod
-    def get_multi_draft_models_by_user(cls, user_id, limit=None):
+    def get_draft_models_by_user(cls, user_id, limit=None):
         """Retrieves the blog post rights objects for draft blog posts for which
-        the given user is an editor .
+        the given user is an editor.
 
         Args:
             user_id: str. ID of the author of the blog post.
-            limit: int|None. Number of BlogPostRightsModel to be fetched.If
+            limit: int|None. Number of BlogPostRightsModel to be fetched. If
                 None, all existing draft models by user will be fetched.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
-            in which the given user is an editor.
+            in which the given user is an editor. The list will be ordered
+            according to last updated.
         """
-        if limit is not None:
-            return cls.query(
-                cls.editor_ids == user_id,
-                cls.blog_post_is_published == False # pylint: disable=singleton-comparison
-            ).order(-cls.last_updated).fetch(limit)
-        return cls.query(
+        query = cls.query(
             cls.editor_ids == user_id,
-            cls.blog_post_is_published == False).fetch() # pylint: disable=singleton-comparison
+            cls.blog_post_is_published == False # pylint: disable=singleton-comparison
+        ).order(-cls.last_updated)
+        if limit is not None:
+            return query.fetch(limit)
+        return query.fetch() # pylint: disable=singleton-comparison
 
     @classmethod
     def get_all_by_user(cls, user_id):

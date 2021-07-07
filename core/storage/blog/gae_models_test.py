@@ -263,7 +263,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_models.BlogPostRightsModel.get_all_by_user(self.USER_ID),
             [self.blog_post_rights_draft_model])
 
-    def test_get_multi_published_models_by_user_when_limit_is_set(self):
+    def test_get_published_models_by_user_when_limit_is_set(self):
         blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
             id='blog_post_two',
             editor_ids=[self.USER_ID_NEW],
@@ -282,16 +282,16 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
 
         # The latest two published blog post rights models should be fetched.
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_multi_published_models_by_user(
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
                 self.USER_ID_NEW, 2),
             [blog_post_rights_punlished_model, self.blog_post_rights_model])
 
         # The latest published blog post rights model should be fetched.
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_multi_published_models_by_user(
+            blog_models.BlogPostRightsModel.get_published_models_by_user(
                 self.USER_ID_NEW, 1), [blog_post_rights_punlished_model])
 
-    def test_get_multi_published_models_by_user_when_no_limit(self):
+    def test_get_published_models_by_user_when_no_limit(self):
         blog_post_rights_punlished_model = blog_models.BlogPostRightsModel(
             id='blog_post_one',
             editor_ids=[self.USER_ID_NEW],
@@ -303,9 +303,9 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             len(
                 blog_models.BlogPostRightsModel
-                .get_multi_published_models_by_user(self.USER_ID_NEW)), 2)
+                .get_published_models_by_user(self.USER_ID_NEW)), 2)
 
-    def test_get_multi_draft_models_by_user_when_limit_is_set(self):
+    def test_get_draft_models_by_user_when_limit_is_set(self):
         blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
             id='blog_post_two',
             editor_ids=[self.USER_ID_NEW],
@@ -324,16 +324,16 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
 
         # The latest two draft blog post rights models should be fetched.
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_multi_draft_models_by_user(
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
                 self.USER_ID_NEW, 2),
             [blog_post_rights_draft_model, self.blog_post_rights_draft_model])
 
         # The latest draft blog post rights model should be fetched.
         self.assertEqual(
-            blog_models.BlogPostRightsModel.get_multi_draft_models_by_user(
+            blog_models.BlogPostRightsModel.get_draft_models_by_user(
                 self.USER_ID_NEW, 1), [blog_post_rights_draft_model])
 
-    def test_get_multi_draft_models_by_user_when_no_limit_is_set(self):
+    def test_get_draft_models_by_user_when_no_limit_is_set(self):
         blog_post_rights_draft_model = blog_models.BlogPostRightsModel(
             id='blog_post_two',
             editor_ids=[self.USER_ID_NEW],
@@ -343,7 +343,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         blog_post_rights_draft_model.put()
 
         self.assertEqual(
-            len(blog_models.BlogPostRightsModel.get_multi_draft_models_by_user(
+            len(blog_models.BlogPostRightsModel.get_draft_models_by_user(
                 self.USER_ID_NEW)), 2)
 
     def test_export_data_on_editor(self):
