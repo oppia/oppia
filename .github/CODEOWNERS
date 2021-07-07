@@ -131,7 +131,7 @@
 /core/templates/pages/about-page/ @DubeySandeep
 # TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
 /core/templates/pages/about-page/about-page.constants.ts @seanlip
-/core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
+/core/templates/pages/license-page/ @vojtechjelinek
 /core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
 # TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
@@ -183,7 +183,7 @@
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
-/scripts/typescript_checks*.py @vojtechjelinek
+/scripts/typescript_checks*.py @vojtechjelinek @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
 /scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
@@ -322,12 +322,12 @@
 /core/templates/services/guppy-initialization.service.ts @iamprayush
 /core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
-/extensions/interactions/ @vojtechjelinek
-/extensions/objects/ @vojtechjelinek
+/extensions/interactions/ @iamprayush @vojtechjelinek
+/extensions/objects/ @iamprayush @vojtechjelinek
 /extensions/objects/templates/filepath-editor.component*.ts @kevintab95
 /extensions/objects/templates/filepath-editor.component.html @kevintab95
-/extensions/value_generators/ @vojtechjelinek
-/extensions/__init__.py @vojtechjelinek
+/extensions/value_generators/ @iamprayush @vojtechjelinek
+/extensions/__init__.py @iamprayush @vojtechjelinek
 
 
 # Lesson Analytics team.
@@ -476,7 +476,7 @@
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
-/core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @jameesjohn
+/core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
@@ -576,37 +576,37 @@
 
 
 # Simple pages.
-/core/controllers/pages*.py @jameesjohn @vojtechjelinek
-/core/controllers/custom_landing_pages*.py @jameesjohn @vojtechjelinek
-/core/templates/pages/contact-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/delete-account-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/donate-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/error-pages/ @jameesjohn @vojtechjelinek
-/core/templates/pages/get-started-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/landing-pages/ @jameesjohn @vojtechjelinek
-/core/templates/pages/maintenance-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/participation-playbook/ @jameesjohn @vojtechjelinek
+/core/controllers/pages*.py @vojtechjelinek
+/core/controllers/custom_landing_pages*.py @vojtechjelinek
+/core/templates/pages/contact-page/ @vojtechjelinek
+/core/templates/pages/delete-account-page/ @vojtechjelinek
+/core/templates/pages/donate-page/ @vojtechjelinek
+/core/templates/pages/error-pages/ @vojtechjelinek
+/core/templates/pages/get-started-page/ @vojtechjelinek
+/core/templates/pages/landing-pages/ @vojtechjelinek
+/core/templates/pages/maintenance-page/ @vojtechjelinek
+/core/templates/pages/pending-account-deletion-page/ @vojtechjelinek
+/core/templates/pages/preferences-page/ @vojtechjelinek
+/core/templates/pages/signup-page/ @vojtechjelinek
+/core/templates/pages/splash-page/ @vojtechjelinek
+/core/templates/pages/teach-page/ @vojtechjelinek
+/core/templates/pages/thanks-page/ @vojtechjelinek
+/core/templates/pages/participation-playbook/ @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @nithusha21 @vojtechjelinek
-/core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
-/core/templates/base-components/ @jameesjohn @vojtechjelinek
-/core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-/core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
-/core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
-/core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
-/core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
+/core/templates/google-analytics.initializer.ts @vojtechjelinek
+/core/templates/base-components/ @vojtechjelinek
+/core/templates/pages/Base.ts @vojtechjelinek
+/core/templates/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/pages/header_css_libs.html @vojtechjelinek
+/core/templates/pages/header_js_libs.html @vojtechjelinek
+/core/templates/services/csrf-token.service*.ts @vojtechjelinek
 /core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
-/.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
+/.lighthouserc.js @jimbyo @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo @vojtechjelinek
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
-/scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
+/scripts/run_lighthouse_tests.py @vojtechjelinek
 /webpack.*.ts @nithusha21 @vojtechjelinek
 
 
