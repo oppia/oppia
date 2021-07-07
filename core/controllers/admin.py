@@ -94,6 +94,8 @@ class AdminHandler(base.BaseHandler):
                         'update_feature_flag_rules'
                     ]
                 },
+                # TODO(#13331): Remove default_value once clear_search_index
+                # is fixed.
                 'default_value': None
             },
             'exploration_id': {
