@@ -617,6 +617,7 @@ class _Validators(python_utils.OBJECT):
 
     @staticmethod
     def is_valid_audio_language_code(obj):
+        # type: (Text) -> bool
         """Checks if the given obj (a string) represents a valid language code.
 
         Args:
