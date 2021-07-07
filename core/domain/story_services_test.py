@@ -165,7 +165,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         # Save a dummy image on filesystem, to be used as thumbnail.
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'image.svg'),
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
