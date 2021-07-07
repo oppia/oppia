@@ -427,9 +427,6 @@ describe('Full exploration editor', function() {
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
       await waitFor.pageToFullyLoad();
-      await waitFor.invisibilityOf(
-        element(by.css('.protractor-test-lost-changes-modal')),
-        'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
