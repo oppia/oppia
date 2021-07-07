@@ -85,8 +85,6 @@
     "core/templates/directives/mathjax.directive.spec.ts",
     "core/templates/directives/ng-init.directive.ts",
     "core/templates/directives/ng-init.directive.spec.ts",
-    "core/templates/domain/admin/computation-data.model.ts",
-    "core/templates/domain/admin/computation-data.model.spec.ts",
     "core/templates/domain/admin/job-status-summary.model.ts",
     "core/templates/domain/admin/job-status-summary.model.spec.ts",
     "core/templates/domain/classifier/answer-classification-result.model.ts",
