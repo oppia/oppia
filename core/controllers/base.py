@@ -23,7 +23,6 @@ import hmac
 import json
 import logging
 import os
-import re
 import time
 
 from core.controllers import payload_validator
