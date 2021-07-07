@@ -23,6 +23,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 
 from core.controllers import payload_validator
@@ -33,7 +34,6 @@ from core.domain import config_services
 from core.domain import user_services
 import feconf
 import python_utils
-import schema_utils
 import utils
 
 import backports.functools_lru_cache
@@ -346,10 +346,13 @@ class BaseHandler(webapp2.RequestHandler):
                 continue
             elif arg == 'source':
                 source_url = self.request.get('source')
-                try:
-                    schema_utils.Normalizers.sanitize_url(source_url)
-                except AssertionError as e:
-                    raise self.InvalidInputException(e)
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
             elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
