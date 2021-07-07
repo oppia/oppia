@@ -25,7 +25,7 @@ require(
   'answer-group-editor.component.ts');
 require(
   'components/state-directives/response-header/response-header.directive.ts');
-require('components/state-editor/state-editor.directive.ts');
+require('components/state-editor/state-editor.component.ts');
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-destination-editor.directive.ts');

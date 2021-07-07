@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
-
 /**
  * @fileoverview Unit test for Answer Group Editor Component.
  */
+
+import { EventEmitter } from '@angular/core';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 describe('AnswerGroupEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
-  let $q = null;
 
   let ExternalSaveService = null;
   let StateEditorService = null;
@@ -86,7 +85,6 @@ describe('AnswerGroupEditorComponent', () => {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    $q = $injector.get('$q');
 
     ExternalSaveService = $injector.get('ExternalSaveService');
     StateEditorService = $injector.get('StateEditorService');
