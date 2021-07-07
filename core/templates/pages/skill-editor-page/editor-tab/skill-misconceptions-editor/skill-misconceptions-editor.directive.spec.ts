@@ -21,7 +21,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';

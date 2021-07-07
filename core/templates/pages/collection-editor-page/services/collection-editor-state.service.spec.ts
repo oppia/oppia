@@ -114,7 +114,6 @@ describe('Collection editor state service', () => {
   );
 
   it('should fire an update event after loading more collections', () => {
-
     // Load initial collection.
     collectionEditorStateService.loadCollection('5', () => {
       // Load a second collection.
@@ -236,7 +235,6 @@ describe('Collection editor state service', () => {
       const saveCollectionsuccessCb = jasmine.createSpy('success');
       const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
-  
       // Load initial collection.
       collectionEditorStateService.loadCollection(
         'sample_collection_id', loadCollectionRightsSuccessCb);
