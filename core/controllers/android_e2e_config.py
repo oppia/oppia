@@ -24,6 +24,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -122,6 +123,18 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.add_uncategorized_skill_id(skill_id)
         topic.add_subtopic(1, 'Test Subtopic Title')
 
+        # Save the dummy image to the filesystem to be used as thumbnail for
+        # subtopic.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, topic_id))
+        fs.commit(
+            '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
         # Update and validate subtopic.
         topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
