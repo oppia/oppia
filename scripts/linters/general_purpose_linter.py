@@ -162,7 +162,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
-            'core/templates/pages/translate-loader.factory.ts',
+            'core/templates/i18n/translate-loader.factory.ts',
             'translate-loader.factory.spec.ts',
             'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
