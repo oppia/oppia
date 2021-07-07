@@ -22,8 +22,8 @@ import { RatioExpressionInputRulesService } from
 import { TestBed } from '@angular/core/testing';
 
 describe('Ratio expression input rules service', () => {
-  let reirs: RatioExpressionInputRulesService = null;
-  let inputList;
+  let reirs: RatioExpressionInputRulesService;
+  let inputList: number[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
