@@ -20,7 +20,6 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 
 import { ReleaseCoordinatorBackendApiService, JobsData } from '../services/release-coordinator-backend-api.service';
-import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 import { InterpolationValuesType, UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -52,9 +51,6 @@ describe('Jobs Tab Component', () => {
   let fixture: ComponentFixture<JobsTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let mockJobId: string = 'testJobId';
-  let mockComputationData: ComputationData = new ComputationData(
-    123, true, 'idle', 123, true, 123, '0', 'testComputation'
-  );
   let mockJobStatusSummary: JobStatusSummary = new JobStatusSummary(
     'testJob', false,
   );
@@ -64,7 +60,6 @@ describe('Jobs Tab Component', () => {
   );
   let mockJobsData: JobsData = {
     humanReadableCurrentTime: 'testReadableTime',
-    continuousComputationsData: [mockComputationData],
     oneOffJobStatusSummaries: [mockJobStatusSummary],
     unfinishedJobData: [mockJob],
     auditJobStatusSummaries: [mockJobStatusSummary],
@@ -105,15 +100,6 @@ describe('Jobs Tab Component', () => {
               }
               return;
             }
-          } else if ('computation_type' in requestData) {
-            if (requestData.computation_type === 'error') {
-              if (errorCallback) {
-                errorCallback({
-                  error: 'test error'
-                });
-              }
-              return;
-            }
           }
           successCallback();
         }
@@ -140,20 +126,6 @@ describe('Jobs Tab Component', () => {
       return this.post('/startNewJobAsync', {
         action: 'start_new_job',
         job_type: jobType
-      });
-    }
-
-    startComputationAsync(computationType: string): FakeThen {
-      return this.post('/startComputationAsync', {
-        action: 'start_computation',
-        computation_type: computationType
-      });
-    }
-
-    stopComputationAsync(computationType: string): FakeThen {
-      return this.post('/stopComputationAsync', {
-        action: 'stop_computation',
-        computation_type: computationType
       });
     }
 
@@ -228,8 +200,6 @@ describe('Jobs Tab Component', () => {
     componentInstance.ngOnInit();
     expect(componentInstance.HUMAN_READABLE_CURRENT_TIME)
       .toEqual(mockJobsData.humanReadableCurrentTime);
-    expect(componentInstance.CONTINUOUS_COMPUTATIONS_DATA)
-      .toEqual(mockJobsData.continuousComputationsData);
     expect(componentInstance.ONE_OFF_JOB_SPECS)
       .toEqual(mockJobsData.oneOffJobStatusSummaries);
     expect(componentInstance.UNFINISHED_JOB_DATA)
@@ -277,47 +247,6 @@ describe('Jobs Tab Component', () => {
       componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.startNewJob('error');
-    expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Server error: test error');
-  });
-
-  it('should start computation', () => {
-    componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
-    spyOn(componentInstance.setStatusMessage, 'emit');
-    componentInstance
-      .startComputation('testComputation');
-    expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Computation started successfully.');
-  });
-
-  it('should expect error when startCompuation is called', () => {
-    componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
-    spyOn(componentInstance.setStatusMessage, 'emit');
-    componentInstance
-      .startComputation('error');
-    expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Server error: test error');
-  });
-
-  it('should stop computation', () => {
-    componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
-    spyOn(componentInstance.setStatusMessage, 'emit');
-
-    componentInstance
-      .stopComputation('testComputation');
-    expect(componentInstance.setStatusMessage.emit)
-      .toHaveBeenCalledWith('Abort signal sent to computation.');
-  });
-
-  it('should expect error when stopComputation is called', () => {
-    componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
-    spyOn(componentInstance.setStatusMessage, 'emit');
-    componentInstance
-      .stopComputation('error');
     expect(componentInstance.setStatusMessage.emit)
       .toHaveBeenCalledWith('Server error: test error');
   });
