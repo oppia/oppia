@@ -454,8 +454,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Test exception when thumbnail is not found on filesystem.
         with self.assertRaisesRegexp(
             Exception,
-            'The thumbnail img.svg for story with id story_id does not exist'
-            ' in the filesystem.'):
+            'The thumbnail img.svg for story with id %s does not exist'
+            ' in the filesystem.' % (self.STORY_ID)):
             self.story.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.

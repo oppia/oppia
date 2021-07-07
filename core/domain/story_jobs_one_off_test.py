@@ -20,7 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import os
 
+from constants import constants
+from core.domain import fs_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_jobs_one_off
@@ -30,6 +33,7 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
@@ -292,9 +296,105 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        updated_story = (
-            story_fetchers.get_story_by_id(self.STORY_ID))
-        self.assertEqual(21131, updated_story.thumbnail_size_in_bytes)
+        output = (
+            story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_already_exists', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_thumbnail_size_job_thumbnail_size_is_newly_added(self):
+        self.save_new_story_with_story_contents_schema_v1(
+            self.STORY_ID, 'story.svg', '#F8BF74', None, self.albert_id,
+            'A title', 'A description', 'A note', self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.STORY_ID))
+        fs.commit(
+            '%s/story.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off
+            .PopulateStoryThumbnailSizeOneOffJob.create_new())
+        story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_newly_added', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_thumbnail_size_job_thumbnail_size_updated_for_old_story(self):
+        """Tests that PopulateStoryThumbnailSizeOneOffJob job results in
+        existing update success key when the thumbnail_size_in_bytes is to
+        be updated.
+        """
+        self.save_new_story_with_story_contents_schema_v1(
+            self.STORY_ID, 'image.svg', '#F8BF74', 21131, self.albert_id,
+            'A title', 'A description', 'A note', self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+
+        # Start migration job.
+        job_id = (
+            story_jobs_one_off
+            .PopulateStoryThumbnailSizeOneOffJob.create_new())
+        story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_already_exists', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_thumbnail_size_job_skips_deleted_story(self):
+        """Tests that the story migration job skips deleted story
+        and does not attempt to migrate.
+        """
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
+            'title-two')
+        story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+
+        # Delete the story before migration occurs.
+        story_services.delete_story(
+            self.albert_id, self.STORY_ID)
+
+        # Ensure the story is deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            story_fetchers.get_story_by_id(self.STORY_ID)
+
+        # Start migration job on sample story.
+        job_id = (
+            story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.create_new())
+        story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the deleted story is
+        # being ignored.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Ensure the story is still deleted.
+        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
+            story_fetchers.get_story_by_id(self.STORY_ID)
+
+        output = (
+            story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'story_deleted', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_thumbnail_size_job_thumbnail_size_is_not_present(self):
         self.save_new_story_with_story_contents_schema_v1(
@@ -314,6 +414,10 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
-        updated_story = (
-            story_fetchers.get_story_by_id(self.STORY_ID))
-        self.assertEqual(None, updated_story.thumbnail_size_in_bytes)
+        output = (
+            story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_update_error',
+                     [u'Thumbnail image.svg for story story_id not'
+                      ' found on the filesystem']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
