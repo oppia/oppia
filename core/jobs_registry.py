@@ -28,7 +28,6 @@ from core.domain import skill_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
-import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -53,28 +52,3 @@ ONE_OFF_JOB_MANAGERS = [
 # to show controls on the admin dashboard.
 AUDIT_JOB_MANAGERS = [
 ]
-
-# List of all ContinuousComputation managers to show controls for on the
-# admin dashboard.
-# NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
-# it should be registered here.
-ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
-]
-
-
-class ContinuousComputationEventDispatcher(python_utils.OBJECT):
-    """Dispatches events to the relevant ContinuousComputation classes."""
-
-    @classmethod
-    def dispatch_event(cls, event_type, *args, **kwargs):
-        """Dispatches an incoming event to the ContinuousComputation
-        classes which listen to events of that type.
-
-        Args:
-            event_type: str. The type of the event.
-            *args: list(*). Positional arguments to pass to on_incoming_event().
-            **kwargs: *. Keyword arguments to pass to on_incoming_event().
-        """
-        for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-            if event_type in klass.get_event_types_listened_to():
-                klass.on_incoming_event(event_type, *args, **kwargs)

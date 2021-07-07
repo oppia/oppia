@@ -18,9 +18,12 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -30,17 +33,26 @@ import { MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   imports: [
     CommonModule,
+    NgxMatSelectSearchModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatChipsModule,
+    MatGridListModule,
+    MatIconModule,
     MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
+    MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
     MatFormFieldModule,
@@ -48,13 +60,19 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule
   ],
   exports: [
+    NgxMatSelectSearchModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatChipsModule,
+    MatGridListModule,
+    MatIconModule,
     MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
+    MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
     MatFormFieldModule,
