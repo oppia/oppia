@@ -30,11 +30,15 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 import feconf
-import utils
 
 
 class ContributorDashboardPage(base.BaseHandler):
     """Page showing the contributor dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -49,13 +53,40 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     """Provides data for opportunities available in different categories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'opportunity_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self, opportunity_type):
         """Handles GET requests."""
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
-        search_cursor = self.request.get('cursor', None)
+        search_cursor = self.normalized_request.get('cursor')
+        language_code = self.normalized_request.get('language_code')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             opportunities, next_cursor, more = (
@@ -63,18 +94,14 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            language_code = self.request.get('language_code')
-            if language_code is None or not (
-                    utils.is_supported_audio_language_code(language_code)):
+            if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
                     language_code, search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
-            language_code = self.request.get('language_code')
-            if language_code is None or not (
-                    utils.is_supported_audio_language_code(language_code)):
+            if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_voiceover_opportunity_dicts(
@@ -194,16 +221,30 @@ class TranslatableTextHandler(base.BaseHandler):
     """Provides lessons content which can be translated in a given language."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                }
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        language_code = self.request.get('language_code')
-        exp_id = self.request.get('exp_id')
-
-        if not utils.is_supported_audio_language_code(language_code):
-            raise self.InvalidInputException('Invalid language_code: %s' % (
-                language_code))
+        language_code = self.normalized_request.get('language_code')
+        exp_id = self.normalized_request.get('exp_id')
 
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
@@ -277,6 +318,36 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     """Provides a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'content_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }, {
+                        'id': 'is_valid_audio_language_code'
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -310,15 +381,11 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             404 (Not Found): PageNotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
         """
-        exp_id = self.request.get('exp_id')
-        if not exp_id:
-            raise self.InvalidInputException('Missing exp_id')
+        exp_id = self.normalized_request.get('exp_id')
 
-        state_name = self.request.get('state_name')
-        if not state_name:
-            raise self.InvalidInputException('Missing state_name')
+        state_name = self.normalized_request.get('state_name')
 
-        content_ids_string = self.request.get('content_ids')
+        content_ids_string = self.normalized_request.get('content_ids')
         content_ids = []
         try:
             content_ids = json.loads(content_ids_string)
@@ -326,19 +393,8 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Improperly formatted content_ids: %s' % content_ids_string)
 
-        target_language_code = self.request.get('target_language_code')
-        if not target_language_code:
-            raise self.InvalidInputException('Missing target_language_code')
-
-        # TODO(#12341): Tidy up this logic once we have a canonical list of
-        # language codes.
-        if not utils.is_supported_audio_language_code(
-                target_language_code
-            ) and not utils.is_valid_language_code(
-                target_language_code
-            ):
-            raise self.InvalidInputException(
-                'Invalid target_language_code: %s' % target_language_code)
+        target_language_code = self.normalized_request.get(
+            'target_language_code')
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
@@ -373,6 +429,8 @@ class UserContributionRightsDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -402,6 +460,10 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
     """Provides featured translation languages set in admin config."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

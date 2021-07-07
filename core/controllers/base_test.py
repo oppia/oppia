@@ -1946,14 +1946,29 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
             debug=feconf.DEBUG,
         ))
+        self.payload = {'arg_b': 'arg_in_payload'}
+        user_id = user_services.get_user_id_from_username('learneruser')
+        self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
     def test_both_args_in_post_request(self):
-        payload = {'arg_b': 'arg_in_payload'}
-        user_id = user_services.get_user_id_from_username('learneruser')
-        csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
-                '/mock?arg_a=arg_in_request', payload, csrf_token=csrf_token)
+                '/mock?arg_a=arg_in_request', self.payload,
+                csrf_token=self.csrf_token)
+
+    def test_post_request_with_invalid_source_raise_error(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock?arg_a=arg_in_request', self.payload,
+                csrf_token=self.csrf_token, source='fake_url',
+                expected_status_int=400)
+
+    def test_post_request_with_valid_source_do_not_raise_error(self):
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock?arg_a=arg_in_request', self.payload,
+                csrf_token=self.csrf_token,
+                source='http://localhost:8181/sample_url/')
 
 
 class ImageUploadHandlerTest(test_utils.GenericTestBase):
@@ -2003,8 +2018,8 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             """Saves an image uploaded by a content creator."""
 
             raw = self.normalized_request.get('image')
-            filename = self.normalized_request.get('filename')
-            filename_prefix = self.normalized_request.get('filename_prefix')
+            filename = self.normalized_payload.get('filename')
+            filename_prefix = self.normalized_payload.get('filename_prefix')
 
             self.render_json({'filename': filename})
 

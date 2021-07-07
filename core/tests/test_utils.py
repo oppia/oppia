@@ -2259,7 +2259,7 @@ title: Title
 
     def post_json(
             self, url, data, csrf_token=None, expected_status_int=200,
-            upload_files=None, use_payload=True):
+            upload_files=None, use_payload=True, source=None):
         """Post an object to the server by JSON; return the received object.
 
         Args:
@@ -2278,6 +2278,7 @@ title: Title
                 false, the dict in 'data' is directly passed as the body of the
                 request. For all requests called from the frontend, this should
                 be set to 'true'.
+            source: unicode. The url from which the post call is requested.
 
         Returns:
             dict. The JSON response for the request in dict form.
@@ -2286,6 +2287,8 @@ title: Title
             data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
+        if source:
+            data['source'] = source
 
         expect_errors = expected_status_int >= 400
 
