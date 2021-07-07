@@ -12,7 +12,6 @@ extensions/classifiers/proto/*.js
 # ignore the files and dirs inside the .git dir.
 .git/*
 third_party/*
-mypy_requirements/*
 assets/hashes.json
 backend_prod_files/*
 local_compiled_js/*

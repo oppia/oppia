@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: types-PyYAML
+Version: 0.1.6
+Summary: Typing stubs for PyYAML
+Home-page: https://github.com/python/typeshed
+License: Apache-2.0 license
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Typing :: Typed
+Description-Content-Type: text/markdown
+
+## Typing stubs for PyYAML
+
+This is an auto-generated PEP 561 type stub package for `PyYAML` package.
+It can be used by type-checking tools like mypy, PyCharm, pytype etc. to check code
+that uses `PyYAML`. The source for this package can be found at
+https://github.com/python/typeshed/tree/master/stubs/PyYAML. All fixes for
+types and metadata should be contributed there.
+
+See https://github.com/python/typeshed/blob/master/README.md for more details.
+This package was generated from typeshed commit `5d811e18b572eb36b1fa9c15c228e18826380d76`.
+
+

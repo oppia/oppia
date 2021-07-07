@@ -32,7 +32,6 @@ from scripts import install_third_party_libs
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
-    'mypy_requirements/',
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
@@ -746,7 +745,7 @@ CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
 # TODO(#13113): Change mypy command to mypy path after Python3 migration.
 MYPY_CMD = 'mypy'
 MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
-MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'mypy_requirements')
+MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
 PYTHON3_CMD = 'python3'
 
 
