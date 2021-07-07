@@ -32,8 +32,7 @@ from core.domain import topic_services
 from core.platform import models
 import feconf
 
-(base_models, topic_models,) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
 class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -131,7 +130,7 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if fs.isfile(filepath):
                 item.thumbnail_size_in_bytes = len(fs.get(filepath))
                 item.update_timestamps(update_last_updated_time=False)
-                item.put()
+                topic_models.TopicModel.put_multi([item])
                 yield (
                     PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
             else:
