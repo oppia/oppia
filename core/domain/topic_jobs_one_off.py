@@ -114,7 +114,7 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1
+            yield (PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1)
             return
 
         topic_model = topic_models.TopicModel.get(item.id)

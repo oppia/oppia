@@ -21,8 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
+import os
 
-from core.domain import topic_domain
+import python_utils
+from constants import constants
+from core.domain import topic_domain, fs_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
@@ -294,3 +297,40 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         expected = [[u'topic_deleted', 1]]
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_populates_new_thumbnail_size(self):
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description',
+            thumbnail_size_in_bytes=None)
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+                'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit(
+            '%s/topic.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_newly_added', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
