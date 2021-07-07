@@ -23,15 +23,16 @@ import ast
 import logging
 import os
 
-import python_utils
 from constants import constants
-from core.domain import topic_domain, fs_domain
+from core.domain import fs_domain
+from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -306,8 +307,8 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
         # Save the dummy image to the filesystem to be used as thumbnail.
         with python_utils.open_file(
-                os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-                'rb', encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -333,4 +334,3 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
-
