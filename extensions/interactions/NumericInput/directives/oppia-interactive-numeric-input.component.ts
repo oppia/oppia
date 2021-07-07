@@ -91,10 +91,6 @@ export class InteractiveNumericInput implements OnInit {
     return this.labelForFocusTarget;
   }
 
-  updateCustArg() {
-    return this.inputGreaterThanZero;
-  }
-
   ngOnInit(): void {
     const {
       inputGreaterThanZero
@@ -103,7 +99,8 @@ export class InteractiveNumericInput implements OnInit {
       this.getAttributesObject()
     ) as NumericInputCustomizationArgs;
     this.inputGreaterThanZero = inputGreaterThanZero.value;
-    //$scope.inputGreaterThanZero= this.inputGreaterThanZero;
+    window.localStorage.setItem('checkInputGreaterThanZero',
+     this.inputGreaterThanZeroWithValue);
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''

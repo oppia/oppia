@@ -26,8 +26,6 @@ require(
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('interactions/NumericInput/directives/oppia-interactive-numeric-input.component.ts');
-//import { InteractiveNumericInput } from 
-  //'interactions/NumericInput/directives/oppia-interactive-numeric-input.component';
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
@@ -47,12 +45,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', '$timeout', 'FocusManagerService',
-        'NumericInputValidationService', 'InteractiveNumericInput',
+        '$scope', '$timeout', 'FocusManagerService',
+        'NumericInputValidationService',
         'SchemaFormSubmittedService',
         function(
-            $rootScope, $scope, $timeout, FocusManagerService,
-            NumericInputValidationService, InteractiveNumericInput,
+            $scope, $timeout, FocusManagerService,
+            NumericInputValidationService,
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
@@ -116,7 +114,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.onDownKeyPress = function(event) {
-            if (InteractiveNumericInput.updateCustArg() && ctrl.localValue < 1) {
+            var inputGreaterThanZeroWithValue=localStorage.getItem('checkInputGreaterThanZero');
+            if (inputGreaterThanZeroWithValue === "true" && ctrl.localValue < 1) {
               if (event.keyCode === 40) {
                 event.preventDefault();
               }

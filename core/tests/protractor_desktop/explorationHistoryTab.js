@@ -77,6 +77,14 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setInteraction('NumericInput', false);
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('NumericInput', {
+      correctAnswer: 6,
+      explanation: 'It is correct'
+    });
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 2'));
@@ -148,7 +156,7 @@ describe('Exploration history', function() {
       },
       14: {
         text: '      html: \'\'',
-        highlighted: false
+        highlighted: true
       },
       15: {
         text: '    labelled_as_correct: false',
@@ -168,7 +176,7 @@ describe('Exploration history', function() {
       },
       19: {
         text: '  hints: []',
-        highlighted: false
+        highlighted: true
       },
       20: {
         text: '  id: null',
@@ -176,7 +184,7 @@ describe('Exploration history', function() {
       },
       21: {
         text: '  solution: null',
-        highlighted: false
+        highlighted: true
       },
       22: {
         text: 'linked_skill_id: null',
@@ -354,8 +362,8 @@ describe('Exploration history', function() {
         highlighted: false
       },
       31: {
-        text: '      html: \'\'',
-        highlighted: false
+        text: '      html: <p>Try again</p>',
+        highlighted: true
       },
       32: {
         text: '    labelled_as_correct: false',
@@ -374,74 +382,122 @@ describe('Exploration history', function() {
         highlighted: false
       },
       36: {
-        text: '  hints: []',
-        highlighted: false
+        text: '  hints:',
+        highlighted: true
       },
       37: {
-        text: '  id: NumericInput',
+        text: '  - hint_content:',
         highlighted: true
       },
       38: {
-        text: '  solution: null',
-        highlighted: false
+        text: '      content_id: hint_2',
+        highlighted: true
       },
       39: {
-        text: 'linked_skill_id: null',
-        highlighted: false
+        text: '      html: <p>Hint 1</p>',
+        highlighted: true
       },
       40: {
-        text: 'next_content_id_index: 2',
+        text: '  id: NumericInput',
         highlighted: true
       },
       41: {
-        text: 'param_changes: []',
-        highlighted: false
+        text: '  solution:',
+        highlighted: true
       },
       42: {
-        text: 'recorded_voiceovers:',
-        highlighted: false
+        text: '    answer_is_exclusive: false',
+        highlighted: true
       },
       43: {
-        text: '  voiceovers_mapping:',
-        highlighted: false
+        text: '    correct_answer: 6.0',
+        highlighted: true
       },
       44: {
-        text: '    content: {}',
-        highlighted: false
+        text: '    explanation:',
+        highlighted: true
       },
       45: {
-        text: '    default_outcome: {}',
-        highlighted: false
+        text: '      content_id: solution',
+        highlighted: true
       },
       46: {
-        text: '    feedback_1: {}',
+        text: '      html: <p>It is correct</p>',
         highlighted: true
       },
       47: {
-        text: 'solicit_answer_details: false',
+        text: 'linked_skill_id: null',
         highlighted: false
       },
       48: {
-        text: 'written_translations:',
-        highlighted: false
+        text: 'next_content_id_index: 3',
+        highlighted: true
       },
       49: {
-        text: '  translations_mapping:',
+        text: 'param_changes: []',
         highlighted: false
       },
       50: {
-        text: '    content: {}',
+        text: 'recorded_voiceovers:',
         highlighted: false
       },
       51: {
-        text: '    default_outcome: {}',
-        highlighted: true
+        text: '  voiceovers_mapping:',
+        highlighted: false
       },
       52: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      53: {
+        text: '    default_outcome: {}',
+        highlighted: false
+      },
+      54: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      53: {
+      55: {
+        text: '    hint_2: {}',
+        highlighted: true
+      },
+      56: {
+        text: '    solution: {}',
+        highlighted: true
+      },
+      57: {
+        text: 'solicit_answer_details: false',
+        highlighted: false
+      },
+      58: {
+        text: 'written_translations:',
+        highlighted: false
+      },
+      59: {
+        text: '  translations_mapping:',
+        highlighted: false
+      },
+      60: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      61: {
+        text: '    default_outcome: {}',
+        highlighted: true
+      },
+      62: {
+        text: '    feedback_1: {}',
+        highlighted: true
+      },
+      63: {
+        text: '    hint_2: {}',
+        highlighted: true
+      },
+      64: {
+        text: '    solution: {}',
+        highlighted: true
+      },
+      65: {
         text: '',
         highlighted: false
       }

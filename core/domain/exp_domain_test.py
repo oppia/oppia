@@ -3618,10 +3618,7 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x:
-              contentId: rule_input_3
-              normalizedStrSet:
-              - InputString
+            x: 6
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -3629,8 +3626,6 @@ states:
       customization_args:
         inputGreaterThanZero:
           value: False
-        rows:
-          value: 1
       default_outcome:
         dest: (untitled state)
         feedback:
@@ -3641,7 +3636,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
+      id: NumericInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 4
@@ -3698,8 +3693,6 @@ states:
       customization_args:
         inputGreaterThanZero:
           value: False
-        rows:
-          value: 1
       default_outcome:
         dest: END
         feedback:
@@ -3710,7 +3703,7 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
+      id: NumericInput
       solution: null
     linked_skill_id: null
     next_content_id_index: 1
