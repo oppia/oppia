@@ -20,6 +20,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReleaseCoordinatorBackendApiService, JobsData } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 
@@ -34,6 +35,7 @@ export class JobsTabComponent {
   showingJobOutput: boolean;
   jobOutput = [];
   HUMAN_READABLE_CURRENT_TIME: string = '';
+  CONTINUOUS_COMPUTATIONS_DATA: ComputationData[] = [];
   ONE_OFF_JOB_SPECS: JobStatusSummary[] = [];
   UNFINISHED_JOB_DATA: Job[] = [];
   AUDIT_JOB_SPECS: JobStatusSummary[] = [];
@@ -72,6 +74,36 @@ export class JobsTabComponent {
       });
   }
 
+  startComputation(
+      computationType: string): void {
+    this.setStatusMessage.emit('Starting computation');
+
+    this.releaseCoordinatorBackendApiService
+      .startComputationAsync(computationType).then(()=> {
+        this.setStatusMessage.emit('Computation started successfully.');
+        this.windowRef._window().location.reload();
+      }, (errorResponse) => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.error
+        );
+      });
+  }
+
+  stopComputation(
+      computationType: string
+  ): void {
+    this.setStatusMessage.emit('Stopping computation...');
+    this.releaseCoordinatorBackendApiService.stopComputationAsync(
+      computationType).then(() => {
+      this.setStatusMessage.emit('Abort signal sent to computation.');
+      this.windowRef._window().location.reload();
+    }, (errorResponse) => {
+      this.setStatusMessage.emit(
+        'Server error: ' + errorResponse.error
+      );
+    });
+  }
+
   cancelJob(
       jobId: string,
       jobType: string): void {
@@ -91,6 +123,7 @@ export class JobsTabComponent {
     this.releaseCoordinatorBackendApiService.getJobsDataAsync()
       .then((jobsData: JobsData) => {
         this.HUMAN_READABLE_CURRENT_TIME = jobsData.humanReadableCurrentTime;
+        this.CONTINUOUS_COMPUTATIONS_DATA = jobsData.continuousComputationsData;
         this.ONE_OFF_JOB_SPECS = jobsData.oneOffJobStatusSummaries;
         this.UNFINISHED_JOB_DATA = jobsData.unfinishedJobData;
         this.AUDIT_JOB_SPECS = jobsData.auditJobStatusSummaries;

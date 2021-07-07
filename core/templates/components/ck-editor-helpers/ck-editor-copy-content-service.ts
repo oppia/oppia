@@ -86,7 +86,6 @@ export class CkEditorCopyContentService {
     let descendants = Array.from(target.childNodes);
     while (descendants.length !== 0) {
       let currentDescendant = descendants.shift();
-
       const currentTagName = currentDescendant.nodeName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
         containedWidgetTagName = currentTagName;

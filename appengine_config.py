@@ -25,8 +25,6 @@ import python_utils
 from google.appengine.ext import vendor
 import pkg_resources
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import
-
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
 THIRD_PARTY_PATH = os.path.join(ROOT_PATH, 'third_party')
@@ -46,7 +44,7 @@ if os.path.isdir(OPPIA_TOOLS_PATH):
     PIL_PATH = os.path.join(OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
     if not os.path.isdir(PIL_PATH):
         raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
-    sys.path.insert(0, PIL_PATH) # type: ignore[arg-type]
+    sys.path.insert(0, PIL_PATH)
 
 
 # Google App Engine (GAE) uses its own virtual environment that sets up the
@@ -82,8 +80,8 @@ old_get_distribution = pkg_resources.get_distribution # pylint: disable=invalid-
 # It should be fine to ignore this, see https://stackoverflow.com/a/47494229
 # and https://github.com/urllib3/urllib3/issues/1138#issuecomment-290325277.
 import requests # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-requests.packages.urllib3.disable_warnings( # type: ignore[no-untyped-call]
-    requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning # type: ignore[attr-defined]
+requests.packages.urllib3.disable_warnings(
+    requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning
 )
 
 
@@ -91,12 +89,10 @@ class MockDistribution(python_utils.OBJECT):
     """Mock distribution object for the monkeypatching function."""
 
     def __init__(self, version):
-        # type: (Text) -> None
         self.version = version
 
 
 def monkeypatched_get_distribution(distribution_name):
-    # type: (Text) -> Any
     """Monkeypatched version of pkg_resources.get_distribution.
 
     This approach is inspired by the discussion at:

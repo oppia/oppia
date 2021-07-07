@@ -19,7 +19,7 @@
 
 require(
   'components/question-directives/questions-list/' +
-  'questions-list.component.ts');
+  'questions-list.directive.ts');
 
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(

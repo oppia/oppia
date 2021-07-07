@@ -24,7 +24,7 @@ describe('ShortResponseFractionInput', () => {
   let component: ShortResponseFractionInput;
   let fixture: ComponentFixture<ShortResponseFractionInput>;
   let mockHtmlEscaperService = {
-    escapedJsonToObj: (answer: string) => {
+    escapedJsonToObj: function(answer) {
       return JSON.parse(answer);
     }
   };

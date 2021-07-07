@@ -22,12 +22,11 @@ import { SiteAnalyticsService } from
   'services/site-analytics.service';
 
 describe('Editor First Time Events Service', () => {
-  let eftes: EditorFirstTimeEventsService;
-  let sas: SiteAnalyticsService;
+  let eftes, sas;
 
   beforeEach(() => {
-    eftes = TestBed.inject(EditorFirstTimeEventsService);
-    sas = TestBed.inject(SiteAnalyticsService);
+    eftes = TestBed.get(EditorFirstTimeEventsService);
+    sas = TestBed.get(SiteAnalyticsService);
   });
 
   it('should intialize register events', () => {

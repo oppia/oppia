@@ -30,10 +30,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   styleUrls: []
 })
 export class OppiaShortResponseContinueComponent implements OnInit {
-  // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() answer!: string;
+  @Input() answer: string;
   escapedAnswer: string = '';
 
   constructor(private readonly htmlEscaperService: HtmlEscaperService) {}

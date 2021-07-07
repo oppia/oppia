@@ -391,7 +391,7 @@ var MultiSelectEditor = function(elem) {
     }
 
     if (filteredElementsCount !== texts.length) {
-      throw new Error(
+      throw (
         'Could not toggle element selection. Values requested: ' + texts +
       '. Found ' + filteredElementsCount + ' matching elements.');
     }

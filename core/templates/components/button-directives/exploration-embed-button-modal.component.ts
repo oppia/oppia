@@ -26,11 +26,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
   styleUrls: []
 })
 export class ExplorationEmbedButtonModalComponent implements OnInit {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion, for more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() explorationId!: string;
-  @Input() serverName!: string;
+  @Input() explorationId: string;
+  @Input() serverName: string;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -46,16 +43,10 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
 
   selectText(event: MouseEvent): void {
     const codeDiv = event.currentTarget;
-    if (codeDiv === null) {
-      throw new Error('No CodeDiv was found!');
-    }
     const range = document.createRange();
-    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild as Node);
-    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild as Node);
+    range.setStartBefore((<HTMLDivElement>codeDiv).firstChild);
+    range.setEndAfter((<HTMLDivElement>codeDiv).lastChild);
     const selection = window.getSelection();
-    if (selection === null) {
-      throw new Error('Unable to Select!');
-    }
     selection.removeAllRanges();
     selection.addRange(range);
   }

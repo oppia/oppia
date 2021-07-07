@@ -24,7 +24,7 @@ import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 
 describe('Pencil Code Editor rules service', () => {
-  let pcers: PencilCodeEditorRulesService;
+  let pcers: PencilCodeEditorRulesService = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [

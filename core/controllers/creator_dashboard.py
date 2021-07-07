@@ -35,6 +35,7 @@ from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
 from core.domain import topic_fetchers
+from core.domain import user_jobs_continuous
 from core.domain import user_services
 import feconf
 import python_utils
@@ -152,7 +153,9 @@ class CreatorDashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
-        dashboard_stats = user_services.get_dashboard_stats(self.user_id)
+        dashboard_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_id))
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)

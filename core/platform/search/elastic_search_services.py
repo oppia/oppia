@@ -26,17 +26,13 @@ import python_utils
 
 import elasticsearch
 
-# A timeout of 30 seconds is needed to avoid calls to
-# exp_services.load_demo() failing with a ReadTimeoutError
-# where loading a exploration from local yaml file takes
-# longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
     ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
     if feconf.ES_CLOUD_ID is None else None,
     cloud_id=feconf.ES_CLOUD_ID,
     http_auth=(
         (feconf.ES_USERNAME, feconf.ES_PASSWORD)
-        if feconf.ES_CLOUD_ID else None), timeout=30)
+        if feconf.ES_CLOUD_ID else None))
 
 
 def _create_index(index_name):

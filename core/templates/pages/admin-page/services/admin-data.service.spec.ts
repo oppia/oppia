@@ -53,9 +53,7 @@ describe('Admin Data Service', () => {
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#C6DCDA',
         total_published_node_count: 10,
-        url_fragment: 'topicurlfrag',
-        can_edit_topic: false,
-        is_published: false
+        url_fragment: 'topicurlfrag'
       }
     ],
     updatable_roles: {

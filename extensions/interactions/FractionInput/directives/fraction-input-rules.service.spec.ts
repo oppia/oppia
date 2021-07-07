@@ -22,7 +22,7 @@ import { FractionAnswer } from 'interactions/answer-defs';
 import { TestBed } from '@angular/core/testing';
 
 describe('Fraction Input rules service', () => {
-  let firs: FractionInputRulesService;
+  let firs: FractionInputRulesService = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [FractionInputRulesService]

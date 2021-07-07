@@ -1,28 +1,28 @@
 <div class="oppia-profile-picture-container">
   <div class="modal-header">
-    <h3>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD' | translate }}</h3>
+    <h3 translate="I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD"></h3>
   </div>
 
   <div class="modal-body oppia-profile-image-uploader-container">
     <div class="oppia-profile-image-uploader">
-      <div *ngIf="!uploadedImage">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
-                              [allowedImageFormats]="allowedImageFormats">
+      <div ng-hide="uploadedImage">
+        <oppia-image-uploader (file-changed)="onFileChanged($event)"
+                              [allowed-image-formats]="allowedImageFormats">
         </oppia-image-uploader>
       </div>
 
       <div class="oppia-form-error oppia-form-error-text"
-           *ngIf="invalidImageWarningIsShown">
-           {{ 'I18N_PREFERENCES_PROFILE_PICTURE_ERROR' | translate }}
+           ng-if="invalidImageWarningIsShown"
+           translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR">
       </div>
 
-      <div *ngIf="uploadedImage">
-        <span>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_DRAG' | translate }}</span>
-        <div class="oppia-profile-picture-crop-area protractor-test-photo-crop">
-          <button class="btn btn-secondary oppia-profile-picture-reset-button" (click)="reset()">
+      <div ng-show="uploadedImage">
+        <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
+        <div class="oppia-profile-picture-crop-area protractor-test-photo-crop" ng-show="uploadedImage">
+          <button class="btn btn-secondary oppia-profile-picture-reset-button" ng-click="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
-          <img id="croppable-image" [src]="uploadedImage" #croppableImage>
+          <img ng-if="uploadedImage" id="croppable-image" ng-src="<[uploadedImage]>">
         </div>
       </div>
     </div>
@@ -30,13 +30,13 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary"
-            (click)="cancel()">
-            {{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}
+            ng-click="cancel()"
+            translate="I18N_PREFERENCES_CANCEL_BUTTON">
     </button>
     <button class="btn btn-success protractor-test-photo-upload-submit"
-            (click)="confirm()"
-            [disabled]="!uploadedImage">
-            {{ 'I18N_PREFERENCES_PROFILE_PICTURE_ADD' | translate }}
+            ng-click="confirm()"
+            ng-disabled="!uploadedImage"
+            translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD">
     </button>
   </div>
 </div>

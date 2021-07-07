@@ -27,8 +27,7 @@ describe('Visualization info model', () => {
       addressed_info_is_supported: true,
       data: [{
         answer: 'hello',
-        frequency: 0,
-        is_addressed: false
+        frequency: 0
       }],
       id: 'testId',
       options: {}

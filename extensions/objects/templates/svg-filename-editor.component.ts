@@ -50,7 +50,7 @@ export class PolyPoint {
   templateUrl: './svg-filename-editor.component.html'
 })
 export class SvgFilenameEditorComponent implements OnInit {
-  @Input() value: string;
+  @Input() value;
   @Output() valueChanged = new EventEmitter();
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
@@ -132,9 +132,9 @@ export class SvgFilenameEditorComponent implements OnInit {
   isRedo = false;
   undoLimit = 5;
   savedSvgDiagram = '';
-  entityId: string;
-  entityType: string;
-  imageSaveDestination: string;
+  entityId = this.contextService.getEntityId();
+  entityType = this.contextService.getEntityType();
+  imageSaveDestination = this.contextService.getImageSaveDestination();
   svgContainerStyle = {};
   layerNum = 0;
   fabricjsOptions = {
@@ -189,9 +189,6 @@ export class SvgFilenameEditorComponent implements OnInit {
     private svgSanitizerService: SvgSanitizerService) { }
 
   ngOnInit(): void {
-    this.imageSaveDestination = this.contextService.getImageSaveDestination();
-    this.entityId = this.contextService.getEntityId();
-    this.entityType = this.contextService.getEntityType();
     const domReady = new Promise((resolve, reject) => {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', resolve);

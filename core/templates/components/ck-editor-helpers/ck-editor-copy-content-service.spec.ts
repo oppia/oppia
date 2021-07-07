@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for the Ck editor copy content service.
  */
 
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import { CkEditorCopyContentService } from
+  'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
@@ -29,10 +30,6 @@ const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
   container.innerHTML = `<angular-html-bind>${html.trim()}</angular-html-bind>`;
   // Return element inside <angular-html-bind />
-  if (container.content.firstChild === null ||
-    container.content.firstChild.firstChild === null) {
-    throw new Error('First Child is null');
-  }
   return <HTMLElement>(container.content.firstChild.firstChild);
 };
 
@@ -42,16 +39,14 @@ describe('Ck editor copy content service', () => {
 
   let service: CkEditorCopyContentService;
   let ckEditorStub: Partial<CKEDITOR.editor>;
-  let insertHtmlSpy: jasmine.Spy<(
-    html: string, mode?: string,
-    range?: CKEDITOR.dom.range) => void>;
+  let insertHtmlSpy;
   let execCommandSpy;
 
   beforeEach(() => {
     ckEditorStub = {
       id: 'editor1',
-      insertHtml: (html: string) => {},
-      execCommand: (commandName: string): boolean => true,
+      insertHtml: (_: string) => {},
+      execCommand: (_: string): boolean => true,
     };
     insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
     execCommandSpy = spyOn(ckEditorStub, 'execCommand');
@@ -162,10 +157,7 @@ describe('Ck editor copy content service', () => {
       'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
       'ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti' +
       've-math></p>');
-    if (mathWidgetElement.firstChild === null ||
-        mathWidgetElement.firstChild.firstChild === null) {
-      throw new Error('First Child is null');
-    }
+
     const nestedMathWidgetElement = (
       <HTMLElement>mathWidgetElement.firstChild.firstChild);
 

@@ -42,14 +42,14 @@ interface MusicPhraseSchema {
   styleUrls: []
 })
 export class MusicPhraseEditorComponent implements OnInit {
-  @Input() modalId!: symbol;
-  @Input() value!: unknown;
+  @Input() modalId;
+  @Input() value;
 
   @Output() valueChanged = new EventEmitter();
 
   _localValue: string[] = [];
 
-  _proxy!: string[];
+  _proxy;
 
   get localValue(): string[] {
     return this._proxy;
@@ -94,11 +94,6 @@ export class MusicPhraseEditorComponent implements OnInit {
         return true;
       },
       set: (target, property, value, receiver) => {
-        // This throws "The Element implicitly has an 'any' type because index
-        // expression is not of type 'number'." The type 'any' comes here from
-        // the dependency interface ProxyConstructor at lib.es2015.proxy.d.ts.
-        // We need to suppress this error because of strict type checking.
-        // @ts-ignore
         target[property] = value;
         this._updateValue(this._localValue);
         return true;

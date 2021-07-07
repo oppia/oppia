@@ -45,9 +45,7 @@ describe('Classroom backend API service', function() {
     additional_story_count: 0,
     topic_model_created_on: 231241343,
     topic_model_last_updated: 3454354354,
-    url_fragment: 'topic-name-one',
-    can_edit_topic: false,
-    is_published: false
+    url_fragment: 'topic-name-one'
   };
   let secondTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic2',
@@ -65,9 +63,7 @@ describe('Classroom backend API service', function() {
     additional_story_count: 0,
     topic_model_created_on: 231241343,
     topic_model_last_updated: 3454354354,
-    url_fragment: 'topic-name-two',
-    can_edit_topic: false,
-    is_published: false
+    url_fragment: 'topic-name-two'
   };
 
   let responseDictionaries = {

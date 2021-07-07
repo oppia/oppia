@@ -547,13 +547,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'content_ids': '["content"]',
                 'target_language_code': 'invalid_language_code'
             }, expected_status_int=400)
-
-        error_msg = (
-            'Schema validation for \'target_language_code\' failed: '
-            'Validation failed: is_supported_audio_language_code ({}) for '
-            'object invalid_language_code')
         self.assertEqual(
-            output['error'], error_msg)
+            output['error'],
+            'Invalid target_language_code: invalid_language_code')
 
     def test_handler_with_no_target_language_code_raises_exception(self):
         output = self.get_json(
@@ -562,10 +558,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'state_name': 'End State',
                 'content_ids': '["content"]',
             }, expected_status_int=400)
-
-        error_msg = 'Missing key in handler args: target_language_code.'
         self.assertEqual(
-            output['error'], error_msg)
+            output['error'],
+            'Missing target_language_code')
 
     def test_handler_with_invalid_exploration_id_returns_not_found(self):
         self.get_json(
@@ -583,10 +578,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'content_ids': '["content"]',
                 'target_language_code': 'es'
             }, expected_status_int=400)
-
-        error_msg = 'Missing key in handler args: exp_id.'
         self.assertEqual(
-            output['error'], error_msg)
+            output['error'],
+            'Missing exp_id')
 
     def test_handler_with_invalid_state_name_returns_not_found(self):
         self.get_json(
@@ -604,10 +598,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'content_ids': '["content"]',
                 'target_language_code': 'es'
             }, expected_status_int=400)
-
-        error_msg = 'Missing key in handler args: state_name.'
         self.assertEqual(
-            output['error'], error_msg)
+            output['error'],
+            'Missing state_name')
 
     def test_handler_with_invalid_content_ids_returns_none(self):
         exp_services.update_exploration(
@@ -673,10 +666,9 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'target_language_code': 'en'
             }, expected_status_int=400
         )
-
-        error_msg = 'Missing key in handler args: content_ids.'
         self.assertEqual(
-            output['error'], error_msg)
+            output['error'],
+            'Improperly formatted content_ids: ')
 
     def test_handler_with_valid_input_returns_translation(self):
         exp_services.update_exploration(

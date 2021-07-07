@@ -42,8 +42,7 @@ import { PlatformFeatureBackendApiService } from
 import {
   FeatureNames,
   FeatureStatusSummary,
-  FeatureStatusChecker,
-  FeatureNamesKeys
+  FeatureStatusChecker
 } from 'domain/platform_feature/feature-status-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -70,8 +69,8 @@ export class PlatformFeatureService {
 
   // The following attributes are made static to avoid potential inconsistencies
   // caused by multi-instantiation of the service.
-  static featureStatusSummary: FeatureStatusSummary;
-  static initializationPromise: Promise<void>;
+  static featureStatusSummary: FeatureStatusSummary = null;
+  static initializationPromise: Promise<void> = null;
   static _isInitializedWithError = false;
   static _isSkipped = false;
 
@@ -254,12 +253,9 @@ export class PlatformFeatureService {
 
     const storedFeatures: string[] = Array.from(
       item.featureStatusSummary.featureNameToFlag.keys());
-    const featureNamesKeys = (
-      <FeatureNamesKeys> Object.keys(FeatureNames)
-    );
-    const requiredFeatures: string[] = featureNamesKeys.map(
-      name => FeatureNames[name]
-    );
+    const requiredFeatures: string[] = Object.keys(FeatureNames)
+      .map(name => FeatureNames[name]);
+
     if (!isEqual(storedFeatures.sort(), requiredFeatures.sort())) {
       return false;
     }
@@ -290,17 +286,14 @@ export class PlatformFeatureService {
     const cookieStrs = this.windowRef.nativeWindow.document.cookie.split('; ');
     const cookieMap = new Map(
       cookieStrs.map(cookieStr => <[string, string]>cookieStr.split('=')));
-    const sessionId = (
-      cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID)
-    );
-    if (sessionId !== undefined) {
-      return sessionId;
+
+    if (cookieMap.has(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID)) {
+      return cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID);
     }
-    const sessionIdInDev = (
-      cookieMap.get(PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV)
-    );
-    if (sessionIdInDev !== undefined) {
-      return sessionIdInDev;
+    if (cookieMap.has(
+      PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV)) {
+      return cookieMap.get(
+        PlatformFeatureService.COOKIE_NAME_FOR_SESSION_ID_IN_DEV);
     }
     return null;
   }

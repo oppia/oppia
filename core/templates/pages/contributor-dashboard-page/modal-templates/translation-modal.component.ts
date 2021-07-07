@@ -16,14 +16,12 @@
  * @fileoverview Component for the translation modal.
  */
 
-import isEqual from 'lodash/isEqual';
-
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AlertsService } from 'services/alerts.service';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -102,13 +100,6 @@ export class TranslationModalComponent {
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
   editorIsShown = true;
-  ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
-    'oppia-noninteractive-image',
-    'oppia-noninteractive-link',
-    'oppia-noninteractive-math',
-    'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-svgdiagram'
-  ];
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -243,10 +234,9 @@ export class TranslationModalComponent {
     this.resetEditor();
   }
 
-  getElementAttributeTexts(
-      elements: HTMLCollectionOf<Element>, type: string): string[] {
+  getElementAttributeTexts(elements: HTMLElement[], type: string): string[] {
     const textWrapperLength = 6;
-    const attributes = Array.from(elements, function(element: Element) {
+    const attributes = Array.from(elements, function(element: HTMLElement) {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
       // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
@@ -261,8 +251,7 @@ export class TranslationModalComponent {
     return attributes.filter(attribute => attribute);
   }
 
-  getImageAttributeTexts(
-      htmlElements: HTMLCollectionOf<Element>): ImageDetails {
+  getImageAttributeTexts(htmlElements: HTMLElement[]): ImageDetails {
     return {
       filePaths: this.getElementAttributeTexts(
         htmlElements, 'filepath-with-value'),
@@ -293,24 +282,29 @@ export class TranslationModalComponent {
   }
 
   isTranslationCompleted(
-      originalElements: HTMLCollectionOf<Element>,
-      translatedElements: HTMLCollectionOf<Element>): boolean {
-    // Checks if there are custom tags present in the original content but not
-    // in the translated content.
-    const filteredOriginalElements = Array.from(
-      originalElements, el => el.tagName.toLowerCase()).filter(
-      tagName => this.ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION.includes(
-        tagName)).sort();
-    const filteredTranslatedElements = Array.from(
-      translatedElements, el => el.tagName.toLowerCase()).filter(
-      tagName => this.ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION.includes(
-        tagName)).sort();
-    return isEqual(filteredOriginalElements, filteredTranslatedElements);
+      originalElements: HTMLElement[],
+      translatedElements: HTMLElement[]): boolean {
+    const filteredOriginalElements = originalElements.filter(
+      element => element.nodeType === Node.ELEMENT_NODE);
+    const filteredTranslatedElements = translatedElements.filter(
+      element => element.nodeType === Node.ELEMENT_NODE);
+
+    if (filteredOriginalElements.length !== filteredTranslatedElements.length) {
+      return false;
+    }
+
+    for (const [i, originalElement] of filteredOriginalElements.entries()) {
+      if (originalElement.nodeName !== filteredTranslatedElements[
+        i].nodeName) {
+        return false;
+      }
+    }
+    return true;
   }
 
   validateTranslation(
-      textToTranslate: HTMLCollectionOf<Element>,
-      translatedText: HTMLCollectionOf<Element>): TranslationError {
+      textToTranslate: HTMLElement[],
+      translatedText: HTMLElement[]): TranslationError {
     const translatedElements: ImageDetails = this.getImageAttributeTexts(
       translatedText);
     const originalElements: ImageDetails = this.getImageAttributeTexts(
@@ -334,15 +328,13 @@ export class TranslationModalComponent {
   }
 
   suggestTranslatedText(): void {
-    const domParser = new DOMParser();
-    const originalElements = domParser.parseFromString(
-      this.textToTranslate, 'text/html');
-    const translatedElements = domParser.parseFromString(
-      this.activeWrittenTranslation.html, 'text/html');
+    const originalElements = Array.from(angular.element(
+      this.textToTranslate));
+    const translatedElements = Array.from(angular.element(
+      this.activeWrittenTranslation.html));
 
     const translationError = this.validateTranslation(
-      originalElements.getElementsByTagName('*'),
-      translatedElements.getElementsByTagName('*'));
+      originalElements, translatedElements);
 
     this.hasImgCopyError = translationError.hasUncopiedImgs;
     this.hasImgTextError = translationError.hasDuplicateAltTexts ||

@@ -37,9 +37,9 @@ from constants import constants
 import feconf
 import python_utils
 
-from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import
-    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
+    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
+    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
@@ -333,7 +333,8 @@ def convert_png_binary_to_data_url(content):
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
+            python_utils.url_quote( # type: ignore[no-untyped-call]
+                base64.b64encode(content))
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -402,14 +403,19 @@ def set_url_query_parameter(url, param_name, param_value):
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = python_utils.url_split(url) # type: ignore[no-untyped-call]
-    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
+    scheme, netloc, path, query_string, fragment = (
+        python_utils.url_split(url)) # type: ignore[no-untyped-call]
+    query_params = (
+        python_utils.parse_query_string( # type: ignore[no-untyped-call]
+            query_string))
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
+    new_query_string = python_utils.url_encode( # type: ignore[no-untyped-call]
+        query_params, doseq=True)
 
-    return python_utils.url_unsplit( # type: ignore[no-any-return, no-untyped-call]
-        (scheme, netloc, path, new_query_string, fragment))
+    return ( # type: ignore[no-any-return]
+        python_utils.url_unsplit( # type: ignore[no-untyped-call]
+            (scheme, netloc, path, new_query_string, fragment)))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -457,7 +463,8 @@ def convert_to_hash(input_string, max_length):
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(
-            python_utils.convert_to_bytes(input_string)).digest(), # type: ignore[no-untyped-call]
+            python_utils.convert_to_bytes(  # type: ignore[no-untyped-call]
+                input_string)).digest(),
         altchars=b'ab'
     ).replace('=', 'c')
 
@@ -474,7 +481,9 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']' # type: ignore[no-untyped-call]
+    byte_value = (
+        b'[' + python_utils.convert_to_bytes( # type: ignore[no-untyped-call]
+            value) + b']')
     return base64.b64encode(byte_value)
 
 
@@ -489,7 +498,9 @@ def get_time_in_millisecs(datetime_obj):
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-any-return, no-untyped-call]
+    return ( # type: ignore[no-any-return]
+        msecs + python_utils.divide( # type: ignore[no-untyped-call]
+            datetime_obj.microsecond, 1000.0))
 
 
 def convert_naive_datetime_to_string(datetime_obj):
@@ -546,7 +557,9 @@ def get_human_readable_time_string(time_msec):
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[arg-type, no-untyped-call]
+        '%B %d %H:%M:%S', # type: ignore[arg-type]
+        time.gmtime(python_utils.divide( # type: ignore[no-untyped-call]
+            time_msec, 1000.0)))
 
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
@@ -695,7 +708,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         raise ValidationError(
             'Adjacent whitespace in %s should be collapsed.' % name_type)
 
-    for character in constants.INVALID_NAME_CHARS:
+    for character in constants.INVALID_NAME_CHARS: # type: ignore[attr-defined]
         if character in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
@@ -731,7 +744,8 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             '%s field should not exceed %d characters, '
             'received %s.' % (name_type, allowed_length, name))
 
-    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
+    if not re.match(
+            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined] # pylint: disable=line-too-long
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
@@ -792,10 +806,11 @@ def require_valid_meta_tag_content(meta_tag_content):
         raise ValidationError(
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
-    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
+    if len(meta_tag_content) > (
+            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined] # pylint: disable=line-too-long
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+            % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined] # pylint: disable=line-too-long
 
 
 def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
@@ -810,7 +825,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
-        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
     if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -818,7 +833,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) # type: ignore[attr-defined] # pylint: disable=line-too-long
 
 
 def capitalize_string(input_string):
@@ -851,9 +866,10 @@ def get_hex_color_for_category(category):
         str. Color assigned to that category.
     """
     return ( # type: ignore[no-any-return]
-        constants.CATEGORIES_TO_COLORS[category]
-        if category in constants.CATEGORIES_TO_COLORS
-        else constants.DEFAULT_COLOR)
+        constants.CATEGORIES_TO_COLORS[category] # type: ignore[attr-defined]
+        if category in (
+            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
+        else constants.DEFAULT_COLOR) # type: ignore[attr-defined]
 
 
 def get_thumbnail_icon_url_for_category(category):
@@ -868,8 +884,9 @@ def get_thumbnail_icon_url_for_category(category):
         str. Path to the Thumbnail Icon assigned to that category.
     """
     icon_name = (
-        category if category in constants.CATEGORIES_TO_COLORS
-        else constants.DEFAULT_THUMBNAIL_ICON)
+        category if category in (
+            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
+        else constants.DEFAULT_THUMBNAIL_ICON) # type: ignore[attr-defined]
     # Remove all spaces from the string.
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
@@ -884,7 +901,8 @@ def is_supported_audio_language_code(language_code):
     Returns:
         bool. Whether the language code is supported audio language code or not.
     """
-    language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES]
+    language_codes = [lc['id'] for lc in (
+        constants.SUPPORTED_AUDIO_LANGUAGES)] # type: ignore[attr-defined]
     return language_code in language_codes
 
 
@@ -899,7 +917,8 @@ def is_valid_language_code(language_code):
         bool. Whether the language code is valid or not.
     """
     language_codes = [
-        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
+        lc['code'] for lc in (
+            constants.SUPPORTED_CONTENT_LANGUAGES)] # type: ignore[attr-defined]
     return language_code in language_codes
 
 
@@ -917,7 +936,8 @@ def get_supported_audio_language_description(language_code):
     Raises:
         Exception. If the given language code is unsupported.
     """
-    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
+    for language in (
+            constants.SUPPORTED_AUDIO_LANGUAGES): # type: ignore[attr-defined]
         if language['id'] == language_code:
             return language['description'] # type: ignore[no-any-return]
     raise Exception('Unsupported audio language code: %s' % language_code)
@@ -970,7 +990,9 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string).decode('utf-8') # type: ignore[no-any-return, no-untyped-call]
+    return ( # type: ignore[no-any-return]
+        python_utils.urllib_unquote( # type: ignore[no-untyped-call]
+            escaped_string).decode('utf-8'))
 
 
 def snake_case_to_camel_case(snake_str):
@@ -999,7 +1021,7 @@ def get_asset_dir_prefix():
         null string.
     """
     asset_dir_prefix = ''
-    if not constants.DEV_MODE:
+    if not constants.DEV_MODE: # type: ignore[attr-defined]
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
@@ -1080,7 +1102,8 @@ def compute_list_difference(list_a, list_b):
 
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic
 # type "OrderedDict"' but here we don't need to specify this.
-class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+class OrderedCounter(
+        collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass
@@ -1107,11 +1130,13 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return python_utils.zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-any-return, no-untyped-call]
+    return ( # type: ignore[no-any-return]
+        python_utils.zip_longest( # type: ignore[no-untyped-call]
+            *args, fillvalue=fillvalue))
 
 
 def partition(iterable, predicate=bool, enumerated=False):
-    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]]
+    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]] # pylint: disable=line-too-long
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.

@@ -151,7 +151,6 @@ describe('Rte Helper Modal Controller', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
-      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -189,7 +188,6 @@ describe('Rte Helper Modal Controller', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
-      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {

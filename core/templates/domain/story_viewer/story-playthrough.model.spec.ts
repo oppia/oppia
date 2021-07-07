@@ -16,10 +16,11 @@
  * @fileoverview Tests for StoryPlaythroughModel.
  */
 
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { StoryPlaythrough } from
+  'domain/story_viewer/story-playthrough.model';
 
 describe('Story playthrough model', () => {
-  var _samplePlaythroughObject: StoryPlaythrough;
+  var _samplePlaythroughObject = null;
 
   beforeEach(() => {
     var firstSampleReadOnlyStoryNodeBackendDict = {
@@ -126,12 +127,5 @@ describe('Story playthrough model', () => {
     expect(_samplePlaythroughObject.getStoryId()).toEqual('qwerty');
     expect(_samplePlaythroughObject.getMetaTagContent()).toEqual(
       'Story meta tag content');
-  });
-
-  it('should throw an error if there are no nodes', () => {
-    _samplePlaythroughObject.nodes.length = 0;
-    expect(() => {
-      _samplePlaythroughObject.getNextPendingNodeId();
-    }).toThrowError('No story nodes found!');
   });
 });

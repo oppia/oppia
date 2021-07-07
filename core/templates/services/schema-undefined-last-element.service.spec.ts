@@ -21,15 +21,16 @@ import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 
 describe('Schema Undefined Last Element Service', () => {
-  let sules: SchemaUndefinedLastElementService;
+  let sules;
 
   beforeEach(() => {
-    sules = TestBed.inject(SchemaUndefinedLastElementService);
+    sules = TestBed.get(SchemaUndefinedLastElementService);
   });
 
   it('should get undefined value by schema', () => {
     expect(sules.getUndefinedValue({type: 'unicode'})).toBe('');
     expect(sules.getUndefinedValue({type: 'html'})).toBe('');
-    expect(sules.getUndefinedValue({type: 'int'})).toBe(undefined);
+    expect(sules.getUndefinedValue({type: 'whatever'})).toBe(undefined);
+    expect(sules.getUndefinedValue({})).toBe(undefined);
   });
 });

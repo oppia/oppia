@@ -18,20 +18,23 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardBackendDict, ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/subtitled-html.model';
+import { WorkedExampleObjectFactory } from
+  'domain/skill/WorkedExampleObjectFactory';
 
 describe('Concept card object factory', () => {
   let conceptCardObjectFactory: ConceptCardObjectFactory;
-  let conceptCardDict: ConceptCardBackendDict;
-  let example1: WorkedExampleBackendDict;
-  let example2: WorkedExampleBackendDict;
+  let conceptCardDict;
+  let example1;
+  let example2;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
-    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
+    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
+    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
 
     example1 = {
       question: {

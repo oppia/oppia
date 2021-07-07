@@ -41,7 +41,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 }
             }, [
                 'Schema validation for \'exploration_id\' failed: '
-                'Expected string, received 2']),
+                'Expected unicode string, received 2']),
             ({
                 'version': 'random_string'
             }, {

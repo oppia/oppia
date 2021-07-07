@@ -58,7 +58,6 @@ bad-functions=apply,input
 [FORMAT]
 
 max-line-length=80
-ignore-long-lines=^.*#\stype:.*$|^\s*(# )?<?https?://\S+>?$
 
 indent-string='    '
 

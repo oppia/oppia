@@ -22,14 +22,10 @@ import { md5 } from 'hash-wasm';
 
 import { AuthService } from 'services/auth.service';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
-import firebase from 'firebase';
 
 describe('Auth service', function() {
   let authService: AuthService;
-  let email: string;
-  let password: string;
-  let idToken: string;
-  let creds: firebase.auth.UserCredential;
+
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
 
@@ -55,11 +51,11 @@ describe('Auth service', function() {
 
     authService = TestBed.inject(AuthService);
 
-    email = 'a@a.com';
-    password = await md5(email);
-    idToken = 'TKN';
-    creds = {
-      user: jasmine.createSpyObj({getIdToken: Promise.resolve(idToken)}),
+    this.email = 'a@a.com';
+    this.password = await md5(this.email);
+    this.idToken = 'TKN';
+    this.creds = {
+      user: jasmine.createSpyObj({getIdToken: Promise.resolve(this.idToken)}),
       credential: null,
       additionalUserInfo: null,
     };
@@ -100,65 +96,63 @@ describe('Auth service', function() {
   it('should throw if signInWithRedirectAsync is called without angular fire',
     async() => {
       await expectAsync(
-        new AuthService(
-          null, authBackendApiService).signInWithRedirectAsync()
+        new AuthService(null, authBackendApiService).signInWithRedirectAsync()
       ).toBeRejectedWithError('AngularFireAuth is not available');
     });
 
   it('should throw if handleRedirectResultAsync is called without angular fire',
     async() => {
       await expectAsync(
-        new AuthService(
-          null, authBackendApiService).handleRedirectResultAsync()
+        new AuthService(null, authBackendApiService).handleRedirectResultAsync()
       ).toBeRejectedWithError('AngularFireAuth is not available');
     });
 
   it('should delegate to signInWithEmailAndPassword', async() => {
     angularFireAuth.signInWithEmailAndPassword
       .and.rejectWith({code: 'auth/user-not-found'});
-    angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(creds);
+    angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(this.creds);
 
-    await expectAsync(authService.signInWithEmail(email))
+    await expectAsync(authService.signInWithEmail(this.email))
       .toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword)
-      .toHaveBeenCalledWith(email, password);
+      .toHaveBeenCalledWith(this.email, this.password);
     expect(angularFireAuth.createUserWithEmailAndPassword)
-      .toHaveBeenCalledWith(email, password);
+      .toHaveBeenCalledWith(this.email, this.password);
     expect(authBackendApiService.beginSessionAsync)
-      .toHaveBeenCalledWith(idToken);
+      .toHaveBeenCalledWith(this.idToken);
   });
 
   it('should propogate signInWithEmailAndPassword errors', async() => {
     const unknownError = {code: 'auth/unknown-error'};
-    spyOn(window, 'prompt').and.returnValue(email);
+    spyOn(window, 'prompt').and.returnValue(this.email);
     angularFireAuth.signInWithEmailAndPassword.and.rejectWith(unknownError);
 
-    await expectAsync(authService.signInWithEmail(email))
+    await expectAsync(authService.signInWithEmail(this.email))
       .toBeRejectedWith(unknownError);
   });
 
   it('should propogate createUserWithEmailAndPassword errors', async() => {
     const unknownError = {code: 'auth/unknown-error'};
-    spyOn(window, 'prompt').and.returnValue(email);
+    spyOn(window, 'prompt').and.returnValue(this.email);
     angularFireAuth.signInWithEmailAndPassword
       .and.rejectWith({code: 'auth/user-not-found'});
     angularFireAuth.createUserWithEmailAndPassword
       .and.rejectWith(unknownError);
 
-    await expectAsync(authService.signInWithEmail(email))
+    await expectAsync(authService.signInWithEmail(this.email))
       .toBeRejectedWith(unknownError);
     expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
   });
 
-  describe('Production mode', () => {
+  describe('Production mode', function() {
     beforeEach(async() => {
       spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
         .and.returnValue(false);
 
-      idToken = 'TKN';
-      creds = {
-        user: jasmine.createSpyObj({getIdToken: Promise.resolve(idToken)}),
+      this.idToken = 'TKN';
+      this.creds = {
+        user: jasmine.createSpyObj({getIdToken: Promise.resolve(this.idToken)}),
         credential: null,
         additionalUserInfo: null,
       };
@@ -167,7 +161,7 @@ describe('Auth service', function() {
     });
 
     it('should fail to call signInWithEmail', async() => {
-      await expectAsync(authService.signInWithEmail(email))
+      await expectAsync(authService.signInWithEmail(this.email))
         .toBeRejectedWithError(
           'signInWithEmail can only be called in emulator mode');
 
@@ -185,14 +179,14 @@ describe('Auth service', function() {
     });
 
     it('should delegate to AngularFireAuth.getRedirectResult', async() => {
-      angularFireAuth.getRedirectResult.and.resolveTo(creds);
+      angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
       await expectAsync(authService.handleRedirectResultAsync())
         .toBeResolvedTo(true);
 
       expect(angularFireAuth.getRedirectResult).toHaveBeenCalled();
       expect(authBackendApiService.beginSessionAsync)
-        .toHaveBeenCalledWith(idToken);
+        .toHaveBeenCalledWith(this.idToken);
     });
 
     it('should delegate to AngularFireAuth.signOut', async() => {
@@ -205,15 +199,15 @@ describe('Auth service', function() {
     });
 
     it('should resolve to false if user is missing', async() => {
-      creds.user = null;
-      angularFireAuth.getRedirectResult.and.resolveTo(creds);
+      this.creds.user = null;
+      angularFireAuth.getRedirectResult.and.resolveTo(this.creds);
 
       await expectAsync(authService.handleRedirectResultAsync())
         .toBeResolvedTo(false);
     });
   });
 
-  describe('Emulator mode', () => {
+  describe('Emulator mode', function() {
     beforeEach(async() => {
       spyOnProperty(AuthService, 'firebaseEmulatorIsEnabled', 'get')
         .and.returnValue(true);
@@ -240,17 +234,6 @@ describe('Auth service', function() {
       expect(angularFireAuth.signOut).toHaveBeenCalled();
       expect(authBackendApiService.endSessionAsync).toHaveBeenCalled();
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
-    });
-
-    it('should return firebase config', () => {
-      expect(AuthService.firebaseConfig).toEqual({
-        apiKey: 'fake-api-key',
-        authDomain: '',
-        projectId: 'dev-project-id',
-        storageBucket: '',
-        messagingSenderId: '',
-        appId: '',
-      });
     });
   });
 });

@@ -31,6 +31,9 @@ interface ExtraParams {
   providedIn: 'root'
 })
 export class SuggestionModalForLearnerDashboardService {
+  successfullyAdded: boolean;
+  addToLearnerPlaylistUrl: string;
+
   constructor(
     private ngbModal: NgbModal,
   ) {}

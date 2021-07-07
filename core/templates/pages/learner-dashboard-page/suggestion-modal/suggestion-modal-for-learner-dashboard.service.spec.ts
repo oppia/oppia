@@ -24,7 +24,7 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { SuggestionModalForLearnerDashboardService } from './suggestion-modal-for-learner-dashboard.service';
 
 class MockNgbModalRef {
-  componentInstance = {
+  componentInstance: {
     newContent: null,
     oldContent: null,
     description: null
@@ -59,9 +59,7 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
   it('should open an ngbModal for suggestions requested' +
     ' when calling showSuggestionModal', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
+      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
@@ -84,9 +82,7 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
   it('should not open an ngbModal for suggestions requested' +
     ' when calling showSuggestionModal', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
+      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
@@ -109,9 +105,7 @@ describe('Suggestion Modal Service For Learners Dashboard', () => {
   it('should do nothing when cancel button is clicked' +
     ' when calling showSuggestionModal', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
+      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.reject('cancel')

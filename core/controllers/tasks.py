@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
+from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -168,6 +169,8 @@ class DeferredTasksHandler(base.BaseHandler):
     """
 
     DEFERRED_TASK_FUNCTIONS = {
+        taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
+            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
             exp_services.delete_explorations_from_user_models),
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (

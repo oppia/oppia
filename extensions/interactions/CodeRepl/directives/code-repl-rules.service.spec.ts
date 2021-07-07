@@ -22,10 +22,9 @@ import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import { CodeReplAnswer } from 'interactions/answer-defs';
 
 describe('Code REPL rules service', () => {
-  let crrs: CodeReplRulesService;
+  let crrs = null;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
@@ -49,7 +48,7 @@ describe('Code REPL rules service', () => {
           '    y = \'ab    c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
     });
 
     it('should remove extra newlines and trailing whitespace', () => {
@@ -61,7 +60,7 @@ describe('Code REPL rules service', () => {
           '    \n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
 
       // Extra trailing whitespace on first line.
       expect(crrs.CodeEquals({
@@ -70,7 +69,7 @@ describe('Code REPL rules service', () => {
           '    y = \'ab    c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
 
       // ---- Tab character ----
       expect(crrs.CodeEquals({
@@ -79,7 +78,7 @@ describe('Code REPL rules service', () => {
           '    y = \'ab    c\'\n' +
           '    return x\n\n\n'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
     });
 
     it('should not change spaces at the start of a line', () => {
@@ -89,7 +88,7 @@ describe('Code REPL rules service', () => {
           '  y = \'ab    c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
     });
 
     it('should detect missing newlines', () => {
@@ -99,7 +98,7 @@ describe('Code REPL rules service', () => {
           '    y = \'ab    c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
     });
 
     it('should compare spaces inside quotes', () => {
@@ -109,7 +108,7 @@ describe('Code REPL rules service', () => {
           '    y = \'ab c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
     });
   });
 
@@ -125,13 +124,13 @@ describe('Code REPL rules service', () => {
           '    y = \'ab c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.CodeContains({
         code: '    def x():\n'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.CodeContains({
         code: 'print 0'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
     });
   });
 
@@ -147,16 +146,16 @@ describe('Code REPL rules service', () => {
           '    y = \'ab c\'\n' +
           '    return x'
         )
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.CodeDoesNotContain({
         code: 'def x():\n'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.CodeDoesNotContain({
         code: '    def x():\n'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.CodeDoesNotContain({
         code: 'print 0'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
     });
   });
 
@@ -176,46 +175,46 @@ describe('Code REPL rules service', () => {
     it('should check if output contains some content', () => {
       expect(crrs.OutputContains({
         output: '1 2 3 4'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.OutputContains({
         output: '\n1\n2\n3\n4\n'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.OutputContains({
         output: ''
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.OutputContains({
         output: 'bad output'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.OutputContains({
         output: 'a b c d e'
-      } as CodeReplAnswer, RULE_INPUT_1)).toBe(true);
+      }, RULE_INPUT_1)).toBe(true);
       expect(crrs.OutputContains({
         output: 'a\nb\nc\nd\n'
-      } as CodeReplAnswer, RULE_INPUT_1)).toBe(false);
+      }, RULE_INPUT_1)).toBe(false);
       expect(crrs.OutputContains({
         output: 'ab\nc\n'
-      } as CodeReplAnswer, RULE_INPUT_1)).toBe(false);
+      }, RULE_INPUT_1)).toBe(false);
       expect(crrs.OutputContains({
         output: ''
-      } as CodeReplAnswer, RULE_INPUT_1)).toBe(false);
+      }, RULE_INPUT_1)).toBe(false);
       expect(crrs.OutputContains({
         output: 'bad output'
-      } as CodeReplAnswer, RULE_INPUT_1)).toBe(false);
+      }, RULE_INPUT_1)).toBe(false);
       expect(crrs.OutputContains({
         output: 'a\nb\nc\nd\ne'
-      } as CodeReplAnswer, RULE_INPUT_2)).toBe(true);
+      }, RULE_INPUT_2)).toBe(true);
       expect(crrs.OutputContains({
         output: '\nabc\ndef\nfgh\n'
-      } as CodeReplAnswer, RULE_INPUT_2)).toBe(false);
+      }, RULE_INPUT_2)).toBe(false);
       expect(crrs.OutputContains({
         output: 'a b c'
-      } as CodeReplAnswer, RULE_INPUT_2)).toBe(false);
+      }, RULE_INPUT_2)).toBe(false);
       expect(crrs.OutputContains({
         output: ''
-      } as CodeReplAnswer, RULE_INPUT_2)).toBe(false);
+      }, RULE_INPUT_2)).toBe(false);
       expect(crrs.OutputContains({
         output: 'bad output'
-      } as CodeReplAnswer, RULE_INPUT_2)).toBe(false);
+      }, RULE_INPUT_2)).toBe(false);
     });
   });
 
@@ -227,30 +226,32 @@ describe('Code REPL rules service', () => {
     it('should compare normalized output', () => {
       expect(crrs.OutputEquals({
         output: '1'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.OutputEquals({
         output: '\n1\n'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.OutputEquals({
         output: ''
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.OutputEquals({
         output: 'bad output'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
     });
   });
 
   describe('\'results in error\' rule', () => {
+    var RULE_INPUT = null;
+
     it('should check if error is not empty', () => {
       expect(crrs.ResultsInError({
         error: ''
-      } as CodeReplAnswer)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.ResultsInError({
         error: ' \t\n'
-      } as CodeReplAnswer)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.ResultsInError({
         error: 'bad output'
-      } as CodeReplAnswer)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
     });
   });
 
@@ -262,22 +263,22 @@ describe('Code REPL rules service', () => {
     it('should check if error message appears', () => {
       expect(crrs.ErrorContains({
         error: 'bad'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.ErrorContains({
         error: '  bad  '
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.ErrorContains({
         error: 'not bad'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(true);
+      }, RULE_INPUT)).toBe(true);
       expect(crrs.ErrorContains({
         error: 'error'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.ErrorContains({
         error: 'b a d'
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
       expect(crrs.ErrorContains({
         error: ''
-      } as CodeReplAnswer, RULE_INPUT)).toBe(false);
+      }, RULE_INPUT)).toBe(false);
     });
   });
 });

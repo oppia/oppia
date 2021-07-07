@@ -22,7 +22,7 @@ import { Ratio } from
   'domain/objects/ratio.model';
 
 describe('Ratio Model', () => {
-  let errors: typeof ObjectsDomainConstants.RATIO_PARSING_ERRORS;
+  let errors = null;
 
   beforeEach(() => {
     errors = ObjectsDomainConstants.RATIO_PARSING_ERRORS;

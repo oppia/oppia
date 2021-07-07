@@ -24,7 +24,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
 describe('BottomNavbarStatusService', () => {
-  let bss: BottomNavbarStatusService;
+  let bss: BottomNavbarStatusService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -28,7 +28,7 @@ let component: SkillMasteryViewerComponent;
 let fixture: ComponentFixture<SkillMasteryViewerComponent>;
 
 describe('SkillMasteryViewerComponent', () => {
-  let skillMasteryBackendApiService: SkillMasteryBackendApiService;
+  let skillMasteryBackendApiService: SkillMasteryBackendApiService = null;
   const mockSkillMastery = SkillMastery.createFromBackendDict(
     {
       skillId1: 1.0,
