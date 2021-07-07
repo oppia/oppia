@@ -537,6 +537,7 @@
 /core/templates/domain/blog-admin/ @DubeySandeep
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
+/core/templates/pages/blog-admin-page/ @DubeySandeep @nithusha21
 
 
 # Release team.

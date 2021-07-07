@@ -340,13 +340,14 @@ class BlogPostRightsModel(base_models.BaseModel):
 
         Args:
             user_id: str. ID of the author of the blog post.
-            limit: int|None. Number of BlogPostRightsModel to be fetched. If
-                None, all existing published models by user will be fetched.
+            limit: int|None. The maximum number of BlogPostRightsModels to be
+                fetched. If None, all existing published models by user will be
+                fetched.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is an editor. The list will be ordered
-            according to last updated.
+            according to the time when the model was last updated.
         """
         query = cls.query(
             cls.editor_ids == user_id, cls.blog_post_is_published == True # pylint: disable=singleton-comparison
@@ -362,13 +363,14 @@ class BlogPostRightsModel(base_models.BaseModel):
 
         Args:
             user_id: str. ID of the author of the blog post.
-            limit: int|None. Number of BlogPostRightsModel to be fetched. If
-                None, all existing draft models by user will be fetched.
+            limit: int|None. The maximum number of BlogPostRightsModels to be
+                fetched. If None, all existing draft models by user will be
+                fetched.
 
         Returns:
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is an editor. The list will be ordered
-            according to last updated.
+            according to the time when the model was last updated.
         """
         query = cls.query(
             cls.editor_ids == user_id,
