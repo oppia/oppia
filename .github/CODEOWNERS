@@ -99,8 +99,8 @@
 
 
 # Blog project
-/core/domain/blog*.py @iamprayush
-/core/controllers/blog_dashboard*.py @iamprayush
+/core/domain/blog*.py @iamprayush @aks681
+/core/controllers/blog_dashboard*.py @aks681
 
 
 # Collection project.
@@ -528,14 +528,15 @@
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
-/core/controllers/blog_admin*.py @iamprayush
+/core/controllers/blog_admin*.py @DubeySandeep
 /core/controllers/moderator*.py @DubeySandeep
 /core/controllers/recent_commits*.py @DubeySandeep
 /core/domain/moderator_services*.py @DubeySandeep
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
-/core/templates/domain/blog-admin/ @iamprayush
+/core/templates/domain/blog-admin/ @DubeySandeep
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
+/core/templates/pages/blog-admin-page/ @DubeySandeep @nithusha21
 
 
 # Release team.
