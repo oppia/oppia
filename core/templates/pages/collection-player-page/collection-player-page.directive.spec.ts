@@ -248,8 +248,8 @@ describe('Collection player page directive', function() {
     expect(ctrl.collection).toEqual(sampleCollection);
   }));
 
-  it('should throw warning message when we try to ' +
-    'fetch invalid collection from backend', fakeAsync(function() {
+  it('should throw warning message when an invalid collection ' +
+    'is fetched from backend', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.rejectWith();
 
@@ -261,8 +261,8 @@ describe('Collection player page directive', function() {
       'There was an error loading the collection.');
   }));
 
-  it('should throw warning message when we try to ' +
-    'fetch invalid collection summary', fakeAsync(function() {
+  it('should throw warning message when an invalid collection summary ' +
+    'is fetched from the backend', fakeAsync(function() {
     ctrl.collection = sampleCollection;
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
@@ -290,12 +290,14 @@ describe('Collection player page directive', function() {
   it('should scroll to the given location when calling ' +
     '\scrollToLocation\'', function() {
     ctrl.scrollToLocation('location');
+
     expect($anchorScroll).toHaveBeenCalled();
   });
 
   it('should stop event propagation when click event is emitted', () => {
     let eventSpy = jasmine.createSpyObj(
       'event', ['stopPropagation']);
+
     ctrl.onClickStopPropagation(eventSpy);
 
     expect(eventSpy.stopPropagation).toHaveBeenCalled();
@@ -303,6 +305,7 @@ describe('Collection player page directive', function() {
 
   it('should close exploration card on clicking outside', () => {
     ctrl.explorationCardIsShown = true;
+
     ctrl.closeOnClickingOutside();
 
     expect(ctrl.explorationCardIsShown).toBe(false);
@@ -333,6 +336,7 @@ describe('Collection player page directive', function() {
   it('should generate path icon parameters', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+
     // Loading collections.
     ctrl.$onInit();
     tick();
@@ -344,6 +348,7 @@ describe('Collection player page directive', function() {
   it('should check whether the exploration is completed', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+
     // Loading collections.
     ctrl.$onInit();
     tick();
@@ -370,7 +375,7 @@ describe('Collection player page directive', function() {
     expect($watchSpy).toHaveBeenCalled();
   }));
 
-  it('should generate path parameters when collection ' +
+  it('should generate empty path parameters when collection ' +
     'node count is one', fakeAsync(function() {
     sampleCollectionBackendObject.nodes = [collectionNodeBackendObject];
     sampleCollection = Collection.create(
@@ -437,6 +442,7 @@ describe('Collection player page directive', function() {
       sampleCollectionBackendObject);
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+
     // Loading collections.
     ctrl.$onInit();
     tick();
@@ -450,6 +456,7 @@ describe('Collection player page directive', function() {
     let urlInterpolationSpy = spyOn(
       urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('imageUrl');
+
     let url = ctrl.getStaticImageUrl('/imagepath');
 
     expect(urlInterpolationSpy).toHaveBeenCalledWith('/imagepath');
@@ -470,6 +477,7 @@ describe('Collection player page directive', function() {
   it('should toggle preview card when calling ' +
     '\'togglePreviewCard\'', function() {
     ctrl.explorationCardIsShown = false;
+
     ctrl.togglePreviewCard();
     expect(ctrl.explorationCardIsShown).toBe(true);
 
@@ -479,7 +487,9 @@ describe('Collection player page directive', function() {
 
   it('should return collecton node from exploration id', function() {
     ctrl.collection = sampleCollection;
+
     let result = ctrl.getCollectionNodeForExplorationId('exp_id');
+
     expect(result).toEqual(sampleCollection.nodes[0]);
   });
 
@@ -497,6 +507,7 @@ describe('Collection player page directive', function() {
   it('should show warning message if we try to ' +
     'load a collection with invalid id', function() {
     ctrl.collection = sampleCollection;
+
     ctrl.getCollectionNodeForExplorationId('invalidId');
 
     expect(alertsSpy).toHaveBeenCalledWith(
@@ -509,6 +520,7 @@ describe('Collection player page directive', function() {
       CollectionPlaythrough.create('exp_id', ['exp_id0']));
 
     let result = ctrl.getNextRecommendedCollectionNodes();
+
     expect(result).toEqual(sampleCollection.nodes[0]);
   }));
 
@@ -518,6 +530,7 @@ describe('Collection player page directive', function() {
       CollectionPlaythrough.create('exp_id0', ['exp_id']));
 
     let result = ctrl.getCompletedExplorationNodes();
+
     expect(result).toEqual(sampleCollection.nodes[0]);
   }));
 
@@ -525,6 +538,7 @@ describe('Collection player page directive', function() {
     'count', fakeAsync(function() {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
+
     // Loading collections.
     ctrl.$onInit();
     tick();

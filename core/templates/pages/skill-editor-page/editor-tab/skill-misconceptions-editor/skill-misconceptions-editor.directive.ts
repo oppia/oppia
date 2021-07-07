@@ -97,6 +97,8 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               backdrop: 'static',
               controller: 'AddMisconceptionModalController'
             }).result.then(function(result) {
+              console.log(result)
+              console.log(result.misconception)
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
               $scope.misconceptions = $scope.skill.getMisconceptions();

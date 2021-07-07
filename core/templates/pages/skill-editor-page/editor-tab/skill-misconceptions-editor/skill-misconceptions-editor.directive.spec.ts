@@ -21,7 +21,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -120,7 +120,8 @@ describe('Skill Misconception Editor Directive', function() {
     expect($scope.misconceptionsListIsShown).toEqual(true);
   });
 
-  it('should toggle misconceptionList', function() {
+  it('should toggle misconceptionList when toggle ' +
+    'button is clicked', function() {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     $scope.misconceptionsListIsShown = false;
 
@@ -132,20 +133,25 @@ describe('Skill Misconception Editor Directive', function() {
   });
 
   it('should open add misconception modal when clicking on add ' +
-    'button', function() {
+    'button', fakeAsync(function() {
+    $scope.skill = sampleSkill;
     let deferred = $q.defer();
-    deferred.resolve({result: sampleMisconception});
+    deferred.resolve({
+      misconception: sampleMisconception
+    });
     let modalSpy = spyOn($uibModal, 'open').and.returnValue(
       {result: deferred.promise});
     let addMisconceptionSpy = spyOn(
       skillUpdateService, 'addMisconception').and.returnValue(null);
 
     $scope.openAddMisconceptionModal();
-    $rootScope.$apply();
+    tick();
+    $scope.$apply();
 
     expect(modalSpy).toHaveBeenCalled();
-    expect(addMisconceptionSpy).toHaveBeenCalled();
-  });
+    expect(addMisconceptionSpy).toHaveBeenCalledWith(
+      sampleSkill, sampleMisconception);
+  }));
 
   it('should close add misconception modal when clicking on close ' +
     'button', function() {

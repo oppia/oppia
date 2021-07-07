@@ -86,19 +86,25 @@ describe('Misconception Editor Directive', function() {
 
   it('should open name editor when clicking on edit button', function() {
     expect($scope.nameEditorIsOpen).toBe(false);
+
     $scope.openNameEditor();
+
     expect($scope.nameEditorIsOpen).toBe(true);
   });
 
   it('should open notes editor when clicking on edit button', function() {
     expect($scope.notesEditorIsOpen).toBe(false);
+
     $scope.openNotesEditor();
+
     expect($scope.notesEditorIsOpen).toBe(true);
   });
 
   it('should open feedback editor when clicking on edit button', function() {
     expect($scope.feedbackEditorIsOpen).toBe(false);
+
     $scope.openFeedbackEditor();
+
     expect($scope.feedbackEditorIsOpen).toBe(true);
   });
 
@@ -135,13 +141,16 @@ describe('Misconception Editor Directive', function() {
     $scope.container.misconceptionFeedback = 'newFeedback';
     $scope.saveFeedback();
 
-    expect(updateFeedbackSpy).toHaveBeenCalled();
+    expect(updateFeedbackSpy).toHaveBeenCalledWith(
+      sampleSkill, 'misconceptionId', 'feedback', 'newFeedback');
   });
 
   it('should close name editor when clicking on cancel button', function() {
     expect($scope.nameEditorIsOpen).toBe(false);
+
     $scope.openNameEditor();
     expect($scope.nameEditorIsOpen).toBe(true);
+
     $scope.cancelEditName();
     expect($scope.nameEditorIsOpen).toBe(false);
   });
@@ -149,16 +158,20 @@ describe('Misconception Editor Directive', function() {
   it('should close notes editor when clicking on cancel button', function() {
     expect($scope.notesEditorIsOpen).toBe(false);
     $scope.openNotesEditor();
+
     expect($scope.notesEditorIsOpen).toBe(true);
     $scope.cancelEditNotes();
+
     expect($scope.notesEditorIsOpen).toBe(false);
   });
 
   it('should close feedback editor when clicking on cancel button', function() {
     expect($scope.feedbackEditorIsOpen).toBe(false);
     $scope.openFeedbackEditor();
+
     expect($scope.feedbackEditorIsOpen).toBe(true);
     $scope.cancelEditFeedback();
+
     expect($scope.feedbackEditorIsOpen).toBe(false);
   });
 
@@ -166,8 +179,10 @@ describe('Misconception Editor Directive', function() {
     let updatesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionMustBeAddressed')
       .and.returnValue(null);
+
     $scope.updateMustBeAddressed();
 
-    expect(updatesSpy).toHaveBeenCalled();
+    expect(updatesSpy).toHaveBeenCalledWith(
+      sampleSkill, 'misconceptionId', true, false);
   });
 });

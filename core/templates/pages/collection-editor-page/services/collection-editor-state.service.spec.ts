@@ -114,6 +114,7 @@ describe('Collection editor state service', () => {
   );
 
   it('should fire an update event after loading more collections', () => {
+
     // Load initial collection.
     collectionEditorStateService.loadCollection('5', () => {
       // Load a second collection.
@@ -166,6 +167,7 @@ describe('Collection editor state service', () => {
       editableCollectionBackendApiService, 'fetchCollectionAsync')
       .and.resolveTo(sampleCollection);
     const loadCollectionSuccessCb = jasmine.createSpy('success');
+
     // Load initial collection.
     collectionEditorStateService.loadCollection(
       'sample_collection_id', loadCollectionSuccessCb);
@@ -181,6 +183,7 @@ describe('Collection editor state service', () => {
       editableCollectionBackendApiService, 'fetchCollectionAsync')
       .and.rejectWith();
     const loadCollectionSuccessCb = jasmine.createSpy('success');
+
     // Load initial collection.
     collectionEditorStateService.loadCollection(
       'sample_collection_id', loadCollectionSuccessCb);
@@ -197,6 +200,7 @@ describe('Collection editor state service', () => {
       collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
       .and.resolveTo(sampleCollectionRights);
     const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
+
     // Load initial collection.
     collectionEditorStateService.loadCollection(
       'sample_collection_id', loadCollectionRightsSuccessCb);
@@ -213,6 +217,7 @@ describe('Collection editor state service', () => {
       collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
       .and.rejectWith();
     const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
+
     // Load initial collection.
     collectionEditorStateService.loadCollection(
       'sample_collection_id', loadCollectionRightsSuccessCb);
@@ -231,6 +236,7 @@ describe('Collection editor state service', () => {
       const saveCollectionsuccessCb = jasmine.createSpy('success');
       const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
+  
       // Load initial collection.
       collectionEditorStateService.loadCollection(
         'sample_collection_id', loadCollectionRightsSuccessCb);
@@ -253,6 +259,7 @@ describe('Collection editor state service', () => {
       .and.resolveTo(sampleCollection);
     const saveCollectionsuccessCb = jasmine.createSpy('success');
     const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
+
 
     // Load initial collection.
     collectionEditorStateService.loadCollection(
@@ -277,6 +284,7 @@ describe('Collection editor state service', () => {
       .and.rejectWith();
     const saveCollectionsuccessCb = jasmine.createSpy('success');
     const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
+
 
     // Load initial collection.
     collectionEditorStateService.loadCollection(
