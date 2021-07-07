@@ -60,7 +60,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
                 continue
 
         try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema( # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+            normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
         except Exception as e:
             errors.append(
@@ -101,11 +101,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'CollectionRightsHandler',
     'CollectionSummariesHandler',
     'CollectionUnpublishHandler',
-    'ConceptCardDataHandler',
     'ConsoleErrorPage',
-    'ContributionOpportunitiesHandler',
     'ContributionRightsDataHandler',
-    'ContributorDashboardPage',
     'ContributorRightsDataHandler',
     'ContributorUsersListHandler',
     'CreatorDashboardHandler',
@@ -161,7 +158,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ExplorationSummariesHandler',
     'ExportAccountHandler',
     'FeaturedActivitiesHandler',
-    'FeaturedTranslationLanguagesHandler',
     'FeedbackStatsHandler',
     'FeedbackThreadStatusChangeEmailHandler',
     'FeedbackThreadViewEventHandler',
@@ -194,7 +190,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'LibraryIndexHandler',
     'LibraryPage',
     'LibraryRedirectPage',
-    'MachineTranslationStateTextsHandler',
     'MemoryCacheAdminHandler',
     'MemoryCacheHandler',
     'MergeSkillHandler',
@@ -304,7 +299,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'TopicsAndSkillsDashboardPage',
     'TopicsAndSkillsDashboardPageDataHandler',
     'TrainedClassifierHandler',
-    'TranslatableTextHandler',
     'UnsentFeedbackEmailHandler',
     'UnsubscribeHandler',
     'UpdateQuestionSuggestionHandler',
@@ -312,7 +306,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UpdateUsernameHandler',
     'UploadExplorationHandler',
     'UrlHandler',
-    'UserContributionRightsDataHandler',
     'UserExplorationEmailsHandler',
     'UserExplorationPermissionsHandler',
     'UserInfoHandler',
