@@ -167,7 +167,7 @@ def normalize_against_schema(
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BASESTRING:
         assert isinstance(obj, python_utils.BASESTRING), (
-            'Expected unicode string, received %s' % obj)
+            'Expected string, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, python_utils.BASESTRING), (
@@ -592,3 +592,15 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid audio language code.
         """
         return utils.is_supported_audio_language_code(obj)
+
+    @staticmethod
+    def is_valid_audio_language_code(obj):
+        """Checks if the given obj (a string) represents a valid language code.
+
+        Args:
+            obj: str. The language code to verify.
+
+        Returns:
+            bool. Whether the given object is a valid audio language code.
+        """
+        return utils.is_valid_language_code(obj)
