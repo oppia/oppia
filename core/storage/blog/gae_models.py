@@ -373,8 +373,7 @@ class BlogPostRightsModel(base_models.BaseModel):
             according to the time when the model was last updated.
         """
         query = cls.query(
-            cls.editor_ids == user_id,
-            cls.blog_post_is_published == False # pylint: disable=singleton-comparison
+            cls.editor_ids == user_id, cls.blog_post_is_published == False # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
         if limit is not None:
             return query.fetch(limit)
