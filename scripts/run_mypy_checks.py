@@ -181,7 +181,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/calculation_registry.py',
     'core/domain/calculation_registry_test.py',
     'core/domain/change_domain.py',
-    'core/domain/change_list_verifier.py',
     'core/domain/classifier_domain.py',
     'core/domain/classifier_domain_test.py',
     'core/domain/classifier_services.py',

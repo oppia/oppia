@@ -57,7 +57,6 @@ from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-from core.domain import change_list_verifier
 from core.platform import models
 import feconf
 import python_utils
@@ -1779,12 +1778,23 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
         exp_id, frontend_version,
         backend_version_exploration.version)
 
-    exploration_change = change_list_verifier.ExplorationChangeMergeVerifier(composite_change_list)
+    exploration_change = exp_domain.ExplorationChangeMergeVerifier(composite_change_list)
     frontend_version_exploration = exp_fetchers.get_exploration_by_id(
         exp_id, version=frontend_version)
-    return exploration_change.is_change_list_mergeable(
-            change_list,
-            frontend_version, exp_id)
+
+    response_dict = exploration_change.is_change_list_mergeable(
+        change_list,
+        frontend_version_exploration,
+        backend_version_exploration, exp_id)
+    if response_dict['send_email']:
+        change_list_dict = [change.to_dict() for change in change_list]
+        (
+            email_manager
+            .send_not_mergeable_change_list_to_admin_for_review(
+                exp_id, frontend_version,
+                backend_version_exploration.version,
+                change_list_dict))
+    return response_dict['changes_are_mergeable']
 
 
 def is_version_of_draft_valid(exp_id, version):
