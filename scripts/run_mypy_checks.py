@@ -848,15 +848,18 @@ def main(args=None):
         env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
     env['PYTHONPATH'] = MYPY_TOOLS_DIR
 
-    process = subprocess.call(cmd, stdin=subprocess.PIPE, env=env)
-
-    if process == 0:
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    output = process.communicate()
+    python_utils.PRINT(output)
+    python_utils.PRINT(output[0])
+    if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
         python_utils.PRINT(
             'Mypy type checks unsuccessful. Please fix the errors.')
         sys.exit(1)
-    return process
+    return process.returncode
 
 
 if __name__ == '__main__': # pragma: no cover
