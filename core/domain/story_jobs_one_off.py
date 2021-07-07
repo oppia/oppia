@@ -103,7 +103,7 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to update the thumbnail_size_in_bytes in story models. """
 
     _DELETED_KEY = 'story_deleted'
-    _ERROR_KEY = 'update_error'
+    _ERROR_KEY = 'thumbnail_size_update_error'
     _NEW_SUCCESS_KEY = 'thumbnail_size_newly_added'
     _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_exists'
 
@@ -127,7 +127,8 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             if fs.isfile(filepath):
                 item.thumbnail_size_in_bytes = len(fs.get(filepath))
-                item.put()
+                item.update_timestamps(update_last_updated_time=False)
+                story_models.StoryModel.put_multi([item])
                 yield (
                     PopulateStoryThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
             else:
@@ -146,6 +147,7 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         if (key == PopulateStoryThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
                 key == PopulateStoryThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY
+                or key == PopulateStoryThumbnailSizeOneOffJob._DELETED_KEY
            ):
             yield (key, len(values))
         else:
