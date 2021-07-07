@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed } from
   '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';

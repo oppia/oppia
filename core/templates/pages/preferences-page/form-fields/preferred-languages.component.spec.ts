@@ -19,7 +19,7 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { PreferredLanguagesComponent } from './preferred-languages.component';
 
 describe('Preferred Site Language Component', () => {

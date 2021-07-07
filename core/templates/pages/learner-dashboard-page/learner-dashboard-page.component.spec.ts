@@ -29,7 +29,7 @@ import { FeedbackThreadSummary } from
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';

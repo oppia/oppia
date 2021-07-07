@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the about page.
+ * @fileoverview Module for Ng Bootstrap.
  */
 
 import { NgModule } from '@angular/core';
-import { AboutPageComponent } from './about-page.component';
-import { AboutPageRootComponent } from './about-page-root.component';
-import { AboutPageRoutingModule } from './about-page-routing.module';
 import { CommonModule } from '@angular/common';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
+  NgbModalModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
     CommonModule,
-    SharedComponentsModule,
-    AboutPageRoutingModule,
+    NgbDropdownModule,
+    NgbTooltipModule,
+    NgbNavModule,
+    NgbModalModule,
+    NgbPopoverModule
   ],
-  declarations: [
-    AboutPageComponent,
-    AboutPageRootComponent,
-  ],
+  exports: [
+    CommonModule,
+    NgbDropdownModule,
+    NgbTooltipModule,
+    NgbNavModule,
+    NgbModalModule,
+    NgbPopoverModule
+  ]
 })
-export class AboutPageModule {}
+export class NgBootstrapModule {}

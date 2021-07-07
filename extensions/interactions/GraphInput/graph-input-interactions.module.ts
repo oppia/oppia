@@ -27,7 +27,7 @@ import { ResponseGraphInput } from './directives/oppia-response-graph-input.comp
 import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { DirectivesModule } from 'directives/directives.module';
 
 @NgModule({

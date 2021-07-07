@@ -23,7 +23,7 @@ import { NgModule } from '@angular/core';
 import { OppiaResponseContinueComponent } from './directives/oppia-response-continue.component';
 import { OppiaShortResponseContinueComponent } from './directives/oppia-short-response-continue.component';
 import { OppiaInteractiveContinue } from './directives/oppia-interactive-continue.component';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 
 
 @NgModule({

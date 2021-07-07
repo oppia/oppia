@@ -21,7 +21,7 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { InteractiveNumericInput } from './directives/oppia-interactive-numeric-input.component';
 import { ResponseNumericInput } from './directives/oppia-response-numeric-input.component';

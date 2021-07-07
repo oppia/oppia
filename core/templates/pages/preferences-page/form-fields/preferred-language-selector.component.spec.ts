@@ -18,7 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { PreferredSiteLanguageSelectorComponent } from './preferred-language-selector.component';
 
 describe('Preferred Site Language Component', () => {

@@ -16,15 +16,25 @@
  * @fileoverview Module for the about page.
  */
 
-import { HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
+
+// Modules.
 import { BrowserModule } from '@angular/platform-browser';
-import { OppiaRootComponent } from './oppia-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './routing/app.routing.module';
+
+// Components.
+import { OppiaRootComponent } from './oppia-root.component';
+
+// Miscellaneous.
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
   ],
@@ -33,6 +43,19 @@ import { AppRoutingModule } from './routing/app.routing.module';
   ],
   entryComponents: [
     OppiaRootComponent,
+  ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: platformFeatureInitFactory,
+      deps: [PlatformFeatureService],
+      multi: true
+    }
   ],
   bootstrap: [OppiaRootComponent]
 })
