@@ -41,11 +41,11 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
-            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT)
+            taskqueue_services.FUNCTION_ID_UPDATE_STATS)
         with serialization_exception:
             taskqueue_services.defer(
-                taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
-                taskqueue_services.QUEUE_NAME_EVENTS, arg1)
+                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
+                taskqueue_services.QUEUE_NAME_DEFAULT, arg1)
 
     def test_exception_raised_when_email_task_params_is_not_serializable(self):
         params = {
@@ -59,38 +59,6 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
                 params,
                 0)
-
-    def test_defer_makes_the_correct_request(self):
-        correct_queue_name = taskqueue_services.QUEUE_NAME_DEFAULT
-        args = (1, 2, 3, 4)
-        kwargs = {
-            'kwarg1': 'arg1',
-            'kwarg2': 'arg2'
-        }
-        correct_payload = {
-            'fn_identifier': taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS,
-            'args': args,
-            'kwargs': kwargs
-        }
-        def mock_create_http_task(
-                queue_name, url, payload=None, scheduled_for=None,
-                task_name=None):
-            self.assertEqual(queue_name, correct_queue_name)
-            self.assertEqual(url, feconf.TASK_URL_DEFERRED)
-            self.assertEqual(payload, correct_payload)
-            self.assertIsNone(task_name)
-            self.assertIsNone(scheduled_for)
-
-        swap_create_http_task = self.swap(
-            taskqueue_services.platform_taskqueue_services, 'create_http_task',
-            mock_create_http_task)
-
-        with swap_create_http_task:
-            taskqueue_services.defer(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS,
-                correct_queue_name,
-                *args,
-                **kwargs)
 
     def test_enqueue_task_makes_the_correct_request(self):
         correct_payload = {

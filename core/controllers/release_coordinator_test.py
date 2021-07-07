@@ -19,9 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core import jobs_registry
-from core import jobs_test
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
@@ -112,7 +109,7 @@ class JobsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         response = self.get_json('/jobshandler')
         self.assertItemsEqual(list(response), [
-            'continuous_computations_data', 'human_readable_current_time',
+            'human_readable_current_time',
             'one_off_job_status_summaries', 'audit_job_status_summaries',
             'recent_job_data', 'unfinished_job_data'])
         self.logout()
@@ -168,155 +165,6 @@ class JobsHandlerTest(test_utils.GenericTestBase):
         status = SampleMapReduceJobManager.get_status_code(job_id)
 
         self.assertEqual(status, job_models.STATUS_CODE_CANCELED)
-
-        self.logout()
-
-    def test_start_computation(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'start_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        self.logout()
-
-    def test_stop_computation_with_running_jobs(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_mapreduce_tasks()
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'stop_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        self.logout()
-
-    def test_stop_computation_with_finished_jobs(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        jobs_test.StartExplorationEventCounter.start_computation()
-
-        self.process_and_flush_pending_mapreduce_tasks()
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'stop_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        self.logout()
-
-    def test_stop_computation_with_stopped_jobs(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_mapreduce_tasks()
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        jobs_test.StartExplorationEventCounter.stop_computation(self.admin_id)
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'stop_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
 
         self.logout()
 

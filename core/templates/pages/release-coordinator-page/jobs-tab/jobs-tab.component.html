@@ -1,37 +1,4 @@
 <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-  <h3>Continuous computations</h3>
-  <table class="table">
-    <tr>
-      <th>Type</th>
-      <th>Status</th>
-      <th>Last started</th>
-      <th>Last stop signal sent</th>
-      <th>Last finished</th>
-      <th>Active realtime layer</th>
-      <th>Controls</th>
-    </tr>
-    <tr *ngFor="let computation of CONTINUOUS_COMPUTATIONS_DATA">
-      <td>{{computation.computationType}}</td>
-      <td>{{computation.statusCode}}</td>
-      <td>{{computation.humanReadableLastStarted}}</td>
-      <td>{{computation.humanReadableLastStopped}}</td>
-      <td>{{computation.humanReadableLastFinished}}</td>
-      <td>{{computation.activeRealtimeLayerIndex}}</td>
-      <td>
-        <button *ngIf="computation.isStartable"
-                (click)="startComputation(computation.computationType)">
-          Start
-        </button>
-        <button *ngIf="computation.isStoppable"
-                (click)="stopComputation(computation.computationType)">
-          Stop
-        </button>
-      </td>
-    </tr>
-  </table>
-</mat-card>
-
-<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
   <h3>One-off jobs</h3>
   <h4>Current time: {{ HUMAN_READABLE_CURRENT_TIME }}</h4>
   <table class="table table-striped">

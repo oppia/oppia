@@ -21,7 +21,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { JobsData, JobsDataBackendDict, ReleaseCoordinatorBackendApiService } from './release-coordinator-backend-api.service';
-import { ComputationData } from 'domain/admin/computation-data.model';
 import { Job } from 'domain/admin/job.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -41,18 +40,6 @@ describe('Release coordinator backend api service', () => {
     human_readable_current_time: 'June 03 15:31:20',
     audit_job_status_summaries: [],
     recent_job_data: [],
-    continuous_computations_data: [
-      {
-        is_startable: true,
-        status_code: 'never_started',
-        computation_type: 'FeedbackAnalyticsAggregator',
-        last_started_msec: null,
-        active_realtime_layer_index: null,
-        last_stopped_msec: null,
-        is_stoppable: false,
-        last_finished_msec: null
-      }
-    ]
   };
   let jobsData: JobsData;
 
@@ -79,9 +66,6 @@ describe('Release coordinator backend api service', () => {
         Job.createFromBackendDict),
       recentJobData: jobsDataBackendResponse.recent_job_data.map(
         Job.createFromBackendDict),
-      continuousComputationsData:
-       jobsDataBackendResponse.continuous_computations_data.map(
-         ComputationData.createFromBackendDict)
     };
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -163,70 +147,6 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should request to start computation given the job' +
-   'name when calling startComputationAsync', fakeAsync(() => {
-    let computationType = 'FeedbackAnalyticsAggregator';
-    let payload = {
-      action: 'start_computation',
-      computation_type: computationType
-    };
-    rcbas.startComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should request to stop computation given the job' +
-   'name when calling stopComputationAsync', fakeAsync(() => {
-    let computationType = 'FeedbackAnalyticsAggregator';
-    let payload = {
-      action: 'stop_computation',
-      computation_type: computationType
-    };
-    rcbas.stopComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should fail to stop computation given the job' +
-   'name when calling stopComputationAsync', fakeAsync(() => {
-    let computationType = 'InvalidComputaionType';
-    let payload = {
-      action: 'stop_computation',
-      computation_type: computationType
-    };
-    rcbas.stopComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/jobshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
   }));
 
   it('should request to show the output of valid' +
