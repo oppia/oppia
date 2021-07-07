@@ -57,6 +57,7 @@ from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
+from core.domain import change_list_verifier
 from core.platform import models
 import feconf
 import python_utils
@@ -1713,31 +1714,35 @@ def is_voiceover_change_list(change_list):
     return True
 
 
-def get_composite_change_list(exp_id, frontend_version, backend_version):
+def get_composite_change_list(exp_id, from_version, to_version):
     """Returns a list of ExplorationChange domain objects consisting of
-    changes from frontend_version to backend_version in an exploration.
+    changes from from_version to to_version in an exploration.
 
     Args:
         exp_id: str. The id of the exploration.
-        frontend_version: int. The version of the exploration on which the user
-            is working.
-        backend_version: int. The latest version of the exploration from the
-            backend.
+        from_version: int. The version of the exploration from where we
+            want to start the change list.
+        to_version: int. The version of the exploration till which we
+            want are change list.
 
     Returns:
         list(ExplorationChange). List of ExplorationChange domain objects
-        consisting of changes from frontend_version to backend_version.
+        consisting of changes from from_version to to_version.
     """
-    if frontend_version > backend_version:
+    if from_version > to_version:
         raise Exception(
             'Unexpected error: Trying to find change list from version %s '
-            'of exploration to version %s. Please reload and try again.'
-            % (frontend_version, backend_version))
+            'of exploration to version %s.'
+            % (from_version, to_version))
 
-    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+
+    version_nums = list(python_utils.RANGE(from_version + 1, to_version + 1))
+    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, version_nums, allow_deleted=False)
+
     composite_change_list_dict = []
-    for i in python_utils.RANGE(frontend_version, backend_version):
-        composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
+    for snapshot in snapshots_metadata:
+        composite_change_list_dict += snapshot['commit_cmds']
 
     composite_change_list = [
         exp_domain.ExplorationChange(change)
@@ -1748,7 +1753,8 @@ def get_composite_change_list(exp_id, frontend_version, backend_version):
 
 def are_changes_mergeable(exp_id, frontend_version, change_list):
     """Checks whether the change list can be merged when the
-    frontend version is not equal to the latest backend version.
+    intended exploration version of changes_list is not same as
+    the current exploration version.
 
     Args:
         exp_id: str. The id of the exploration where the change_list is to
@@ -1761,26 +1767,24 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
     Returns:
         boolean. Whether the changes are mergeable.
     """
-
     backend_version_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if backend_version_exploration.version == frontend_version:
         return True
     elif backend_version_exploration.version < frontend_version:
         return False
-    else:
-        # A complete list of changes from one version to another
-        # is composite_change_list.
-        composite_change_list = get_composite_change_list(
-            exp_id, frontend_version,
-            backend_version_exploration.version)
 
-        exploration_change = exp_domain.ExplorationChangeMergeVerifier(composite_change_list)
-        frontend_version_exploration = exp_fetchers.get_exploration_by_id(
-            exp_id, version=frontend_version)
-        return exploration_change.is_change_list_mergeable(
-                change_list,
-                frontend_version_exploration,
-                backend_version_exploration, exp_id)
+    # A complete list of changes from one version to another
+    # is composite_change_list.
+    composite_change_list = get_composite_change_list(
+        exp_id, frontend_version,
+        backend_version_exploration.version)
+
+    exploration_change = change_list_verifier.ExplorationChangeMergeVerifier(composite_change_list)
+    frontend_version_exploration = exp_fetchers.get_exploration_by_id(
+        exp_id, version=frontend_version)
+    return exploration_change.is_change_list_mergeable(
+            change_list,
+            frontend_version, exp_id)
 
 
 def is_version_of_draft_valid(exp_id, version):

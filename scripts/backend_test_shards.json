@@ -103,7 +103,8 @@
         "core.domain.feedback_services_test",
         "core.domain.classroom_services_test",
         "core.domain.visualization_registry_test",
-        "core.domain.exp_services_test"
+        "core.domain.exp_services_test",
+        "core.domain.change_list_verifier_test"
     ],
     "4": [
         "core.controllers.learner_goals_test",
