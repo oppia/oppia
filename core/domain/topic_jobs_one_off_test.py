@@ -217,7 +217,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
-    def test_job_skips_thumbnail_size_already_updated(self):
+    def test_job_with_existing_thumbnail_size_skips(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results in
         existing update success key when the thumbnail_size_in_bytes is to
         be updated.
@@ -245,7 +245,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
-    def test_thumbnail_size_job_thumbnail_size_is_none(self):
+    def test_job_with_thumbnail_not_in_filesystem_logs_error(self):
         """Tests that PopulateTopicThumbnailSizeOneOffJob job results error
         key if the thumbnail_filename does not exist in the filesystem and
         thumbnail_filename does not exist in the filesystem.
@@ -276,7 +276,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
-    def test_thumbnail_size_job_skips_deleted_topic(self):
+    def test_job_with_topic_deleted_skips(self):
         """Tests that PopulateThumbnailSizeOneOffJob skips deleted topics."""
         self.save_new_topic(self.TOPIC_ID, self.albert_id)
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
@@ -298,7 +298,7 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
-    def test_job_populates_new_thumbnail_size(self):
+    def test_job_with_thumbnail_in_filesystem_logs_success(self):
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='A name',
             abbreviated_name='abbrev', description='description',

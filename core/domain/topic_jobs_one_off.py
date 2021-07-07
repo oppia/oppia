@@ -32,7 +32,8 @@ from core.domain import topic_services
 from core.platform import models
 import feconf
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(base_models, topic_models,) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.topic])
 
 
 class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
