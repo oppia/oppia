@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Error classes for blog model audits."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -33,5 +35,5 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
     """Error class for blog posts with duplicate urls."""
 
     def __init__(self, model):
-        message = 'url=%s is not unique' % utils.quoted(model.title)
-        super(DuplicateBlogTitleError, self).__init__(message, model)
+        message = 'url=%s is not unique' % utils.quoted(model.url_fragment)
+        super(DuplicateBlogUrlError, self).__init__(message, model)

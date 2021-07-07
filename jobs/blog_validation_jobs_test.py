@@ -20,13 +20,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-import feconf
-from jobs import job_test_utils
-from jobs import blog_validation_jobs
 from jobs import blog_validation_errors
+from jobs import blog_validation_jobs
+from jobs import job_test_utils
 
 (blog_models, user_models) = models.Registry.import_models(
     [models.NAMES.blog, models.NAMES.user])
+
 
 class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
 
@@ -34,14 +34,29 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
 
     def test_run_with_same_titles_for_blog_posts(self):
         blog_post_model_1 = self.create_model(
-            blog_models.BlogPostModel, id='validblogid1', deleted=False,
-            title='Sample Title')
+            blog_models.BlogPostModel,
+            id='validblogid1',
+            deleted=False,
+            title='Sample Title',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url_fragment_1')
         blog_post_model_2 = self.create_model(
-            blog_models.BlogPostModel, id='validblogid2', deleted=False,
-            title='Sample Title')
+            blog_models.BlogPostModel,
+            id='validblogid2',
+            deleted=False,
+            title='Sample Title',
+            content='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='url_fragment_2')
         blog_post_model_3 = self.create_model(
-            blog_models.BlogPostModel, id='validblogid3', deleted=False,
-            title='Sample Diff Title')
+            blog_models.BlogPostModel,
+            id='validblogid3',
+            deleted=False,
+            title='Sample Diff Title',
+            content='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='url_fragment_2')
 
         self.put_multi([
             blog_post_model_1,

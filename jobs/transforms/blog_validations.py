@@ -19,31 +19,27 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
+from core.domain import blog_services
 from core.platform import models
-import feconf
-from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
-from jobs.types import user_validation_errors
 
-import apache_beam as beam
-(base_models, blog_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.blog])
+(blog_models, user_models) = models.Registry.import_models([
+    models.NAMES.blog, models.Names.user])
 
 
 @validation_decorators.AuditsExisting(
     blog_models.BlogPostModel,
     blog_models.BlogPostSummaryModel)
 class ValidateBlogModelDomainObjectsInstances(
-    base_validation.ValidateModelDomainObjectInstances):
+        base_validation.ValidateModelDomainObjectInstances):
+    """Provides the validation type for validating blog post objects."""
 
-    def _get_domain_object_validation_type(self, unused_item):
+    def _get_domain_object_validation_type(self, item):
         """Returns the type of domain object validation to be performed.
 
         Args:
-            unused_item: datastore_services.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
 
         Returns:
             str. The type of validation mode: strict or non strict.
@@ -52,9 +48,9 @@ class ValidateBlogModelDomainObjectsInstances(
             item.id, strict=True)
 
         if blog_post_rights.blog_post_is_published:
-            return VALIDATION_MODES.strict
+            return base_validation.VALIDATION_MODES.strict
 
-        return VALIDATION_MODES.non_strict
+        return base_validation.VALIDATION_MODES.non_strict
 
 
 @validation_decorators.RelationshipsOf(blog_models.BlogPostModel)
@@ -64,12 +60,14 @@ def blog_post_model_relationships(model):
     yield model.id, [blog_models.BlogPostRightsModel]
     yield model.author_id, [user_models.UserSettingsModel]
 
+
 @validation_decorators.RelationshipsOf(blog_models.BlogPostSummaryModel)
 def blog_post_summary_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [blog_models.BlogPostModel]
     yield model.id, [blog_models.BlogPostRightsModel]
     yield model.author_id, [user_models.UserSettingsModel]
+
 
 @validation_decorators.RelationshipsOf(blog_models.BlogPostRightsModel)
 def blog_post_rights_model_relationships(model):
