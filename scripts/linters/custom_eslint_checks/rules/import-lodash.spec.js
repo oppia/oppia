@@ -41,9 +41,9 @@ ruleTester.run('import-lodash', rule, {
       'import { cloneDeep }  from "lodash";',
       errors: [{
         message: (
-          'Please do not use import { someFunction } from "lodash and' +
-          ' import _ from "lodash" Use import someFunction from' +
-          ' "lodash/someFunction" instead.')
+          'Please do not use "import { someFunction } from \'lodash\'" and' +
+          ' "import _ from \'lodash\'". Use "import someFunction from' +
+          ' \'lodash/someFunction\'" instead.')
       }],
     },
     {
@@ -51,9 +51,9 @@ ruleTester.run('import-lodash', rule, {
       'import _ from "lodash";',
       errors: [{
         message: (
-          'Please do not use import { someFunction } from "lodash and' +
-          ' import _ from "lodash" Use import someFunction from' +
-          ' "lodash/someFunction" instead.')
+          'Please do not use "import { someFunction } from \'lodash\'" and' +
+          ' "import _ from \'lodash\'". Use "import someFunction from' +
+          ' \'lodash/someFunction\'" instead.')
       }],
     }
   ]

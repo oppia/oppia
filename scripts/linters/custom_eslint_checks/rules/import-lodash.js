@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to prohibit the use of inject call.
+ * @fileoverview Lint check to Only allow imports relevant part of lodash.
  */
 
 'use strict';
@@ -22,7 +22,7 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to prohibit the use of inject call',
+      description: 'Lint check to Only allow imports relevant part of lodash',
       category: 'Best Practices',
       recommended: true,
     },
@@ -30,14 +30,15 @@ module.exports = {
     schema: [],
     messages: {
       validImportLodash: (
-        'Please do not use import { someFunction } from "lodash and' +
-        ' import _ from "lodash" Use import someFunction from' +
-        ' "lodash/someFunction" instead.')
+        'Please do not use "import { someFunction } from \'lodash\'" and' +
+        ' "import _ from \'lodash\'". Use "import someFunction from' +
+        ' \'lodash/someFunction\'" instead.')
     }
   },
 
   create: function(context) {
-    var importSelector = 'ImportDeclaration[source.value=/^lodash*./]';
+    var importSelector = 'ImportDeclaration[source.value=/^lodash/]';
+
     var catchAndReportInvalidImportLodash = function(node) {
       if (node.specifiers[0].type !== 'ImportDefaultSpecifier' ||
        node.specifiers[0].local.name === '_') {
