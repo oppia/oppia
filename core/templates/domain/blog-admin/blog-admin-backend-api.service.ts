@@ -35,7 +35,7 @@ interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
-interface ConfigPropertiesBackendResponse {
+export interface ConfigPropertiesBackendResponse {
   [property: string]: {
     description: string,
     value: string[] | number,
@@ -43,7 +43,7 @@ interface ConfigPropertiesBackendResponse {
   }
 }
 
-interface ConfigPropertyValues {
+export interface ConfigPropertyValues {
   'max_number_of_tags_assigned_to_blog_post': number,
   'list_of_default_tags_for_blog_post': string[]
 }
