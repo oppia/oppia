@@ -583,6 +583,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Subtopic thumbnail background color is not specified.')
 
+    def test_subtopic_thumbnail_size_in_bytes_validation(self):
+        self.topic.subtopics[0].thumbnail_size_in_bytes = 0
+        self._assert_validation_error(
+            'Subtopic thumbnail size in bytes cannot be zero.')
+
     def test_topic_practice_tab_is_displayed_validation(self):
         self.topic.practice_tab_is_displayed = 0
         self._assert_validation_error(
@@ -869,6 +874,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_size_in_bytes, 21131)
 
+        # Test Exception when the thumbnail is not found in filesystem.
+        with self.assertRaisesRegexp(
+            Exception, 'The thumbnail %s for subtopic with topic_id %s does'
+            ' not exist in the filesystem.' % (
+                'new_image.svg', self.topic_id)):
+            self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
+
+        # Test successful update of thumbnail_filename when the thumbnail
+        # is found in the filesystem.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
             encoding=None) as f:
