@@ -36,7 +36,7 @@ import { RichTextComponentsModule } from 'rich_text_components/rich-text-compone
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 import { I18nModule } from 'i18n/i18n.module';
-import { BaseComponentsModule } from '../base-components/base-component.module';
+import { BaseComponentsModule } from '../base-components/base-components.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 
 // Components.
