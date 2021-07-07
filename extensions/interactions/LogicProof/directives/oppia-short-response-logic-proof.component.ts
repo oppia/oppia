@@ -25,14 +25,17 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   templateUrl: './logic-proof-short-response.component.html'
 })
 export class ShortResponseLogicProofComponent implements OnInit {
-  @Input('answer') answerWithValue: string;
-  answer;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input('answer') answerWithValue!: string;
+  answer!: string;
 
   constructor(private htmlEscaperService: HtmlEscaperService) { }
 
   ngOnInit(): void {
     this.answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answerWithValue);
+      this.answerWithValue) as string;
   }
 }
 

@@ -28,18 +28,19 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 })
 export class EditorFirstTimeEventsService {
   constructor(private siteAnalyticsService: SiteAnalyticsService) {}
-
-    explorationId = null;
-    shouldRegisterEvents = false;
+    // The other functions cannot be called until 'initRegisterEvents'
+    // is called, 'initRegisterEvents' initializes 'explorationId'.
+    explorationId: string = '';
+    shouldRegisterEvents: boolean = false;
     alreadyRegisteredEvents = {
-      EditorFirstEntryEvent: null,
-      FirstOpenContentBoxEvent: null,
-      FirstSaveContentEvent: null,
-      FirstClickAddInteractionEvent: null,
-      FirstSelectInteractionTypeEvent: null,
-      FirstSaveInteractionEvent: null,
-      FirstSaveRuleEvent: null,
-      FirstCreateSecondStateEvent: null
+      EditorFirstEntryEvent: false,
+      FirstOpenContentBoxEvent: false,
+      FirstSaveContentEvent: false,
+      FirstClickAddInteractionEvent: false,
+      FirstSelectInteractionTypeEvent: false,
+      FirstSaveInteractionEvent: false,
+      FirstSaveRuleEvent: false,
+      FirstCreateSecondStateEvent: false
     };
 
     initRegisterEvents(expId: string): void {
@@ -49,7 +50,7 @@ export class EditorFirstTimeEventsService {
 
     registerEditorFirstEntryEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.EditorFirstEntryEvent === null) {
+            !this.alreadyRegisteredEvents.EditorFirstEntryEvent) {
         this.siteAnalyticsService.registerEditorFirstEntryEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.EditorFirstEntryEvent = true;
@@ -58,7 +59,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstOpenContentBoxEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstOpenContentBoxEvent === null) {
+            !this.alreadyRegisteredEvents.FirstOpenContentBoxEvent) {
         this.siteAnalyticsService.registerFirstOpenContentBoxEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
@@ -67,7 +68,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstSaveContentEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstSaveContentEvent === null) {
+            !this.alreadyRegisteredEvents.FirstSaveContentEvent) {
         this.siteAnalyticsService.registerFirstSaveContentEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstSaveContentEvent = true;
@@ -76,8 +77,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstClickAddInteractionEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstClickAddInteractionEvent ===
-          null) {
+            !this.alreadyRegisteredEvents.FirstClickAddInteractionEvent) {
         this.siteAnalyticsService.registerFirstClickAddInteractionEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
@@ -86,8 +86,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstSelectInteractionTypeEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent ===
-          null) {
+            !this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent) {
         this.siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
@@ -96,7 +95,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstSaveInteractionEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstSaveInteractionEvent === null) {
+            !this.alreadyRegisteredEvents.FirstSaveInteractionEvent) {
         this.siteAnalyticsService.registerFirstSaveInteractionEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
@@ -105,7 +104,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstSaveRuleEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstSaveRuleEvent === null) {
+            !this.alreadyRegisteredEvents.FirstSaveRuleEvent) {
         this.siteAnalyticsService.registerFirstSaveRuleEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstSaveRuleEvent = true;
@@ -114,7 +113,7 @@ export class EditorFirstTimeEventsService {
 
     registerFirstCreateSecondStateEvent(): void {
       if (this.shouldRegisterEvents &&
-            this.alreadyRegisteredEvents.FirstCreateSecondStateEvent === null) {
+            !this.alreadyRegisteredEvents.FirstCreateSecondStateEvent) {
         this.siteAnalyticsService.registerFirstCreateSecondStateEvent(
           this.explorationId);
         this.alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
