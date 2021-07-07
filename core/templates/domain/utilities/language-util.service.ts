@@ -50,7 +50,7 @@ interface SupportedContentLanguageBackendDict {
   'direction': string;
 }
 
-interface LanguageIdAndText {
+export interface LanguageIdAndText {
   id: string;
   text: string;
 }
