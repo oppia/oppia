@@ -94,8 +94,9 @@ class AdminHandler(base.BaseHandler):
                         'update_feature_flag_rules'
                     ]
                 },
-                # TODO(#13331): Remove default_value once clear_search_index
-                # is fixed.
+                # TODO(#13331): Remove default_value when it is confirmed that,
+                # for clearing the search indices of exploration & collection
+                # 'action' field must be provided in the payload.
                 'default_value': None
             },
             'exploration_id': {
