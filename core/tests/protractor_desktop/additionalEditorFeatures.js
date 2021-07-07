@@ -427,6 +427,8 @@ describe('Full exploration editor', function() {
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
       await waitFor.pageToFullyLoad();
+      expect(await element(by.css(
+        '.protractor-test-lost-changes-modal')).isPresent()).toBe(false);
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
