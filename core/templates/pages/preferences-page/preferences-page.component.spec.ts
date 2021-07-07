@@ -16,306 +16,310 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// preferences-page.component.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { UserInfo } from 'domain/user/user-info.model';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AlertsService } from 'services/alerts.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LoaderService } from 'services/loader.service';
+import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { PreferencesBackendDict, SubscriptionSummary, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PreferencesPageComponent } from './preferences-page.component';
 
-import { TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
+describe('Preferences Page Component', () => {
+  let componentInstance: PreferencesPageComponent;
+  let fixture: ComponentFixture<PreferencesPageComponent>;
+  let loaderService: LoaderService;
+  let userService: UserService;
+  let languageUtilService: LanguageUtilService;
+  let urlInterpolationService: UrlInterpolationService;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let alertsService: AlertsService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let ngbModal: NgbModal;
+  let mockWindowRef: MockWindowRef;
+  let mockUserBackendApiService: MockUserBackendApiService;
 
-require('pages/preferences-page/preferences-page.component.ts');
-
-describe('Preferences Controller', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $rootScope = null;
-  var $q = null;
-  var $timeout = null;
-  var $uibModal = null;
-  var CsrfService = null;
-  var PreventPageUnloadEventService = null;
-  var UserService = null;
-  var userInfo = {
-    getUsername: () => 'myUsername',
-    getEmail: () => 'myusername@email.com'
+  let preferencesData: PreferencesBackendDict = {
+    preferred_language_codes: ['en'],
+    preferred_site_language_code: 'en',
+    preferred_audio_language_code: 'en',
+    profile_picture_data_url: '',
+    default_dashboard: 'creator',
+    user_bio: 'test user bio',
+    subject_interests: '',
+    can_receive_email_updates: true,
+    can_receive_editor_role_email: true,
+    can_receive_feedback_message_email: false,
+    can_receive_subscription_email: true,
+    subscription_list: [{
+      creator_picture_data_url: 'picture_url',
+      creator_username: 'creator',
+      creator_impact: 0
+    }]
   };
-  var mockWindow = {
-    location: {
-      reload: () => {}
+
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        reload: () => {}
+      }
+    };
+  }
+
+  @Pipe({name: 'truncate'})
+  class MockTruncatePipe {
+    transform(value: string, params: Object | undefined): string {
+      return value;
     }
-  };
+  }
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', mockWindow);
-  }));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+  class MockUserBackendApiService {
+    async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+      return Promise.resolve(preferencesData);
     }
-  }));
 
-  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $httpBackend = $injector.get('$httpBackend');
-    $q = $injector.get('$q');
-    $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
-    $uibModal = $injector.get('$uibModal');
-
-    CsrfService = $injector.get('CsrfTokenService');
-    PreventPageUnloadEventService = $injector.get(
-      'PreventPageUnloadEventService');
-    UserService = $injector.get('UserService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.returnValue(
-      $q.resolve('sample-csrf-token'));
-
-    ctrl = $componentController('preferencesPage', {
-      $rootScope: $rootScope
-    });
-
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve(userInfo));
-    $httpBackend.expectGET('/preferenceshandler/data').respond({
-      can_receive_email_updates: false,
-      can_receive_editor_role_email: true,
-      can_receive_feedback_message_email: true
-    });
-
-    ctrl.$onInit();
-    $rootScope.$apply();
-    $httpBackend.flush();
-  }));
-
-  it('should get static image url', function() {
-    expect(ctrl.getStaticImageUrl('/path/to/image.png')).toBe(
-      '/assets/images/path/to/image.png');
-  });
-
-  it('should send the updated user bio to the backend', function() {
-    var userBio = 'User bio example';
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match('"update_type":"user_bio"');
-    };
-
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.saveUserBio(userBio);
-    $httpBackend.flush();
-
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
-
-  it('should send the updated subject interests to the backend', function() {
-    var subjectInterests = 'Math';
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match(
-        '"update_type":"subject_interests"');
-    };
-
-    expect(ctrl.subjectInterestsChangedAtLeastOnce).toBe(false);
-
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.onSubjectInterestsSelectionChange(subjectInterests);
-    $httpBackend.flush();
-
-    expect(ctrl.subjectInterestsChangedAtLeastOnce).toBe(true);
-
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
-
-  it('should send the preferred site language code to the backend', function() {
-    var newLanguage = 'es';
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match(
-        '"update_type":"preferred_site_language_code"');
-    };
-
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.savePreferredSiteLanguageCodes(newLanguage);
-    $httpBackend.flush();
-
-    expect(ctrl.select2DropdownIsShown).toBe(false);
-    $timeout.flush();
-    expect(ctrl.select2DropdownIsShown).toBe(true);
-
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
-
-  it('should send the preferred audio language code to the backend',
-    function() {
-      var newLanguage = 'es';
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams).match(
-          '"update_type":"preferred_audio_language_code"');
-      };
-
-      $httpBackend.expect(
-        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-      ctrl.savePreferredAudioLanguageCode(newLanguage);
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
-  it('should show username popover based on its length', function() {
-    expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
-    expect(ctrl.showUsernamePopover('abc')).toBe('none');
-  });
-
-  it('should save email preferences on backend when saving email preferences',
-    function() {
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams).match(
-          '"update_type":"email_preferences"');
-      };
-      $httpBackend.expect(
-        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond({
+    async updatePreferencesDataAsync(
+        updateType: string,
+        data: boolean | string | string[] | SubscriptionSummary[]
+    ): Promise<UpdatePreferencesResponse> {
+      return Promise.resolve({
         bulk_email_signup_message_should_be_shown: false
       });
-      ctrl.saveEmailPreferences(true, true, true, true);
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
-  it('should show signup link if the user cannot be added automatically',
-    function() {
-      expect(ctrl.showEmailSignupLink).toBeFalse();
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams).match(
-          '"update_type":"email_preferences"');
-      };
-      $httpBackend.expect(
-        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond({
-        bulk_email_signup_message_should_be_shown: true
-      });
-      ctrl.saveEmailPreferences(true, true, true, true);
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-
-      expect(ctrl.canReceiveEmailUpdates).toBeFalse();
-      expect(ctrl.showEmailSignupLink).toBeTrue();
-    });
-
-  it('should save preferred language codes on backend when saving chosen' +
-    ' languages', function() {
-    var isRequestTheExpectOne = function(queryParams) {
-      return decodeURIComponent(queryParams).match(
-        '"update_type":"preferred_language_codes"');
-    };
-    $httpBackend.expect(
-      'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-    ctrl.savePreferredLanguageCodes([]);
-    $httpBackend.flush();
-
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
-  });
-
-  it('should save default dashboard on backend when saving dashboard',
-    function() {
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams).match(
-          '"update_type":"default_dashboard"');
-      };
-      $httpBackend.expect(
-        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-      ctrl.saveDefaultDashboard({});
-      $httpBackend.flush();
-
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
-  it('should export account when handling export account data click',
-    function() {
-      expect(ctrl.exportingData).toBe(false);
-      ctrl.handleExportDataClick();
-      expect(ctrl.exportingData).toBe(true);
-    });
-
-  it('should show that notifications checkbox is true by default',
-    function() {
-      expect(ctrl.canReceiveEditorRoleEmail).toBe(true);
-      expect(ctrl.canReceiveFeedbackMessageEmail).toBe(true);
-    });
-
-  it('should map SUPPORTED_AUDIO_LANGUAGES correctly to ' +
-      'AUDIO_LANGUAGE_CHOICES to support select2 plugin',
-  function() {
-    var numberOfAudioLanguageChoices = ctrl.AUDIO_LANGUAGE_CHOICES.length;
-    expect(numberOfAudioLanguageChoices > 0).toBe(true);
-    for (var index = 0; index < numberOfAudioLanguageChoices; index++) {
-      expect(Object.keys(ctrl.AUDIO_LANGUAGE_CHOICES[index])).toEqual(
-        ['id', 'text']);
     }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        NgbModalModule
+      ],
+      declarations: [
+        MockTranslatePipe,
+        MockTruncatePipe,
+        PreferencesPageComponent
+      ],
+      providers: [
+        AlertsService,
+        I18nLanguageCodeService,
+        LanguageUtilService,
+        LoaderService,
+        PreventPageUnloadEventService,
+        UrlInterpolationService,
+        {
+          provide: UserBackendApiService,
+          useClass: MockUserBackendApiService
+        },
+        UserService,
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PreferencesPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = TestBed.inject(LoaderService);
+    userService = TestBed.inject(UserService);
+    languageUtilService = TestBed.inject(LanguageUtilService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService);
+    alertsService = TestBed.inject(AlertsService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    ngbModal = TestBed.inject(NgbModal);
+    mockWindowRef = TestBed.inject(WindowRef);
+    mockUserBackendApiService = TestBed.inject(UserBackendApiService);
   });
 
-  it('should change profile picture when closing modal', function() {
-    var newPicture = 'new-picture.png';
-    spyOn(mockWindow.location, 'reload').and.callThrough();
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve(newPicture)
-    });
-    spyOn(
-      UserService, 'setProfileImageDataUrlAsync'
-    ).and.returnValue($q.resolve());
-
-    ctrl.showEditProfilePictureModal();
-    $rootScope.$apply();
-    $rootScope.$apply();
-
-    expect(mockWindow.location.reload).toHaveBeenCalled();
+  it('should be defined', () => {
+    expect(componentInstance).toBeDefined();
   });
 
-  it('should not change profile picture when dismissing modal', function() {
-    spyOn(mockWindow.location, 'reload').and.callThrough();
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
+  it('should initialize', fakeAsync(() => {
+    let username = 'test';
+    let userEmail = 'test_email@example.com';
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(userService, 'getUserInfoAsync').and
+      .returnValue(Promise.resolve(new UserInfo(
+        false, false, false, false, false, 'en', username,
+        userEmail, true)));
+    spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue(
+      [{
+        id: 'en',
+        text: 'English'
+      }]);
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+    tick();
+    expect(componentInstance.hasPageLoaded).toBeTrue();
+    expect(componentInstance.username).toEqual(username);
+    expect(componentInstance.email).toEqual(userEmail);
+    expect(componentInstance.userBio).toEqual(preferencesData.user_bio);
+    expect(componentInstance.subjectInterests).toEqual(
+      preferencesData.subject_interests);
+    expect(componentInstance.preferredLanguageCodes).toEqual(
+      preferencesData.preferred_language_codes);
+    expect(componentInstance.profilePictureDataUrl).toEqual(
+      preferencesData.profile_picture_data_url);
+    expect(componentInstance.defaultDashboard).toEqual(
+      preferencesData.default_dashboard);
+    expect(componentInstance.canReceiveEmailUpdates).toEqual(
+      preferencesData.can_receive_email_updates);
+    expect(componentInstance.canReceiveEditorRoleEmail).toEqual(
+      preferencesData.can_receive_editor_role_email);
+    expect(componentInstance.canReceiveSubscriptionEmail).toEqual(
+      preferencesData.can_receive_subscription_email);
+    expect(componentInstance.canReceiveFeedbackMessageEmail).toEqual(
+      preferencesData.can_receive_feedback_message_email);
+    expect(componentInstance.preferredSiteLanguageCode).toEqual(
+      preferencesData.preferred_site_language_code);
+    expect(componentInstance.subscriptionList).toEqual(
+      preferencesData.subscription_list);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
 
-    ctrl.showEditProfilePictureModal();
-    $rootScope.$apply();
-
-    expect(mockWindow.location.reload).not.toHaveBeenCalled();
+  it('should get static image url', () => {
+    let staticImageUrl = 'static_image_url';
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      staticImageUrl);
+    expect(componentInstance.getStaticImageUrl('')).toEqual(staticImageUrl);
   });
 
-  it('should add prevent reload event listener when a bio is changed',
-    function() {
-      spyOn(PreventPageUnloadEventService, 'addListener').and.callThrough();
-      ctrl.registerBioChanged();
-      expect(PreventPageUnloadEventService.addListener).toHaveBeenCalled();
+  describe('preferences data', () => {
+    beforeEach(() => {
+      spyOn(preventPageUnloadEventService, 'addListener');
+      spyOn(preventPageUnloadEventService, 'removeListener');
+      spyOn(alertsService, 'addInfoMessage');
+      spyOn(alertsService, 'clearWarnings');
     });
 
-  it('should remove listener once http call is completed',
-    function() {
-      var userBio = 'User bio example';
-      var isRequestTheExpectOne = function(queryParams) {
-        return decodeURIComponent(queryParams)
-          .match('"update_type":"user_bio"');
-      };
-      spyOn(PreventPageUnloadEventService, 'removeListener').and.callThrough();
+    it('should save user bio', fakeAsync(() => {
+      let bio = 'new user bio';
+      componentInstance.saveUserBio(bio);
+      tick();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+    }));
 
-      $httpBackend.expect(
-        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
-      ctrl.saveUserBio(userBio);
-      $httpBackend.flush();
-      expect(PreventPageUnloadEventService.removeListener).toHaveBeenCalled();
+    it('should save subject interests', fakeAsync(() => {
+      componentInstance.onSubjectInterestsSelectionChange('math');
+      expect(alertsService.clearWarnings).toHaveBeenCalled();
+      tick();
+      expect(componentInstance.subjectInterestsChangeAtLeastOnce).toBeTrue();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+    }));
 
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
+    it('should save preferred site language codes', fakeAsync(() => {
+      let code = 'en';
+      spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
+      componentInstance.savePreferredSiteLanguageCodes(code);
+      tick();
+      expect(i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
+        code);
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+    }));
+
+    it('should save preferred audio language code', fakeAsync(() => {
+      componentInstance.savePreferredAudioLanguageCode('en');
+      tick();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+    }));
+
+    it('should save email preferences', fakeAsync(() => {
+      spyOn(mockUserBackendApiService, 'updatePreferencesDataAsync')
+        .and.returnValue(
+          Promise.resolve({
+            bulk_email_signup_message_should_be_shown: true
+          }));
+      componentInstance.saveEmailPreferences(true, true, true, true);
+      tick();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
+    }));
+
+    it('should save preferred language codes', fakeAsync(() => {
+      componentInstance.savePreferredLanguageCodes(['en', 'hi']);
+      tick();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+    }));
+
+    it('should save default dashboard', fakeAsync(() => {
+      componentInstance.saveDefaultDashboard('creator');
+      tick();
+      expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+      expect(alertsService.addInfoMessage).toHaveBeenCalled();
+    }));
+  });
+
+  it('should register bio changed', () => {
+    spyOn(preventPageUnloadEventService, 'addListener');
+    componentInstance.registerBioChanged();
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+  });
+
+  it('should validate user popover when username is longer 10 chars', () => {
+    expect(componentInstance.showUsernamePopover('greaterthan10characters'))
+      .toEqual('mouseenter');
+  });
+
+  it('should not show popover when username is shorter than 10 chars', () => {
+    expect(componentInstance.showUsernamePopover('user')).toEqual('none');
+  });
+
+  it('should handle export data click', () => {
+    componentInstance.exportingData = false;
+    componentInstance.handleExportDataClick();
+    expect(componentInstance.exportingData).toBeTrue();
+  });
+
+  it('should show edit profile picture modal', fakeAsync(() => {
+    let profilePictureDataUrl = 'profile_picture_data_url';
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(profilePictureDataUrl)
+    } as NgbModalRef);
+    spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
+      Promise.resolve({ bulk_email_signup_message_should_be_shown: false }));
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
+    componentInstance.showEditProfilePictureModal();
+    tick();
+    tick();
+    expect(userService.setProfileImageDataUrlAsync).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
+  }));
+
+  it('should handle edit profile picture modal is canceled', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
+    } as NgbModalRef);
+    spyOn(userService, 'setProfileImageDataUrlAsync');
+    componentInstance.showEditProfilePictureModal();
+    tick();
+    tick();
+    expect(userService.setProfileImageDataUrlAsync).not.toHaveBeenCalled();
+  }));
 });
