@@ -60,7 +60,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
                 continue
 
         try:
-            normalized_value[arg_key] = schema_utils.normalize_against_schema( # type: ignore[no-untyped-call] # pylint: disable=line-too-long
+            normalized_value[arg_key] = schema_utils.normalize_against_schema(
                 handler_args[arg_key], arg_schema['schema'])
         except Exception as e:
             errors.append(

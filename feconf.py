@@ -25,6 +25,8 @@ import os
 
 from constants import constants
 
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
@@ -336,14 +338,14 @@ DEFAULT_RECORDED_VOICEOVERS = {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -422,6 +424,7 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
+    # type: () -> Dict[Text, int]
     """Returns a copy of the empty ratings object.
 
     Returns:

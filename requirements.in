@@ -37,3 +37,4 @@ googleapis_common_protos==1.52.0
 webapp2==3.0.0b1
 elasticsearch==7.10.0
 mailchimp3==3.0.14
+typing==3.7.4.3
