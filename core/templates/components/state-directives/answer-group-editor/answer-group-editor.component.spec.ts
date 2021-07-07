@@ -249,11 +249,11 @@ describe('AnswerGroupEditorComponent', () => {
       vertices: []
     });
     expect(ctrl.getDefaultInputValue('NormalizedRectangle2D')).toEqual([
-      [0,0],
-      [0,0]
+      [0, 0],
+      [0, 0]
     ]);
     expect(ctrl.getDefaultInputValue('ImageRegion')).toEqual({
-      area: [[0,0], [0,0]],
+      area: [[0, 0], [0, 0]],
       regionType: ''
     });
     expect(ctrl.getDefaultInputValue('ImageWithRegions')).toEqual({

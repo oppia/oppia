@@ -162,8 +162,14 @@ angular.module('oppia').component('answerGroupEditor', {
             };
           case 'NormalizedRectangle2D':
             return [
-              [ctrl.getDefaultInputValue('Real'), ctrl.getDefaultInputValue('Real')],
-              [ctrl.getDefaultInputValue('Real'), ctrl.getDefaultInputValue('Real')]];
+              [
+                ctrl.getDefaultInputValue('Real'),
+                ctrl.getDefaultInputValue('Real')
+              ],
+              [
+                ctrl.getDefaultInputValue('Real'),
+                ctrl.getDefaultInputValue('Real')
+              ]];
           case 'ImageRegion':
             return {
               area: ctrl.getDefaultInputValue('NormalizedRectangle2D'),
@@ -177,7 +183,9 @@ angular.module('oppia').component('answerGroupEditor', {
           case 'ClickOnImage':
             return {
               clickPosition: [
-                ctrl.getDefaultInputValue('Real'), ctrl.getDefaultInputValue('Real')],
+                ctrl.getDefaultInputValue('Real'),
+                ctrl.getDefaultInputValue('Real')
+              ],
               clickedRegions: []
             };
           case 'TranslatableSetOfNormalizedString':
