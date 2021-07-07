@@ -124,7 +124,7 @@ const componentMap = {
   }
 };
 
-let firstLoad = false;
+let areRteElementsInitialized = false;
 
 @Component({
   selector: 'oppia-angular-root',
@@ -170,7 +170,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private urlService: UrlService,
     private injector: Injector
   ) {
-    if (!firstLoad) {
+    if (!areRteElementsInitialized) {
       for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
         const rteElement = createCustomElement(
           componentMap[rteKey].component_class,
@@ -181,7 +181,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           rteElement
         );
       }
-      firstLoad = true;
+      areRteElementsInitialized = true;
     }
   }
 
