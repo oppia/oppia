@@ -31,8 +31,6 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-const { element } = require('protractor');
-const { expect } = require('globalthis/implementation');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -386,14 +384,14 @@ describe('Full exploration editor', function() {
   });
 
   it(
-    'should show merge changes when the changes are not conflicting',
+    'should merge changes when the changes are not conflicting ' +
+      'and the frontend version is not equal to the backend version',
     async function() {
-      await users.createUser(
-        'user9@editor.com',
-        'user9Editor');
-      await users.createUser(
-        'user10@editor.com',
-        'user10Editor');
+      await users.createUser('user9@editor.com', 'user9Editor');
+      await users.createUser('user10@editor.com', 'user10Editor');
+
+      // Create an exploration from first user and add second user too
+      // as a collaborator.
       await users.login('user9@editor.com');
       await workflow.createExploration(true);
       var explorationId = await general.getExplorationIdFromEditor();
@@ -407,12 +405,15 @@ describe('Full exploration editor', function() {
       await workflow.addExplorationManager('user10Editor');
       await explorationEditorPage.navigateToMainTab();
 
+      // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
       });
       await action.waitForAutosave();
       await users.logout();
 
+      // Make and save the changes from the second user which are not conflictng
+      // to the first user's unsaved changes.
       await users.login('user10@editor.com');
       await general.openEditor(explorationId, true);
       await explorationEditorPage.navigateToSettingsTab();
@@ -421,9 +422,14 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.saveChanges();
       await users.logout();
 
+      // Open the exploration again from the first user's account and try saving
+      // the unsaved changes. They should be saved.
       await users.login('user9@editor.com');
       await general.openEditor(explorationId, false);
       await waitFor.pageToFullyLoad();
+      await waitFor.invisibilityOf(
+        element(by.css('.protractor-test-lost-changes-modal')),
+        'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
@@ -442,14 +448,13 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should show a discard changes modal when the changes are conflicting',
+    'should show discard changes modal when the changes are conflicting',
     async function() {
-      await users.createUser(
-        'user11@editor.com',
-        'user11Editor');
-      await users.createUser(
-        'user12@editor.com',
-        'user12Editor');
+      await users.createUser('user11@editor.com', 'user11Editor');
+      await users.createUser('user12@editor.com', 'user12Editor');
+
+      // Create an exploration from first user and add second user too
+      // as a collaborator.
       await users.login('user11@editor.com');
       await workflow.createExploration(true);
       var explorationId = await general.getExplorationIdFromEditor();
@@ -463,12 +468,15 @@ describe('Full exploration editor', function() {
       await workflow.addExplorationManager('user12Editor');
       await explorationEditorPage.navigateToMainTab();
 
+      // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
       });
       await action.waitForAutosave();
       await users.logout();
 
+      // Make and save the changes from the second user which are conflictng
+      // to the first user's unsaved changes.
       await users.login('user12@editor.com');
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
@@ -477,10 +485,12 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.saveChanges();
       await users.logout();
 
+      // Open the exploration again from the first user's account and the
+      // lost changes should appear.
       await users.login('user11@editor.com');
       await general.openEditor(explorationId, false);
       await waitFor.visibilityOf(
-        element(by.css('.modal-content')),
+        element(by.css('.protractor-test-lost-changes-modal')),
         'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.discardLostChanges();
       await explorationEditorMainTab.expectContentToMatch(
@@ -492,14 +502,13 @@ describe('Full exploration editor', function() {
     });
 
   it(
-    'should show a discard the changes and download the lost changes file',
+    'should show discard changes modal and allow downloading of lost changes',
     async function() {
-      await users.createUser(
-        'user13@editor.com',
-        'user13Editor');
-      await users.createUser(
-        'user14@editor.com',
-        'user14Editor');
+      await users.createUser('user13@editor.com', 'user13Editor');
+      await users.createUser('user14@editor.com', 'user14Editor');
+
+      // Create an exploration from first user and add second user too
+      // as a collaborator.
       await users.login('user13@editor.com');
       await workflow.createExploration(true);
       var explorationId = await general.getExplorationIdFromEditor();
@@ -513,12 +522,15 @@ describe('Full exploration editor', function() {
       await workflow.addExplorationManager('user14Editor');
       await explorationEditorPage.navigateToMainTab();
 
+      // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
       });
       await action.waitForAutosave();
       await users.logout();
 
+      // Make and save the changes from the second user which are conflictng
+      // to the first user's unsaved changes.
       await users.login('user14@editor.com');
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
@@ -527,10 +539,13 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.saveChanges();
       await users.logout();
 
+      // Open the exploration again from the first user's account and the
+      // lost changes modal should appear. Try downloading the lost changes
+      // file.
       await users.login('user13@editor.com');
       await general.openEditor(explorationId, false);
       await waitFor.visibilityOf(
-        element(by.css('.modal-content')),
+        element(by.css('.protractor-test-lost-changes-modal')),
         'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.discardLostChanges();
       await explorationEditorMainTab.expectContentToMatch(
@@ -541,17 +556,13 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  afterEach(async function() {
-    await general.checkForConsoleErrors([]);
-  });
-
   it(
     'should show a warning notification to merge the changes' +
     ' if there are more than 50 changes in the draft',
     async function() {
-      await users.createUser(
-        'user15@editor.com',
-        'user15Editor');
+      await users.createUser('user15@editor.com', 'user15Editor');
+
+      // Create an exploration and add 50 changes to the draft.
       await users.login('user15@editor.com');
       await workflow.createExploration(true);
       await explorationEditorPage.navigateToMainTab();
@@ -755,9 +766,12 @@ describe('Full exploration editor', function() {
         await richTextEditor.appendPlainText('Content 50');
       });
       await action.waitForAutosave();
+
+      // After 50th change, modal should appear recommending user to save the
+      // changes.
       await waitFor.visibilityOf(
         element(by.css('.protractor-test-save-prompt-modal')),
-        'Save Prompt Modal taking too long to appear');
+        'Save Recommendation Prompt Modal taking too long to appear');
       await explorationEditorPage.saveChangesAfterPrompt(
         'Changed Content so many times');
       await explorationEditorMainTab.expectContentToMatch(
