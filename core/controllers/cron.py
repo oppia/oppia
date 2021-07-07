@@ -42,9 +42,7 @@ class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -86,9 +84,7 @@ class CronDashboardStatsHandler(base.BaseHandler):
     """Handler for appending dashboard stats to a list."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -101,9 +97,7 @@ class CronUserDeletionHandler(base.BaseHandler):
     """Handler for running the user deletion one off job."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -117,9 +111,7 @@ class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
     """Handler for running the fully complete user deletion one off job."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -133,9 +125,7 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
     """Handler for computing exploration recommendations."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -149,9 +139,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
     """Handler for computing activity search ranks."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -164,9 +152,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
     """Handler for cleaning up data items of completed map/reduce jobs."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -218,9 +204,7 @@ class CronModelsCleanupHandler(base.BaseHandler):
     """
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -243,9 +227,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -279,9 +261,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
