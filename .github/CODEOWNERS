@@ -45,8 +45,7 @@
 
 
 # Android team
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/android_validation_constants*.py @rt4914
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -127,25 +126,21 @@
 
 
 # Core documentation
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/AUTHORS @seanlip
+/AUTHORS @seanlip @BenHenning
 /CHANGELOG @seanlip
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/about-page/about-page.constants.ts @seanlip
+/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
 /core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/license-page/license-page.component.html @seanlip
+/core/templates/pages/license-page/license-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/privacy-page/privacy-page.component.html @seanlip
-/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/terms-page/terms-page.component.html @seanlip
+/core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
 
 
 # Dashboard pages.
@@ -499,8 +494,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/redis.conf @seanlip
+/redis.conf @seanlip @BenHenning
 /release_constants.json @nithusha21
 /.firebase.json @brianrodri
 
@@ -657,14 +651,13 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/controllers/platform_feature*.py @vinitamurthi
-/core/domain/platform_feature_services*.py @vinitamurthi
-/core/domain/platform_parameter*.py @vinitamurthi
-/core/platform_feature*.py @vinitamurthi
-/core/templates/domain/platform_feature/ @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @vinitamurthi
-/core/templates/services/platform-feature*.ts @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
+/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
@@ -722,16 +715,15 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24 (up to /core/domain/user*.py).
-/core/templates/services/svg-sanitizer.service.ts @seanlip
-/scripts/linters/warranted_angular_security_bypasses.py @seanlip
-/core/controllers/acl_decorators*.py @seanlip
-/core/controllers/base*.py @seanlip
-/core/domain/html*.py @seanlip
-/core/domain/rights_manager*.py @seanlip
-/core/domain/role_services*.py @seanlip
-/core/storage/ @seanlip
-/core/domain/user*.py @seanlip
+/core/templates/services/svg-sanitizer.service.ts @seanlip @BenHenning
+/scripts/linters/warranted_angular_security_bypasses.py @seanlip @BenHenning
+/core/controllers/acl_decorators*.py @seanlip @BenHenning
+/core/controllers/base*.py @seanlip @BenHenning
+/core/domain/html*.py @seanlip @BenHenning
+/core/domain/rights_manager*.py @seanlip @BenHenning
+/core/domain/role_services*.py @seanlip @BenHenning
+/core/storage/ @seanlip @BenHenning
+/core/domain/user*.py @seanlip @BenHenning
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06 (up to /scripts/install_third_party_libs.py)
 /requirements.txt @DubeySandeep
 /requirements.in @DubeySandeep
