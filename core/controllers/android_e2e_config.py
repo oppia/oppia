@@ -181,6 +181,19 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
 
         # Update and validate the story.
         story.update_meta_tag_content('tag')
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, story_id))
+        fs.commit(
+            '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         story.update_thumbnail_filename('test_svg.svg')
         story.update_thumbnail_bg_color(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])

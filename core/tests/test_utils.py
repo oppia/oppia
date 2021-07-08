@@ -2758,7 +2758,8 @@ title: Title
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, thumbnail_filename, thumbnail_bg_color,
-            owner_id, title, description, notes, corresponding_topic_id,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
             meta_tag_content='story meta tag content'):
@@ -2778,6 +2779,8 @@ title: Title
             thumbnail_filename: str|None. Thumbnail filename for the story.
             thumbnail_bg_color: str|None. Thumbnail background color for the
                 story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -2792,8 +2795,10 @@ title: Title
         """
         story_model = story_models.StoryModel(
             id=story_id, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color, description=description,
-            title=title, language_code=language_code,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
             story_contents_schema_version=1, notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
