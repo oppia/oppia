@@ -109,4 +109,11 @@ describe('Topic Selector Component', () => {
     expect(componentInstance.filteredTopics[1].name).toEqual(
       topicSummaries[1].name);
   });
+
+  it('should throw error if topicId is wrong and no' +
+     ' topicSummaries exist', () => {
+    expect(() => {
+      componentInstance.selectOrDeselectTopic('');
+    }).toThrowError('No Topic with given topicId exists!');
+  });
 });

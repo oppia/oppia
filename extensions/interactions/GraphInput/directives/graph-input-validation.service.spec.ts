@@ -115,7 +115,7 @@ describe('GraphInputValidationService', () => {
         rule_type: 'IsIsomorphicTo'
       }, 'GraphInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null);
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
   });

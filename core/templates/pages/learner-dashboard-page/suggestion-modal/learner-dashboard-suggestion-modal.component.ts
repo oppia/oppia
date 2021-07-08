@@ -28,9 +28,12 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class LearnerDashboardSuggestionModalComponent
   extends ConfirmOrCancelModal {
-  @Input() newContent: string;
-  @Input() oldContent: string;
-  @Input() description: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() newContent!: string;
+  @Input() oldContent!: string;
+  @Input() description!: string;
 
   constructor(
     private activeModal: NgbActiveModal,
