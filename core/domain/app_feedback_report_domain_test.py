@@ -1270,7 +1270,6 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.stats_obj, 'The parameter value should be a string')
 
-
     def _assert_validation_error(
             self, stats_obj, expected_error_substring):
         """Checks that the stats object passes validation.

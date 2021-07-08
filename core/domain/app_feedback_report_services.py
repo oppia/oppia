@@ -659,36 +659,41 @@ def reassign_ticket(report, new_ticket):
         raise NotImplementedError(
             'Assigning web reports to tickets has not been implemented yet.')
 
-    # Update the old ticket model to remove the report from the old ticket's
-    # list of reports.
+    platform = report.platform
+    stats_date = report.submitted_on_timestamp.date()
+    # Remove the report from the stats model associated with the old ticket.
     old_ticket_id = report.ticket_id
     if old_ticket_id is None:
-        # If the report was unticketed, remove the it from unticketed reports.
-        old_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
-    old_ticket_model = (
-        app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-            old_ticket_id))
-    if old_ticket_model is None:
-        raise utils.InvalidInputException(
-            'The report is being removed from an invalid ticket id: %s.'
-            % old_ticket_id)
-    old_ticket_obj = get_ticket_from_model(old_ticket_model)
-    old_ticket_obj.reports.remove(report)
-    if old_ticket_obj.newest_report_creation_timestamp == (
-            report.submitted_on_timestamp):
-        report_models = get_report_models(old_ticket_obj.reports)
-        latest_timestamp = report_models[0].submitted_on_datetime
-        for index in python_utils.RANGE(1, len(report_models)):
-            if report_models[index].submitted_on_datetime > (
-                    latest_timestamp):
-                latest_timestamp = (
-                    report_models[index].submitted_on_datetime)
-        old_ticket_obj.newest_report_creation_timestamp = latest_timestamp
-    _save_ticket(old_ticket_obj)
-    _update_report_stats_model_in_transaction(
-        old_ticket_id, platform, stats_date, report, -1)
+        _update_report_stats_model_in_transaction(
+            constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
+            stats_date, report, -1)
+    else:
+        # The report was ticketed so the report needs to be removed
+        # from a ticket in storage.
+        old_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                old_ticket_id))
+        if old_ticket_model is None:
+            raise utils.InvalidInputException(
+                'The report is being removed from an invalid ticket id: %s.'
+                % old_ticket_id)
+        old_ticket_obj = get_ticket_from_model(old_ticket_model)
+        old_ticket_obj.reports.remove(report)
+        if old_ticket_obj.newest_report_creation_timestamp == (
+                report.submitted_on_timestamp):
+            report_models = get_report_models(old_ticket_obj.reports)
+            latest_timestamp = report_models[0].submitted_on_datetime
+            for index in python_utils.RANGE(1, len(report_models)):
+                if report_models[index].submitted_on_datetime > (
+                        latest_timestamp):
+                    latest_timestamp = (
+                        report_models[index].submitted_on_datetime)
+            old_ticket_obj.newest_report_creation_timestamp = latest_timestamp
+        _save_ticket(old_ticket_obj)
+        _update_report_stats_model_in_transaction(
+            old_ticket_id, platform, stats_date, report, -1)
 
-    # Get the info of the new ticket to add the report to.
+    # Add the report to the new ticket.
     new_ticket_id = constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID
     if new_ticket is not None:
         new_ticket_id = new_ticket.ticket_id
@@ -696,13 +701,14 @@ def reassign_ticket(report, new_ticket):
         app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
             new_ticket_id))
     new_ticket_obj = get_ticket_from_model(new_ticket_model)
-    new_ticket_obj.reports.add(report)
+    new_ticket_obj.reports.append(report.report_id)
     if report.submitted_on_timestamp > (
             new_ticket_obj.newest_report_creation_timestamp):
         new_ticket_obj.newest_report_creation_timestamp = (
             report.submitted_on_timestamp)
     _save_ticket(new_ticket_obj)
 
+    # Update the stats model for the new ticket.
     platform = report.platform
     stats_date = report.submitted_on_timestamp.date()
     _update_report_stats_model_in_transaction(
@@ -711,6 +717,7 @@ def reassign_ticket(report, new_ticket):
     # Update the report model to the new ticket id.
     report.ticket_id = new_ticket.ticket_id
     save_feedback_report_to_storage(report)
+
 
 def edit_ticket_name(ticket, new_name):
     """Updates the ticket name.
@@ -738,6 +745,6 @@ def _save_ticket(ticket):
     ticket_model.archived = ticket.archived
     ticket_model.newest_report_timestamp = (
         ticket.newest_report_creation_timestamp)
-    ticket_model.report_ids = [report_id for report_id in ticket.reports]
+    ticket_model.report_ids = ticket.reports
     ticket_model.update_timestamps()
     ticket_model.put()

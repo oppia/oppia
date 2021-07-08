@@ -129,6 +129,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         }
     }
 
+    REPORT_STATS = {
+        'platform': {PLATFORM_ANDROID: 1},
+        'report_type': {REPORT_TYPE_SUGGESTION.name: 1},
+        'country_locale_code': {COUNTRY_LOCALE_CODE_INDIA: 1},
+        'entry_point_name': {ENTRY_POINT_NAVIGATION_DRAWER.name: 1},
+        'text_language_code': {TEXT_LANGUAGE_CODE_ENGLISH: 1},
+        'audio_language_code': {AUDIO_LANGUAGE_CODE_ENGLISH: 1},
+        'android_sdk_version': {python_utils.UNICODE(ANDROID_SDK_VERSION): 1},
+        'version_name': {ANDROID_PLATFORM_VERSION: 1}
+    }
+
     def setUp(self):
         super(AppFeedbackReportServicesUnitTests, self).setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
@@ -652,18 +663,37 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_obj.platform, new_ticket_model.platform)
 
     def test_edit_ticket_name_does_not_change_stats_model(self):
-        app_feedback_report_services.store_incoming_report_stats(
-            self.android_report_obj)
         self.android_ticket_obj.reports = []
+        old_ticket_name = 'old ticket name'
+        old_ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                old_ticket_name))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            old_ticket_id, old_ticket_name, self.PLATFORM_ANDROID,
+            None, None, self.REPORT_SUBMITTED_TIMESTAMP,
+            [self.android_report_id])
+        old_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                old_ticket_id))
+        old_ticket_obj = (
+            app_feedback_report_services.get_ticket_from_model(
+                old_ticket_model))
+        self.android_report_model.ticket_id = old_ticket_id
+        self.android_report_model.update_timestamps()
+        self.android_report_model.put()
+        self.android_report_obj = (
+            app_feedback_report_services.get_report_from_model(
+                self.android_report_model))
 
-        app_feedback_report_services.reassign_ticket(
-            self.android_report_obj, self.android_ticket_obj)
-        # Fetch the stats model before changing the ticket name.
         old_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 self.android_report_obj.platform,
                 self.android_report_obj.ticket_id,
                 self.android_report_obj.submitted_on_timestamp.date()))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            old_stats_id, self.android_report_obj.platform, old_ticket_id,
+            self.android_report_obj.submitted_on_timestamp.date(), 1,
+            self.REPORT_STATS)
         old_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 old_stats_id))
@@ -672,10 +702,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_services.edit_ticket_name(
             self.android_ticket_obj, new_ticket_name)
 
+        new_report_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.android_report_id))
+        new_report_obj = (
+            app_feedback_report_services.get_report_from_model(
+                new_report_model))
         new_stats_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
-                self.android_report_obj.platform, self.android_ticket_id,
-                self.android_report_obj.submitted_on_timestamp.date()))
+                new_report_obj.platform,
+                new_report_obj.ticket_id,
+                new_report_obj.submitted_on_timestamp.date()))
         new_stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 new_stats_id))
@@ -751,7 +788,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             new_stats_model.daily_param_stats,
             expected_json)
 
-    def test_reassign_report_to_ticket_updates_decreasing_stats_model(self):
+    def test_reassign_ticket_updates_decreasing_stats_model(self):
         new_ticket_id = self._add_new_android_ticket(
             'ticket_name', ['report_id'])
         new_ticket_model = (
@@ -803,8 +840,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             decremented_stats_model.daily_param_stats,
             expected_json)
 
-    def test_reassign_report_to_ticket_does_not_change_all_report_stats_model(
-            self):
+    def test_reassign_ticket_does_not_change_all_report_stats_model(self):
         new_ticket_id = self._add_new_android_ticket(
             'ticket_name', ['report_id'])
         new_ticket_model = (
@@ -846,6 +882,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'Assigning web reports to tickets has not been implemented yet.'):
             app_feedback_report_services.reassign_ticket(
                 mock_web_report_obj, None)
+
+    def test_reassign_ticket_with_invalid_stats_model_raises_error(
+            self):
+        # Set an invalid ticket_id so that the stats model calculates an invalid
+        # id for this ticket's stats model.
+        self.android_report_obj.ticket_id = 'invalid_id'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The report is being removed from an invalid ticket id'):
+            app_feedback_report_services.reassign_ticket(
+                self.android_report_obj, None)
 
     def test_scrub_android_report_removes_info(self):
         app_feedback_report_services.scrub_single_app_feedback_report(
@@ -1101,60 +1148,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_services.store_incoming_report_stats(
                 mock_web_report_obj)
 
-    def test_reassign_ticket_with_invalid_stats_model_raises_error(
-            self):
-        # Set an invalid ticket_id so that the stats model calculates an invalid
-        # id for this ticket's stats model.
-        self.android_report_obj.ticket_id = 'invalid_id'
-        with self.assertRaisesRegexp(
-            utils.InvalidInputException,
-            'The report is being removed from an invalid ticket id'):
-            app_feedback_report_services.reassign_ticket(
-                self.android_report_obj, None)
-
-    # def test_reassign_ticket_updates_newest_report_timestamp_for_stats_model(
-    #         self):
-    #     scrubbed_report_id = self._add_scrubbed_report(self.user_id)
-    #     scrubbed_report_model = (
-    #         app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-    #             scrubbed_report_id))
-    #     scrubbed_report_obj = (
-    #         app_feedback_report_services.get_report_from_model(
-    #             scrubbed_report_model))
-    #     # Add scrubbed report to the same ticket as the Android report.
-    #     app_feedback_report_services.reassign_ticket(
-    #         scrubbed_report_obj, self.android_ticket_obj)
-    #     self.assertTrue(
-    #         scrubbed_report_id in self.android_ticket_model.report_ids)
-    #     self.assertTrue(
-    #         self.android_report_id in self.android_ticket_model.report_ids)
-
-    #     current_report_id = self._add_current_report()
-    #     current_report_model = (
-    #         app_feedback_report_models.AppFeedbackReportModel.get_by_id(
-    #             current_report_id))
-    #     current_report_obj = (
-    #         app_feedback_report_services.get_report_from_model(
-    #             current_report_model))
-    #     new_ticket_id = self._add_new_android_ticket(
-    #         'new ticket', [current_report_id])
-    #     new_ticket_model = (
-    #         app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-    #             new_ticket_id))
-    #     app_feedback_report_services.reassign_ticket(
-    #         self.android_report_obj, new_ticket_model)
-    #     updated_new_ticket_model = (
-    #         app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-    #             new_ticket_id))
-        
-    #     self.assertEqual(
-    #         self.android_ticket_model.newest_report_timestamp,
-    #         scrubbed_report_model.submitted_on_timestamp)
-    #     self.assertTrue(
-    #         scrubbed_report_id in self.android_ticket_model.report_ids)
-    #     self.assertFalse(
-    #         self.android_report_id in updated_new_ticket_model.report_ids)
-
     def test_calculate_new_stats_count_for_parameter_adds_new_stats_val_to_dict(
             self):
         stats_map = {
@@ -1208,9 +1201,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 id=report_id,
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=ticket_id,
-                # '%s.%s.%s' % (
-                #     'random_hash', self.TICKET_CREATION_TIMESTAMP,
-                #     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION.name,
@@ -1241,10 +1231,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel(
                 id=report_id,
                 platform=self.PLATFORM_ANDROID,
-                ticket_id=tickt_id,
-                # '%s.%s.%s' % (
-                #     'random_hash', self.TICKET_CREATION_TIMESTAMP,
-                #     '16CharString1234'),
+                ticket_id=ticket_id,
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION.name,
@@ -1277,9 +1264,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 platform=self.PLATFORM_ANDROID,
                 scrubbed_by=scrubber_user,
                 ticket_id=ticket_id,
-                # '%s.%s.%s' % (
-                #     'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
-                #     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION.name,
@@ -1305,7 +1289,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
                 ticket_name))
         app_feedback_report_models.AppFeedbackReportTicketModel.create(
-            android_ticket_id, self.TICKET_NAME, self.PLATFORM_ANDROID,
+            android_ticket_id, ticket_name, self.PLATFORM_ANDROID,
             None, None, self.REPORT_SUBMITTED_TIMESTAMP, report_ids)
         return android_ticket_id
 
