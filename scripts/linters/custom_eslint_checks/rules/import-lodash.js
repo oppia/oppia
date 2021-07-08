@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to Only allow imports relevant part of lodash.
+ * @fileoverview Lint check to only allow imports relevant part of lodash.
  */
 
 'use strict';
@@ -22,7 +22,7 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to Only allow imports relevant part of lodash',
+      description: 'Lint check to only allow imports relevant part of lodash',
       category: 'Best Practices',
       recommended: true,
     },
