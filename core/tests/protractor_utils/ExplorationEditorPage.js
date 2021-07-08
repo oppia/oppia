@@ -114,8 +114,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-save-draft-button'));
   var saveDraftButtonTextContainer = element(
     by.css('.protractor-test-save-draft-message'));
-  var savePromptSaveButton = element(
-    by.css('.protractor-test-save-prompt-save-button'));
+  var recommendationPromptSaveButton = element(
+    by.css('.protractor-test-recommendation-prompt-save-button'));
   var publishChangesButtonTextContainer = element(
     by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
@@ -302,8 +302,9 @@ var ExplorationEditorPage = function() {
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
-  this.saveChangesAfterPrompt = async function(commitMessage) {
-    await action.click('Save prompt Save button', savePromptSaveButton);
+  this.acceptSaveRecommendationPrompt = async function(commitMessage) {
+    await action.click(
+      'Recommendation prompt Save button', recommendationPromptSaveButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-save-prompt-modal')),
       'Save Recommendation Prompt modal does not disappear.');
