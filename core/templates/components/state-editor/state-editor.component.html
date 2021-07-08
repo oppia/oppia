@@ -40,7 +40,7 @@
 <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
   <state-responses add-state="$ctrl.addState"
                    navigate-to-state="$ctrl.navigateToState"
-                   on-responses-initialized="reinitializeEditor"
+                   on-responses-initialized="$ctrl.reinitializeEditor"
                    on-save-inapplicable-skill-misconception-ids="$ctrl.onSaveInapplicableSkillMisconceptionIds"
                    on-save-interaction-answer-groups="$ctrl.onSaveInteractionAnswerGroups"
                    on-save-interaction-default-outcome="$ctrl.onSaveInteractionDefaultOutcome"

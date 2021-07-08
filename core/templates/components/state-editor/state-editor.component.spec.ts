@@ -17,9 +17,11 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { fakeAsync, tick } from '@angular/core/testing';
+import { State } from 'domain/state/StateObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('StateEditorComponent', () => {
+fdescribe('StateEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
@@ -101,7 +103,8 @@ describe('StateEditorComponent', () => {
   });
 
   it('should initialize services when component is reinitialized', () => {
-    $scope.stateData = {
+    let onStateEditorInitializedEmitter = new EventEmitter();
+    let stateData = {
       content: {},
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -133,27 +136,39 @@ describe('StateEditorComponent', () => {
         }
       },
     };
+    spyOnProperty(StateEditorService, 'onStateEditorInitialized')
+      .and.returnValue(onStateEditorInitializedEmitter);
 
     ctrl.$onInit();
 
     expect($scope.servicesInitialized).toBe(false);
 
-    $scope.reinitializeEditor();
+    onStateEditorInitializedEmitter.emit(stateData);
     $scope.$apply();
 
     expect($scope.servicesInitialized).toBe(true);
   });
 
-  it('should throw error if state data is not defined o reinitialized', () => {
-    $scope.stateData = undefined;
+  it('should throw error if state data is not defined and' +
+    ' component is reinitialized', fakeAsync(() => {
+    let onStateEditorInitializedEmitter = new EventEmitter<State>();
+    let stateData = undefined;
+    spyOnProperty(StateEditorService, 'onStateEditorInitialized')
+      .and.returnValue(onStateEditorInitializedEmitter);
 
     ctrl.$onInit();
 
-    expect($scope.servicesInitialized).toBe(false);
+    expect(() => {
+      onStateEditorInitializedEmitter.emit(stateData);
+      tick();
+    }).toThrowError('Expected stateData to be defined but received undefined');
+  }));
+
+  it('should reinitialize editor when responses change', () => {
+    spyOn(StateEditorService.onStateEditorInitialized, 'emit').and.stub();
 
     $scope.reinitializeEditor();
-    $scope.$apply();
 
-    expect($scope.servicesInitialized).toBe(false);
+    expect(StateEditorService.onStateEditorInitialized.emit).toHaveBeenCalled();
   });
 });
