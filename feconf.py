@@ -25,6 +25,8 @@ import os
 
 from constants import constants
 
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
@@ -336,14 +338,14 @@ DEFAULT_RECORDED_VOICEOVERS = {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -422,6 +424,7 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
+    # type: () -> Dict[Text, int]
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -635,6 +638,18 @@ MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
 
+# The maximum number of blog post cards to be visible on each page in blog
+# homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in author
+# specific blog post page.
+MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+
+# The maximum number of blog post cards to be visible as suggestions on the
+# blog post page.
+MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = 2
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -775,6 +790,9 @@ BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
 BLOG_DASHBOARD_URL = '/blog-dashboard'
 BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
+BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
+BLOG_HOMEPAGE_URL = '/blog'
+AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
