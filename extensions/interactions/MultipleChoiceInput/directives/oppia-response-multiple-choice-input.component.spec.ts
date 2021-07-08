@@ -13,49 +13,58 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Continue button response.
+ * @fileoverview Unit tests for the MultipleChoiceInput response.
  */
-
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { OppiaResponseContinueComponent } from './oppia-response-continue.component';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ResponseMultipleChoiceInputComponent } from './oppia-response-multiple-choice-input.component';
 
-describe('OppiaResponseContinueComponent', () => {
-  let component: OppiaResponseContinueComponent;
-  let fixture: ComponentFixture<OppiaResponseContinueComponent>;
+describe('ResponseMultipleChoiceInputComponent', () => {
+  let component: ResponseMultipleChoiceInputComponent;
+  let fixture: ComponentFixture<ResponseMultipleChoiceInputComponent>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
+    escapedJsonToObj(answer): string {
       return answer;
     }
   }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [OppiaResponseContinueComponent],
+      declarations: [ResponseMultipleChoiceInputComponent],
       providers: [
         {
           provide: HtmlEscaperService,
           useClass: mockHtmlEscaperService
         }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OppiaResponseContinueComponent);
+    fixture = TestBed.createComponent(ResponseMultipleChoiceInputComponent);
     component = fixture.componentInstance;
+    component.answer = 1;
+    component.choices = [{
+      _html: 'opt1',
+      contentId: 'ca_choices_9'
+    }, {
+      _html: 'opt2',
+      contentId: 'ca_choices_10'
+    }, {
+      _html: 'opt3',
+      contentId: 'ca_choices_11'
+    }, {
+      _html: 'opt4',
+      contentId: 'ca_choices_12'
+    }];
   });
 
-  // Note: The users response is the same as the Continue button placeholder
-  // text.
-  it('should display user\'s response', () => {
-    component.answer = 'Continue button text';
-
-    expect(component.escapedAnswer).toBe('');
-
+  it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    expect(component.escapedAnswer).toBe('Continue button text');
+    expect(component.response).toBe('opt2');
   });
 });
