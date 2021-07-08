@@ -27,7 +27,7 @@ import { Schema } from 'services/schema-default-value.service';
 export class SchemaUndefinedLastElementService {
   // Returns true if the input value, taken as the last element in a list,
   // should be considered as 'undefined' and therefore deleted.
-  getUndefinedValue(schema: Schema): string {
+  getUndefinedValue(schema: Schema): string | undefined {
     if (schema.type === 'unicode' || schema.type === 'html') {
       return '';
     } else {
