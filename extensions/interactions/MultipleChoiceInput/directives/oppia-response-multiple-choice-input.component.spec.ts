@@ -62,7 +62,7 @@ describe('ResponseMultipleChoiceInputComponent', () => {
     }];
   });
 
-  it('should create', () => {
+  it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
     expect(component.response).toBe('opt2');
