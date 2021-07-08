@@ -1734,7 +1734,8 @@ def get_composite_change_list(exp_id, frontend_version, backend_version):
             'of exploration to version %s. Please reload and try again.'
             % (frontend_version, backend_version))
 
-    version_nums = list(python_utils.RANGE(frontend_version + 1, backend_version + 1))
+    version_nums = list(python_utils.RANGE(
+        frontend_version + 1, backend_version + 1))
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
         exp_id, version_nums, allow_deleted=False)
 
