@@ -1,0 +1,57 @@
+<div class="h-100">
+  <div ng-if="!$ctrl.hintEditorIsOpen"
+       class="h-100"
+       ng-attr-title="<[$ctrl.isEditable ? 'Edit hint' : '']>">
+    <div class="oppia-readonly-rule-tile"
+         ng-class="{'oppia-editable-section': $ctrl.isEditable}">
+      <div class="oppia-rule-preview oppia-transition-200">
+        <div class="oppia-click-to-start-editing protractor-test-open-hint-editor"
+             ng-if="$ctrl.isEditable" ng-click="$ctrl.openHintEditor()">
+          <i ng-if="$ctrl.isEditable"
+             class="material-icons oppia-editor-edit-icon float-right"
+             title="Edit Hint">&#xE254;
+          </i>
+        </div>
+
+        <strong>Hint #<[$ctrl.getIndexPlusOne()]> is...</strong>
+        <span>
+          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.hint.hintContent.html">
+          </angular-html-bind>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.isEditable && $ctrl.hintEditorIsOpen">
+    <form role="form"
+          class="form-inline"
+          name="$ctrl.editHintForm"
+          ng-submit="$ctrl.saveThisHint()">
+      <div class="oppia-rule-details-header">
+        <strong>Hint #<[$ctrl.getIndexPlusOne()]> is...</strong>
+        <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
+        <schema-based-editor schema="$ctrl.HINT_FORM_SCHEMA"
+                             local-value="$ctrl.hint.hintContent._html">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="float-right">
+        <button type="button"
+                class="btn btn-secondary protractor-test-cancel-hint-edit"
+                ng-click="$ctrl.cancelThisHintEdit()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success protractor-test-save-hint-edit"
+                ng-disabled="!$ctrl.hint.hintContent.html || $ctrl.editHintForm.$invalid"
+                ng-click="$ctrl.saveThisHint()">
+          Save
+        </button>
+      </div>
+
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+</div>

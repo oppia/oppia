@@ -44,6 +44,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
     Raises:
         ValidationError. Any required attribute is missing or an extra attribute
             exists or the value of an attribute is not allowed.
+        DeprecatedCommandError. The value of any attribute is deprecated.
     """
 
     required_attribute_names = valid_cmd_attribute_specs[
@@ -74,6 +75,14 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
     if error_msg_list:
         raise utils.ValidationError((', ').join(error_msg_list))
 
+    deprecated_values = valid_cmd_attribute_specs.get('deprecated_values', {})
+    for attribute_name, attribute_values in deprecated_values.items():
+        actual_value = actual_cmd_attributes.get(attribute_name)
+        if actual_value in attribute_values:
+            raise utils.DeprecatedCommandError(
+                'Value for %s in cmd %s: %s is deprecated' % (
+                    attribute_name, cmd_name, actual_value))
+
     allowed_values = valid_cmd_attribute_specs.get('allowed_values')
     if not allowed_values:
         return
@@ -93,18 +102,29 @@ class BaseChange(python_utils.OBJECT):
     # list is a dict with keys as: name (command name), required_attribute_names
     # (a list of required attribute names of a command),
     # optional_attribute_name (the list of optional attribute names of a
-    # command). There can be a optional key allowed_values which is a
+    # command), user_id_attribute_names (the list of attribute names that
+    # contain user ID). There are also optional keys like allowed_values
+    # and deprecated_values. allowed_values is a
     # dict with key as attribute name and value as allowed values
+    # for the attribute. deprecated_values is a
+    # dict with key as attribute name and value as deprecated values
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
     ALLOWED_COMMANDS = []
+
+    # The list of deprecated commands of a change domain object. Each item
+    # is a command that has been deprecated but these commands are yet to be
+    # removed from the server data. Thus, once these commands are removed using
+    # a migration job, we can remove the command from this list.
+    DEPRECATED_COMMANDS = []
 
     # This is a list of common commands which is valid for all subclasses.
     # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
         'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
         'required_attribute_names': [],
-        'optional_attribute_names': []
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
     }]
 
     def __init__(self, change_dict):
@@ -114,7 +134,7 @@ class BaseChange(python_utils.OBJECT):
             change_dict: dict. The dict containing cmd name and attributes.
 
         Raises:
-            ValidationError: The given change_dict is not valid.
+            ValidationError. The given change_dict is not valid.
         """
         self.validate_dict(change_dict)
 
@@ -141,12 +161,14 @@ class BaseChange(python_utils.OBJECT):
 
         Args:
             change_dict: dict. A dict of changes with keys as a cmd and the
-            attributes of a command.
+                attributes of a command.
 
         Raises:
             ValidationError. The change dict does not contain the cmd key,
                 or the cmd name is not allowed for the Change domain object
                 or the command attributes are missing or extra.
+            DeprecatedCommandError. The change dict contains a deprecated
+                command or the value for the command attribute is deprecated.
         """
         if 'cmd' not in change_dict:
             raise utils.ValidationError('Missing cmd key in change dict')
@@ -161,6 +183,10 @@ class BaseChange(python_utils.OBJECT):
             if cmd['name'] == cmd_name:
                 valid_cmd_attribute_specs = copy.deepcopy(cmd)
                 break
+
+        if cmd_name in self.DEPRECATED_COMMANDS:
+            raise utils.DeprecatedCommandError(
+                'Command %s is deprecated' % cmd_name)
 
         if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
@@ -177,7 +203,7 @@ class BaseChange(python_utils.OBJECT):
         """Returns a dict representing the BaseChange domain object.
 
         Returns:
-            A dict, mapping all fields of BaseChange instance.
+            dict. A dict, mapping all fields of BaseChange instance.
         """
         base_change_dict = {}
         base_change_dict['cmd'] = self.cmd

@@ -1,0 +1,92 @@
+<div uib-dropdown class="oppia-html-select">
+  <button uib-dropdown-toggle class="btn btn-secondary oppia-html-select-selection" type="button" aria-expanded="false" data-toggle="dropdown">
+    <div class="oppia-dropdown-menu-text">
+      <angular-html-bind class="oppia-html-select-selection-element" html-data="options[getSelectionIndex()].val">
+      </angular-html-bind>
+    </div>
+  </button>
+  <ul uib-dropdown-menu class="oppia-dropdown-menu">
+    <li ng-repeat="choice in options" class="dropdown-item float-left">
+      <a ng-click="select(choice.id)">
+        <angular-html-bind class="oppia-html-select-option protractor-test-html-multiple-select-option" html-data="choice.val">
+        </angular-html-bind>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<style>
+  .oppia-html-select {
+    position: relative;
+    width: 80%;
+  }
+  .oppia-html-select .oppia-html-select-selection-element {
+    overflow: hidden;
+    padding-top: 5px;
+  }
+  .oppia-html-select .oppia-html-select-selection-caret {
+    bottom: 0;
+    color: black;
+    margin: auto;
+    overflow: auto;
+    position: absolute;
+    right: 5px;
+    top: 0;
+  }
+  .oppia-html-select .oppia-html-select-selection {
+    height: 30px;
+    min-width: 24rem;
+    overflow: hidden;
+    padding-right: 10px;
+    position: relative;
+    text-align: end;
+    text-decoration: none;
+    width: 80%;
+  }
+  .oppia-html-select .oppia-html-select-option {
+    margin-right: 10px;
+    overflow: hidden;
+    padding-top: 10px;
+  }
+  .oppia-html-select .oppia-html-select-option:hover {
+    background: #1485E6;
+    color: black;
+  }
+  .oppia-html-select .oppia-html-select-option oppia-noninteractive-image {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+  .oppia-html-select .oppia-dropdown-menu {
+    max-width: 80%;
+    overflow: auto;
+    width: auto;
+  }
+  .oppia-html-select .oppia-dropdown-menu-text {
+    white-space: normal;
+    word-wrap: break-word;
+  }
+  @media only screen and (max-width: 1023px) {
+    .oppia-html-select .oppia-html-select-selection {
+    height: 30px;
+    min-width: 12rem;
+    overflow: hidden;
+    padding-right: 10px;
+    position: relative;
+    text-align: end;
+    text-decoration: none;
+    width: 80%;
+  }
+  }
+  @media only screen and (max-width: 767px) {
+    .oppia-html-select .oppia-html-select-selection {
+    height: 30px;
+    min-width: 12rem;
+    overflow: hidden;
+    padding-right: 10px;
+    position: relative;
+    text-align: end;
+    text-decoration: none;
+    width: 80%;
+  }
+  }
+</style>

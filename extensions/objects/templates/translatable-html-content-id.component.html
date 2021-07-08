@@ -1,0 +1,25 @@
+<style>
+  .container {
+    cursor: pointer;
+    display: block;
+    font-size: 15px;
+    position: relative;
+  }
+</style>
+
+<div class="container-fluid">
+  <div *ngFor="let choice of choices;">
+    <span class="drag-and-drop-select-container">
+      <div class="row">
+        <label class="container">
+          <div class="col-sm-1">
+            <input type="radio" [(ngModel)]="value" (ngModelChange)="updateLocalValue($event)" [ngValue]="choice.val" name="{{ name }}">
+          </div>
+          <div class="col-sm-10">
+            <angular-html-bind-wrapper [htmlData]="choice.id" ></angular-html-bind-wrapper>
+          </div>
+        </label>
+      </div>
+    </span>
+  </div>
+</div>

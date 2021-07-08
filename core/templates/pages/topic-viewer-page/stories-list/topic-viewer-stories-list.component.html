@@ -1,0 +1,51 @@
+<div class="stories-list">
+  <div class="oppia-stories-list-container">
+    <mat-card class="oppia-page-card oppia-long-text">
+      <h2 class="tab-title">{{ topicName }}</h2>
+      <div class="topic-description protractor-test-topic-description">
+        {{ topicDescription }}
+      </div>
+      <div *ngFor="let storySummary of canonicalStorySummaries" class="story-info-container">
+        <oppia-story-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                                  [storySummary]="storySummary"
+                                  [topicUrlFragment]="topicUrlFragment">
+        </oppia-story-summary-tile>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+<style>
+  .oppia-stories-list-container .oppia-page-card {
+    margin-top: 10em;
+    padding: 30px 55px 30px 45px;
+    width: 704px;
+  }
+
+  .tab-title {
+    margin: .83em 0 0.1em 0;
+  }
+
+  .story-info-container {
+    padding-top: 4vh;
+  }
+
+  .topic-description {
+    border-bottom: 1px solid #7B7B7B;
+    font-size: 1.1em;
+    padding-bottom: 2vh;
+  }
+
+  @media(max-width: 500px) {
+    .oppia-stories-list-container .oppia-page-card {
+      padding: 30px 30px 30px 25px;
+      width: 90vw;
+    }
+  }
+
+  @media(max-width: 1024px) {
+    .oppia-stories-list-container .oppia-page-card {
+      width: 80vw;
+    }
+  }
+</style>

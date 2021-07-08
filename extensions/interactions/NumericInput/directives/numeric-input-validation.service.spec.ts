@@ -29,17 +29,19 @@ import { Outcome, OutcomeObjectFactory } from
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { Warning } from 'interactions/base-interaction-validation.service';
 
 describe('NumericInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let validatorService: NumericInputValidationService, WARNING_TYPES: any;
+  let validatorService: NumericInputValidationService;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let betweenNegativeOneAndOneRule: Rule, equalsZeroRule: Rule,
-    lessThanOneRule: Rule;
+  let equalsZeroRule: Rule, betweenNegativeOneAndOneRule: Rule,
+    betweenFourAndTwoRule: Rule, lessThanOneRule: Rule,
+    greaterThanNegativeOneRule: Rule, lessThanOrEqualToOneRule: Rule,
+    greaterThanOrEqualToNegativeOneRule: Rule,
+    zeroWithinToleranceOfOneRule: Rule;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -59,7 +61,7 @@ describe('NumericInputValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        audio_translations: {},
+        content_id: '',
         html: ''
       },
       labelled_as_correct: false,
@@ -72,24 +74,56 @@ describe('NumericInputValidationService', () => {
       inputs: {
         x: 0
       }
-    });
+    }, 'NumericInput');
     betweenNegativeOneAndOneRule = rof.createFromBackendDict({
       rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
         b: 1
       }
-    });
+    }, 'NumericInput');
+    betweenFourAndTwoRule = rof.createFromBackendDict({
+      rule_type: 'IsInclusivelyBetween',
+      inputs: {
+        a: 4,
+        b: 2
+      }
+    }, 'NumericInput');
     lessThanOneRule = rof.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         x: 1
       }
-    });
+    }, 'NumericInput');
+    greaterThanNegativeOneRule = rof.createFromBackendDict({
+      rule_type: 'IsGreaterThan',
+      inputs: {
+        x: -1
+      }
+    }, 'NumericInput');
+    lessThanOrEqualToOneRule = rof.createFromBackendDict({
+      rule_type: 'IsLessThanOrEqualTo',
+      inputs: {
+        x: 1
+      }
+    }, 'NumericInput');
+    greaterThanOrEqualToNegativeOneRule = rof.createFromBackendDict({
+      rule_type: 'IsGreaterThanOrEqualTo',
+      inputs: {
+        x: -1
+      }
+    }, 'NumericInput');
+    zeroWithinToleranceOfOneRule = rof.createFromBackendDict({
+      rule_type: 'IsWithinTolerance',
+      inputs: {
+        x: 0,
+        tol: 1
+      }
+    }, 'NumericInput');
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false,
+      null,
       null
     )];
   });
@@ -98,6 +132,19 @@ describe('NumericInputValidationService', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should raise warning for IsInclusivelyBetween rule ' +
+  'caused by incorrect range',
+  () => {
+    answerGroups[0].rules = [betweenFourAndTwoRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'In Rule 1 from answer group 1, Please ensure ' +
+      'that the second number ' + 'is greater than the first number.'
+    }]);
   });
 
   it('should catch redundant rules', () => {
@@ -137,7 +184,51 @@ describe('NumericInputValidationService', () => {
 
   it('should catch redundant rules caused by greater/less than range',
     () => {
+      var warnings: Warning[];
       answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
+      warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+      answerGroups[0].rules = [greaterThanNegativeOneRule, equalsZeroRule];
+      warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+    });
+
+  it('should catch redundant rules caused by greater/less than or equal range',
+    () => {
+      var warnings: Warning[];
+      answerGroups[0].rules = [lessThanOrEqualToOneRule, equalsZeroRule];
+      warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+      answerGroups[0].rules = [
+        greaterThanOrEqualToNegativeOneRule, equalsZeroRule
+      ];
+      warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+    });
+
+  it('should catch redundant rules caused by within tolerance range',
+    () => {
+      answerGroups[0].rules = [zeroWithinToleranceOfOneRule, equalsZeroRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
@@ -146,4 +237,25 @@ describe('NumericInputValidationService', () => {
           'because it is made redundant by rule 1 from answer group 1.'
       }]);
     });
+
+
+  it('should generate errors in the given input', () => {
+    expect(validatorService.getErrorString(undefined)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(null)).toEqual(
+      'Please enter a valid number.');
+    expect(validatorService.getErrorString(1200000000E+27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(1200000000E-27)).toEqual(
+      'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
+    expect(validatorService.getErrorString(999999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(99.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(-9.9999999999999)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(-2.2)).toEqual(undefined);
+    expect(validatorService.getErrorString(34.56)).toEqual(undefined);
+  });
 });

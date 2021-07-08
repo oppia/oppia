@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 import feconf
 import utils
@@ -47,11 +48,11 @@ class SkillMasteryDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
+        except utils.ValidationError:
             raise self.InvalidInputException('Invalid skill ID %s' % skill_id)
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -62,7 +63,6 @@ class SkillMasteryDataHandler(base.BaseHandler):
             'degrees_of_mastery': degrees_of_mastery
         })
         self.render_json(self.values)
-
 
     @acl_decorators.can_access_learner_dashboard
     def put(self):
@@ -117,7 +117,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
                 new_degrees_of_mastery[skill_id] = 1.0
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 

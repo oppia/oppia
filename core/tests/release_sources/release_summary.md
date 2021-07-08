@@ -38,7 +38,7 @@ This indicates that a migration may be needed
 
 ### Existing Authors:
 * Akshay Anand <akshayanand681@gmail.com>
-* Amey <43315144+amey-kudari@users.noreply.github.com>
+* Amey <amey-kudari@gmail.com>
 * Ankita Saxena <ankitasonu24@gmail.com>
 * Anubhav Sinha <anubhavsinha98@gmail.com>
 * Apurv Bajaj <apurvabajaj007@gmail.com>

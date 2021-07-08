@@ -17,194 +17,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
+from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import learner_progress_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
-
-import utils
-
-
-class ActivityRightsChangeTests(test_utils.GenericTestBase):
-
-    def test_activity_rights_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Missing cmd key in change dict'):
-            rights_manager.ActivityRightsChange({'invalid': 'data'})
-
-    def test_activity_rights_change_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Command invalid is not allowed'):
-            rights_manager.ActivityRightsChange({'cmd': 'invalid'})
-
-    def test_activity_rights_change_object_with_missing_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following required attributes are missing: '
-                'new_role, old_role')):
-            rights_manager.ActivityRightsChange({
-                'cmd': 'change_role',
-                'assignee_id': 'assignee_id',
-            })
-
-    def test_activity_rights_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
-            rights_manager.ActivityRightsChange({
-                'cmd': 'change_private_viewability',
-                'old_viewable_if_private': 'old_viewable_if_private',
-                'new_viewable_if_private': 'new_viewable_if_private',
-                'invalid': 'invalid'
-            })
-
-    def test_activity_rights_change_object_with_invalid_role(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Value for new_role in cmd change_role: '
-                'invalid is not allowed')):
-            rights_manager.ActivityRightsChange({
-                'cmd': 'change_role',
-                'assignee_id': 'assignee_id',
-                'old_role': rights_manager.ROLE_OWNER,
-                'new_role': 'invalid',
-            })
-
-    def test_exploration_rights_change_object_with_invalid_status(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Value for new_status in cmd change_exploration_status: '
-                'invalid is not allowed')):
-            rights_manager.ExplorationRightsChange({
-                'cmd': 'change_exploration_status',
-                'old_status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-                'new_status': 'invalid'
-            })
-
-    def test_collection_rights_change_object_with_invalid_status(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Value for old_status in cmd change_collection_status: '
-                'invalid is not allowed')):
-            rights_manager.CollectionRightsChange({
-                'cmd': 'change_collection_status',
-                'old_status': 'invalid',
-                'new_status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-            })
-
-    def test_activity_rights_change_object_with_create_new(self):
-        activity_rights_change_object = rights_manager.ActivityRightsChange({
-            'cmd': 'create_new'
-        })
-
-        self.assertEqual(activity_rights_change_object.cmd, 'create_new')
-
-    def test_activity_rights_change_object_with_change_role(self):
-        activity_rights_change_object = rights_manager.ActivityRightsChange({
-            'cmd': 'change_role',
-            'assignee_id': 'assignee_id',
-            'old_role': rights_manager.ROLE_OWNER,
-            'new_role': rights_manager.ROLE_VIEWER
-        })
-
-        self.assertEqual(activity_rights_change_object.cmd, 'change_role')
-        self.assertEqual(
-            activity_rights_change_object.assignee_id, 'assignee_id')
-        self.assertEqual(
-            activity_rights_change_object.old_role, rights_manager.ROLE_OWNER)
-        self.assertEqual(
-            activity_rights_change_object.new_role, rights_manager.ROLE_VIEWER)
-
-    def test_activity_rights_change_object_with_release_ownership(self):
-        activity_rights_change_object = rights_manager.ActivityRightsChange({
-            'cmd': 'release_ownership'
-        })
-
-        self.assertEqual(activity_rights_change_object.cmd, 'release_ownership')
-
-    def test_activity_rights_change_object_with_change_private_viewability(
-            self):
-        activity_rights_change_object = rights_manager.ActivityRightsChange({
-            'cmd': 'change_private_viewability',
-            'old_viewable_if_private': 'old_viewable_if_private',
-            'new_viewable_if_private': 'new_viewable_if_private'
-        })
-
-        self.assertEqual(
-            activity_rights_change_object.cmd, 'change_private_viewability')
-        self.assertEqual(
-            activity_rights_change_object.old_viewable_if_private,
-            'old_viewable_if_private')
-        self.assertEqual(
-            activity_rights_change_object.new_viewable_if_private,
-            'new_viewable_if_private')
-
-    def test_activity_rights_change_object_with_update_first_published_msec(
-            self):
-        activity_rights_change_object = rights_manager.ActivityRightsChange({
-            'cmd': 'update_first_published_msec',
-            'old_first_published_msec': 'old_first_published_msec',
-            'new_first_published_msec': 'new_first_published_msec'
-        })
-
-        self.assertEqual(
-            activity_rights_change_object.cmd, 'update_first_published_msec')
-        self.assertEqual(
-            activity_rights_change_object.old_first_published_msec,
-            'old_first_published_msec')
-        self.assertEqual(
-            activity_rights_change_object.new_first_published_msec,
-            'new_first_published_msec')
-
-    def test_exploration_rights_change_object_with_change_exploration_status(
-            self):
-        exp_rights_change_object = rights_manager.ExplorationRightsChange({
-            'cmd': 'change_exploration_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-            'new_status': rights_manager.ACTIVITY_STATUS_PUBLIC
-        })
-
-        self.assertEqual(
-            exp_rights_change_object.cmd, 'change_exploration_status')
-        self.assertEqual(
-            exp_rights_change_object.old_status,
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
-        self.assertEqual(
-            exp_rights_change_object.new_status,
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-    def test_exploration_rights_change_object_with_change_collection_status(
-            self):
-        col_rights_change_object = rights_manager.CollectionRightsChange({
-            'cmd': 'change_collection_status',
-            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-            'new_status': rights_manager.ACTIVITY_STATUS_PRIVATE
-        })
-
-        self.assertEqual(
-            col_rights_change_object.cmd, 'change_collection_status')
-        self.assertEqual(
-            col_rights_change_object.old_status,
-            rights_manager.ACTIVITY_STATUS_PUBLIC)
-        self.assertEqual(
-            col_rights_change_object.new_status,
-            rights_manager.ACTIVITY_STATUS_PRIVATE)
-
-    def test_to_dict(self):
-        activity_rights_change_dict = {
-            'cmd': 'change_private_viewability',
-            'old_viewable_if_private': 'old_viewable_if_private',
-            'new_viewable_if_private': 'new_viewable_if_private'
-        }
-        activity_rights_change_object = rights_manager.ActivityRightsChange(
-            activity_rights_change_dict)
-        self.assertEqual(
-            activity_rights_change_object.to_dict(),
-            activity_rights_change_dict)
+import feconf
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
@@ -220,8 +42,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
         self.signup('f@example.com', 'F')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -232,20 +55,28 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
+        self.user_id_voiceover_admin = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
-        self.user_c = user_services.UserActionsInfo(self.user_id_c)
-        self.user_d = user_services.UserActionsInfo(self.user_id_d)
-        self.user_e = user_services.UserActionsInfo(self.user_id_e)
-        self.user_f = user_services.UserActionsInfo(self.user_id_f)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
-        self.user_moderator = user_services.UserActionsInfo(
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_c = user_services.get_user_actions_info(self.user_id_c)
+        self.user_d = user_services.get_user_actions_info(self.user_id_d)
+        self.user_e = user_services.get_user_actions_info(self.user_id_e)
+        self.user_f = user_services.get_user_actions_info(self.user_id_f)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+        self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
+        user_services.update_user_role(
+            self.user_id_voiceover_admin, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.user_voiceover_admin = user_services.get_user_actions_info(
+            self.user_id_voiceover_admin)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -298,6 +129,18 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
+        self.assertTrue(
+            rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user_voiceover_admin, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user_a, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user_admin, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_manage_voice_artist_in_activity(
+                self.user_a, None))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
@@ -346,7 +189,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(exp_rights.is_owner(self.user_id_a))
@@ -420,7 +263,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -450,9 +293,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -484,7 +328,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(rights_manager.check_can_access_activity(
@@ -504,47 +348,35 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_c,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_EDITOR)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_b, self.EXP_ID, self.user_id_c,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
-
-        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
-            rights_manager.assign_role_for_exploration(
-                self.user_b, self.EXP_ID, self.user_id_c,
-                rights_manager.ROLE_VIEWER)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_c,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_d,
-            rights_manager.ROLE_EDITOR)
-        rights_manager.assign_role_for_exploration(
-            self.user_b, self.EXP_ID, self.user_id_e,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_f,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
 
     def test_publishing_and_unpublishing_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -570,6 +402,52 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
+
+    def test_unpublished_exploration_is_removed_from_completed_activities(self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id_f, self.EXP_ID)
+
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id_f),
+            [self.EXP_ID]
+        )
+
+        rights_manager.unpublish_exploration(self.user_admin, self.EXP_ID)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id_f),
+            []
+        )
+
+    def test_unpublished_exploration_is_removed_from_incomplete_activities(
+            self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, title='A title', category='A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id_e, self.EXP_ID, 'state', 1)
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id_e),
+            [self.EXP_ID]
+        )
+
+        rights_manager.unpublish_exploration(self.user_admin, self.EXP_ID)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id_e),
+            []
+        )
 
     def test_can_only_delete_unpublished_explorations(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -624,21 +502,52 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
 
-    def test_check_exploration_rights(self):
+    def test_reassign_higher_role_to_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_owner(self.user_id_b))
+
+    def test_reassign_lower_role_to_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_owner(self.user_id_a))
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_viewer(self.user_id_b))
+
+    def test_check_exploration_rights(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_c,
-            rights_manager.ROLE_EDITOR)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_d,
-            rights_manager.ROLE_VOICE_ARTIST)
+            rights_domain.ROLE_EDITOR)
 
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
@@ -648,6 +557,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(exp_rights.is_viewer(self.user_id_a))
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
         self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_d,
+            rights_domain.ROLE_VOICE_ARTIST)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
         self.assertTrue(exp_rights.is_voice_artist(self.user_id_d))
         self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
@@ -673,7 +589,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'This user already owns this'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_a,
-                rights_manager.ROLE_OWNER)
+                rights_domain.ROLE_OWNER)
 
     def test_assign_viewer_to_role_owner(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -681,61 +597,74 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
 
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b, rights_manager.ROLE_OWNER)
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_OWNER)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(exp_rights.is_owner(self.user_id_b))
 
-    def test_assign_voice_artist_to_role_owner(self):
+    def test_owner_cannot_assign_voice_artist(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VOICE_ARTIST)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-
-        self.assertFalse(exp_rights.is_owner(self.user_id_b))
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b, rights_manager.ROLE_OWNER)
-        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-
-        self.assertTrue(exp_rights.is_owner(self.user_id_b))
-
-    def test_editor_cannot_be_reassigned_as_editor(self):
-        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
-        rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
-
-        with self.assertRaisesRegexp(
-            Exception, 'This user already can edit this'):
+        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
-                rights_manager.ROLE_EDITOR)
+                rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_voiceover_admin_can_modify_voice_artist_role(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        self.assertTrue(exp_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b)
+
+        self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
+
+    def test_owner_cannot_assign_voice_artist_to_core_role(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        self.assertFalse(exp_rights.is_owner(self.user_id_b))
+        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+            rights_manager.assign_role_for_exploration(
+                self.user_a, self.EXP_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
 
     def test_voice_artist_cannot_be_reassigned_as_voice_artist(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
 
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VOICE_ARTIST)
+            self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
 
         with self.assertRaisesRegexp(
             Exception, 'This user already can voiceover this'):
             rights_manager.assign_role_for_exploration(
-                self.user_a, self.EXP_ID, self.user_id_b,
-                rights_manager.ROLE_VOICE_ARTIST)
+                self.user_voiceover_admin, self.EXP_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
 
     def test_viewer_cannot_be_reassigned_as_viewer(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -743,13 +672,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
 
         with self.assertRaisesRegexp(
             Exception, 'This user already can view this'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
     def test_public_explorations_cannot_be_assigned_role_viewer(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -761,7 +690,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             Exception, 'Public explorations can be viewed by anyone.'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
     def test_cannot_assign_invalid_role(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -770,6 +699,66 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid role: invalid_role'):
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b, 'invalid_role')
+
+    def test_deassign_without_rights_fails(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Could not deassign role'):
+            rights_manager.deassign_role_for_exploration(
+                self.user_b, self.EXP_ID, self.user_id_a)
+
+    def test_deassign_viewer_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_VIEWER)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_viewer(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_viewer(self.user_id_b))
+
+    def test_deassign_editor_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_editor(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
+    def test_deassign_owner_is_successful(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_OWNER)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_owner(self.user_id_b))
+
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_owner(self.user_id_b))
+
+    def test_deassign_non_existent_fails(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user does not have any role in'):
+            rights_manager.deassign_role_for_exploration(
+                self.user_a, self.EXP_ID, self.user_id_b)
 
 
 class CollectionRightsTests(test_utils.GenericTestBase):
@@ -785,8 +774,8 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.signup('c@example.com', 'C')
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
-        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -798,13 +787,14 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.MODERATOR_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_b = user_services.UserActionsInfo(self.user_id_b)
-        self.user_c = user_services.UserActionsInfo(self.user_id_c)
-        self.user_d = user_services.UserActionsInfo(self.user_id_d)
-        self.user_e = user_services.UserActionsInfo(self.user_id_e)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
-        self.user_moderator = user_services.UserActionsInfo(
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
+        self.user_c = user_services.get_user_actions_info(self.user_id_c)
+        self.user_d = user_services.get_user_actions_info(self.user_id_d)
+        self.user_e = user_services.get_user_actions_info(self.user_id_e)
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
+        self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
@@ -854,7 +844,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         self.assertListEqual(
             ['A'],
@@ -906,6 +896,194 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, collection_rights))
 
+    def test_owner_cannot_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        with self.assertRaisesRegexp(Exception, 'This user already owns this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_a,
+                rights_domain.ROLE_OWNER)
+
+    def test_editor_can_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_editor(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        self.assertTrue(collection_rights.is_owner(self.user_id_b))
+        self.assertFalse(collection_rights.is_editor(self.user_id_b))
+
+    def test_voiceartist_can_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        self.assertTrue(collection_rights.is_owner(self.user_id_b))
+        self.assertFalse(collection_rights.is_voice_artist(self.user_id_b))
+
+    def test_viewer_can_be_reassigned_as_owner(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_OWNER)
+
+        self.assertTrue(collection_rights.is_owner(self.user_id_b))
+        self.assertFalse(collection_rights.is_viewer(self.user_id_b))
+
+    def test_viewer_can_be_reassigned_as_editor(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+
+        self.assertTrue(collection_rights.is_editor(self.user_id_b))
+        self.assertFalse(collection_rights.is_viewer(self.user_id_b))
+
+    def test_voiceartist_can_be_reassigned_as_editor(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+
+        self.assertTrue(collection_rights.is_editor(self.user_id_b))
+        self.assertFalse(collection_rights.is_voice_artist(self.user_id_b))
+
+    def test_viewer_can_be_reassigned_as_voiceartist(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+        collection_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+
+        self.assertTrue(collection_rights.is_viewer(self.user_id_b))
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        self.assertTrue(collection_rights.is_voice_artist(self.user_id_b))
+        self.assertFalse(collection_rights.is_viewer(self.user_id_b))
+
+    def test_editor_cannot_be_reassigned_as_editor(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_EDITOR)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can edit this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_EDITOR)
+
+    def test_voice_artist_cannot_be_reassigned_as_voice_artist(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can voiceover this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_viewer_cannot_be_reassigned_as_viewer(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b,
+            rights_domain.ROLE_VIEWER)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can view this'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_VIEWER)
+
+    def test_public_collection_cannot_be_assigned_role_viewer(self):
+        collection = collection_domain.Collection.create_default_collection(
+            self.COLLECTION_ID)
+        collection_services.save_new_collection(self.user_id_a, collection)
+
+        rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Public collections can be viewed by anyone.'):
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b,
+                rights_domain.ROLE_VIEWER)
+
     def test_inviting_collaborator_to_collection(self):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.user_id_a,
@@ -929,7 +1107,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         # User A adds user B to the collection as an editor.
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         # Ensure User A is the only user in the owner names list.
         self.assertListEqual(
@@ -981,7 +1159,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         # User A adds user B to the collection as a viewer.
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
         exp_for_collection_rights = rights_manager.get_exploration_rights(
@@ -1005,35 +1183,35 @@ class CollectionRightsTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_c,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_collection(
                 self.user_b, self.COLLECTION_ID, self.user_id_c,
-                rights_manager.ROLE_VIEWER)
+                rights_domain.ROLE_VIEWER)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
 
         rights_manager.assign_role_for_collection(
             self.user_b, self.COLLECTION_ID, self.user_id_c,
-            rights_manager.ROLE_OWNER)
+            rights_domain.ROLE_OWNER)
         rights_manager.assign_role_for_collection(
             self.user_b, self.COLLECTION_ID, self.user_id_d,
-            rights_manager.ROLE_EDITOR)
+            rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_collection(
             self.user_b, self.COLLECTION_ID, self.user_id_e,
-            rights_manager.ROLE_VIEWER)
+            rights_domain.ROLE_VIEWER)
 
     def test_publishing_and_unpublishing_collection(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
@@ -1085,9 +1263,95 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, collection_rights))
 
+    def test_deassign_without_rights_fails(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Could not deassign role'):
+            rights_manager.deassign_role_for_collection(
+                self.user_b, self.COLLECTION_ID, self.user_id_a)
+
+    def test_deassign_viewer_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_VIEWER
+        )
+        col_rights = rights_manager.get_collection_rights(
+            self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_viewer(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_viewer(self.user_id_b))
+
+    def test_deassign_voice_artist_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_VOICE_ARTIST
+        )
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_voice_artist(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_voice_artist(self.user_id_b))
+
+    def test_deassign_editor_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_EDITOR
+        )
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_editor(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_editor(self.user_id_b))
+
+    def test_deassign_owner_is_successful(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        rights_manager.assign_role_for_collection(
+            self.user_a,
+            self.COLLECTION_ID,
+            self.user_id_b,
+            rights_domain.ROLE_OWNER
+        )
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertTrue(col_rights.is_owner(self.user_id_b))
+
+        rights_manager.deassign_role_for_collection(
+            self.user_a, self.COLLECTION_ID, self.user_id_b)
+        col_rights = rights_manager.get_collection_rights(self.COLLECTION_ID)
+        self.assertFalse(col_rights.is_owner(self.user_id_b))
+
+    def test_deassign_non_existent_fails(self):
+        self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
+
+        with self.assertRaisesRegexp(
+            Exception, 'This user does not have any role in'):
+            rights_manager.deassign_role_for_collection(
+                self.user_a, self.COLLECTION_ID, self.user_id_b)
+
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     """Tests for check_can_release_ownership function."""
+
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
 
@@ -1098,8 +1362,8 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1129,6 +1393,7 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
 
 class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
     """Tests for check_can_unpublish_activity function."""
+
     published_exp_id = 'exp_id_1'
     private_exp_id = 'exp_id_2'
     private_col_id = 'col_id_1'
@@ -1144,9 +1409,9 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.moderator = user_services.UserActionsInfo(self.moderator_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.moderator = user_services.get_user_actions_info(self.moderator_id)
         self.save_new_valid_exploration(
             self.published_exp_id, self.owner_id)
         self.save_new_valid_exploration(
@@ -1194,155 +1459,3 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_unpublish_activity(
             self.moderator,
             rights_manager.get_exploration_rights(self.published_exp_id)))
-
-
-class ActivityRightsTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(ActivityRightsTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.viewer = user_services.UserActionsInfo(self.viewer_id)
-
-        self.exp_id = 'exp_id'
-        self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner, self.exp_id)
-        self.activity_rights = rights_manager.get_exploration_rights(
-            self.exp_id)
-
-    def test_validate_community_owned_explorations(self):
-        self.activity_rights.community_owned = True
-        with self.assertRaisesRegexp(
-            Exception,
-            'Community-owned explorations should have no owners, '
-            'editors, voice artists or viewers specified.'):
-            self.activity_rights.validate()
-
-        self.activity_rights.owner_ids = []
-        self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegexp(
-            Exception, 'Community-owned explorations cannot be private'):
-            self.activity_rights.validate()
-
-    def test_validate_private_explorations(self):
-        self.activity_rights.viewer_ids = [self.viewer_id]
-        with self.assertRaisesRegexp(
-            Exception, 'Public explorations should have no viewers specified.'):
-            self.activity_rights.validate()
-
-    def test_validate_owner_cannot_be_editor(self):
-        self.activity_rights.editor_ids = [self.owner_id]
-        with self.assertRaisesRegexp(
-            Exception, 'A user cannot be both an owner and an editor.'):
-            self.activity_rights.validate()
-
-    def test_validate_owner_cannot_be_voice_artist(self):
-        self.activity_rights.voice_artist_ids = [self.owner_id]
-        with self.assertRaisesRegexp(
-            Exception, 'A user cannot be both an owner and a voice artist.'):
-            self.activity_rights.validate()
-
-    def test_validate_owner_cannot_be_viewer(self):
-        self.activity_rights.viewer_ids = [self.owner_id]
-        self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegexp(
-            Exception, 'A user cannot be both an owner and a viewer.'):
-            self.activity_rights.validate()
-
-    def test_validate_editor_cannot_be_voice_artist(self):
-        self.activity_rights.voice_artist_ids = [self.viewer_id]
-        self.activity_rights.editor_ids = [self.viewer_id]
-        self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegexp(
-            Exception, 'A user cannot be both an editor and a voice artist.'):
-            self.activity_rights.validate()
-
-    def test_validate_editor_cannot_be_viewer(self):
-        self.activity_rights.viewer_ids = [self.viewer_id]
-        self.activity_rights.editor_ids = [self.viewer_id]
-        self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegexp(
-            Exception, 'A user cannot be both an editor and a viewer.'):
-            self.activity_rights.validate()
-
-    def test_validate_voice_artist_cannot_be_viewer(self):
-        self.activity_rights.viewer_ids = [self.viewer_id]
-        self.activity_rights.voice_artist_ids = [self.viewer_id]
-        self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
-        with self.assertRaisesRegexp(
-            Exception, 'A user cannot be both a voice artist and a viewer.'):
-            self.activity_rights.validate()
-
-    def test_cannot_update_activity_first_published_msec_for_invalid_activity(
-            self):
-        with self.assertRaisesRegexp(
-            Exception, 'Cannot get activity rights for unknown activity type'):
-            rights_manager.update_activity_first_published_msec(
-                'invalid_activity', 'activity_id', 0.0)
-
-    def test_check_cannot_access_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_access_activity(
-            self.owner, None))
-
-    def test_check_cannot_edit_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_edit_activity(
-            self.owner, None))
-
-    def test_check_cannot_voiceover_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_voiceover_activity(
-            self.owner, None))
-
-    def test_cannot_save_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_save_activity(
-            self.owner, None))
-
-    def test_check_cannot_delete_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_delete_activity(
-            self.owner, None))
-
-    def test_check_cannot_modify_activity_roles_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_modify_activity_roles(
-            self.owner, None))
-
-    def test_check_cannot_release_ownership_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_release_ownership(
-            self.owner, None))
-
-    def test_check_cannnot_publish_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_publish_activity(
-            self.owner, None))
-
-    def test_check_cannot_publish_activity_with_cloned_from(self):
-        self.activity_rights.cloned_from = True
-        self.assertFalse(rights_manager.check_can_publish_activity(
-            self.owner, self.activity_rights))
-
-    def test_check_cannot_unpublish_activity_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_unpublish_activity(
-            self.owner, None))
-
-    def test_cannot_release_ownership_of_exploration_with_insufficient_rights(
-            self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'The ownership of this exploration cannot be released.')
-
-        with logging_swap, assert_raises_regexp_context_manager:
-            rights_manager.release_ownership_of_exploration(
-                self.viewer, self.exp_id)
-
-        self.assertEqual(len(observed_log_messages), 1)
-        self.assertEqual(
-            observed_log_messages[0],
-            'User %s tried to release ownership of exploration %s but was '
-            'refused permission.' % (self.viewer_id, self.exp_id))

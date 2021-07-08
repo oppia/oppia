@@ -1,0 +1,90 @@
+<div>
+  <div ng-if="$ctrl.isExplorationPopulated">
+    <div ng-if="$ctrl.previewWarning">
+      <div class="oppia-preview-state-warning"><[$ctrl.previewWarning]></div>
+    </div>
+    <conversation-skin></conversation-skin>
+    <div class="navbar-fixed-bottom oppia-footer"></div>
+
+  </div>
+
+  <div class="oppia-preview-bottom-right-container">
+    <div class="oppia-parameter-summary" ng-if="$ctrl.showParameterSummary()">
+      <strong>Parameters:</strong>
+      <table>
+        <tr ng-repeat="(paramName, paramValue) in $ctrl.allParams">
+          <td class="oppia-param-column"><[paramName]>:</td>
+          <td class="oppia-param-column">
+            <[paramValue != "" ? paramValue : "[Not set]"]>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <button class="btn-lg" ng-click="$ctrl.resetPreview()">
+      <i class="material-icons oppia-reload-icon">&#xE5D5;</i>
+      <span class="oppia-restart-text">Restart From Beginning</span>
+    </button>
+  </div>
+
+</div>
+
+<style>
+  .oppia-footer {
+    height: 42px;
+  }
+
+  .oppia-preview-bottom-right-container {
+    /* Fixed at bottom right corner (before footer) and appear on top of other div*/
+    bottom: 42px;
+    display: block;
+    position: fixed;
+    right: 0;
+    z-index: 1020;
+  }
+
+  .oppia-preview-bottom-right-container .oppia-parameter-summary {
+    background-color: #fff;
+    font-size: 16px;
+    margin: 0 0 2px 0;
+    padding: 5px 0 0 5px;
+    text-align: left;
+  }
+
+  .oppia-preview-bottom-right-container .btn-lg {
+    background-color: #fff;
+    border: none;
+    border-radius: 0;
+    display: block;
+    font-size: 20px;
+    margin-top: 10px;
+    padding-top: 10px;
+    text-align: right;
+  }
+
+  .oppia-preview-state-warning {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    left: 6px;
+    max-width: 296px;
+    padding: 3px;
+    position: absolute;
+    text-align: left;
+    top: 63px;
+    white-space: normal;
+    z-index: 1060;
+  }
+  preview-tab .oppia-param-column {
+    padding: 1px 5px;
+  }
+  preview-tab .oppia-reload-icon {
+    margin-bottom: 2px;
+  }
+  preview-tab .oppia-restart-text {
+    margin-left: 10px;
+    padding-top: 20px;
+  }
+</style>

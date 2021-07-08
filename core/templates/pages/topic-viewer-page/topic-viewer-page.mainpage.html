@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Oppia"})
+    <style>
+      @media(max-width: 768px) {
+        .collapse:not(.show) {
+          display: flex;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <topic-viewer-navbar-breadcrumb>
+            </topic-viewer-navbar-breadcrumb>
+          </navbar-breadcrumb>
+
+          <content>
+            <topic-viewer-page></topic-viewer-page>
+          </content>
+
+          <page-footer></page-footer>
+        </oppia-base-content>
+      </div>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

@@ -1,0 +1,600 @@
+<div>
+  <div class="oppia-stewards-landing-section oppia-stewards-landing-section-custom-container">
+    <div class="oppia-stewards-landing-section-inner">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-6 col-sm-push-6 oppia-stewards-landing-image-container">
+            <picture>
+              <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.webp')]>">
+              <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/partner.png')]>">
+              <img ng-src="<[$ctrl.getStaticImageUrl('/general/partner.png')]>" class="oppia-stewards-landing-image" alt="oppia stewards landing image">
+            </picture>
+          </div>
+          <div class="col-sm-6 col-sm-pull-6 oppia-stewards-landing-top-section-container">
+            <div class="oppia-stewards-landing-top-section">
+              <h1 class="oppia-stewards-landing-h1">Get involved.</h1>
+              <h2 class="oppia-stewards-landing-h2 oppia-support-text">Support from educators, NGOs and student volunteers makes Oppia possible. Help increase student access to Oppia.</h2>
+              <div>
+                <span ng-repeat="buttonDefinition in $ctrl.buttonDefinitions track by $index">
+                  <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="$ctrl.onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="oppia-stewards-landing-background-icon-row-container">
+        <div class="oppia-stewards-landing-background-icon-row oppia-stewards-landing-background-icons-container">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Government')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Architecture')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('History')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Microbiology')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Engineering')]>" class="oppia-stewards-landing-background-icon" alt="">
+
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algorithms')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Economics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Computing')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Reading')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Art')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Creativity')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Physics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Language')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chess')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Astronomy')]>" class="oppia-stewards-landing-background-icon" alt="">
+
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Religion')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Mathematics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Philosophy')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Government')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Architecture')]>" class="oppia-stewards-landing-background-icon" alt="">
+        </div>
+
+        <div class="oppia-stewards-landing-background-icon-row">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Genetics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Space')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algebra')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Music')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chemistry')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Poetry')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Puzzles')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Calculus')]>" class="oppia-stewards-landing-background-icon" alt="">
+
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Business')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Geography')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Biology')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Genetics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Space')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algebra')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Music')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chemistry')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Poetry')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Puzzles')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Calculus')]>" class="oppia-stewards-landing-background-icon" alt="">
+
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Business')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Geography')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Biology')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Genetics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Space')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algebra')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Music')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chemistry')]>" class="oppia-stewards-landing-background-icon" alt="">
+        </div>
+
+        <div class="oppia-stewards-landing-background-icon-row">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Economics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algorithms')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Creativity')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Astronomy')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chess')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Arithmetic')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Language')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Physics')]>" class="oppia-stewards-landing-background-icon" alt="">
+
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Humor')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Philosophy')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Mathematics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Religion')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Cooking')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Engineering')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Microbiology')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('History')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Architecture')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Government')]>" class="oppia-stewards-landing-background-icon" alt="">
+
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Art')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Reading')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Computing')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Economics')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Algorithms')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Creativity')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Astronomy')]>" class="oppia-stewards-landing-background-icon" alt="">
+          <img ng-src="<[$ctrl.getStaticSubjectImageUrl('Chess')]>" class="oppia-stewards-landing-background-icon" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-stewards-landing-section oppia-stewards-landing-custom-section">
+    <section class="oppia-landing-section">
+      <!--A container to make a grid with a fixed column-->
+      <main class="row d-flex">
+        <div class="column oppia-stewards-sidebar" ng-if="!$ctrl.windowIsNarrow">
+          <ul class="primary">
+            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_PARENTS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parents</a></li>
+            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_TEACHERS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_TEACHERS)">Teachers</a></li>
+            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_NONPROFITS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_NONPROFITS)">NGOs</a></li>
+            <li ng-class="{active: $ctrl.isActiveTab($ctrl.TAB_NAME_VOLUNTEERS)}"><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_VOLUNTEERS)">Volunteers</a></li>
+          </ul>
+        </div>
+
+        <div class="column tab-content view-content oppia-stewards-main-content" autoscroll="true">
+          <div ng-if="$ctrl.windowIsNarrow">
+            <strong>I AM A ...</strong>
+            <div uib-dropdown class="oppia-stewards-dropdown">
+              <button uib-dropdown-toggle class="btn btn-secondary selection dropdown-toggle" type="button" aria-expanded="false" data-toggle="dropdown">
+                <[$ctrl.getActiveTabNameInSingularForm()]>
+              </button>
+              <ul uib-dropdown-menu class="oppia-dropdown-menu">
+                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_PARENTS)">Parent</a></li>
+                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_TEACHERS)">Teacher</a></li>
+                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_NONPROFITS)">Nonprofit</a></li>
+                <li><a ng-click="$ctrl.setActiveTabName($ctrl.TAB_NAME_VOLUNTEERS)">Volunteer</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_PARENTS">
+            <h2>Help your child learn with our free, engaging lessons</h2>
+            <p>
+              Oppia is a digital library of academic lessons that teaches
+              students the skills they'll need to succeed in life, both
+              academically and beyond.
+            </p>
+
+            <p>
+              Our guided and interactive lessons empower your child to learn
+              independently. Or, if you prefer to work together, our content
+              allows you to guide their learning even if you aren’t an expert
+              on a given subject.
+            </p>
+
+            <p>
+              Oppia is 100% free and does not contain advertisements or
+              monetization. Everything at Oppia is built by a community of
+              professionals and volunteers who believe that a quality
+              education is an essential right. We are always testing and
+              refining our approach to create the best possible learning
+              experience for your child.
+            </p>
+
+            <p>
+              Browse our lessons to learn more about what Oppia has to offer.
+              If you want to join our community, offer feedback, or have a say
+              in how our lessons our built, we would welcome your feedback.
+              Time to get busy learning!
+            </p>
+          </div>
+
+          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_TEACHERS">
+            <h2>
+              Oppia's free, personalized lessons are a great way to support student learning
+            </h2>
+
+            <p>
+              Every student learns in a unique way at their own pace. As a
+              teacher, even in the best circumstances, it can be difficult to
+              cater to every student's unique needs. Oppia's engaging,
+              story-driven lessons are a great tool to support student
+              learning.
+            </p>
+
+            <p>
+              Oppia's personalized feedback and engaging storytelling can
+              assist students who require additional help outside of the
+              classroom. Or, Oppia can be used inside your classroom,
+              allowing every student to work at their own pace and giving
+              you the opportunity to provide additional support to those that
+              need a helping hand.
+            </p>
+
+            <p>
+              Our approach to creating lessons has been tested in controlled
+              trials and shown to result in significant learning gains. We
+              have designed our content to be relatable, interesting, and
+              scaffolded in a way that builds on earlier conceptual
+              understanding.
+            </p>
+
+            <p>
+              And, best of all, as a volunteer-led non-profit, our lessons
+              are <strong>100% free to use</strong> and contain no
+              advertising or monetization strategies.
+            </p>
+
+            <p>
+              We welcome you to join our community, support the project by
+              spreading the message to other educators, request lessons
+              needed by your students, or create new lessons for others.
+            </p>
+          </div>
+
+          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_NONPROFITS">
+            <h2>
+              Let's work together to make compelling educational
+              content available to everyone
+            </h2>
+            <p>
+              Oppia is a rapidly-growing, all volunteer non-profit dedicated
+              to making engaging educational lessons available to students
+              from every walk of life.
+            </p>
+
+            <p>
+              Oppia’s free and effective digital library of lessons is being
+              built with an emphasis on scalability and accessibility. Our
+              lesson builder allows content creators to provide intelligent,
+              personalized feedback to students based on their responses.
+              This means even large groups of students can receive the
+              attention and support of a private tutor without actually
+              needing close supervision. Lessons are continuously translated
+              into new languages and available on low-bandwidth mobile
+              devices to reach students in underserved communities around the
+              world.
+            </p>
+
+            <p>
+              In controlled trials, Oppia has been shown to result in
+              significant learning gains in communities that lack access to
+              effective learning environments. (Learn about one such study
+              <a href="https://docs.google.com/presentation/d/1zjdomWP4MKSDgT0whixNn8TbXeUNhrNUt6h_mlSH2GI/edit" target="_blank" rel="noopener">here</a>.)
+            </p>
+
+            <p>
+              At Oppia, we believe that quality education is a fundamental
+              right. Our mission is to provide every student the tools they
+              need to achieve basic literacy and numeracy while developing a
+              lifelong love for learning. That's why we're building a
+              complete, no-fuss digital classroom capable of teaching
+              thousands and thousands of students at once. It’s no small
+              task, but with the help of partners who share our vision, it's
+              one we are confident can be achieved.
+            </p>
+
+            <p>
+              We invite you to contact us to learn more about our
+              organization, inquire about partnerships, or arrange a pilot
+              study.
+            </p>
+          </div>
+
+          <div ng-if="$ctrl.activeTabName === $ctrl.TAB_NAME_VOLUNTEERS">
+            <h2>
+              Help improve access to high-quality education for students
+              around the world
+            </h2>
+            <p>
+              Oppia is a volunteer-led nonprofit, which means that our
+              mission depends entirely on the efforts of people who want to
+              make a difference in the lives of underserved students. Our
+              organization is made up of people from all over the world --
+              from the United States to India to Cameroon and many places in
+              between -- who work together to improve access to quality
+              educational content.
+            </p>
+
+            <p>
+              Not only is volunteering a great way to make a positive impact
+              on the world, it is a great opportunity to learn, to advance
+              your skills, and to work with a dedicated team of fellow
+              volunteers. Committed volunteers are given leadership roles
+              within the organization, which is a great way to get experience
+              in that role.
+            </p>
+
+            <p>
+              All sorts of skillsets are needed to make Oppia grow. Visit our
+              volunteer page at OppiaFoundation.org to learn more about
+              joining our team.
+            </p>
+          </div>
+
+          <div class="oppia-stewards-main-content-buttons">
+            <span ng-repeat="buttonDefinition in $ctrl.buttonDefinitions track by $index">
+              <button class="btn oppia-stewards-button" ng-class="{'oppia-stewards-button-primary': $index === 0, 'oppia-stewards-button-secondary': $index > 0}" ng-click="$ctrl.onClickButton(buttonDefinition)"><[buttonDefinition.text]></button>
+            </span>
+          </div>
+        </div>
+      </main>
+    </section>
+  </div>
+</div>
+
+<style>
+  stewards-landing-page .oppia-stewards-landing-background-icon-row-container {
+    position: absolute;
+    top: 50px;
+  }
+  stewards-landing-page .oppia-stewards-sidebar {
+    float: left;
+    margin-right: 80px;
+    max-width: 240px;
+    padding-top: 20px;
+    width: 200px;
+  }
+  stewards-landing-page .oppia-stewards-sidebar ul {
+    margin: 0;
+    padding: 0;
+  }
+  stewards-landing-page .oppia-stewards-sidebar li {
+    display: flex;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    line-height: 20px;
+    list-style: none;
+    padding-left: 20px;
+    position: relative;
+    width: 200px;
+  }
+  stewards-landing-page .oppia-stewards-sidebar li.active {
+    background-color: #BC5A29;
+    color: #222;
+    /* Disables the link completely instead of just cursor: default; */
+    font-weight: 600;
+    pointer-events: none;
+    text-decoration: none;
+  }
+  stewards-landing-page .oppia-stewards-sidebar li.active:after {
+    border: 12px solid transparent;
+    border-left: 12px solid #BC5A29;
+    content: "";
+    height: 0;
+    left: 100%;
+    position: absolute;
+    top: 18px;
+    width: 0;
+  }
+  stewards-landing-page .oppia-stewards-sidebar li a {
+    color: black;
+    display: table;
+    flex: 1;
+    height: 16px;
+    padding: 20px;
+    vertical-align: middle;
+  }
+  stewards-landing-page .oppia-stewards-sidebar li.active a {
+    color: white;
+  }
+  stewards-landing-page .oppia-stewards-sidebar li a:hover,
+  stewards-landing-page .oppia-stewards-sidebar li a:focus {
+    text-decoration: none
+  }
+
+  stewards-landing-page .oppia-stewards-dropdown {
+    margin-bottom: 50px;
+    margin-top: 12px;
+    position: relative;
+    width: 80%;
+  }
+  stewards-landing-page .oppia-stewards-dropdown .caret {
+    bottom: 0;
+    color: black;
+    margin: auto;
+    position: absolute;
+    right: 5px;
+    top: 0;
+  }
+  stewards-landing-page .oppia-stewards-dropdown .selection {
+    padding: 12px 20px 12px 18px;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
+    width: inherit;
+  }
+
+  stewards-landing-page .oppia-stewards-landing-section {
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+  }
+  stewards-landing-page .oppia-stewards-landing-image {
+    max-height: 500px;
+    max-width: 100%;
+    position: relative;
+    width: 60%;
+    z-index: 20;
+  }
+  stewards-landing-page .oppia-stewards-landing-h1 {
+    font-size: 3.5vw;
+    line-height: 5vw;
+    margin: 0;
+    text-align: left;
+    top: 160px;
+  }
+  stewards-landing-page .oppia-stewards-landing-section-inner {
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 6%;
+    padding-top: 6%;
+    position: relative;
+  }
+  stewards-landing-page .oppia-stewards-landing-h2 {
+    font-size: 1.95vmax;
+    line-height: 1.6em;
+    margin-bottom: 30px;
+    margin-top: 5%;
+    position: relative;
+    text-align: left;
+    z-index: 20;
+  }
+  stewards-landing-page .oppia-stewards-landing-h1,
+  stewards-landing-page .oppia-stewards-landing-h2 {
+    color: #005c5e;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  stewards-landing-page .oppia-stewards-landing-section .tab-content p {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  stewards-landing-page .oppia-stewards-button {
+    border-radius: 4px;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 20px;
+    height: 56px;
+    margin-bottom: 20px;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    z-index: 20;
+  }
+  stewards-landing-page .oppia-stewards-button-primary {
+    background-color: #015c53;
+    color: #fff;
+    left: 0;
+    margin-right: 15px;
+  }
+  stewards-landing-page .oppia-stewards-button-secondary {
+    background-color: transparent;
+    border: 4px solid #265a53;
+    box-sizing: border-box;
+    color: #265a53;
+    margin-right: 15px;
+  }
+  stewards-landing-page .oppia-stewards-button-primary:hover,
+  stewards-landing-page .oppia-stewards-button-primary:focus,
+  stewards-landing-page .oppia-stewards-button-primary:active {
+    background-color: #05beb2;
+    color: #fff;
+  }
+  stewards-landing-page .oppia-stewards-button-secondary:hover,
+  stewards-landing-page .oppia-stewards-button-secondary:focus,
+  stewards-landing-page .oppia-stewards-button-secondary:active {
+    border-color: #05beb2;
+    color: #05beb2;
+  }
+  stewards-landing-page .oppia-stewards-main-content {
+    float: left;
+    height: 500px;
+    margin-left: 20px;
+  }
+  stewards-landing-page .oppia-stewards-main-content-buttons {
+    display: block;
+    margin: 40px auto 0;
+    text-align: center;
+  }
+  stewards-landing-page .oppia-stewards-landing-top-section {
+    margin-left: 60px;
+  }
+  stewards-landing-page .oppia-stewards-landing-background-icon-row {
+    margin-bottom: 0;
+    margin-left: -webkit-calc((100vw - 2700px) / 2);
+    margin-left: -moz-calc((100vw - 2700px) / 2);
+    margin-left: -o-calc((100vw - 2700px) / 2);
+    margin-left: calc((100vw - 2700px) / 2);
+    margin-right: -webkit-calc((100vw - 2700px) / 2);
+    margin-right: -moz-calc((100vw - 2700px) / 2);
+    margin-right: -o-calc((100vw - 2700px) / 2);
+    margin-right: calc((100vw - 2700px) / 2);
+    margin-top: 0;
+    opacity: 0.4;
+    position: relative;
+    text-align: center;
+    width: 2700px;
+  }
+  stewards-landing-page .oppia-stewards-landing-background-icon {
+    margin: -1px;
+    max-width: 96px;
+    width: 10%;
+  }
+  stewards-landing-page .oppia-stewards-landing-section-custom-container {
+    background-color: #afd2eb;
+  }
+  stewards-landing-page .oppia-stewards-landing-image-container {
+    height: auto;
+    z-index: 20;
+  }
+  stewards-landing-page .oppia-stewards-landing-top-section-container {
+    z-index: 20;
+  }
+  stewards-landing-page .oppia-support-text {
+    padding-right: 15px;
+  }
+  stewards-landing-page .oppia-stewards-landing-background-icons-container {
+    margin-top: 20px;
+  }
+  stewards-landing-page .oppia-stewards-landing-custom-section {
+    background-color: #e8e7e3;
+    max-width: 90%;
+    padding-bottom: 50px;
+  }
+  stewards-landing-page .oppia-landing-section {
+    padding: 30px;
+  }
+  stewards-landing-page .oppia-dropdown-menu {
+    width: inherit;
+  }
+
+  /* Note: This should be kept in sync with the CSS media query on
+     stewards-landing-page.mainpage.html.
+  */
+  @media screen and (max-width: 890px) {
+    .oppia-stewards-landing-background-icon-row-container {
+      margin-left: -54px;
+      max-width: 100vw;
+      overflow: hidden;
+    }
+    .oppia-stewards-landing-section-inner,
+    .oppia-stewards-landing-section {
+      height: auto;
+    }
+    .oppia-stewards-landing-section-inner {
+      margin-left: 54px;
+    }
+    .oppia-stewards-landing-h1 {
+      font-size: 1.6em;
+      line-height: 1.6em;
+      margin-right: 20%;
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 40px;
+      width: 80%;
+    }
+    .oppia-stewards-landing-h2 {
+      font-size: 1em;
+      width: 80%;
+    }
+    .oppia-stewards-landing-top-section {
+      margin-left: auto;
+    }
+    .oppia-stewards-button {
+      /* This font size is used in oppia.css for the button in splash page in
+         mobile view. */
+      font-size: 3.6vw;
+      margin-bottom: 30px;
+      width: auto;
+    }
+    .oppia-stewards-main-content {
+      width: 90%;
+    }
+  }
+  @media screen and (max-width: 320px) {
+    .oppia-stewards-button {
+      /* This font size is used in oppia.css for the button in splash page in
+         mobile view. */
+      font-size: 3.6vw;
+    }
+    .oppia-stewards-landing-h1 {
+      white-space: normal;
+    }
+  }
+</style>

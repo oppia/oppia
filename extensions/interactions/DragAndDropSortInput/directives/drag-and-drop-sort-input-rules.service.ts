@@ -21,15 +21,23 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { DragAndDropAnswer } from 'interactions/answer-defs';
+import {
+  DragAndDropCheckEqualityRuleInputs,
+  DragAndDropHasElementXAtPositionYRuleInputs,
+  DragAndDropHasElementXBeforeElementYRuleInputs
+} from 'interactions/rule-input-defs';
+
 @Injectable({
   providedIn: 'root'
 })
 export class DragAndDropSortInputRulesService {
-  static checkEquality(answer: string[][],
-      inputs: {x: string[][]}): boolean {
-    for (var i:number = 0; i < answer.length; i++) {
+  static checkEquality(
+      answer: DragAndDropAnswer,
+      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
+    for (var i: number = 0; i < answer.length; i++) {
       if (answer[i].length === inputs.x[i].length) {
-        for (var j:number = 0; j < answer[i].length; j++) {
+        for (var j: number = 0; j < answer[i].length; j++) {
           if (inputs.x[i].indexOf(answer[i][j]) === -1) {
             return false;
           }
@@ -41,12 +49,13 @@ export class DragAndDropSortInputRulesService {
     return true;
   }
 
-  static checkEqualityWithIncorrectPositions(answer: string[][],
-      inputs: {x: string[][]}): boolean {
+  static checkEqualityWithIncorrectPositions(
+      answer: DragAndDropAnswer,
+      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     var noOfMismatches: number = 0;
-    for (var i:number = 0; i < Math.min(inputs.x.length, answer.length); i++) {
+    for (var i: number = 0; i < Math.min(inputs.x.length, answer.length); i++) {
       for (
-        var j:number = 0; j < Math.max(answer[i].length,
+        var j: number = 0; j < Math.max(answer[i].length,
           inputs.x[i].length); j++) {
         if (inputs.x[i].length > answer[i].length) {
           if (answer[i].indexOf(inputs.x[i][j]) === -1) {
@@ -62,34 +71,39 @@ export class DragAndDropSortInputRulesService {
     return noOfMismatches === 1;
   }
 
-  IsEqualToOrdering(answer: string[][],
-      inputs: {x: string[][]}):boolean {
+  IsEqualToOrdering(
+      answer: DragAndDropAnswer,
+      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     return answer.length === inputs.x.length && (
       DragAndDropSortInputRulesService.checkEquality(
         answer, inputs));
   }
 
   IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      answer: string[][], inputs: {x: string[][]}): boolean {
+      answer: DragAndDropAnswer,
+      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
     return DragAndDropSortInputRulesService.checkEqualityWithIncorrectPositions(
       answer, inputs);
   }
 
-  HasElementXAtPositionY(answer: string[][],
-      inputs: {x:string, y:number}): boolean {
-    for (var i:number = 0; i < answer.length; i++) {
+  HasElementXAtPositionY(
+      answer: DragAndDropAnswer,
+      inputs: DragAndDropHasElementXAtPositionYRuleInputs): boolean {
+    for (var i: number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
         return ((i + 1) === inputs.y);
       }
     }
+    return false;
   }
 
-  HasElementXBeforeElementY(answer: string[][],
-      inputs: {x:string, y:string}): boolean {
+  HasElementXBeforeElementY(
+      answer: DragAndDropAnswer,
+      inputs: DragAndDropHasElementXBeforeElementYRuleInputs): boolean {
     var indX = -1;
     var indY = -1;
-    for (var i:number = 0; i < answer.length; i++) {
+    for (var i: number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
         indX = i;

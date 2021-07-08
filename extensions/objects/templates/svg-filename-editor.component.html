@@ -1,0 +1,567 @@
+<div class="fs-container svg-filename-editor">
+  <div *ngIf="!isDiagramSaved()" class="diagram-editor-size-toolbar">
+    <div class="input-box">
+      Width:&nbsp;
+      <input type="number" [(ngModel)]="diagramWidth" (blur)="onWidthInputBlur()">
+    </div>
+    <div class="input-box">
+      Height:&nbsp;
+      <input type="number" [(ngModel)]="diagramHeight" (blur)="onHeightInputBlur()">
+    </div>
+    <div class="dimension-note">
+      This diagram has a maximum dimension of 490 X 550 px. Changes made to the dimensions will
+      be reflected after "Use this Image" button is clicked.
+    </div>
+  </div>
+  <div class="svg-editor" *ngIf="!isDiagramSaved()">
+    <div class="fabric-canvas" [attr.id]="canvasContainerId">
+      <canvas [attr.id]="canvasID" class="fabric-canvas-container"></canvas>
+    </div>
+    <div *ngIf="isDrawModeSvgUpload()" class="fabric-canvas custom-tool-form">
+      <div class="container upload-warning">
+        Note: The uploaded svg may not be rendered exactly.
+      </div>
+      <div *ngIf="!isFileUploaded()">
+        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+                              [allowedImageFormats]="allowedImageFormats">
+        </oppia-image-uploader>
+      </div>
+      <div *ngIf="isFileUploaded()">
+        <img [src]="uploadedSvgDataUrl.safeUrl" class="uploaded-svg-image">
+        <div class="container">
+          <label>
+            <input type="radio" [(ngModel)]="loadType" value="group" checked>
+            <span>
+              Load as Single Image
+            </span>
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="loadType" value="nogroup">
+            <span>
+              Load as Individual Shapes
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="isDrawModePieChart()" class="fabric-canvas custom-tool-form">
+      <div class="container">
+        <div class="piechart-note">
+          Note: The pie chart can't be edited once it has been added to the diagram.
+        </div>
+        <div class="row">
+          <div class="col-md-5 col-sm-5 col-4">
+            Name:
+          </div>
+          <div class="col-md-5 col-sm-4 col-4">
+            Value:
+          </div>
+          <div class="col-md-2 col-sm-3 col-4">
+            Color:
+          </div>
+        </div>
+        <div *ngFor="let inputTag of pieChartDataInput; let idx = index">
+          <div class="form-row form-group">
+            <div class="col-md-5 col-sm-5 col-4">
+              <input type="text" class="form-control" name="input_0_{{idx}}" [(ngModel)]="inputTag.name">
+            </div>
+            <div class="col-md-5 col-sm-4 col-4">
+              <input type="number" class="form-control" name="input_1_{{idx}}" [(ngModel)]="inputTag.data">
+            </div>
+            <div class="col-md-2 col-sm-3 col-4">
+              <input type="color" class="form-control" name="input_2_{{idx}}" [(ngModel)]="inputTag.color">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <button *ngIf="pieChartDataInput.length < pieChartDataLimit"
+                  class="btn btn-outline-secondary btn-block" (click)="onAddItem()">
+                  Add item +
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="vertical-toolbar">
+      <div>
+        <button class="icon-tool toolbar-button thin-button"
+                [ngClass]="{'disabled' : !isPencilEnabled()}"
+                (click)="togglePencilDrawing()"
+                placement="left"
+                ngbTooltip="Pencil"
+                [disabled]="!isPencilEnabled()">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createLine()"
+                placement="right"
+                ngbTooltip="Line"
+                [disabled]="!areAllToolsEnabled()">
+          <i class="fas fa-slash oppia-slash-icon"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createRect()"
+                placement="left"
+                ngbTooltip="Rectangle"
+                [disabled]="!areAllToolsEnabled()">
+          <i class="far fa-square"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-circle"
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createCircle()"
+                placement="right"
+                ngbTooltip="Circle"
+                [disabled]="!areAllToolsEnabled()">
+          <i class="far fa-circle"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-text"
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createText()"
+                placement="left"
+                ngbTooltip="Text"
+                [disabled]="!areAllToolsEnabled()">
+          <i class="fas fa-font"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon"
+        [ngClass]="{'disabled' : !isClosedPolygonEnabled()}"
+                (click)="createClosedPolygon()"
+                placement="right"
+                ngbTooltip="Closed Polygon"
+                [disabled]="!isClosedPolygonEnabled()">
+        </button>
+        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon"
+        [ngClass]="{'disabled' : !isOpenPolygonEnabled()}"
+                (click)="createOpenPolygon()"
+                placement="left"
+                ngbTooltip="Open Polygon"
+                [disabled]="!isOpenPolygonEnabled()">
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
+                [ngClass]="{'disabled' : !(areAllToolsEnabled() || isDrawModeBezier())}"
+                (click)="createQuadraticBezier()"
+                placement="right"
+                ngbTooltip="Quadratic Bezier curve"
+                [disabled]="!(areAllToolsEnabled() || isDrawModeBezier())">
+          <i class="fas fa-bezier-curve bezier-curve"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-piechart"
+                [ngClass]="{'disabled' : !isPieChartEnabled()}"
+                (click)="createPieChart()"
+                placement="left"
+                ngbTooltip="Pie Chart"
+                [disabled]="!isPieChartEnabled()">
+          <i class="fas fa-chart-pie pie-chart"></i>
+        </button>
+        <button class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
+                [ngClass]="{'disabled' : !isSvgUploadEnabled()}"
+                (click)="uploadSvgFile()"
+                placement="right"
+                ngbTooltip="Upload SVG"
+                [disabled]="!isSvgUploadEnabled()">
+          <i class="far fa-file-image file-upload"></i>
+        </button>
+        <div class="vert-bottom-toolbar">
+          <div>
+            <div class="color-well">
+              <div>Stroke</div>
+              <div id="stroke-color" class="colorPicker" placement="right" ngbTooltip="Stroke Color">
+                <div id="top-stroke-alpha" class="alphaSquare top"></div>
+                <div id="bottom-stroke-alpha" class="alphaSquare bottom"></div>
+              </div>
+            </div>
+            <div class="color-well">
+              <div>Fill</div>
+              <div id="fill-color" class="colorPicker" placement="right" ngbTooltip="Fill Color">
+                <div id="top-fill-alpha" class="alphaSquare top"></div>
+                <div id="bottom-fill-alpha" class="alphaSquare bottom"></div>
+              </div>
+            </div>
+            <div class="color-well">
+              <div>bg</div>
+              <div id="bg-color" class="colorPicker" placement="right" ngbTooltip="Background Color">
+                <div id="top-bg-alpha" class="alphaSquare top"></div>
+                <div id="bottom-bg-alpha" class="alphaSquare bottom"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon"
+                    [ngClass]="{'disabled' : !objectIsSelected}"
+                    (click)="bringObjectForward()"
+                    placement="left"
+                    ngbTooltip="Bring Forward"
+                    [disabled]="!objectIsSelected">
+            </button>
+            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon"
+                    [ngClass]="{'disabled' : !objectIsSelected}"
+                    (click)="sendObjectBackward()"
+                    placement="right"
+                    ngbTooltip="Send Backward"
+                    [disabled]="!objectIsSelected">
+            </button>
+            <button class="icon-tool toolbar-button thin-button"
+                    [ngClass]="{'disabled' : !isUndoEnabled()}"
+                    (click)="onUndo()"
+                    [disabled]="!isUndoEnabled()">
+              <i class="fas fa-undo"></i>
+            </button>
+            <button class="icon-tool toolbar-button thin-button"
+                    [ngClass]="{'disabled' : !isRedoEnabled()}"
+                    (click)="onRedo()"
+                    [disabled]="!isRedoEnabled()">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+          <button class="toolbar-button fat-button"
+                  (click)="removeShape()"
+                  [disabled]="!objectIsSelected">
+            Remove
+          </button>
+          <button class="toolbar-button fat-button"
+                  (click)="onClear()"
+                  [disabled]="!isClearEnabled()">
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="horizontal-toolbar top-toolbar">
+      <div class="info-tag" *ngIf="isDrawModeSvgUpload()">
+        Click the SVG upload button to load the SVG.
+      </div>
+      <div class="info-tag" *ngIf="isDrawModePieChart()">
+        Click the PieChart button once the data is entered.
+      </div>
+      <div class="info-tag" *ngIf="isDrawModePencil()">
+        Click the pencil button to exit free drawing mode.
+      </div>
+      <div class="info-tag" *ngIf="isDrawModePolygon() && isTouchDevice">
+        Click the polygon button to complete the diagram.
+      </div>
+      <div class="info-tag" *ngIf="isDrawModePolygon() && !isTouchDevice">
+        Double click to complete the polygon.
+      </div>
+      <div class="info-tag" *ngIf="isDrawModeBezier()">
+        Click the bezier curve button to complete the diagram.
+      </div>
+      <div class="input-tag" *ngIf="displayFontStyles">
+        <input type="checkbox" [(ngModel)]="fabricjsOptions.italic" (ngModelChange)="onItalicToggle()">
+        <span class="oppia-font-styles-text">Italic</span>
+      </div>
+      <div class="input-tag" *ngIf="displayFontStyles">
+        <input type="checkbox" [(ngModel)]="fabricjsOptions.bold" (ngModelChange)="onBoldToggle()">
+        <span class="oppia-font-styles-text">Bold</span>
+      </div>
+      <div class="input-tag" *ngIf="displayFontStyles">
+        <select [(ngModel)]="fabricjsOptions.fontFamily"
+                (ngModelChange)="onFontChange()">
+          <option *ngFor="let font of fontFamily">
+            {{ font }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="horizontal-toolbar bottom-toolbar" *ngIf="!isDrawModePieChart() && !isDrawModeSvgUpload()">
+      <div class="input-tag" *ngIf="isSizeVisible()">
+        <select [(ngModel)]="fabricjsOptions.size"
+                (ngModelChange)="onSizeChange()">
+          <option *ngFor="let size of sizes">
+            {{size}}
+          </option>
+        </select>
+      </div>
+      <div class="input-tag" *ngIf="objectIsSelected">
+        Layer number:{{ layerNum }}
+        <i class="material-icons layer-info" placement="bottom"
+           ngbTooltip="This denotes the layer in which the currently selected shape is present. Layer 1 is the bottom layer.">
+          &#xE887;
+        </i>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isDiagramSaved()">
+    <div class="diagram-editor-saved-image-container protractor-test-saved-diagram-container">
+      <i class="material-icons diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
+         title="Continue editing the diagram">
+        &#xE254;
+      </i>
+      <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
+    </div>
+  </div>
+  <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box">
+    <button class="btn btn-success float-right protractor-test-save-diagram"
+            (click)="saveSvgFile()"
+            [disabled]="isUserDrawing() || loadingIndicatorIsShown">
+      <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
+      <span *ngIf="loadingIndicatorIsShown">
+        <mat-progress-spinner [diameter]="25"
+                              [mode]="indeterminate"
+                              class="oppia-diagram-spinning-button">
+        </mat-progress-spinner>
+      </span>
+    </button>
+  </div>
+</div>
+<style>
+  .svg-filename-editor .diagram-editor-size-toolbar .input-box {
+    display: inline-block;
+  }
+  .svg-filename-editor .diagram-editor-size-toolbar .dimension-note {
+    font-size: 15px;
+  }
+
+  .svg-filename-editor .diagram-editor-saved-image-container {
+    position: relative;
+  }
+
+  .svg-filename-editor .diagram-editor-saved-image-container .edit-icon {
+    color: #000;
+    cursor: pointer;
+    position: absolute;
+    right: 6px;
+    text-shadow: 0 0 1px #fff;
+    top: 6px;
+  }
+
+  .svg-filename-editor .svg-editor {
+    background-color: #fff;
+    min-height: 450px;
+    position: relative;
+  }
+
+  .svg-filename-editor .svg-editor>* {
+    position: absolute
+  }
+
+  .svg-filename-editor .svg-editor,
+  .svg-filename-editor .svg-editor * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+  }
+
+  .svg-editor .fabric-canvas::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 7px;
+    width: 7px;
+  }
+
+  .svg-filename-editor .svg-editor .fabric-canvas {
+    border: 1px solid #555;
+    bottom: 31px;
+    cursor: default;
+    left: 62px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    right: 0;
+    top: 31px;
+  }
+
+  .svg-editor .fabric-canvas.custom-tool-form {
+    background-color: #fff;
+    bottom: 0;
+    overflow: auto;
+  }
+
+  .svg-editor .fabric-canvas .piechart-note {
+    font-size: 13px;
+  }
+
+  .svg-editor .fabric-canvas .upload-warning {
+    color: #f00;
+  }
+
+  .svg-editor .fabric-canvas .uploaded-svg-image {
+    display: block;
+    height: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+  }
+
+  .svg-filename-editor .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
+    background-color: #7c7c7c;
+    border-radius: 4px;
+  }
+
+  .svg-filename-editor .svg-editor .fabric-canvas .fabric-canvas-container {
+    height: 368px;
+    width: 494px;
+  }
+
+  .svg-filename-editor .svg-editor .horizontal-toolbar {
+    background-color: #fff;
+    border: 1px solid #555;
+    height: 31px;
+    left: 62px;
+    right: 0;
+  }
+
+  .svg-filename-editor .svg-editor .horizontal-toolbar.bottom-toolbar {
+    bottom: 0;
+  }
+
+  .svg-filename-editor .svg-editor .horizontal-toolbar.top-toolbar {
+    top: 0;
+  }
+
+  .svg-filename-editor .svg-editor .horizontal-toolbar .input-tag {
+    border-radius: 3px;
+    float: left;
+    font-size: 13px;
+    height: 28px;
+    margin: 1px;
+    padding-left: 3px;
+    padding-top: 5px;
+    position: relative;
+  }
+
+  .svg-filename-editor .svg-editor .horizontal-toolbar .info-tag {
+    padding-left: 3px;
+    padding-top: 5px;
+  }
+
+  @media only screen and (min-width: 400px) {
+    .svg-editor .horizontal-toolbar .info-tag {
+      font-size: 13px;
+    }
+  }
+
+  @media only screen and (max-width: 400px) {
+    .svg-editor .horizontal-toolbar .info-tag {
+      font-size: 3vw;
+    }
+  }
+
+  .svg-filename-editor .svg-editor .horizontal-toolbar .layer-info {
+    font-size: 19px;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar {
+    background-color: #fff;
+    border: 1px solid #555;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    width: 62px;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .fat-button {
+    clear: both;
+    font-size: 13px;
+    width: 57px
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .icon-tool {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    font-size: 24px;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .icon-tool.disabled {
+    filter: alpha(opacity=40);
+    opacity: 0.4;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .thin-button {
+    float: left;
+    position: relative;
+    width: 26px;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button {
+    background-color: #fff;
+    border: 2px solid transparent;
+    border-radius: 3px;
+    height: 26px;
+    line-height: 26px;
+    margin: 2px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
+    font-size: 21px;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button .pie-chart {
+    font-size: 22px;
+  }
+
+  .svg-editor .vertical-toolbar .toolbar-button .file-upload {
+    font-size: 21px;
+  }
+
+  .svg-editor .vertical-toolbar .tooltip-inner {
+    background-color: #555;
+  }
+
+  .svg-filename-editor .svg-editor .vertical-toolbar .vert-bottom-toolbar {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0
+  }
+
+  .svg-filename-editor .svg-editor .color-well {
+    float: left;
+    font-size: 10px;
+    padding-bottom: 3px;
+    text-align: center;
+    width: 60px
+  }
+
+  .svg-filename-editor .svg-editor .color-well .colorPicker {
+    background-color: #000;
+    border: 1px solid #000;
+    border-radius: 3px;
+    cursor: pointer;
+    height: 28px;
+    margin: 0 auto;
+    width: 28px;
+  }
+
+  .svg-filename-editor .svg-editor .color-well .alphaSquare {
+    background-color: #000;
+    height: 13px;
+    width: 13px;
+  }
+
+  .svg-filename-editor .svg-editor .color-well .alphaSquare.bottom {
+    left: 50%;
+    position: absolute;
+  }
+
+  .svg-filename-editor .oppia-slash-icon {
+    font-size: 19px;
+  }
+
+  .svg-filename-editor .oppia-closed-polygon-icon {
+    background-image: url(/assets/svg_diagram_editor/closed_polygon.svg);
+  }
+
+  .svg-filename-editor .oppia-open-polygon-icon {
+    background-image: url(/assets/svg_diagram_editor/open_polygon.svg);
+  }
+
+  .svg-filename-editor .oppia-bring-forward-icon {
+    background-image: url(/assets/svg_diagram_editor/bring_forward.svg);
+  }
+
+  .svg-filename-editor .oppia-send-backward-icon {
+    background-image: url(/assets/svg_diagram_editor/send_backward.svg);
+  }
+
+  .svg-filename-editor .oppia-font-styles-text {
+    padding-left: 3px;
+  }
+
+  .svg-filename-editor .oppia-diagram-spinning-button {
+    margin-left: 30px;
+    margin-right: 30px;
+  }
+
+  .svg-filename-editor  .oppia-diagram-spinning-button svg path { stroke: #f8f6e1; }
+</style>

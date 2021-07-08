@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.tests import test_utils
@@ -29,9 +31,14 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
     def test_requires_override_for_calculation(self):
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseCalculation should implement the '
+                'calculate_from_state_answers_dict(state_answers_dict) '
+                'method.')):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
-                state_answers_dict={})
+                {})
 
     def test_equality_of_hashable_answers(self):
         hashable_answer_1 = answer_models.HashableAnswer('answer_1')
@@ -259,6 +266,7 @@ class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
 
 class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
     """This calculation only works on answers which are all lists."""
+
     CALCULATION_ID = 'FrequencyCommonlySubmittedElements'
 
     def test_shared_answers(self):

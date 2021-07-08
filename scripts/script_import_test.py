@@ -32,28 +32,26 @@ import sys
 from core.tests import test_utils
 
 
-class GcloudAdapterImportTests(test_utils.GenericTestBase):
-    """Tests import of gcloud adapter."""
-
-    def test_import_with_missing_gae_dir(self):
-        def mock_exists(unused_path):
-            return False
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        gae_dir = os.path.join(
-            os.path.abspath(os.getcwd()), '..', 'oppia_tools',
-            'google_appengine_1.9.67', 'google_appengine')
-        with exists_swap, self.assertRaisesRegexp(
-            Exception, 'Directory %s does not exist.' % gae_dir):
-            from scripts.release_scripts import gcloud_adapter # pylint: disable=unused-variable
-
-
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     """Tests import of install third party libs."""
+
     def setUp(self):
         super(InstallThirdPartyLibsImportTests, self).setUp()
         self.commands = []
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs): # pylint: disable=unused-argument
+            class Ret(test_utils.GenericTestBase):
+                """Return object that gives user-prefix error."""
+
+                def __init__(self):  # pylint: disable=super-init-not-called
+                    self.returncode = 1
+                def communicate(self):
+                    """Return user-prefix error as stderr."""
+                    return '', 'can\'t combine user with prefix'
+            return Ret()
         def mock_check_call(cmd_tokens):
             self.commands.extend(cmd_tokens)
+        self.Popen_swap = self.swap(
+            subprocess, 'Popen', mock_popen_error_call)
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
 
@@ -61,11 +59,27 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with self.check_call_swap, exists_swap:
+        with self.Popen_swap, self.check_call_swap, exists_swap:
             from scripts import install_third_party_libs # pylint: disable=unused-variable
         self.assertEqual(
             self.commands, [
                 sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2',
                 '--target', '../oppia_tools/pyyaml-5.1.2',
+                '--user', '--prefix=', '--system',
                 sys.executable, '-m', 'pip', 'install',
-                'future==0.17.1', '--target', 'third_party/future-0.17.1'])
+                'future==0.18.2', '--target',
+                'third_party/python_libs',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'six==1.15.0', '--target',
+                'third_party/python_libs',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'certifi==2020.12.5', '--target',
+                '../oppia_tools/certifi-2020.12.5',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'typing==3.7.4.3', '--target',
+                'third_party/python_libs',
+                '--user', '--prefix=', '--system',
+            ])

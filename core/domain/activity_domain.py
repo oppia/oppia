@@ -54,7 +54,7 @@ class ActivityReference(python_utils.OBJECT):
         are valid.
 
         Raises:
-            Exception: The activity type is invalid.
+            Exception. The activity type is invalid.
         """
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
@@ -67,7 +67,7 @@ class ActivityReference(python_utils.OBJECT):
         """Returns a dict representing this ActivityReference domain object.
 
         Returns:
-            A dict, mapping type and id of a ActivityReference
+            dict. A dict, mapping type and id of an ActivityReference
             instance to corresponding keys 'type' and 'id'.
         """
         return {
@@ -98,7 +98,7 @@ class ActivityReferences(python_utils.OBJECT):
         self.activity_reference_list are valid.
 
         Raises:
-            Exception: Any ActivityReference in self.activity_reference_list
+            Exception. Any ActivityReference in self.activity_reference_list
                 is invalid.
         """
         for reference in self.activity_reference_list:

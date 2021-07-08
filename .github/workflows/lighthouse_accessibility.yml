@@ -1,0 +1,35 @@
+name: Lighthouse CI accessibility tests
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+jobs:
+  lighthouse:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '2.x'
+          architecture: 'x64'
+      - name: Setup python by installing wheel
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: pip install wheel==0.35.0
+      - name: Install Third Party Dependencies
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_third_party_libs
+      - name: Install chrome
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.install_chrome_for_ci
+      - name: Run lighthouse checks
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_lighthouse_tests --mode accessibility

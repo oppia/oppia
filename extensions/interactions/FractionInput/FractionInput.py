@@ -60,9 +60,13 @@ class FractionInput(base.BaseInteraction):
         'name': 'customPlaceholder',
         'description': 'Custom placeholder text (optional)',
         'schema': {
-            'type': 'unicode'
+            'type': 'custom',
+            'obj_type': 'SubtitledUnicode'
         },
-        'default_value': ''
+        'default_value': {
+            'content_id': None,
+            'unicode_str': ''
+        }
     }]
 
     _answer_visualization_specs = [{

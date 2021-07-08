@@ -19,10 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform import models
+from core.domain import taskqueue_services
 import feconf
-
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 def enqueue_flag_exploration_email_task(
@@ -35,5 +33,5 @@ def enqueue_flag_exploration_email_task(
     }
 
     # Emails about flagged explorations are sent immediately to moderators.
-    taskqueue_services.enqueue_email_task(
+    taskqueue_services.enqueue_task(
         feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)

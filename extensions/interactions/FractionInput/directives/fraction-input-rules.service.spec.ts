@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for Fraction Input rules.
  */
 
-import { FractionAnswer, FractionInputRulesService } from
+import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
+import { FractionAnswer } from 'interactions/answer-defs';
 import { TestBed } from '@angular/core/testing';
 
 describe('Fraction Input rules service', () => {
-  let firs: FractionInputRulesService = null;
+  let firs: FractionInputRulesService;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [FractionInputRulesService]

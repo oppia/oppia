@@ -1,30 +1,37 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "lib": ["es2017", "dom", "webworker"],
+    "downlevelIteration": true,
+    "lib": ["es2017", "dom"],
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
-    "skipLibCheck": true,
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "app.constants": ["core/templates/dev/head/app.constants"],
-      "components/*": ["core/templates/dev/head/components/*"],
-      "domain/*": ["core/templates/dev/head/domain/*"],
-      "expressions/*": ["core/templates/dev/head/expressions/*"],
-      "pages/*": ["core/templates/dev/head/pages/*"],
-      "services/*": ["core/templates/dev/head/services/*"],
+      "app.constants": ["core/templates/app.constants"],
+      "components/*": ["core/templates/components/*"],
+      "directives/*": ["core/templates/directives/*"],
+      "domain/*": ["core/templates/domain/*"],
+      "expressions/*": ["core/templates/expressions/*"],
+      "app-events/*": ["core/templates/app-events/*"],
+      "pages/*": ["core/templates/pages/*"],
+      "services/*": ["core/templates/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
       "interactions/*": ["extensions/interactions/*"],
-      "filters/*": ["core/templates/dev/head/filters/*"],
-      "tests/*": ["core/templates/dev/head/tests/*"]
+      "rich_text_components/*": ["extensions/rich_text_components/*"],
+      "objects/*": ["extensions/objects/*"],
+      "filters/*": ["core/templates/filters/*"],
+      "static/*": ["third_party/static/*"],
+      "tests/*": ["core/templates/tests/*"]
     }
   },
   "files": [
@@ -35,6 +42,6 @@
   "include": ["core", "extensions", "typings"],
   "exclude": [
     "core/tests",
-    "core/templates/dev/head/google-analytics.initializer.ts"
+    "extensions/classifiers/proto"
   ]
 }

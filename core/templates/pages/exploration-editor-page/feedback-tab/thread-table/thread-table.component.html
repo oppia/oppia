@@ -1,0 +1,32 @@
+<style>
+  .oppia-feedback-tab-row {
+    cursor: pointer;
+  }
+  .oppia-feedback-tab-row:hover {
+    background: #eee;
+  }
+</style>
+<table class="table">
+  <thead>
+    <tr *ngIf="threads.length > 0">
+      <th>Status</th>
+      <th>Subject</th>
+      <th>Original author</th>
+      <th>Last updated</th>
+    </tr>
+  </thead>
+  <tr *ngFor="let thread of this.threads" (click)="onRowClick(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
+    <td width="15%">
+      <span [ngClass]="getLabelClass(thread.status)">{{ getHumanReadableStatus(thread.status)}}</span>
+    </td>
+    <td width="45%">
+      <div class="protractor-test-exploration-feedback-subject">{{thread.subject | truncate:40 }}</div>
+    </td>
+    <td width="20%">
+      <span *ngIf="thread.originalAuthorName">{{thread.originalAuthorName}}</span>
+    </td>
+    <td width="20%">
+      <span>{{getLocaleAbbreviatedDateTimeString(thread.lastUpdatedMsecs)}}</span>
+    </td>
+  </tr>
+</table>

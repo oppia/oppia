@@ -1,0 +1,127 @@
+<div class="practice-tab">
+  <div class="oppia-practice-tab-container">
+    <mat-card class="oppia-page-card oppia-long-text">
+      <h2 class="tab-title">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_MASTER_SKILLS' | translate: {topicName: topicName}"></span>
+      </h2>
+      <div class="practice-content">
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_SELECT_SKILLS' | translate: {topicName: topicName}"></span>
+      </div>
+      <mat-card-content>
+        <div *ngFor="let subtopic of availableSubtopics; let i = index" class="practice-tab-subtopic-item">
+          <mat-checkbox color="primary" class="practice-tab-mat-checkbox protractor-test-skill-checkbox" [(ngModel)]="selectedSubtopicIndices[i]"
+                        (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
+            {{ subtopic.getTitle() }}
+          </mat-checkbox>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <div class="fx-row fx-main-center fx-cross-center full-width">
+          <button mat-raised-button [disabled]="isStartButtonDisabled()" (click)="openNewPracticeSession()" class="practice-session-button protractor-test-practice-start-button">
+            <span *ngIf="questionsStatusCallIsComplete" class="font-heavy" [innerHTML]="'I18N_TOPIC_VIEWER_START_PRACTICE' | translate"></span>
+            <mat-spinner [diameter]="20" class="question-status-spinner" *ngIf="!questionsStatusCallIsComplete"></mat-spinner>
+          </button>
+        </div>
+        <div class="mt-3" *ngIf="questionsStatusCallIsComplete && !questionsAreAvailable && isAtLeastOneSubtopicSelected()">
+          <em class="text-danger">
+            There are no questions created yet for the selected subtopic(s).
+          </em>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
+<style>
+  .practice-tab .oppia-practice-tab-container .oppia-page-card {
+    border-radius: 0.25em;
+    margin-top: 10em;
+    padding-bottom: 7.5vh;
+    padding-left: 48px;
+    padding-right: 48px;
+    width: 550px;
+  }
+
+  .practice-tab .font-heavy {
+    font-size: medium;
+    font-weight: bold;
+    letter-spacing: 0.0625em;
+  }
+
+  .practice-tab .tab-title {
+    margin: .83em 0;
+  }
+
+  @media (max-width: 1024px) {
+    .practice-tab .oppia-practice-tab-container .oppia-page-card {
+      width: 60vw;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .practice-tab .oppia-practice-tab-container .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
+    }
+  }
+
+  .practice-tab .mat-button {
+    align-self: center;
+    border-radius: 0.4em;
+    color: white;
+    font-family: "Roboto", Arial, sans-serif;
+    margin-top: 20px;
+    text-transform: uppercase;
+    width: 200px;
+  }
+
+  .practice-tab .practice-tab-mat-checkbox .mat-label {
+    margin-top: -1px;
+    vertical-align: top;
+  }
+
+  .practice-tab .practice-session-button {
+    align-self: center;
+    background-color: #00645C;
+    border-radius: 0.4em;
+    color: white;
+    font-family: "Roboto", Arial, sans-serif;
+    height: 36px;
+    margin-top: 20px;
+    text-transform: uppercase;
+    width: 200px;
+  }
+
+  .practice-tab .practice-session-button:disabled {
+    background-color: rgba(0, 0, 0, .26);
+    box-shadow: none;
+    color: rgba(0, 0, 0, .26);
+  }
+
+  .practice-tab .practice-session-button .question-status-spinner {
+    margin: 0 auto;
+  }
+
+  .practice-tab .practice-tab-mat-checkbox {
+    margin-top: 1vh;
+  }
+
+  .practice-tab .full-width {
+    text-align: center;
+    width: 100%;
+  }
+
+  .practice-tab .practice-content {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 1.2em;
+    margin-bottom: 2.5vh;
+  }
+
+  .oppia-topic-viewer-container .background-banner-position {
+    position: inherit;
+  }
+
+  .practice-tab-subtopic-item {
+    margin: 5px 0;
+  }
+
+</style>

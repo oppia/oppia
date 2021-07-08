@@ -1,4 +1,4 @@
-<form ng-disabled="$ctrl.NumberWithUnitsForm.$invalid" ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal">
+<form autocomplete="off" ng-disabled="$ctrl.NumberWithUnitsForm.$invalid" ng-submit="$ctrl.submitAnswer($ctrl.answer)" role="form" class="form-horizontal">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <ng-form name="$ctrl.NumberWithUnitsForm" class="input">
     <input type="text" name="answer" ng-model="$ctrl.answer" class="form-control">

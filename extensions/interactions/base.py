@@ -40,7 +40,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import json
 
-from core.domain import obj_services
+from core.domain import object_registry
 from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
@@ -68,6 +68,10 @@ class BaseInteraction(python_utils.OBJECT):
     178 x 146 pixels. This image will be shown in the interaction selector.
     """
 
+    # NOTE TO DEVELOPERS: The property answer_calculation_ids() was removed in
+    # #13021 as part of the migration to Apache Beam. Please refer to that PR if
+    # you need to reinstate it.
+
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
     # A description of the interaction. Overridden in subclasses.
@@ -83,7 +87,7 @@ class BaseInteraction(python_utils.OBJECT):
     # Whether the interaction has only one possible answer.
     is_linear = False
     # Whether this interaction supports machine learning classification.
-    # TODO(chiangs): remove once classifier_services is generalized.
+    # TODO(chiangs): Remove once classifier_services is generalized.
     is_trainable = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
@@ -156,13 +160,6 @@ class BaseInteraction(python_utils.OBJECT):
         return result
 
     @property
-    def answer_calculation_ids(self):
-        """A set of answer calculation ids."""
-        visualizations = self.answer_visualizations
-        return set(
-            [visualization.calculation_id for visualization in visualizations])
-
-    @property
     def dependency_ids(self):
         """A copy of dependency ids of the interaction."""
         return copy.deepcopy(self._dependency_ids)
@@ -172,7 +169,7 @@ class BaseInteraction(python_utils.OBJECT):
         if self.answer_type is None:
             return None
         else:
-            return obj_services.Registry.get_object_class_by_type(
+            return object_registry.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
 
     @property

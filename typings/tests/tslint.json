@@ -1,0 +1,10 @@
+{
+  "extends": ["dtslint/dtslint.json"],
+  "rules": {
+    "no-useless-files": false,
+    "no-relative-import-in-test": false,
+    "import-spacing": false,
+    "no-empty-interface": false,
+    "no-consecutive-blank-lines": false
+  }
+}

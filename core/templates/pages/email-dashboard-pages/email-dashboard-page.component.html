@@ -1,0 +1,64 @@
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-10">
+        <md-card class="oppia-page-card oppia-long-text">
+          <form class="form-horizontal" ng-submit="$ctrl.submitQueryAsync()" name="form.schemaForm">
+            <legend>Email Dashboard</legend>
+            <div ng-repeat="customizationArgSpec in $ctrl.customizationArgSpecs track by $index">
+              <div class="d-xl-inline-flex form-group">
+                <label class="col-3 col-form-label" for="label-target-role-method">
+                  <[customizationArgSpec.description]>:
+                </label>
+                <div class="col-2">
+                  <schema-based-editor local-value="$ctrl.data[customizationArgSpec.backend_attr]"
+                                       schema="customizationArgSpec.schema"
+                                       not-required="true"
+                                       class="protractor-test-email-dashboard-input-{{ $index }}">
+                  </schema-based-editor>
+                </div>
+              </div>
+            </div>
+            <input type="submit"
+                   value="submit query"
+                   ng-disabled="form.schemaForm.$invalid || $ctrl.areAllInputsEmpty()"
+                   class="protractor-test-submit-query-button">
+            <input type="reset" value="reset" ng-click="$ctrl.resetForm()">
+          </form>
+        </md-card>
+      </div>
+    </div>
+  </div>
+  <p class="success" ng-if="$ctrl.showSuccessMessage">Query has been submitted successfully. Check recent queries below.</p>
+  <div class="oppia-recent-queries">
+    <p>Recent queries:</p>
+    <table class="table" ng-if="$ctrl.currentPageOfQueries.length > 0">
+      <thead>
+        <tr>
+          <td>Query id</td>
+          <td>Submitted on</td>
+          <td>Submitted by</td>
+          <td>Status</td>
+          <td>No. of qualified users</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="q in $ctrl.currentPageOfQueries track by $index">
+          <td><[q.id]></td>
+          <td><[q.createdOn]></td>
+          <td><[q.submitterUsername]></td>
+          <td class="protractor-test-status-{{ $index }}"><[q.status]></td>
+          <td class="protractor-test-number-of-users-{{ $index }}"><[q.numQualifiedUsers]></td>
+          <td><button ng-click="$ctrl.recheckStatus($index)" class="protractor-test-check-status-button-{{ $index }}">Re-check status</button></td>
+          <td ng-if="$ctrl.showLinkToResultPage(q.submitterUsername, q.status)">
+            <a ng-href="/emaildashboardresult/<[q.id]>">
+              <button class="btn btn-link">Result</button>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button ng-if="$ctrl.showPreviousButton()" ng-click="$ctrl.getPreviousPageOfQueries()">Previous</button>
+    <button ng-if="$ctrl.showNextButton()" ng-click="$ctrl.getNextPageOfQueries()">Next</button>
+  </div>
+</div>

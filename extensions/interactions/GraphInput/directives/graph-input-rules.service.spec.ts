@@ -18,9 +18,8 @@
 
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
-import { GraphUtilsService } from
-  'interactions/GraphInput/directives/graph-utils.service';
 import { TestBed } from '@angular/core/testing';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 describe('Graph Input service', () => {
   let girs: GraphInputRulesService = null;
@@ -28,161 +27,7 @@ describe('Graph Input service', () => {
     girs = TestBed.get(GraphInputRulesService);
   });
 
-  describe('graph utilities', () => {
-    let utils: GraphUtilsService = null;
-    beforeEach(() => {
-      utils = TestBed.get(GraphUtilsService);
-    });
-
-    it('should construct an adjacency matrix from a graph', () => {
-      expect(utils.constructAdjacencyMatrix({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      })).toEqual([
-        [null, 1, null],
-        [1, null, 2],
-        [null, 2, null]
-      ]);
-      expect(utils.constructAdjacencyMatrix({
-        vertices: [{
-          label: 'a',
-          x: 1.0,
-          y: 1.0
-        }, {
-          label: 'b',
-          x: 2.0,
-          y: 2.0
-        }, {
-          label: 'c',
-          x: 3.0,
-          y: 3.0
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }],
-        isDirected: false,
-        isWeighted: false,
-        isLabeled: true
-      })).toEqual([
-        [null, 1, null],
-        [1, null, 1],
-        [null, 1, null]
-      ]);
-    });
-
-    it('should find the next lexicographical permutation', () => {
-      let permutation: number[] = [0, 1, 2, 3];
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 1, 3, 2]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 2, 1, 3]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 2, 3, 1]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 3, 1, 2]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([0, 3, 2, 1]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 0, 2, 3]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 0, 3, 2]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 2, 0, 3]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 2, 3, 0]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 3, 0, 2]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([1, 3, 2, 0]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 0, 1, 3]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 0, 3, 1]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 1, 0, 3]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 1, 3, 0]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 3, 0, 1]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([2, 3, 1, 0]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 0, 1, 2]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 0, 2, 1]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 1, 0, 2]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 1, 2, 0]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 2, 0, 1]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toEqual([3, 2, 1, 0]);
-      permutation = utils.nextPermutation(permutation);
-      expect(permutation).toBe(null);
-    });
-
-    it('should compare adjacency matrices with a permutation', () => {
-      expect(utils.areAdjacencyMatricesEqualWithPermutation([
-        [null, 1, 1],
-        [2, null, 1],
-        [1, 1, null]
-      ], [
-        [null, 1, 1],
-        [2, null, 1],
-        [1, 1, null]
-      ], [0, 1, 2])).toBe(true);
-      expect(utils.areAdjacencyMatricesEqualWithPermutation([
-        [null, 1, 1],
-        [2, null, 1],
-        [1, 1, null]
-      ], [
-        [null, 1, null],
-        [2, null, 1],
-        [1, 1, null]
-      ], [0, 1, 2])).toBe(false);
-      expect(utils.areAdjacencyMatricesEqualWithPermutation([
-        [null, 1, 2],
-        [2, null, 1],
-        [1, 1, null]
-      ], [
-        [null, 1, 1],
-        [2, null, 1],
-        [1, 2, null]
-      ], [2, 0, 1])).toBe(true);
-    });
-  });
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedEmptyGraph = (): any => {
+  let undirectedEmptyGraph = (): GraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -191,8 +36,8 @@ describe('Graph Input service', () => {
       isLabeled: false
     };
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedNullGraph = (numVertices: number): any => {
+
+  let undirectedNullGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -203,8 +48,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedCycleGraph = (numVertices: number): any => {
+
+  let undirectedCycleGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;
@@ -218,8 +63,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedCompleteGraph = (numVertices: number): any => {
+
+  let undirectedCompleteGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 0; i < numVertices; i++) {
       for (var j = i + 1; j < numVertices; j++) {
@@ -232,8 +77,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let undirectedStarGraph = (numVertices: number): any => {
+
+  let undirectedStarGraph = (numVertices: number): GraphAnswer => {
     var graph = undirectedNullGraph(numVertices);
     for (var i = 1; i < numVertices; i++) {
       graph.edges.push({
@@ -244,8 +89,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let directedEmptyGraph = (): any => {
+
+  let directedEmptyGraph = (): GraphAnswer => {
     return {
       vertices: [],
       edges: [],
@@ -254,8 +99,8 @@ describe('Graph Input service', () => {
       isLabeled: false
     };
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let directedNullGraph = (numVertices: number): any => {
+
+  let directedNullGraph = (numVertices: number): GraphAnswer => {
     var graph = directedEmptyGraph();
     for (var i = 0; i < numVertices; i++) {
       graph.vertices.push({
@@ -266,8 +111,8 @@ describe('Graph Input service', () => {
     }
     return graph;
   };
-  // TODO(#7165): Replace 'any' with the exact type.
-  let directedCycleGraph = (numVertices: number): any => {
+
+  let directedCycleGraph = (numVertices: number): GraphAnswer => {
     var graph = directedNullGraph(numVertices);
     if (numVertices === 1) {
       return graph;
@@ -1262,6 +1107,99 @@ describe('Graph Input service', () => {
         isLabeled: false
       }, {
         p: 'regular'
+      })).toBe(false);
+    });
+  });
+
+  describe('\'is not strongly_connected, weakly_connected, acyclic' +
+  ' and regular\' rule', () => {
+    it('should return false for no rule', () => {
+      expect(girs.HasGraphProperty(undirectedEmptyGraph(), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedNullGraph(9), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedCompleteGraph(8), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedCycleGraph(3), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedCycleGraph(4), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty(undirectedStarGraph(4), {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty({
+        vertices: [{
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }],
+        isDirected: false,
+        isWeighted: false,
+        isLabeled: false
+      }, {
+        p: 'no_rule'
+      })).toBe(false);
+
+      expect(girs.HasGraphProperty({
+        vertices: [{
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }, {
+          label: '',
+          x: 0.0,
+          y: 0.0
+        }],
+        edges: [{
+          src: 0,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 2,
+          dst: 1,
+          weight: 1
+        }, {
+          src: 3,
+          dst: 1,
+          weight: 1
+        }],
+        isDirected: false,
+        isWeighted: false,
+        isLabeled: false
+      }, {
+        p: 'no_rule'
       })).toBe(false);
     });
   });

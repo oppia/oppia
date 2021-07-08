@@ -1,0 +1,159 @@
+<div class="donate-page">
+  <div class="oppia-page-card oppia-static-content protractor-test-donate-page">
+    <div class="oppia-donation-card-content-wide">
+      <div class="oppia-donate-options">
+        <div *ngIf="windowIsNarrow">
+          <h1 class="oppia-donate-h1">Donate to the <br>
+          Oppia Foundation</h1>
+        </div>
+        <div *ngIf="!windowIsNarrow">
+          <h1 class="oppia-donate-h1">Donate to <br>
+          The Oppia Foundation</h1>
+        </div>
+        <div class="text-center">
+          <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+            <button type="submit" class="btn oppia-donate-options-button protractor-test-paypal-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
+              PayPal
+            </button>
+          </form>
+        </div>
+        <div class="text-center">
+          <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
+            <button class="btn oppia-donate-options-button protractor-test-credit-card-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
+              Credit Card
+            </button>
+          </form>
+        </div>
+        <div class="text-center">
+          <a (click)="onDonateThroughAmazon()" class="btn oppia-donate-options-button" tabindex="0">Amazon Smile</a>
+        </div>
+        <h2 class="oppia-gift-funds-text">
+          Your generous gift funds:
+        </h2>
+        <div class="oppia-donate-img-container text-center">
+          <img [src]="donateImgUrl" alt="Server costs, student outreach, marketing">
+        </div>
+      </div>
+      <div class="oppia-donate-info">
+        <div class="position-relative oppia-meet-contributors-iframe-container">
+          <iframe title="Meet Oppia's Contributors"
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/OConyxG7HaM?rel=0&cc_lang_pref=en&cc_load_policy=1"
+                  frameborder="0"
+                  allowfullscreen
+                  class="position-absolute w-100 h-100 oppia-meet-contributors-iframe">
+          </iframe>
+        </div>
+        <h3 class="oppia-donate-h3"><em>Hear from our Oppia community</em></h3>
+        <div class="oppia-vision-text-container">
+          <p class="oppia-vision-text">
+            In 2012, Oppia started with a simple idea: to improve the education of
+            students around the world while improving the quality of teaching.
+            This vision has since turned into an educational platform with over
+            11,000 explorations that have been used by more than 430,000 users
+            worldwide.
+          </p>
+          <p class="oppia-vision-text">
+            Please donate to The Oppia Foundation, a registered 501(c)(3) nonprofit,
+            and join us in bringing the joys of teaching and learning to people
+            everywhere.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<style>
+  h1.oppia-donate-h1 {
+    color: #fff;
+    font-size: 1.5em;
+    line-height: 1.7em;
+    margin-top: 60px;
+    text-align: center;
+  }
+  h3.oppia-donate-h3 {
+    font-size: .80em;
+    font-weight: normal;
+    margin: 2.33em 0;
+    text-align: center;
+  }
+  .donate-page .oppia-donation-card-content-wide {
+    margin: 40px auto 80px;
+    min-height: 670px;
+    overflow: auto;
+  }
+  .donate-page .oppia-donate-options {
+    background-color: #009688;
+    display: block;
+    float: right;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    padding: 10px 10px 35px 10px;
+    width: 340px;
+  }
+  .donate-page .btn.oppia-donate-options-button {
+    background-color: #00645c;
+    border-radius: 4px;
+    color: rgba(255,255,255,1.0);
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    height: 40px;
+    letter-spacing: 0.7px;
+    margin: 10px auto;
+    width: 180px;
+  }
+  .donate-page .btn.oppia-donate-options-button:hover,
+  .donate-page .btn.oppia-donate-options-button:focus {
+    background-color: #3d9991;
+    color: rgba(255,255,255,1);
+  }
+  .donate-page .oppia-donate-info {
+    float: left;
+    padding-bottom: 30px;
+    width: calc(100% - 340px);
+  }
+  .donate-page .oppia-gift-funds-text {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+  .donate-page .oppia-donate-img-container {
+    margin-bottom: 16px;
+  }
+  .donate-page .oppia-meet-contributors-iframe-container {
+    height: 0;
+    margin: 60px auto 0 auto;
+    padding-bottom: 56.25%;
+    width: 70%;
+  }
+  .donate-page .oppia-meet-contributors-iframe {
+    left: 0;
+    top: 0;
+  }
+  .donate-page .oppia-vision-text-container {
+    margin: 0 auto;
+    width: 70%;
+  }
+  .donate-page .oppia-vision-text {
+    font-size: 0.825em;
+  }
+
+  @media only screen and (max-width: 1160px) {
+    .oppia-donation-card-content-wide {
+      display: flex;
+      flex-direction: row-reverse;
+      width: 100%;
+    }
+
+    .oppia-donate-info, .oppia-donate-options {
+      flex: 1;
+    }
+  }
+</style>

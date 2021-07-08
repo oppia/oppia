@@ -24,10 +24,10 @@ require(
   'logic-proof-validation.service.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'oppia-interactive-logic-proof.directive.ts');
+  'oppia-interactive-logic-proof.component.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'oppia-response-logic-proof.directive.ts');
+  'oppia-response-logic-proof.component.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'oppia-short-response-logic-proof.directive.ts');
+  'oppia-short-response-logic-proof.component.ts');

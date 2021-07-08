@@ -1,0 +1,142 @@
+<div>
+  <div class="skill-editor-main">
+    <div class="navbar-helper">
+      <div class="navbar-text">
+        Skill Editor
+      </div>
+      <div class="navbar-tabs navbar-icons">
+        <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'navbar-tab-active': $ctrl.getActiveTabName() === 'main'}"
+            ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
+            ng-click="$ctrl.selectMainTab()" class="navbar-tab nav-list-item">
+          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="protractor-test-main-tab">
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
+          </a>
+          <div ng-show="$ctrl.getWarningsCount()"
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
+            <span class="oppia-editor-warnings-count">
+              <[$ctrl.getWarningsCount()]>
+            </span>
+          </div>
+          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box skill-editor-warning-box" ng-if="$ctrl.warningsAreShown">
+            <span class="oppia-editor-warnings-header">Warnings</span>
+            <li class="oppia-editor-warnings-text"
+                ng-repeat="issue in $ctrl.skill.getValidationIssues() track by $index">
+              <hr class="oppia-editor-warnings-separator">
+              <[issue]>
+            </li>
+          </ul>
+        </li>
+        <li class="navbar-tab icon nav-list-item protractor-test-questions-tab"
+            ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}"
+            ng-click="$ctrl.selectQuestionsTab()">
+          <a uib-tooltip="Questions" tooltip-placement="bottom" aria-label="Questions">
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'questions'}">import_contacts</i>
+          </a>
+        </li>
+        <li class="navbar-tab icon nav-list-item" ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview'}" ng-click="$ctrl.selectPreviewTab()" >
+          <a class="nav-link" uib-tooltip="Preview" tooltip-placement="bottom" aria-label="Preview">
+            <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}">&#xE037;</i>
+          </a>
+        </li>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'main'">
+    <skill-editor-main-tab></skill-editor-main-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'questions'">
+    <questions-tab></questions-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'preview'">
+    <skill-preview-tab></skill-preview-tab>
+  </div>
+</div>
+
+
+<style>
+  .skill-editor-main .navbar-helper {
+    background-color: #00609C;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+    display: flex;
+    height: 70px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+    z-index: 10;
+  }
+
+  .skill-editor-main .navbar-text {
+    align-items: center;
+    color: #FFF;
+    display: flex;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px;
+    margin-left: 4%;
+    width: 35%;
+  }
+
+  .skill-editor-main .oppia-editor-warnings-box {
+    cursor: default;
+    max-width: none;
+  }
+
+  .skill-editor-main .navbar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .skill-editor-main .navbar-tab {
+    align-items: center;
+    display: flex;
+  }
+
+  .skill-editor-main .navbar-tab-icon {
+    color: #FFF;
+    display: block;
+    font-size: 30px;
+    width: 100%;
+  }
+
+  .skill-editor-main .navbar-tab span {
+    color: #333;
+    font-size: 12px;
+  }
+  .skill-editor-main .navbar-tab-active {
+    background-color: #e6e6e6;
+    box-shadow: 0 3px 2px 0 #e6e6e6;
+  }
+  .skill-editor-main .nav-list-item {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    width: 90px;
+  }
+  .skill-editor-main .navbar-icons .nav-list-item:hover {
+    background-color: #4eb0c0;
+  }
+  .skill-editor-warning-box {
+    display: block;
+    width: 250px;
+  }
+  .skill-editor-main .navbar-tab-active-icon {
+    color: #00609C;
+  }
+  @media screen and (max-width: 768px) {
+    .skill-editor-main .navbar-helper {
+      display: none;
+    }
+
+    .skill-editor-main .oppia-editor-warnings-box {
+      display: block;
+      width: 200px;
+  }
+  }
+</style>

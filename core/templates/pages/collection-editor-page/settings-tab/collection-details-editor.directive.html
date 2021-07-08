@@ -1,0 +1,80 @@
+<div role="form" class="form-horizontal">
+  <div class="form-group" ng-class="{'has-error': !$ctrl.displayedCollectionTitle}">
+    <label for="$ctrl.collectionTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <input id="$ctrl.collectionTitle" type="text" class="form-control"
+             ng-model="$ctrl.displayedCollectionTitle"
+             ng-blur="$ctrl.updateCollectionTitle()"
+             placeholder="Choose a title for your collection."
+             focus-on="<[::$ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL]>">
+    </div>
+  </div>
+
+  <div class="form-group" ng-class="{'has-error': !$ctrl.displayedCollectionObjective}">
+    <label for="$ctrl.collectionObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <input id="$ctrl.collectionObjective" type="text" class="form-control"
+             ng-model="$ctrl.displayedCollectionObjective"
+             ng-blur="$ctrl.updateCollectionObjective()"
+             placeholder="Learn how to ...">
+      <span class="form-text oppia-form-text">
+        What does this collection help people to do?
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group" ng-class="{'has-error': !$ctrl.displayedCollectionCategory}">
+    <label for="$ctrl.collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <div ng-if="$ctrl.hasPageLoaded()">
+        <select2-dropdown id="$ctrl.collectionCategory"
+                          item="$ctrl.displayedCollectionCategory"
+                          choices="$ctrl.CATEGORY_LIST_FOR_SELECT2"
+                          placeholder="Choose or type new"
+                          new-choice-regex="^[A-Z a-z]+$"
+                          on-selection-change="$ctrl.updateCollectionCategory()"
+                          width="100%"
+                          invalid-search-term-message="Invalid category name">
+        </select2-dropdown>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="$ctrl.collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <select id="$ctrl.collectionLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="$ctrl.displayedCollectionLanguage" ng-change="$ctrl.updateCollectionLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.languageListForSelect">
+      </select>
+      <span class="form-text oppia-form-text">
+        <em>
+          Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
+        </em>
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="$ctrl.collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <div ng-if="$ctrl.hasPageLoaded">
+        <select2-dropdown item="$ctrl.displayedCollectionTags"
+                          choices="$ctrl.displayedCollectionTags"
+                          allow-multiple-choices="true"
+                          invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+                          new-choice-regex="<[::$ctrl.TAG_REGEX]>"
+                          width="100%"
+                          placeholder="Skills, concepts, topics..."
+                          on-selection-change="$ctrl.updateCollectionTags()">
+        </select2-dropdown>
+      </div>
+      <span class="form-text oppia-form-text">
+        <em>Tags help learners discover your collection when searching.</em>
+      </span>
+    </div>
+  </div>
+</div>
+<style>
+  collection-details-editor .oppia-form-text {
+    font-size: smaller;
+  }
+</style>

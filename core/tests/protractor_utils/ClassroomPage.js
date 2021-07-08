@@ -17,23 +17,25 @@
  * in Protractor tests.
  */
 
-var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var ClassroomPage = function() {
-  var PAGE_URL_PREFIX = '/classroom/';
   var topicSummaryTiles = element.all(
     by.css('.protractor-test-topic-summary-tile'));
 
-  this.get = function(classroomName) {
-    browser.get(PAGE_URL_PREFIX + classroomName);
-    waitFor.pageToFullyLoad();
+  this.get = async function(classroomName) {
+    await browser.get('/learn/' + classroomName);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfTopicsToBe = function(count) {
-    topicSummaryTiles.then(function(topics) {
-      expect(topics.length).toEqual(count);
-    });
+  this.expectNumberOfTopicsToBe = async function(count) {
+    if (count > 0) {
+      await waitFor.visibilityOf(
+        topicSummaryTiles.first(), 'Topic summary tile is not visible');
+      expect(await topicSummaryTiles.count()).toEqual(count);
+    } else {
+      expect(await topicSummaryTiles.count()).toEqual(0);
+    }
   };
 };
 

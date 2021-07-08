@@ -16,11 +16,11 @@
  * @fileoverview Components used by the LogicProof interaction reader.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 
 var logicProofStudent = (function() {
-  // BUILD INSTANCE
+  // ---- BUILD INSTANCE ----
 
   // These evaluation rules must all return an object of their specified output
   // type (boolean, integer, string, formula or set_of_formulas) or throw an
@@ -352,7 +352,7 @@ var logicProofStudent = (function() {
         }
       },
       antecedents: {
-        // NOTE: assumes antecedents are given as formulas, not integers
+        // NOTE: assumes antecedents are given as formulas, not integers.
         format: 'bottom_up',
         evaluateExpression: function(args, types, evaluationParameters) {
           var line = evaluationParameters.proof.lines[args[0] - 1];
@@ -543,7 +543,7 @@ var logicProofStudent = (function() {
     };
   };
 
-  // BUILD PROOF
+  // ---- BUILD PROOF ----
 
   /**
    * This function identifies a way in which the expression is an instance of
@@ -587,7 +587,7 @@ var logicProofStudent = (function() {
           expression.dummies.length !== template.dummies.length) {
       throw new logicProofShared.UserError('unmatched_line', {});
     } else {
-      // For matching purposes arguments and dummies are equivalent
+      // For matching purposes arguments and dummies are equivalent.
       var subExpressions = expression.arguments.concat(expression.dummies);
       var subTemplates = template.arguments.concat(template.dummies);
       return matchExpressionArray(subExpressions, subTemplates, matchings);
@@ -678,7 +678,7 @@ var logicProofStudent = (function() {
    */
   var computeExpressionFromTemplate = function(template, matchings) {
     // E.g. template represents p[x -> a] and matchings represents
-    // {p: A(y), x: y, a: 2}
+    // {p: A(y), x: y, a: 2}.
     var newExpression = instantiateExpression(template.expression, matchings);
     var newSubstitutions = [];
     for (var i = 0; i < template.substitutions.length; i++) {
@@ -689,13 +689,13 @@ var logicProofStudent = (function() {
       }
       newSubstitutions.push(substitution);
     }
-    // E.g. now new_expression is A(y) and new_subsitutions represents [y -> 2]
+    // E.g. now new_expression is A(y) and new_subsitutions represents [y -> 2].
     for (var i = 0; i < newSubstitutions.length; i++) {
       newExpression = substituteIntoExpression(
         newExpression, newSubstitutions[i]);
     }
     return newExpression;
-    // E.g. result is A(2)
+    // E.g. result is A(2).
   };
 
   var computeExpressionsFromTemplateArray = function(templateArray, matchings) {
@@ -762,7 +762,7 @@ var logicProofStudent = (function() {
     // p' then matchings would end up as {p: A∧B}.
     var matchings = {};
 
-    // Check unsubstituted expressions agree
+    // Check unsubstituted expressions agree.
     if (protoLine.length !== template.length) {
       throw new logicProofShared.UserError('unmatched_line', {});
     }
@@ -855,12 +855,13 @@ var logicProofStudent = (function() {
    *           message: a string describing the problem
    *         }
    */
-  var requireIdentifiableLine = function(lineString, lineTemplates, language,
-      vocabulary, generalMessages) {
+  var requireIdentifiableLine = function(
+      lineString, lineTemplates, language, vocabulary, generalMessages) {
     try {
       var protoLines = logicProofShared.parseLineString(
         lineString.trim(), language.operators, vocabulary, false);
     } catch (err) {
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: logicProofShared.renderError(err, generalMessages, language)
       };
@@ -882,6 +883,7 @@ var logicProofStudent = (function() {
       }
     }
     if (!lineIdentified) {
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: errorMessage
       };
@@ -908,10 +910,12 @@ var logicProofStudent = (function() {
     for (var i = 0; i < lineStrings.length; i++) {
       if (lineStrings[i].split(' ').join('').length !== 0) {
         try {
-          requireIdentifiableLine(lineStrings[i],
-            questionInstance.line_templates, questionInstance.language,
-            questionInstance.vocabulary, questionInstance.general_messages);
+          requireIdentifiableLine(
+            lineStrings[i], questionInstance.line_templates,
+            questionInstance.language, questionInstance.vocabulary,
+            questionInstance.general_messages);
         } catch (err) {
+          // eslint-disable-next-line no-throw-literal
           throw {
             message: err.message,
             line: i
@@ -942,7 +946,7 @@ var logicProofStudent = (function() {
    *         of an invalid deduction.
    */
   var buildLine = function(lineString, lineTemplates, language, vocabulary) {
-    // Get list of possible parsings of line (usually there is only one)
+    // Get list of possible parsings of line (usually there is only one).
     var n = 0;
     while (lineString[n] === ' ') {
       n++;
@@ -961,9 +965,9 @@ var logicProofStudent = (function() {
     //    for a logically correct derivation. If we find one we return it
     //    immediately
     // 2. A correctly typed matching to an incorrect line template
-    // 3. An incorrectly typed matching to a line template
+    // 3. An incorrectly typed matching to a line template.
 
-    // Returns true iff error1 is a better attempt than error2
+    // Returns true iff error1 is a better attempt than error2.
     var _isBetterAttempt = function(error1, error2) {
       return error2 === undefined ||
         (error1.code === 'pre-rendered' && error2.code !== 'pre-rendered') ||
@@ -1025,7 +1029,7 @@ var logicProofStudent = (function() {
    */
   var buildProof = function(proofString, questionInstance) {
     var lineStrings = proofString.split('\n');
-    // Ignore blank lines at the end
+    // Ignore blank lines at the end.
     var lastLineNum = lineStrings.length - 1;
     while (lastLineNum > 0 &&
         lineStrings[lastLineNum].replace(/ /g, '').length === 0) {
@@ -1040,6 +1044,7 @@ var logicProofStudent = (function() {
             lineStrings[i], questionInstance.line_templates,
             questionInstance.language, questionInstance.vocabulary));
       } catch (err) {
+        // eslint-disable-next-line no-throw-literal
         throw {
           message: logicProofShared.renderError(
             err, questionInstance.general_messages, questionInstance.language),
@@ -1056,7 +1061,7 @@ var logicProofStudent = (function() {
     };
   };
 
-  // CHECK PROOF
+  // ---- CHECK PROOF ----
 
   /**
    * This function is a core component of the program - it takes an expression
@@ -1100,7 +1105,8 @@ var logicProofStudent = (function() {
         // Evaluate arguments (spec requires that the expression has no
         // dummies).
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' +
+          throw new Error(
+            'evaluate() received ' +
             expression.top_operator_name +
             ' to be evaluated via a definition but it has dummies');
         }
@@ -1109,7 +1115,8 @@ var logicProofStudent = (function() {
       } else if (evaluationRule.format === 'bottom_up') {
         // Evaluate arguments (spec requires that there are no dummies).
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' +
+          throw new Error(
+            'evaluate() received ' +
             expression.top_operator_name +
             ' to be evaluated bottom-up but it has dummies');
         }
@@ -1127,7 +1134,8 @@ var logicProofStudent = (function() {
         var answer = evaluationRule.evaluateExpression(
           argumentsList, types, evaluationRuleParameters);
       } else {
-        throw Error('Unknown evaluation rule format (' +
+        throw new Error(
+          'Unknown evaluation rule format (' +
           evaluationRule.format + ') sent to evaluate().');
       }
     }
@@ -1247,6 +1255,7 @@ var logicProofStudent = (function() {
                 section: questionInstance.mistake_table[i].name,
                 entry: mistake.name
               });
+              // eslint-disable-next-line no-throw-literal
             throw {
               message: logicProofShared.renderError(
                 error, questionInstance.general_messages,

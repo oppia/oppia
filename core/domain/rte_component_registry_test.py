@@ -27,7 +27,7 @@ import string
 import struct
 
 from constants import constants
-from core.domain import obj_services
+from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
 import feconf
@@ -95,8 +95,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 if ca_spec['schema']['obj_type'] == 'SanitizedUrl':
                     self.assertEqual(ca_spec['default_value'], '')
                 else:
-                    obj_class = obj_services.Registry.get_object_class_by_type(
-                        ca_spec['schema']['obj_type'])
+                    obj_class = (
+                        object_registry.Registry.get_object_class_by_type(
+                            ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
                         obj_class.normalize(ca_spec['default_value']))
@@ -165,10 +166,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(protractor_file))
 
             main_ts_file = os.path.join(
-                directives_dir, 'oppia-noninteractive-%s.directive.ts'
+                directives_dir, 'oppia-noninteractive-%s.component.ts'
                 % hyphenated_component_id)
             main_html_file = os.path.join(
-                directives_dir, '%s.directive.html' % hyphenated_component_id)
+                directives_dir, '%s.component.html'
+                % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
@@ -177,7 +179,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 'oppiaNoninteractive%s' % component_id, ts_file_content)
             self.assertNotIn('<script>', ts_file_content)
             self.assertNotIn('</script>', ts_file_content)
-
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
@@ -202,9 +203,13 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
+            # When reading for all the .ts files in the directives directory,
+            # the .spec.ts files should not be included.
             rtc_ts_filenames.extend(
                 filename for filename
-                in directive_filenames if filename.endswith('.ts'))
+                in directive_filenames if (
+                    filename.endswith('.ts') and
+                    not filename.endswith('.spec.ts')))
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')

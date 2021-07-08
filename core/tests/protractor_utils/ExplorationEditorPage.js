@@ -16,14 +16,17 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
+
+var action = require('./action');
+var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+
+var ExplorationEditorImprovementsTab = require(
+  '../protractor_utils/ExplorationEditorImprovementsTab.js');
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
   '../protractor_utils/ExplorationEditorHistoryTab.js');
-var ExplorationEditorImprovementsTab = require(
-  '../protractor_utils/ExplorationEditorImprovementsTab.js'
-);
 var ExplorationEditorMainTab = require(
   '../protractor_utils/ExplorationEditorMainTab.js');
 var ExplorationEditorSettingsTab = require(
@@ -39,15 +42,15 @@ var ExplorationEditorPage = function() {
   /*
    * Components
    */
+  this.getImprovementsTab = function() {
+    return (
+      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
+  };
   this.getFeedbackTab = function() {
     return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
   };
   this.getHistoryTab = function() {
     return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
-  };
-  this.getImprovementsTab = function() {
-    return new ExplorationEditorImprovementsTab
-      .ExplorationEditorImprovementsTab();
   };
   this.getMainTab = function() {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
@@ -75,19 +78,24 @@ var ExplorationEditorPage = function() {
     .first();
 
   /*
+   * Non-Interactive elements
+   */
+  var loadingModal = element(by.css('.protractor-test-loading-modal'));
+
+  /*
    * Buttons
    */
   var confirmDiscardChangesButton = element(
     by.css('.protractor-test-confirm-discard-changes'));
   var discardChangesButton = element(
     by.css('.protractor-test-discard-changes'));
+  var navigateToImprovementsTabButton = element(
+    by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
     by.css('.protractor-test-feedback-tab'));
   var navigateToHistoryTabButton = element(
     by.css('.protractor-test-history-tab'));
   var navigateToMainTabButton = element(by.css('.protractor-test-main-tab'));
-  var navigateToImprovementsTabButton = element(
-    by.css('.protractor-test-improvements-tab'));
   var navigateToPreviewTabButton = element(
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
@@ -98,20 +106,24 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
-  var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
+  var commitChangesButton = element(
+    by.css('.protractor-test-save-draft-button'));
+  var saveDraftButtonTextContainer = element(
+    by.css('.protractor-test-save-draft-message'));
+  var publishChangesButtonTextContainer = element(
+    by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
   /*
    * Workflows
    */
-  // CONTROLS
+  // ---- CONTROLS ----
 
-  this.publishCardExploration = function(
+  this.publishCardExploration = async function(
       title, objective, category, language, tags) {
-    waitFor.elementToBeClickable(publishExplorationButton,
-      'Publish button taking too long to be clickable.');
-    publishExplorationButton.click();
+    await action.waitForAutosave();
+    await action.click('Publish button', publishExplorationButton);
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -119,166 +131,196 @@ var ExplorationEditorPage = function() {
       '.protractor-test-exploration-objective-input'));
     var expTags = element(by.css('.protractor-test-tags'));
     var expInput = expTags.element(by.tagName('input'));
+    var expCategory = element(
+      by.css('.protractor-test-exploration-category-dropdown'));
+    var expLanguage = element(
+      by.css('.protractor-test-exploration-language-select'));
+    var neutralElement = element(
+      by.css('.protractor-test-metadata-modal-header'));
 
-    waitFor.elementToBeClickable(expTitle,
-      'Exploration Title input is taking too long to appear');
+    await action.sendKeys('Exploration title', expTitle, title);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    expTitle.sendKeys(title);
-    expObjective.sendKeys(objective);
+    await action.sendKeys('Exploration objective', expObjective, objective);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    element(by.css('.select2-container')).click();
-    element(by.css('.select2-dropdown')).element(
-      by.css('.select2-search input')).sendKeys(category + '\n');
+    await waitFor.presenceOf(
+      expCategory, 'Category input takes too long to be visible.');
+    await (
+      await forms.AutocompleteDropdownEditor(expCategory)
+    ).setValue(category);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    element(by.css('.protractor-test-exploration-language-select')).click();
-    element(by.css('.protractor-test-exploration-language-select'))
-      .sendKeys(language + '\n');
+    await action.select('Exploration Language', expLanguage, language);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
+    for (var elem of tags) {
+      await action.click('Exploration input', expInput);
+      await action.sendKeys('Exploration input', expInput, elem + '\n');
+      await action.click('Neutral Element', neutralElement);
+      await action.waitForAutosave();
+    }
 
-    expTags.click();
-    expInput.click();
-
-    tags.forEach(function(element) {
-      expInput.sendKeys(element, protractor.Key.ENTER);
-    });
-
-    const saveChangesButton = element(by.css(
+    var saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
-    waitFor.elementToBeClickable(saveChangesButton,
-      'Save changes button taking too long to be clickable');
-    saveChangesButton.click();
-
-    waitFor.visibilityOf(element(by.css('.modal-content')),
+    await action.click('Save Changes', saveChangesButton);
+    await waitFor.invisibilityOf(
+      saveChangesButton,
+      'Exploration metadata modal takes too long to disappear.');
+    await waitFor.visibilityOf(
+      element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
 
-    const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
-    waitFor.elementToBeClickable(confirmPublish,
-      'Confirm publish button taking too long to appear');
-    confirmPublish.click();
-
-    waitFor.visibilityOf(element(by.css(
+    var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
+    await action.click('Confirm Publish', confirmPublish);
+    await waitFor.invisibilityOf(
+      confirmPublish,
+      'Confirm publish modal takes too long to disappear.');
+    await waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
     'Awesome modal taking too long to appear');
 
-    const closeButton = element(by.css('.protractor-test-share-publish-close'));
-    waitFor.elementToBeClickable(closeButton,
-      'Close button taking too long to be clickable');
-    closeButton.click();
+    var closeButton = element(by.css('.protractor-test-share-publish-close'));
+    await action.click('Share publish button', closeButton);
+    await waitFor.invisibilityOf(
+      closeButton, 'Close button taking too long to disappear');
   };
 
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
-    const explorationTitle = element(by.css(
+    var explorationTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
-    const explorationObjective = element(by.css(
+    var explorationObjective = element(by.css(
       '.protractor-test-exploration-objective-input'
     ));
-    const explorationCategory = element(by.css(
+    var explorationCategory = await element(by.css(
       '.select2-selection__rendered')).getText();
-    const explorationLanguage = element(by.css(
+    var explorationLanguage = await element(by.css(
       '.protractor-test-exploration-language-select'
     )).$('option:checked').getText();
-    const explorationTags = element.all(by.css(
+    var explorationTags = element.all(by.css(
       '.select2-selection__choice'
     ));
-    waitFor.visibilityOf(explorationTitle,
-      'Exploration Goal taking too long to appear');
-    expect(explorationTitle.getAttribute('value')).toMatch(title);
+    await waitFor.visibilityOf(
+      explorationTitle, 'Exploration Goal taking too long to appear');
+    expect(await explorationTitle.getAttribute('value')).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    expect(explorationObjective.getAttribute('value')).toMatch(objective);
+    expect(await explorationObjective.getAttribute('value')).toMatch(objective);
     expect(explorationLanguage).toMatch(language);
-    explorationTags.then(function(elems) {
-      elems.forEach(function(explorationTag, index) {
-        expect(explorationTag.getText()).toMatch(tags[index]);
-      });
-    });
+    for (var i = 0; i < await explorationTags.count(); i++) {
+      expect(
+        await explorationTags.get(i).getText()
+      ).toMatch(tags[i]);
+    }
   };
 
-  this.saveChanges = function(commitMessage) {
-    var toastSuccessElement = element(by.css('.toast-success'));
-    expect(saveChangesButton.isDisplayed()).toBe(true);
-    saveChangesButton.click().then(function() {
-      if (commitMessage) {
-        commitMessageInput.sendKeys(commitMessage);
-      }
-      waitFor.elementToBeClickable(
-        saveDraftButton, 'Save Draft button is not clickable');
-      saveDraftButton.click();
-
-      // This is necessary to give the page time to record the changes,
-      // so that it does not attempt to stop the user leaving.
-      waitFor.invisibilityOf(
-        toastSuccessElement,
-        'Toast message taking too long to disappear after saving changes');
-      expect(toastSuccessElement.isPresent()).toBe(false);
-    });
+  this.saveChanges = async function(commitMessage) {
+    await action.waitForAutosave();
+    await action.click('Save changes button', saveChangesButton);
+    if (commitMessage) {
+      await action.sendKeys(
+        'Commit message input', commitMessageInput, commitMessage);
+    }
+    await action.click('Save draft button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      saveDraftButtonTextContainer, 'Save Draft',
+      'Changes could not be saved');
   };
 
-  this.discardChanges = function() {
-    saveDiscardToggleButton.click();
-    discardChangesButton.click();
-    confirmDiscardChangesButton.click();
+  this.publishChanges = async function(commitMessage) {
+    await action.waitForAutosave();
+    await action.click('Save changes button', saveChangesButton);
+    await action.sendKeys(
+      'Commit message input', commitMessageInput, commitMessage);
+    await action.click('Publish changes button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      publishChangesButtonTextContainer, 'Publish Changes',
+      'Changes could not be saved');
+  };
+
+  this.discardChanges = async function() {
+    await action.waitForAutosave();
+    await action.click('Save Discard Toggle button', saveDiscardToggleButton);
+    await action.click('Discard Changes button', discardChangesButton);
+    await action.click(
+      'Confirm Discard Changes button', confirmDiscardChangesButton);
+    await waitFor.invisibilityOf(
+      loadingModal, 'Loading modal taking too long to disappear');
+    await waitFor.invisibilityOfInfoToast(
+      'Changes take too long to be discarded.');
     // Expect editor page to completely reload.
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   };
 
-  this.expectCannotSaveChanges = function() {
-    expect(saveChangesButton.isPresent()).toBeFalsy();
+  this.expectCannotSaveChanges = async function() {
+    await action.waitForAutosave();
+    expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
-  // NAVIGATION
-
-  this.navigateToHistoryTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToHistoryTabButton, 'History tab is not clickable');
-    navigateToHistoryTabButton.click();
-    waitFor.pageToFullyLoad();
+  this.expectCanPublishChanges = async function() {
+    await action.waitForAutosave();
+    expect(await publishExplorationButton.isEnabled()).toBeTrue();
   };
 
-  this.navigateToFeedbackTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToFeedbackTabButton, 'Feedback tab is not clickable');
-    navigateToFeedbackTabButton.click();
-    waitFor.pageToFullyLoad();
+  this.expectCannotPublishChanges = async function() {
+    await action.waitForAutosave();
+    expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
-  this.navigateToImprovementsTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToImprovementsTabButton, 'Improvements tab is not clickable');
-    navigateToImprovementsTabButton.click();
-    waitFor.pageToFullyLoad();
+  // ---- NAVIGATION ----
+
+  this.navigateToImprovementsTab = async function() {
+    await action.click(
+      'Improvements tab button', navigateToImprovementsTabButton);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToMainTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToMainTabButton, 'Main tab is not clickable');
-    navigateToMainTabButton.click();
-    neutralElement.click();
+  this.navigateToHistoryTab = async function() {
+    await action.click('History tab button', navigateToHistoryTabButton);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToPreviewTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToPreviewTabButton, 'Preview tab is not clickable');
-    navigateToPreviewTabButton.click();
-    waitFor.pageToFullyLoad();
+  this.navigateToFeedbackTab = async function() {
+    await action.click('Feedback tab button', navigateToFeedbackTabButton);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSettingsTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToSettingsTabButton, 'Settings tab is not clickable');
-    navigateToSettingsTabButton.click();
+  this.navigateToMainTab = async function() {
+    await action.waitForAutosave();
+    await action.click('Main tab button', navigateToMainTabButton);
+    await action.click('Neutral element', neutralElement);
+    await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToStatsTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToStatsTabButton, 'Stats tab is not clickable');
-    navigateToStatsTabButton.click();
+  this.navigateToPreviewTab = async function() {
+    await action.click('Preview tab button', navigateToPreviewTabButton);
+    await waitFor.pageToFullyLoad();
   };
-  this.navigateToTranslationTab = function() {
-    waitFor.elementToBeClickable(
-      navigateToTranslationTabButton, 'Translation tab is not clickable');
-    navigateToTranslationTabButton.click();
-    waitFor.pageToFullyLoad();
+
+  this.navigateToSettingsTab = async function() {
+    await action.click('Settings tab button', navigateToSettingsTabButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToStatsTab = async function() {
+    await action.click('Statistics tab button', navigateToStatsTabButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.navigateToTranslationTab = async function() {
+    await action.click(
+      'Translation tab button', navigateToTranslationTabButton);
+    await waitFor.pageToFullyLoad();
   };
 };
 

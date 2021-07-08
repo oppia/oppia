@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import suggestion_registry
 from core.domain import user_services
@@ -39,7 +40,7 @@ def _get_voiceover_application_class(target_type):
         class. The voiceover application class for the given target type.
 
     Raises:
-        Exception: The voiceover application target type is invalid.
+        Exception. The voiceover application target type is invalid.
     """
     target_type_to_classes = (
         suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
@@ -115,6 +116,8 @@ def _save_voiceover_applications(voiceover_applications):
             voiceover_application)
         voiceover_application_models.append(voiceover_application_model)
 
+    suggestion_models.GeneralVoiceoverApplicationModel.update_timestamps_multi(
+        voiceover_application_models)
     suggestion_models.GeneralVoiceoverApplicationModel.put_multi(
         voiceover_application_models)
 
@@ -190,7 +193,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    reviewer = user_services.get_user_actions_info(reviewer_id)
 
     voiceover_application.accept(reviewer_id)
 
@@ -199,7 +202,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         rights_manager.assign_role_for_exploration(
             reviewer, voiceover_application.target_id,
-            voiceover_application.author_id, rights_manager.ROLE_VOICE_ARTIST)
+            voiceover_application.author_id, rights_domain.ROLE_VOICE_ARTIST)
         opportunity_services.update_exploration_voiceover_opportunities(
             voiceover_application.target_id,
             voiceover_application.language_code)
@@ -208,7 +211,7 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
                 voiceover_application.target_id]))
         email_manager.send_accepted_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[0].chapter_title,
+            opportunities[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
@@ -249,7 +252,7 @@ def reject_voiceover_application(
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    reviewer = user_services.get_user_actions_info(reviewer_id)
 
     voiceover_application.reject(reviewer.user_id, rejection_message)
     _save_voiceover_applications([voiceover_application])
@@ -260,7 +263,7 @@ def reject_voiceover_application(
                 voiceover_application.target_id]))
         email_manager.send_rejected_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[0].chapter_title,
+            opportunities[voiceover_application.target_id].chapter_title,
             voiceover_application.language_code, rejection_message)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.

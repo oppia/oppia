@@ -1,0 +1,209 @@
+<div>
+  <div class="skill-editor-preview">
+    <div class="content-box">
+      <div class="question-filter-box">
+        <div><span class="headings">Selection</span></div>
+        <div class="question-box">
+          <div><span class="heading-secondary">Questions</span></div>
+          <div ng-if="$ctrl.questionsFetched">
+            <div class="question-filters">
+              <input type="text" ng-model="$ctrl.questionTextFilter" ng-change="$ctrl.applyFilters()">
+              <select ng-model="$ctrl.interactionFilter"
+                      class="form-control"
+                      ng-change="$ctrl.applyFilters()"
+                      ng-options="interaction for interaction in $ctrl.ALLOWED_QUESTION_INTERACTIONS">
+              </select>
+            </div>
+            <div ng-repeat="question in $ctrl.displayedQuestions track by $index" class="question-list-item">
+              <div ng-click="$ctrl.selectQuestionToPreview($index)">
+                <div class="question-data">
+                  <angular-html-bind class="question-text" html-data="question.question_state_data.content.html"></angular-html-bind>
+                  <span ng-if="question.question_state_data.interaction.id==='TextInput'">
+                    <["Text Input"]>
+                  </span>
+                  <span ng-if="question.question_state_data.interaction.id==='ItemSelectionInput'">
+                    <["Item Selection"]>
+                  </span>
+                  <span ng-if="question.question_state_data.interaction.id==='MultipleChoiceInput'">
+                    <["Multiple Choice"]>
+                  </span>
+                  <span ng-if="question.question_state_data.interaction.id==='NumericInput'">
+                    <["Numeric Input"]>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="skill-description-box">
+          <div class="skill-description">
+            <div class="content-text-box">
+              <span class="heading-secondary">
+                Content
+              </span>
+            </div>
+            <div ng-if="$ctrl.htmlData">
+              <angular-html-bind html-data="$ctrl.htmlData">
+              </angular-html-bind>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="seperator-block">
+        <div class="seperator"></div>
+      </div>
+      <div class="skill-question-container">
+        <div><span class="headings">Preview</span></div>
+        <div class="preview-box" ng-if="$ctrl.displayCardIsInitialized">
+          <tutor-card displayed-card="$ctrl.displayedCard"
+                      avatar-image-is-shown="false"
+                      is-learn-again-button="$ctrl.isLearnAgainButton()"
+                      start-card-change-animation="false">
+          </tutor-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .skill-editor-preview .content-box {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  .skill-editor-preview .question-filter-box {
+    width: 25%;
+  }
+
+  .skill-editor-preview .seperator-block {
+    text-align: center;
+    width: 10%;
+  }
+
+  .skill-editor-preview .seperator {
+    background-color: #707070;
+    display: inline-block;
+    height: 60vh;
+    width: 2px;
+  }
+
+  .skill-editor-preview .content-heading {
+    border-bottom: 1px solid #707070;
+    width: 100%;
+  }
+
+  .skill-editor-preview .question-box {
+    background-color: #FFF;
+    border-radius: 7px;
+    height: 250px;
+    margin-top: 20px;
+    overflow-y: scroll;
+    padding: 30px;
+  }
+
+  .skill-editor-preview .skill-description-box {
+    margin-top: 30px;
+  }
+
+  .skill-editor-preview .skill-description {
+    background-color: #FFF;
+    border-radius: 7px;
+    padding: 30px;
+  }
+
+  .skill-editor-preview .skill-question-container {
+    width: 40%;
+  }
+
+  .skill-editor-preview .question-text {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 60%;
+  }
+
+  .skill-editor-preview .question-data {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .skill-editor-preview .question-filters {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .skill-editor-preview .question-filters input {
+    width: 60%;
+  }
+
+  .skill-editor-preview .question-filters select {
+    width: 38%;
+  }
+
+  .skill-editor-preview .preview-box {
+    margin-top: -40px;
+    padding: 30px 0;
+  }
+
+  .skill-editor-preview .content-text-box {
+    border-bottom: 2px solid #707070;
+    margin-bottom: 15px;
+  }
+
+  .skill-editor-preview .question-list-item {
+    border-bottom: 1px solid #e6e6e6;
+    margin: 12px 0;
+  }
+
+  .skill-editor-preview .headings {
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  .skill-editor-preview .heading-secondary {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  @media screen and (max-width: 1250px) {
+    .skill-editor-preview .question-filter-box {
+      width: 35%;
+    }
+
+    .skill-editor-preview .skill-question-container {
+      width: 45%;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    .skill-editor-preview .seperator-block {
+      width: 5%;
+    }
+  }
+
+  @media screen and (max-width: 700px) {
+    .skill-editor-preview .question-filter-box {
+      width: 90%;
+    }
+
+    .skill-editor-preview .seperator-block,
+    .skill-editor-preview .skill-description-box {
+      display: none;
+    }
+
+    .skill-editor-preview .skill-question-container {
+      margin: 0;
+      width: 90%;
+    }
+  }
+</style>

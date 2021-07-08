@@ -19,20 +19,30 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { FractionAnswer } from 'interactions/answer-defs';
+import { Fraction } from 'domain/objects/fraction.model';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';
+import { Warning } from 'services/alerts.service';
+import { FractionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+
+interface FractionWarning {
+  type: string;
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class FractionInputValidationService {
   constructor(
-    private fof: FractionObjectFactory,
     private bivs: baseInteractionValidationService) {}
 
-  getNonIntegerInputWarning(i, j) {
+  getNonIntegerInputWarning(i: number, j: number): FractionWarning {
     return {
       type: AppConstants.WARNING_TYPES.ERROR,
       message: (
@@ -41,11 +51,13 @@ export class FractionInputValidationService {
         'integer.')
     };
   }
-  getCustomizationArgsWarnings(customizationArgs) {
+  getCustomizationArgsWarnings(
+      customizationArgs: FractionInputCustomizationArgs): Warning[] {
     return [];
   }
   getAllWarnings(
-      stateName, customizationArgs, answerGroups, defaultOutcome) {
+      stateName: string, customizationArgs: FractionInputCustomizationArgs,
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var warningsList = [];
     var shouldBeInSimplestForm =
       customizationArgs.requireSimplestForm.value;
@@ -58,7 +70,7 @@ export class FractionInputValidationService {
       this.getCustomizationArgsWarnings(customizationArgs));
 
     var toFloat = function(fraction) {
-      return this.fof.fromDict(fraction).toFloat();
+      return Fraction.fromDict(fraction).toFloat();
     };
     /**
      * Store an answer range for every rule, then check for redundant
@@ -112,8 +124,8 @@ export class FractionInputValidationService {
       for (var j = 0; j < rules.length; j++) {
         var rule = rules[j];
         var range = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           lb: null,
           ub: null,
           lbi: false,
@@ -121,18 +133,18 @@ export class FractionInputValidationService {
         };
 
         var matchedDenominator = {
-          answerGroupIndex: i + 1,
-          ruleIndex: j + 1,
+          answerGroupIndex: i,
+          ruleIndex: j,
           denominator: null,
         };
 
         switch (rule.type) {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
-              var fraction: any = rule.inputs.f;
-              var fractionInSimplestForm = this.fof.fromDict(
-                fraction).convertToSimplestForm();
-              if (!angular.equals(fraction, fractionInSimplestForm)) {
+              var fractionDict = <FractionAnswer> rule.inputs.f;
+              var fractionInSimplestForm = Fraction.fromDict(
+                fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message: (
@@ -144,7 +156,8 @@ export class FractionInputValidationService {
               }
             }
             if (!allowImproperFraction) {
-              var fraction: any = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = Fraction.fromDict(
+                <FractionAnswer> rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -157,7 +170,8 @@ export class FractionInputValidationService {
               }
             }
             if (!allowNonzeroIntegerPart) {
-              var fraction: any = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = Fraction.fromDict(
+                <FractionAnswer> rule.inputs.f);
               if (fraction.hasNonzeroIntegerPart()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -172,7 +186,7 @@ export class FractionInputValidationService {
             var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
-          case 'IsEquivalentTo': // fall-through
+          case 'IsEquivalentTo': // fall-through.
           case 'IsEquivalentToAndInSimplestForm':
             var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, f, true, true);
@@ -221,7 +235,7 @@ export class FractionInputValidationService {
             matchedDenominator.denominator = rule.inputs.x;
             break;
           case 'HasFractionalPartExactlyEqualTo':
-            if (rule.inputs.f.wholeNumber !== 0) {
+            if ((<FractionAnswer> rule.inputs.f).wholeNumber !== 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -230,7 +244,7 @@ export class FractionInputValidationService {
                   ' is invalid as integer part should be zero')
               });
             }
-            if (rule.inputs.f.isNegative !== false) {
+            if ((<FractionAnswer> rule.inputs.f).isNegative !== false) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -240,7 +254,8 @@ export class FractionInputValidationService {
               });
             }
             if (!allowImproperFraction) {
-              var fraction: any = this.fof.fromDict(rule.inputs.f);
+              var fraction: Fraction = Fraction.fromDict(
+                <FractionAnswer> rule.inputs.f);
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -257,16 +272,16 @@ export class FractionInputValidationService {
         }
         for (var k = 0; k < ranges.length; k++) {
           if (isEnclosedBy(range, ranges[k])) {
-            var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
-              .rules[ranges[k].ruleIndex - 1];
+            var earlierRule = answerGroups[ranges[k].answerGroupIndex]
+              .rules[ranges[k].ruleIndex];
             if (shouldCheckRangeCriteria(earlierRule, rule)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by rule ' + ranges[k].ruleIndex +
-                  ' from answer group ' + ranges[k].answerGroupIndex +
+                  'is made redundant by rule ' + (ranges[k].ruleIndex + 1) +
+                  ' from answer group ' + (ranges[k].answerGroupIndex + 1) +
                   '.')
               });
             }
@@ -277,16 +292,16 @@ export class FractionInputValidationService {
           if (matchedDenominators[k].denominator !== null &&
             rule.type === 'HasFractionalPartExactlyEqualTo') {
             if (matchedDenominators[k].denominator ===
-              rule.inputs.f.denominator) {
+              (<FractionAnswer> rule.inputs.f).denominator) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' from answer group ' +
                   (i + 1) + ' will never be matched because it ' +
                   'is made redundant by rule ' +
-                  matchedDenominators[k].ruleIndex +
+                  (matchedDenominators[k].ruleIndex + 1) +
                   ' from answer group ' +
-                  matchedDenominators[k].answerGroupIndex + '.')
+                  (matchedDenominators[k].answerGroupIndex + 1) + '.')
               });
             }
           }

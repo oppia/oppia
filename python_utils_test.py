@@ -38,13 +38,13 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     Python 3.
     """
 
-    def test_get_args_of_function(self):
+    def test_get_args_of_function_node(self):
         function_txt = b"""def _mock_function(arg1, arg2):
                       pass"""
 
         ast_node = ast.walk(ast.parse(function_txt))
         function_node = [n for n in ast_node if isinstance(n, ast.FunctionDef)]
-        args_list = python_utils.get_args_of_function(function_node[0], [])
+        args_list = python_utils.get_args_of_function_node(function_node[0], [])
         self.assertEqual(args_list, ['arg1', 'arg2'])
 
     def test_open_file(self):
@@ -103,22 +103,42 @@ class PythonUtilsTests(test_utils.GenericTestBase):
     def test_with_metaclass(self):
         class BaseForm(python_utils.OBJECT):
             """Test baseclass."""
+
             pass
 
         class FormType1(type):
             """Test metaclass."""
+
             pass
 
         class FormType2(type):
             """Test metaclass."""
+
             pass
 
         class Form(python_utils.with_metaclass(FormType1, BaseForm)): # pylint: disable=inherit-non-class
             """Test class."""
+
             pass
 
         self.assertTrue(isinstance(Form, FormType1))
         self.assertFalse(isinstance(Form, FormType2))
+        self.assertTrue(issubclass(Form, BaseForm))
+
+    def test_with_metaclass_without_bases(self):
+        class FormType(type):
+            """Test metaclass."""
+
+            pass
+
+        class Form(python_utils.with_metaclass(FormType)): # pylint: disable=inherit-non-class
+            """Test class."""
+
+            def __init__(self):
+                pass
+
+        self.assertTrue(isinstance(Form, FormType))
+        self.assertTrue(issubclass(Form, python_utils.OBJECT))
 
     def test_convert_to_bytes(self):
         string1 = 'Home'
@@ -224,6 +244,48 @@ class PythonUtilsTests(test_utils.GenericTestBase):
                 self.assertEqual(type(k), unicode)
                 self.assertEqual(type(v), bytes)
 
+    def test_is_string(self):
+        self.assertTrue(python_utils.is_string('abc'))
+        self.assertFalse(python_utils.is_string(123))
+        self.assertFalse(python_utils.is_string(['a', 'b', 'c']))
+
+    def test_get_args_of_function(self):
+        def func(a, b, *c, **d): # pylint: disable=unused-argument
+            """Does nothing."""
+            pass
+        self.assertEqual(
+            python_utils.get_args_of_function(func), ['a', 'b'])
+
+    def test_create_enum_method_and_check_its_values(self):
+        """Test create_enum method."""
+        enums = python_utils.create_enum('first', 'second', 'third')
+        self.assertEqual(enums.first.value, 'first')
+        self.assertEqual(enums.second.value, 'second')
+        self.assertEqual(enums.third.value, 'third')
+
+    def test_create_enum_method_and_check_its_names(self):
+        """Test create_enum method."""
+        enums = python_utils.create_enum('first', 'second', 'third')
+        self.assertEqual(enums.first.name, 'first')
+        self.assertEqual(enums.second.name, 'second')
+        self.assertEqual(enums.third.name, 'third')
+
+    def test_enum_for_invalid_attribute(self):
+        enums = python_utils.create_enum('first', 'second', 'third')
+        with self.assertRaisesRegexp(AttributeError, 'fourth'):
+            getattr(enums, 'fourth')
+
+    def test_zip_longest(self):
+        self.assertEqual(
+            [list(g) for g in python_utils.zip_longest(
+                [0, 1, 2, 3], [4, 5, 6], [7, 8])],
+            [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
+        # Zip longest with fillvalue.
+        self.assertEqual(
+            [''.join(g) for g in python_utils.zip_longest(
+                'ABC', 'DE', 'F', fillvalue='x')],
+            ['ADF', 'BEx', 'Cxx'])
+
 
 @unittest.skipUnless(
     sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')
@@ -246,6 +308,7 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
             'core/tests/data/unicode_and_str_handler.py', 'r') as f:
             file_content = f.read()
             self.assertIsInstance(file_content, python_utils.UNICODE)
+
 
 @unittest.skipUnless(
     sys.version[0] == '3', 'Test cases for ensuring Python 3 behavior only')

@@ -83,7 +83,7 @@ export class PythonProgramTokenizer {
   // Tail end of """ string.
   private double3 = '[^"\\\\]*(?:(?:\\\\.|"(?!""))[^"\\\\]*)*"""';
   private triple = this.groupOfRegEx("[uUbB]?[rR]?'''", '[uUbB]?[rR]?"""');
-  // single-line ' or " string.
+  // Single-line ' or " string.
   private str = this.groupOfRegEx(
     "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'",
     '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*"');
@@ -119,7 +119,7 @@ export class PythonProgramTokenizer {
   private single3prog = new RegExp(this.single3);
   private double3prog = new RegExp(this.double3);
 
-  private endprogs = {
+  private endprogs: Record<string, RegExp | null> = {
     "'": new RegExp(this.single), '"': new RegExp(this.doubleQuote),
     "'''": this.single3prog, '"""': this.double3prog,
     "r'''": this.single3prog, 'r"""': this.double3prog,
@@ -153,9 +153,8 @@ export class PythonProgramTokenizer {
 
   private tabsize = 8;
 
-  generateTokens(program: string[]): any[] {
+  generateTokens(program: string[]): string[][] {
     const tokenizedProgram = [];
-    const lnum = 0;
     let parenlev = 0;
     let continued = 0;
     const namechars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
@@ -176,14 +175,15 @@ export class PythonProgramTokenizer {
       let pos = 0;
       const max = line.length;
 
-      let endmatch: { length: number; }[];
       if (contstr) {
         if (!line) {
           // Exception.
           this.loggerService.error('EOF in multi-line string');
         }
-
-        let endmatch = endprog.exec(line);
+        let endmatch;
+        if (endprog !== null) {
+          endmatch = endprog.exec(line);
+        }
         if (endmatch && endmatch.index === 0) {
           this.token = endmatch[0];
           pos = pos + this.token.length;
@@ -298,8 +298,11 @@ export class PythonProgramTokenizer {
                 [this.PythonProgramTokenType.COMMENT, token]);
             }
           } else if (this.tripleQuoted.indexOf(token) !== -1) {
-            endprog = this.endprogs[token];
-            endmatch = endprog.exec(line.slice(pos));
+            let endprog = this.endprogs[token];
+            let endmatch;
+            if (endprog !== null) {
+              endmatch = endprog.exec(line.slice(pos));
+            }
             // All on one line.
             if (endmatch) {
               pos = pos + endmatch[0].length;
@@ -330,7 +333,7 @@ export class PythonProgramTokenizer {
                 [this.PythonProgramTokenType.STRING, token]);
             }
           } else if (namechars.indexOf(initial) !== -1) {
-            // Ordinary name
+            // Ordinary name.
             tokenizedProgram.push([this.PythonProgramTokenType.NAME, token]);
           } else if (initial === '\\') {
             // Continued statement.
@@ -351,7 +354,8 @@ export class PythonProgramTokenizer {
       }
     }
 
-    // Pop remaining indent levels
+    // Pop remaining indent levels.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (let indent in indents.slice(1)) {
       tokenizedProgram.push([this.PythonProgramTokenType.DEDENT, '']);
     }

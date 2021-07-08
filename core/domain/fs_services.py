@@ -19,18 +19,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
 from core.domain import fs_domain
+from core.domain import image_services
 from core.platform import models
 import feconf
+import utils
 
-gae_image_services = models.Registry.import_gae_image_services()
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 def save_original_and_compressed_versions_of_image(
         filename, entity_type, entity_id, original_image_content,
-        filename_prefix):
+        filename_prefix, image_is_compressible):
     """Saves the three versions of the image file.
 
     Args:
@@ -39,6 +39,8 @@ def save_original_and_compressed_versions_of_image(
         entity_id: str. The id of the entity.
         original_image_content: str. The content of the original image.
         filename_prefix: str. The string to prefix to the filename.
+        image_is_compressible: bool. Whether the image can be compressed or
+            not.
     """
     filepath = '%s/%s' % (filename_prefix, filename)
 
@@ -58,11 +60,17 @@ def save_original_and_compressed_versions_of_image(
     fs = fs_domain.AbstractFileSystem(file_system_class(
         entity_type, entity_id))
 
-    compressed_image_content = gae_image_services.compress_image(
-        original_image_content, 0.8)
-    micro_image_content = gae_image_services.compress_image(
-        original_image_content, 0.7)
+    if image_is_compressible:
+        compressed_image_content = image_services.compress_image(
+            original_image_content, 0.8)
+        micro_image_content = image_services.compress_image(
+            original_image_content, 0.7)
+    else:
+        compressed_image_content = original_image_content
+        micro_image_content = original_image_content
 
+    mimetype = (
+        'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
     # Because in case of CreateVersionsOfImageJob, the original image is
     # already there. Also, even if the compressed, micro versions for some
     # image exists, then this would prevent from creating another copy of
@@ -70,55 +78,36 @@ def save_original_and_compressed_versions_of_image(
     if not fs.isfile(filepath.encode('utf-8')):
         fs.commit(
             filepath.encode('utf-8'), original_image_content,
-            mimetype='image/%s' % filetype)
+            mimetype=mimetype)
 
     if not fs.isfile(compressed_image_filepath.encode('utf-8')):
         fs.commit(
             compressed_image_filepath.encode('utf-8'),
-            compressed_image_content, mimetype='image/%s' % filetype)
+            compressed_image_content, mimetype=mimetype)
 
     if not fs.isfile(micro_image_filepath.encode('utf-8')):
         fs.commit(
             micro_image_filepath.encode('utf-8'),
-            micro_image_content, mimetype='image/%s' % filetype)
+            micro_image_content, mimetype=mimetype)
 
 
-def save_classifier_data(exp_id, job_id, classifier_data):
+def save_classifier_data(exp_id, job_id, classifier_data_proto):
     """Store classifier model data in a file.
 
     Args:
         exp_id: str. The id of the exploration.
         job_id: str. The id of the classifier training job model.
-        classifier_data: dict. Classifier data to be stored.
+        classifier_data_proto: Object. Protobuf object of the classifier data
+            to be stored.
     """
-    filepath = '%s-classifier-data.json' % (job_id)
+    filepath = '%s-classifier-data.pb.xz' % (job_id)
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    content = utils.compress_to_zlib(
+        classifier_data_proto.SerializeToString())
     fs.commit(
-        filepath, json.dumps(classifier_data),
-        mimetype='application/json')
-
-
-def read_classifier_data(exp_id, job_id):
-    """Read the classifier data from file.
-
-    Args:
-        exp_id: str. The id of the exploration.
-        job_id: str. The id of the classifier training job model.
-
-    Returns:
-        dict|None. The classifier data read from the file. Returns None
-            if no classifier data is stored for the given job.
-    """
-    filepath = '%s-classifier-data.json' % (job_id)
-    file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(
-        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-    if not fs.isfile(filepath):
-        return None
-    classifier_data = fs.get(filepath)
-    return json.loads(classifier_data)
+        filepath, content, mimetype='application/octet-stream')
 
 
 def delete_classifier_data(exp_id, job_id):
@@ -128,11 +117,12 @@ def delete_classifier_data(exp_id, job_id):
         exp_id: str. The id of the exploration.
         job_id: str. The id of the classifier training job model.
     """
-    filepath = '%s-classifier-data.json' % (job_id)
+    filepath = '%s-classifier-data.pb.xz' % (job_id)
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-    fs.delete(filepath)
+    if fs.isfile(filepath):
+        fs.delete(filepath)
 
 
 def get_entity_file_system_class():
@@ -142,3 +132,36 @@ def get_entity_file_system_class():
         class. GcsFileSystem class.
     """
     return fs_domain.GcsFileSystem
+
+
+def copy_images(
+        source_entity_type, source_entity_id, destination_entity_type,
+        destination_entity_id, filenames):
+    """Copy images from source to destination.
+
+    Args:
+        source_entity_type: str. The entity type of the source.
+        source_entity_id: str. The type of the source entity.
+        destination_entity_id: str. The id of the destination entity.
+        destination_entity_type: str. The entity type of the destination.
+        filenames: list(str). The list of filenames to copy.
+    """
+    file_system_class = get_entity_file_system_class()
+    source_fs = fs_domain.AbstractFileSystem(file_system_class(
+        source_entity_type, source_entity_id))
+    destination_fs = fs_domain.AbstractFileSystem(file_system_class(
+        destination_entity_type, destination_entity_id))
+    for filename in filenames:
+        filename_wo_filetype = filename[:filename.rfind('.')]
+        filetype = filename[filename.rfind('.') + 1:]
+        compressed_image_filename = '%s_compressed.%s' % (
+            filename_wo_filetype, filetype)
+        micro_image_filename = '%s_micro.%s' % (
+            filename_wo_filetype, filetype)
+        destination_fs.copy(
+            source_fs.impl.assets_path, ('image/%s' % filename))
+        destination_fs.copy(
+            source_fs.impl.assets_path,
+            ('image/%s' % compressed_image_filename))
+        destination_fs.copy(
+            source_fs.impl.assets_path, ('image/%s' % micro_image_filename))

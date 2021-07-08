@@ -16,8 +16,8 @@
  * @fileoverview Page object for Collection Editor Page, for use in Protractor
  * tests.
  */
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
@@ -27,7 +27,7 @@ var CollectionEditorPage = function() {
   var closeSaveModalButton = element(
     by.css('.protractor-test-close-save-modal-button'));
   var collectionEditorObjectiveInput = element(
-    by.css('.protractor-collection-editor-objective-input'));
+    by.css('.protractor-test-collection-editor-objective-input'));
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
   var editorCategoryDropdown = element.all(
@@ -41,129 +41,132 @@ var CollectionEditorPage = function() {
   var editorShiftRight = element.all(
     by.css('.protractor-test-editor-shift-right'));
   var editorTitleInput = element(
-    by.css('.protractor-collection-editor-title-input'));
+    by.css('.protractor-test-collection-editor-title-input'));
   var saveChangesButton = element(
     by.css('.protractor-test-collection-save-changes-button'));
   var saveDraftButton = element(
     by.css('.protractor-test-save-draft-button'));
   var saveModal = element(by.css('.protractor-test-save-modal'));
+  var saveInProgressLabel = element(by.css(
+    '.protractor-test-save-in-progress-label'));
 
-  this.addExistingExploration = function(explorationId) {
-    addExplorationInput.sendKeys(explorationId);
+  this.addExistingExploration = async function(explorationId) {
+    await waitFor.visibilityOf(
+      addExplorationInput, 'Add Exploration Input is not visible');
+    await action.sendKeys(
+      'Add Exploration Input', addExplorationInput, explorationId);
     // Waits until the button becomes active after debouncing.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addExplorationButton,
       'Unable to find exploration ID: ' + explorationId);
-    addExplorationButton.click();
+    await action.click('Add Exploration Button', addExplorationButton);
   };
 
-  // Search and add existing exploration to the node graph.
-  this.searchForAndAddExistingExploration = function(query) {
-    waitFor.visibilityOf(
+  // Search and add an existing exploration (by title) to the node graph.
+  this.searchForAndAddExistingExploration = async function(query) {
+    await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
-    addExplorationInput.sendKeys(query);
+    await action.sendKeys(
+      'Add Exploration Input', addExplorationInput, query);
     // Need to wait for result to appear.
-    waitFor.elementToBeClickable(
+    await waitFor.elementToBeClickable(
       addExplorationButton, 'Unable to find exploration: ' + query);
 
-    var matched = false;
-    var dropdownResultElements = element.all(by.css('.dropdown-menu'));
-    dropdownResultElements.map(function(dropdownResult) {
-      return dropdownResult.getText();
-    }).then(function(listOfResult) {
-      listOfResult.forEach(function(element, index) {
-        if (element.indexOf(query) >= 0) {
-          // Selects the exploration from dropdown.
-          dropdownResultElements.get(index).click();
-          matched = true;
-        }
-      });
-    });
-    if (!matched) {
-      // Press Tab to fill in the default result should one appear when
-      // none of the answer matches the given query.
-      addExplorationInput.sendKeys(protractor.Key.TAB);
-      // If query gets zero result, hitting Tab would not enable the
-      // addExplorationButton.
+    var dropdownResultElement = element(
+      by.cssContainingText('.dropdown-menu', new RegExp(query)));
+    await waitFor.presenceOf(
+      dropdownResultElement, 'Unable to find exploration: ' + query);
+
+    var matchingSearchResult = element(by.cssContainingText(
+      '.uib-typeahead-match', new RegExp(query)));
+    await waitFor.presenceOf(
+      matchingSearchResult, 'Unable to find search result: ' + query);
+    await action.click('Matching search result', matchingSearchResult);
+
+    var isEnabled = await addExplorationButton.isEnabled();
+    if (isEnabled) {
+      await action.click('Add Exploration Button', addExplorationButton);
+    } else {
+      throw new Error ('Add Exploration Button is not clickable');
     }
-    addExplorationButton.isEnabled().then( function(isEnabled) {
-      if (isEnabled) {
-        addExplorationButton.click();
-      } else {
-        throw Error ('Add Exploration Button is not clickable');
-      }
-    });
   };
 
   // Shift a node left in the node graph.
-  this.shiftNodeLeft = function(number) {
-    editorShiftLeft.get(number).click();
+  this.shiftNodeLeft = async function(number) {
+    await action.click('Editor Shift Left', editorShiftLeft.get(number));
   };
 
-  this.setCommitMessage = function(message) {
-    waitFor.visibilityOf(saveModal, 'Save Modal takes too long to appear');
-    waitFor.elementToBeClickable(
+  this.setCommitMessage = async function(message) {
+    await waitFor.visibilityOf(
+      saveModal, 'Save Modal takes too long to appear');
+    await waitFor.elementToBeClickable(
       commitMessageInput, 'Commit Message input takes too long to appear');
-    commitMessageInput.click();
-    commitMessageInput.sendKeys(message);
+    await action.click('Commit Message Input', commitMessageInput);
+    await action.sendKeys(
+      'Commit Message Input', commitMessageInput, message);
   };
 
   // Shift a node right in the node graph.
-  this.shiftNodeRight = function(number) {
-    editorShiftRight.get(number).click();
+  this.shiftNodeRight = async function(number) {
+    await action.click('Editor Shift Right', editorShiftRight.get(number));
   };
 
   // Delete a node in the node graph.
-  this.deleteNode = function(number) {
-    editorDeleteNode.get(number).click();
+  this.deleteNode = async function(number) {
+    await action.click('Editor Delete Node', editorDeleteNode.get(number));
   };
 
   // Save draft of the collection.
-  this.saveDraft = function() {
-    waitFor.elementToBeClickable(
+  this.saveDraft = async function() {
+    await waitFor.elementToBeClickable(
       saveDraftButton, 'Collection Save Draft button is not clickable');
-    saveDraftButton.click();
+    await action.click('Save Draft Button', saveDraftButton);
   };
 
   // Closes the save modal.
-  this.closeSaveModal = function() {
-    waitFor.elementToBeClickable(
+  this.closeSaveModal = async function() {
+    await waitFor.elementToBeClickable(
       closeSaveModalButton, 'Publish Changes button is not clickable');
-    closeSaveModalButton.click();
-    waitFor.invisibilityOf(
+    await action.click('Close Save Modal Button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
       closeSaveModalButton, 'Save Modal takes too long to close');
   };
 
   // Click on publish collection.
-  this.publishCollection = function() {
-    waitFor.elementToBeClickable(
+  this.publishCollection = async function() {
+    await waitFor.elementToBeClickable(
       editorPublishButton, 'Collection Publish button is not clickable');
-    editorPublishButton.click();
+    await action.click('Editor Publish Button', editorPublishButton);
   };
 
   // Set collection title.
-  this.setTitle = function(title) {
-    editorTitleInput.sendKeys(title);
+  this.setTitle = async function(title) {
+    await action.sendKeys('Editor Title Input', editorTitleInput, title);
   };
 
   // Set collection objective.
-  this.setObjective = function(objective) {
-    collectionEditorObjectiveInput.sendKeys(objective);
+  this.setObjective = async function(objective) {
+    await action.sendKeys(
+      'Collection Editor Objective Input',
+      collectionEditorObjectiveInput, objective);
   };
 
   // Set collection category.
-  this.setCategory = function(category) {
-    editorCategoryDropdown.first().click();
-    browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+  this.setCategory = async function(category) {
+    await action.select2(
+      'Editor Category Drop Down', editorCategoryDropdown.first(),
+      category);
   };
 
   // Saves changes and publishes collection.
-  this.saveChanges = function() {
-    waitFor.elementToBeClickable(
+  this.saveChanges = async function() {
+    await waitFor.elementToBeClickable(
       saveChangesButton, 'Save Changes button is not clickable');
-    saveChangesButton.click();
-    waitFor.invisibilityOf(
-      saveChangesButton, 'Save Changes modal takes too long to close');
+    await action.click('Save Changes Button', saveChangesButton);
+    await waitFor.invisibilityOf(
+      saveChangesButton, 'Save Changes Modal takes too long to close');
+    await waitFor.invisibilityOf(
+      saveInProgressLabel, 'Collection is taking too long to save.');
   };
 };
 

@@ -1,0 +1,46 @@
+<style>
+  .oppia-email-form {
+    margin-top: 2%;
+    text-align: center;
+  }
+  .disable-form {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  textarea {
+    border-radius: 10px;
+    margin-bottom: 1%;
+  }
+  .invalid-input {
+    color: red;
+  }
+  .success {
+    color: green;
+  }
+  .warning {
+    color: #ccb418;
+  }
+</style>
+<div class="oppia-email-form">
+  <p ng-if="$ctrl.emailSubmitted" class="success">Emails sent successfully. Redirecting to the Email Dashboard...</p>
+  <p ng-if="testEmailSentSuccessfully" class="success">Test email sent successfully. Please check your inbox.</p>
+  <p ng-if="emailCancelled" class="warning">Emails cancelled. Redirecting to the Email Dashboard...</p>
+  <p ng-if="$ctrl.invalid.subject" class="invalid-input">Please enter a valid email subject</p>
+  <p ng-if="$ctrl.invalid.body" class="invalid-input">Please enter a valid email body</p>
+  <p ng-if="$ctrl.invalid.maxRecipients" class="invalid-input">Please enter valid number of recipients</p>
+  <p ng-if="$ctrl.errorHasOccurred" class="invalid-input">There was an error processing your request. Please report this bug.</p>
+  <form ng-class="{'disable-form': $ctrl.submitIsInProgress}" ng-submit="$ctrl.submitEmail()">
+    Email subject: <textarea rows="2" cols="10" placeholder="Enter email subject here..." ng-model="$ctrl.emailSubject"></textarea>
+    <br>
+    Email body: <textarea rows="15" cols="20" placeholder="Enter email body here..." ng-model="emailBody"></textarea>
+    <br>
+    Email intent: <select ng-model="$ctrl.emailIntent" ng-options="intent for intent in $ctrl.POSSIBLE_EMAIL_INTENTS"></select><br><br>
+    Email option: <input type="radio" name="email" ng-model="$ctrl.emailOption" value="all" checked> Send to all
+    <input type="radio" name="email" ng-model="$ctrl.emailOption" value="custom"> Send to max N users:
+    <input type="number" ng-model="$ctrl.maxRecipients" min="0" placeholder="Enter number of users..." ng-disabled="$ctrl.emailOption == 'all'"><br><br>
+    <input class="btn btn-secondary" type="button" ng-click="$ctrl.sendTestEmail()" value="Send yourself a test email">
+    <input class="btn btn-success" type="submit" value="Submit Email">
+    <input class="btn btn-secondary" type="reset" value="Reset" ng-click="$ctrl.resetForm()">
+    <input class="btn btn-danger" type="button" ng-click="$ctrl.cancelEmail()" value="Cancel">
+  </form>
+</div>

@@ -33,16 +33,14 @@ import { baseInteractionValidationService } from
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Interaction validator', function() {
-  var scope, filter, bivs, WARNING_TYPES, agof;
+  var bivs, WARNING_TYPES, agof;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
-  var badOutcome, goodAnswerGroups, goodDefaultOutcome;
+  var badOutcome, goodAnswerGroups;
   var agof, oof;
 
   beforeEach(function() {
@@ -57,22 +55,17 @@ describe('Interaction validator', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
+        new OutcomeObjectFactory(),
         new RuleObjectFactory()));
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
     $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
+      'OutcomeObjectFactory', new OutcomeObjectFactory());
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
-    scope = $rootScope.$new();
-    filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -118,7 +111,6 @@ describe('Interaction validator', function() {
       agof.createNew([], goodOutcomeDest, false, null),
       agof.createNew([], goodOutcomeFeedback, false, null)
     ];
-    goodDefaultOutcome = goodOutcomeDest;
   }));
 
   describe('baseValidator', function() {
@@ -203,7 +195,9 @@ describe('Interaction validator', function() {
     it('should throw a warning for a missing top-level field', function() {
       expect(function() {
         bivs.requireCustomizationArguments({}, ['levelone']);
-      }).toThrow('Expected customization arguments to have property: levelone');
+      }).toThrowError(
+        'Expected customization arguments to have property: levelone'
+      );
     });
 
     it('should throw warnings for multiple missing top-level fields',
@@ -211,8 +205,9 @@ describe('Interaction validator', function() {
         var expectedArgs = ['first', 'second'];
         expect(function() {
           bivs.requireCustomizationArguments({}, expectedArgs);
-        }).toThrow(
-          'Expected customization arguments to have properties: first, second');
+        }).toThrowError(
+          'Expected customization arguments to have properties: first, second'
+        );
       }
     );
   });

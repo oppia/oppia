@@ -16,12 +16,19 @@
  * @fileoverview Directive for random selector value generator.
  */
 
+interface RandomSelectorCustomScope extends ng.IScope {
+  $ctrl?: {
+    generatorId?: string;
+  }
+  getTemplateUrl?: (() => string);
+}
+
 angular.module('oppia').directive('randomSelector', [
   '$compile', function($compile) {
     return {
-      link: function(scope: ICustomScope, element) {
+      link: function(scope: RandomSelectorCustomScope, element) {
         scope.getTemplateUrl = function() {
-          return '/value_generator_handler/' + scope.generatorId;
+          return '/value_generator_handler/' + scope.$ctrl.generatorId;
         };
         $compile(element.contents())(scope);
       },

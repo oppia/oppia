@@ -27,7 +27,6 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -37,11 +36,6 @@ import python_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
-
-
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
 
 
 class ExplorationChangeTests(test_utils.GenericTestBase):
@@ -55,6 +49,27 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Command invalid is not allowed'):
             exp_domain.ExplorationChange({'cmd': 'invalid'})
+
+    def test_exp_change_object_with_deprecated_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.DeprecatedCommandError, 'Command clone is deprecated'):
+            exp_domain.ExplorationChange({
+                'cmd': 'clone',
+                'property_name': 'content',
+                'old_value': 'old_value'
+            })
+
+    def test_exp_change_object_with_deprecated_cmd_argument(self):
+        with self.assertRaisesRegexp(
+            utils.DeprecatedCommandError,
+            'Value for property_name in cmd edit_state_property: '
+            'fallbacks is deprecated'):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Introduction',
+                'property_name': 'fallbacks',
+                'new_value': 'foo',
+            })
 
     def test_exp_change_object_with_missing_attribute_in_cmd(self):
         with self.assertRaisesRegexp(
@@ -435,6 +450,548 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             exp_domain.ExpVersionReference(0, 1)
 
 
+class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
+    """Test checkpoints validations in an exploration. """
+
+    def setUp(self):
+        super(ExplorationCheckpointsUnitTests, self).setUp()
+        self.exploration = (
+            exp_domain.Exploration.create_default_exploration('eid'))
+        self.new_state = state_domain.State.create_default_state(
+            'Introduction', is_initial_state=True)
+        self.set_interaction_for_state(self.new_state, 'TextInput')
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state
+        }
+        self.set_interaction_for_state(
+            self.exploration.states[self.exploration.init_state_name],
+            'TextInput')
+        self.init_state = (
+            self.exploration.states[self.exploration.init_state_name])
+        self.end_state = state_domain.State.create_default_state('End')
+        self.set_interaction_for_state(self.end_state, 'EndExploration')
+
+        self.end_state.update_interaction_default_outcome(None)
+
+    def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
+        self.init_state.update_card_is_checkpoint(False)
+        with self.assertRaisesRegexp(
+            Exception, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False'):
+            self.exploration.validate(strict=True)
+        self.init_state.update_card_is_checkpoint(True)
+
+    def test_end_state_with_card_is_checkpoint_true_is_invalid(self):
+        default_outcome = self.init_state.interaction.default_outcome
+        default_outcome.dest = self.exploration.init_state_name
+        self.init_state.update_interaction_default_outcome(default_outcome)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        with self.assertRaisesRegexp(
+            Exception, 'Expected card_is_checkpoint of terminal state '
+            'to be False but found it to be True'):
+            self.exploration.validate(strict=True)
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(self):
+        self.exploration.init_state_name = 'End'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.end_state
+        }
+        self.exploration.objective = 'Objective'
+        self.exploration.title = 'Title'
+        self.exploration.category = 'Category'
+        self.end_state.update_card_is_checkpoint(True)
+        self.exploration.validate(strict=True)
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_checkpoint_count_with_count_outside_range_is_invalid(self):
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        for i in python_utils.RANGE(8):
+            self.exploration.add_states(['State%s' % i])
+            self.exploration.states['State%s' % i].card_is_checkpoint = True
+            self.set_interaction_for_state(
+                self.exploration.states['State%s' % i],
+                'Continue')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected checkpoint count to be between 1 and 8 '
+            'inclusive but found it to be 9'
+            ):
+            self.exploration.validate(strict=True)
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+        # Note: In the graphs below, states with the * symbol are checkpoints.
+
+        # Exploration to test a checkpoint state which has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │   Second* │      │   Third   │
+        # └───────────┘      └─┬─────────┘
+        #                      │
+        #        ┌─────────────┴─┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        second_state = state_domain.State.create_default_state('Second')
+        self.set_interaction_for_state(second_state, 'TextInput')
+        third_state = state_domain.State.create_default_state('Third')
+        self.set_interaction_for_state(third_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state,
+            'Second': second_state,
+            'Third': third_state,
+        }
+
+        # Answer group dicts to connect init_state to second_state and
+        # third_state.
+        init_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Second', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Third', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        # Answer group dict to connect third_state to end_state.
+        third_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_groups)
+        third_state.update_interaction_answer_groups(
+            third_state_answer_groups)
+
+        # The exploration can be completed via third_state. Hence, making
+        # second_state a checkpoint raises a validation error.
+        second_state.card_is_checkpoint = True
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot make Second a checkpoint as it is'
+            ' bypassable'
+            ):
+            self.exploration.validate(strict=True)
+        second_state.card_is_checkpoint = False
+
+        # Exploration to test a checkpoint state when the state in the other
+        # path has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │  Second*  │      │   Third   │
+        # └────────┬──┘      └───────────┘
+        #          │
+        #        ┌─┴─────────────┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        # Answer group dicts to connect second_state to end_state.
+        second_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        second_state.update_interaction_answer_groups(
+            second_state_answer_groups)
+
+        # Reset the answer group dicts of third_state.
+        third_state.update_interaction_answer_groups([])
+
+        # As second_state is now connected to end_state and third_state has no
+        # outcome, second_state has become non-bypassable.
+        second_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Reset the exploration.
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        # Exploration to test a bypassable state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └─────┬──────┘
+        #      │            ┌────┴─────┐            │
+        #      │            │    B     │            │
+        #      │            └──┬───────┘            │
+        #      └─────────┐     │                    │
+        #         ┌──────┴─────┴─┐    ┌─────────────┘
+        #         │      D*      │    │
+        #         └─────────────┬┘    │
+        #                       │     │
+        #                    ┌──┴─────┴──┐
+        #                    │    End    │
+        #                    └───────────┘.
+
+        a_state = state_domain.State.create_default_state('A')
+        self.set_interaction_for_state(a_state, 'TextInput')
+        b_state = state_domain.State.create_default_state('B')
+        self.set_interaction_for_state(b_state, 'TextInput')
+        c_state = state_domain.State.create_default_state('C')
+        self.set_interaction_for_state(c_state, 'TextInput')
+        d_state = state_domain.State.create_default_state('D')
+        self.set_interaction_for_state(d_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state
+        }
+
+        # Answer group dicts to connect init_state to a_state, b_state and
+        # c_state.
+        init_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'A', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'B', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'C', state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_2',
+                                'normalizedStrSet': ['Test2']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        # Answer group dict to connect a_state and b_state to d_state.
+        a_and_b_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        # Answer group dict to connect c_state and d_state to end_state.
+        c_and_d_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_groups)
+        a_state.update_interaction_answer_groups(
+            a_and_b_state_answer_groups)
+        b_state.update_interaction_answer_groups(
+            a_and_b_state_answer_groups)
+        c_state.update_interaction_answer_groups(
+            c_and_d_state_answer_groups)
+        d_state.update_interaction_answer_groups(
+            c_and_d_state_answer_groups)
+
+        # As a user can complete the exploration by going through c_state,
+        # d_state becomes bypassable. Hence, making d_state a checkpoint raises
+        # validation error.
+        d_state.update_card_is_checkpoint(True)
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot make D a checkpoint as it is bypassable'
+            ):
+            self.exploration.validate(strict=True)
+        d_state.update_card_is_checkpoint(False)
+
+        # Modifying the graph to make D non-bypassable.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬─────┘
+        #      │            ┌────┴─────┐             │
+        #      │            │    B     │             │
+        #      │            └────┬─────┘             │
+        #      │                 │                   │
+        #      │          ┌──────┴───────┐           │
+        #      └──────────┤      D*      ├───────────┘
+        #                 └──────┬───────┘
+        #                        │
+        #                  ┌─────┴─────┐
+        #                  │    End    │
+        #                  └───────────┘.
+
+        # Answer group dict to connect c_state to d_state. Hence, making d_state
+        # non-bypassable.
+        c_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_groups)
+
+        d_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Modifying the graph to add another EndExploration state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬───┬─┘
+        #      │            ┌────┴─────┐             │   │
+        #      │            │    B     │             │   │
+        #      │            └────┬─────┘             │   │
+        #      │                 │                   │   │
+        #      │          ┌──────┴───────┐           │   │
+        #      └──────────┤      D*      ├───────────┘   │
+        #                 └──────┬───────┘               │
+        #                        │                       │
+        #                  ┌─────┴─────┐           ┌─────┴─────┐
+        #                  │    End    │           │    End 2  │
+        #                  └───────────┘           └───────────┘.
+
+        new_end_state = state_domain.State.create_default_state('End 2')
+        self.set_interaction_for_state(new_end_state, 'EndExploration')
+        new_end_state.update_interaction_default_outcome(None)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state,
+            'End 2': new_end_state
+        }
+
+        # Answer group dicts to connect c_state to d_state and new_end_state,
+        # making d_state bypassable.
+        c_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End 2', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_groups)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot make D a checkpoint as it is bypassable'
+            ):
+            self.exploration.validate(strict=True)
+        d_state.update_card_is_checkpoint(False)
+
+
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
@@ -461,7 +1018,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name')
 
         new_state = state_domain.State.create_default_state('ABC')
-        new_state.update_interaction_id('TextInput')
+        self.set_interaction_for_state(new_state, 'TextInput')
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -493,9 +1050,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
-        default_outcome_dict['dest'] = exploration.init_state_name
-        init_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest = exploration.init_state_name
+        init_state.update_interaction_default_outcome(default_outcome)
+        init_state.update_card_is_checkpoint(True)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -521,7 +1079,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -529,7 +1090,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         })
 
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
 
         exploration.validate()
 
@@ -541,8 +1106,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'destination DEF is not a valid')
 
         # Restore a valid exploration.
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+            init_state, 'TextInput')
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
         answer_group.outcome.dest = exploration.init_state_name
         exploration.validate()
 
@@ -560,18 +1132,36 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.rule_type = 'FakeRuleType'
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
-        rule_spec.inputs = {'x': 15}
+        rule_spec.inputs = {'x': {
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': 15
+        }}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-            Exception, 'Expected unicode string, received 15'
+            AssertionError, 'Expected list, received 15'
             ):
             exploration.validate()
 
-        rule_spec.inputs = {'x': '{{ExampleParam}}'}
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name],
+            'PencilCodeEditor')
+        temp_rule = old_answer_groups[0]['rule_specs'][0]
+        old_answer_groups[0]['rule_specs'][0] = {
+            'rule_type': 'ErrorContains',
+            'inputs': {'x': '{{ExampleParam}}'}
+        }
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        old_answer_groups[0]['rule_specs'][0] = temp_rule
+
         self._assert_validation_error(
             exploration,
-            'RuleSpec \'Contains\' has an input with name \'x\' which refers '
-            'to an unknown parameter within the exploration: ExampleParam')
+            'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
+            'refers to an unknown parameter within the exploration: '
+            'ExampleParam')
 
         # Restore a valid exploration.
         exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
@@ -579,7 +1169,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Validate Outcome.
-        outcome = answer_group.outcome
+        outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
         outcome.dest = None
         self._assert_validation_error(
@@ -668,8 +1258,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
+        interaction.id = 'PencilCodeEditor'
 
-        interaction.id = 'TextInput'
+        self.set_interaction_for_state(init_state, 'TextInput')
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        valid_text_input_cust_args = init_state.interaction.customization_args
+        rule_spec.inputs = {'x': {
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': ['Test']
+        }}
+        rule_spec.rule_type = 'Contains'
         exploration.validate()
 
         interaction.customization_args = []
@@ -678,53 +1280,76 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.customization_args = {15: ''}
         self._assert_validation_error(
+            exploration,
+            (
+                'Expected customization arg value to be a '
+                'InteractionCustomizationArg'
+            )
+        )
+
+        interaction.customization_args = {
+            15: state_domain.InteractionCustomizationArg('', {
+                'type': 'unicode'
+            })
+        }
+        self._assert_validation_error(
             exploration, 'Invalid customization arg name')
 
-        interaction.customization_args = {'placeholder': ''}
+        interaction.customization_args = valid_text_input_cust_args
+        self.set_interaction_for_state(init_state, 'TextInput')
         exploration.validate()
 
         interaction.answer_groups = {}
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
-        interaction.answer_groups = answer_groups
-        interaction.id = 'EndExploration'
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have a default outcome.')
 
-        interaction.id = 'TextInput'
+        self.set_interaction_for_state(init_state, 'TextInput')
         init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Non-terminal interactions must have a default outcome.')
 
-        interaction.id = 'EndExploration'
+        self.set_interaction_for_state(init_state, 'EndExploration')
+        init_state.interaction.answer_groups = [answer_groups]
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
 
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
-        init_state.update_interaction_answer_groups([])
+        init_state.interaction.answer_groups = []
         exploration.validate()
 
         # Restore a valid exploration.
-        interaction.id = 'TextInput'
+        self.set_interaction_for_state(init_state, 'TextInput')
         answer_groups_list = [
-            answer_group.to_dict() for answer_group in answer_groups]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in [answer_groups]
+            ]
         init_state.update_interaction_answer_groups(answer_groups_list)
-        init_state.update_interaction_default_outcome(default_outcome.to_dict())
+        init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
-
-        init_state.update_interaction_solution({
+        solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
                 'html': 'hello_world is a string'
                 }
-        })
+        }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
@@ -736,56 +1361,50 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.hints = []
 
         # Validate AnswerGroup.
-        answer_groups_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': 1
-        }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            1
+        )
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         self._assert_validation_error(
             exploration,
             'Expected tagged skill misconception id to be a str, received 1')
-
-        answer_groups_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id':
-                'invalid_tagged_skill_misconception_id'
-        }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            'invalid_tagged_skill_misconception_id'
+        )
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         self._assert_validation_error(
             exploration,
@@ -808,10 +1427,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.states = {
             exploration.init_state_name: (
                 state_domain.State.create_default_state(
-                    exploration.init_state_name))
+                    exploration.init_state_name, is_initial_state=True))
         }
-        exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'TextInput')
         exploration.validate()
 
         exploration.language_code = 'fake_code'
@@ -843,7 +1462,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(init_state, 'EndExploration')
         init_state.update_interaction_default_outcome(None)
         exploration.validate()
 
@@ -1042,15 +1661,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_languages_with_complete_translation(), [])
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
-                        'needs_update': False
-                    }
-                },
-                'default_outcome': {
-                    'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
@@ -1067,45 +1681,75 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         exploration.add_states(['New state'])
+        new_state = exploration.states['New state']
+        new_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        new_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None)
+        new_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
-                        'html': '<p>New state translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>New state translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>New State translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>New State translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
             }
         })
-        exploration.states['New state'].update_written_translations(
-            written_translations)
+        new_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 4})
@@ -1114,25 +1758,40 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': True
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 1})
@@ -1141,29 +1800,45 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi-en': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     },
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 },
                 'default_outcome': {
                     'hi': {
-                        'html': '<p>Translation in Hindi.</p>',
+                        'data_format': 'html',
+                        'translation': '<p>Translation in Hindi.</p>',
                         'needs_update': False
                     }
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {
@@ -1172,47 +1847,48 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             })
 
     def test_get_content_count(self):
+        # Adds 1 to content count to exploration (content, default_outcome).
         exploration = exp_domain.Exploration.create_default_exploration('0')
-        self.assertEqual(
-            exploration.get_content_count(), 2)
+        self.assertEqual(exploration.get_content_count(), 1)
 
+        # Adds 2 to content count to exploration (content default_outcome).
         exploration.add_states(['New state'])
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        init_state.update_interaction_answer_groups([answer_group_dict])
+        # Adds 1 to content count to exploration (ca_placeholder_0)
+        self.set_interaction_for_state(init_state, 'TextInput')
 
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_5',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
+        )
+        # Adds 1 to content count to exploration (feedback_1).
+        init_state.update_interaction_answer_groups([state_answer_group])
+
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        # Adds 1 to content count to exploration (hint_1).
         init_state.update_interaction_hints(hints_list)
 
-        solution = {
+        solution_dict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -1220,29 +1896,30 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        # Adds 1 to content count to exploration (solution).
         init_state.update_interaction_solution(solution)
 
-        self.assertEqual(exploration.get_content_count(), 7)
+        self.assertEqual(exploration.get_content_count(), 5)
 
     def test_get_content_with_correct_state_name_returns_html(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        self.set_interaction_for_state(init_state, 'TextInput')
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             exploration.get_content_html(exploration.init_state_name, 'hint_1'),
             '<p>hint one</p>')
 
-        hints_list[0]['hint_content']['html'] = '<p>Changed hint one</p>'
+        hints_list[0].hint_content.html = '<p>Changed hint one</p>'
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
@@ -1253,14 +1930,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>hint one</p>'
-            },
-        })
+        self.set_interaction_for_state(init_state, 'TextInput')
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
@@ -1529,19 +2204,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['DEF'])
 
-        default_outcome_dict = {
-            'dest': 'DEF',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Default outcome for state1</p>'
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'refresher_exploration_id': 'refresher_exploration_id',
-            'missing_prerequisite_skill_id': None
-        }
+        default_outcome = state_domain.Outcome(
+            'DEF', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], 'refresher_exploration_id', None,
+        )
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
+            default_outcome
+        )
 
         with self.assertRaisesRegexp(
             Exception,
@@ -1555,37 +2225,32 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration.validate()
 
-        param_changes = [{
-            'customization_args': {
+        param_changes = [param_domain.ParamChange(
+            'ParamChange', 'RandomSelector', {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
-            },
-            'name': 'ParamChange',
-            'generator_id': 'RandomSelector'
-        }]
-
-        answer_groups = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': param_changes,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        exploration.init_state.update_interaction_answer_groups(answer_groups)
+            }
+        )]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, param_changes, None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
+        )
+        exploration.init_state.update_interaction_answer_groups(
+            [state_answer_group])
         with self.assertRaisesRegexp(
             Exception,
             'The parameter ParamChange was used in an answer group, '
@@ -1599,7 +2264,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
-        end_state.update_interaction_id('EndExploration')
+        self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         with self.assertRaisesRegexp(
@@ -1645,17 +2310,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='objective', end_state_name='End')
         exploration.validate(strict=True)
 
-        (exploration.init_state.interaction.default_outcome
-         .labelled_as_correct) = True
+        (
+            exploration.init_state.interaction.default_outcome
+            .labelled_as_correct) = True
 
-        (exploration.init_state.interaction.default_outcome
-         .dest) = exploration.init_state_name
+        (
+            exploration.init_state.interaction.default_outcome
+            .dest) = exploration.init_state_name
 
         with self.assertRaisesRegexp(
             Exception,
             'The default outcome for state Introduction is labelled '
             'correct but is a self-loop'):
             exploration.validate(strict=True)
+
+    def test_serialize_and_deserialize_returns_unchanged_exploration(self):
+        """Checks that serializing and then deserializing a default exploration
+        works as intended by leaving the exploration unchanged.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        self.assertEqual(
+            exploration.to_dict(),
+            exp_domain.Exploration.deserialize(
+                exploration.serialize()).to_dict())
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
@@ -1918,11 +2595,185 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.assertFalse(
             self.exp_summary.is_solely_owned_by_user('contributor_id'))
 
+    def test_add_new_contribution_for_user_adds_user_to_contributors(self):
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 1)
+        self.assertIn('user_id', self.exp_summary.contributor_ids)
+
+    def test_add_new_contribution_for_user_increases_score_in_contributors(
+            self):
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 2)
+
+    def test_add_new_contribution_for_user_does_not_add_system_user(self):
+        self.exp_summary.add_contribution_by_user(
+            feconf.SYSTEM_COMMITTER_ID)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributors_summary)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributor_ids)
+
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
+    YAML_CONTENT_INVALID_SCHEMA_VERSION = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 10000
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 10000
+tags: []
+title: Title
+""")
+
     EXP_ID = 'An exploration_id'
+
+    def test_creation_with_invalid_yaml_schema_version(self):
+        """Test that a schema version that is too big is detected."""
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v46 to v[0-9]+ exploration YAML files '
+            'at present.'):
+            exp_domain.Exploration.from_yaml(
+                'bad_exp', self.YAML_CONTENT_INVALID_SCHEMA_VERSION)
 
     def test_yaml_import_and_export(self):
         """Test the from_yaml() and to_yaml() methods."""
@@ -1941,33 +2792,26 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
 
-        # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
-        # without error.
-        exp_domain.Exploration.from_untitled_yaml(
-            'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
-
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Please ensure that you are uploading a YAML text file, '
+            'not a zip file. The YAML parser returned the following error: '):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: mapping '
+            'values are not allowed here'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please ensure that you are uploading a YAML text file, not a zip'
+            ' file. The YAML parser returned the following error: while '
+            'scanning a simple key'):
             exp_domain.Exploration.from_yaml(
                 'exp4', 'State1:\n(\nInvalid yaml')
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected a YAML version >= 10, received: 9'
-            ):
-            exp_domain.Exploration.from_yaml(
-                'exp4', self.SAMPLE_UNTITLED_YAML_CONTENT)
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected a YAML version <= 9'
-            ):
-            exp_domain.Exploration.from_untitled_yaml(
-                'exp4', 'Title', 'Category', self.SAMPLE_YAML_CONTENT)
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -1979,7 +2823,9 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        for version_num in python_utils.RANGE(current_states_schema_version):
+        for version_num in python_utils.RANGE(
+                feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
+                current_states_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_states_v%s_dict_to_v%s_dict' % (
@@ -1996,7 +2842,9 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
         current_exp_schema_version = (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION)
 
-        for version_num in python_utils.RANGE(1, current_exp_schema_version):
+        for version_num in python_utils.RANGE(
+                exp_domain.Exploration.EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION,
+                current_exp_schema_version):
             self.assertTrue(hasattr(
                 exp_domain.Exploration,
                 '_convert_v%s_dict_to_v%s_dict' % (
@@ -2011,1501 +2859,8 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
 
-    YAML_CONTENT_V1 = ("""default_skin: conversation_v1
-param_changes: []
-param_specs: {}
-schema_version: 1
-states:
-- content:
-  - type: text
-    value: ''
-  name: (untitled state)
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: InputString
-          name: Equals
-          rule_type: atomic
-        dest: END
-        feedback:
-          - Correct!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: ''
-  name: New state
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: END
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-""")
-
-    YAML_CONTENT_V2 = ("""default_skin: conversation_v1
-init_state_name: (untitled state)
-param_changes: []
-param_specs: {}
-schema_version: 2
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  New state:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-""")
-
-    YAML_CONTENT_V3 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  New state:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-""")
-
-    YAML_CONTENT_V4 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 4
-skill_tags: []
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-""")
-
-    YAML_CONTENT_V5 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 5
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-tags: []
-""")
-
-    YAML_CONTENT_V6 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 6
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-states_schema_version: 3
-tags: []
-""")
-
-    YAML_CONTENT_V7 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 7
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      id: EndExploration
-      triggers: []
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-states_schema_version: 4
-tags: []
-""")
-
-    YAML_CONTENT_V8 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 8
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      id: EndExploration
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-states_schema_version: 5
-tags: []
-""")
-
-    YAML_CONTENT_V9 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 9
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      id: EndExploration
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-        language:
-          value: ''
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: CodeRepl
-    param_changes: []
-states_schema_version: 6
-tags: []
-""")
-
-    YAML_CONTENT_V10 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      id: EndExploration
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-states_schema_version: 7
-tags: []
-title: Title
-""")
-    YAML_CONTENT_V11 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 11
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      id: EndExploration
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-states_schema_version: 8
-tags: []
-title: Title
-""")
-    YAML_CONTENT_V12 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 12
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: TextInput
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      id: EndExploration
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks:
-      - outcome:
-          dest: END
-          feedback:
-          - Correct!
-      id: TextInput
-    param_changes: []
-states_schema_version: 9
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V13 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 13
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      hints: []
-      id: TextInput
-      solution: {}
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      hints: []
-      id: EndExploration
-      solution: {}
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      hints: []
-      id: TextInput
-      solution: {}
-    param_changes: []
-states_schema_version: 10
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V14 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 14
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: []
-      html: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      hints: []
-      id: TextInput
-      solution: {}
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: []
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      hints: []
-      id: EndExploration
-      solution: {}
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: []
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      hints: []
-      id: TextInput
-      solution: {}
-    param_changes: []
-states_schema_version: 11
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V15 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 15
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      hints: []
-      id: TextInput
-      solution: {}
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      fallbacks: []
-      hints: []
-      id: EndExploration
-      solution: {}
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      hints: []
-      id: TextInput
-      solution: {}
-    param_changes: []
-states_schema_version: 12
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V16 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 16
-skin_customizations:
-  panels_contents:
-    bottom: []
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 13
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V17 = ("""author_notes: ''
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 17
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 13
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V18 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 18
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-          - Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback: []
-        param_changes: []
-      hints:
-      - hint_text: ''
-      id: TextInput
-      solution:
-        explanation: ''
-        answer_is_exclusive: False
-        correct_answer: Answer
-    param_changes: []
-states_schema_version: 13
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V19 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 19
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - correct: false
-        outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 14
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V20 = ("""author_notes: ''
+    YAML_CONTENT_V46 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -3515,694 +2870,13 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 20
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - labelled_as_correct: false
-        outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          param_changes: []
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        param_changes: []
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 15
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V21 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 21
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - labelled_as_correct: false
-        outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: FractionInput
-      solution: null
-    param_changes: []
-states_schema_version: 16
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V22 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 22
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          labelled_as_correct: false
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 17
-tags: []
-title: Title
-""")
-    YAML_CONTENT_V23 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 23
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          labelled_as_correct: false
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 18
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V24 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 24
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          labelled_as_correct: false
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 19
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V25 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 25
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            audio_translations: {}
-            html: Correct!
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: Congratulations, you have finished!
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 20
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V26 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 26
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: Correct!
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: Congratulations, you have finished!
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 21
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V27 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 27
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4216,344 +2890,19 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 22
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V28 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 28
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 23
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V29 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 29
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-        imageAndRegions:
           value:
-            imagePath: s1ImagePath.png
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: ImageClickInput
-      solution: null
-    param_changes: []
-states_schema_version: 24
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V30 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 30
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
+            content_id: ca_placeholder_2
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -4568,353 +2917,23 @@ states:
       hints: []
       id: TextInput
       solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 25
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V31 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 31
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      new_content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 26
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V32 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 32
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: 27
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V33 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 33
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_2: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -4930,131 +2949,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: 28
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V34 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 34
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -5073,1346 +2968,9 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: 29
-tags: []
-title: Title
-""")
-
-    YAML_CONTENT_V35 = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: 30
-tags: []
-title: Title
-""")
-
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V35
-
-    def test_load_from_v1(self):
-        """Test direct loading from a v1 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v2(self):
-        """Test direct loading from a v2 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V2)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v3(self):
-        """Test direct loading from a v3 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V3)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v4(self):
-        """Test direct loading from a v4 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V4)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v5(self):
-        """Test direct loading from a v5 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V5)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v6(self):
-        """Test direct loading from a v6 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V6)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_cannot_load_from_v6_with_invalid_handler_name(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 6
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: invalid_handler_name
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-states_schema_version: 3
-tags: []
-""")
-        with self.assertRaisesRegexp(
-            Exception,
-            'Error: Can only convert rules with a name '
-            '\'submit\' in states v3 to v4 conversion process. '):
-            exp_domain.Exploration.from_untitled_yaml(
-                'eid', 'Title', 'Category', invalid_yaml_content_v6)
-
-    def test_cannot_load_from_v6_with_invalid_rule(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 6
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: invalid_rule
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-states_schema_version: 3
-tags: []
-""")
-        with self.assertRaisesRegexp(
-            Exception,
-            'Error: Can only convert default and atomic '
-            'rules in states v3 to v4 conversion process.'):
-            exp_domain.Exploration.from_untitled_yaml(
-                'eid', 'Title', 'Category', invalid_yaml_content_v6)
-
-    def test_cannot_load_from_v6_with_invalid_subject(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 6
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-            subject: invalid_subject
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-states_schema_version: 3
-tags: []
-""")
-        with self.assertRaisesRegexp(
-            Exception,
-            'Error: Can only convert rules with an \'answer\' '
-            'subject in states v3 to v4 conversion process.'):
-            exp_domain.Exploration.from_untitled_yaml(
-                'eid', 'Title', 'Category', invalid_yaml_content_v6)
-
-    def test_cannot_load_from_v6_with_invalid_interaction_id(self):
-        invalid_yaml_content_v6 = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 6
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-      triggers: []
-    param_changes: []
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: invalid_id
-      triggers: []
-    param_changes: []
-states_schema_version: 3
-tags: []
-""")
-        with self.assertRaisesRegexp(
-            Exception,
-            'Trying to migrate exploration containing non-existent '
-            'interaction ID'):
-            exp_domain.Exploration.from_untitled_yaml(
-                'eid', 'Title', 'Category', invalid_yaml_content_v6)
-
-    def test_load_from_v7(self):
-        """Test direct loading from a v7 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V7)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v8(self):
-        """Test direct loading from a v8 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V8)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v9(self):
-        """Test direct loading from a v9 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        language:
-          value: python
-        placeholder:
-          value: ''
-        postCode:
-          value: ''
-        preCode:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: CodeRepl
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: 30
-tags: []
-title: Title
-""")
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V9)
-        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
-
-    def test_load_from_v10(self):
-        """Test direct loading from a v10 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V10)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v11(self):
-        """Test direct loading from a v11 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V11)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v12(self):
-        """Test direct loading from a v12 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints:
-      - hint_content:
-          content_id: hint_1
-          html: <p>Correct!</p>
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        hint_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        hint_1: {}
-states_schema_version: 30
-tags: []
-title: Title
-""")
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V12)
-        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
-
-    def test_load_from_v13(self):
-        """Test direct loading from a v13 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V13)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v14(self):
-        """Test direct loading from a v14 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V14)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v15(self):
-        """Test direct loading from a v15 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V15)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v16(self):
-        """Test direct loading from a v16 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V16)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v17(self):
-        """Test direct loading from a v17 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V17)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v18(self):
-        """Test direct loading from a v18 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints:
-      - hint_content:
-          content_id: hint_1
-          html: ''
-      id: TextInput
-      solution:
-        answer_is_exclusive: false
-        correct_answer: Answer
-        explanation:
-          content_id: solution
-          html: ''
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        hint_1: {}
-        solution: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        hint_1: {}
-        solution: {}
-states_schema_version: 30
-tags: []
-title: Title
-""")
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V18)
-        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
-
-    def test_load_from_v19(self):
-        """Test direct loading from a v19 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V19)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v20(self):
-        """Test direct loading from a v20 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V20)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v21(self):
-        """Test direct loading from a v21 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        allowImproperFraction:
-          value: true
-        allowNonzeroIntegerPart:
-          value: true
-        customPlaceholder:
-          value: ''
-        placeholder:
-          value: ''
-        requireSimplestForm:
-          value: false
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: FractionInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-states_schema_version: 30
-tags: []
-title: Title
-""")
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V21)
-        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
-
-    def test_load_from_v22(self):
-        """Test direct loading from a v22 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V22)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v23(self):
-        """Test direct loading from a v23 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V23)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v24(self):
-        """Test direct loading from a v24 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V24)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v25(self):
-        """Test direct loading from a v25 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V25)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v26(self):
-        """Test direct loading from a v26 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V26)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v27(self):
-        """Test direct loading from a v27 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V27)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v28(self):
-        """Test direct loading from a v28 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V28)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v29(self):
-        """Test direct loading from a v29 yaml file."""
-        latest_yaml_content = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-  END:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        highlightRegionsOnHover:
-          value: false
-        imageAndRegions:
           value:
-            imagePath: s1ImagePath_height_120_width_120.png
-        placeholder:
-          value: ''
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
@@ -6425,281 +2983,74 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: ImageClickInput
+      id: TextInput
       solution: null
+    next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 30
+states_schema_version: 41
 tags: []
 title: Title
 """)
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V29)
-        self.assertEqual(exploration.to_yaml(), latest_yaml_content)
 
-    def test_load_from_v30(self):
-        """Test direct loading from a v30 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V30)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v31(self):
-        """Test direct loading from a v31 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V31)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v32(self):
-        """Test direct loading from a v32 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V32)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v33(self):
-        """Test direct loading from a v33 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V33)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_cannot_load_from_yaml_with_no_schema_version(self):
-        sample_yaml_content = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-tags: []
-""")
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid YAML file: no schema version specified.'):
-            exp_domain.Exploration.from_untitled_yaml(
-                'eid', 'Title', 'Category', sample_yaml_content)
-
-    def test_cannot_load_from_yaml_with_invalid_schema_version(self):
-        sample_yaml_content = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 0
-skin_customizations:
-  panels_contents: {}
-states:
-  (untitled state):
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: InputString
-            name: Equals
-            rule_type: atomic
-          dest: END
-          feedback:
-            - Correct!
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: (untitled state)
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: TextInput
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  END:
-    content:
-    - type: text
-      value: Congratulations, you have finished!
-    interaction:
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: END
-          feedback: []
-          param_changes: []
-      id: EndExploration
-      triggers: []
-    param_changes: []
-tags: []
-""")
-        with self.assertRaisesRegexp(
-            Exception,
-            'Sorry, we can only process v1 to v%s exploration YAML files '
-            'at present.' % exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION):
-            exp_domain.Exploration.from_untitled_yaml(
-                'eid', 'Title', 'Category', sample_yaml_content)
-
-
-class HTMLMigrationUnitTests(test_utils.GenericTestBase):
-    """Test HTML migration."""
-
-    YAML_CONTENT_V26_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V47 = (
+        """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
-category: category
+category: Category
 correctness_feedback_enabled: false
-init_state_name: Introduction
+init_state_name: (untitled state)
 language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 26
+schema_version: 47
 states:
-  Introduction:
+  (untitled state):
     classifier_model_id: null
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
-      answer_groups: []
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
       default_outcome:
-        dest: Introduction
+        dest: (untitled state)
         feedback:
           content_id: default_outcome
           html: ''
@@ -6708,144 +3059,679 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: null
+      id: TextInput
       solution: null
+    next_content_id_index: 4
     param_changes: []
-  state1:
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
     classifier_model_id: null
     content:
       content_id: content
-      html: <blockquote><p>Hello, this is state1</p></blockquote>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      solution: {}
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value: ''
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
         rows:
           value: 1
       default_outcome:
-        dest: state2
+        dest: END
         feedback:
           content_id: default_outcome
-          html: Default <p>outcome</p> for state1
+          html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
       id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V48 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 48
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 43
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V49 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 49
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 44
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V50 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 50
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 45
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V50
+
+    def test_load_from_v46_with_item_selection_input_interaction(self):
+        """Tests the migration of ItemSelectionInput rule inputs."""
+        sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 1</p>
+            - <p>Choice 2</p>
+            - <p>Choice Invalid</p>
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
       solution:
         answer_is_exclusive: true
-        correct_answer: Answer1
+        correct_answer:
+          - <p>Choice 1</p>
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
+    next_content_id_index: 4
     param_changes: []
-  state2:
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
     classifier_model_id: null
     content:
       content_id: content
-      html: <p>Hello, </p>this <i>is </i>state2
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      hint_1: {}
-      hint_2: {}
+      html: <p>Congratulations, you have finished!</p>
     interaction:
-      answer_groups:
-      - outcome:
-          dest: state1
-          feedback:
-            content_id: feedback_1
-            html: <div>Outcome1 for state2</div>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        - inputs:
-            x: 1
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: state3
-          feedback:
-            content_id: feedback_2
-            html: <pre>Outcome2 <br>for state2</pre>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
+      answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        choices:
-          value:
-          - <p>This is </p>value1 <br>for MultipleChoice
-          - This is value2<span> for <br>MultipleChoice</span>
-      default_outcome:
-        dest: state2
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints:
-      - hint_content:
-          content_id: hint_1
-          html: <p>Hello, this is<div> html1<b> for </b></div>state2</p>
-      - hint_content:
-          content_id: hint_2
-          html: Here is link 2 <oppia-noninteractive-link
-                text-with-value="&amp;quot;discussion forum&amp;quot;"
-                url-with-value="&amp;quot;https://groups.google.com/
-                forum/?fromgroups#!forum/oppia&amp;quot;">
-                </oppia-noninteractive-link>
-      id: MultipleChoiceInput
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
       solution: null
+    next_content_id_index: 0
     param_changes: []
-  state3:
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 50
+states:
+  (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
-      html: <p>Hello, this is state3</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
+      html: ''
     interaction:
       answer_groups:
       - outcome:
-          dest: state1
+          dest: END
           feedback:
             content_id: feedback_1
-            html: Here is the image1 <i><oppia-noninteractive-image
-                caption-with-value="&amp;quot;&amp;quot;"
-                filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
-                alt-with-value="&amp;quot;&amp;quot;">
-                </oppia-noninteractive-image></i>Here is the image2
-                <div><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-                filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
-                alt-with-value="&amp;quot;&amp;quot;">
-                </oppia-noninteractive-image></div>
+            html: <p>Correct!</p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -6853,27 +3739,26 @@ states:
         rule_specs:
         - inputs:
             x:
-            - This <span>is value1 for </span>ItemSelectionInput
+            - ca_choices_2
+            - ca_choices_3
+            - invalid_content_id
           rule_type: Equals
-        - inputs:
-            x:
-            - This is value3 for ItemSelectionInput
-          rule_type: Equals
-        tagged_misconception_id: null
+        tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - This <span>is value1 for </span>ItemSelection
-          - This <code>is value2</code> for ItemSelection
-          - This is value3 for ItemSelection
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
         maxAllowableSelectionCount:
-          value: 1
+          value: 2
         minAllowableSelectionCount:
           value: 1
       default_outcome:
-        dest: state3
+        dest: (untitled state)
         feedback:
           content_id: default_outcome
           html: ''
@@ -6883,320 +3768,39 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution: null
-    param_changes: []
-states_schema_version: 21
-tags: []
-title: title
-""")
-
-# pylint: disable=line-too-long
-    YAML_CONTENT_V35_IMAGE_DIMENSIONS = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: category
-correctness_feedback_enabled: false
-init_state_name: Introduction
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 35
-states:
-  Introduction:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: Introduction
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-  state1:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <blockquote><p>Hello, this is state1</p></blockquote>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: state2
-        feedback:
-          content_id: default_outcome
-          html: <p>Default </p><p>outcome</p><p> for state1</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
       solution:
         answer_is_exclusive: true
-        correct_answer: Answer1
+        correct_answer:
+        - ca_choices_2
         explanation:
           content_id: solution
-          html: <p>This is <em>solution</em> for state1</p>
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
         content: {}
         default_outcome: {}
+        feedback_1: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
         content: {}
         default_outcome: {}
+        feedback_1: {}
         solution: {}
-  state2:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Hello, </p><p>this <em>is </em>state2</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: state1
-          feedback:
-            content_id: feedback_1
-            html: <p>Outcome1 for state2</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        - inputs:
-            x: 1
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      - outcome:
-          dest: state3
-          feedback:
-            content_id: feedback_2
-            html: "<pre>Outcome2 \\nfor state2</pre>"
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: 0
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
-      default_outcome:
-        dest: state2
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints:
-      - hint_content:
-          content_id: hint_1
-          html: <p>Hello, this is</p><p> html1<strong> for </strong></p><p>state2</p>
-      - hint_content:
-          content_id: hint_2
-          html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
-            forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
-            forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
-      id: MultipleChoiceInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_2: {}
-        hint_1: {}
-        hint_2: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        feedback_2: {}
-        hint_1: {}
-        hint_2: {}
-  state3:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Hello, this is state3</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: state1
-          feedback:
-            content_id: feedback_1
-            html: <p>Here is the image1 </p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
-              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
-              alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-            - <p>This is value1 for ItemSelectionInput</p>
-          rule_type: Equals
-        - inputs:
-            x:
-            - <p>This is value3 for ItemSelectionInput</p>
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - <p>This is value1 for ItemSelection</p>
-          - <p>This is value2 for ItemSelection</p>
-          - <p>This is value3 for ItemSelection</p>
-        maxAllowableSelectionCount:
-          value: 1
-        minAllowableSelectionCount:
-          value: 1
-      default_outcome:
-        dest: state3
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: ItemSelectionInput
-      solution: null
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-states_schema_version: 30
-tags: []
-title: title
-""")
-
-    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 27
-states:
-  (untitled state):
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>Hello this
-            is test case to check image tag inside p tag</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: InputString
-          rule_type: Equals
-        tagged_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -7207,42 +3811,28 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
     param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    param_changes: []
-states_schema_version: 22
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 45
 tags: []
 title: Title
 """)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    YAML_CONTENT_V35_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    def test_load_from_v46_with_drag_and_drop_sort_input_interaction(self):
+        """Tests the migration of DragAndDropSortInput rule inputs."""
+        sample_yaml_content = (
+            """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7252,15 +3842,13 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 35
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
     content:
       content_id: content
-      html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-        filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></oppia-noninteractive-image><p>Hello
-        this is test case to check image tag inside p tag</p>
+      html: ''
     interaction:
       answer_groups:
       - outcome:
@@ -7274,16 +3862,34 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
-          rule_type: Equals
+            x:
+            - - <p>Choice 1</p>
+              - <p>Choice 2</p>
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: <p>Choice 1</p>
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: <p>Choice 1</p>
+            y: <p>Choice 2</p>
+          rule_type: HasElementXBeforeElementY
         tagged_skill_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
       default_outcome:
         dest: (untitled state)
         feedback:
@@ -7294,20 +3900,35 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
-      solution: null
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - <p>Choice 1</p>
+          - <p>Choice 2</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
   END:
     classifier_model_id: null
     content:
@@ -7323,6 +3944,8 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7331,21 +3954,73 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-  New state:
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 50
+states:
+  (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
       html: ''
     interaction:
-      answer_groups: []
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_2
+              - ca_choices_3
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_2
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: ca_choices_2
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: ca_choices_2
+            y: ca_choices_3
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
-          value: ''
-        rows:
-          value: 1
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
       default_outcome:
-        dest: END
+        dest: (untitled state)
         feedback:
           content_id: default_outcome
           html: ''
@@ -7354,50 +4029,68 @@ states:
         param_changes: []
         refresher_exploration_id: null
       hints: []
-      id: TextInput
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_2
+          - ca_choices_3
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
       solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
-        default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
-        default_outcome: {}
-states_schema_version: 30
+states_schema_version: 45
 tags: []
 title: Title
 """)
-
-# pylint: enable=line-too-long
-
-
-    def test_load_from_v26_textangular(self):
-        """Test direct loading from a v26 yaml file."""
-        mock_get_filename_with_dimensions_context = self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions)
-
-        with mock_get_filename_with_dimensions_context:
-            exploration = exp_domain.Exploration.from_yaml(
-                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
-        self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V35_IMAGE_DIMENSIONS)
-
-
-    def test_load_from_v27_without_image_caption(self):
-        """Test direct loading from a v27 yaml file."""
-        mock_get_filename_with_dimensions_context = self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions)
-
-        with mock_get_filename_with_dimensions_context:
-            exploration = exp_domain.Exploration.from_yaml(
-                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
-        self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V35_WITH_IMAGE_CAPTION)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -7411,9 +4104,11 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', title=exp_title, category='Category')
         exploration.add_states([second_state_name])
 
-        def _get_default_state_dict(content_str, dest_name):
+        def _get_default_state_dict(content_str, dest_name, is_init_state):
             """Gets the default state dict of the exploration."""
             return {
+                'linked_skill_id': None,
+                'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',
@@ -7426,6 +4121,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'solicit_answer_details': False,
+                'card_is_checkpoint': is_init_state,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
@@ -7461,9 +4157,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-                    feconf.DEFAULT_INIT_STATE_NAME),
+                    feconf.DEFAULT_INIT_STATE_NAME, True),
                 second_state_name: _get_default_state_dict(
-                    '', second_state_name),
+                    '', second_state_name, False),
             },
             'param_changes': [],
             'param_specs': {},
@@ -7529,33 +4225,63 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_content(
             state_domain.SubtitledHtml.from_dict(content4_dict))
 
-        state1.update_interaction_id('TextInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
-        state4.update_interaction_id('DragAndDropSortInput')
+        self.set_interaction_for_state(state1, 'TextInput')
+        self.set_interaction_for_state(state2, 'MultipleChoiceInput')
+        self.set_interaction_for_state(state3, 'ItemSelectionInput')
+        self.set_interaction_for_state(state4, 'DragAndDropSortInput')
 
         customization_args_dict1 = {
-            'placeholder': {'value': ''},
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Enter here.'
+                }
+            },
             'rows': {'value': 1}
         }
         customization_args_dict2 = {
             'choices': {'value': [
-                '<p>This is value1 for MultipleChoice</p>',
-                '<p>This is value2 for MultipleChoice</p>'
-            ]}
+                {
+                    'content_id': 'ca_choices_0',
+                    'html': '<p>This is value1 for MultipleChoice</p>'
+                },
+                {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>This is value2 for MultipleChoice</p>'
+                }
+            ]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
             'choices': {'value': [
-                '<p>This is value1 for ItemSelection</p>',
-                '<p>This is value2 for ItemSelection</p>',
-                '<p>This is value3 for ItemSelection</p>'
-            ]}
+                {
+                    'content_id': 'ca_choices_0',
+                    'html': '<p>This is value1 for ItemSelection</p>'
+                },
+                {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>This is value2 for ItemSelection</p>'
+                },
+                {
+                    'content_id': 'ca_choices_2',
+                    'html': '<p>This is value3 for ItemSelection</p>'
+                }
+            ]},
+            'minAllowableSelectionCount': {'value': 1},
+            'maxAllowableSelectionCount': {'value': 2}
         }
         customization_args_dict4 = {
             'choices': {'value': [
-                '<p>This is value1 for DragAndDropSortInput</p>',
-                '<p>This is value2 for DragAndDropSortInput</p>',
-            ]}
+                {
+                    'content_id': 'ca_choices_0',
+                    'html': '<p>This is value1 for DragAndDropSortInput</p>'
+                },
+                {
+                    'content_id': 'ca_choices_1',
+                    'html': '<p>This is value2 for DragAndDropSortInput</p>'
+                }
+            ]},
+            'allowMultipleItemsInSamePosition': {'value': True}
         }
 
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -7563,33 +4289,28 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state3.update_interaction_customization_args(customization_args_dict3)
         state4.update_interaction_customization_args(customization_args_dict4)
 
-        default_outcome_dict1 = {
-            'dest': 'state2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Default outcome for state1</p>'
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        state1.update_interaction_default_outcome(default_outcome_dict1)
+        default_outcome = state_domain.Outcome(
+            'state2', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], None, None
+        )
+        state1.update_interaction_default_outcome(default_outcome)
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1', '<p>Hello, this is html1 for state2</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>'
+                )
+            ),
+        ]
         state2.update_interaction_hints(hint_list2)
 
-        solution_dict1 = {
+        solution_dict = {
             'interaction_id': '',
             'answer_is_exclusive': True,
             'correct_answer': 'Answer1',
@@ -7598,77 +4319,67 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
+        solution = state_domain.Solution.from_dict(
+            state1.interaction.id, solution_dict)
+        state1.update_interaction_solution(solution)
 
-        state1.update_interaction_solution(solution_dict1)
-
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome1 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelectionInput</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelectionInput</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+        state_answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state1', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Outcome2 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        }),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 1
+                        })
+                ],
+                [],
+                None),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state3', state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Outcome1 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        })
+                ],
+                [],
+                None
+            )]
+        state_answer_group_list3 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Outcome for state3</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_0']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_2']
+                    })
+            ],
+            [],
+            None
+        )]
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
 
         expected_html_list = [
             '',
@@ -7686,8 +4397,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             '<p>This is solution for state1</p>',
             '<p>Hello, this is state3</p>',
             '<p>Outcome for state3</p>',
-            '<p>This is value1 for ItemSelectionInput</p>',
-            '<p>This is value3 for ItemSelectionInput</p>',
             '',
             '<p>This is value1 for ItemSelection</p>',
             '<p>This is value2 for ItemSelection</p>',
@@ -7700,4 +4409,4 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         actual_outcome_list = exploration.get_all_html_content_strings()
 
-        self.assertEqual(actual_outcome_list, expected_html_list)
+        self.assertEqual(set(actual_outcome_list), set(expected_html_list))

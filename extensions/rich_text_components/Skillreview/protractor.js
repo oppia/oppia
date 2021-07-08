@@ -17,16 +17,31 @@
  * end-to-end testing with Protractor.js
  */
 
-var objects = require('../../objects/protractor.js');
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeComponent = function(modal, index) {
-  objects.SkillSelector(
+var customizeComponent = async function(modal, text, skillDescription) {
+  await objects.UnicodeStringEditor(
+    modal.element(by.tagName('schema-based-unicode-editor'))
+  ).setValue(text);
+  await objects.SkillSelector(
     modal.element(by.tagName('skill-selector-editor'))
-  ).setValue(index);
+  ).setValue(skillDescription);
 };
 
-var expectComponentDetailsToMatch = function(elem, description) {
-  expect(elem.element(by.tagName('a'))).toBe('description');
+var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
+  var link = elem.element(by.tagName('a'));
+  expect(await link.getText()).toBe(text);
+  await link.click();
+  await waitFor.visibilityOf(
+    element(by.css('.protractor-test-concept-card-explanation')),
+    'concept-card-explanation taking too long to show up'
+  );
+  await forms.expectRichText(
+    element(by.css('.protractor-test-concept-card-explanation'))
+  ).toMatch(reviewMaterial);
 };
 
 exports.customizeComponent = customizeComponent;

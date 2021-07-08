@@ -34,75 +34,32 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
-from core.domain import topic_services
-from core.domain import user_jobs_continuous
+from core.domain import topic_fetchers
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
 
-(feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.suggestion])
-
-EXPLORATION_ID_KEY = 'explorationId'
-COLLECTION_ID_KEY = 'collectionId'
-QUESTION_ID_KEY = 'questionId'
+EXPLORATION_ID_KEY = 'exploration_id'
+COLLECTION_ID_KEY = 'collection_id'
 
 
-class NotificationsDashboardPage(base.BaseHandler):
-    """Page with notifications for the user."""
+class OldContributorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old contributor dashboard URL to the new one."""
 
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        self.render_template(
-            'notifications-dashboard-page.mainpage.html')
-
-
-class NotificationsDashboardHandler(base.BaseHandler):
-    """Provides data for the user notifications dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_creator_dashboard
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
+        self.redirect('/contributor-dashboard', permanent=True)
 
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
 
-        # Replace author_ids with their usernames.
-        author_ids = [
-            notification['author_id'] for notification in recent_notifications
-            if notification['author_id']]
-        author_usernames = user_services.get_usernames(author_ids)
+class OldCreatorDashboardRedirectPage(base.BaseHandler):
+    """Redirects the old creator dashboard URL to the new one."""
 
-        author_id_to_username = {
-            None: '',
-        }
-        for ind, author_id in enumerate(author_ids):
-            author_id_to_username[author_id] = author_usernames[ind]
-        for notification in recent_notifications:
-            notification['author_username'] = (
-                author_id_to_username[notification['author_id']])
-            del notification['author_id']
-
-        subscription_services.record_user_has_seen_notifications(
-            self.user_id, job_queued_msec if job_queued_msec else 0.0)
-
-        self.values.update({
-            # This may be None if no job has ever run for this user.
-            'job_queued_msec': job_queued_msec,
-            # This may be None if this is the first time the user has seen
-            # the dashboard.
-            'last_seen_msec': last_seen_msec,
-            'recent_notifications': recent_notifications,
-        })
-        self.render_json(self.values)
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
 class CreatorDashboardPage(base.BaseHandler):
@@ -167,10 +124,9 @@ class CreatorDashboardHandler(base.BaseHandler):
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
             reverse=True)
 
-        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            topic_summaries = topic_services.get_all_topic_summaries()
-            topic_summary_dicts = [
-                summary.to_dict() for summary in topic_summaries]
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
@@ -182,7 +138,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                     'category': collection_summary.category,
                     'objective': collection_summary.objective,
                     'language_code': collection_summary.language_code,
-                    'last_updated': utils.get_time_in_millisecs(
+                    'last_updated_msec': utils.get_time_in_millisecs(
                         collection_summary.collection_model_last_updated),
                     'created_on': utils.get_time_in_millisecs(
                         collection_summary.collection_model_created_on),
@@ -196,9 +152,7 @@ class CreatorDashboardHandler(base.BaseHandler):
                         collection_summary.category),
                 })
 
-        dashboard_stats = (
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.user_id))
+        dashboard_stats = user_services.get_dashboard_stats(self.user_id)
         dashboard_stats.update({
             'total_open_feedback': feedback_services.get_total_open_threads(
                 feedback_thread_analytics)
@@ -211,7 +165,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             user_services.get_last_week_dashboard_stats(self.user_id))
 
         if last_week_stats and len(list(last_week_stats.keys())) != 1:
-            logging.error(
+            logging.exception(
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
                 ' datetime string.')
@@ -251,7 +205,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             [('author_id', self.user_id),
              (
                  'suggestion_type',
-                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
+                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
         suggestions_which_can_be_reviewed = (
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
@@ -292,12 +246,11 @@ class CreatorDashboardHandler(base.BaseHandler):
             'threads_for_suggestions_to_review_list': (
                 threads_linked_to_suggestions_which_can_be_reviewed),
             'created_suggestions_list': suggestion_dicts_created_by_user,
-            'suggestions_to_review_list': suggestion_dicts_which_can_be_reviewed
+            'suggestions_to_review_list': (
+                suggestion_dicts_which_can_be_reviewed),
+            'topic_summary_dicts': topic_summary_dicts
         })
-        if constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            self.values.update({
-                'topic_summary_dicts': topic_summary_dicts
-            })
+
         self.render_json(self.values)
 
     @acl_decorators.can_access_creator_dashboard
@@ -306,31 +259,6 @@ class CreatorDashboardHandler(base.BaseHandler):
         user_services.update_user_creator_dashboard_display(
             self.user_id, creator_dashboard_display_pref)
         self.render_json({})
-
-
-class NotificationsHandler(base.BaseHandler):
-    """Provides data about unseen notifications."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self):
-        """Handles GET requests."""
-        num_unseen_notifications = 0
-        last_seen_msec = (
-            subscription_services.get_last_seen_notifications_msec(
-                self.user_id))
-        _, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator
-            .get_recent_user_changes(self.user_id))
-        for notification in recent_notifications:
-            if (notification['last_updated_ms'] > last_seen_msec and
-                    notification['author_id'] != self.user_id):
-                num_unseen_notifications += 1
-
-        self.render_json({
-            'num_unseen_notifications': num_unseen_notifications,
-        })
 
 
 class NewExplorationHandler(base.BaseHandler):

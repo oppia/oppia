@@ -21,7 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
-from core.domain import obj_services
+from core.domain import object_registry
 from core.domain import value_generators_domain
 import feconf
 import python_utils
@@ -44,18 +44,16 @@ class ParamSpec(python_utils.OBJECT):
         """
         self.obj_type = obj_type
 
-
     def to_dict(self):
         """Returns a dict representation of this ParamSpec.
 
         Returns:
             dict. A dict with a single key, whose value is the type
-                of the parameter represented by this ParamSpec.
+            of the parameter represented by this ParamSpec.
         """
         return {
             'obj_type': self.obj_type,
         }
-
 
     @classmethod
     def from_dict(cls, param_spec_dict):
@@ -68,22 +66,21 @@ class ParamSpec(python_utils.OBJECT):
 
         Returns:
             ParamSpec. A ParamSpec object created from the specified
-                object type.
+            object type.
         """
         return cls(param_spec_dict['obj_type'])
-
 
     def validate(self):
         """Validate the existence of the object class."""
 
         # Ensure that this object class exists.
-        obj_services.Registry.get_object_class_by_type(self.obj_type)
+        object_registry.Registry.get_object_class_by_type(self.obj_type)
 
         # Ensure the obj_type is among the supported ParamSpec types.
         if self.obj_type not in self.SUPPORTED_OBJ_TYPES:
             raise utils.ValidationError(
-                ('%s is not among the supported object types for parameters: '
-                 '{%s}.') %
+                '%s is not among the supported object types for parameters:'
+                ' {%s}.' %
                 (self.obj_type, ', '.join(sorted(self.SUPPORTED_OBJ_TYPES))))
 
 
@@ -178,8 +175,8 @@ class ParamChange(python_utils.OBJECT):
 
         Returns:
             ParamChange. The ParamChange object created from the
-                `param_change_dict` dict, which specifies the name,
-                customization arguments and the generator used.
+            `param_change_dict` dict, which specifies the name,
+            customization arguments and the generator used.
         """
         return cls(
             param_change_dict['name'], param_change_dict['generator_id'],
@@ -194,7 +191,7 @@ class ParamChange(python_utils.OBJECT):
     def get_normalized_value(self, obj_type, context_params):
         """Generates a single normalized value for a parameter change."""
         raw_value = self._get_value(context_params)
-        return obj_services.Registry.get_object_class_by_type(
+        return object_registry.Registry.get_object_class_by_type(
             obj_type).normalize(raw_value)
 
     def validate(self):
@@ -208,15 +205,14 @@ class ParamChange(python_utils.OBJECT):
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
 
-        try:
-            self.generator
-        except KeyError:
+        if not isinstance(self._generator_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid generator id %s' % self._generator_id)
-        except Exception:
+                'Expected generator ID to be a string, received %s '
+                % self._generator_id)
+
+        if not hasattr(self, 'generator'):
             raise utils.ValidationError(
-                'Expected generator id to be a string, received %s '
-                % (self._generator_id))
+                'Invalid generator ID %s' % self._generator_id)
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

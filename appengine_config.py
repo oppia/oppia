@@ -12,70 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: skip-file
-
 """Configuration for App Engine."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import os
 import sys
-import time
 
-import feconf
+import python_utils
 
-# Whether to calculate costs for RPCs, in addition to time taken.
-appstats_CALC_RPC_COSTS = True
-# The number of lines to record for an RPC stacktrace.
-appstats_MAX_STACK = 50
+from google.appengine.ext import vendor
+import pkg_resources
 
-
-def webapp_add_wsgi_middleware(app):  # pragma: no cover
-    """Add AppStats recording.
-
-    This also sets the level of appstats log messages to 'debug' by
-    monkey-patching. For details, see:
-
-        https://stackoverflow.com/questions/4305243/disable-appstats-logging
-    """
-
-    from google.appengine.ext.appstats import recording
-
-    def save(self):
-        t0 = time.time()
-        with self._lock:
-            num_pending = len(self.pending)
-        if num_pending:
-            logging.warn('Found %d RPC request(s) without matching response '
-                         '(presumably due to timeouts or other errors)',
-                         num_pending)
-        self.dump()
-        try:
-            key, len_part, len_full = self._save()
-        except Exception:
-            logging.exception('Recorder.save() failed')
-            return
-        t1 = time.time()
-        link = 'http://%s%s/details?time=%s' % (
-            self.env.get('HTTP_HOST', ''),
-            recording.config.stats_url,
-            int(self.start_timestamp * 1000))
-        logging.debug('Saved; key: %s, part: %s bytes, full: %s bytes, '
-                      'overhead: %.3f + %.3f; link: %s',
-                      key, len_part, len_full, self.overhead, t1 - t0, link)
-
-    recording.Recorder.save = save
-
-    app = recording.appstats_wsgi_middleware(app)
-    return app
-
+from typing import Any, Text # isort:skip # pylint: disable=unused-import
 
 # Root path of the app.
 ROOT_PATH = os.path.dirname(__file__)
+THIRD_PARTY_PATH = os.path.join(ROOT_PATH, 'third_party')
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
+OPPIA_TOOLS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools')
+THIRD_PARTY_PYTHON_LIBS_PATH = os.path.join(THIRD_PARTY_PATH, 'python_libs')
+
 
 # oppia_tools/ is available locally (in both dev and prod mode). However,
 # on the GAE production server, oppia_tools/ is not available, and the default
@@ -84,31 +42,89 @@ oppia_tools_path = os.path.join(_PARENT_DIR, 'oppia_tools')
 # We cannot special-case this using DEV_MODE because it is possible to run
 # Oppia in production mode locally, where a built-in PIL won't be available.
 # Hence the check for oppia_tools instead.
-if os.path.isdir(oppia_tools_path):
-    pil_path = os.path.join(oppia_tools_path, 'Pillow-6.0.0')
-    if not os.path.isdir(pil_path):
-        raise Exception('Invalid path for oppia_tools library: %s' % pil_path)
-    sys.path.insert(0, pil_path)
+if os.path.isdir(OPPIA_TOOLS_PATH):
+    PIL_PATH = os.path.join(OPPIA_TOOLS_PATH, 'Pillow-6.2.2')
+    if not os.path.isdir(PIL_PATH):
+        raise Exception('Invalid path for oppia_tools library: %s' % PIL_PATH)
+    sys.path.insert(0, PIL_PATH) # type: ignore[arg-type]
 
-THIRD_PARTY_LIBS = [
-    os.path.join(ROOT_PATH, 'third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'bleach-3.1.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'callbacks-0.3.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'future-0.17.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.22.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-mapreduce-1.9.22.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.42.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.16.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
-    os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.9.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'webencodings-0.5.1'),
-]
 
-for lib_path in THIRD_PARTY_LIBS:
-    if not os.path.isdir(lib_path):
-        raise Exception('Invalid path for third_party library: %s' % lib_path)
-    sys.path.insert(0, lib_path)
+# Google App Engine (GAE) uses its own virtual environment that sets up the
+# python library system path using their third party python library, vendor. In
+# order to inform GAE of the packages that are required for Oppia, we need to
+# add it using the vendor library. More information can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/tools/using-libraries-python-27
+vendor.add(THIRD_PARTY_PYTHON_LIBS_PATH)
+pkg_resources.working_set.add_entry(THIRD_PARTY_PYTHON_LIBS_PATH)
+
+# It is necessary to reload the six module because of a bug in the google cloud
+# ndb imports. More details can be found here:
+# https://github.com/googleapis/python-ndb/issues/249.
+# We need to reload at the very end of this file because we have to add the
+# six python path to the app engine vendor first.
+import six # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+reload(six) # pylint: disable=reload-builtin
+
+
+# For some reason, pkg_resources.get_distribution returns an empty list in the
+# prod env. We need to monkeypatch this function so that prod deployments
+# work. Otherwise, pkg_resources.get_distribution('google-api-core').version in
+# google/api_core/__init__.py throws a DistributionNotFound error, and
+# similarly for pkg_resources.get_distribution('google-cloud-tasks').version in
+# google/cloud/tasks_v2/gapic/cloud_tasks_client.py, which results in the
+# entire application being broken on production.
+import requests_toolbelt.adapters.appengine # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+requests_toolbelt.adapters.appengine.monkeypatch()
+old_get_distribution = pkg_resources.get_distribution # pylint: disable=invalid-name
+
+# Disables "AppEnginePlatformWarning" because it is a "warning" that occurs
+# frequently and tends to bury other important logs.
+# It should be fine to ignore this, see https://stackoverflow.com/a/47494229
+# and https://github.com/urllib3/urllib3/issues/1138#issuecomment-290325277.
+import requests # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+requests.packages.urllib3.disable_warnings( # type: ignore[no-untyped-call]
+    requests.packages.urllib3.contrib.appengine.AppEnginePlatformWarning # type: ignore[attr-defined]
+)
+
+
+class MockDistribution(python_utils.OBJECT):
+    """Mock distribution object for the monkeypatching function."""
+
+    def __init__(self, version):
+        # type: (Text) -> None
+        self.version = version
+
+
+def monkeypatched_get_distribution(distribution_name):
+    # type: (Text) -> Any
+    """Monkeypatched version of pkg_resources.get_distribution.
+
+    This approach is inspired by the discussion at:
+
+        https://github.com/googleapis/google-cloud-python/issues/1893#issuecomment-396983379
+
+    Args:
+        distribution_name: str. The name of the distribution to get the
+            Distribution object for.
+
+    Returns:
+        *. An object that contains the version attribute needed for App Engine
+        third-party libs to successfully initialize. This is a hack to get the
+        new Python 3 libs working in a Python 2 environment.
+
+    Raises:
+        Exception. The mock is used in a context apart from the google-api-core
+            and google-cloud-tasks initializations.
+    """
+    try:
+        return old_get_distribution(distribution_name)
+    except pkg_resources.DistributionNotFound:
+        if distribution_name == 'google-cloud-tasks':
+            return MockDistribution('1.5.0')
+        if distribution_name == 'google-cloud-translate':
+            return MockDistribution('2.0.1')
+        else:
+            raise
+
+
+pkg_resources.get_distribution = monkeypatched_get_distribution

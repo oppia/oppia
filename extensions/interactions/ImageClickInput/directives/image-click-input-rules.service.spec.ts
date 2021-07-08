@@ -20,7 +20,7 @@ import { ImageClickInputRulesService } from
   'interactions/ImageClickInput/directives/image-click-input-rules.service';
 
 describe('Image Click Input rules service', () => {
-  let icirs: ImageClickInputRulesService = null;
+  let icirs: ImageClickInputRulesService;
   beforeEach(() => {
     icirs = new ImageClickInputRulesService();
   });

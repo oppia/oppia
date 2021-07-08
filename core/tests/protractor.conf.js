@@ -1,6 +1,13 @@
+require('dotenv').config();
+var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var glob = require('glob')
-var path = require('path')
+var glob = require('glob');
+var path = require('path');
+var fs = require('fs');
+var childProcess = require('child_process');
+var Constants = require('./protractor_utils/ProtractorConstants');
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
+var exitCode = 0;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -41,8 +48,8 @@ var suites = {
       'protractor_desktop/collections.js'
     ],
 
-    communityDashboard: [
-      'protractor_desktop/communityDashboard.js'
+    contributorDashboard: [
+      'protractor_desktop/contributorDashboard.js'
     ],
 
     coreEditorAndPlayerFeatures: [
@@ -53,8 +60,16 @@ var suites = {
       'protractor_desktop/creatorDashboard.js'
     ],
 
+    emailDashboard: [
+      'protractor_desktop/emailDashboard.js'
+    ],
+
     embedding: [
       'protractor_desktop/embedding.js'
+    ],
+
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
     ],
 
     explorationFeedbackTab: [
@@ -63,10 +78,6 @@ var suites = {
 
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
-    ],
-
-    explorationImprovementsTab: [
-      'protractor_desktop/explorationImprovementsTab.js'
     ],
 
     explorationStatisticsTab: [
@@ -81,8 +92,16 @@ var suites = {
       'protractor_desktop/extensions.js'
     ],
 
+    featureGating: [
+      'protractor/featureGatingFlow.js'
+    ],
+
     fileUploadFeatures: [
       'protractor_desktop/voiceoverUploadFeatures.js'
+    ],
+
+    fileUploadExtensions: [
+      'protractor_desktop/fileUploadExtensions.js'
     ],
 
     learnerDashboard: [
@@ -99,6 +118,10 @@ var suites = {
 
     navigation: [
       'protractor_desktop/navigation.js'
+    ],
+
+    playVoiceovers: [
+      'protractor_desktop/playVoiceovers.js'
     ],
 
     preferences: [
@@ -137,9 +160,17 @@ var suites = {
       'protractor_desktop/skillEditor.js'
     ],
 
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
+    ],
+
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+
+    wipeout: [
+      'protractor_desktop/wipeout.js',
+    ]
   };
 
 // A reference configuration file.
@@ -156,7 +187,7 @@ exports.config = {
   //
   // If the chromeOnly option is specified, no Selenium server will be started,
   // and chromeDriver will be used directly (from the location specified in
-  // chromeDriver)
+  // chromeDriver).
 
   // The location of the selenium standalone server .jar file, relative
   // to the location of this config. If no other method of starting selenium
@@ -192,7 +223,7 @@ exports.config = {
           } else {
             errorMessage = pattern + ' does not exist.';
           }
-          throw Error(errorMessage)
+          throw new Error(errorMessage)
         }
       }
     });
@@ -209,7 +240,7 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  // (Note that the hint tooltip has a 60-second timeout.)
+  // (Note that the hint tooltip has a 60-second timeout).
   allScriptsTimeout: 180000,
 
 
@@ -230,15 +261,31 @@ exports.config = {
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
     browserName: 'chrome',
-    chromeOptions: {
+    'goog:chromeOptions': {
+      // Chromedriver versions 75+ sets w3c mode to true by default.
+      // see https://chromedriver.storage.googleapis.com/75.0.3770.8/notes.txt
+      // This causes certain legacy APIs to fail eg. sendKeysToActiveElement.
+      // The workaround is to set this property to false per discussion on
+      // this thread: https://github.com/angular/protractor/issues/5274
+      w3c: false,
       args: [
         '--lang=en-EN',
         '--window-size=1285x1000',
-        // These arguments let us simulate recording from a microphone
+        // These arguments let us simulate recording from a microphone.
         '--use-fake-device-for-media-stream',
         '--use-fake-ui-for-media-stream',
         '--use-file-for-fake-audio-capture=data/cafe.mp3',
-      ]
+        // These arguments are required to run the tests on GitHub
+        // Actions.
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+      ],
+      prefs: {
+        download: {
+            'prompt_for_download': false,
+            'default_directory': DOWNLOAD_PATH,
+          }
+      }
     },
     prefs: {
       intl: {
@@ -262,10 +309,6 @@ exports.config = {
   // with relative paths will be prepended with this.
   baseUrl: 'http://localhost:9001',
 
-  // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>
-  rootElement: 'body',
-
   // A callback function called once protractor is ready and available, and
   // before the specs are executed
   // You can specify a file containing code to run by setting onPrepare to
@@ -277,36 +320,92 @@ exports.config = {
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
 
-    // This is currently pulled out into a flag because it sometimes obscures
-    // the actual protractor error logs and does not close the browser after
-    // a failed run.
-    // TODO(sll): Switch this option on by default, once the above issues are
-    // fixed.
-    var _ADD_SCREENSHOT_REPORTER = false;
+    var spw = null;
+    var vidPath = '';
+    // Enable ALL_VIDEOS if you want success videos to be saved.
+    const ALL_VIDEOS = false;
 
-    if (_ADD_SCREENSHOT_REPORTER) {
+    // Only running video recorder on Github Actions, since running it on
+    // CicleCI causes RAM issues (meaning very high flakiness).
+
+    if (process.env.GITHUB_ACTIONS && process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      jasmine.getEnv().addReporter({
+        specStarted: function(result){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1285x1000',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-loglevel', '16',
+          ];
+          const uniqueString = Math.random().toString(36).substring(2,8);
+          var name = uniqueString + '.mp4';
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          vidPath = path.resolve(dirPath, name);
+          console.log('Test name: ' + result.fullName + ' has video path ' + vidPath);
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.on('message', (message) => {console.log(`ffmpeg stdout: ${message}`)});
+          spw.on('error', (errorMessage) => {console.error(`ffmpeg stderr: ${errorMessage}`)});
+          spw.on('close', (code) => {console.log(`ffmpeg exited with code ${code}`)});
+        },
+        specDone: function(result) {
+          spw.kill();
+          if (result.status == 'passed' && !ALL_VIDEOS && fs.existsSync(vidPath)) {
+            fs.unlinkSync(vidPath);
+            console.log(`Video for test: ${result.fullName} was deleted successfully (test passed).`);
+          }
+        },
+      });
+    }
+    else {
+      console.log(
+        'Videos will not be recorded for this suite either because videos' +
+        ' have been disabled for it (using environment variables) or' +
+        ' because it\'s on CircleCI');
+    }
+
+    // Screenshots will only run on CircleCI, since we don't have videos here.
+    // We don't need these on Github Actions since we have videos.
+
+    if (process.env.CIRCLECI) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
-        // Directory for screenshots
+        // Directory for screenshots.
         dest: '../protractor-screenshots',
-        // Function to build filenames of screenshots
-        filename: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
+        // Function to build filenames of screenshots.
+        pathBuilder: function(currentSpec) {
+          let filename = currentSpec.fullName;
+          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
         },
-        captureOnlyFailedSpecs: true
+        captureOnlyFailedSpecs: true,
+        reportFailedUrl: true,
+        preserveDirectory: true
       }));
     }
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: 'all',
+      displayStacktrace: 'pretty',
       displaySpecDuration: true
     }));
 
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.driver.manage().window().setSize(1285, 1000);
+
+    // Configure the Firebase Admin SDK to communicate with the emulator.
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+
+    // Navigate to the splash page so that tests can begin on an Angular page.
+    browser.driver.get('http://localhost:9001');
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -359,8 +458,22 @@ exports.config = {
     // Only execute the features or scenarios with tags matching @dev.
     // This may be an array of strings to specify multiple tags to include.
     tags: '@dev',
-    // How to format features (default: progress)
+    // How to format features (default: progress).
     format: 'summary'
+  },
+
+  SELENIUM_PROMISE_MANAGER: false,
+
+  // A callback function called once tests are finished. onComplete can
+  // optionally return a promise, which Protractor will wait for before
+  // shutting down webdriver.
+
+  // At this point, tests will be done but global objects will still be
+  // available.
+  onComplete: function(success){
+    if (!success) {
+      exitCode = 1;
+    }
   },
 
   // ----- The cleanup step -----
@@ -368,5 +481,9 @@ exports.config = {
   // A callback function called once the tests have finished running and
   // the webdriver instance has been shut down. It is passed the exit code
   // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  onCleanUp: function() {
+    if (exitCode !== 0){
+      process.exit(exitCode);
+    }
+  }
 };

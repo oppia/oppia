@@ -32,9 +32,11 @@ import os
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import collection_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import subscription_services
@@ -47,7 +49,6 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -70,14 +71,14 @@ def _migrate_collection_contents_to_latest_schema(
     this function to account for that new version.
 
     Args:
-        versioned_collection_contents: A dict with two keys:
+        versioned_collection_contents: dict. A dict with two keys:
           - schema_version: int. The schema version for the collection.
           - collection_contents: dict. The dict comprising the collection
               contents.
 
     Raises:
-        Exception: The schema version of the collection is outside of what is
-        supported at present.
+        Exception. The schema version of the collection is outside of what is
+            supported at present.
     """
     collection_schema_version = versioned_collection_contents['schema_version']
     if not (1 <= collection_schema_version
@@ -91,23 +92,6 @@ def _migrate_collection_contents_to_latest_schema(
         collection_domain.Collection.update_collection_contents_from_model(
             versioned_collection_contents, collection_schema_version)
         collection_schema_version += 1
-
-
-# Repository GET methods.
-def _get_collection_memcache_key(collection_id, version=None):
-    """Returns a memcache key for the collection.
-
-    Args:
-        collection_id: str. ID of the collection.
-        version: int. Schema version of the collection.
-
-    Returns:
-        str. The memcache key of the collection.
-    """
-    if version:
-        return 'collection-version:%s:%s' % (collection_id, version)
-    else:
-        return 'collection:%s' % collection_id
 
 
 def get_collection_from_model(collection_model):
@@ -160,10 +144,12 @@ def get_collection_summary_from_model(collection_summary_model):
     collection summary model.
 
     Args:
-        collection_summary_model: CollectionSummaryModel.
+        collection_summary_model: CollectionSummaryModel. The model object
+            to extract domain object for oppia collection summary.
 
     Returns:
-        CollectionSummary.
+        CollectionSummary. The collection summary domain object extracted
+        from collection summary model.
     """
     return collection_domain.CollectionSummary(
         collection_summary_model.id, collection_summary_model.title,
@@ -197,19 +183,24 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         Collection or None. The domain object representing a collection with the
         given id, or None if it does not exist.
     """
-    collection_memcache_key = _get_collection_memcache_key(
-        collection_id, version=version)
-    memcached_collection = memcache_services.get_multi(
-        [collection_memcache_key]).get(collection_memcache_key)
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_collection = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION,
+        sub_namespace,
+        [collection_id]
+    ).get(collection_id)
 
-    if memcached_collection is not None:
-        return memcached_collection
+    if cached_collection is not None:
+        return cached_collection
     else:
         collection_model = collection_models.CollectionModel.get(
             collection_id, strict=strict, version=version)
         if collection_model:
             collection = get_collection_from_model(collection_model)
-            memcache_services.set_multi({collection_memcache_key: collection})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_COLLECTION,
+                sub_namespace,
+                {collection_id: collection})
             return collection
         else:
             return None
@@ -247,18 +238,17 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             exists in the datastore.
 
     Returns:
-        A dict of domain objects representing collections with the given ids as
-        keys.
+        dict. A dict of domain objects representing collections with
+        the given ids as keys.
 
     Raises:
-        ValueError: 'strict' is True, and one or more of the given collection
-            ids are invalid.
+        ValueError. The 'strict' is True, and one or more of the given
+            collection ids are invalid.
     """
-    collection_ids = set(collection_ids)
     result = {}
     uncached = []
-    memcache_keys = [_get_collection_memcache_key(i) for i in collection_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
 
     for collection_obj in cache_result.values():
         result[collection_obj.id] = collection_obj
@@ -277,8 +267,9 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             collection = get_collection_from_model(model)
             db_results_dict[cid] = collection
         else:
-            logging.info('Tried to fetch collection with id %s, but no such '
-                         'collection exists in the datastore' % cid)
+            logging.info(
+                'Tried to fetch collection with id %s, but no such '
+                'collection exists in the datastore' % cid)
             not_found.append(cid)
 
     if strict and not_found:
@@ -292,7 +283,8 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
     }
 
     if cache_update:
-        memcache_services.set_multi(cache_update)
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_COLLECTION, None, cache_update)
 
     result.update(db_results_dict)
     return result
@@ -408,7 +400,7 @@ def get_explorations_completed_in_collections(user_id, collection_ids):
 
     Returns:
         list(list(str)). List of the exploration ids completed in each
-            collection.
+        collection.
     """
     progress_models = user_models.CollectionProgressModel.get_multi(
         user_id, collection_ids)
@@ -432,12 +424,12 @@ def get_valid_completed_exploration_ids(user_id, collection):
 
     Args:
         user_id: str. ID of the given user.
-        collection: Collection.
+        collection: Collection. The collection to fetch exploration from.
 
     Returns:
-        A filtered version of the return value of get_completed_exploration_ids
-        which only includes explorations found within the current version of
-        the collection.
+        list(str). A filtered version of the return value of
+        get_completed_exploration_ids which only includes explorations found
+        within the current version of the collection.
     """
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection.id)
@@ -487,6 +479,7 @@ def record_played_exploration_in_collection_context(
 
     if exploration_id not in progress_model.completed_explorations:
         progress_model.completed_explorations.append(exploration_id)
+        progress_model.update_timestamps()
         progress_model.put()
 
 
@@ -499,7 +492,7 @@ def get_collection_summary_dicts_from_models(collection_summary_models):
             iterable of CollectionSummaryModel instances.
 
     Returns:
-        A dict containing corresponding collection summary domain objects,
+        dict. A dict containing corresponding collection summary domain objects,
         keyed by id.
     """
     collection_summaries = [
@@ -517,7 +510,7 @@ def get_collection_summaries_matching_ids(collection_ids):
     exist).
 
     Args:
-        collection_ids: A list of collection ids.
+        collection_ids: list(str). A list of collection ids.
 
     Returns:
         list(CollectionSummary). A list with the corresponding summary domain
@@ -548,37 +541,69 @@ def get_collection_summaries_subscribed_to(user_id):
     ]
 
 
-# TODO(bhenning): Update this function to support also matching the query to
-# explorations contained within this collection. Introduce tests to verify this
-# behavior.
-def get_collection_ids_matching_query(query_string, cursor=None):
+def get_collection_summaries_where_user_has_role(user_id):
+    """Returns a list of CollectionSummary domain objects where the user has
+    some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects
+        where the user has some role.
+    """
+    col_summary_models = collection_models.CollectionSummaryModel.query(
+        datastore_services.any_of(
+            collection_models.CollectionSummaryModel.owner_ids == user_id,
+            collection_models.CollectionSummaryModel.editor_ids == user_id,
+            collection_models.CollectionSummaryModel.viewer_ids == user_id,
+            collection_models.CollectionSummaryModel.contributor_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_collection_summary_from_model(col_summary_model)
+        for col_summary_model in col_summary_models
+    ]
+
+
+def get_collection_ids_matching_query(
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all collection ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     Args:
         query_string: str. The search query string.
-        cursor: str or None. Cursor indicating where, in the list of
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        offset: str or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_cursor), where:
+        2-tuple of (returned_collection_ids, search_offset). Where:
             returned_collection_ids : list(str). A list with all collection ids
                 matching the given search query string, as well as a search
-                cursor for future fetches. The list contains exactly
+                offset for future fetches. The list contains exactly
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_cursor: str. Search cursor for future fetches.
+            search_offset: str. Search offset for future fetches.
     """
     returned_collection_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
-        collection_ids, search_cursor = search_services.search_collections(
-            query_string, remaining_to_fetch, cursor=search_cursor)
+        collection_ids, search_offset = search_services.search_collections(
+            query_string, categories, language_codes, remaining_to_fetch,
+            offset=search_offset)
 
         # Collection model cannot be None as we are fetching the collection ids
         # through query and there cannot be a collection id for which there is
@@ -588,13 +613,13 @@ def get_collection_ids_matching_query(query_string, cursor=None):
                     collection_ids)):
             returned_collection_ids.append(collection_ids[ind])
 
-        # The number of collections in a page is always lesser or equal to
+        # The number of collections in a page is always less than or equal to
         # feconf.SEARCH_RESULTS_PAGE_SIZE.
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
-                search_cursor is None):
+                search_offset is None):
             break
 
-    return (returned_collection_ids, search_cursor)
+    return (returned_collection_ids, search_offset)
 
 
 # Repository SAVE and DELETE methods.
@@ -604,18 +629,19 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry is a dict that represents a
-            CollectionChange.
-    object.
+            collection. Each entry is a dict that represents a CollectionChange
+            object.
 
     Returns:
-      Collection. The resulting collection domain object.
+        Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
-    try:
-        changes = [collection_domain.CollectionChange(change_dict)
-                   for change_dict in change_list]
 
+    try:
+        changes = [
+            collection_domain.CollectionChange(change_dict)
+            for change_dict in change_list
+        ]
         for change in changes:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
                 collection.add_node(change.exploration_id)
@@ -639,14 +665,14 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_PROPERTY_TAGS):
                     collection.update_tags(change.new_value)
-            elif (
-                    change.cmd ==
-                    collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
                 # Loading the collection model from the datastore into an
                 # Collection domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+
         return collection
 
     except Exception as e:
@@ -654,7 +680,7 @@ def apply_change_list(collection_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def validate_exps_in_collection_are_public(collection):
@@ -664,7 +690,7 @@ def validate_exps_in_collection_are_public(collection):
         collection: Collection. Collection to be validated.
 
     Raises:
-        ValidationError: The collection contains at least one private
+        ValidationError. The collection contains at least one private
             exploration.
     """
     for exploration_id in collection.exploration_ids:
@@ -687,9 +713,9 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             entry in change_list is a dict that represents a CollectionChange.
 
     Raises:
-        ValidationError: An invalid exploration was referenced in the
+        ValidationError. An invalid exploration was referenced in the
             collection.
-        Exception: The collection model and the incoming collection domain
+        Exception. The collection model and the incoming collection domain
             object have different version numbers.
     """
     if not change_list:
@@ -698,7 +724,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             'save collection %s: %s' % (collection.id, change_list))
 
     collection_rights = rights_manager.get_collection_rights(collection.id)
-    if collection_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if collection_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         collection.validate(strict=True)
     else:
         collection.validate(strict=False)
@@ -753,9 +779,11 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             collection_node.to_dict() for collection_node in collection.nodes
         ]
     }
-    collection_model.node_count = len(collection_model.nodes)
+    collection_model.node_count = len(
+        collection_model.collection_contents['nodes'])
     collection_model.commit(committer_id, commit_message, change_list)
-    memcache_services.delete(_get_collection_memcache_key(collection.id))
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
     index_collections_given_ids([collection.id])
 
     collection.version += 1
@@ -768,7 +796,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
 
     Args:
         committer_id: str. ID of the committer.
-        collection: Collection. collection domain object.
+        collection: Collection. Collection domain object.
         commit_message: str. A description of changes made to the collection.
         commit_cmds: list(dict). A list of change commands made to the given
             collection.
@@ -794,7 +822,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    create_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(
+        collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -856,10 +885,8 @@ def delete_collections(committer_id, collection_ids, force_deletion=False):
 
     # This must come after the collection is retrieved. Otherwise the memcache
     # key will be reinstated.
-    collection_memcache_keys = [
-        _get_collection_memcache_key(collection_id)
-        for collection_id in collection_ids]
-    memcache_services.delete_multi(collection_memcache_keys)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_COLLECTION, None, collection_ids)
 
     # Delete the collection from search.
     search_services.delete_collections_from_search_index(collection_ids)
@@ -939,7 +966,8 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    update_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(
+        collection.id, committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
@@ -947,39 +975,44 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def create_collection_summary(collection_id, contributor_id_to_add):
-    """Creates and stores a summary of the given collection.
+def regenerate_collection_summary_with_new_contributor(
+        collection_id, contributor_id):
+    """Regenerate a summary of the given collection and add a new contributor to
+    the contributors summary. If the summary does not exist, this function
+    generates a new one.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
+        contributor_id: str. ID of the contributor to be added to the collection
+            summary.
     """
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(
-        collection, contributor_id_to_add)
+    collection_summary = _compute_summary_of_collection(collection)
+    collection_summary.add_contribution_by_user(contributor_id)
     save_collection_summary(collection_summary)
 
 
-def update_collection_summary(collection_id, contributor_id_to_add):
-    """Update the summary of an collection.
+def regenerate_collection_and_contributors_summaries(collection_id):
+    """Regenerate a summary of the given collection and also regenerate
+    the contributors summary from the snapshots. If the summary does not exist,
+    this function generates a new one.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
     """
-    create_collection_summary(collection_id, contributor_id_to_add)
+    collection = get_collection_by_id(collection_id)
+    collection_summary = _compute_summary_of_collection(collection)
+    collection_summary.contributors_summary = (
+        compute_collection_contributors_summary(collection_summary.id))
+    save_collection_summary(collection_summary)
 
 
-def compute_summary_of_collection(collection, contributor_id_to_add):
+def _compute_summary_of_collection(collection):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
 
     Args:
         collection: Collection. The domain object.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
@@ -989,31 +1022,11 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     collection_summary_model = (
         collection_models.CollectionSummaryModel.get_by_id(collection.id))
 
-    # Update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an collection's content).
-    if collection_summary_model:
-        contributor_ids = collection_summary_model.contributor_ids
-        contributors_summary = collection_summary_model.contributors_summary
-    else:
-        contributor_ids = []
-        contributors_summary = {}
-
-    if (contributor_id_to_add is not None and
-            contributor_id_to_add not in constants.SYSTEM_USER_IDS and
-            contributor_id_to_add not in contributor_ids):
-        contributor_ids.append(contributor_id_to_add)
-
-    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit.
-            contributors_summary = compute_collection_contributors_summary(
-                collection.id)
-        else:
-            if contributor_id_to_add in contributors_summary:
-                contributors_summary[contributor_id_to_add] += 1
-            else:
-                contributors_summary[contributor_id_to_add] = 1
+    contributors_summary = (
+        collection_summary_model.contributors_summary
+        if collection_summary_model else {}
+    )
+    contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
@@ -1026,8 +1039,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         collection_rights.owner_ids, collection_rights.editor_ids,
         collection_rights.viewer_ids, contributor_ids, contributors_summary,
         collection.version, collection_model_node_count,
-        collection_model_created_on,
-        collection_model_last_updated
+        collection_model_created_on, collection_model_last_updated
     )
 
     return collection_summary
@@ -1040,7 +1052,7 @@ def compute_collection_contributors_summary(collection_id):
         collection_id: str. ID of the collection.
 
     Returns:
-        A dict whose keys are user_ids and whose values are the number of
+        dict. A dict whose keys are user_ids and whose values are the number of
         (non-revert) commits made to the given collection by that user_id.
         This does not count commits which have since been reverted.
     """
@@ -1057,6 +1069,15 @@ def compute_collection_contributors_summary(collection_id):
             break
 
         current_version -= 1
+
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
+        if user_settings is None:
+            del contributors_summary[contributor_id]
+
     return contributors_summary
 
 
@@ -1065,32 +1086,43 @@ def save_collection_summary(collection_summary):
     entity in the datastore.
 
     Args:
-        collection_summary: The collection summary object to be saved in the
-            datastore.
+        collection_summary: CollectionSummaryModel. The collection summary
+            object to be saved in the datastore.
     """
-    collection_summary_model = collection_models.CollectionSummaryModel(
-        id=collection_summary.id,
-        title=collection_summary.title,
-        category=collection_summary.category,
-        objective=collection_summary.objective,
-        language_code=collection_summary.language_code,
-        tags=collection_summary.tags,
-        status=collection_summary.status,
-        community_owned=collection_summary.community_owned,
-        owner_ids=collection_summary.owner_ids,
-        editor_ids=collection_summary.editor_ids,
-        viewer_ids=collection_summary.viewer_ids,
-        contributor_ids=collection_summary.contributor_ids,
-        contributors_summary=collection_summary.contributors_summary,
-        version=collection_summary.version,
-        node_count=collection_summary.node_count,
-        collection_model_last_updated=(
+    collection_summary_dict = {
+        'title': collection_summary.title,
+        'category': collection_summary.category,
+        'objective': collection_summary.objective,
+        'language_code': collection_summary.language_code,
+        'tags': collection_summary.tags,
+        'status': collection_summary.status,
+        'community_owned': collection_summary.community_owned,
+        'owner_ids': collection_summary.owner_ids,
+        'editor_ids': collection_summary.editor_ids,
+        'viewer_ids': collection_summary.viewer_ids,
+        'contributor_ids': list(collection_summary.contributors_summary.keys()),
+        'contributors_summary': collection_summary.contributors_summary,
+        'version': collection_summary.version,
+        'node_count': collection_summary.node_count,
+        'collection_model_last_updated': (
             collection_summary.collection_model_last_updated),
-        collection_model_created_on=(
+        'collection_model_created_on': (
             collection_summary.collection_model_created_on)
-    )
+    }
 
-    collection_summary_model.put()
+    collection_summary_model = (
+        collection_models.CollectionSummaryModel.get_by_id(
+            collection_summary.id))
+    if collection_summary_model is not None:
+        collection_summary_model.populate(**collection_summary_dict)
+        collection_summary_model.update_timestamps()
+        collection_summary_model.put()
+    else:
+        collection_summary_dict['id'] = collection_summary.id
+        model = collection_models.CollectionSummaryModel(
+            **collection_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def delete_collection_summaries(collection_ids):
@@ -1102,7 +1134,12 @@ def delete_collection_summaries(collection_ids):
     """
     summary_models = (
         collection_models.CollectionSummaryModel.get_multi(collection_ids))
-    collection_models.CollectionSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    collection_models.CollectionSummaryModel.delete_multi(
+        existing_summary_models)
 
 
 def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
@@ -1143,8 +1180,9 @@ def delete_demo(collection_id):
 
     collection = get_collection_by_id(collection_id, strict=False)
     if not collection:
-        logging.info('Collection with id %s was not deleted, because it '
-                     'does not exist.' % collection_id)
+        logging.info(
+            'Collection with id %s was not deleted, because it '
+            'does not exist.' % collection_id)
     else:
         delete_collection(
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)

@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h3> <[modalHeader]> </h3>
+</div>
+
+<div class="modal-body">
+  <concept-card skill-ids="skillIds" index="index"> </concept-card>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="cancel()">
+    Close
+  </button>
+  <button class="btn btn-success"
+          ng-if="isInTestMode && !isLastConceptCard()"
+          ng-click="goToNextConceptCard()">
+    Next
+  </button>
+  <button class="btn btn-success"
+          ng-if="isInTestMode && isLastConceptCard()"
+          ng-click="retryTest()">
+    Retry Test
+  </button>
+</div>

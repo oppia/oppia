@@ -1,0 +1,62 @@
+<button mat-button
+        class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button oppia-autofocus"
+        [oppiaFocusOn]="focusLabel"
+        (click)="clickContinueButton.emit()"
+        aria-label="Continue">
+  <div *ngIf="!isLearnAgainButton">
+    <span class="protractor-test-next-card-button">{{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate | uppercase }}</span>
+    <i class="fas fa-arrow-right icon">
+    </i>
+  </div>
+  <div *ngIf="isLearnAgainButton">
+    <span class="protractor-test-next-card-button">{{ 'I18N_PLAYER_LEARN_AGAIN_BUTTON' | translate | uppercase }}</span>
+    <i class="fas fa-redo icon">
+    </i>
+  </div>
+</button>
+
+<style>
+  .oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled] {
+    background-color: transparent;
+    color: rgba(0,0,0,0.38);
+    cursor: default;
+  }
+
+  .oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled]:hover {
+    text-decoration: none;
+  }
+
+  .oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
+    font: 16px;
+    margin: 0;
+    min-width: 55px;
+  }
+
+  .mat-button.oppia-learner-confirm-button {
+    background: #0D48A1;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+
+  .mat-button.oppia-learner-confirm-button:hover {
+    background-color: #115fd4;
+  }
+
+  .mat-button.mat-default-theme.oppia-learner-confirm-button:focus,
+  .mat-button.mat-default-theme.oppia-learner-confirm-button:hover {
+    background-color: #115FD4;
+    text-decoration: none;
+  }
+
+  .oppia-learner-confirm-button {
+    margin-top: 0;
+  }
+
+  .oppia-learner-confirm-button .icon {
+    font-size: 19px;
+    margin-left: 4px;
+    padding-top: 1.5px;
+  }
+</style>

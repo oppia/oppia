@@ -26,39 +26,179 @@ import shutil
 import socket
 import subprocess
 import sys
+import time
 
+import constants
 import python_utils
-import release_constants
 
-PSUTIL_VERSION = '5.6.7'
+AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
-NODE_VERSION = '10.18.0'
+
+# Versions of libraries used in devflow.
+COVERAGE_VERSION = '5.3'
+ESPRIMA_VERSION = '4.0.1'
+ISORT_VERSION = '4.3.21'
+PYCODESTYLE_VERSION = '2.6.0'
+PSUTIL_VERSION = '5.7.3'
+PYLINT_VERSION = '1.9.5'
+PYLINT_QUOTES_VERSION = '0.1.8'
+PYGITHUB_VERSION = '1.45'
+WEBTEST_VERSION = '2.0.35'
+PIP_TOOLS_VERSION = '5.4.0'
+GRPCIO_VERSION = '1.0.0'
+ENUM_VERSION = '1.1.10'
+PROTOBUF_VERSION = '3.13.0'
+SETUPTOOLS_VERSION = '36.6.0'
+
+# Node version.
+NODE_VERSION = '14.15.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.21.1'
+YARN_VERSION = '1.22.10'
 
-COVERAGE_VERSION = '4.5.4'
+# Versions of libraries used in backend.
+PILLOW_VERSION = '6.2.2'
+
+# Buf version.
+BUF_VERSION = '0.29.0'
+# Protoc is the compiler for protobuf files and the version must be same as
+# the version of protobuf library being used.
+PROTOC_VERSION = PROTOBUF_VERSION
+
+# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
+# 1. Download the new version of the redis cli.
+# 2. Extract the cli in the folder that it was downloaded, most likely
+#    Downloads/.
+# 3. Change directories into the folder you extracted, titled
+#    redis-<new version>/ and change into that directory:
+#    cd redis-<new version>/
+# 4. From the top level of the redis-<new version> directory,
+#    run `make test`.
+# 5. All of the tests should pass with an [ok] status with no error codes. The
+#    final output should be 'All tests pass'.
+# 6. Be sure to leave a note in the PR description to confirm that you have read
+#    this message, and that all of the `make test` tests pass before you commit
+#    the upgrade to develop.
+# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
+REDIS_CLI_VERSION = '6.0.10'
+ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-GOOGLE_APP_ENGINE_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-335.0.0', 'google-cloud-sdk')
+GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+WEBPACK_BIN_PATH = (
+    os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
+DEV_APPSERVER_PATH = (
+    os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'dev_appserver.py'))
+GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
+PYCODESTYLE_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
+PYLINT_QUOTES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
-FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
+FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+FIREBASE_PATH = os.path.join(
+    NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
+REDIS_SERVER_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-server')
+REDIS_CLI_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
+    'src', 'redis-cli')
+# Directory for storing/fetching data related to the Cloud Datastore emulator.
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
+    os.path.join(CURR_DIR, os.pardir, 'cloud_datastore_emulator_cache'))
+# Directory for storing/fetching data related to the Firebase emulator.
+FIREBASE_EMULATOR_CACHE_DIR = (
+    os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
+
+ES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
+ES_PATH_CONFIG_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
+ES_PATH_DATA_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
+USER_PREFERENCES = {'open_new_tab_in_browser': None}
+
+FECONF_PATH = os.path.join('feconf.py')
+CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60 * 2
+MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
+REDIS_CONF_PATH = os.path.join('redis.conf')
+# Path for the dump file the redis server autogenerates. It contains data
+# used by the Redis server.
+REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
+# The requirements.txt file is auto-generated and contains a deterministic list
+# of all libraries and versions that should exist in the
+# 'third_party/python_libs' directory.
+# NOTE: Developers should NOT modify this file.
+COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
+# The precompiled requirements file is the one that developers should be
+# modifying. It is the file that we use to recompile the
+# "requirements.txt" file so that all installations using "requirements.txt"
+# will be identical.
+REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+
+WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
+WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
+WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
+WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
+
+PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
+
+WEBDRIVER_HOME_PATH = os.path.join(NODE_MODULES_PATH, 'webdriver-manager')
+WEBDRIVER_MANAGER_BIN_PATH = (
+    os.path.join(WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'))
+WEBDRIVER_PROVIDER_PATH = (
+    os.path.join(WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider'))
+GECKO_PROVIDER_FILE_PATH = (
+    os.path.join(WEBDRIVER_PROVIDER_PATH, 'geckodriver.js'))
+CHROME_PROVIDER_FILE_PATH = (
+    os.path.join(WEBDRIVER_PROVIDER_PATH, 'chromedriver.js'))
+
+PROTRACTOR_BIN_PATH = (
+    os.path.join(NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'))
+PROTRACTOR_CONFIG_FILE_PATH = (
+    os.path.join('core', 'tests', 'protractor.conf.js'))
+
+DIRS_TO_ADD_TO_SYS_PATH = [
+    GOOGLE_APP_ENGINE_SDK_HOME,
+    PYLINT_PATH,
+
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
+    PSUTIL_DIR,
+    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
+    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),
+    os.path.join(
+        OPPIA_TOOLS_DIR, 'pip-tools-%s' % PIP_TOOLS_VERSION),
+    CURR_DIR,
+    THIRD_PARTY_PYTHON_LIBS_DIR,
+]
 
 
 def is_windows_os():
@@ -87,8 +227,10 @@ NODE_BIN_PATH = os.path.join(
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
-    os.path.dirname(NODE_BIN_PATH), os.path.join(YARN_PATH, 'bin'),
-    os.environ['PATH']])
+    os.path.dirname(NODE_BIN_PATH),
+    os.path.join(YARN_PATH, 'bin'),
+    os.environ['PATH'],
+])
 
 
 def run_cmd(cmd_tokens):
@@ -101,7 +243,8 @@ def run_cmd(cmd_tokens):
     Returns:
         str. The output of the command.
     """
-    return subprocess.check_output(cmd_tokens).strip()
+    return subprocess.check_output(
+        cmd_tokens, stderr=subprocess.STDOUT).strip()
 
 
 def ensure_directory_exists(d):
@@ -131,6 +274,15 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
+    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
+        python_utils.PRINT(
+            '\nDo you want the url to be opened in the browser? '
+            'Confirm by entering y/ye/yes.')
+        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        python_utils.PRINT(
+            'Please open the following link in browser: %s' % url)
+        return
     browser_cmds = ['chromium-browser', 'google-chrome', 'firefox']
     for cmd in browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
@@ -220,6 +372,17 @@ def get_current_release_version_number(release_branch_name):
         raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
+def is_current_branch_a_hotfix_branch():
+    """Checks if the current branch is a hotfix branch.
+
+    Returns:
+        bool. Whether the current branch is hotfix branch.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+
+
 def is_current_branch_a_release_branch():
     """Returns whether the current branch is a release branch.
 
@@ -253,48 +416,13 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
-def ensure_release_scripts_folder_exists_and_is_up_to_date():
-    """Checks that the release-scripts folder exists and is up-to-date."""
-    parent_dirpath = os.path.join(os.getcwd(), os.pardir)
-    release_scripts_dirpath = os.path.join(parent_dirpath, 'release-scripts')
-
-    # If the release-scripts folder does not exist, set it up.
-    if not os.path.isdir(release_scripts_dirpath):
-        with CD(parent_dirpath):
-            # Taken from the "Check your SSH section" at
-            # https://help.github.com/articles/error-repository-not-found/
-            _, stderr = subprocess.Popen(
-                ['ssh', '-T', 'git@github.com'],
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE).communicate()
-            if 'You\'ve successfully authenticated' not in stderr:
-                raise Exception(
-                    'You need SSH access to GitHub. See the '
-                    '"Check your SSH access" section here and follow the '
-                    'instructions: '
-                    'https://help.github.com/articles/'
-                    'error-repository-not-found/#check-your-ssh-access')
-            subprocess.check_call([
-                'git', 'clone',
-                'git@github.com:oppia/release-scripts.git'])
-
-    with CD(release_scripts_dirpath):
-        verify_local_repo_is_clean()
-        verify_current_branch_name('master')
-
-        # Update the local repo.
-        remote_alias = get_remote_alias(
-            'git@github.com:oppia/release-scripts.git')
-        subprocess.check_call(['git', 'pull', remote_alias])
-
-
-def is_port_open(port):
+def is_port_in_use(port):
     """Checks if a process is listening to the port.
 
     Args:
         port: int. The port number.
 
-    Return:
+    Returns:
         bool. True if port is open else False.
     """
     with contextlib.closing(
@@ -373,7 +501,7 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        if answer in AFFIRMATIVE_CONFIRMATIONS:
             return
 
 
@@ -384,7 +512,7 @@ def get_personal_access_token():
         str. The personal access token for the GitHub id of user.
 
     Raises:
-        Exception: Personal access token is None.
+        Exception. Personal access token is None.
     """
     personal_access_token = getpass.getpass(
         prompt=(
@@ -406,11 +534,11 @@ def check_blocking_bug_issue_count(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Number of unresolved blocking bugs is not zero.
-        Exception: The blocking bug milestone is closed.
+        Exception. Number of unresolved blocking bugs is not zero.
+        Exception. The blocking bug milestone is closed.
     """
     blocking_bugs_milestone = repo.get_milestone(
-        number=release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
+        number=constants.release_constants.BLOCKING_BUG_MILESTONE_NUMBER)
     if blocking_bugs_milestone.state == 'closed':
         raise Exception('The blocking bug milestone is closed.')
     if blocking_bugs_milestone.open_issues:
@@ -431,16 +559,17 @@ def check_prs_for_current_release_are_released(repo):
         repo: github.Repository.Repository. The PyGithub object for the repo.
 
     Raises:
-        Exception: Some pull requests for current release do not have a
-            PR: released label.
+        Exception. Some pull requests for current release do not have a
+            "PR: released" label.
     """
     current_release_label = repo.get_label(
-        release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
+        constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
     current_release_prs = repo.get_issues(
         state='all', labels=[current_release_label])
     for pr in current_release_prs:
         label_names = [label.name for label in pr.labels]
-        if release_constants.LABEL_FOR_RELEASED_PRS not in label_names:
+        if constants.release_constants.LABEL_FOR_RELEASED_PRS not in (
+                label_names):
             open_new_tab_in_browser_if_possible(
                 'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
                 '+label%3A%22PR%3A+for+current+release%22+')
@@ -448,30 +577,6 @@ def check_prs_for_current_release_are_released(repo):
                 'There are PRs for current release which do not have '
                 'a \'PR: released\' label. Please ensure that they are '
                 'released before release summary generation.')
-
-
-def kill_processes_based_on_regex(pattern):
-    """Kill any processes whose command line matches the provided regex.
-
-    Args:
-        pattern: str. Pattern for searching processes.
-    """
-    regex = re.compile(pattern)
-    if PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, PSUTIL_DIR)
-    import psutil
-    for process in psutil.process_iter():
-        try:
-            cmdline = ' '.join(process.cmdline())
-            if regex.match(cmdline) and process.is_running():
-                python_utils.PRINT('Killing %s ...' % cmdline)
-                process.kill()
-        # Possible exception raised by psutil includes: AccessDenied,
-        # NoSuchProcess, ZombieProcess, TimeoutExpired. We can safely ignore
-        # those ones and continue.
-        # https://psutil.readthedocs.io/en/latest/#exceptions
-        except psutil.Error:
-            continue
 
 
 def convert_to_posixpath(file_path):
@@ -535,6 +640,114 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         raise
 
 
+@contextlib.contextmanager
+def inplace_replace_file_context(filename, regex_pattern, replacement_string):
+    """Context manager in which the file's content is replaced according to the
+    given regex pattern. This function should only be used with files that are
+    processed line by line.
+
+    Args:
+        filename: str. The name of the file to be changed.
+        regex_pattern: str. The pattern to check.
+        replacement_string: str. The content to be replaced.
+
+    Yields:
+        None. Nothing.
+    """
+    backup_filename = '%s.bak' % filename
+    regex = re.compile(regex_pattern)
+
+    shutil.copyfile(filename, backup_filename)
+
+    try:
+        with python_utils.open_file(backup_filename, 'r') as f:
+            new_contents = [regex.sub(replacement_string, line) for line in f]
+        with python_utils.open_file(filename, 'w') as f:
+            f.write(''.join(new_contents))
+        yield
+    finally:
+        if os.path.isfile(filename) and os.path.isfile(backup_filename):
+            os.remove(filename)
+        if os.path.isfile(backup_filename):
+            shutil.move(backup_filename, filename)
+
+
+def wait_for_port_to_be_in_use(port_number):
+    """Wait until the port is in use and exit if port isn't open after
+    MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+    """
+    waited_seconds = 0
+    while (not is_port_in_use(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            and not is_port_in_use(port_number)):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' %
+            port_number)
+        python_utils.PRINT(
+            'This may be because you do not have enough available '
+            'memory. Please refer to '
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
+        sys.exit(1)
+
+
+def wait_for_port_to_not_be_in_use(port_number):
+    """Wait until the port is closed or
+    MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+
+    Returns:
+        bool. Whether the port closed in time.
+    """
+    waited_seconds = 0
+    while (is_port_in_use(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    return not is_port_in_use(port_number)
+
+
+def fix_third_party_imports():
+    """Sets up up the environment variables and corrects the system paths so
+    that the backend tests and imports work correctly.
+    """
+    # These environmental variables are required to allow Google Cloud Tasks to
+    # operate in a local development environment without connecting to the
+    # internet. These environment variables allow Cloud APIs to be instantiated.
+    os.environ['CLOUDSDK_CORE_PROJECT'] = 'dummy-cloudsdk-project-id'
+    os.environ['APPLICATION_ID'] = 'dummy-cloudsdk-project-id'
+
+    # The devappserver function fixes the system path by adding certain google
+    # appengine libraries that we need in oppia to the python system path. The
+    # Google Cloud SDK comes with certain packages preinstalled including
+    # webapp2, jinja2, and pyyaml so this function makes sure that those
+    # libraries are installed.
+    import dev_appserver
+    dev_appserver.fix_sys_path()
+    # In the process of migrating Oppia from Python 2 to Python 3, we are using
+    # both google app engine apis that are contained in the Google Cloud SDK
+    # folder, and also google cloud apis that are installed in our
+    # 'third_party/python_libs' directory. Therefore, there is a confusion of
+    # where the google module is located and which google module to import from.
+    # The following code ensures that the google module that python looks at
+    # imports from the 'third_party/python_libs' folder so that the imports are
+    # correct.
+    if 'google' in sys.modules:
+        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_module = sys.modules['google']
+        google_module.__path__ = [google_path]
+        google_module.__file__ = os.path.join(google_path, '__init__.py')
+
+    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
+
+
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
@@ -548,3 +761,26 @@ class CD(python_utils.OBJECT):
 
     def __exit__(self, etype, value, traceback):
         os.chdir(self.saved_path)
+
+
+@contextlib.contextmanager
+def swap_env(key, value):
+    """Context manager that temporarily changes the value of os.environ[key].
+
+    Args:
+        key: str. The name of the environment variable to change.
+        value: str. The value to give the environment variable.
+
+    Yields:
+        str|None. The old value of the environment variable, or None if it did
+        not exist.
+    """
+    old_value = os.environ.get(key, None)
+    os.environ[key] = value
+    try:
+        yield old_value
+    finally:
+        if old_value is None:
+            del os.environ[key]
+        else:
+            os.environ[key] = old_value

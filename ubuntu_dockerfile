@@ -154,7 +154,9 @@
 
 ##########################################################################
 
-FROM ubuntu:latest
+# Use latest version of Ubuntu that supports python 2
+# TODO(#11292): Revise docker ubuntu version once back end is updated to python 3
+FROM ubuntu:18.04 
 
 # To bypass tzdata configuration. 
 ENV DEBIAN_FRONTEND noninteractive
@@ -203,7 +205,7 @@ ENTRYPOINT ["dumb-init"]
 
 # Install packages needed for Google Chrome
 RUN apt-get update && \
-   apt-get install -y fonts-liberation libappindicator3-1 libgtk-3-0 libxss1 lsb-release xdg-utils
+   apt-get install -y fonts-liberation libappindicator3-1 libgtk-3-0 libxss1 libgbm1 lsb-release xdg-utils
 
 # Install Google Chrome for frontend tests
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb

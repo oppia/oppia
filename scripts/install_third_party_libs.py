@@ -19,44 +19,85 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
+import zipfile
+
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 # These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
+PREREQUISITES = [
+    ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
+    ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
+    ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
+    ('certifi', '2020.12.5', os.path.join(
+        TOOLS_DIR, 'certifi-2020.12.5')),
+    ('typing', '3.7.4.3', os.path.join('third_party', 'python_libs')),
+]
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import python_utils  # isort:skip
+for package_name, version_number, target_path in PREREQUISITES:
+    command_text = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package_name, version_number), '--target', target_path]
+    uextention_text = ['--user', '--prefix=', '--system']
+    current_process = subprocess.Popen(
+        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output_stderr = current_process.communicate()[1]
+    if 'can\'t combine user with prefix' in output_stderr:
+        subprocess.check_call(command_text + uextention_text)
 
-from . import common  # isort:skip
-from . import install_third_party  # isort:skip
-from . import pre_commit_hook  # isort:skip
-from . import pre_push_hook  # isort:skip
-from . import setup  # isort:skip
-from . import setup_gae  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
 
-_PARSER = argparse.ArgumentParser(description="""
+import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+
+from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import setup  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import setup_gae  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+_PARSER = argparse.ArgumentParser(
+    description="""
 Installation script for Oppia third-party libraries.
 """)
 
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-1.9.4', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
+    'configparser.py')
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
+    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
+    'configparser.py')
+
+# Download locations for buf binary.
+BUF_BASE_URL = (
+    'https://github.com/bufbuild/buf/releases/download/v0.29.0/')
+
+BUF_LINUX_FILES = [
+    'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
+    'protoc-gen-buf-check-breaking-Linux-x86_64']
+BUF_DARWIN_FILES = [
+    'buf-Darwin-x86_64', 'protoc-gen-buf-check-lint-Darwin-x86_64',
+    'protoc-gen-buf-check-breaking-Darwin-x86_64']
+
+# Download URL of protoc compiler.
+PROTOC_URL = (
+    'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
+    common.PROTOC_VERSION)
+PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
+PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
+
+# Path of the buf executable.
+BUF_DIR = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
+PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
+# Path of files which needs to be compiled by protobuf.
+PROTO_FILES_PATHS = [
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+# Path to typescript plugin required to compile ts compatible files from proto.
+PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
 
 def tweak_yarn_executable():
@@ -79,60 +120,59 @@ def get_yarn_command():
     return 'yarn'
 
 
-def pip_install(package, version, install_path):
-    """Installs third party libraries with pip.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-        install_path: str. The installation path for the package.
+def install_buf_and_protoc():
+    """Installs buf and protoc for Linux or Darwin, depending upon the
+    platform.
     """
+    buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES
+    protoc_file = (
+        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)
+    buf_path = os.path.join(BUF_DIR, buf_files[0])
+    protoc_path = os.path.join(PROTOC_DIR, 'bin', 'protoc')
+
+    if os.path.isfile(buf_path) and os.path.isfile(protoc_path):
+        return
+
+    common.ensure_directory_exists(BUF_DIR)
+    for bin_file in buf_files:
+        python_utils.url_retrieve('%s/%s' % (
+            BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
+    python_utils.url_retrieve('%s/%s' % (
+        PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
     try:
-        python_utils.PRINT('Checking if pip is installed on the local machine')
-        # Importing pip just to check if its installed.
-        import pip  #pylint: disable=unused-variable
-    except ImportError:
-        common.print_each_string_after_two_new_lines([
-            'Pip is required to install Oppia dependencies, but pip wasn\'t '
-            'found on your local machine.',
-            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
-            'page:'])
+        with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
+            zfile.extractall(path=PROTOC_DIR)
+        os.remove(os.path.join(BUF_DIR, protoc_file))
+    except Exception:
+        raise Exception('Error installing protoc binary')
+    common.recursive_chmod(buf_path, 0o744)
+    common.recursive_chmod(protoc_path, 0o744)
 
-        if common.is_mac_os():
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-                'OS%29')
-        elif common.is_linux_os():
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-                '%29')
+
+def compile_protobuf_files(proto_files_paths):
+    """Compiles protobuf files using buf.
+
+    Raises:
+        Exception. If there is any error in compiling the proto files.
+    """
+    proto_env = os.environ.copy()
+    proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_DIR)
+    proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_GEN_TS_PATH)
+    buf_path = os.path.join(
+        BUF_DIR,
+        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
+    for path in proto_files_paths:
+        command = [
+            buf_path, 'generate', path]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env=proto_env)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            python_utils.PRINT(stdout)
         else:
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29')
-        raise Exception
-
-    # The call to python -m is used to ensure that Python and Pip versions are
-    # compatible.
-    command = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package, version), '--target', install_path]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
-        python_utils.PRINT('Trying by setting --user and --prefix flags.')
-        subprocess.check_call([
-            sys.executable, '-m', 'pip', 'install',
-            '%s==%s' % (package, version), '--target', install_path,
-            '--user', '--prefix=', '--system'])
-    else:
-        python_utils.PRINT(stderr)
-        python_utils.PRINT(
-            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing package')
+            python_utils.PRINT(stderr)
+            raise Exception('Error compiling proto files at %s' % path)
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -149,31 +189,57 @@ def ensure_pip_library_is_installed(package, version, path):
     exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
-        pip_install(package, version, exact_lib_path)
+        install_backend_python_libs.pip_install(
+            '%s==%s' % (package, version), exact_lib_path)
+
+
+def ensure_system_python_libraries_are_installed(package, version):
+    """Installs the pip library with the corresponding version to the system
+    globally. This is necessary because the development application server
+    requires certain libraries on the host machine.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+    """
+    python_utils.PRINT(
+        'Checking if %s is installed.' % (package))
+    install_backend_python_libs.pip_install_to_system(package, version)
 
 
 def main():
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    pip_dependencies = [
+    # These system python libraries are REQUIRED to start the development server
+    # and cannot be added to oppia_tools because the dev_appserver python script
+    # looks for them in the default system paths when it is run. Therefore, we
+    # must install these libraries to the developer's computer.
+    system_pip_dependencies = [
+        ('enum34', common.ENUM_VERSION),
+        ('protobuf', common.PROTOBUF_VERSION)
+    ]
+    local_pip_dependencies = [
         ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
-        ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
-        ('webtest', '2.0.33', common.OPPIA_TOOLS_DIR),
-        ('isort', '4.3.20', common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', '2.5.0', common.OPPIA_TOOLS_DIR),
-        ('esprima', '4.0.1', common.OPPIA_TOOLS_DIR),
-        ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
-        ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
-        ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
+        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
+        ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
+        ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
+        ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
+        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
+        ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
+        ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
+        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
+        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
-    for package, version, path in pip_dependencies:
+    for package, version, path in local_pip_dependencies:
         ensure_pip_library_is_installed(package, version, path)
 
+    for package, version in system_pip_dependencies:
+        ensure_system_python_libraries_are_installed(package, version)
     # Do a little surgery on configparser in pylint-1.9.4 to remove dependency
     # on ConverterMapping, which is not implemented in some Python
     # distributions.
@@ -207,11 +273,67 @@ def main():
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
+    # The following steps solves the problem of multiple google paths confusing
+    # the python interpreter. Namely, there are two modules named google/, one
+    # that is installed with google cloud libraries and another that comes with
+    # the Google Cloud SDK. Python cannot import from both paths simultaneously
+    # so we must combine the two modules into one. We solve this by copying the
+    # Google Cloud SDK libraries that we need into the correct google
+    # module directory in the 'third_party/python_libs' directory.
+    python_utils.PRINT(
+        'Copying Google Cloud SDK modules to third_party/python_libs...')
+    correct_google_path = os.path.join(
+        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+    if not os.path.isdir(correct_google_path):
+        os.mkdir(correct_google_path)
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+            os.path.join(correct_google_path, 'appengine'))
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'net')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+            os.path.join(correct_google_path, 'net'))
+
+    if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
+        shutil.copytree(
+            os.path.join(
+                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+            os.path.join(correct_google_path, 'pyglib'))
+
+    # The following for loop populates all of the google modules with
+    # the correct __init__.py files if they do not exist. This solves the bug
+    # mentioned below where namespace packages sometimes install modules without
+    # __init__.py files (python requires modules to have __init__.py files in
+    # in order to recognize them as modules and import them):
+    # https://github.com/googleapis/python-ndb/issues/518
+    python_utils.PRINT(
+        'Checking that all google library modules contain __init__.py files...')
+    for path_list in os.walk(
+            correct_google_path):
+        root_path = path_list[0]
+        if not root_path.endswith('__pycache__'):
+            with python_utils.open_file(
+                os.path.join(root_path, '__init__.py'), 'a'):
+                # If the file doesn't exist, it is created. If it does exist,
+                # this open does nothing.
+                pass
+
     if common.is_windows_os():
         tweak_yarn_executable()
 
     # Install third-party node modules needed for the build process.
-    subprocess.check_call([get_yarn_command()])
+    subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
+
+    # Compile protobuf files.
+    python_utils.PRINT('Installing buf and protoc binary.')
+    install_buf_and_protoc()
+    python_utils.PRINT('Compiling protobuf files.')
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')

@@ -19,14 +19,20 @@ and are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import fs_services
+from core.domain import html_cleaner
+from core.domain import image_validation_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
+import utils
 
 
 class QuestionCreationHandler(base.BaseHandler):
@@ -52,7 +58,7 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException('Skill ID(s) aren\'t valid: ', e)
 
         try:
-            skill_services.get_multi_skills(skill_ids)
+            skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
             raise self.PageNotFoundException(e)
 
@@ -61,10 +67,10 @@ class QuestionCreationHandler(base.BaseHandler):
                 (question_dict['id'] is not None) or
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict) or
-                (question_dict['version'] != 1)):
+                (question_dict['version'] != 0)):
             raise self.InvalidInputException(
                 'Question Data should contain id, state data, language code, ' +
-                'and its version should be set as 1')
+                'and its version should be set as 0')
 
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
@@ -105,6 +111,33 @@ class QuestionCreationHandler(base.BaseHandler):
             question.id,
             skill_ids,
             skill_difficulties)
+        html_list = question.question_state_data.get_all_html_content_strings()
+        filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(html_list))
+        image_validation_error_message_suffix = (
+            'Please go to the question editor for question with id %s and edit '
+            'the image.' % question.id)
+        for filename in filenames:
+            image = self.request.get(filename)
+            if not image:
+                logging.exception(
+                    'Image not provided for file with name %s when the question'
+                    ' with id %s was created.' % (filename, question.id))
+                raise self.InvalidInputException(
+                    'No image data provided for file with name %s. %s'
+                    % (filename, image_validation_error_message_suffix))
+            try:
+                file_format = (
+                    image_validation_services.validate_image_and_filename(
+                        image, filename))
+            except utils.ValidationError as e:
+                e = '%s %s' % (e, image_validation_error_message_suffix)
+                raise self.InvalidInputException(e)
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, feconf.ENTITY_TYPE_QUESTION, question.id, image,
+                'image', image_is_compressible)
 
         self.values.update({
             'question_id': question.id
@@ -120,42 +153,28 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         """Updates the QuestionSkillLink models with respect to the given
         question.
         """
-        if self.payload.get('action') == 'update_difficulty':
-            new_difficulty = self.payload.get('new_difficulty')
-            skill_id = self.payload.get('skill_id')
-            if skill_id is None:
-                raise self.InvalidInputException(
-                    'The \'skill_id\' field is missing in payload')
-            if new_difficulty is None:
-                raise self.InvalidInputException(
-                    'The \'new_difficulty\' field is missing in payload')
-            question_services.update_question_skill_link_difficulty(
-                question_id, skill_id, float(new_difficulty))
-        elif self.payload.get('action') == 'edit_links':
-            difficulty = self.payload.get('difficulty')
-            skill_ids_task_list = self.payload.get('skill_ids_task_list')
-            if skill_ids_task_list is None:
-                raise self.InvalidInputException(
-                    'Missing fields \'skill_ids_task_list\'in payload')
+        skill_ids_task_list = self.payload.get('skill_ids_task_list')
+        if skill_ids_task_list is None:
+            raise self.InvalidInputException(
+                'Missing fields \'skill_ids_task_list\'in payload')
 
-            for task_dict in skill_ids_task_list:
-                if not 'id' in task_dict:
-                    raise self.InvalidInputException(
-                        'Missing skill ID for edit_links.')
-                if task_dict['task'] == 'remove':
-                    question_services.delete_question_skill_link(
-                        self.user_id, question_id, task_dict['id'])
-                elif task_dict['task'] == 'add':
-                    if difficulty is None:
-                        raise self.InvalidInputException(
-                            'Missing field \'difficulty\' in payload')
-                    question_services.create_new_question_skill_link(
-                        self.user_id, question_id, task_dict['id'], difficulty)
-                else:
-                    raise self.InvalidInputException(
-                        'Invalid task for edit_links.')
-        else:
-            raise self.InvalidInputException('Invalid action in payload.')
+        for task_dict in skill_ids_task_list:
+            if not 'id' in task_dict:
+                raise self.InvalidInputException(
+                    'Missing skill ID.')
+            if task_dict['task'] == 'remove':
+                question_services.delete_question_skill_link(
+                    self.user_id, question_id, task_dict['id'])
+            elif task_dict['task'] == 'add':
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, task_dict['id'],
+                    task_dict['difficulty'])
+            elif task_dict['task'] == 'update_difficulty':
+                question_services.update_question_skill_link_difficulty(
+                    question_id, task_dict['id'],
+                    float(task_dict['difficulty']))
+            else:
+                raise self.InvalidInputException('Invalid task.')
 
         self.render_json(self.values)
 
@@ -172,7 +191,7 @@ class EditableQuestionDataHandler(base.BaseHandler):
             question_id, strict=False)
 
         associated_skill_dicts = [
-            skill.to_dict() for skill in skill_services.get_multi_skills(
+            skill.to_dict() for skill in skill_fetchers.get_multi_skills(
                 question.linked_skill_ids)]
 
         self.values.update({
@@ -188,6 +207,13 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         if not commit_message:
             raise self.PageNotFoundException
+
+        if (commit_message is not None and
+                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+            raise self.InvalidInputException(
+                'Commit messages must be at most %s characters long.'
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+
         if not self.payload.get('change_list'):
             raise self.PageNotFoundException
         change_list = [

@@ -44,8 +44,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')
@@ -61,13 +61,19 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
+
+    def test_get_no_questions_with_no_skill_ids(self):
+        questions, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                1, [], 0))
+        self.assertEqual(len(questions), 0)
 
     def test_get_questions_with_multi_skill_ids(self):
         question_id_1 = question_services.get_new_question_id()
@@ -79,9 +85,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_2', 0.5)
 
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, ['skill_1', 'skill_2'], ''))
+                2, ['skill_1', 'skill_2'], 0))
 
         self.assertEqual(len(questions), 1)
         self.assertEqual(

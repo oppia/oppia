@@ -1,0 +1,76 @@
+<div class="oppia-concept-card-viewer" ng-if="!$ctrl.loadingMessage">
+  <div class="concept-card-explanation">
+    <div class="oppia-concept-card-explanation-container">
+      <angular-html-bind class="protractor-test-concept-card-explanation"
+                         html-data="$ctrl.currentConceptCard.getExplanation().html">
+      </angular-html-bind>
+    </div>
+  </div>
+  <div class="concept-card-worked-examples" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
+    <strong> Worked Examples </strong>
+    <div class="oppia-worked-examples-container"
+         ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
+         ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
+      <strong> Question: </strong>
+      <angular-html-bind class="example-content" html-data="example.getQuestion().html"></angular-html-bind>
+
+      <button class="btn btn-secondary show-example-explanation-button"
+              ng-if="!$ctrl.explanationIsShown && $index == $ctrl.numberOfWorkedExamplesShown - 1"
+              ng-click="$ctrl.explanationIsShown = true;">
+        Show Explanation
+      </button>
+      <div ng-if="$ctrl.explanationIsShown || $index < $ctrl.numberOfWorkedExamplesShown - 1">
+        <strong> Explanation: </strong>
+        <angular-html-bind class="example-content" html-data="example.getExplanation().html"></angular-html-bind>
+      </div>
+    </div>
+    <button class="btn btn-secondary show-more-worked-examples-button"
+            ng-if="!$ctrl.isLastWorkedExample()"
+            ng-click="$ctrl.showMoreWorkedExamples()">
+      + Worked Examples
+    </button>
+  </div>
+</div>
+
+<div ng-if="$ctrl.loadingMessage">
+  <div class="oppia-align-center">
+    <span translate="<[$ctrl.loadingMessage]>"></span>
+    <loading-dots></loading-dots>
+  </div>
+</div>
+
+<style>
+  .oppia-concept-card-viewer .concept-card-explanation {
+    padding: 15px;
+  }
+
+  .oppia-concept-card-viewer .concept-card-worked-examples {
+    padding: 15px;
+  }
+
+  .oppia-concept-card-viewer .show-example-explanation-button {
+    background-color: #009688;
+    color: white;
+    margin-top: 1vh;
+  }
+
+  .oppia-concept-card-viewer .example-content {
+    margin-top: 1vh;
+  }
+
+  .oppia-concept-card-viewer .show-more-worked-examples-button {
+    background-color: #0D48A1;
+    color: #FFF;
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+
+  .oppia-concept-card-viewer .oppia-concept-card-explanation-container {
+    margin-bottom: 10px;
+  }
+
+  .oppia-concept-card-viewer .oppia-worked-examples-container {
+    margin-top: 2vh;
+  }
+</style>

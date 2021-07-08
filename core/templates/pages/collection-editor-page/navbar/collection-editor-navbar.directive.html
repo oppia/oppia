@@ -1,0 +1,131 @@
+<ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak oppia-collection-editor-navbar">
+  <!-- Editor -->
+  <li ng-class="{'active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.getWarningsCount()}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>" class="nav-item">
+    <a href="#" uib-tooltip="Editor" ng-click="$ctrl.selectMainTab()" class="nav-link protractor-test-main-tab">
+      <i class="material-icons">&#xE254;</i>
+    </a>
+    <div ng-show="$ctrl.getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="$ctrl.selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        <[$ctrl.getWarningsCount()]>
+      </span>
+    </div>
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li class="oppia-editor-warnings-text"
+          ng-repeat="issue in $ctrl.validationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
+    </ul>
+  </li>
+
+  <!-- Settings -->
+  <li ng-class="{'active': $ctrl.getActiveTabName() === 'settings'}" class="nav-item">
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="$ctrl.selectSettingsTab()" class="nav-link protractor-test-settings-tab">
+      <i class="material-icons">&#xE8B8;</i>
+    </a>
+  </li>
+
+  <!-- Player -->
+  <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount() || $ctrl.getChangeListCount() > 0}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>" class="nav-item">
+    <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom" class="nav-link">
+      <i class="material-icons">&#xE037;</i>
+    </a>
+    <div ng-show="$ctrl.getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="$ctrl.selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        <[$ctrl.getWarningsCount()]>
+      </span>
+    </div>
+    <div ng-show="$ctrl.getChangeListCount() > 0"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="$ctrl.selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        1
+      </span>
+    </div>
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li ng-if="$ctrl.getWarningsCount()"
+          class="oppia-editor-warnings-text"
+          ng-repeat="issue in $ctrl.validationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
+      <li ng-if="$ctrl.getChangeListCount() && $ctrl.isCollectionSaveable()"
+          class="oppia-editor-warnings-text">
+        Save Draft to preview latest changes.
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<ul class="nav navbar-nav oppia-navbar-nav float-right" ng-if="!$ctrl.isLoadingCollection()">
+  <li class="oppia-button-container">
+    <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-draft-button"
+            ng-class="{'btn-success': $ctrl.isCollectionSaveable()}"
+            ng-click="$ctrl.saveChanges()"
+            ng-disabled="!$ctrl.isCollectionSaveable()">
+      <span ng-if="!$ctrl.isSaveInProgress()">
+        <span ng-if="$ctrl.collectionRights.isPrivate()">
+          <i class="material-icons md-18 oppia-save-publish-button-icon"
+             alt="Save Collection">
+            &#xE161;
+          </i>
+          <span class="oppia-save-publish-button-label float-left">Save Draft</span>
+          <span class="d-none d-md-block float-left oppia-change-count"
+                ng-if="$ctrl.getChangeListCount() > 0">
+            (<[$ctrl.getChangeListCount()]>)
+          </span>
+        </span>
+        <span ng-if="$ctrl.collectionRights.isPublic()" title="Publish Changes">
+          <i class="material-icons md-18 oppia-save-publish-button-icon"
+             alt="Publish Changes">
+            &#xE2C3;
+          </i>
+          <span class="oppia-save-publish-button-label">Publish Changes</span>
+        </span>
+      </span>
+
+      <span ng-if="$ctrl.isSaveInProgress()" class="protractor-test-save-in-progress-label">
+        <span ng-if="$ctrl.collectionRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
+        <span ng-if="$ctrl.collectionRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
+        <loading-dots></loading-dots>
+      </span>
+    </button>
+
+    <button type="button" ng-if="$ctrl.collectionRights.isPrivate()"
+            class="btn btn-secondary oppia-editor-publish-button protractor-test-editor-publish-button"
+            ng-class="{'btn-success': $ctrl.isCollectionPublishable()}"
+            ng-click="$ctrl.publishCollection()"
+            ng-disabled="!$ctrl.isCollectionPublishable()">
+      <i class="material-icons md-18 oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
+      <span class="oppia-save-publish-button-label">Publish</span>
+    </button>
+
+    <button type="button" ng-click="$ctrl.unpublishCollection()"
+            ng-if="$ctrl.collectionRights.isPublic() && $ctrl.collectionRights.canUnpublish()"
+            class="btn btn-secondary">
+      Unpublish (as moderator)
+    </button>
+  </li>
+</ul>
+<style>
+  collection-editor-navbar .oppia-collection-editor-navbar {
+    margin-left: 20px;
+  }
+  collection-editor-navbar .oppia-button-container {
+    margin-right: 10px;
+    margin-top: 8px;
+  }
+  collection-editor-navbar .oppia-change-count {
+    margin-left: 2px;
+    opacity: 0.5;
+  }
+</style>

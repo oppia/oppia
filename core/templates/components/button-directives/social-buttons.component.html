@@ -1,0 +1,81 @@
+<div class="oppia-footer-social">
+  <div class="oppia-follow-us">
+    <h3>
+      <span [innerHTML]="'I18N_FOOTER_FOLLOW_US' | translate"></span>:
+    </h3>
+  </div>
+
+  <div class="oppia-footer-social-icons">
+    <div class="oppia-youtube-follow">
+      <a href="https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw" target="_blank" rel="noopener">
+        <i class="oppia-follow-icons fab fa-youtube"></i>
+        <span class="oppia-icon-accessibility-label">Youtube</span>
+      </a>
+    </div>
+
+    <div class="oppia-facebook-follow">
+      <a href="https://www.facebook.com/oppiaorg" target="_blank" rel="noopener">
+        <i class="oppia-follow-icons fab fa-facebook-f"></i>
+        <span class="oppia-icon-accessibility-label">Facebook</span>
+      </a>
+    </div>
+
+    <div class="oppia-twitter-follow">
+      <a href="https://twitter.com/oppiaorg" target="_blank" rel="noopener">
+        <i class="oppia-follow-icons fab fa-twitter"></i>
+        <span class="oppia-icon-accessibility-label">Twitter</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .oppia-follow-us {
+    margin-bottom: 15px;
+  }
+
+  .oppia-footer-social a:hover,
+  .oppia-footer-social a:focus {
+    text-decoration: none;
+  }
+  .oppia-footer-social a > img {
+    width: 30px;
+  }
+  .oppia-footer-social a:focus > img {
+    outline: 1px dotted #FFF;
+    outline: auto 5px -webkit-focus-ring-color;
+  }
+
+  .oppia-footer-social .oppia-footer-social-icons {
+    display: -webkit-inline-box;
+    font-size: 24px;
+    position: relative;
+  }
+
+  .oppia-footer-social .oppia-footer-social-icons .oppia-youtube-follow {
+    background: #cd201f;
+    margin-right: 6px;
+    padding: 5px 9px;
+  }
+  .oppia-footer-social .oppia-footer-social-icons .oppia-facebook-follow {
+    background: #3b5998;
+    margin-right: 6px;
+    padding: 5px 10px;
+  }
+  .oppia-footer-social .oppia-footer-social-icons .oppia-twitter-follow {
+    background: #1da1f2;
+    margin-right: 6px;
+    padding: 5px 6px;
+  }
+  .oppia-footer-social .oppia-facebook-follow  i.oppia-follow-icons.fab.fa-facebook {
+    bottom: -7px;
+    position: relative;
+    right: -5px;
+  }
+  .oppia-footer-social .oppia-youtube-follow  i.oppia-follow-icons.fab.fa-youtube-play {
+    font-size: 18px;
+    left: -0.35px;
+    position: relative;
+  }
+</style>

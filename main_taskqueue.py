@@ -22,12 +22,10 @@ from core.platform import models
 import feconf
 import main
 
-# pylint: disable=wrong-import-order
 import webapp2
-# pylint: enable=wrong-import-order
 
 
-transaction_services = models.Registry.import_transaction_services()
+transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [
@@ -46,6 +44,9 @@ URLS = [
     main.get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
         tasks.FeedbackThreadStatusChangeEmailHandler),
+    main.get_redirect_route(
+        r'%s' % feconf.TASK_URL_DEFERRED,
+        tasks.DeferredTasksHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

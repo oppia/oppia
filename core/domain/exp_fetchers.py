@@ -28,18 +28,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.platform import models
 import feconf
 import python_utils
-import utils
 
-memcache_services = models.Registry.import_memcache_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+datastore_services = models.Registry.import_datastore_services()
 
 
-def _migrate_states_schema(versioned_exploration_states, exploration_id):
+def _migrate_states_schema(versioned_exploration_states, init_state_name):
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
     exploration dictionary. This is very similar to the YAML conversion process
@@ -56,28 +56,28 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
                 exploration.
             - states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
-        exploration_id: str. ID of the exploration.
+        init_state_name: str. Name of initial state.
 
     Raises:
-        Exception: The given states_schema_version is invalid.
+        Exception. The given states_schema_version is invalid.
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
-    if states_schema_version is None or states_schema_version < 1:
-        states_schema_version = 0
 
-    if not (0 <= states_schema_version
+    if not (feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION
+            <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
         raise Exception(
-            'Sorry, we can only process v1-v%d and unversioned exploration '
-            'state schemas at present.' %
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
+            'Sorry, we can only process v%d-v%d exploration state schemas at '
+            'present.' % (
+                feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
+                feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version,
-            exploration_id)
+            versioned_exploration_states,
+            states_schema_version, init_state_name)
         states_schema_version += 1
 
 
@@ -90,56 +90,47 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def get_multiple_explorations_by_version(exp_id, version_numbers):
-    """Returns a list of Exploration domain objects corresponding to the
-    specified versions.
+def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
+        exp_id, version_numbers):
+    """Returns a list of VersionedExplorationInteractionIdsMapping domain
+    objects corresponding to the specified versions.
 
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
 
     Returns:
-        list(Exploration). List of Exploration domain objects.
+        list(VersionedExplorationInteractionIdsMapping). List of Exploration
+        domain objects.
 
     Raises:
         Exception. One or more of the given versions of the exploration could
             not be converted to the latest schema version.
     """
-    explorations = []
+    versioned_exp_interaction_ids_mapping = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
-    error_versions = []
     for index, exploration_model in enumerate(exploration_models):
-        try:
-            explorations.append(get_exploration_from_model(exploration_model))
-        except utils.ExplorationConversionError:
-            error_versions.append(version_numbers[index])
+        if (exploration_model.states_schema_version !=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
+            raise Exception(
+                'Exploration(id=%s, version=%s, states_schema_version=%s) '
+                'does not match the latest schema version %s' % (
+                    exp_id,
+                    version_numbers[index],
+                    exploration_model.states_schema_version,
+                    feconf.CURRENT_STATE_SCHEMA_VERSION
+                ))
+        states_to_interaction_id_mapping = {}
+        for state_name in exploration_model.states:
+            states_to_interaction_id_mapping[state_name] = (
+                exploration_model.states[state_name]['interaction']['id'])
+        versioned_exp_interaction_ids_mapping.append(
+            exp_domain.VersionedExplorationInteractionIdsMapping(
+                exploration_model.version,
+                states_to_interaction_id_mapping))
 
-    if error_versions:
-        raise Exception(
-            'Exploration %s, versions [%s] could not be converted to latest '
-            'schema version.'
-            % (exp_id, ', '.join(python_utils.MAP(str, error_versions))))
-    return explorations
-
-
-def get_exploration_memcache_key(exploration_id, version=None):
-    """Returns a memcache key for an exploration.
-
-    Args:
-        exploration_id: str. The id of the exploration whose memcache key
-            is to be returned.
-        version: int or None. If specified, the version of the exploration
-            whose memcache key is to be returned.
-
-    Returns:
-        str. Memcache key for the given exploration (or exploration version).
-    """
-
-    if version:
-        return 'exploration-version:%s:%s' % (exploration_id, version)
-    else:
-        return 'exploration:%s' % exploration_id
+    return versioned_exp_interaction_ids_mapping
 
 
 def get_exploration_from_model(exploration_model, run_conversion=True):
@@ -161,8 +152,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
             states_schema_version if necessary.
 
     Returns:
-       Exploration. The exploration domain object corresponding to the given
-       exploration model.
+        Exploration. The exploration domain object corresponding to the given
+        exploration model.
     """
 
     # Ensure the original exploration model does not get altered.
@@ -170,13 +161,13 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         'states_schema_version': exploration_model.states_schema_version,
         'states': copy.deepcopy(exploration_model.states)
     }
+    init_state_name = exploration_model.init_state_name
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(
-            versioned_exploration_states, exploration_model.id)
+        _migrate_states_schema(versioned_exploration_states, init_state_name)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
@@ -311,21 +302,26 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     Returns:
         Exploration. The domain object corresponding to the given exploration.
     """
+    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    cached_exploration = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        sub_namespace,
+        [exploration_id]
+    ).get(exploration_id)
 
-    exploration_memcache_key = get_exploration_memcache_key(
-        exploration_id, version=version)
-    memcached_exploration = memcache_services.get_multi(
-        [exploration_memcache_key]).get(exploration_memcache_key)
-
-    if memcached_exploration is not None:
-        return memcached_exploration
+    if cached_exploration is not None:
+        return cached_exploration
     else:
         exploration_model = exp_models.ExplorationModel.get(
             exploration_id, strict=strict, version=version)
         if exploration_model:
             exploration = get_exploration_from_model(exploration_model)
-            memcache_services.set_multi({
-                exploration_memcache_key: exploration})
+            caching_services.set_multi(
+                caching_services.CACHE_NAMESPACE_EXPLORATION,
+                sub_namespace,
+                {
+                    exploration_id: exploration
+                })
             return exploration
         else:
             return None
@@ -346,14 +342,13 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         objects. Any invalid exploration ids are omitted.
 
     Raises:
-        ValueError: When strict is True and at least one of the given exp_ids
-        is invalid.
+        ValueError. When strict is True and at least one of the given exp_ids
+            is invalid.
     """
-    exp_ids = set(exp_ids)
     result = {}
     uncached = []
-    memcache_keys = [get_exploration_memcache_key(i) for i in exp_ids]
-    cache_result = memcache_services.get_multi(memcache_keys)
+    cache_result = caching_services.get_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None, exp_ids)
 
     for exp_obj in cache_result.values():
         result[exp_obj.id] = exp_obj
@@ -371,8 +366,9 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info('Tried to fetch exploration with id %s, but no such '
-                         'exploration exists in the datastore' % eid)
+            logging.info(
+                'Tried to fetch exploration with id %s, but no such '
+                'exploration exists in the datastore' % eid)
             not_found.append(eid)
 
     if strict and not_found:
@@ -386,7 +382,34 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
     }
 
     if cache_update:
-        memcache_services.set_multi(cache_update)
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_EXPLORATION, None, cache_update)
 
     result.update(db_results_dict)
     return result
+
+
+def get_exploration_summaries_where_user_has_role(user_id):
+    """Returns a list of ExplorationSummary domain objects where the user has
+    some role.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ExplorationSummary). List of ExplorationSummary domain objects
+        where the user has some role.
+    """
+    exp_summary_models = exp_models.ExpSummaryModel.query(
+        datastore_services.any_of(
+            exp_models.ExpSummaryModel.owner_ids == user_id,
+            exp_models.ExpSummaryModel.editor_ids == user_id,
+            exp_models.ExpSummaryModel.voice_artist_ids == user_id,
+            exp_models.ExpSummaryModel.viewer_ids == user_id,
+            exp_models.ExpSummaryModel.contributor_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_exploration_summary_from_model(exp_summary_model)
+        for exp_summary_model in exp_summary_models
+    ]

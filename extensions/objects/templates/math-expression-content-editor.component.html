@@ -1,0 +1,20 @@
+<div *ngIf="!active && !alwaysEditable">
+  <textarea disabled="true">
+    {{localValue.label}}
+  </textarea>
+  (<a href="#" (click)="openEditor()">Edit</a>)
+</div>
+
+<div *ngIf="active || alwaysEditable">
+  <div>
+    <textarea [(ngModel)]="localValue.label" (ngModelChange)="updateLocalValue($event)" placeholder="\frac{x}{y}"></textarea>
+  </div>
+  Preview:
+  <span *ngIf="localValue.label" [oppiaMathJax]="localValue.label">
+  </span>
+  <span *ngIf="!localValue.label" [oppiaMathJax]="placeholderText" class="text-secondary">
+  </span>
+  <button type="button" class="btn btn-secondary"  *ngIf="!alwaysEditable" (click)="replaceValue(localValue.label)">
+    Close
+  </button>
+</div>

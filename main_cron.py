@@ -25,7 +25,7 @@ import main
 import webapp2
 
 
-transaction_services = models.Registry.import_transaction_services()
+transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [
@@ -36,8 +36,8 @@ URLS = [
     main.get_redirect_route(
         r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
     main.get_redirect_route(
-        r'/cron/users/verify_user_deletion',
-        cron.CronVerifyUserDeletionHandler),
+        r'/cron/users/fully_complete_user_deletion',
+        cron.CronFullyCompleteUserDeletionHandler),
     main.get_redirect_route(
         r'/cron/explorations/recommendations',
         cron.CronExplorationRecommendationsHandler),
@@ -47,8 +47,13 @@ URLS = [
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
     main.get_redirect_route(
-        r'/cron/suggestions/accept_stale_suggestions',
-        cron.CronAcceptStaleSuggestionsHandler),
+        r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    main.get_redirect_route(
+        r'/cron/mail/admins/contributor_dashboard_bottlenecks',
+        cron.CronMailAdminContributorDashboardBottlenecksHandler),
+    main.get_redirect_route(
+        r'/cron/mail/reviewers/contributor_dashboard_suggestions',
+        cron.CronMailReviewersContributorDashboardSuggestionsHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

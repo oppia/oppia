@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+
+  <head>
+    @load('base-components/header.template.html', {"title": "Email Dashboard Result - Oppia"})
+  </head>
+
+  <body>
+    <oppia-root>
+      <div ng-controller="Base">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+              <li>
+                <span class="oppia-navbar-breadcrumb-separator"></span>
+                Email Dashboard Result
+              </li>
+            </ul>
+          </navbar-breadcrumb>
+          <content>
+            <email-dashboard-result-page></email-dashboard-result-page>
+          </content>
+          <page-footer></page-footer>
+        </oppia-base-content>
+      </div>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

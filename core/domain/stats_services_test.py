@@ -19,20 +19,16 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import operator
 import os
 
-from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_services
 from core.domain import stats_domain
-from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -66,15 +62,15 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.exp_id, 'new_exp_id')
         self.assertEqual(exploration_stats.state_stats_mapping, {})
 
-
     def test_update_stats_method(self):
         """Test the update_stats method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         exploration_stats.state_stats_mapping = {
-            'Home': stats_domain.StateStats.create_default()
+            'Home': stats_domain.StateStats.create_default(),
+            '🙂': stats_domain.StateStats.create_default(),
         }
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         # Pass in exploration start event to stats model created in setup
         # function.
@@ -90,12 +86,19 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                     'useful_feedback_count': 1,
                     'num_times_solution_viewed': 1,
                     'num_completions': 1
-                }
+                },
+                '🙂': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
             }
         }
 
-        stats_services.update_stats(
-            'exp_id1', 1, aggregated_stats)
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
         self.assertEqual(exploration_stats.num_starts_v2, 1)
@@ -119,6 +122,146 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].num_times_solution_viewed_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].total_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].first_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].total_answers_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].useful_feedback_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                '🙂'].num_times_solution_viewed_v2, 1)
+
+    def test_update_stats_throws_if_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'id="nullid.1" does not exist'):
+            stats_services.update_stats('nullid', 1, aggregated_stats)
+
+    def test_update_stats_throws_if_model_is_missing_state_stats(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default()
+        }
+        stats_services.save_stats_model(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+                'Away from Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'does not exist'):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+    def test_update_stats_returns_if_state_name_is_undefined(self):
+        """Tests that the update_stats returns if a state name is undefined."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'undefined': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+    def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
+        """Test the update_stats method."""
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        exploration_stats.state_stats_mapping = {
+            'Home': stats_domain.StateStats.create_default(),
+            # No stats for '🙂'.
+        }
+        stats_services.save_stats_model(exploration_stats)
+
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+                '🙂': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        with self.assertRaisesRegexp(Exception, 'does not exist'):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_calls_to_stats_methods(self):
         """Test that calls are being made to the
@@ -166,120 +309,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         # called once.
         self.assertEqual(stats_for_new_exploration_log.times_called, 1)
         self.assertEqual(stats_for_new_exp_version_log.times_called, 1)
-
-    def test_exploration_changes_effect_on_exp_issues_model(self):
-        """Test the effect of exploration changes on exploration issues
-        model.
-        """
-        exp_id = 'exp_id'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-
-        # Exploration is created, exploration issues model must also be created.
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, exploration.version)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-        # Update exploration to next version, exploration issues model also
-        # created.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
-        })]
-        exp_services.update_exploration(
-            'committer_id_v3', exploration.id, change_list, 'Added new state')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, exploration.version)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-        # Create a playthrough and assign it to an issue in exploration issues
-        # model.
-        playthrough_id1 = stats_models.PlaythroughModel.create(
-            exploration.id, exploration.version, 'EarlyQuit', {
-                'state_name': {
-                    'value': 'New state'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            }, [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'New state'
-                    }
-                },
-                'schema_version': 1
-            }])
-        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {
-                'state_name': {
-                    'value': 'New state'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            },
-            'playthrough_ids': [playthrough_id1],
-            'schema_version': 1,
-            'is_valid': True
-        })
-        exp_issues.unresolved_issues.append(exp_issue1)
-        stats_services.save_exp_issues_model_transactional(exp_issues)
-
-        # Delete a state.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_DELETE_STATE,
-            'state_name': 'New state'
-        })]
-        exp_services.update_exploration(
-            'committer_id_v3', exploration.id, change_list, 'Deleted a state')
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, exploration.version)
-        self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {
-                'state_name': {
-                    'value': 'New state'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            },
-            'playthrough_ids': [playthrough_id1],
-            'schema_version': 1,
-            'is_valid': False
-        })
-
-        # Revert to an older version, exploration issues model also changes.
-        exp_services.revert_exploration(
-            'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, exploration.version)
-        self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {
-                'state_name': {
-                    'value': 'New state'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            },
-            'playthrough_ids': [playthrough_id1],
-            'schema_version': 1,
-            'is_valid': True
-        })
 
     def test_get_stats_for_new_exploration(self):
         """Test the get_stats_for_new_exploration method."""
@@ -332,7 +361,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats.num_starts_v2 = 3
         exploration_stats.num_actual_starts_v2 = 2
         exploration_stats.num_completions_v2 = 1
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         # Update exploration to next version 2 and its stats.
         exp_services.update_exploration(
@@ -342,11 +371,11 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats.num_starts_v2 = 4
         exploration_stats.num_actual_starts_v2 = 3
         exploration_stats.num_completions_v2 = 2
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         # Revert to an older version.
         exp_services.revert_exploration(
-            'committer_id_v3', exp_id, current_version=2, revert_to_version=1)
+            'committer_id_v3', exp_id, 2, 1)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 3
         )
@@ -381,7 +410,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -411,7 +440,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -431,7 +460,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -460,7 +489,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -490,7 +519,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -514,6 +543,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'first_hit_count_v2'] = 2
         exploration_stats_model.state_stats_mapping['End'][
             'useful_feedback_count_v2'] = 4
+        exploration_stats_model.update_timestamps()
         exploration_stats_model.put()
 
         # Test deletion, addition and rename.
@@ -535,7 +565,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=exp_versions_diff, revert_to_version=None)
+            exp_versions_diff, None)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -567,7 +597,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration.version += 1
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            exp_versions_diff=None, revert_to_version=5)
+            None, 5)
         stats_services.create_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
@@ -580,263 +610,51 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
 
-    def test_create_exp_issues_for_new_exploration(self):
-        """Test the create_exp_issues_for_new_exploration method."""
-        # Create exploration object in datastore.
-        exp_id = 'exp_id'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        # Test state name swaps.
+        exploration.add_states(['New state 5', 'New state 6'])
+        exploration.version += 1
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state 5'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state 6'
+        })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            exp_versions_diff, None)
+        stats_services.create_stats_model(exploration_stats)
 
-        stats_services.create_exp_issues_for_new_exploration(
-            exploration.id, exploration.version)
-
-        exp_issues = stats_services.get_exp_issues(
-            exploration.id, exploration.version)
-        self.assertEqual(exp_issues.exp_id, exploration.id)
-        self.assertEqual(exp_issues.exp_version, exploration.version)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-    def test_update_exp_issues_for_new_exp_version(self):
-        """Test the update_exp_issues_for_new_exp_version method."""
-        # Create exploration object in datastore.
-        exp_id = 'exp_id'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-
-        exp_issues = stats_services.get_exp_issues(
-            exploration.id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 1)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-        # Create playthrough instances for this version.
-        playthrough_id1 = stats_models.PlaythroughModel.create(
-            exploration.id, exploration.version, 'EarlyQuit', {
-                'state_name': {
-                    'value': 'Home'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            }, [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'Home'
-                    }
-                },
-                'schema_version': 1
-            }])
-        playthrough_id2 = stats_models.PlaythroughModel.create(
-            exploration.id, exploration.version, 'EarlyQuit', {
-                'state_name': {
-                    'value': 'End'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            }, [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'End'
-                    }
-                },
-                'schema_version': 1
-            }])
-        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {
-                'state_name': {
-                    'value': 'Home'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            },
-            'playthrough_ids': [playthrough_id1],
-            'schema_version': 1,
-            'is_valid': True
-        })
-        exp_issue2 = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {
-                'state_name': {
-                    'value': 'End'
-                },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            },
-            'playthrough_ids': [playthrough_id2],
-            'schema_version': 1,
-            'is_valid': True
-        })
-        exp_issues.unresolved_issues = [exp_issue1, exp_issue2]
-        stats_services.save_exp_issues_model_transactional(exp_issues)
-
-        # Test renaming of states.
-        exploration.rename_state('Home', 'Renamed state')
+        exploration.rename_state('New state 5', 'New state 7')
+        exploration.rename_state('New state 6', 'New state 5')
+        exploration.rename_state('New state 7', 'New state 6')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
-            'old_state_name': 'Home',
-            'new_state_name': 'Renamed state'
+            'old_state_name': 'New state 5',
+            'new_state_name': 'New state 7'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 6',
+            'new_state_name': 'New state 5'
+        }), exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 7',
+            'new_state_name': 'New state 6'
         })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff, False)
+        exploration_stats = stats_services.get_stats_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            exp_versions_diff, None)
+        stats_services.create_stats_model(exploration_stats)
 
-        exp_issues = stats_services.get_exp_issues(
+        exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 2)
+        self.assertEqual(exploration_stats.exp_version, 10)
         self.assertEqual(
-            exp_issues.unresolved_issues[0].issue_customization_args[
-                'state_name']['value'], 'Renamed state')
-        self.assertEqual(
-            exp_issues.unresolved_issues[1].issue_customization_args[
-                'state_name']['value'], 'End')
-
-        playthrough1_instance = stats_models.PlaythroughModel.get(
-            playthrough_id1)
-        self.assertEqual(
-            playthrough1_instance.issue_customization_args['state_name'][
-                'value'], 'Renamed state')
-        self.assertEqual(
-            playthrough1_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
-            'Renamed state')
-        playthrough2_instance = stats_models.PlaythroughModel.get(
-            playthrough_id2)
-        self.assertEqual(
-            playthrough2_instance.issue_customization_args['state_name'][
-                'value'], 'End')
-        self.assertEqual(
-            playthrough2_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
-            'End')
-
-        # Test deletion of states.
-        exploration.delete_state('End')
-        exploration.version += 1
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'delete_state',
-            'state_name': 'End'
-        })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff, False)
-
-        exp_issues = stats_services.get_exp_issues(
-            exploration.id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 3)
-        self.assertEqual(
-            exp_issues.unresolved_issues[0].issue_customization_args[
-                'state_name']['value'], 'Renamed state')
-        self.assertEqual(
-            exp_issues.unresolved_issues[1].issue_customization_args[
-                'state_name']['value'], 'End')
-        self.assertEqual(
-            exp_issues.unresolved_issues[1].is_valid, False)
-
-        playthrough1_instance = stats_models.PlaythroughModel.get(
-            playthrough_id1)
-        self.assertEqual(
-            playthrough1_instance.issue_customization_args['state_name'][
-                'value'], 'Renamed state')
-        self.assertEqual(
-            playthrough1_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
-            'Renamed state')
-        playthrough2_instance = stats_models.PlaythroughModel.get(
-            playthrough_id2)
-        self.assertEqual(
-            playthrough2_instance.issue_customization_args['state_name'][
-                'value'], 'End')
-        self.assertEqual(
-            playthrough2_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
-            'End')
-
-    def test_get_playthroughs_multi(self):
-        """Test the get_playthroughs_multi method."""
-        playthrough_id1 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthrough_id2 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthroughs = stats_services.get_playthroughs_multi(
-            [playthrough_id1, playthrough_id2])
-
-        self.assertEqual(playthroughs[0].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[0].exp_version, 1)
-        self.assertEqual(playthroughs[0].issue_type, 'EarlyQuit')
-        self.assertEqual(playthroughs[0].issue_customization_args, {})
-        self.assertEqual(playthroughs[0].actions, [])
-
-        self.assertEqual(playthroughs[1].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[1].exp_version, 1)
-        self.assertEqual(playthroughs[1].issue_type, 'EarlyQuit')
-        self.assertEqual(playthroughs[1].issue_customization_args, {})
-        self.assertEqual(playthroughs[1].actions, [])
-
-    def test_update_playthroughs_multi(self):
-        """Test the update_playthroughs_multi method."""
-        playthrough_id1 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthrough_id2 = stats_models.PlaythroughModel.create(
-            self.exp_id, 1, 'EarlyQuit', {}, [])
-        playthroughs = stats_services.get_playthroughs_multi(
-            [playthrough_id1, playthrough_id2])
-
-        playthroughs[0].issue_type = 'MultipleIncorrectSubmissions'
-        playthroughs[1].issue_type = 'CyclicStateTransitions'
-        stats_services.update_playthroughs_multi(
-            [playthrough_id1, playthrough_id2], playthroughs)
-
-        playthroughs = stats_services.get_playthroughs_multi(
-            [playthrough_id1, playthrough_id2])
-
-        self.assertEqual(playthroughs[0].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[0].exp_version, 1)
-        self.assertEqual(
-            playthroughs[0].issue_type, 'MultipleIncorrectSubmissions')
-        self.assertEqual(playthroughs[0].issue_customization_args, {})
-        self.assertEqual(playthroughs[0].actions, [])
-
-        self.assertEqual(playthroughs[1].exp_id, self.exp_id)
-        self.assertEqual(playthroughs[1].exp_version, 1)
-        self.assertEqual(playthroughs[1].issue_type, 'CyclicStateTransitions')
-        self.assertEqual(playthroughs[1].issue_customization_args, {})
-        self.assertEqual(playthroughs[1].actions, [])
-
-    def test_create_exp_issues_model(self):
-        """Test the create_exp_issues_model method."""
-        exp_issues = stats_domain.ExplorationIssues(self.exp_id, 1, [])
-        stats_services.create_exp_issues_model(exp_issues)
-        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
-            self.exp_id, 1)
-        self.assertEqual(exp_issues_instance.exp_id, self.exp_id)
-        self.assertEqual(exp_issues_instance.exp_version, 1)
-        self.assertEqual(exp_issues_instance.unresolved_issues, [])
-
-    def test_get_exp_issues_from_model(self):
-        """Test the get_exp_issues_from_model method."""
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        exp_issues = stats_services.get_exp_issues_from_model(model)
-        self.assertEqual(exp_issues.exp_id, self.exp_id)
-        self.assertEqual(exp_issues.exp_version, 1)
-        self.assertEqual(exp_issues.unresolved_issues, [])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['End', 'Home', 'New state 6', 'New state 5', 'Renamed state']))
 
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""
@@ -857,22 +675,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         """Test the get_playthrough_from_model method."""
         model = stats_models.PlaythroughModel.get(self.playthrough_id)
         playthrough = stats_services.get_playthrough_from_model(model)
-        self.assertEqual(playthrough.exp_id, 'exp_id1')
-        self.assertEqual(playthrough.exp_version, 1)
-        self.assertEqual(playthrough.issue_type, 'EarlyQuit')
-        self.assertEqual(playthrough.issue_customization_args, {})
-        self.assertEqual(playthrough.actions, [])
-
-    def test_get_exp_issues_by_id(self):
-        """Test the get_exp_issues_by_id method."""
-        exp_issues = stats_services.get_exp_issues(self.exp_id, 1)
-        self.assertEqual(exp_issues.exp_id, self.exp_id)
-        self.assertEqual(exp_issues.exp_version, 1)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-    def test_get_playthrough_by_id(self):
-        """Test the get_playthrough_by_id method."""
-        playthrough = stats_services.get_playthrough_by_id(self.playthrough_id)
         self.assertEqual(playthrough.exp_id, 'exp_id1')
         self.assertEqual(playthrough.exp_version, 1)
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
@@ -943,40 +745,14 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 }
             })
 
-    def test_save_exp_issues_model_transactional(self):
-        """Test the save_exp_issues_model_transactional method."""
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        exp_issues = stats_services.get_exp_issues_from_model(model)
-        exp_issues.unresolved_issues.append(
-            stats_domain.ExplorationIssue.from_dict({
-                'issue_type': 'EarlyQuit',
-                'issue_customization_args': {
-                    'state_name': {
-                        'value': 'state_name1'
-                    },
-                    'time_spent_in_exp_in_msecs': {
-                        'value': 200
-                    }
-                },
-                'playthrough_ids': ['playthrough_id1'],
-                'schema_version': 1,
-                'is_valid': True
-            }))
-        stats_services.save_exp_issues_model_transactional(exp_issues)
-
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(
-            model.unresolved_issues[0],
-            exp_issues.unresolved_issues[0].to_dict())
-
-    def test_save_stats_model_transactional(self):
-        """Test the save_stats_model_transactional method."""
+    def test_save_stats_model(self):
+        """Test the save_stats_model method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         exploration_stats.num_starts_v2 += 15
         exploration_stats.num_actual_starts_v2 += 5
         exploration_stats.num_completions_v2 += 2
-        stats_services.save_stats_model_transactional(exploration_stats)
+        stats_services.save_stats_model(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
@@ -999,101 +775,6 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[0].exp_version, self.exp_version)
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
-
-    def test_update_exp_issues_for_new_exp_version_with_cyclic_state_transition(
-            self):
-        # Create exploration object in datastore.
-        exp_id = 'exp_id'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-
-        exp_issues = stats_services.get_exp_issues(
-            exploration.id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 1)
-        self.assertEqual(exp_issues.unresolved_issues, [])
-
-        # Create playthrough instances for this version.
-        playthrough_id = stats_models.PlaythroughModel.create(
-            exp_id, exploration.version, 'CyclicStateTransitions',
-            {
-                'state_names': {
-                    'value': ['Home', 'End', 'Home']
-                },
-            },
-            [{
-                'action_type': 'ExplorationStart',
-                'action_customization_args': {
-                    'state_name': {
-                        'value': 'Home'
-                    }
-                },
-                'schema_version': 1
-            }])
-
-        exp_issue = stats_domain.ExplorationIssue.from_dict({
-            'issue_type': 'CyclicStateTransitions',
-            'issue_customization_args': {
-                'state_names': {
-                    'value': ['Home', 'End', 'Home']
-                },
-            },
-            'playthrough_ids': [playthrough_id],
-            'schema_version': 1,
-            'is_valid': True
-        })
-
-        exp_issues.unresolved_issues = [exp_issue]
-        stats_services.save_exp_issues_model_transactional(exp_issues)
-
-        self.assertEqual(
-            exp_issues.unresolved_issues[0].issue_customization_args[
-                'state_names']['value'], ['Home', 'End', 'Home'])
-
-
-        playthrough_instance = stats_models.PlaythroughModel.get(
-            playthrough_id)
-        self.assertEqual(
-            playthrough_instance.issue_customization_args['state_names'][
-                'value'], ['Home', 'End', 'Home'])
-        self.assertEqual(
-            playthrough_instance.actions[0]['action_customization_args'][
-                'state_name']['value'], 'Home')
-
-        # Test renaming of states.
-        exploration.rename_state('Home', 'Renamed state')
-        exploration.version += 1
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': 'rename_state',
-            'old_state_name': 'Home',
-            'new_state_name': 'Renamed state'
-        })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff, False)
-
-        exp_issues = stats_services.get_exp_issues(
-            exploration.id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 2)
-        self.assertEqual(
-            exp_issues.unresolved_issues[0].issue_customization_args[
-                'state_names']['value'], [
-                    'Renamed state', 'End', 'Renamed state'])
-
-        playthrough_instance = stats_models.PlaythroughModel.get(
-            playthrough_id)
-        self.assertEqual(
-            playthrough_instance.issue_customization_args['state_names'][
-                'value'], ['Renamed state', 'End', 'Renamed state'])
-        self.assertEqual(
-            playthrough_instance.actions[0]['action_customization_args'][
-                'state_name']['value'],
-            'Renamed state')
 
     def test_get_multiple_exploration_stats_by_version_with_invalid_exp_id(
             self):
@@ -1123,26 +804,472 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
-class MockInteractionAnswerSummariesAggregator(
-        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
-    """A modified InteractionAnswerSummariesAggregator that does not start
-    a new batch job when the previous one has finished.
-    """
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockInteractionAnswerSummariesMRJobManager
+class ExplorationIssuesTests(test_utils.GenericTestBase):
+    """Unit tests focused on services related to exploration issues."""
 
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
+    def setUp(self):
+        super(ExplorationIssuesTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp = self.save_new_linear_exp_with_state_names_and_interactions(
+            'exp_id', self.owner_id,
+            ['A', 'B'], ['TextInput', 'EndExploration'])
 
+    def _create_cst_playthrough(self, state_names):
+        """Creates a Cyclic State Transitions playthrough and returns its id.
 
-class MockInteractionAnswerSummariesMRJobManager(
-        stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
+        Args:
+            state_names: list(str). The states of the cycle, where only the
+                first and last values are the same. Requires at least 2 distinct
+                values.
 
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockInteractionAnswerSummariesAggregator
+        Returns:
+            str. The ID of the new playthrough.
+        """
+        issue_customization_args = {'state_names': {'value': state_names}}
+        actions = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {
+                'state_name': {'value': state_names[0]},
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }]
+        actions.extend(
+            {
+                'action_type': 'AnswerSubmit',
+                'action_customization_args': {
+                    'state_name': {'value': state_name},
+                    'dest_state_name': {'value': dest_state_name},
+                    'interaction_id': {'value': 'TextInput'},
+                    'submitted_answer': {'value': 'Foo!'},
+                    'feedback': {'value': ''},
+                    'time_spent_in_exp_in_msecs': {'value': 1000},
+                },
+                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+            }
+            for state_name, dest_state_name in python_utils.ZIP(
+                state_names[:-1], state_names[1:]))
+        actions.append({
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {'value': state_names[-1]},
+                'time_spent_in_state_in_msecs': {'value': 1000},
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        })
+        return stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, 'CyclicStateTransitions',
+            issue_customization_args, actions)
+
+    def _create_eq_playthrough(self, state_name):
+        """Creates an Early Quit playthrough and returns its id.
+
+        Args:
+            state_name: str. The state the early quit occurred from.
+
+        Returns:
+            str. The ID of the new playthrough.
+        """
+        issue_customization_args = {
+            'state_name': {'value': state_name},
+            'time_spent_in_exp_in_msecs': {'value': 200},
+        }
+        actions = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {'state_name': {'value': state_name}},
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }, {
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {'value': state_name},
+                'time_spent_in_state_in_msecs': {'value': 1000},
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }]
+        return stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, 'EarlyQuit',
+            issue_customization_args, actions)
+
+    def _create_mis_playthrough(
+            self, state_name, num_times_answered_incorrectly):
+        """Creates a Multiple Incorrect Submissions playthrough and returns its
+        id.
+
+        Args:
+            state_name: str. The state the answers were submitted to.
+            num_times_answered_incorrectly: int. Number of times incorrect
+                answers were submitted.
+
+        Returns:
+            str. The ID of the new playthrough.
+        """
+        issue_customization_args = {
+            'state_name': {'value': state_name},
+            'num_times_answered_incorrectly': {
+                'value': num_times_answered_incorrectly
+            },
+        }
+        actions = [{
+            'action_type': 'ExplorationStart',
+            'action_customization_args': {'state_name': {'value': state_name}},
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        }]
+        actions.extend(
+            {
+                'action_type': 'AnswerSubmit',
+                'action_customization_args': {
+                    'state_name': {'value': state_name},
+                    'dest_state_name': {'value': state_name},
+                    'interaction_id': {'value': 'TextInput'},
+                    'submitted_answer': {'value': 'Foo!'},
+                    'feedback': {'value': ''},
+                    'time_spent_in_exp_in_msecs': {'value': 1000},
+                },
+                'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+            }
+            for _ in python_utils.RANGE(num_times_answered_incorrectly))
+        actions.append({
+            'action_type': 'ExplorationQuit',
+            'action_customization_args': {
+                'state_name': {'value': state_name},
+                'time_spent_in_state_in_msecs': {'value': 1000},
+            },
+            'schema_version': stats_models.CURRENT_ACTION_SCHEMA_VERSION,
+        })
+        return stats_models.PlaythroughModel.create(
+            self.exp.id, self.exp.version, 'MultipleIncorrectSubmissions',
+            issue_customization_args, actions)
+
+    def _create_cst_exp_issue(self, playthrough_ids, state_names):
+        """Returns a new Cyclic State Transitions issue domain object.
+
+        Args:
+            playthrough_ids: list(str). List of playthrough IDs demonstrating a
+                Cyclic State Transitions issue.
+            state_names: list(str). The states of the cycle, where only the
+                first and last values are the same. Requires at least 2 distinct
+                values.
+
+        Returns:
+            stats_domain.ExplorationIssue. The new issue.
+        """
+        issue_customization_args = {'state_names': {'value': state_names}}
+        is_valid = True
+        return stats_domain.ExplorationIssue(
+            'CyclicStateTransitions', issue_customization_args, playthrough_ids,
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION, is_valid)
+
+    def _create_eq_exp_issue(self, playthrough_ids, state_name):
+        """Returns a new Early Quit issue domain object.
+
+        Args:
+            playthrough_ids: list(str). List of playthrough IDs demonstrating an
+                Early Quit issue.
+            state_name: str. The state the early quit occurred from.
+
+        Returns:
+            stats_domain.ExplorationIssue. The new issue.
+        """
+        issue_customization_args = {
+            'state_name': {'value': state_name},
+            'time_spent_in_exp_in_msecs': {'value': 200},
+        }
+        is_valid = True
+        return stats_domain.ExplorationIssue(
+            'EarlyQuit', issue_customization_args, playthrough_ids,
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION, is_valid)
+
+    def _create_mis_exp_issue(
+            self, playthrough_ids, state_name, num_times_answered_incorrectly):
+        """Returns a new Multiple Incorrect Submissions issue domain object.
+
+        Args:
+            playthrough_ids: list(str). List of playthrough IDs demonstrating a
+                Multiple Incorrect Submissions issue.
+            state_name: str. The state the answers were submitted to.
+            num_times_answered_incorrectly: int. Number of times incorrect
+                answers were submitted.
+
+        Returns:
+            stats_domain.ExplorationIssue. The new issue.
+        """
+        issue_customization_args = {
+            'state_name': {'value': state_name},
+            'num_times_answered_incorrectly': {
+                'value': num_times_answered_incorrectly
+            },
+        }
+        is_valid = True
+        return stats_domain.ExplorationIssue(
+            'MultipleIncorrectSubmissions', issue_customization_args,
+            playthrough_ids, stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
+            is_valid)
+
+    def test_create_exp_issues_model(self):
+        exp_issues = stats_domain.ExplorationIssues(
+            self.exp.id, stats_models.CURRENT_ISSUE_SCHEMA_VERSION, [])
+
+        stats_services.create_exp_issues_model(exp_issues)
+
+        exp_issues = stats_models.ExplorationIssuesModel.get_model(
+            self.exp.id, self.exp.version)
+        self.assertEqual(exp_issues.exp_id, self.exp.id)
+        self.assertEqual(exp_issues.exp_version, self.exp.version)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+    def test_get_exp_issues_creates_new_empty_exp_issues_when_missing(self):
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version))
+        self.assertEqual(exp_issues.exp_id, self.exp.id)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+    def test_delete_playthroughs_multi(self):
+        playthrough_ids = [
+            self._create_eq_playthrough('A'),
+            self._create_cst_playthrough(['A', 'B', 'A']),
+            self._create_mis_playthrough('A', 3),
+        ]
+
+        stats_services.delete_playthroughs_multi(playthrough_ids)
+
+        self.assertEqual(
+            stats_models.PlaythroughModel.get_multi(playthrough_ids),
+            [None, None, None])
+
+    def test_save_exp_issues_model(self):
+        eq_playthrough_ids = [self._create_eq_playthrough('A')]
+        cst_playthrough_ids = [self._create_cst_playthrough(['A', 'B', 'A'])]
+        mis_playthrough_ids = [self._create_mis_playthrough('A', 3)]
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_eq_exp_issue(eq_playthrough_ids, 'A'),
+                self._create_mis_exp_issue(mis_playthrough_ids, 'A', 3),
+                self._create_cst_exp_issue(cst_playthrough_ids, ['A', 'B', 'A'])
+            ]))
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version))
+        self.assertEqual(len(exp_issues.unresolved_issues), 3)
+        self.assertEqual(
+            exp_issues.unresolved_issues[0].playthrough_ids,
+            eq_playthrough_ids)
+        self.assertEqual(
+            exp_issues.unresolved_issues[1].playthrough_ids,
+            mis_playthrough_ids)
+        self.assertEqual(
+            exp_issues.unresolved_issues[2].playthrough_ids,
+            cst_playthrough_ids)
+
+    def test_cst_exp_issue_is_invalidated_when_state_is_deleted(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_cst_exp_issue(
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A'])
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'})
+        ], 'change')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 1)
+        self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
+
+    def test_cst_exp_issue_is_updated_when_state_is_renamed(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_cst_exp_issue(
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A'])
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'A',
+                'new_state_name': 'Z',
+            })
+        ], 'change')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 1)
+
+        exp_issue = exp_issues.unresolved_issues[0]
+        self.assertTrue(exp_issue.is_valid)
+        self.assertEqual(
+            exp_issue.issue_customization_args['state_names']['value'],
+            ['Z', 'B', 'Z'])
+        self.assertEqual(len(exp_issue.playthrough_ids), 1)
+
+        playthrough = stats_models.PlaythroughModel.get_by_id(
+            exp_issue.playthrough_ids[0])
+        self.assertEqual(
+            playthrough.issue_customization_args['state_names']['value'],
+            ['Z', 'B', 'Z'])
+        self.assertEqual(len(playthrough.actions), 4)
+
+        actions = playthrough.actions
+        self.assertEqual(
+            actions[0]['action_customization_args']['state_name']['value'],
+            'Z')
+        self.assertEqual(
+            actions[1]['action_customization_args']['state_name']['value'],
+            'Z')
+        self.assertEqual(
+            actions[2]['action_customization_args']['dest_state_name']['value'],
+            'Z')
+        self.assertEqual(
+            actions[3]['action_customization_args']['state_name']['value'],
+            'Z')
+
+    def test_eq_exp_issue_is_invalidated_when_state_is_deleted(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_eq_exp_issue(
+                    [self._create_eq_playthrough('B')], 'B')
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'})
+        ], 'change')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 1)
+        self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
+
+    def test_eq_exp_issue_is_updated_when_state_is_renamed(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_eq_exp_issue(
+                    [self._create_eq_playthrough('A')], 'A')
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'A',
+                'new_state_name': 'Z',
+            })
+        ], 'change')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 1)
+
+        exp_issue = exp_issues.unresolved_issues[0]
+        self.assertTrue(exp_issue.is_valid)
+        self.assertEqual(
+            exp_issue.issue_customization_args['state_name']['value'], 'Z')
+        self.assertEqual(len(exp_issue.playthrough_ids), 1)
+
+        playthrough = stats_models.PlaythroughModel.get_by_id(
+            exp_issue.playthrough_ids[0])
+        self.assertEqual(
+            playthrough.issue_customization_args['state_name']['value'], 'Z')
+        self.assertEqual(len(playthrough.actions), 2)
+
+        actions = playthrough.actions
+        self.assertEqual(
+            actions[0]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[1]['action_customization_args']['state_name']['value'], 'Z')
+
+    def test_mis_exp_issue_is_invalidated_when_state_is_deleted(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_mis_exp_issue(
+                    [self._create_mis_playthrough('B', 2)], 'B', 2)
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'}),
+        ], 'Delete B')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 1)
+        self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
+
+    def test_mis_exp_issue_is_updated_when_state_is_renamed(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_mis_exp_issue(
+                    [self._create_mis_playthrough('A', 2)], 'A', 2)
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'A',
+                'new_state_name': 'Z',
+            })
+        ], 'change')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 1)
+
+        exp_issue = exp_issues.unresolved_issues[0]
+        self.assertTrue(exp_issue.is_valid)
+        self.assertEqual(
+            exp_issue.issue_customization_args['state_name']['value'], 'Z')
+        self.assertEqual(len(exp_issue.playthrough_ids), 1)
+
+        playthrough = stats_models.PlaythroughModel.get_by_id(
+            exp_issue.playthrough_ids[0])
+        self.assertEqual(
+            playthrough.issue_customization_args['state_name']['value'], 'Z')
+        self.assertEqual(len(playthrough.actions), 4)
+
+        actions = playthrough.actions
+        self.assertEqual(
+            actions[0]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[1]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[2]['action_customization_args']['state_name']['value'], 'Z')
+        self.assertEqual(
+            actions[3]['action_customization_args']['state_name']['value'], 'Z')
+
+    def test_revert_exploration_recovers_exp_issues(self):
+        stats_services.save_exp_issues_model(
+            stats_domain.ExplorationIssues(self.exp.id, self.exp.version, [
+                self._create_eq_exp_issue(
+                    [self._create_eq_playthrough('B')], 'B'),
+                self._create_cst_exp_issue(
+                    [self._create_cst_playthrough(['A', 'B', 'A'])],
+                    ['A', 'B', 'A']),
+                self._create_mis_exp_issue(
+                    [self._create_mis_playthrough('B', 3)], 'B', 3),
+            ]))
+
+        exp_services.update_exploration(self.owner_id, self.exp.id, [
+            exp_domain.ExplorationChange(
+                {'cmd': 'delete_state', 'state_name': 'B'}),
+        ], 'commit')
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 1))
+        self.assertEqual(len(exp_issues.unresolved_issues), 3)
+        self.assertFalse(exp_issues.unresolved_issues[0].is_valid)
+        self.assertFalse(exp_issues.unresolved_issues[1].is_valid)
+        self.assertFalse(exp_issues.unresolved_issues[2].is_valid)
+
+        exp_services.revert_exploration(self.owner_id, self.exp.id, 2, 1)
+
+        exp_issues = (
+            stats_services.get_exp_issues(self.exp.id, self.exp.version + 2))
+        self.assertEqual(len(exp_issues.unresolved_issues), 3)
+        self.assertTrue(exp_issues.unresolved_issues[0].is_valid)
+        self.assertTrue(exp_issues.unresolved_issues[1].is_valid)
+        self.assertTrue(exp_issues.unresolved_issues[2].is_valid)
 
 
 class EventLogEntryTests(test_utils.GenericTestBase):
@@ -1177,6 +1304,26 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'TextInput',
             }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': 'Enter here'
+                        }
+                    },
+                    'rows': {'value': 1}
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 1
+            }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': second_state_name,
             }), exp_domain.ExplorationChange({
@@ -1189,9 +1336,48 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'new_value': 'TextInput',
             }), exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'new_value': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': 'Enter here'
+                        }
+                    },
+                    'rows': {'value': 1}
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': second_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 1
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': third_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'Continue',
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': third_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                'new_value': {
+                    'buttonText': {
+                        'value': {
+                            'content_id': 'ca_buttonText_1',
+                            'unicode_str': 'Continue'
+                        }
+                    },
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': third_state_name,
+                'property_name':
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+                'new_value': 2
             })], 'Add new state')
         exp = exp_fetchers.get_exploration_by_id('eid')
 
@@ -1745,513 +1931,6 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         self.assertEqual(sample_answers, [])
 
 
-# TODO(bhenning): Either add tests for multiple visualizations for one state or
-# disallow stats from having multiple visualizations (no interactions currently
-# seem to use more than one visualization ID).
-
-# TODO(bhenning): Add tests for each possible visualization
-# (TopAnswersByCategorization is not currently used yet by any interactions).
-class AnswerVisualizationsTests(test_utils.GenericTestBase):
-    """Tests for functionality related to retrieving visualization information
-    for answers.
-    """
-    ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
-    INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
-    TEXT_INPUT_EXP_ID = 'exp_id0'
-    SET_INPUT_EXP_ID = 'exp_id1'
-    DEFAULT_EXP_ID = 'exp_id2'
-    NEW_STATE_NAME = 'new state'
-
-    def _get_swap_context(self):
-        """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
-        value with ALL_CC_MANAGERS_FOR_TESTS.
-        """
-        return self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS)
-
-    def _get_visualizations(
-            self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
-        """Returns the visualizations info corresponding to the given
-        exploration id and state name.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        init_state = exploration.states[state_name]
-        return stats_services.get_visualizations_info(
-            exp_id, state_name, init_state.interaction.id)
-
-    def _record_answer(
-            self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
-        """Records the submitted answer corresponding to the given exploration
-        id and state name.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        interaction_id = exploration.states[state_name].interaction.id
-        event_services.AnswerSubmissionEventHandler.record(
-            exp_id, exploration.version, state_name, interaction_id, 0, 0,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', 10.0, {}, answer)
-
-    def _run_answer_summaries_aggregator(self):
-        """Runs the MockInteractionAnswerSummariesAggregator."""
-        MockInteractionAnswerSummariesAggregator.start_computation()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-
-    def _rerun_answer_summaries_aggregator(self):
-        """Reruns the MockInteractionAnswerSummariesAggregator."""
-        MockInteractionAnswerSummariesAggregator.stop_computation('a')
-        self._run_answer_summaries_aggregator()
-
-    def _rename_state(
-            self, new_state_name, exp_id=TEXT_INPUT_EXP_ID,
-            state_name=INIT_STATE_NAME):
-        """Renames the state corresponding to the given exploration id
-        and state name.
-        """
-        exp_services.update_exploration(
-            self.owner_id, exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': state_name,
-                'new_state_name': new_state_name
-            })], 'Update state name')
-
-    def _change_state_interaction_id(
-            self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
-            state_name=INIT_STATE_NAME):
-        """Updates the state interaction id corresponding to the given
-        exploration id and state name.
-        """
-        exp_services.update_exploration(
-            self.owner_id, exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': interaction_id
-            })], 'Update state interaction ID')
-
-    def _change_state_content(
-            self, new_content, exp_id=TEXT_INPUT_EXP_ID,
-            state_name=INIT_STATE_NAME):
-        """Updates the state content corresponding to the given exploration id
-        and state name.
-        """
-        exp_services.update_exploration(
-            self.owner_id, exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': state_name,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': {
-                    'content_id': 'content',
-                    'html': new_content
-                }
-            })], 'Change content description')
-
-    def setUp(self):
-        super(AnswerVisualizationsTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(
-            self.TEXT_INPUT_EXP_ID, self.owner_id, end_state_name='End')
-        self.save_new_valid_exploration(
-            self.SET_INPUT_EXP_ID, self.owner_id, end_state_name='End',
-            interaction_id='SetInput')
-        self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
-
-    def test_no_vis_info_for_exp_with_no_interaction_id(self):
-        with self._get_swap_context():
-            visualizations = self._get_visualizations(
-                exp_id=self.DEFAULT_EXP_ID)
-            self.assertEqual(visualizations, [])
-
-    def test_no_vis_info_for_exp_with_no_answers_no_calculations(self):
-        with self._get_swap_context():
-            visualizations = self._get_visualizations()
-            self.assertEqual(visualizations, [])
-
-    def test_no_vis_info_for_exp_with_answer_no_completed_calculations(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            visualizations = self._get_visualizations()
-            self.assertEqual(visualizations, [])
-
-    def test_no_vis_info_for_exp_with_no_answers_but_with_calculations(self):
-        with self._get_swap_context():
-            self._run_answer_summaries_aggregator()
-            visualizations = self._get_visualizations()
-            self.assertEqual(visualizations, [])
-
-    def test_has_vis_info_options_for_text_input_interaction(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._run_answer_summaries_aggregator()
-            visualizations = self._get_visualizations()
-            # There are two visualizations for TextInput. One for top answers
-            # and second is for top unresolved answers but top unresolved
-            # answers visualization is not shown as part of exploration stats.
-            self.assertEqual(len(visualizations), 1)
-
-            visualization = visualizations[0]
-            self.assertEqual(
-                visualization['options']['column_headers'], ['Answer', 'Count'])
-            self.assertIn('Top', visualization['options']['title'])
-
-    def test_has_vis_info_for_exp_with_answer_for_one_calculation(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._run_answer_summaries_aggregator()
-            visualizations = self._get_visualizations()
-
-            # There are two visualizations for TextInput. One for top answers
-            # and second is for top unresolved answers but top unresolved
-            # answers visualization is not shown as part of exploration stats.
-            self.assertEqual(len(visualizations), 1)
-
-            visualization = visualizations[0]
-            self.assertEqual(visualization['id'], 'FrequencyTable')
-            self.assertEqual(
-                visualization['data'], [{
-                    'answer': 'Answer A',
-                    'frequency': 1
-                }])
-
-    def test_has_vis_info_for_exp_with_many_answers_for_one_calculation(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._record_answer('Answer A')
-            self._record_answer('Answer C')
-            self._record_answer('Answer B')
-            self._record_answer('Answer A')
-            self._run_answer_summaries_aggregator()
-            visualizations = self._get_visualizations()
-            # There are two visualizations for TextInput. One for top answers
-            # and second is for top unresolved answers but top unresolved
-            # answers visualization is not shown as part of exploration stats.
-            self.assertEqual(len(visualizations), 1)
-
-            visualization = visualizations[0]
-            self.assertEqual(visualization['id'], 'FrequencyTable')
-            # Ties will appear in same order they are submitted in.
-            self.assertEqual(
-                visualization['data'], [{
-                    'answer': 'Answer A',
-                    'frequency': 3
-                }, {
-                    'answer': 'Answer C',
-                    'frequency': 1
-                }, {
-                    'answer': 'Answer B',
-                    'frequency': 1
-                }])
-
-    def test_has_vis_info_for_each_calculation_for_multi_calc_exp(self):
-        with self._get_swap_context():
-            self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
-            self._record_answer(['C', 'A'], exp_id=self.SET_INPUT_EXP_ID)
-            self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
-            self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
-            self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
-            self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
-            self._run_answer_summaries_aggregator()
-            visualizations = sorted(
-                self._get_visualizations(exp_id=self.SET_INPUT_EXP_ID),
-                key=operator.itemgetter('data'))
-            self.assertEqual(len(visualizations), 2)
-
-            # Use options to distinguish between the two visualizations, since
-            # both are FrequencyTable.
-            top_answers_visualization = visualizations[0]
-            self.assertEqual(top_answers_visualization['id'], 'FrequencyTable')
-            self.assertEqual(
-                top_answers_visualization['options']['column_headers'],
-                ['Answer', 'Count'])
-            self.assertEqual(
-                top_answers_visualization['data'], [{
-                    'answer': ['A', 'B'],
-                    'frequency': 3
-                }, {
-                    'answer': ['A'],
-                    'frequency': 2
-                }, {
-                    'answer': ['C', 'A'],
-                    'frequency': 1
-                }])
-
-            common_elements_visualization = visualizations[1]
-            self.assertEqual(
-                common_elements_visualization['id'], 'FrequencyTable')
-            self.assertEqual(
-                common_elements_visualization['options']['column_headers'],
-                ['Element', 'Count'])
-
-            common_visualization_data = (
-                common_elements_visualization['data'])
-            self.assertEqual(
-                common_visualization_data, [{
-                    'answer': 'A',
-                    'frequency': 6
-                }, {
-                    'answer': 'B',
-                    'frequency': 3
-                }, {
-                    'answer': 'C',
-                    'frequency': 1
-                }])
-
-    def test_retrieves_latest_vis_info_with_rounds_of_calculations(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._record_answer('Answer C')
-            self._run_answer_summaries_aggregator()
-
-            # Submit a new answer and run the aggregator again.
-            self._record_answer('Answer A')
-            self._rerun_answer_summaries_aggregator()
-            visualizations = self._get_visualizations()
-            # There are two visualizations for TextInput. One for top answers
-            # and second is for top unresolved answers but top unresolved
-            # answers visualization is not shown as part of exploration stats.
-            self.assertEqual(len(visualizations), 1)
-
-            visualization = visualizations[0]
-            # The latest data should include all submitted answers.
-            self.assertEqual(
-                visualization['data'], [{
-                    'answer': 'Answer A',
-                    'frequency': 2
-                }, {
-                    'answer': 'Answer C',
-                    'frequency': 1
-                }])
-
-    def test_retrieves_vis_info_across_multiple_exploration_versions(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._record_answer('Answer B')
-
-            # Change the exploration version and submit a new answer.
-            self._change_state_content('<p>New content</p>')
-            self._record_answer('Answer A')
-
-            self._run_answer_summaries_aggregator()
-            visualizations = self._get_visualizations()
-            # There are two visualizations for TextInput. One for top answers
-            # and second is for top unresolved answers but top unresolved
-            # answers visualization is not shown as part of exploration stats.
-            self.assertEqual(len(visualizations), 1)
-
-            visualization = visualizations[0]
-            # The latest data should include all submitted answers.
-            self.assertEqual(
-                visualization['data'], [{
-                    'answer': 'Answer A',
-                    'frequency': 2
-                }, {
-                    'answer': 'Answer B',
-                    'frequency': 1
-                }])
-
-    def test_no_vis_info_for_exp_with_new_state_name_before_calculations(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._rename_state(self.NEW_STATE_NAME)
-            self._run_answer_summaries_aggregator()
-
-            visualizations = self._get_visualizations(
-                state_name=self.NEW_STATE_NAME)
-
-            self.assertEqual(visualizations, [])
-
-    def test_no_vis_info_for_exp_with_new_state_name_after_calculations(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._run_answer_summaries_aggregator()
-            self._rename_state(self.NEW_STATE_NAME)
-
-            visualizations = self._get_visualizations(
-                state_name=self.NEW_STATE_NAME)
-
-            self.assertEqual(visualizations, [])
-
-    def test_no_vis_info_for_exp_with_new_interaction_before_calculations(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._change_state_interaction_id('SetInput')
-            self._run_answer_summaries_aggregator()
-
-            visualizations = self._get_visualizations()
-
-            self.assertEqual(visualizations, [])
-
-    def test_no_vis_info_for_exp_with_new_interaction_after_calculations(self):
-        with self._get_swap_context():
-            self._record_answer('Answer A')
-            self._run_answer_summaries_aggregator()
-            self._change_state_interaction_id('SetInput')
-
-            visualizations = self._get_visualizations()
-
-            self.assertEqual(visualizations, [])
-
-
-class StateAnswersStatisticsTest(test_utils.GenericTestBase):
-    """Tests for functionality related to retrieving statistics for answers of a
-    particular state.
-    """
-    STATE_NAMES = ['STATE A', 'STATE B', 'STATE C']
-    EXP_ID = 'exp_id'
-
-    def _get_top_state_answer_stats(
-            self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
-        """Returns the top answer stats corresponding to the given exploration
-        id and state names.
-        """
-        return stats_services.get_top_state_answer_stats(exp_id, state_name)
-
-    def _get_top_state_unresolved_answer_stats(
-            self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
-        """Returns the top unresolved answer stats corresponding to the given
-        exploration id and state names.
-        """
-        return stats_services.get_top_state_unresolved_answers(
-            exp_id, state_name)
-
-    def _get_top_state_answer_stats_multi(
-            self, state_names, exp_id=EXP_ID):
-        """Returns the top answer stats corresponding to the given exploration
-        id and state names.
-        """
-        return stats_services.get_top_state_answer_stats_multi(
-            exp_id, state_names)
-
-    def _record_answer(
-            self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0],
-            classification_category=exp_domain.EXPLICIT_CLASSIFICATION):
-        """Records the submitted answer corresponding to the given interaction
-        id in an exploration.
-        """
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        interaction_id = exploration.states[state_name].interaction.id
-        event_services.AnswerSubmissionEventHandler.record(
-            exp_id, exploration.version, state_name, interaction_id, 0, 0,
-            classification_category, 'sid1', 10.0, {}, answer)
-
-    def _run_answer_summaries_aggregator(self):
-        """Runs the MockInteractionAnswerSummariesAggregator."""
-        MockInteractionAnswerSummariesAggregator.start_computation()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        MockInteractionAnswerSummariesAggregator.stop_computation(
-            feconf.SYSTEM_COMMITTER_ID)
-
-    def setUp(self):
-        super(StateAnswersStatisticsTest, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.owner_id, self.STATE_NAMES, ['TextInput'])
-
-    def test_get_top_state_unresolved_answer_stats(self):
-        self._record_answer(
-            'A', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
-        self._record_answer(
-            'B', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
-        self._record_answer(
-            'C', classification_category=exp_domain.STATISTICAL_CLASSIFICATION)
-        self._record_answer(
-            'A', classification_category=exp_domain.STATISTICAL_CLASSIFICATION)
-        self._record_answer(
-            'D',
-            classification_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-        self._record_answer(
-            'E',
-            classification_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-        self._record_answer(
-            'D', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
-        self._run_answer_summaries_aggregator()
-
-        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
-            state_answers_stats = self._get_top_state_unresolved_answer_stats()
-
-        self.assertEqual(
-            state_answers_stats, [
-                {'answer': 'A', 'frequency': 2},
-                {'answer': 'C', 'frequency': 1},
-                {'answer': 'E', 'frequency': 1}
-            ])
-
-        self._record_answer(
-            'A', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
-        self._record_answer(
-            'E', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
-        self._run_answer_summaries_aggregator()
-
-        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
-            state_answers_stats = self._get_top_state_unresolved_answer_stats()
-
-        self.assertEqual(
-            state_answers_stats, [
-                {'answer': 'C', 'frequency': 1}
-            ])
-
-    def test_get_top_state_answer_stats(self):
-        self._record_answer('A')
-        self._record_answer('B')
-        self._record_answer('A')
-        self._record_answer('A')
-        self._record_answer('B')
-        self._record_answer('C')
-        self._run_answer_summaries_aggregator()
-
-        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 2):
-            state_answers_stats = self._get_top_state_answer_stats()
-
-        self.assertEqual(
-            state_answers_stats, [
-                {'answer': 'A', 'frequency': 3},
-                {'answer': 'B', 'frequency': 2},
-                # C is not included because min frequency is 2.
-            ])
-
-    def test_get_top_state_answer_stats_multi(self):
-        self._record_answer('A', state_name='STATE A')
-        self._record_answer('A', state_name='STATE A')
-        self._record_answer('B', state_name='STATE A')
-        self._record_answer(1, state_name='STATE B')
-        self._record_answer(1, state_name='STATE B')
-        self._record_answer(2, state_name='STATE B')
-        self._record_answer('X', state_name='STATE C')
-        self._record_answer('X', state_name='STATE C')
-        self._record_answer('Y', state_name='STATE C')
-        self._run_answer_summaries_aggregator()
-
-        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
-            state_answers_stats_multi = self._get_top_state_answer_stats_multi(
-                ['STATE A', 'STATE B'])
-
-        self.assertEqual(sorted(state_answers_stats_multi), [
-            'STATE A',
-            'STATE B',
-        ])
-        self.assertEqual(state_answers_stats_multi['STATE A'], [
-            {'answer': 'A', 'frequency': 2},
-            {'answer': 'B', 'frequency': 1},
-        ])
-        self.assertEqual(state_answers_stats_multi['STATE B'], [
-            {'answer': 1, 'frequency': 2},
-            {'answer': 2, 'frequency': 1},
-        ])
-
-
 class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     """Test for services related to learner answer details."""
 
@@ -2262,10 +1941,12 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.question_id = 'q_id_1'
         self.interaction_id = 'TextInput'
         self.state_reference_exploration = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_exploration(
                 self.exp_id, self.state_name))
         self.state_reference_question = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel.
+            get_state_reference_for_question(
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(

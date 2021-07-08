@@ -19,33 +19,25 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.platform import models
 from core.tests import test_utils
 
 import feconf
 
-(base_models, topic_models, ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.topic])
-
-
-# TODO(lilithxxx): Remove this mock class and the migrate_page_contents tests
-# once the actual functions for page content migrations are implemented.
-# See issue: https://github.com/oppia/oppia/issues/7009.
-class MockSubtopicPage(subtopic_page_domain.SubtopicPage):
-
-    @classmethod
-    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents):
-        """Mocks SubtopicPage._convert_page_contents_v1_dict_to_v2_dict()."""
-        return page_contents
+(base_models, subtopic_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.subtopic])
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
+
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -56,7 +48,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubtopicPageServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
@@ -73,7 +65,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
 
     def test_get_subtopic_page_from_model(self):
-        subtopic_page_model = topic_models.SubtopicPageModel.get(
+        subtopic_page_model = subtopic_models.SubtopicPageModel.get(
             self.subtopic_page_id)
         subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
             subtopic_page_model)
@@ -104,8 +96,9 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
-        self.assertEqual([subtopic_pages[0].to_dict(), subtopic_pages[1]],
-                         expected_subtopic_pages)
+        self.assertEqual(
+            [subtopic_pages[0].to_dict(), subtopic_pages[1]],
+            expected_subtopic_pages)
         subtopic_ids = []
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
@@ -114,7 +107,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
             self.TOPIC_ID, subtopic_ids)
         self.assertEqual(subtopic_pages, [None, None])
-
 
     def test_get_subtopic_page_contents_by_id(self):
         self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
@@ -125,7 +117,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 7.213
                     }
                 }
             }
@@ -185,7 +178,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_id_1 = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 'topic_id_1', 1))
-        subtopic_page_model_1 = topic_models.SubtopicPageModel.get(
+        subtopic_page_model_1 = subtopic_models.SubtopicPageModel.get(
             subtopic_page_id_1)
         subtopic_page_1.version = 2
         subtopic_page_model_1.version = 3
@@ -211,7 +204,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def test_commit_log_entry(self):
         subtopic_page_commit_log_entry = (
-            topic_models.SubtopicPageCommitLogEntryModel.get_commit(
+            subtopic_models.SubtopicPageCommitLogEntryModel.get_commit(
                 self.subtopic_page_id, 1)
         )
         self.assertEqual(subtopic_page_commit_log_entry.commit_type, 'create')
@@ -226,45 +219,146 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 1))
         subtopic_page_services.delete_subtopic_page(
             self.user_id, self.TOPIC_ID, 1)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
-            topic_models.SubtopicPageModel.get(subtopic_page_id)
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            re.escape(
+                'Entity for class SubtopicPageModel with id %s not found' % (
+                    subtopic_page_id))):
+            subtopic_models.SubtopicPageModel.get(subtopic_page_id)
+        with self.assertRaisesRegexp(
+            base_models.BaseModel.EntityNotFoundError,
+            re.escape(
+                'Entity for class SubtopicPageModel with id %s not found' % (
+                    subtopic_page_id))):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 
     def test_migrate_page_contents_to_latest_schema(self):
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        subtopic_page_swap = self.swap(
-            subtopic_page_domain, 'SubtopicPage', MockSubtopicPage)
+        html_content = (
+            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
+            'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
+        expected_html_content = (
+            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
+            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
+            'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
+            '-noninteractive-math>')
+        written_translations_dict = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations_dict_math = {
+            'translations_mapping': {
+                'content1': {
+                    'en': {
+                        'data_format': 'html',
+                        'translation': expected_html_content,
+                        'needs_update': True
+                    },
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Hey!',
+                        'needs_update': False
+                    }
+                },
+                'feedback_1': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': 'Testing!',
+                        'needs_update': False
+                    },
+                    'en': {
+                        'data_format': 'html',
+                        'translation': 'hello!',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        recorded_voiceovers = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False,
+                        'duration_secs': 7.213
+                    }
+                }
+            }
+        }
+        page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': html_content
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict
+        }
+        expected_page_contents_dict = {
+            'subtitled_html': {
+                'content_id': 'content', 'html': expected_html_content
+            },
+            'recorded_voiceovers': recorded_voiceovers,
+            'written_translations': written_translations_dict_math
+        }
 
-        subtopic_page_model = topic_models.SubtopicPageModel.get(
-            self.subtopic_page_id)
-
+        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
+        subtopic_page_model = subtopic_models.SubtopicPageModel(
+            id=subtopic_page_id,
+            topic_id=self.TOPIC_ID,
+            page_contents=page_contents_dict,
+            page_contents_schema_version=1,
+            language_code='en'
+        )
         self.assertEqual(subtopic_page_model.page_contents_schema_version, 1)
 
-        with current_schema_version_swap, subtopic_page_swap:
+        with current_schema_version_swap:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
 
         self.assertEqual(subtopic_page.page_contents_schema_version, 2)
+        self.assertEqual(
+            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
 
     def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
             self):
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        subtopic_page_swap = self.swap(
-            subtopic_page_domain, 'SubtopicPage', MockSubtopicPage)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v2 page schemas at present.')
 
-        subtopic_page_model = topic_models.SubtopicPageModel.get(
+        subtopic_page_model = subtopic_models.SubtopicPageModel.get(
             self.subtopic_page_id)
         subtopic_page_model.page_contents_schema_version = 0
         subtopic_page_model.commit(self.user_id, '', [])
 
-        with current_schema_version_swap, subtopic_page_swap, (
+        with current_schema_version_swap, (
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)

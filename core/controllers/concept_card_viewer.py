@@ -17,10 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import skill_services
+from core.domain import skill_fetchers
 import feconf
 
 
@@ -28,16 +27,27 @@ class ConceptCardDataHandler(base.BaseHandler):
     """A card that shows the explanation of a skill's concept."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'comma_separated_skill_ids': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_view_skills
     def get(self, comma_separated_skill_ids):
-        """Handles GET requests."""
+        """Handles GET requests.
 
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
+        Args:
+            comma_separated_skill_ids: str. Comma separated IDs of skills.
+        """
 
         skill_ids = comma_separated_skill_ids.split(',')
-        skills = skill_services.get_multi_skills(skill_ids)
+        skills = skill_fetchers.get_multi_skills(skill_ids)
 
         concept_card_dicts = []
         for skill in skills:

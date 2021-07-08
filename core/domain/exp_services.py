@@ -31,24 +31,30 @@ import logging
 import math
 import os
 import pprint
-import traceback
 import zipfile
 
+import android_validation_constants
 from constants import constants
 from core.domain import activity_services
+from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import param_domain
+from core.domain import recommendations_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -56,8 +62,6 @@ import python_utils
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
-memcache_services = models.Registry.import_memcache_services()
-taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
@@ -68,6 +72,10 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
+
+# NOTE TO DEVELOPERS: The get_story_ids_linked_to_explorations function was
+# removed in #13021 as part of the migration to Apache Beam. Please refer to
+# that PR if you need to reinstate it.
 
 
 def is_exp_summary_editable(exp_summary, user_id=None):
@@ -122,33 +130,43 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def get_exploration_ids_matching_query(query_string, cursor=None):
+def get_exploration_ids_matching_query(
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all exploration ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
     there are at least that many, otherwise it returns all remaining results.
     (If this behaviour does not occur, an error will be logged.) The method
-    also returns a search cursor.
+    also returns a search offset.
 
     Args:
         query_string: str. A search query string.
-        cursor: str or None. Optional cursor from which to start the search
-            query. If no cursor is supplied, the first N results matching
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        offset: str or None. Optional offset from which to start the search
+            query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
         list(str). A list of exploration ids matching the given search query.
     """
     returned_exploration_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_services.search_explorations(
-            query_string, remaining_to_fetch, cursor=search_cursor)
+        exp_ids, search_offset = search_services.search_explorations(
+            query_string, categories, language_codes, remaining_to_fetch,
+            offset=search_offset)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
@@ -159,7 +177,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 invalid_exp_ids.append(exp_ids[ind])
 
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
-                or search_cursor is None):
+                or search_offset is None):
             break
         else:
             logging.error(
@@ -167,12 +185,12 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 ', '.join(invalid_exp_ids))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
+            and search_offset is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return (returned_exploration_ids, search_cursor)
+    return (returned_exploration_ids, search_offset)
 
 
 def get_non_private_exploration_summaries():
@@ -215,11 +233,29 @@ def get_recently_published_exp_summaries(limit):
 
     Returns:
         dict. The dict contains recently published ExplorationSummary model
-            instances as a value keyed by their exploration id. At most 'limit'
-            entries are returned.
+        instances as a value keyed by their exploration id. At most 'limit'
+        entries are returned.
     """
     return exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_recently_published(limit))
+
+
+def get_story_id_linked_to_exploration(exp_id):
+    """Returns the ID of the story that the exploration is a part of, or None if
+    the exploration is not part of a story.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+
+    Returns:
+        str|None. The ID of the story if the exploration is linked to some
+        story, otherwise None.
+    """
+    exploration_context_model = exp_models.ExplorationContextModel.get(
+        exp_id, strict=False)
+    if exploration_context_model is not None:
+        return exploration_context_model.story_id
+    return None
 
 
 def get_all_exploration_summaries():
@@ -248,21 +284,27 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
+    # Asset directories that need to be included in exploration download.
+    asset_dirs_to_include_in_downloads = ('image',)
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    memfile = python_utils.string_io()
+    temp_file = python_utils.string_io()
     with zipfile.ZipFile(
-        memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
-
-        zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
+        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+        if not exploration.title:
+            zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
+        else:
+            zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
+            if not filepath.startswith(asset_dirs_to_include_in_downloads):
+                continue
             file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
@@ -270,7 +312,7 @@ def export_to_zip_file(exploration_id, version=None):
             unicode_filepath = str_filepath.decode('utf-8')
             zfile.writestr(unicode_filepath, file_contents)
 
-    return memfile.getvalue()
+    return temp_file.getvalue()
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):
@@ -316,7 +358,7 @@ def apply_change_list(exploration_id, change_list):
         the given changelist to the existing version of the exploration.
 
     Raises:
-        Exception: Any entries in the changelist are invalid.
+        Exception. Any entries in the changelist are invalid.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     try:
@@ -337,77 +379,133 @@ def apply_change_list(exploration_id, change_list):
                         list(python_utils.MAP(
                             to_param_domain, change.new_value)))
                 elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    state.update_content(
+                    content = (
                         state_domain.SubtitledHtml.from_dict(change.new_value))
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    content.validate()
+                    state.update_content(content)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
                     state.update_interaction_id(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    state.update_next_content_id_index(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    state.update_linked_skill_id(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     raise utils.InvalidInputException(
                         'Editing interaction handlers is no longer supported')
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    state.update_interaction_answer_groups(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                    state.update_interaction_default_outcome(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    new_answer_groups = [
+                        state_domain.AnswerGroup.from_dict(answer_groups)
+                        for answer_groups in change.new_value
+                    ]
+                    state.update_interaction_answer_groups(new_answer_groups)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                    new_outcome = None
+                    if change.new_value:
+                        new_outcome = state_domain.Outcome.from_dict(
+                            change.new_value
+                        )
+                    state.update_interaction_default_outcome(new_outcome)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
                     state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                    state.update_interaction_hints(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    state.update_interaction_solution(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    if not isinstance(change.new_value, list):
+                        raise Exception(
+                            'Expected hints_list to be a list,'
+                            ' received %s' % change.new_value)
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
+                    state.update_interaction_hints(new_hints_list)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    new_solution = None
+                    if change.new_value is not None:
+                        new_solution = state_domain.Solution.from_dict(
+                            state.interaction.id, change.new_value)
+                    state.update_interaction_solution(new_solution)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
+                    # Explicitly convert the duration_secs value from
+                    # int to float. Reason for this is the data from
+                    # the frontend will be able to match the backend
+                    # state model for Voiceover properly. Also js
+                    # treats any number that can be float and int as
+                    # int (no explicit types). For example,
+                    # 10.000 is not 10.000 it is 10.
+                    new_voiceovers_mapping = (
+                        change.new_value['voiceovers_mapping'])
+                    language_codes_to_audio_metadata = (
+                        new_voiceovers_mapping.values())
+                    for language_codes in language_codes_to_audio_metadata:
+                        for audio_metadata in language_codes.values():
+                            audio_metadata['duration_secs'] = (
+                                float(audio_metadata['duration_secs'])
+                            )
                     recorded_voiceovers = (
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
                     state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
                     if not isinstance(change.new_value, dict):
                         raise Exception(
                             'Expected written_translations to be a dict, '
                             'received %s' % change.new_value)
+                    cleaned_written_translations_dict = (
+                        state_domain.WrittenTranslations
+                        .convert_html_in_written_translations(
+                            change.new_value, html_cleaner.clean))
                     written_translations = (
                         state_domain.WrittenTranslations.from_dict(
-                            change.new_value))
+                            cleaned_written_translations_dict))
                     state.update_written_translations(written_translations)
-            elif change.cmd == exp_domain.CMD_ADD_TRANSLATION:
+            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
+                # DEPRECATED: This command is deprecated. Please do not use.
+                # The command remains here to support old suggestions.
                 exploration.states[change.state_name].add_translation(
                     change.content_id, change.language_code,
                     change.translation_html)
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                exploration.states[change.state_name].add_written_translation(
+                    change.content_id, change.language_code,
+                    change.translation_html, change.data_format)
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                exploration.states[
+                    change.state_name
+                ].mark_written_translations_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -426,9 +524,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                    exploration.update_param_changes(list(
+                        python_utils.MAP(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -436,15 +533,24 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-            elif (
-                    change.cmd ==
-                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
                 # resaving the exploration is sufficient to apply the states
-                # schema update.
-                continue
+                # schema update. Thus, no action is needed here other than
+                # to make sure that the version that the user is trying to
+                # migrate to is the latest version.
+                target_version_is_current_state_schema_version = (
+                    change.to_version ==
+                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                if not target_version_is_current_state_schema_version:
+                    raise Exception(
+                        'Expected to migrate to the latest state schema '
+                        'version %s, received %s' % (
+                            feconf.CURRENT_STATE_SCHEMA_VERSION,
+                            change.to_version))
         return exploration
 
     except Exception as e:
@@ -453,8 +559,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        logging.error(traceback.format_exc())
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -471,11 +576,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             this commit.
 
     Raises:
-        Exception: The versions of the given exploration and the currently
+        Exception. The versions of the given exploration and the currently
             stored exploration model do not match.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -516,8 +621,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION,
+        None,
+        [exploration.id])
 
     exploration.version += 1
 
@@ -526,7 +633,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, exploration.version, exploration.states,
-        exp_versions_diff=exp_versions_diff, revert_to_version=None)
+        exp_versions_diff, None)
 
     stats_services.create_stats_model(new_exp_stats)
 
@@ -551,8 +658,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff=exp_versions_diff,
-        revert_to_version=None)
+        exploration, exp_versions_diff, None)
 
 
 def _create_exploration(
@@ -619,7 +725,8 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    create_exploration_summary(exploration.id, committer_id)
+    regenerate_exploration_summary_with_new_contributor(
+        exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -692,34 +799,41 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
         feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
-    # This must come after the explorations are retrieved. Otherwise the
-    # memcache keys will be reinstated.
-    exploration_memcache_keys = [
-        exp_fetchers.get_exploration_memcache_key(exploration_id)
-        for exploration_id in exploration_ids]
-    memcache_services.delete_multi(exploration_memcache_keys)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+        exploration_ids)
 
     # Delete the explorations from search.
     search_services.delete_explorations_from_search_index(exploration_ids)
 
-    # Delete the exploration summaries, regardless of whether or not
-    # force_deletion is True.
+    # Delete the exploration summaries, recommendations and opportunities
+    # regardless of whether or not force_deletion is True.
     delete_exploration_summaries(exploration_ids)
+    recommendations_services.delete_explorations_from_recommendations(
+        exploration_ids)
+    opportunity_services.delete_exploration_opportunities(exploration_ids)
+    feedback_services.delete_exploration_feedback_analytics(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
+    feedback_services.delete_threads_for_multiple_entities(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
+
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_explorations_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_ids)
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
+    # Remove from activities.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
-def delete_explorations_from_subscribed_users(exploration_ids):
-    """Remove explorations from all subscribers' activity_ids.
+def delete_explorations_from_user_models(exploration_ids):
+    """Remove explorations from all subscribers' exploration_ids.
 
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
@@ -728,12 +842,77 @@ def delete_explorations_from_subscribed_users(exploration_ids):
         return
 
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+        user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
     ).fetch()
     for model in subscription_models:
-        model.activity_ids = [
-            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+        model.exploration_ids = [
+            id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
+    user_models.UserSubscriptionsModel.update_timestamps_multi(
+        subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
+
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_all().filter(
+            user_models.ExplorationUserDataModel.exploration_id.IN(
+                exploration_ids
+            )
+        ).fetch()
+    )
+    user_models.ExplorationUserDataModel.delete_multi(exp_user_data_models)
+
+    user_contributions_models = (
+        user_models.UserContributionsModel.get_all().filter(
+            datastore_services.any_of(
+                user_models.UserContributionsModel.created_exploration_ids.IN(
+                    exploration_ids
+                ),
+                user_models.UserContributionsModel.edited_exploration_ids.IN(
+                    exploration_ids
+                )
+            )
+        ).fetch()
+    )
+    for model in user_contributions_models:
+        model.created_exploration_ids = [
+            exp_id for exp_id in model.created_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+        model.edited_exploration_ids = [
+            exp_id for exp_id in model.edited_exploration_ids
+            if exp_id not in exploration_ids
+        ]
+    user_models.UserContributionsModel.update_timestamps_multi(
+        user_contributions_models)
+    user_models.UserContributionsModel.put_multi(user_contributions_models)
+
+
+def delete_explorations_from_activities(exploration_ids):
+    """Remove explorations from exploration_ids field in completed and
+    incomplete activities models.
+
+    Args:
+        exploration_ids: list(str). The ids of the explorations to delete.
+    """
+    if not exploration_ids:
+        return
+
+    model_classes = (
+        user_models.CompletedActivitiesModel,
+        user_models.IncompleteActivitiesModel,
+    )
+    all_entities = []
+    for model_class in model_classes:
+        entities = model_class.query(
+            model_class.exploration_ids.IN(exploration_ids)
+        ).fetch()
+        for model in entities:
+            model.exploration_ids = [
+                id_ for id_ in model.exploration_ids
+                if id_ not in exploration_ids
+            ]
+        all_entities.extend(entities)
+    datastore_services.update_timestamps_multi(all_entities)
+    datastore_services.put_multi(all_entities)
 
 
 # Operations on exploration snapshots.
@@ -810,6 +989,89 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
+def validate_exploration_for_story(exp, strict):
+    """Validates an exploration with story validations.
+
+    Args:
+        exp: Exploration. Exploration object to be validated.
+        strict: bool. Whether to raise an Exception when a validation error
+            is encountered. If not, a list of the error messages are
+            returned. strict should be True when this is called before
+            saving the story and False when this function is called from the
+            frontend.
+
+    Returns:
+        list(str). The various validation error messages (if strict is
+        False).
+
+    Raises:
+        ValidationError. Invalid language found for exploration.
+        ValidationError. Expected no exploration to have parameter values in it.
+        ValidationError. Invalid interaction in exploration.
+        ValidationError. RTE content in state of exploration with ID is not
+            supported on mobile.
+    """
+    validation_error_messages = []
+    if (
+            exp.language_code not in
+            android_validation_constants.SUPPORTED_LANGUAGES):
+        error_string = (
+            'Invalid language %s found for exploration '
+            'with ID %s.' % (exp.language_code, exp.id))
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if exp.param_specs or exp.param_changes:
+        error_string = (
+            'Expected no exploration to have parameter '
+            'values in it. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    if not exp.correctness_feedback_enabled:
+        error_string = (
+            'Expected all explorations to have correctness feedback '
+            'enabled. Invalid exploration: %s' % exp.id)
+        if strict:
+            raise utils.ValidationError(error_string)
+        validation_error_messages.append(error_string)
+
+    for state_name in exp.states:
+        state = exp.states[state_name]
+        if not state.interaction.is_supported_on_android_app():
+            error_string = (
+                'Invalid interaction %s in exploration '
+                'with ID: %s.' % (state.interaction.id, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        if not state.is_rte_content_supported_on_android():
+            error_string = (
+                'RTE content in state %s of exploration '
+                'with ID %s is not supported on mobile.'
+                % (state_name, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        if state.interaction.id == 'EndExploration':
+            recommended_exploration_ids = (
+                state.interaction.customization_args[
+                    'recommendedExplorationIds'].value)
+            if len(recommended_exploration_ids) != 0:
+                error_string = (
+                    'Exploration with ID: %s contains exploration '
+                    'recommendations in its EndExploration interaction.'
+                    % (exp.id))
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+    return validation_error_messages
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
         is_suggestion=False, is_by_voice_artist=False):
@@ -833,10 +1095,10 @@ def update_exploration(
             voice artist.
 
     Raises:
-        ValueError: No commit message is supplied and the exploration is public.
-        ValueError: The update is due to a suggestion and the commit message is
+        ValueError. No commit message is supplied and the exploration is public.
+        ValueError. The update is due to a suggestion and the commit message is
             invalid.
-        ValueError: The update is not due to a suggestion, and the commit
+        ValueError. The update is not due to a suggestion, and the commit
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
@@ -866,12 +1128,18 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     updated_exploration = apply_change_list(exploration_id, change_list)
+    if get_story_id_linked_to_exploration(exploration_id) is not None:
+        validate_exploration_for_story(updated_exploration, True)
     _save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
-    # Update summary of changed exploration.
-    update_exploration_summary(exploration_id, committer_id)
+
+    # Update summary of changed exploration in a deferred task.
+    taskqueue_services.defer(
+        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_id,
+        committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
@@ -886,55 +1154,45 @@ def update_exploration(
             exploration_id)
 
 
-def create_exploration_summary(exploration_id, contributor_id_to_add):
-    """Create the summary model for an exploration, and store it in the
-    datastore.
+def regenerate_exploration_summary_with_new_contributor(
+        exploration_id, contributor_id):
+    """Regenerate a summary of the given exploration and add a new contributor
+    to the contributors summary. If the summary does not exist, this function
+    generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
-        contributor_id_to_add: str or None. The user_id of user who have
-            created the exploration will be added to the list of contributours
-            for the exploration if the argument is not None and it is not a
-            system id.
+        contributor_id: str. ID of the contributor to be added to
+            the exploration summary.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add)
+    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary.add_contribution_by_user(contributor_id)
     save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(exploration_id, contributor_id_to_add):
-    """Update the summary of an exploration.
+def regenerate_exploration_and_contributors_summaries(exploration_id):
+    """Regenerate a summary of the given exploration and also regenerate
+    the contributors summary from the snapshots. If the summary does not exist,
+    this function generates a new one.
 
     Args:
-        exploration_id: str. The id of the exploration whose summary is
-            to be updated.
-        contributor_id_to_add: str or None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            update to the exploration's content) will be added to the list of
-            contributours for the exploration if the argument is not None and it
-            is not a system id.
+        exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add)
+    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary.contributors_summary = (
+        compute_exploration_contributors_summary(exp_summary.id))
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration, contributor_id_to_add):
+def _compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it. contributor_id_to_add will be added to
-    the list of contributors for the exploration if the argument is not
-    None and if the id is not a system id.
+    domain object and return it.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
-        contributor_id_to_add: str or None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            change to the exploration's content) will be added to the list of
-            contributours for the exploration if the argument is not None and it
-            is not a system id.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
@@ -945,34 +1203,14 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
-        scaled_average_rating = get_scaled_average_rating(
-            old_exp_summary.ratings)
-        contributor_ids = old_exp_summary.contributor_ids or []
-        contributors_summary = old_exp_summary.contributors_summary or {}
+        scaled_average_rating = get_scaled_average_rating(ratings)
     else:
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
-        contributor_ids = []
-        contributors_summary = {}
 
-    # Update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an exploration's content).
-    if (contributor_id_to_add is not None and
-            contributor_id_to_add not in constants.SYSTEM_USER_IDS):
-        if contributor_id_to_add not in contributor_ids:
-            contributor_ids.append(contributor_id_to_add)
-
-    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit.
-            contributors_summary = compute_exploration_contributors_summary(
-                exploration.id)
-        else:
-            if contributor_id_to_add in contributors_summary:
-                contributors_summary[contributor_id_to_add] += 1
-            else:
-                contributors_summary[contributor_id_to_add] = 1
+    contributors_summary = (
+        exp_summary_model.contributors_summary if exp_summary_model else {})
+    contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         python_utils.divide(
@@ -1023,6 +1261,15 @@ def compute_exploration_contributors_summary(exploration_id):
                 'version_number']
         else:
             current_version -= 1
+
+    contributor_ids = list(contributors_summary)
+    # Remove IDs that are deleted or do not exist.
+    users_settings = user_services.get_users_settings(contributor_ids)
+    for contributor_id, user_settings in python_utils.ZIP(
+            contributor_ids, users_settings):
+        if user_settings is None:
+            del contributors_summary[contributor_id]
+
     return contributors_summary
 
 
@@ -1033,33 +1280,41 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_model = exp_models.ExpSummaryModel(
-        id=exp_summary.id,
-        title=exp_summary.title,
-        category=exp_summary.category,
-        objective=exp_summary.objective,
-        language_code=exp_summary.language_code,
-        tags=exp_summary.tags,
-        ratings=exp_summary.ratings,
-        scaled_average_rating=exp_summary.scaled_average_rating,
-        status=exp_summary.status,
-        community_owned=exp_summary.community_owned,
-        owner_ids=exp_summary.owner_ids,
-        editor_ids=exp_summary.editor_ids,
-        voice_artist_ids=exp_summary.voice_artist_ids,
-        viewer_ids=exp_summary.viewer_ids,
-        contributor_ids=exp_summary.contributor_ids,
-        contributors_summary=exp_summary.contributors_summary,
-        version=exp_summary.version,
-        exploration_model_last_updated=(
+    exp_summary_dict = {
+        'title': exp_summary.title,
+        'category': exp_summary.category,
+        'objective': exp_summary.objective,
+        'language_code': exp_summary.language_code,
+        'tags': exp_summary.tags,
+        'ratings': exp_summary.ratings,
+        'scaled_average_rating': exp_summary.scaled_average_rating,
+        'status': exp_summary.status,
+        'community_owned': exp_summary.community_owned,
+        'owner_ids': exp_summary.owner_ids,
+        'editor_ids': exp_summary.editor_ids,
+        'voice_artist_ids': exp_summary.voice_artist_ids,
+        'viewer_ids': exp_summary.viewer_ids,
+        'contributor_ids': list(exp_summary.contributors_summary.keys()),
+        'contributors_summary': exp_summary.contributors_summary,
+        'version': exp_summary.version,
+        'exploration_model_last_updated': (
             exp_summary.exploration_model_last_updated),
-        exploration_model_created_on=(
+        'exploration_model_created_on': (
             exp_summary.exploration_model_created_on),
-        first_published_msec=(
+        'first_published_msec': (
             exp_summary.first_published_msec)
-    )
+    }
 
-    exp_summary_model.put()
+    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
+    if exp_summary_model is not None:
+        exp_summary_model.populate(**exp_summary_dict)
+        exp_summary_model.update_timestamps()
+        exp_summary_model.put()
+    else:
+        exp_summary_dict['id'] = exp_summary.id
+        model = exp_models.ExpSummaryModel(**exp_summary_dict)
+        model.update_timestamps()
+        model.put()
 
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
@@ -1076,7 +1331,11 @@ def delete_exploration_summaries(exploration_ids):
             deleted.
     """
     summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
-    exp_models.ExpSummaryModel.delete_multi(summary_models)
+    existing_summary_models = [
+        summary_model for summary_model in summary_models
+        if summary_model is not None
+    ]
+    exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
 
 def revert_exploration(
@@ -1092,8 +1351,8 @@ def revert_exploration(
             is to be reverted.
 
     Raises:
-        Exception:  does not match the version of the currently-stored
-            exploration model.
+        Exception. Version of exploration does not match the version of the
+            currently-stored exploration model.
     """
     exploration_model = exp_models.ExplorationModel.get(
         exploration_id, strict=False)
@@ -1114,7 +1373,7 @@ def revert_exploration(
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
     else:
         exploration.validate()
@@ -1123,23 +1382,21 @@ def revert_exploration(
         exploration_model, committer_id,
         'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
-    exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
-    memcache_services.delete(exp_memcache_key)
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_EXPLORATION, None,
+        [exploration.id])
 
-    # Update the exploration summary, but since this is just a revert do
-    # not add the committer of the revert to the list of contributors.
-    update_exploration_summary(exploration_id, None)
+    regenerate_exploration_and_contributors_summaries(exploration_id)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
-        exp_versions_diff=None, revert_to_version=revert_to_version)
+        None, revert_to_version)
     stats_services.create_stats_model(exploration_stats)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=current_version)
     stats_services.update_exp_issues_for_new_exp_version(
-        current_exploration, exp_versions_diff=None,
-        revert_to_version=revert_to_version)
+        current_exploration, None, revert_to_version)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
@@ -1163,7 +1420,7 @@ def get_demo_exploration_components(demo_path):
         filepath does not include the assets/ prefix.
 
     Raises:
-        Exception: The path of the file is unrecognized or does not exist.
+        Exception. The path of the file is unrecognized or does not exist.
     """
     demo_filepath = os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, demo_path)
 
@@ -1179,11 +1436,8 @@ def get_demo_exploration_components(demo_path):
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
         strip_voiceovers=False):
-    """Note that the default title and category will be used if the YAML
-    schema version is less than
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    since in that case the YAML schema will not have a title and category
-    present.
+    """Saves a new exploration given its representation in YAML form and the
+    list of assets associated with it.
 
     Args:
         committer_id: str. The id of the user who made the commit.
@@ -1195,7 +1449,7 @@ def save_new_exploration_from_yaml_and_assets(
             from the imported exploration.
 
     Raises:
-        Exception: The yaml file is invalid due to a missing schema version.
+        Exception. The yaml file is invalid due to a missing schema version.
     """
     if assets_list is None:
         assets_list = []
@@ -1203,7 +1457,6 @@ def save_new_exploration_from_yaml_and_assets(
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
-    exp_schema_version = yaml_dict['schema_version']
 
     # The assets are committed before the exploration is created because the
     # migrating to state schema version 25 involves adding dimensions to
@@ -1215,16 +1468,7 @@ def save_new_exploration_from_yaml_and_assets(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(asset_filename, asset_content)
 
-    if (exp_schema_version <=
-            exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
-        # The schema of the YAML file for older explorations did not include
-        # a title and a category; these need to be manually specified.
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
-            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
-    else:
-        exploration = exp_domain.Exploration.from_yaml(
-            exploration_id, yaml_content)
+    exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:
@@ -1251,7 +1495,7 @@ def delete_demo(exploration_id):
         exploration_id: str. The id of the exploration to be deleted.
 
     Raises:
-        Exception: The exploration id is invalid.
+        Exception. The exploration id is invalid.
     """
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
@@ -1259,8 +1503,9 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info('Exploration with id %s was not deleted, because it '
-                     'does not exist.' % exploration_id)
+        logging.info(
+            'Exploration with id %s was not deleted, because it '
+            'does not exist.' % exploration_id)
     else:
         delete_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
@@ -1276,7 +1521,7 @@ def load_demo(exploration_id):
         exploration_id: str. The id of the demo exploration.
 
     Raises:
-        Exception: The exploration id provided is invalid.
+        Exception. The exploration id provided is invalid.
     """
     if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
@@ -1325,8 +1570,9 @@ def get_next_page_of_all_non_private_commits(
             - bool. indicating whether there are (likely) more results after
               this batch. If False, there are no more results; if True, there
               are probably more results.
+
     Raises:
-        ValueError: The argument max_age is not datetime.timedelta or None.
+        ValueError. The argument max_age is not datetime.timedelta or None.
     """
     if max_age is not None and not isinstance(max_age, datetime.timedelta):
         raise ValueError(
@@ -1337,7 +1583,7 @@ def get_next_page_of_all_non_private_commits(
             page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.created_on, entry.last_updated, entry.user_id,
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
@@ -1348,30 +1594,21 @@ def get_image_filenames_from_exploration(exploration):
     """Get the image filenames from the exploration.
 
     Args:
-        exploration: Exploration object. The exploration itself.
+        exploration: Exploration. The exploration to get the image filenames.
 
     Returns:
-       list(str). List containing the name of the image files in exploration.
+        list(str). List containing the name of the image files in exploration.
     """
     filenames = []
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
             filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
+                'imageAndRegions'].value['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
-    rte_components_in_exp = []
-    for html_string in html_list:
-        rte_components_in_exp = (
-            rte_components_in_exp + html_cleaner.get_rte_components(
-                html_string))
-
-    for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-image':
-            filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
-    # This is done because the ItemSelectInput may repeat the image names.
-    return list(set(filenames))
+    filenames.extend(
+        html_cleaner.get_image_filenames_from_html_strings(html_list))
+    return filenames
 
 
 def get_number_of_ratings(ratings):
@@ -1385,7 +1622,7 @@ def get_number_of_ratings(ratings):
     Returns:
         int. The total number of ratings given.
     """
-    return sum(ratings.values())
+    return sum(ratings.values()) if ratings else 0
 
 
 def get_average_rating(ratings):
@@ -1473,6 +1710,516 @@ def is_voiceover_change_list(change_list):
     return True
 
 
+def get_composite_change_list(exp_id, frontend_version, backend_version):
+    """Returns a list of ExplorationChange domain objects consisting of
+    changes from frontend_version to backend_version in an exploration.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        frontend_version: int. The version of the exploration on which the user
+            is working.
+        backend_version: int. The latest version of the exploration from the
+            backend.
+
+    Returns:
+        list(ExplorationChange). List of ExplorationChange domain objects
+        consisting of changes from frontend_version to backend_version.
+    """
+    if frontend_version > backend_version:
+        raise Exception(
+            'Unexpected error: Trying to find change list from version %s '
+            'of exploration to version %s. Please reload and try again.'
+            % (frontend_version, backend_version))
+
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    composite_change_list_dict = []
+    for i in python_utils.RANGE(frontend_version, backend_version):
+        composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
+
+    composite_change_list = [
+        exp_domain.ExplorationChange(change)
+        for change in composite_change_list_dict]
+
+    return composite_change_list
+
+
+def are_changes_mergeable(exp_id, frontend_version, change_list):
+    """Checks whether the change list can be merged when the
+    frontend version is not equal to the latest backend version.
+
+    Args:
+        exp_id: str. The id of the exploration where the change_list is to
+            be applied.
+        frontend_version: int. Version of an exploration from frontend on
+            which a user is working.
+        change_list: list(ExplorationChange). List of the changes made by the
+            user on the frontend, which needs to be checked for mergeability.
+
+    Returns:
+        boolean. Whether the changes are mergeable.
+    """
+
+    backend_version_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if backend_version_exploration.version == frontend_version:
+        return True
+    elif backend_version_exploration.version < frontend_version:
+        return False
+    else:
+        # A complete list of changes from one version to another
+        # is composite_change_list.
+        composite_change_list = get_composite_change_list(
+            exp_id, frontend_version,
+            backend_version_exploration.version)
+
+        # Added_state_names: list(str). Names of the states added to the
+        # exploration from prev_exp_version to current_exp_version. It
+        # stores the latest name of the added state.
+        added_state_names = []
+
+        # Deleted_state_names: list(str). Names of the states deleted from
+        # the exploration from prev_exp_version to current_exp_version.
+        # It stores the initial name of the deleted state from
+        # pre_exp_version.
+        deleted_state_names = []
+
+        # New_to_old_state_names: dict. Dictionary mapping state names of
+        # current_exp_version to the state names of prev_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+        new_to_old_state_names = {}
+
+        # Changed_properties: dict. List of all the properties changed
+        # according to the state and property name.
+        changed_properties = {}
+
+        # Changed_translations: dict. List of all the translations changed
+        # according to the state and content_id name.
+        changed_translations = {}
+
+        # NOTE: List properties_related_to_cust_args,
+        # properties_related_to_answer_groups, and
+        # properties_related_to_solution should remain separate lists
+        # irrespective of its content. This is because they are for
+        # different unique properties so if in the future any new
+        # property is added which is affected by that unique property
+        # only then in that case we'll add that property name in the
+        # list of that unique property only. Therefore we can not keep
+        # a common list.
+
+        # properties_related_to_cust_args: List of the properties
+        # related (affected by or affecting) customization args. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by customization args.
+        properties_related_to_cust_args = ['solution', 'recorded_voiceovers',
+                                           'answer_groups',
+                                           'widget_customization_args']
+
+        # properties_related_to_answer_groups: List of the properties
+        # related (affected by or affecting) answer groups. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by answer groups.
+        properties_related_to_answer_groups = ['solution',
+                                               'recorded_voiceovers',
+                                               'answer_groups',
+                                               'widget_customization_args']
+
+        # properties_related_to_solution: List of the properties
+        # related (affected by or affecting) solution. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by solution.
+        properties_related_to_solution = ['solution', 'answer_groups',
+                                          'recorded_voiceovers',
+                                          'widget_customization_args']
+
+        # properties_related_to_voiceovers: List of the properties
+        # related (affected by or affecting) voiceovers. This list
+        # can be changed when any new property is added or deleted which
+        # affects or is affected by voiceovers.
+        properties_related_to_voiceovers = ['content', 'solution',
+                                            'hints',
+                                            'written_translations',
+                                            'answer_group',
+                                            'default_outcome',
+                                            'widget_customization_args',
+                                            'recorded_voiceovers']
+        frontend_version_exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, version=frontend_version)
+        for change in composite_change_list:
+            if change.cmd == exp_domain.CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                state_name = change.state_name
+                if state_name in added_state_names:
+                    added_state_names.remove(state_name)
+                else:
+                    original_state_name = state_name
+                    if original_state_name in new_to_old_state_names:
+                        original_state_name = new_to_old_state_names.pop(
+                            original_state_name)
+                    deleted_state_names.append(original_state_name)
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in added_state_names:
+                    added_state_names.remove(old_state_name)
+                    added_state_names.append(new_state_name)
+                elif old_state_name in new_to_old_state_names:
+                    new_to_old_state_names[new_state_name] = (
+                        new_to_old_state_names.pop(old_state_name))
+                else:
+                    new_to_old_state_names[new_state_name] = old_state_name
+
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                # A condition to store the name of the properties changed
+                # in changed_properties dict.
+                state_name = change.state_name
+                if state_name in new_to_old_state_names:
+                    state_name = new_to_old_state_names[change.state_name]
+                if state_name in changed_properties:
+                    if (change.property_name not in
+                            changed_properties[state_name]):
+                        changed_properties[state_name].append(
+                            change.property_name)
+                else:
+                    changed_properties[state_name] = [change.property_name]
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                changed_property = None
+                if change.content_id == 'content':
+                    changed_property = 'content'
+                elif change.content_id[:14] == 'ca_placeholder':
+                    changed_property = 'widget_customization_args'
+                elif change.content_id == 'default_outcome':
+                    changed_property = 'default_outcome'
+                elif change.content_id == 'solution':
+                    changed_property = 'solution'
+                elif change.content_id[:4] == 'hint':
+                    changed_property = 'hints'
+                elif change.content_id[:8] == 'feedback':
+                    changed_property = 'answer_groups'
+                elif change.content_id[:10] == 'rule_input':
+                    changed_property = 'answer_groups'
+                # A condition to store the name of the properties changed
+                # in changed_properties dict.
+                state_name = change.state_name
+                if state_name in new_to_old_state_names:
+                    state_name = new_to_old_state_names[change.state_name]
+                if state_name in changed_translations:
+                    if (changed_property not in
+                            changed_translations[state_name]):
+                        changed_translations[state_name].append(
+                            changed_property)
+                else:
+                    changed_translations[state_name] = [changed_property]
+                if state_name in changed_properties:
+                    if ('written_translations' not in
+                            changed_properties[state_name]):
+                        changed_properties[state_name].append(
+                            'written_translations')
+                else:
+                    changed_properties[state_name] = [
+                        'written_translations']
+
+        # Old_to_new_state_names: dict. Dictionary mapping state names of
+        # prev_exp_version to the state names of current_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+        old_to_new_state_names = {
+            value: key for key, value in new_to_old_state_names.items()
+        }
+
+        if len(added_state_names) > 0 or len(deleted_state_names) > 0:
+            # Here we will send the changelist, version, latest_version,
+            # and exploration to the admin, so that the conditions
+            # can be reviewed.
+            return False
+
+        changes_are_mergeable = False
+
+        # state_names_of_renamed_states: dict. Stores the changes in
+        # states names in change_list where the key is the state name in
+        # frontend version and the value is the renamed name from the
+        # change list if there is any rename state change.
+        state_names_of_renamed_states = {}
+        for change in change_list:
+            change_is_mergeable = False
+            if change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in state_names_of_renamed_states:
+                    state_names_of_renamed_states[new_state_name] = (
+                        state_names_of_renamed_states.pop(old_state_name))
+                else:
+                    state_names_of_renamed_states[new_state_name] = (
+                        old_state_name)
+                if (state_names_of_renamed_states[new_state_name] not in
+                        old_to_new_state_names):
+                    change_is_mergeable = True
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                old_state_name = change.state_name
+                new_state_name = change.state_name
+                if change.state_name in state_names_of_renamed_states:
+                    old_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                    new_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                if change.state_name in old_to_new_state_names:
+                    new_state_name = old_to_new_state_names[old_state_name]
+                if old_state_name not in changed_translations:
+                    changed_translations[old_state_name] = []
+                frontend_exp_states = (
+                    frontend_version_exploration.states[old_state_name])
+                backend_exp_states = (
+                    backend_version_exploration.states[new_state_name])
+                if (change.property_name ==
+                        exp_domain.STATE_PROPERTY_CONTENT):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.content.html ==
+                                backend_exp_states.content.html):
+                            if ('content' not in
+                                    changed_translations[old_state_name] and
+                                    'recorded_voiceovers' not in
+                                    changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if ('widget_customization_args' not in
+                                    changed_properties[old_state_name] and
+                                    'answer_groups' not in
+                                    changed_properties[old_state_name] and
+                                    'solution' not in
+                                    changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                # Customization args differ for every interaction, so in
+                # case of different interactions merging is simply not
+                # possible, but in case of same interaction, the values in
+                # the customization_args are often lists so if someone
+                # changes even one item of that list then determining which
+                # item is changed is not feasible, so suppose there is long
+                # list of values in item selection interaction and one user
+                # deletes one value and another one edits another value,
+                # so after deletion the indices of all the values will be
+                # changed and it will not be possible to compare and know
+                # that which value is changed by second user.
+                # So we will not be handling the merge on the basis of
+                # individual fields.
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in
+                                    properties_related_to_cust_args) and
+                                    change.property_name not in
+                                    changed_translations[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in
+                                    properties_related_to_answer_groups) and
+                                    change.property_name not in
+                                    changed_translations[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                     ):
+                    if old_state_name in changed_properties:
+                        if (change.property_name not in
+                                changed_properties[old_state_name] and
+                                change.property_name not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                    change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    change_is_mergeable = True
+                # We’ll not be able to handle the merge if changelists
+                # affect the different indices of the hint in the same
+                # state because whenever there is even a small change
+                # in one field of any hint, they treat the whole hints
+                # list as a new value.
+                # So it will not be possible to find out the exact change.
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    if old_state_name in changed_properties:
+                        if (change.property_name not in
+                                changed_properties[old_state_name] and
+                                change.property_name not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id):
+                            if (all(property not in
+                                    changed_properties[old_state_name]
+                                    for property in
+                                    properties_related_to_solution) and
+                                    change.property_name not in
+                                    changed_translations[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if old_state_name in changed_properties:
+                        if (frontend_exp_states.interaction.id ==
+                                backend_exp_states.interaction.id and
+                                frontend_exp_states.solicit_answer_details ==
+                                backend_exp_states.solicit_answer_details):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if old_state_name in changed_properties:
+                        if all(property not in
+                               changed_properties[old_state_name]
+                               for property in
+                               properties_related_to_voiceovers):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                old_state_name = change.state_name
+                new_state_name = change.state_name
+                if change.state_name in state_names_of_renamed_states:
+                    old_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                    new_state_name = (
+                        state_names_of_renamed_states[change.state_name])
+                if change.state_name in old_to_new_state_names:
+                    new_state_name = old_to_new_state_names[old_state_name]
+                if old_state_name not in changed_translations:
+                    changed_translations[old_state_name] = []
+                if old_state_name in changed_properties:
+                    if change.content_id == 'content':
+                        if ('content' not in
+                                changed_properties[old_state_name] and
+                                'content' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:14] == 'ca_placeholder':
+                        if ('widget_customization_args' not in
+                                changed_properties[old_state_name] and
+                                'widget_customization_args' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id == 'default_outcome':
+                        if ('default_outcome' not in
+                                changed_properties[old_state_name] and
+                                'default_outcome' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id == 'solution':
+                        if ('solution' not in
+                                changed_properties[old_state_name] and
+                                'solution' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:4] == 'hint':
+                        if ('hints' not in
+                                changed_properties[old_state_name] and
+                                'hints' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:8] == 'feedback':
+                        if ('answer_groups' not in
+                                changed_properties[old_state_name] and
+                                'answer_groups' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                    elif change.content_id[:10] == 'rule_input':
+                        if ('answer_groups' not in
+                                changed_properties[old_state_name] and
+                                'answer_groups' not in
+                                changed_translations[old_state_name]):
+                            change_is_mergeable = True
+                else:
+                    change_is_mergeable = True
+            elif (change.cmd ==
+                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                change_is_mergeable = True
+            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                if change.property_name == 'title':
+                    if (frontend_version_exploration.title ==
+                            backend_version_exploration.title):
+                        change_is_mergeable = True
+                elif change.property_name == 'category':
+                    if (frontend_version_exploration.category ==
+                            backend_version_exploration.category):
+                        change_is_mergeable = True
+                elif change.property_name == 'objective':
+                    if (frontend_version_exploration.objective ==
+                            backend_version_exploration.objective):
+                        change_is_mergeable = True
+                elif change.property_name == 'language_code':
+                    if (frontend_version_exploration.language_code ==
+                            backend_version_exploration.language_code):
+                        change_is_mergeable = True
+                elif change.property_name == 'tags':
+                    if (frontend_version_exploration.tags ==
+                            backend_version_exploration.tags):
+                        change_is_mergeable = True
+                elif change.property_name == 'blurb':
+                    if (frontend_version_exploration.blurb ==
+                            backend_version_exploration.blurb):
+                        change_is_mergeable = True
+                elif change.property_name == 'author_notes':
+                    if (frontend_version_exploration.author_notes ==
+                            backend_version_exploration.author_notes):
+                        change_is_mergeable = True
+                elif change.property_name == 'init_state_name':
+                    if (frontend_version_exploration.init_state_name ==
+                            backend_version_exploration.init_state_name):
+                        change_is_mergeable = True
+                elif change.property_name == 'auto_tts_enabled':
+                    if (frontend_version_exploration.auto_tts_enabled ==
+                            backend_version_exploration.auto_tts_enabled):
+                        change_is_mergeable = True
+                elif change.property_name == 'correctness_feedback_enabled':
+                    if (frontend_version_exploration.correctness_feedback_enabled == # pylint: disable=line-too-long
+                            backend_version_exploration.correctness_feedback_enabled): # pylint: disable=line-too-long
+                        change_is_mergeable = True
+
+            if change_is_mergeable:
+                changes_are_mergeable = True
+                continue
+            else:
+                changes_are_mergeable = False
+                return False
+
+        return changes_are_mergeable
+
+
 def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
     exploration.
@@ -1516,23 +2263,14 @@ def get_user_exploration_data(
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                     and exp_user_data.draft_change_list else None)
-    draft_change_list_id = (exp_user_data.draft_change_list_id
-                            if exp_user_data else 0)
+    draft_changes = (
+        exp_user_data.draft_change_list if exp_user_data
+        and exp_user_data.draft_change_list else None)
+    draft_change_list_id = (
+        exp_user_data.draft_change_list_id if exp_user_data else 0)
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
-
-    # Retrieve all classifiers for the exploration.
-    state_classifier_mapping = {}
-    classifier_training_jobs = (
-        classifier_services.get_classifier_training_jobs(
-            exploration_id, exploration.version, exploration.states))
-    for index, state_name in enumerate(exploration.states):
-        if classifier_training_jobs[index] is not None:
-            state_classifier_mapping[state_name] = (
-                classifier_training_jobs[index].to_player_dict())
 
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
@@ -1557,7 +2295,6 @@ def get_user_exploration_data(
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
         'email_preferences': exploration_email_preferences.to_dict(),
-        'state_classifier_mapping': state_classifier_mapping
     }
 
     return editor_dict
@@ -1607,6 +2344,7 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.draft_change_list_id = draft_change_list_id
+    exp_user_data.update_timestamps()
     exp_user_data.put()
 
 
@@ -1631,8 +2369,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]
-            if (
-                    exploration.version >
+            if (exploration.version >
                     exp_user_data.draft_change_list_exp_version):
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
@@ -1641,16 +2378,31 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_upgrade_services.try_upgrading_draft_to_exp_version(
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
-                        exploration.version, exp_id))
+                        exploration.version, exploration.id))
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
+    updated_exploration = None
 
-    return (
-        apply_change_list(exp_id, draft_change_list)
-        if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
-        else None)
+    if (exp_user_data and exp_user_data.draft_change_list and
+            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
+        updated_exploration = apply_change_list(exp_id, draft_change_list)
+        updated_exploration_has_no_invalid_math_tags = True
+        # verify that all the math-tags are valid before returning the
+        # updated exploration.
+        for state in updated_exploration.states.values():
+            html_string = ''.join(state.get_all_html_content_strings())
+            error_list = (
+                html_validation_service.
+                validate_math_tags_in_html_with_attribute_math_content(
+                    html_string))
+            if len(error_list) > 0:
+                updated_exploration_has_no_invalid_math_tags = False
+                break
+        if not updated_exploration_has_no_invalid_math_tags:
+            updated_exploration = None
+
+    return updated_exploration
 
 
 def discard_draft(exp_id, user_id):
@@ -1667,6 +2419,7 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list = None
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
+        exp_user_data.update_timestamps()
         exp_user_data.put()
 
 
@@ -1681,7 +2434,7 @@ def get_interaction_id_for_state(exp_id, state_name):
         str. The ID of the interaction.
 
     Raises:
-        Exception: If the state with the given state name does not exist in
+        Exception. If the state with the given state name does not exist in
             the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)

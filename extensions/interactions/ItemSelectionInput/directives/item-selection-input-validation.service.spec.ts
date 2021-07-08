@@ -20,26 +20,24 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-/* eslint-disable max-len */
-import { ItemSelectionInputValidationService } from
-  'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-/* eslint-enable max-len */
+import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import { AppConstants } from 'app.constants';
+import { ItemSelectionInputCustomizationArgs } from
+  'interactions/customization-args-defs';
 
 describe('ItemSelectionInputValidationService', () => {
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
-  // preferably in the constants file itself.
-  let WARNING_TYPES: any, validatorService: ItemSelectionInputValidationService;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
+  let validatorService: ItemSelectionInputValidationService;
 
   let currentState: string = null;
   let goodAnswerGroups: AnswerGroup[] = null,
     goodDefaultOutcome: Outcome = null;
-  let customizationArguments: any = null;
+  let customizationArguments: ItemSelectionInputCustomizationArgs = null;
   let IsProperSubsetValidOption: AnswerGroup[] = null;
   let oof: OutcomeObjectFactory = null,
     agof: AnswerGroupObjectFactory = null,
@@ -66,7 +64,7 @@ describe('ItemSelectionInputValidationService', () => {
       dest: 'Second State',
       feedback: {
         html: 'Feedback',
-        audio_translations: {}
+        content_id: ''
       },
       labelled_as_correct: false,
       param_changes: [],
@@ -76,7 +74,11 @@ describe('ItemSelectionInputValidationService', () => {
 
     customizationArguments = {
       choices: {
-        value: ['Selection 1', 'Selection 2', 'Selection 3']
+        value: [
+          new SubtitledHtml('Selection 1', 'ca_0'),
+          new SubtitledHtml('Selection 2', 'ca_1'),
+          new SubtitledHtml('Selection 3', 'ca_2')
+        ]
       },
       maxAllowableSelectionCount: {
         value: 2
@@ -89,33 +91,33 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1', 'Selection 2']
+          x: ['ca_0', 'ca_1']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1', 'Selection 2', 'Selection 3']
+          x: ['ca_0', 'ca_1', 'ca_2']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1']
+          x: ['ca_0']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
@@ -124,20 +126,20 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: []
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
-          x: ['Selection 1']
+          x: ['ca_0']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      false,
+      null,
       null)
     ];
   });
@@ -152,8 +154,14 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect a choices customization argument', () => {
     expect(() => {
       validatorService.getAllWarnings(
+        // This throws "Argument of type '{}'. We need to suppress this error
+        // because is not assignable to parameter of type
+        // 'ItemSelectionInputCustomizationArgs'." We are purposely assigning
+        // the wrong type of customization args in order to test validations.
+        // @ts-expect-error
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have property: choices');
+    }).toThrowError(
+      'Expected customization arguments to have property: choices');
   });
 
   it(
@@ -196,7 +204,7 @@ describe('ItemSelectionInputValidationService', () => {
     'should expect minAllowableSelectionCount to be less than the total ' +
     'number of selections',
     () => {
-    // Remove the last choice.
+      // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
       customizationArguments.minAllowableSelectionCount.value = 3;
@@ -209,12 +217,18 @@ describe('ItemSelectionInputValidationService', () => {
         type: WARNING_TYPES.CRITICAL,
         message: (
           'Please ensure that you have enough choices to reach the min count.')
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 1 options do not match ' +
+          'customization argument choices.')
       }]);
     });
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArguments.choices.value[0] = '';
+    customizationArguments.choices.value[0] = (
+      new SubtitledHtml('', ''));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -222,12 +236,18 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
       message: 'Please ensure the choices are nonempty.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.')
     }]);
   });
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
-    customizationArguments.choices.value.push('Selection 3');
+    customizationArguments.choices.value.push(
+      new SubtitledHtml('Selection 3', 'ca_4'));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
@@ -286,4 +306,17 @@ describe('ItemSelectionInputValidationService', () => {
           'should have at least one option.')
       }]);
     });
+
+  it('should expect all rule inputs to match choices', () => {
+    goodAnswerGroups[0].rules[0].inputs.x[0] = 'invalid_content_id';
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.')
+    }]);
+  });
 });
