@@ -84,6 +84,17 @@ class CronJobTests(test_utils.GenericTestBase):
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
+        self.task_status = 'Not Started'
+        def _mock_taskqueue_service_defer(
+                unused_function_id, unused_queue_name):
+            """Mocks taskqueue_services.defer() so that it can be checked
+            if the method is being invoked or not.
+            """
+            self.task_status = 'Started'
+
+        self.taskqueue_service_defer_swap = self.swap(
+            taskqueue_services, 'defer', _mock_taskqueue_service_defer)
+
     def test_send_mail_to_admin_on_job_success(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -150,39 +161,20 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def test_cron_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
-        with self.testapp_swap:
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
             self.get_html_response('/cron/users/user_deletion')
-
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
-        self.assertEqual(len(all_jobs), 1)
-        self.assertEqual(all_jobs[0].job_type, 'UserDeletionOneOffJob')
+            self.assertEqual(self.task_status, 'Started')
         self.logout()
 
     def test_cron_fully_complete_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
-        with self.testapp_swap:
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
             self.get_html_response('/cron/users/fully_complete_user_deletion')
-
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
-        self.assertEqual(len(all_jobs), 1)
-        self.assertEqual(
-            all_jobs[0].job_type, 'FullyCompleteUserDeletionOneOffJob')
+            self.assertEqual(self.task_status, 'Started')
         self.logout()
 
     def test_cron_exploration_recommendations_handler(self):

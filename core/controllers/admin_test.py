@@ -669,9 +669,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-        self.assertEqual(
-            response['error'],
-            'feature_name should be string, received \'123\'.')
+        error_msg = (
+            'Schema validation for \'feature_name\' failed: Expected '
+            'string, received 123')
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -690,9 +691,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-        self.assertEqual(
-            response['error'],
-            'commit_message should be string, received \'123\'.')
+        error_msg = (
+            'Schema validation for \'commit_message\' failed: Expected '
+            'string, received 123')
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -710,9 +712,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-        self.assertEqual(
-            response['error'],
-            'new_rules should be a list of dicts, received \'{}\'.')
+        error_msg = (
+            'Schema validation for \'new_rules\' failed: Expected list, '
+            'received {}')
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -731,9 +734,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-        self.assertEqual(
-            response['error'],
-            'new_rules should be a list of dicts, received \'[1, 2]\'.')
+        error_msg = (
+            'Schema validation for \'new_rules\' failed: \'int\' '
+            'object has no attribute \'__getitem__\'')
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -825,7 +829,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
             expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Missing username param')
+        error_msg = 'Missing key in handler args: username.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_grant_super_admin_privileges_fails_with_invalid_username(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
@@ -874,7 +879,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Missing username param')
+        error_msg = 'Missing key in handler args: username.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_revoke_super_admin_privileges_fails_with_invalid_username(self):
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
@@ -952,8 +958,10 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        with self.assertRaisesRegexp(
-            Exception, 'invalid_type is not a number'):
+        error_msg = (
+            'Schema validation for \'num_dummy_exps_to_generate\' failed: '
+            'Could not convert unicode to int: invalid_type')
+        with self.assertRaisesRegexp(Exception, error_msg):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_explorations',
@@ -972,8 +980,10 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        with self.assertRaisesRegexp(
-            Exception, 'invalid_type is not a number'):
+        error_msg = (
+            'Schema validation for \'num_dummy_exps_to_publish\' failed: '
+            'Could not convert unicode to int: invalid_type')
+        with self.assertRaisesRegexp(Exception, error_msg):
             self.post_json(
                 '/adminhandler', {
                     'action': 'generate_dummy_explorations',
@@ -1079,9 +1089,11 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'filter_criterion': 'invalid', 'username': 'user1'},
             expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid filter criterion to view roles.')
+        error_msg = (
+            'Schema validation for \'filter_criterion\' failed: Received '
+            'invalid which is not in the allowed range of choices: '
+            '[u\'role\', u\'username\']')
+        self.assertEqual(response['error'], error_msg)
 
     def test_changing_user_role_from_topic_manager_to_moderator(self):
         user_email = 'user1@example.com'
@@ -1235,8 +1247,11 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             params=payload,
             expected_status_int=400
         )
+        error_msg = (
+            'Schema validation for \'exp_version\' failed: '
+            'Could not convert unicode to int: a')
         self.assertEqual(
-            response['error'], 'Version a cannot be converted to int.')
+            response['error'], error_msg)
 
     def test_that_handler_raises_exception(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1367,9 +1382,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': None},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid request: A new username must be '
-            'specified.')
+        error_msg = 'Missing key in handler args: new_username.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_none_old_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1381,9 +1395,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Invalid request: The old username must be '
-            'specified.')
+        error_msg = 'Missing key in handler args: old_username.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_non_string_new_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1396,8 +1409,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Expected new username to be a unicode '
-            'string, received 123')
+            response['error'], 'Schema validation for \'new_username\' failed:'
+            ' Expected string, received 123')
 
     def test_update_username_with_non_string_old_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1409,9 +1422,10 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Expected old username to be a unicode '
-            'string, received 123')
+        error_msg = (
+            'Schema validation for \'old_username\' failed: Expected'
+            ' string, received 123')
+        self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_long_new_username(self):
         long_username = 'a' * (constants.MAX_USERNAME_LENGTH + 1)
@@ -1424,11 +1438,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': long_username},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Expected new username to be less than %s '
-            'characters, received %s' % (
-                constants.MAX_USERNAME_LENGTH,
-                long_username))
+        error_msg = (
+            'Schema validation for \'new_username\' failed: Validation failed'
+            ': has_length_at_most ({u\'max_value\': %s}) for object %s'
+            % (constants.MAX_USERNAME_LENGTH, long_username))
+        self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_nonexistent_old_username(self):
         non_existent_username = 'invalid'
@@ -1571,8 +1585,11 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
+        error_msg = (
+            'Schema validation for \'language_code\' failed: '
+            'Validation failed: is_supported_audio_language_code ({}) '
+            'for object invalid')
+        self.assertEqual(response['error'], error_msg)
 
     def test_assigning_same_language_for_translation_review_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1633,8 +1650,10 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation '
+            'failed: is_supported_audio_language_code ({}) for object invalid')
+        self.assertEqual(response['error'], error_msg)
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
@@ -1757,9 +1776,11 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'username': 'question',
                 'category': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid category: invalid')
+        error_msg = (
+            'Schema validation for \'category\' failed: Received invalid which '
+            'is not in the allowed range of choices: [u\'translation\', '
+            'u\'voiceover\', u\'question\', u\'submit_question\']')
+        self.assertEqual(response['error'], error_msg)
 
 
 class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
@@ -1792,7 +1813,8 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'removal_type': 'all'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Missing username param')
+        error_msg = 'Missing key in handler args: username.'
+        self.assertEqual(response['error'], error_msg)
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1843,8 +1865,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation'
+            ' failed: is_supported_audio_language_code ({}) for object invalid')
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_unassigned_translation_reviewer_raise_error(self):
         self.assertFalse(
@@ -1901,8 +1925,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation '
+            'failed: is_supported_audio_language_code ({}) for object invalid')
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_unassigned_voiceover_reviewer_raise_error(self):
         self.assertFalse(
@@ -2001,8 +2027,12 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'category': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid category: invalid')
+        error_msg = (
+            'Schema validation for \'category\' failed: Received invalid '
+            'which is not in the allowed range of choices: '
+            '[u\'translation\', u\'voiceover\', u\'question\', '
+            'u\'submit_question\']')
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -2013,8 +2043,11 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
                 'removal_type': 'invalid'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
-            response['error'], 'Invalid removal_type: invalid')
+        error_msg = (
+            'Schema validation for \'removal_type\' failed: Received invalid '
+            'which is not in the allowed range of choices: '
+            '[u\'all\', u\'specific\']')
+        self.assertEqual(response['error'], error_msg)
 
     def test_remove_reviewer_from_all_reviewable_items(self):
         user_services.allow_user_to_review_question(
@@ -2140,7 +2173,10 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'invalid'
             }, expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Invalid language_code: invalid')
+        error_msg = (
+            'Schema validation for \'language_code\' failed: Validation failed'
+            ': is_supported_audio_language_code ({}) for object invalid')
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
     def test_check_contribution_reviewer_with_invalid_category_raise_error(
@@ -2152,7 +2188,11 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
                 'language_code': 'hi'
             }, expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Invalid category: invalid')
+        error_msg = (
+            'Schema validation for \'category\' failed: Received invalid '
+            'which is not in the allowed range of choices: [u\'translation\', '
+            'u\'voiceover\', u\'question\', u\'submit_question\']')
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 
@@ -2215,7 +2255,8 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             '/contributionrightsdatahandler', params={},
             expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Missing username param')
+        error_msg = 'Missing key in handler args: username.'
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 

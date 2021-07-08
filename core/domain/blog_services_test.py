@@ -68,14 +68,6 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_post = blog_services.get_blog_post_by_id(self.blog_post_a_id)
         self.assertEqual(blog_post.to_dict(), expected_blog_post)
 
-    def test_get_blog_post_by_ids(self):
-        blog_posts = blog_services.get_blog_posts_by_ids([
-            self.blog_post_a_id, self.blog_post_b_id])
-        self.assertTrue(len(blog_posts) == 2)
-        blog_post_ids = [blog_posts[0].id, blog_posts[1].id]
-        self.assertTrue(self.blog_post_a_id in blog_post_ids)
-        self.assertTrue(self.blog_post_b_id in blog_post_ids)
-
     def test_get_blog_post_summary_models_list_by_user_id(self):
         blog_posts = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
@@ -111,6 +103,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                self.blog_post_a.thumbnail_filename,
+                self.blog_post_a.last_updated,
+                self.blog_post_a.published_on
             )
         )
         blog_post_summary = (
@@ -132,6 +127,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                blog_post_summary_model.thumbnail_filename,
+                blog_post_summary_model.last_updated,
+                blog_post_summary_model.published_on
             )
         )
         self.assertEqual(
@@ -149,6 +147,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                blog_post_summary.thumbnail_filename,
+                blog_post_summary.last_updated,
+                blog_post_summary.published_on
             )
         )
         self.assertEqual(
@@ -383,18 +384,11 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 '...',
                 '',
                 [],
+                blog_post_summary.thumbnail_filename,
+                blog_post_summary.last_updated,
+                blog_post_summary.published_on
             )
         )
         self.assertEqual(
             blog_post_summary.to_dict(), expected_blog_post_summary.to_dict())
         self.assertIsNone(blog_services.get_blog_post_summary_by_title('Hello'))
-
-    def test_get_blog_post_rights_by_user_id(self):
-        blog_post_rights_models = (
-            blog_services.get_blog_post_rights_by_user_id(self.user_id_a))
-        self.assertTrue(len(blog_post_rights_models) == 1)
-        self.assertEqual(blog_post_rights_models[0].id, self.blog_post_a_id)
-        blog_services.create_new_blog_post(self.user_id_a)
-        blog_post_rights_models = (
-            blog_services.get_blog_post_rights_by_user_id(self.user_id_a))
-        self.assertTrue(len(blog_post_rights_models) == 2)
