@@ -18,10 +18,12 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import os
 
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import param_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -33,6 +35,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import python_utils
 import utils
 
 (story_models, user_models) = models.Registry.import_models(
@@ -159,6 +162,19 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'new story meta tag content'
             })
         ]
+
+        # Save a dummy image on filesystem, to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.STORY_ID))
+        fs.commit(
+            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
             'Updated Title and Description.')
@@ -166,6 +182,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
         self.assertEqual(story.thumbnail_filename, 'image.svg')
+        self.assertEqual(story.thumbnail_size_in_bytes, len(raw_image))
         self.assertEqual(
             story.thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])

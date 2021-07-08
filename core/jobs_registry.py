@@ -43,6 +43,7 @@ ONE_OFF_JOB_MANAGERS = [
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
+    story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob,
     suggestion_jobs_one_off.PopulateTranslationContributionStatsOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     topic_jobs_one_off.TopicMigrationOneOffJob,

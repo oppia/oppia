@@ -18,8 +18,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
 from constants import constants
+from core.domain import fs_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -344,6 +346,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'title': 'Title',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'description': 'Description',
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
@@ -445,6 +448,32 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.thumbnail_filename = 'test.svg'
         self._assert_validation_error(
             'Story thumbnail background color is not specified.')
+
+    def test_update_thumbnail_filename(self):
+        self.assertEqual(self.story.thumbnail_filename, None)
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The thumbnail img.svg for story with id %s does not exist'
+            ' in the filesystem.' % (self.STORY_ID)):
+            self.story.update_thumbnail_filename('img.svg')
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs.commit(
+            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Test successful update of thumbnail present in the filesystem.
+        self.story.update_thumbnail_filename('img.svg')
+        self.assertEqual(self.story.thumbnail_filename, 'img.svg')
+        self.assertEqual(self.story.thumbnail_size_in_bytes, len(raw_image))
 
     def test_description_validation(self):
         self.story.description = 1

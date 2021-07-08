@@ -649,9 +649,6 @@ class ResolveIssueHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
-    # The string to prefix to the filename (before tacking the whole thing on
-    # to the end of 'assets/').
-    _FILENAME_PREFIX = 'image'
     _decorator = None
 
     @acl_decorators.can_edit_entity
@@ -662,7 +659,7 @@ class ImageUploadHandler(EditorHandler):
         filename = self.payload.get('filename')
         filename_prefix = self.payload.get('filename_prefix')
         if filename_prefix is None:
-            filename_prefix = self._FILENAME_PREFIX
+            filename_prefix = constants.ASSET_TYPE_IMAGE
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
@@ -673,7 +670,8 @@ class ImageUploadHandler(EditorHandler):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))
-        filepath = '%s/%s' % (filename_prefix, filename)
+        filepath = '%s/%s' % (
+            filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(

@@ -72,6 +72,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         title=story.title,
         thumbnail_bg_color=story.thumbnail_bg_color,
         thumbnail_filename=story.thumbnail_filename,
+        thumbnail_size_in_bytes=story.thumbnail_size_in_bytes,
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
@@ -457,6 +458,7 @@ def _save_story(
     story_model.title = story.title
     story_model.thumbnail_bg_color = story.thumbnail_bg_color
     story_model.thumbnail_filename = story.thumbnail_filename
+    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
     story_model.notes = story.notes
     story_model.language_code = story.language_code
     story_model.story_contents_schema_version = (
