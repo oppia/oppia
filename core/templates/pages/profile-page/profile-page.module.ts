@@ -48,13 +48,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent
   ],
   entryComponents: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent
   ],

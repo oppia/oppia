@@ -41,7 +41,6 @@ import { PreferencesPageComponent } from './preferences-page.component';
   ],
   declarations: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     PreferencesPageComponent,
     PreferredLanguagesComponent,
     PreferredSiteLanguageSelectorComponent,
@@ -49,7 +48,6 @@ import { PreferencesPageComponent } from './preferences-page.component';
   ],
   entryComponents: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     PreferencesPageComponent,
     PreferredLanguagesComponent,
     PreferredSiteLanguageSelectorComponent,
