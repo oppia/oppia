@@ -13,49 +13,50 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Continue button response.
+ * @fileoverview Directive for the ImageClickInput response.
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { OppiaResponseContinueComponent } from './oppia-response-continue.component';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ResponseImageClickInput } from './oppia-response-image-click-input.component';
 
-describe('OppiaResponseContinueComponent', () => {
-  let component: OppiaResponseContinueComponent;
-  let fixture: ComponentFixture<OppiaResponseContinueComponent>;
-
-  class mockHtmlEscaperService {
-    escapedJsonToObj(answer: string): string {
-      return answer;
+describe('ResponseImageClickInput', () => {
+  let component: ResponseImageClickInput;
+  let fixture: ComponentFixture<ResponseImageClickInput>;
+  let mockHtmlEscaperService = {
+    escapedJsonToObj: function(answer) {
+      return JSON.parse(answer);
     }
-  }
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [OppiaResponseContinueComponent],
+      declarations: [ResponseImageClickInput],
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useValue: mockHtmlEscaperService
         }
       ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OppiaResponseContinueComponent);
+    fixture = TestBed.createComponent(ResponseImageClickInput);
     component = fixture.componentInstance;
+
+    component.answer = '{' +
+      '"clickPosition": [' +
+      '  0.40913347791798105, ' +
+      '  0.39177101967799643 ' +
+      '],' +
+      '"clickedRegions": ["Region1"]' +
+      '}';
   });
 
-  // Note: The users response is the same as the Continue button placeholder
-  // text.
-  it('should display user\'s response', () => {
-    component.answer = 'Continue button text';
-
-    expect(component.escapedAnswer).toBe('');
-
+  it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    expect(component.escapedAnswer).toBe('Continue button text');
+    expect(component.clickRegionLabel).toBe('(Clicks on \'Region1\')');
   });
 });
