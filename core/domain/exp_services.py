@@ -39,6 +39,7 @@ from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
+from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -388,7 +389,9 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    state.update_next_content_id_index(change.new_value)
+                    next_content_id_index = max(
+                        change.new_value, state.next_content_id_index)
+                    state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                     state.update_linked_skill_id(change.new_value)
@@ -1731,10 +1734,14 @@ def get_composite_change_list(exp_id, frontend_version, backend_version):
             'of exploration to version %s. Please reload and try again.'
             % (frontend_version, backend_version))
 
-    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    version_nums = list(python_utils.RANGE(
+        frontend_version + 1, backend_version + 1))
+    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, version_nums, allow_deleted=False)
+
     composite_change_list_dict = []
-    for i in python_utils.RANGE(frontend_version, backend_version):
-        composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
+    for snapshot in snapshots_metadata:
+        composite_change_list_dict += snapshot['commit_cmds']
 
     composite_change_list = [
         exp_domain.ExplorationChange(change)
@@ -1925,10 +1932,22 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
             value: key for key, value in new_to_old_state_names.items()
         }
 
+        change_list_dict = [change.to_dict() for change in change_list]
         if len(added_state_names) > 0 or len(deleted_state_names) > 0:
-            # Here we will send the changelist, version, latest_version,
-            # and exploration to the admin, so that the conditions
-            # can be reviewed.
+            # In case of the addition and the deletion of the state,
+            # we are rejecting the mergebility because these cases
+            # change the flow of the exploration and are quite complex
+            # for now to handle. So in such cases, we are sending the
+            # changelist, frontend_version, backend_version and
+            # exploration id to the admin, so that we can look into the
+            # situations and can figure out the way if it’s possible to
+            # handle these cases.
+            (
+                email_manager
+                .send_not_mergeable_change_list_to_admin_for_review(
+                    exp_id, frontend_version,
+                    backend_version_exploration.version,
+                    change_list_dict))
             return False
 
         changes_are_mergeable = False
@@ -1958,16 +1977,25 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if change.state_name in state_names_of_renamed_states:
                     old_state_name = (
                         state_names_of_renamed_states[change.state_name])
-                    new_state_name = (
-                        state_names_of_renamed_states[change.state_name])
-                if change.state_name in old_to_new_state_names:
-                    new_state_name = old_to_new_state_names[old_state_name]
+                if old_state_name in old_to_new_state_names:
+                    # Here we will send the changelist, frontend_version,
+                    # backend_version and exploration to the admin, so
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
+                    (
+                        email_manager
+                        .send_not_mergeable_change_list_to_admin_for_review(
+                            exp_id, frontend_version,
+                            backend_version_exploration.version,
+                            change_list_dict))
+                    return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
                 frontend_exp_states = (
                     frontend_version_exploration.states[old_state_name])
                 backend_exp_states = (
-                    backend_version_exploration.states[new_state_name])
+                    backend_version_exploration.states[old_state_name])
                 if (change.property_name ==
                         exp_domain.STATE_PROPERTY_CONTENT):
                     if old_state_name in changed_properties:
@@ -2114,10 +2142,19 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 if change.state_name in state_names_of_renamed_states:
                     old_state_name = (
                         state_names_of_renamed_states[change.state_name])
-                    new_state_name = (
-                        state_names_of_renamed_states[change.state_name])
-                if change.state_name in old_to_new_state_names:
-                    new_state_name = old_to_new_state_names[old_state_name]
+                if old_state_name in old_to_new_state_names:
+                    # Here we will send the changelist, frontend_version,
+                    # backend_version and exploration to the admin, so
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
+                    (
+                        email_manager
+                        .send_not_mergeable_change_list_to_admin_for_review(
+                            exp_id, frontend_version,
+                            backend_version_exploration.version,
+                            change_list_dict))
+                    return False
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
                 if old_state_name in changed_properties:
@@ -2215,7 +2252,7 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                 continue
             else:
                 changes_are_mergeable = False
-                return False
+                break
 
         return changes_are_mergeable
 
@@ -2385,8 +2422,10 @@ def get_exp_with_draft_applied(exp_id, user_id):
     updated_exploration = None
 
     if (exp_user_data and exp_user_data.draft_change_list and
-            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
-        updated_exploration = apply_change_list(exp_id, draft_change_list)
+            are_changes_mergeable(
+                exp_id, draft_change_list_exp_version, draft_change_list)):
+        updated_exploration = apply_change_list(
+            exp_id, draft_change_list)
         updated_exploration_has_no_invalid_math_tags = True
         # verify that all the math-tags are valid before returning the
         # updated exploration.

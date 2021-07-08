@@ -247,4 +247,23 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.isDestEqual()).toBe(false);
     expect(lostChange.isOutcomeDestEqual()).toBe(false);
   });
+
+  it('should return the language name from language code', () => {
+    const lostChange = lcof.createNew({
+      cmd: 'edit_exploration_property',
+      new_value: 'bn',
+      old_value: 'en',
+      property_name: 'language_code'
+    });
+    expect(lostChange.getLanguage()).toBe('বাংলা (Bangla)');
+    const lostChange2 = lcof.createNew({
+      language_code: 'en',
+      cmd: 'add_written_translation',
+      content_id: 'content',
+      translation_html: '<p>Translation Content.</p>',
+      state_name: 'Introduction',
+      content_html: 'N/A'
+    });
+    expect(lostChange2.getLanguage()).toBe('English');
+  });
 });

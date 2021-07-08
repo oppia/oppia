@@ -108,7 +108,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
             self):
         with self.assertRaisesRegexp(
             Exception, 'Trying to update version 1 of exploration from version'
-            ' 3, which is too old. Please reload the page and try again.'):
+            ' 3, which is not possible. Please reload the page and try again.'):
 
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
@@ -270,6 +270,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertFalse(response['changes_are_mergeable'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):

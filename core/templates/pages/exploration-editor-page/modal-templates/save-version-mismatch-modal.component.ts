@@ -16,8 +16,7 @@
  * @fileoverview Component for version mismatch modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -37,6 +36,7 @@ export class SaveVersionMismatchModalComponent
 
   constructor(
     private windowRef: WindowRef,
+    private elRef: ElementRef,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
     private lostChangeObjectFactory: LostChangeObjectFactory,
@@ -48,12 +48,8 @@ export class SaveVersionMismatchModalComponent
   ngOnInit(): void {
     this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
     if (this.hasLostChanges) {
-      // TODO(sll): This should also include changes to exploration
-      // properties (such as the exploration title, category, etc.).
       this.lostChanges = this.lostChanges.map(
         this.lostChangeObjectFactory.createNew);
-      this.loggerService.error(
-        'Lost changes: ' + JSON.stringify(this.lostChanges));
     }
   }
 
@@ -67,5 +63,17 @@ export class SaveVersionMismatchModalComponent
     this.explorationDataService.discardDraftAsync().then(() => {
       this._refreshPage(this.MSECS_TO_REFRESH);
     });
+  }
+
+  exportAndDiscardChanges(): void {
+    let lostChangesData: HTMLElement = (
+      this.elRef.nativeElement.getElementsByClassName(
+        'oppia-lost-changes'));
+    let blob = new Blob([lostChangesData[0].innerText], {type: 'text/plain'});
+    var elem = document.createElement('a');
+    elem.href = URL.createObjectURL(blob);
+    elem.download = 'lostChanges.txt';
+    elem.click();
+    this.discardChanges();
   }
 }
