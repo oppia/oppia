@@ -22,6 +22,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationRatings } from
   'domain/summary/learner-exploration-summary.model';
 
+type ExplorationRatingsKey = keyof ExplorationRatings;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,21 +33,25 @@ export class RatingComputationService {
 
     let totalNumber: number = 0;
     for (var value in ratingFrequencies) {
-      totalNumber += ratingFrequencies[value];
+      totalNumber += ratingFrequencies[<ExplorationRatingsKey> value];
     }
 
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
   }
-
-  computeAverageRating(ratingFrequencies: ExplorationRatings): number {
+  // Returns 'undefined' if the ratings are less than the
+  // minimum acceptable number of ratings. The average should
+  // not be computed in this case.
+  computeAverageRating(
+      ratingFrequencies: ExplorationRatings): number | undefined {
     if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
       return undefined;
     } else {
       var totalNumber = 0;
       var totalValue = 0.0;
       for (var value in ratingFrequencies) {
-        totalValue += parseInt(value) * ratingFrequencies[value];
-        totalNumber += ratingFrequencies[value];
+        let _value = <ExplorationRatingsKey> value;
+        totalValue += parseInt(_value) * ratingFrequencies[_value];
+        totalNumber += ratingFrequencies[_value];
       }
 
       return totalValue / totalNumber;

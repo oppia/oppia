@@ -24,15 +24,18 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './drag-and-drop-positive-int-editor.component.html'
 })
 export class DragAndDropPositiveIntEditorComponent implements OnInit {
-  @Input() initArgs;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() initArgs!: { choices: string[] };
+  @Input() value!: string | number;
   @Output() valueChanged = new EventEmitter();
-  selectedRank: string;
-  allowedRanks;
-  choices;
+  selectedRank!: string;
+  allowedRanks!: number[];
+  choices!: string[];
 
   ngOnInit(): void {
-    if (!parseInt(this.value)) {
+    if (!parseInt(<string> this.value)) {
       this.value = 1;
       this.valueChanged.emit(this.value);
     }

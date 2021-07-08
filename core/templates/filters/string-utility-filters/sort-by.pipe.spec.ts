@@ -41,7 +41,7 @@ describe('Sort By Pipe', () => {
     username: 'Captain America',
   }];
 
-  let sortByPipe: SortByPipe = null;
+  let sortByPipe: SortByPipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [SortByPipe]
@@ -186,10 +186,5 @@ describe('Sort By Pipe', () => {
     let result = sortByPipe.transform(
       multidimensionalArray, true, 'default');
     expect(result).toEqual(multidimensionalArray.reverse());
-  });
-
-  it('should return null if value is not given', () => {
-    let result = sortByPipe.transform(null, true, 'default');
-    expect(result).toBe(null);
   });
 });
