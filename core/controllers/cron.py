@@ -28,9 +28,9 @@ from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_jobs_one_off
 from core.domain import user_services
-from core.domain import wipeout_jobs_one_off
 import feconf
 import utils
 
@@ -40,6 +40,9 @@ MAX_JOBS_TO_REPORT_ON = 50
 
 class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -80,6 +83,9 @@ class JobStatusMailerHandler(base.BaseHandler):
 class CronDashboardStatsHandler(base.BaseHandler):
     """Handler for appending dashboard stats to a list."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
@@ -90,27 +96,36 @@ class CronDashboardStatsHandler(base.BaseHandler):
 class CronUserDeletionHandler(base.BaseHandler):
     """Handler for running the user deletion one off job."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.UserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
 
 class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
     """Handler for running the fully complete user deletion one off job."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
-        wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob.enqueue(
-            wipeout_jobs_one_off.FullyCompleteUserDeletionOneOffJob
-            .create_new()
-        )
+        taskqueue_services.defer(
+            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
     """Handler for computing exploration recommendations."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -123,6 +138,9 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
 class CronActivitySearchRankHandler(base.BaseHandler):
     """Handler for computing activity search ranks."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
@@ -132,6 +150,9 @@ class CronActivitySearchRankHandler(base.BaseHandler):
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
     """Handler for cleaning up data items of completed map/reduce jobs."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -182,6 +203,9 @@ class CronModelsCleanupHandler(base.BaseHandler):
     specific types of models as deleted.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Cron handler that hard-deletes all models that were marked as deleted
@@ -201,6 +225,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
     """Handler for mailing reviewers suggestions on the Contributor
     Dashboard that need review.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -232,6 +259,9 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
     """Handler for mailing admins if there are bottlenecks that are causing a
     longer reviewer turnaround time on the Contributor Dashboard.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):

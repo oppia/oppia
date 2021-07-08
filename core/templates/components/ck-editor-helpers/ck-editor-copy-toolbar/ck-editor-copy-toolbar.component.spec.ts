@@ -22,7 +22,7 @@ import { CkEditorCopyToolbarComponent } from
   // eslint-disable-next-line max-len
   'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content-service';
+  'components/ck-editor-helpers/ck-editor-copy-content.service';
 
 
 describe('CkEditor copy toolbar', () => {
