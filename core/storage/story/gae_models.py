@@ -103,6 +103,8 @@ class StoryModel(base_models.VersionedModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
+    # The thumbnail size of the story.
+    thumbnail_size_in_bytes = datastore_services.IntegerProperty(indexed=True)
     # A high-level description of the story.
     description = datastore_services.TextProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
@@ -173,6 +175,7 @@ class StoryModel(base_models.VersionedModel):
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'notes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
