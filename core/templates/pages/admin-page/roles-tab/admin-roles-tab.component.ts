@@ -19,26 +19,27 @@
 import { Component, Output, EventEmitter} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, RoleToActionsBackendResponse, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
-interface ViewUserRolesAction {
+export interface ViewUserRolesAction {
     filterCriterion: string;
     role: string;
     username: string;
     isValid: () => boolean;
 }
 
-interface UpdateRoleAction {
+export interface UpdateRoleAction {
     newRole: string;
     username: string;
     topicId: string;
     isValid: () => boolean;
 }
 
-interface ViewContributionReviewersAction {
+export interface ViewContributionReviewersAction {
   category: string;
   filterCriterion: string;
   isValid: () => boolean;
@@ -46,14 +47,14 @@ interface ViewContributionReviewersAction {
   username: string;
 }
 
-interface AddContributionRightsAction {
+export interface AddContributionRightsAction {
   category: string;
   isValid: () => boolean;
   languageCode: string;
   username: string;
 }
 
-interface RemoveContributionRightsAction {
+export interface RemoveContributionRightsAction {
   category: string;
   isValid: () => boolean;
   languageCode: string;
@@ -61,7 +62,7 @@ interface RemoveContributionRightsAction {
   username: string
 }
 
-interface FormData {
+export interface AdminRolesFormData {
   viewUserRoles: ViewUserRolesAction;
   updateRole: UpdateRoleAction;
   viewContributionReviewers: ViewContributionReviewersAction;
@@ -69,7 +70,7 @@ interface FormData {
   removeContributionReviewer: RemoveContributionRightsAction;
 }
 
-interface ContributionReviewersResult {
+export interface ContributionReviewersResult {
   usernames: string[] | null;
   translationLanguages: string[];
   voiceoverLanguages: string[];
@@ -83,22 +84,22 @@ interface ContributionReviewersResult {
 })
 export class AdminRolesTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
-  userRolesResult = {};
+  userRolesResult: UserRolesBackendResponse = null;
   resultRolesVisible: boolean = false;
   languageCodesAndDescriptions: { id: string; description: string; }[];
-  contributionReviewersResult: ContributionReviewersResult;
+  contributionReviewersResult: ContributionReviewersResult = null;
   contributionReviewersDataFetched: boolean = false;
-  topicSummaries = {};
-  roleToActions;
-  formData: FormData;
+  topicSummaries: CreatorTopicSummary[] = null;
+  roleToActions: RoleToActionsBackendResponse = null;
+  formData: AdminRolesFormData;
   ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
     AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS);
   ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
     AppConstants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
   USER_FILTER_CRITERION_USERNAME = AppConstants.USER_FILTER_CRITERION_USERNAME;
   USER_FILTER_CRITERION_ROLE = AppConstants.USER_FILTER_CRITERION_ROLE;
-  UPDATABLE_ROLES = {};
-  VIEWABLE_ROLES = {};
+  UPDATABLE_ROLES: UserRolesBackendResponse = {};
+  VIEWABLE_ROLES: UserRolesBackendResponse = {};
   CONTRIBUTION_RIGHT_CATEGORIES = {
     REVIEW_TRANSLATION: (
       AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION),
@@ -243,8 +244,13 @@ export class AdminRolesTabComponent {
       ).then((usersObject) => {
         this.contributionReviewersResult.usernames = (
           usersObject.usernames);
-        this.contributionReviewersDataFetched = true;
-        this.setStatusMessage.emit('Success.');
+        if (this.contributionReviewersResult.usernames.length === 0) {
+          this.contributionReviewersDataFetched = false;
+          this.setStatusMessage.emit('No results.');
+        } else {
+          this.contributionReviewersDataFetched = true;
+          this.setStatusMessage.emit('Success.');
+        }
         this.refreshFormData();
       }, this.handleErrorResponse.bind(this));
     } else {

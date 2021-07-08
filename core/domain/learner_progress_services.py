@@ -1309,16 +1309,16 @@ def _get_filtered_topics_to_learn_summaries(
     filtered_topics_to_learn_summaries = []
 
     completed_story_ids = get_all_completed_story_ids(user_id)
+    topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
 
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is None:
             nonexistent_topic_ids_to_learn.append(topic_ids[index])
         else:
             topic_id = topic_summary.id
-            topic_rights = topic_fetchers.get_topic_rights(topic_id)
-            topic = topic_fetchers.get_topic_by_id(topic_id)
             story_ids_in_topic = []
-            for story in topic.canonical_story_references:
+            for story in topics[index].canonical_story_references:
                 story_ids_in_topic.append(story.story_id)
 
             if (set(story_ids_in_topic).issubset(
@@ -1326,7 +1326,7 @@ def _get_filtered_topics_to_learn_summaries(
                 learner_goals_services.remove_topics_from_learn_goal(
                     user_id, [topic_id])
                 mark_topic_as_learnt(user_id, topic_id)
-            elif not topic_rights.topic_is_published:
+            elif not topic_rights[index].topic_is_published:
                 nonexistent_topic_ids_to_learn.append(topic_ids[index])
             else:
                 filtered_topics_to_learn_summaries.append(topic_summary)
@@ -1396,7 +1396,7 @@ def _get_filtered_collection_playlist_summaries(
         nonexistent_playlist_collection_ids)
 
 
-def get_all_and_new_topic_ids_for_user(
+def get_all_and_untracked_topic_ids_for_user(
         partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn):
     """Returns a list of all the topic ids on the server and ids of topics
     not tracked for the user.
@@ -1420,12 +1420,12 @@ def get_all_and_new_topic_ids_for_user(
             all_topic_ids.append(topic_id)
     tracked_topic_ids = (
         partially_learnt_topic_ids + learnt_topic_ids + topic_ids_to_learn)
-    new_topic_ids = []
+    untracked_topic_ids = []
     for topic_id in all_topic_ids:
         if topic_id not in tracked_topic_ids:
-            new_topic_ids.append(topic_id)
+            untracked_topic_ids.append(topic_id)
 
-    return all_topic_ids, new_topic_ids
+    return all_topic_ids, untracked_topic_ids
 
 
 def _get_filtered_all_topic_summaries(topic_summaries, topic_ids):
@@ -1452,7 +1452,7 @@ def _get_filtered_all_topic_summaries(topic_summaries, topic_ids):
     return filtered_all_topic_summaries
 
 
-def _get_filtered_new_topic_summaries(topic_summaries, topic_ids):
+def _get_filtered_untracked_topic_summaries(topic_summaries, topic_ids):
     """Returns a list of summaries of the topics not tracked for the user
     and the ids of topics that are no longer present.
 
@@ -1468,14 +1468,14 @@ def _get_filtered_new_topic_summaries(topic_summaries, topic_ids):
             objects of the topics not tracked for the user.
         - list(str). The ids of the topics that are no longer present.
     """
-    filtered_new_topic_summaries = []
+    filtered_untracked_topic_summaries = []
     topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is not None:
             if topic_rights[index].topic_is_published:
-                filtered_new_topic_summaries.append(topic_summary)
+                filtered_untracked_topic_summaries.append(topic_summary)
 
-    return filtered_new_topic_summaries
+    return filtered_untracked_topic_summaries
 
 
 def get_displayable_story_summary_dicts(user_id, story_summaries):
@@ -1514,6 +1514,7 @@ def get_displayable_story_summary_dicts(user_id, story_summaries):
             'all_node_dicts': [
                 node.to_dict() for node in stories[index].story_contents.nodes
             ],
+            'topic_name': topics[index].name,
             'topic_url_fragment': topics[index].url_fragment,
             'classroom_url_fragment': (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
@@ -1675,16 +1676,16 @@ def get_learner_dashboard_activities(user_id):
     else:
         topic_ids_to_learn = []
 
-    all_topic_ids, new_topic_ids = get_all_and_new_topic_ids_for_user(
-        partially_learnt_topic_ids, learnt_topic_ids,
-        topic_ids_to_learn)
+    all_topic_ids, untracked_topic_ids = (
+        get_all_and_untracked_topic_ids_for_user(
+            partially_learnt_topic_ids, learnt_topic_ids, topic_ids_to_learn))
 
     activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
         completed_exploration_ids, completed_collection_ids,
         completed_story_ids, learnt_topic_ids,
         incomplete_exploration_ids, incomplete_collection_ids,
         partially_learnt_topic_ids, topic_ids_to_learn, all_topic_ids,
-        new_topic_ids, exploration_playlist_ids, collection_playlist_ids)
+        untracked_topic_ids, exploration_playlist_ids, collection_playlist_ids)
 
     return activity_ids
 
@@ -1737,8 +1738,8 @@ def get_activity_progress(user_id):
         activity_ids_in_learner_dashboard.topic_ids_to_learn)
     all_topic_ids = (
         activity_ids_in_learner_dashboard.all_topic_ids)
-    new_topic_ids = (
-        activity_ids_in_learner_dashboard.new_topic_ids)
+    untracked_topic_ids = (
+        activity_ids_in_learner_dashboard.untracked_topic_ids)
     exploration_playlist_ids = (
         activity_ids_in_learner_dashboard.exploration_playlist_ids)
     collection_playlist_ids = (
@@ -1758,7 +1759,7 @@ def get_activity_progress(user_id):
                 ('ExpSummaryModel', exploration_playlist_ids),
                 ('CollectionSummaryModel', collection_playlist_ids),
                 ('TopicSummaryModel', all_topic_ids),
-                ('TopicSummaryModel', new_topic_ids)
+                ('TopicSummaryModel', untracked_topic_ids)
             ]))
 
     incomplete_exploration_models = activity_models[0]
@@ -1772,7 +1773,7 @@ def get_activity_progress(user_id):
     exploration_playlist_models = activity_models[8]
     collection_playlist_models = activity_models[9]
     all_topic_models = activity_models[10]
-    new_topic_models = activity_models[11]
+    untracked_topic_models = activity_models[11]
 
     incomplete_exp_summaries = (
         [exp_fetchers.get_exploration_summary_from_model(model)
@@ -1807,9 +1808,9 @@ def get_activity_progress(user_id):
     all_topic_summaries = (
         [topic_fetchers.get_topic_summary_from_model(model)
          if model else None for model in all_topic_models])
-    new_topic_summaries = (
+    untracked_topic_summaries = (
         [topic_fetchers.get_topic_summary_from_model(model)
-         if model else None for model in new_topic_models])
+         if model else None for model in untracked_topic_models])
 
     filtered_incomplete_exp_summaries, nonexistent_incomplete_exp_ids = (
         _get_filtered_incomplete_exp_summaries(
@@ -1892,9 +1893,9 @@ def get_activity_progress(user_id):
         _get_filtered_all_topic_summaries(
             all_topic_summaries, all_topic_ids))
 
-    filtered_new_topic_summaries = (
-        _get_filtered_new_topic_summaries(
-            new_topic_summaries, new_topic_ids))
+    filtered_untracked_topic_summaries = (
+        _get_filtered_untracked_topic_summaries(
+            untracked_topic_summaries, untracked_topic_ids))
 
     number_of_nonexistent_activities = {
         'incomplete_explorations': len(nonexistent_incomplete_exp_ids),
@@ -1937,7 +1938,7 @@ def get_activity_progress(user_id):
         filtered_exp_playlist_summaries,
         filtered_collection_playlist_summaries,
         filtered_all_topic_summaries,
-        filtered_new_topic_summaries,
+        filtered_untracked_topic_summaries,
         completed_to_incomplete_collection_titles,
         completed_to_incomplete_story_titles,
         learnt_to_partially_learnt_topic_titles)
