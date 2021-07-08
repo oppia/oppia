@@ -225,7 +225,7 @@ describe('MathExpressionContentEditorComponent', () => {
       expect(component.closeEditor).toHaveBeenCalled();
     });
 
-  it('should process and save mathe expression as an svg when user' +
+  it('should process and save math expression as an svg when user' +
   ' clicks \'Done\'', () => {
     spyOnProperty(externalRteSaveService, 'onExternalRteSave').and.returnValue(
       mockOnExternalRteSaveEventEmitter

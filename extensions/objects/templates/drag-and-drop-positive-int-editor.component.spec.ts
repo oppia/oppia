@@ -38,7 +38,7 @@ describe('DragAndDropPositiveIntEditorComponent', () => {
     };
   });
 
-  it('should create', () => {
+  it('should initialise when user interacts drag and drop interaction', () => {
     spyOn(component.valueChanged, 'emit');
 
     component.ngOnInit();

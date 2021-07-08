@@ -51,7 +51,7 @@ describe('ResponseTextInputComponent', () => {
     component.answerWithValue = 'answer';
   });
 
-  it('should initialise when users submits answer', () => {
+  it('should initialise when user submits answer', () => {
     component.ngOnInit();
 
     expect(component.answer).toBe('answer');
