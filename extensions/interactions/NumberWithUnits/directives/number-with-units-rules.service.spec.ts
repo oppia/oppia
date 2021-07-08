@@ -17,21 +17,24 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { FractionDict } from 'domain/objects/fraction.model';
+import { Unit } from 'interactions/answer-defs';
 
 import { NumberWithUnitsRulesService } from
   'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 
 describe('Number with Units rules service', () => {
-  let nurs: NumberWithUnitsRulesService = null;
+  let nurs: NumberWithUnitsRulesService;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NumberWithUnitsRulesService]
     });
-    nurs = TestBed.get(NumberWithUnitsRulesService);
+    nurs = TestBed.inject(NumberWithUnitsRulesService);
   });
 
   var createFractionDict = (
-      isNegative, wholeNumber, numerator, denominator) => {
+      isNegative: boolean, wholeNumber: number, numerator: number,
+      denominator: number) => {
     return {
       isNegative: isNegative,
       wholeNumber: wholeNumber,
@@ -41,7 +44,8 @@ describe('Number with Units rules service', () => {
   };
 
   var createNumberWithUnitsDict = (
-      type, real, fractionDict, unitList) => {
+      type: string, real: number, fractionDict: FractionDict,
+      unitList: Unit[]) => {
     return {
       type: type,
       real: real,

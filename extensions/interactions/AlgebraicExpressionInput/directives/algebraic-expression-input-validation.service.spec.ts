@@ -89,7 +89,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       }
     }, 'AlgebraicExpressionInput');
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {

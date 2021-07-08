@@ -113,7 +113,7 @@ export class ItemSelectionInputValidationService {
       stateName: string, customizationArgs:
       ItemSelectionInputCustomizationArgs, answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -134,9 +134,13 @@ export class ItemSelectionInputValidationService {
 
     var areAllChoicesCovered = false;
     if (maxAllowedCount === 1) {
-      var answerChoiceToIndex = {};
+      var answerChoiceToIndex: Record<string, number> = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
-        answerChoiceToIndex[seenChoice.contentId] = choiceIndex;
+        const contentId = seenChoice.contentId;
+        if (contentId === null) {
+          throw new Error('ContentId of choice does not exist');
+        }
+        answerChoiceToIndex[contentId] = choiceIndex;
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {

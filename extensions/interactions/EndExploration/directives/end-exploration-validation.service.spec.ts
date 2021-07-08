@@ -34,7 +34,8 @@ describe('EndExplorationValidationService', () => {
   let validatorService: EndExplorationValidationService;
 
   let currentState: string;
-  let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
+  let badOutcome: Outcome;
+  let goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
@@ -43,10 +44,10 @@ describe('EndExplorationValidationService', () => {
       providers: [EndExplorationValidationService]
     });
 
-    validatorService = TestBed.get(EndExplorationValidationService);
+    validatorService = TestBed.inject(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -81,7 +82,7 @@ describe('EndExplorationValidationService', () => {
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null
       }),
-      null,
+      [],
       null
     )];
   });

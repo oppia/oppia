@@ -43,7 +43,8 @@ describe('DragAndDropSortInputValidationService', () => {
     equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule,
     hasElementXAtPositionYRule: Rule;
-  let customizationArgs: DragAndDropSortInputCustomizationArgs;
+  let customizationArgs: DragAndDropSortInputCustomizationArgs,
+    badCustomizationArgs: DragAndDropSortInputCustomizationArgs;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -91,6 +92,19 @@ describe('DragAndDropSortInputValidationService', () => {
           new SubtitledHtml('b', 'ca_1'),
           new SubtitledHtml('c', 'ca_2'),
           new SubtitledHtml('d', 'ca_3')
+        ]
+      },
+      allowMultipleItemsInSamePosition: {
+        value: true
+      }
+    };
+
+    badCustomizationArgs = {
+      choices: {
+        value: [
+          new SubtitledHtml('a', 'ca_0'),
+          new SubtitledHtml('b', null),
+          new SubtitledHtml('c', 'ca_2'),
         ]
       },
       allowMultipleItemsInSamePosition: {
@@ -171,12 +185,12 @@ describe('DragAndDropSortInputValidationService', () => {
       agof.createNew(
         [equalsListWithAllowedValuesRule],
         goodDefaultOutcome,
-        null,
+        [],
         null
       ), agof.createNew(
         [goodRule1, goodRule2],
         customOutcome,
-        null,
+        [],
         null
       )
     ];
@@ -197,8 +211,8 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput')];
     answerGroups = [
-      agof.createNew(rules, customOutcome, null, null),
-      agof.createNew(rules, customOutcome, null, null)
+      agof.createNew(rules, customOutcome, [], null),
+      agof.createNew(rules, customOutcome, [], null)
     ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -264,6 +278,15 @@ describe('DragAndDropSortInputValidationService', () => {
       message: 'Please ensure that the choices are nonempty.'
     }]);
   });
+
+  it('should throw error if contentId of choice in customizationArguments' +
+  ' does not exist', () => {
+    expect(() => {
+      validatorService.getAllWarnings(
+        currentState, badCustomizationArgs, answerGroups, goodDefaultOutcome);
+    }).toThrowError('ContentId of choice does not exist');
+  });
+
 
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.

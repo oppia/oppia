@@ -63,7 +63,7 @@ export class MathEquationInputValidationService {
       stateName: string,
       customizationArgs: MathEquationInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    let warningsList = [];
+    let warningsList: Warning[] = [];
     let meirs = new MathEquationInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 

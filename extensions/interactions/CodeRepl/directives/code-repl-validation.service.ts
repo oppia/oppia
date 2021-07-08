@@ -84,7 +84,7 @@ export class CodeReplValidationService {
 
   getAllWarnings(
       stateName: string, customizationArgs: CodeReplCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));

@@ -38,7 +38,8 @@ export class TextInputRulesService {
     const normalizedInput = inputs.x.normalizedStrSet.map(
       input => this.nws.transform(input).toLowerCase());
 
-    const hasEditDistanceEqualToOne = (inputString, matchString) => {
+    const hasEditDistanceEqualToOne = (
+        inputString: string, matchString: string) => {
       if (inputString === matchString) {
         return true;
       }

@@ -82,7 +82,7 @@ export class GraphInputValidationService {
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
     var ISOMORPHISM_VERTICES_LIMIT = 10;
 
-    var warningsList = [];
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

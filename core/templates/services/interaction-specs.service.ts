@@ -24,8 +24,11 @@ import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 @Injectable({providedIn: 'root'})
 export class InteractionSpecsService {
   isInteractionTrainable(interactionId: string): boolean {
+    const _interactionId = (
+      interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS
+    );
     const interactionSpecs =
-      InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
+      InteractionSpecsConstants.INTERACTION_SPECS[_interactionId];
     if (!interactionSpecs) {
       throw new Error(interactionId + ' is not a valid interaction id');
     }

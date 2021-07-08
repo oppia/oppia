@@ -77,8 +77,8 @@ export class MultipleChoiceInputValidationService {
   getAllWarnings(
       stateName: string,
       customizationArgs: MultipleChoiceInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));

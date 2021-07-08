@@ -34,29 +34,30 @@ describe('ItemSelectionInputValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let validatorService: ItemSelectionInputValidationService;
 
-  let currentState: string = null;
-  let goodAnswerGroups: AnswerGroup[] = null,
-    goodDefaultOutcome: Outcome = null;
-  let customizationArguments: ItemSelectionInputCustomizationArgs = null;
-  let IsProperSubsetValidOption: AnswerGroup[] = null;
-  let oof: OutcomeObjectFactory = null,
-    agof: AnswerGroupObjectFactory = null,
-    rof: RuleObjectFactory = null;
-  let ThreeInputsAnswerGroups: AnswerGroup[] = null,
-    OneInputAnswerGroups: AnswerGroup[] = null,
-    NoInputAnswerGroups: AnswerGroup[] = null;
+  let currentState: string;
+  let goodAnswerGroups: AnswerGroup[],
+    goodDefaultOutcome: Outcome;
+  let customizationArguments: ItemSelectionInputCustomizationArgs,
+    badCustomizationArguments: ItemSelectionInputCustomizationArgs;
+  let IsProperSubsetValidOption: AnswerGroup[];
+  let oof: OutcomeObjectFactory,
+    agof: AnswerGroupObjectFactory,
+    rof: RuleObjectFactory;
+  let ThreeInputsAnswerGroups: AnswerGroup[],
+    OneInputAnswerGroups: AnswerGroup[],
+    NoInputAnswerGroups: AnswerGroup[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [ItemSelectionInputValidationService]
     });
 
-    validatorService = TestBed.get(ItemSelectionInputValidationService);
+    validatorService = TestBed.inject(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
 
     currentState = 'First State';
 
@@ -87,6 +88,20 @@ describe('ItemSelectionInputValidationService', () => {
         value: 1
       }
     };
+    badCustomizationArguments = {
+      choices: {
+        value: [
+          new SubtitledHtml('Selection 1', 'ca_0'),
+          new SubtitledHtml('Selection 2', null),
+        ]
+      },
+      maxAllowableSelectionCount: {
+        value: 1
+      },
+      minAllowableSelectionCount: {
+        value: 1
+      }
+    };
     goodAnswerGroups = [agof.createNew(
       [rof.createFromBackendDict({
         rule_type: 'Equals',
@@ -95,7 +110,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null)
     ];
     ThreeInputsAnswerGroups = [agof.createNew(
@@ -106,7 +121,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null)
     ];
     OneInputAnswerGroups = [agof.createNew(
@@ -117,7 +132,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null)
     ];
     NoInputAnswerGroups = [agof.createNew(
@@ -128,7 +143,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null)
     ];
     IsProperSubsetValidOption = [agof.createNew(
@@ -139,7 +154,7 @@ describe('ItemSelectionInputValidationService', () => {
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null)
     ];
   });
@@ -149,6 +164,15 @@ describe('ItemSelectionInputValidationService', () => {
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should throw error if contentId of choice in customizationArguments' +
+  ' does not exist', () => {
+    expect(() => {
+      validatorService.getAllWarnings(
+        currentState, badCustomizationArguments, goodAnswerGroups,
+        goodDefaultOutcome);
+    }).toThrowError('ContentId of choice does not exist');
   });
 
   it('should expect a choices customization argument', () => {
@@ -308,7 +332,8 @@ describe('ItemSelectionInputValidationService', () => {
     });
 
   it('should expect all rule inputs to match choices', () => {
-    goodAnswerGroups[0].rules[0].inputs.x[0] = 'invalid_content_id';
+    const ruleInput = <string[]> goodAnswerGroups[0].rules[0].inputs.x;
+    ruleInput[0] = 'invalid_content_id';
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
