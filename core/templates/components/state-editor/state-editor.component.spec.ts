@@ -100,6 +100,10 @@ describe('StateEditorComponent', () => {
     $scope.toggleConceptCard();
 
     expect($scope.conceptCardIsShown).toBe(false);
+
+    $scope.toggleConceptCard();
+
+    expect($scope.conceptCardIsShown).toBe(true);
   });
 
   it('should initialize services when component is reinitialized', () => {

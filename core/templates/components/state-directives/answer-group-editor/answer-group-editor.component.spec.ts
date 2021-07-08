@@ -338,7 +338,7 @@ describe('AnswerGroupEditorComponent', () => {
     ]);
   });
 
-  it('should show warning if when user deletes the only existing rule', () => {
+  it('should show warning if user deletes the only existing rule', () => {
     ctrl.rules = [
       new Rule('StartsWith', {
         x: {
@@ -400,14 +400,18 @@ describe('AnswerGroupEditorComponent', () => {
   });
 
   it('should check if current interaction is trainable', () => {
+    // We set the current interaction as TextInput, which is trainable.
     StateInteractionIdService.savedMemento = 'TextInput';
 
     expect(ctrl.isCurrentInteractionTrainable()).toBe(true);
 
+    // We set the current interaction as MultipleChoiceInpit, which is not
+    // trainable, according to the values provided during setup.
     StateInteractionIdService.savedMemento = 'MultipleChoiceInput';
 
     expect(ctrl.isCurrentInteractionTrainable()).toBe(false);
 
+    // An error is thrown if an invalid interaction ID is passed.
     StateInteractionIdService.savedMemento = 'InvalidInteraction';
 
     expect(() => ctrl.isCurrentInteractionTrainable())
