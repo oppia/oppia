@@ -1054,6 +1054,22 @@ class Story(python_utils.OBJECT):
         return story_contents_dict
 
     @classmethod
+    def _convert_story_contents_v4_dict_to_v5_dict(cls, story_contents_dict):
+        """Converts v4 Story Contents schema to the modern v5 schema.
+        v5 schema introduces the thumbnail_size_in_bytes for Story Nodes.
+
+        Args:
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = None
+        return story_contents_dict
+
+    @classmethod
     def update_story_contents_from_model(
             cls, versioned_story_contents, current_version):
         """Converts the story_contents blob contained in the given

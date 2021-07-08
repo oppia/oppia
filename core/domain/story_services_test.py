@@ -251,11 +251,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'chapter'][0]
             })
         ]
+
+        # Save a dummy image on filesystem, to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.STORY_ID))
+        fs.commit(
+            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_filename, 'image.svg')
+        self.assertEqual(
+            story.story_contents.nodes[1].thumbnail_size_in_bytes,
+            len(raw_image))
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_bg_color,
             constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
@@ -2112,11 +2128,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         )
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 4)
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
-        self.assertEqual(story.story_contents_schema_version, 4)
+        self.assertEqual(story.story_contents_schema_version, 5)
         self.assertEqual(
-            story.story_contents.to_dict(), self.VERSION_4_STORY_CONTENTS_DICT)
+            story.story_contents.to_dict(), self.VERSION_5_STORY_CONTENTS_DICT)
