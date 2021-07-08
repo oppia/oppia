@@ -27,10 +27,10 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import param_domain
-from core.domain import state_domain
 from core.domain import exp_services_test
+from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf

@@ -1734,7 +1734,6 @@ def get_composite_change_list(exp_id, from_version, to_version):
             'of exploration to version %s.'
             % (from_version, to_version))
 
-
     version_nums = list(python_utils.RANGE(from_version + 1, to_version + 1))
     snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
         exp_id, version_nums, allow_deleted=False)
@@ -1750,7 +1749,7 @@ def get_composite_change_list(exp_id, from_version, to_version):
     return composite_change_list
 
 
-def are_changes_mergeable(exp_id, frontend_version, change_list):
+def are_changes_mergeable(exp_id, change_list_version, change_list):
     """Checks whether the change list can be merged when the
     intended exploration version of changes_list is not same as
     the current exploration version.
@@ -1758,41 +1757,41 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
     Args:
         exp_id: str. The id of the exploration where the change_list is to
             be applied.
-        frontend_version: int. Version of an exploration from frontend on
-            which a user is working.
+        change_list_version: int. Version of an exploration on which the change
+            list was applied.
         change_list: list(ExplorationChange). List of the changes made by the
             user on the frontend, which needs to be checked for mergeability.
 
     Returns:
         boolean. Whether the changes are mergeable.
     """
-    backend_version_exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    if backend_version_exploration.version == frontend_version:
+    current_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if current_exploration.version == change_list_version:
         return True
-    elif backend_version_exploration.version < frontend_version:
+    elif current_exploration.version < change_list_version:
         return False
 
     # A complete list of changes from one version to another
     # is composite_change_list.
     composite_change_list = get_composite_change_list(
-        exp_id, frontend_version,
-        backend_version_exploration.version)
+        exp_id, change_list_version,
+        current_exploration.version)
 
-    exploration_change = exp_domain.ExplorationChangeMergeVerifier(composite_change_list)
-    frontend_version_exploration = exp_fetchers.get_exploration_by_id(
-        exp_id, version=frontend_version)
+    exp_at_change_list_version = exp_fetchers.get_exploration_by_id(
+        exp_id, version=change_list_version)
 
-    response_dict = exploration_change.is_change_list_mergeable(
-        change_list,
-        frontend_version_exploration,
-        backend_version_exploration, exp_id)
+    response_dict = exp_domain.ExplorationChangeMergeVerifier(
+        composite_change_list).is_change_list_mergeable(
+            change_list, exp_at_change_list_version,
+            current_exploration)
+
     if response_dict['send_email']:
         change_list_dict = [change.to_dict() for change in change_list]
         (
             email_manager
             .send_not_mergeable_change_list_to_admin_for_review(
-                exp_id, frontend_version,
-                backend_version_exploration.version,
+                exp_id, change_list_version,
+                current_exploration.version,
                 change_list_dict))
     return response_dict['changes_are_mergeable']
 
