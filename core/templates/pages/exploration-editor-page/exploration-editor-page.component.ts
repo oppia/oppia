@@ -176,7 +176,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
+    'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
@@ -199,7 +199,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
+        StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
@@ -374,25 +374,25 @@ angular.module('oppia').component('explorationEditorPage', {
           // relevant when an exploration is published and is being played by
           // learners.
           if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
+            // await StateTopAnswersStatsService.initAsync(
+            //   ctrl.explorationId, ExplorationStatesService.getStates());
 
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
+            // ExplorationStatesService.registerOnStateAddedCallback(
+            //   (stateName: string) => {
+            //     StateTopAnswersStatsService.onStateAdded(stateName);
+            //   });
+            // ExplorationStatesService.registerOnStateDeletedCallback(
+            //   (stateName: string) => {
+            //     StateTopAnswersStatsService.onStateDeleted(stateName);
+            //   });
+            // ExplorationStatesService.registerOnStateRenamedCallback(
+            //   (oldName: string, newName: string) => {
+            //     StateTopAnswersStatsService.onStateRenamed(oldName, newName);
+            //   });
+            // ExplorationStatesService.registerOnStateInteractionSavedCallback(
+            //   (state: State) => {
+            //     StateTopAnswersStatsService.onStateInteractionSaved(state);
+            //   });
           }
 
           await ExplorationImprovementsService.initAsync();
