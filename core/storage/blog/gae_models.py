@@ -373,7 +373,7 @@ class BlogPostRightsModel(base_models.BaseModel):
         query = cls.query(
             cls.editor_ids == user_id, cls.blog_post_is_published == False # pylint: disable=singleton-comparison
         ).order(-cls.last_updated)
-        return query.fetch(limit) if limit is not None else query.fetch() 
+        return query.fetch(limit) if limit is not None else query.fetch()
 
     @classmethod
     def get_all_by_user(cls, user_id):
