@@ -44,7 +44,7 @@
         "core.controllers.topics_and_skills_dashboard_test",
         "extensions.value_generators.models.generators_test",
         "core.controllers.admin_test",
-        "core.controllers.contributor_dashboard_admin_test",
+        "core.controllers.android_e2e_config_test",
         "core.controllers.release_coordinator_test",
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
@@ -131,6 +131,7 @@
         "scripts.common_test"
     ],
     "5": [
+        "core.controllers.contributor_dashboard_admin_test",
         "core.domain.subtopic_page_domain_test",
         "core.domain.subscription_services_test",
         "core.domain.draft_upgrade_services_test",
@@ -199,7 +200,6 @@
         "core.domain.caching_services_test",
         "core.domain.email_manager_test",
         "core.domain.classifier_domain_test",
-        "core.domain.user_jobs_continuous_test",
         "core.domain.wipeout_domain_test",
         "core.domain.learner_playlist_services_test",
         "core.domain.state_domain_test",

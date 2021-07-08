@@ -19,19 +19,19 @@
 import { Component, Output, EventEmitter} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
-interface ViewUserRolesAction {
+export interface ViewUserRolesAction {
     filterCriterion: string;
     role: string;
     username: string;
     isValid: () => boolean;
 }
 
-interface UpdateRoleAction {
+export interface UpdateRoleAction {
     newRole: string;
     username: string;
     topicId: string;
@@ -49,7 +49,7 @@ interface FormData {
 })
 export class AdminRolesTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
-  userRolesResult = {};
+  userRolesResult: UserRolesBackendResponse = null;
   resultRolesVisible: boolean = false;
   topicSummaries = {};
   roleToActions;

@@ -170,11 +170,6 @@ export const AppConstants = {
     QUESTION: 'question',
   },
 
-  ASSET_TYPE_AUDIO: 'audio',
-  ASSET_TYPE_IMAGE: 'image',
-  ASSET_TYPE_THUMBNAIL: 'thumbnail',
-  ASSET_TYPE_CLASSIFIER_DATA: 'classifier_data',
-
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
   IMAGE_UPLOAD_URL_TEMPLATE: (
     '/createhandler/imageupload/<entity_type>/<entity_id>'),

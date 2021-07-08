@@ -27,7 +27,8 @@ import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
-  abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential>;
+  abstract getRedirectResultAsync():
+   Promise<firebase.auth.UserCredential | null>;
   abstract signInWithRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
@@ -56,7 +57,7 @@ class DevAuthServiceImpl extends AuthServiceImpl {
   async signInWithRedirectAsync(): Promise<void> {
   }
 
-  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
     return null;
   }
 
@@ -96,9 +97,10 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 })
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
+  creds!: firebase.auth.UserCredential;
 
   constructor(
-      @Optional() private angularFireAuth: AngularFireAuth,
+      @Optional() private angularFireAuth: AngularFireAuth | null,
       private authBackendApiService: AuthBackendApiService) {
     if (!this.angularFireAuth) {
       this.authServiceImpl = new NullAuthServiceImpl();
@@ -124,7 +126,7 @@ export class AuthService {
     } as const;
   }
 
-  static get firebaseEmulatorConfig(): readonly [string, number] {
+  static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
     return AuthService.firebaseEmulatorIsEnabled ?
       ['localhost', 9099] : undefined;
   }
@@ -155,20 +157,26 @@ export class AuthService {
     // emulator DOES NOT run. Instead, production takes the user to the Google
     // sign-in page, which eventually redirects them back to Oppia.
     const password = await md5(email);
-    let creds: firebase.auth.UserCredential;
     try {
-      creds = await this.angularFireAuth.signInWithEmailAndPassword(
-        email, password);
+      if (this.angularFireAuth !== null) {
+        this.creds = await this.angularFireAuth.signInWithEmailAndPassword(
+          email, password);
+      }
     } catch (err) {
       if (err.code === 'auth/user-not-found') {
-        creds = await this.angularFireAuth.createUserWithEmailAndPassword(
-          email, password);
+        if (this.angularFireAuth !== null) {
+          this.creds =
+           await this.angularFireAuth.createUserWithEmailAndPassword(
+             email, password);
+        }
       } else {
         throw err;
       }
     }
-    const idToken = await creds.user.getIdToken();
-    await this.authBackendApiService.beginSessionAsync(idToken);
+    if (this.creds?.user !== null) {
+      const idToken = await this.creds.user.getIdToken();
+      await this.authBackendApiService.beginSessionAsync(idToken);
+    }
   }
 
   async signInWithRedirectAsync(): Promise<void> {
