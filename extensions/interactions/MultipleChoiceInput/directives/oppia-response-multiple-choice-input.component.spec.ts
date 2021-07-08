@@ -48,17 +48,17 @@ describe('ResponseMultipleChoiceInputComponent', () => {
     component = fixture.componentInstance;
     component.answer = '1';
     component.choices = '[{' +
-      '_html: "opt1",' +
-      'contentId: "ca_choices_9"' +
+      '"_html": "opt1",' +
+      '"contentId": "ca_choices_9"' +
     '}, {' +
-      '_html: "opt2",' +
-      'contentId: "ca_choices_10"' +
+      '"_html": "opt2",' +
+      '"contentId": "ca_choices_10"' +
     '}, {' +
-      '_html: "opt3",' +
-      'contentId: "ca_choices_11"' +
+      '"_html": "opt3",' +
+      '"contentId": "ca_choices_11"' +
     '}, {' +
-      '_html: "opt4",' +
-      'contentId: "ca_choices_12"' +
+      '"_html": "opt4",' +
+      '"contentId": "ca_choices_12"' +
     '}]';
   });
 
