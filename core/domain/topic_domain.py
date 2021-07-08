@@ -451,7 +451,7 @@ class Subtopic(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Subtopic thumbnail background color is not specified.')
         if self.thumbnail_filename is not None and (
-                self.thumbnail_size_in_bytes is 0):
+                self.thumbnail_size_in_bytes == 0):
             raise utils.ValidationError(
                 'Subtopic thumbnail size in bytes cannot be zero.')
 
@@ -1154,7 +1154,7 @@ class Topic(python_utils.OBJECT):
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(cls, topic_id, subtopic_dict):
         """Converts old Subtopic schema to the modern v4 schema. v4 schema
-        introduces the thumbnail_size_in_bytes field
+        introduces the thumbnail_size_in_bytes field.
 
         Args:
             topic_id: str. The id of the topic to which the subtopic is linked
