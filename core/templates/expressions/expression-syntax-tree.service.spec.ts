@@ -66,7 +66,7 @@ describe('Expression syntax tree service', () => {
     let exprUndefinedVarError: ExprUndefinedVarError;
 
     it('should extend ExpressionError class', () => {
-      const exampleVar = undefined;
+      const exampleVar = '';
       exprUndefinedVarError = new ExprUndefinedVarError(exampleVar, []);
 
       expect(exprUndefinedVarError.name).toBe('ExprUndefinedVarError');
@@ -89,7 +89,7 @@ describe('Expression syntax tree service', () => {
     let exprWrongArgTypeError: ExprWrongArgTypeError;
 
     it('should extend ExpressionError class', () => {
-      exprWrongArgTypeError = new ExprWrongArgTypeError(undefined, '0', '1');
+      exprWrongArgTypeError = new ExprWrongArgTypeError('I', '0', '1');
 
       expect(exprWrongArgTypeError.name).toBe('ExprWrongArgTypeError');
       expect(exprWrongArgTypeError instanceof ExpressionError).toBe(true);

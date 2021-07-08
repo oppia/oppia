@@ -51,6 +51,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/blog_admin_test.py',
     'core/controllers/blog_dashboard.py',
     'core/controllers/blog_dashboard_test.py',
+    'core/controllers/blog_homepage.py',
+    'core/controllers/blog_homepage_test.py',
     'core/controllers/classifier.py',
     'core/controllers/classifier_test.py',
     'core/controllers/classroom.py',
