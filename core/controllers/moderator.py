@@ -29,6 +29,11 @@ import feconf
 class ModeratorPage(base.BaseHandler):
     """The moderator page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
@@ -39,6 +44,21 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     """The moderator page handler for featured activities."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'featured_activity_reference_dicts': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'object_class': activity_domain.ActivityReference
+                    }
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_moderator_page
     def get(self):
@@ -53,7 +73,7 @@ class FeaturedActivitiesHandler(base.BaseHandler):
     @acl_decorators.can_access_moderator_page
     def post(self):
         """Handles POST requests."""
-        featured_activity_reference_dicts = self.payload.get(
+        featured_activity_reference_dicts = self.normalized_payload.get(
             'featured_activity_reference_dicts')
         featured_activity_references = [
             activity_domain.ActivityReference(
@@ -76,6 +96,10 @@ class EmailDraftHandler(base.BaseHandler):
     """Provide default email templates for moderator emails."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_send_moderator_emails
     def get(self):
