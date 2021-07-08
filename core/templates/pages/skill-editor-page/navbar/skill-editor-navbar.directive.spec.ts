@@ -40,7 +40,6 @@ describe('Skill Editor Navbar Directive', function() {
   let skillObjectFactory: SkillObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
 
-  let alertsSpy = null;
   let sampleSkill: Skill = null;
   let mockEventEmitter = new EventEmitter();
 
@@ -53,8 +52,8 @@ describe('Skill Editor Navbar Directive', function() {
       imports: [HttpClientTestingModule]
     });
   });
-  
-  
+
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
@@ -69,7 +68,6 @@ describe('Skill Editor Navbar Directive', function() {
 
     sampleSkill = skillObjectFactory.createInterstitialSkill();
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
-    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue(null);
     spyOnProperty(skillEditorStateService, 'onSkillChange')
       .and.returnValue(mockEventEmitter);
 
@@ -122,7 +120,6 @@ describe('Skill Editor Navbar Directive', function() {
 
   it('should get change list count when calling ' +
     '\'getChangeListCount\'', function() {
-
     spyOn(undoRedoService, 'getChangeCount')
       .and.returnValue(2);
 
@@ -237,7 +234,7 @@ describe('Skill Editor Navbar Directive', function() {
     expect(saveSkillSpy).not.toHaveBeenCalled();
   }));
 
-  describe('on navigating to questions tab ', function(){
+  describe('on navigating to questions tab ', function() {
     it('should open undo changes modal if there are unsaved ' +
       'changes', fakeAsync(function() {
       // Setting unsaved changes to be two.
