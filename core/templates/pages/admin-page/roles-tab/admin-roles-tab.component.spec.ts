@@ -26,7 +26,7 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-import { AddContributionRightsAction, AdminRolesTabComponent, RemoveContributionRightsAction, UpdateRoleAction, ViewContributionReviewersAction, ViewUserRolesAction } from './admin-roles-tab.component';
+import { AddContributionRightsAction, AdminRolesTabComponent, RemoveContributionRightsAction, UpdateRoleAction, ViewContributionReviewersAction, ViewTranslationContributionStatsAction, ViewUserRolesAction } from './admin-roles-tab.component';
 
 describe('Admin roles tab component ', function() {
   let component: AdminRolesTabComponent;
@@ -563,6 +563,43 @@ describe('Admin roles tab component ', function() {
     }));
   });
 
+  describe('on clicking view translation contribution stats button ', () => {
+    it('should successfully show stats of the user', fakeAsync(() => {
+      const adminBackendServiceSpy = spyOn(
+        adminBackendApiService, 'viewTranslationContributionStatsAsync')
+        .and.returnValue(Promise.resolve(null));
+      const viewStatsAction: ViewTranslationContributionStatsAction = {
+        isValid: () => true,
+        username: 'user1'
+      };
+
+      component.submitViewTranslationContributionStatsForm(viewStatsAction);
+      tick();
+
+      expect(adminBackendServiceSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Success.');
+    }));
+
+    it('should not send request to backend if a task ' +
+      'is still running in the queue', fakeAsync(() => {
+      // Setting task running to be true.
+      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+      const adminBackendServiceSpy = spyOn(
+        adminBackendApiService, 'viewTranslationContributionStatsAsync')
+        .and.returnValue(Promise.resolve(null));
+      const viewStatsAction: ViewTranslationContributionStatsAction = {
+        isValid: () => true,
+        username: 'user1'
+      };
+
+      component.submitViewTranslationContributionStatsForm(viewStatsAction);
+      tick();
+
+      expect(adminBackendServiceSpy).not.toHaveBeenCalled();
+    }));
+  });
+
 
   // Note that 'refreshFormData()' is called when
   // ever change is detected in any one of the
@@ -800,6 +837,35 @@ describe('Admin roles tab component ', function() {
         fixture.detectChanges();
 
         let result = component.formData.removeContributionReviewer.isValid();
+        expect(result).toBe(false);
+      }));
+    });
+
+    describe('in the view translation contribution stats section ', () => {
+      it('should return true if there are no validation errors ' +
+        'when viewing translation contribution stats', fakeAsync(() => {
+        component.refreshFormData();
+        fixture.detectChanges();
+
+        component.formData.viewTranslationContributionStats.username = '';
+        fixture.detectChanges();
+
+        const result = (
+          component.formData.viewTranslationContributionStats.isValid());
+        expect(result).toBe(true);
+      }));
+
+      it('should return false if there are validation errors ' +
+        'when viewing translation contribution stats', fakeAsync(() => {
+        component.refreshFormData();
+        fixture.detectChanges();
+
+        // Setting category to be null.
+        component.formData.viewTranslationContributionStats.username = 'user1';
+        fixture.detectChanges();
+
+        const result = (
+          component.formData.viewTranslationContributionStats.isValid());
         expect(result).toBe(false);
       }));
     });
