@@ -62,7 +62,7 @@ export interface RemoveContributionRightsAction {
   username: string
 }
 
-interface ViewTranslationContributionStatsAction {
+export interface ViewTranslationContributionStatsAction {
   username: string;
   isValid: () => boolean;
 }
