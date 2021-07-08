@@ -23,9 +23,8 @@
 </div>
 
 <div class="oppia-same-row-container">
-  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector dropdown">
+  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector dropdown" autoClose="outside">
     <button ngbDropdownToggle
-            data-toggle="dropdown"
             (click)="openSubmenu($event, 'category')"
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
@@ -33,11 +32,9 @@
             title="{{ selectionDetails.categories.description | translate }}">
       {{categoryButtonText|truncate:14}}
     </button>
-    <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul ngbDropdownMenu
         class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
-        role="menu"
-        (click)="$event.stopPropagation()">
+        role="menu">
       <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
         <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
@@ -81,20 +78,17 @@
     </ul>
   </div>
 </div>
-<div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown">
+<div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
   <button ngbDropdownToggle
           (click)="openSubmenu($event, 'language')"
-          data-toggle="dropdown"
           (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
           type="button"
           class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
           title="{{selectionDetails.languageCodes.description | translate}}">
     {{ languageButtonText | truncate:14 }}
   </button>
-  <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
   <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
-      role="menu"
-      (click)="$event.stopPropagation()">
+      role="menu">
     <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; trackBy: index">
       <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
         <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
@@ -152,12 +146,12 @@
   }
   .oppia-search-bar-input,
   .oppia-search-button {
-    background: #257D76;
+    background: #fff;
     border-color: #257D76;
     border-radius: 0;
     border-style: solid;
     border-width: 1px 1px 1px 0;
-    color: white;
+    color: #257D76;
     font-size: 15px;
     height: 35px;
   }
@@ -177,18 +171,18 @@
     padding-right: 0;
   }
   .oppia-search-bar-input.btn {
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
   .oppia-search-bar-icon {
-    background: #257D76;
+    background: #fff;
     border-color: #257D76;
     border-style: solid;
     border-width: 1px 0 1px 1px;
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
   .oppia-search-bar-input.btn:hover,
   .oppia-search-bar-input.btn:focus {
-    color: #fff;
+    color: #257D76;
   }
 
   .oppia-search-bar-input.btn:focus {
@@ -197,16 +191,16 @@
   }
 
   .oppia-search-bar-input::-webkit-input-placeholder {
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
   .oppia-search-bar-input::-moz-placeholder {
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
   .oppia-search-bar-input:-moz-placeholder {
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
   .oppia-search-bar-input:-ms-input-placeholder {
-    color: rgba(255,255,255,0.95);
+    color: #257D76;
   }
   .oppia-input-group {
     max-width: 375px;
@@ -234,7 +228,6 @@
 
   @media (max-width: 1125px) {
     .oppia-search-bar-input {
-      background: #fff;
       color: #257D76;
     }
     .oppia-search-bar-input::-webkit-input-placeholder {
@@ -250,7 +243,6 @@
       color: #257D76;
     }
     .oppia-search-bar-icon {
-      background: #fff;
       color: #257D76;
     }
     .oppia-search-bar-input.btn {
@@ -261,14 +253,12 @@
       color: #257D76;
     }
     .oppia-search-bar-input:focus {
-      background-color: white;
       color: #257D76;
     }
   }
 
   @media (max-width: 767px) {
     .oppia-search-bar-input {
-      background: #fff;
       color: #257D76;
       padding-top: 17px;
     }
@@ -295,7 +285,6 @@
       color: #257D76;
     }
     .oppia-search-bar-icon {
-      background: #fff;
       color: #257D76;
     }
     .oppia-search-bar-input.btn {
@@ -359,13 +348,6 @@
 
     .oppia-translate-icon-down {
       transform: translate(0,6px);
-    }
-  }
-
-  @media(min-width: 1126px) {
-    .oppia-search-bar-input:focus {
-      background-color: #257D76;
-      color: white;
     }
   }
 

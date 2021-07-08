@@ -40,12 +40,24 @@ interface LearnerPlaylistResponseObject {
   'username': string
   }
 
+interface LearnerGoalsResponseObject {
+  'belongs_to_learnt_list': boolean
+  'is_admin': boolean
+  'is_moderator': boolean
+  'is_super_admin': boolean
+  'is_topic_manager': boolean
+  'goals_limit_exceeded': boolean
+  'user_email': string
+  'username': string
+  }
+
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerDashboardActivityBackendApiService {
   successfullyAdded: boolean;
   addToLearnerPlaylistUrl: string;
+  addToLearnerGoalsUrl: string;
   removeActivityModalStatus: string;
 
   constructor(
@@ -118,8 +130,38 @@ export class LearnerDashboardActivityBackendApiService {
     });
   }
 
+  async addToLearnerGoals(
+      activityId: string, activityType: string): Promise<boolean> {
+    this.successfullyAdded = true;
+    this.addToLearnerGoalsUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        '/learnergoalshandler/<activityType>/<activityId>', {
+          activityType: activityType,
+          activityId: activityId
+        }));
+    var response = await this.http.post<LearnerGoalsResponseObject>(
+      this.addToLearnerGoalsUrl, {}).toPromise();
+    if (response.belongs_to_learnt_list) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'You have already learnt this activity.');
+    }
+    if (response.goals_limit_exceeded) {
+      this.successfullyAdded = false;
+      this.alertsService.addInfoMessage(
+        'Your \'Current Goals\' list is full! Please finish existing ' +
+        'goals or remove some to add new goals to your list.');
+    }
+    if (this.successfullyAdded) {
+      this.alertsService.addSuccessMessage(
+        'Successfully added to your \'Current Goals\' list.');
+    }
+    return this.successfullyAdded;
+  }
+
   // This function will open a modal to remove an exploration
   // from the given list either 'Play Later' or 'In Progress'
+  // or remove a topic from the 'Current Goals' or 'In Progress'
   // in Learner Dashboard Page.
   async removeActivityModalAsync(
       sectionNameI18nId: string, subsectionName: string,
