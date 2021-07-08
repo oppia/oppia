@@ -260,9 +260,9 @@ describe('Contributor dashboard page', function() {
 
 describe('Contributor dashboard admin page contribution rights form', () => {
   const HINDI_LANGUAGE = 'Hindi';
-  const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const QUESTION_ADMIN_EMAIL = 'userX@contributor.com';
   const QUESTION_ADMIN_USERNAME = 'user1234';
-  const TRANSLATION_ADMIN_EMAIL = 'user2@contributor.com';
+  const TRANSLATION_ADMIN_EMAIL = 'userY@contributor.com';
   const TRANSLATION_ADMIN_USERNAME = 'user12345';
 
   var adminPage = null;
