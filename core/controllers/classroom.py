@@ -29,6 +29,17 @@ import feconf
 class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.does_classroom_exist
     def get(self, _):
         """Handles GET requests."""
@@ -42,6 +53,16 @@ class ClassroomDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.does_classroom_exist
     def get(self, classroom_url_fragment):
@@ -77,6 +98,10 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
     # This prevents partially logged in user from being logged out
     # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -88,6 +113,11 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
 
 class DefaultClassroomRedirectPage(base.BaseHandler):
     """Redirects to the default classroom page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
