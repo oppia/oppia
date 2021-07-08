@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for HintAndSolutionButtonsComponent
+ */
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -28,10 +32,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
-
-/**
- * @fileoverview Unit tests for HintAndSolutionButtonsComponent
- */
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
@@ -51,7 +52,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [HintAndSolutionButtonsComponent]
+      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe]
     }).compileComponents();
   }));
 
@@ -132,7 +133,7 @@ describe('HintAndSolutionButtonsComponent', () => {
             content_id: '2',
             html: 'test_explanation1',
           },
-        },
+        }
       }),
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),

@@ -23,6 +23,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 
 from core.controllers import payload_validator
@@ -37,7 +38,6 @@ import utils
 
 import backports.functools_lru_cache
 import webapp2
-
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -158,6 +158,8 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
@@ -334,18 +336,31 @@ class BaseHandler(webapp2.RequestHandler):
         if handler_class_name in handler_class_names_with_no_schema:
             return
 
-        if request_method in ['GET', 'DELETE']:
-            handler_args = {}
-            for arg in self.request.arguments():
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg == 'csrf_token':
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
+                continue
+            elif arg == 'source':
+                source_url = self.request.get('source')
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
+            elif arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = payload_args.keys()
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
                 handler_args[arg] = self.request.get(arg)
-        else:
-            # When request_method in ['PUT', 'POST']
-            handler_args = self.payload
-        if handler_args is None:
-            # When a handler class expects an argument but it is missing in
-            # payloads then for raising exception for missing args,
-            # handler_args must be initialized with empty dict.
-            handler_args = {}
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
@@ -388,10 +403,13 @@ class BaseHandler(webapp2.RequestHandler):
             payload_validator.validate(
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
-        if request_method in ['PUT', 'POST']:
-            self.normalized_payload = normalized_value
-        else:
-            self.normalized_request = normalized_value
+
+        self.normalized_payload = {
+            arg: normalized_value.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_value.get(arg) for arg in request_arg_keys
+        }
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
