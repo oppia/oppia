@@ -24,7 +24,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { PreferencesBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService;
@@ -177,6 +177,32 @@ describe('User Backend Api Service', () => {
       '/usercontributionrightsdatahandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserContributionRightsDict);
+
+    flushMicrotasks();
+  }));
+
+  it('should return user preferences data', fakeAsync(() => {
+    let samplePreferencesData: PreferencesBackendDict = {
+      preferred_language_codes: ['en', 'hi'],
+      preferred_site_language_code: 'en',
+      preferred_audio_language_code: 'en',
+      profile_picture_data_url: '',
+      default_dashboard: 'learner',
+      user_bio: '',
+      subject_interests: '',
+      can_receive_email_updates: true,
+      can_receive_editor_role_email: true,
+      can_receive_feedback_message_email: true,
+      can_receive_subscription_email: true,
+      subscription_list: []
+    };
+    userBackendApiService.getPreferencesAsync().then((preferencesData) => {
+      expect(preferencesData).toEqual(samplePreferencesData);
+    });
+
+    const req = httpTestingController.expectOne('/preferenceshandler/data');
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePreferencesData);
 
     flushMicrotasks();
   }));
