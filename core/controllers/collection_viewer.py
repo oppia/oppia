@@ -28,6 +28,17 @@ import utils
 class CollectionPage(base.BaseHandler):
     """Page describing a single collection."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_play_collection
     def get(self, _):
         """Handles GET requests."""
@@ -39,6 +50,16 @@ class CollectionDataHandler(base.BaseHandler):
     """Provides the data for a single collection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_collection
     def get(self, collection_id):

@@ -75,10 +75,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         whitelisted_usernames = [self.EDITOR_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
-        # Check that it is possible to access a page with specific version
-        # number.
+        # Check that it is possible to access a page.
         self.get_json(
-            '%s/%s?v=1' % (
+            '%s/%s' % (
                 feconf.COLLECTION_DATA_URL_PREFIX,
                 self.COLLECTION_ID))
 
