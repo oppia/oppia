@@ -5768,6 +5768,48 @@ title: Old Title
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.title, 'new title')
 
+        # Check that the property can be changed when working
+        # on old version.
+        # Add change to upgrade the version.
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'new title'
+            })], 'Changed title.')
+
+        hint_dict = {
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
+            }
+        }
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+            'state_name': exploration.init_state_name,
+            'new_value': hint_dict
+        })]
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            self.NEW_EXP_ID, 1, change_list)
+        self.assertTrue(changes_are_mergeable)
+        with self.assertRaisesRegexp(
+            Exception, 'Expected hints_list to be a list.*'):
+            exp_services.update_exploration(
+                self.albert_id, self.NEW_EXP_ID, change_list,
+                'Changed hints.')
+
+        # Assert that final version consists all the changes.
+        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.title, 'new title')
+
     def test_update_interaction_solutions(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertIsNone(exploration.init_state.interaction.solution)
