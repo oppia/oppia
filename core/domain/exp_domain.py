@@ -2569,14 +2569,14 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                     changed_properties[state_name] = [change.property_name]
             elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
                 changed_property = None
-                if change.content_id == 'content':
-                    changed_property = 'content'
+                if change.content_id == STATE_PROPERTY_CONTENT:
+                    changed_property = STATE_PROPERTY_CONTENT
                 elif change.content_id[:14] == 'ca_placeholder':
                     changed_property = 'widget_customization_args'
                 elif change.content_id == 'default_outcome':
                     changed_property = 'default_outcome'
-                elif change.content_id == 'solution':
-                    changed_property = 'solution'
+                elif change.content_id == STATE_PROPERTY_INTERACTION_SOLUTION:
+                    changed_property = STATE_PROPERTY_INTERACTION_SOLUTION
                 elif change.content_id[:4] == 'hint':
                     changed_property = 'hints'
                 elif change.content_id[:8] == 'feedback':
@@ -2596,13 +2596,13 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                 else:
                     changed_translations[state_name] = [changed_property]
                 if state_name in changed_properties:
-                    if ('written_translations' not in
+                    if (STATE_PROPERTY_WRITTEN_TRANSLATIONS not in
                             changed_properties[state_name]):
                         changed_properties[state_name].append(
-                            'written_translations')
+                            STATE_PROPERTY_WRITTEN_TRANSLATIONS)
                 else:
                     changed_properties[state_name] = [
-                        'written_translations']
+                        STATE_PROPERTY_WRITTEN_TRANSLATIONS]
 
         self.added_state_names = added_state_names
         self.deleted_state_names = deleted_state_names
@@ -2624,7 +2624,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     # related (affected by or affecting) customization args. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by customization args.
-    PROPERTIES_RELATED_TO_CUST_ARGS = ['solution', 'recorded_voiceovers',
+    PROPERTIES_RELATED_TO_CUST_ARGS = [STATE_PROPERTY_INTERACTION_SOLUTION, STATE_PROPERTY_RECORDED_VOICEOVERS,
                                         'answer_groups',
                                         'widget_customization_args']
 
@@ -2632,8 +2632,8 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     # related (affected by or affecting) answer groups. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by answer groups.
-    PROPERTIES_RELATED_TO_ANSWER_GROUPS = ['solution',
-                                            'recorded_voiceovers',
+    PROPERTIES_RELATED_TO_ANSWER_GROUPS = [STATE_PROPERTY_INTERACTION_SOLUTION,
+                                            STATE_PROPERTY_RECORDED_VOICEOVERS,
                                             'answer_groups',
                                             'widget_customization_args']
 
@@ -2641,21 +2641,21 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     # related (affected by or affecting) solution. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by solution.
-    PROPERTIES_RELATED_TO_SOLUTION = ['solution', 'answer_groups',
-                                        'recorded_voiceovers',
+    PROPERTIES_RELATED_TO_SOLUTION = [STATE_PROPERTY_INTERACTION_SOLUTION, 'answer_groups',
+                                        STATE_PROPERTY_RECORDED_VOICEOVERS,
                                         'widget_customization_args']
 
     # PROPERTIES_RELATED_TO_VOICEOVERS: List of the properties
     # related (affected by or affecting) voiceovers. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by voiceovers.
-    PROPERTIES_RELATED_TO_VOICEOVERS = ['content', 'solution',
+    PROPERTIES_RELATED_TO_VOICEOVERS = [STATE_PROPERTY_CONTENT, STATE_PROPERTY_INTERACTION_SOLUTION,
                                         'hints',
-                                        'written_translations',
+                                        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
                                         'answer_group',
                                         'default_outcome',
                                         'widget_customization_args',
-                                        'recorded_voiceovers']
+                                        STATE_PROPERTY_RECORDED_VOICEOVERS]
 
     def is_change_list_mergeable(
         self, change_list,
@@ -2740,9 +2740,9 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                     if old_state_name in changed_properties:
                         if (frontend_exp_states.content.html ==
                                 backend_exp_states.content.html):
-                            if ('content' not in
+                            if (STATE_PROPERTY_CONTENT not in
                                     changed_translations[old_state_name] and
-                                    'recorded_voiceovers' not in
+                                    STATE_PROPERTY_RECORDED_VOICEOVERS not in
                                     changed_properties[old_state_name]):
                                 change_is_mergeable = True
                     else:
@@ -2756,7 +2756,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                                     changed_properties[old_state_name] and
                                     'answer_groups' not in
                                     changed_properties[old_state_name] and
-                                    'solution' not in
+                                    STATE_PROPERTY_INTERACTION_SOLUTION not in
                                     changed_properties[old_state_name]):
                                 change_is_mergeable = True
                     else:
@@ -2895,10 +2895,10 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                 if old_state_name not in changed_translations:
                     changed_translations[old_state_name] = []
                 if old_state_name in changed_properties:
-                    if change.content_id == 'content':
-                        if ('content' not in
+                    if change.content_id == STATE_PROPERTY_CONTENT:
+                        if (STATE_PROPERTY_CONTENT not in
                                 changed_properties[old_state_name] and
-                                'content' not in
+                                STATE_PROPERTY_CONTENT not in
                                 changed_translations[old_state_name]):
                             change_is_mergeable = True
                     elif change.content_id[:14] == 'ca_placeholder':
@@ -2913,10 +2913,10 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                                 'default_outcome' not in
                                 changed_translations[old_state_name]):
                             change_is_mergeable = True
-                    elif change.content_id == 'solution':
-                        if ('solution' not in
+                    elif change.content_id == STATE_PROPERTY_INTERACTION_SOLUTION:
+                        if (STATE_PROPERTY_INTERACTION_SOLUTION not in
                                 changed_properties[old_state_name] and
-                                'solution' not in
+                                STATE_PROPERTY_INTERACTION_SOLUTION not in
                                 changed_translations[old_state_name]):
                             change_is_mergeable = True
                     elif change.content_id[:4] == 'hint':
