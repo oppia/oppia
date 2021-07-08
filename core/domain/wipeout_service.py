@@ -199,6 +199,73 @@ def pre_delete_user(user_id):
     save_pending_deletion_requests(pending_deletion_requests)
 
 
+def delete_users_pending_to_be_deleted():
+    """Taskqueue service method for deleting users that are pending
+    to be deleted. Once these users are deleted, the job results
+    will be mailed to the admin.
+    """
+    pending_deletion_request_models = (
+        user_models.PendingDeletionRequestModel.query().fetch())
+
+    email_message = 'Results of the User Deletion Cron Job'
+    for request_model in pending_deletion_request_models:
+        pending_deletion_request = get_pending_deletion_request(
+            request_model.id)
+        # The final status of the deletion. Either 'SUCCESS' or 'ALREADY DONE'.
+        deletion_status = run_user_deletion(pending_deletion_request)
+        email_message += '\n'
+        email_message += '-----------------------------------'
+        email_message += '\n'
+        email_message += (
+            'PendingDeletionRequestModel ID: %s'
+            'User ID: %s'
+            'Deletion status: %s'
+        ) % (
+            request_model.id, pending_deletion_request.user_id,
+            deletion_status
+        )
+
+    email_subject = 'User Deletion job result'
+    email_manager.send_mail_to_admin(email_subject, email_message)
+
+
+def check_completion_of_user_deletion():
+    """Taskqueue service method for checking the completion of user deletion.
+    It checks if all models do not contain the user ID of the deleted user in
+    their fields. If any field contains the user ID of the deleted user, the
+    deletion_complete is set to False, so that later the
+    delete_users_pending_to_be_deleted will be run on that user again.
+    If all the fields do not contain the user ID of the deleted
+    user, the final email announcing that the deletion was completed is sent,
+    and the deletion request is deleted.
+    """
+    pending_deletion_request_models = (
+        user_models.PendingDeletionRequestModel.query().fetch())
+
+    email_message = 'Results of the Completion of User Deletion Cron Job'
+    for request_model in pending_deletion_request_models:
+        pending_deletion_request = get_pending_deletion_request(
+            request_model.id)
+        # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',
+        # or 'FAILURE'.
+        completion_status = run_user_deletion_completion(
+            pending_deletion_request)
+        email_message += '\n'
+        email_message += '-----------------------------------'
+        email_message += '\n'
+        email_message += (
+            'PendingDeletionRequestModel ID: %s'
+            'User ID: %s'
+            'Completion status: %s'
+        ) % (
+            request_model.id, pending_deletion_request.user_id,
+            completion_status
+        )
+
+        email_subject = 'Completion of User Deletion job result'
+        email_manager.send_mail_to_admin(email_subject, email_message)
+
+
 def run_user_deletion(pending_deletion_request):
     """Run the user deletion.
 
@@ -229,9 +296,9 @@ def run_user_deletion_completion(pending_deletion_request):
     Returns:
         str. The outcome of the verification.
     """
-    # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
-    # for the user. The verification will be done in the next run of
-    # FullyCompleteUserDeletionOneOffJob.
+    # If deletion_complete is False the delete_users_pending_to_be_deleted
+    # wasn't yet run for the user. The verification will be done in the next
+    # run of check_completion_of_user_deletion.
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
