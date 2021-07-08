@@ -85,6 +85,11 @@ var logout = async function() {
 // that this will fail if the user already has a username.
 var _completeSignup = async function(username) {
   await waitFor.pageToFullyLoad();
+  let cookieBanner = element(
+    by.css('.protractor-test-oppia-cookie-banner-accept-button'));
+  if (await cookieBanner.isPresent()) {
+    await action.click('Cookie banner', cookieBanner);
+  }
 
   var signupPage = element(by.css('.protractor-test-signup-page'));
   await waitFor.presenceOf(signupPage, 'Signup page did not load');

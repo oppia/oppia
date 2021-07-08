@@ -23,6 +23,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { CookieOptions, CookieService } from 'ngx-cookie';
 
 @Injectable({
@@ -42,3 +43,7 @@ export class OppiaCookieService {
     this.ngxCookieService.put(key, value, options);
   }
 }
+
+angular.module('oppia').factory('OppiaCookieService', downgradeInjectable(
+  OppiaCookieService
+));
