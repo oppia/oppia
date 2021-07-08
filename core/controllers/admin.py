@@ -1050,8 +1050,6 @@ class ContributionRightsHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def delete(self):
         username = self.normalized_request.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
