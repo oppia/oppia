@@ -40,7 +40,6 @@ EXCLUDED_DIRECTORIES = [
 NOT_FULLY_COVERED_FILENAMES = [
     'angular-html-bind.directive.ts',
     'answer-classification.service.ts',
-    'answer-group-editor.component.ts',
     'App.ts',
     'audio-player.service.ts',
     'audio-preloader.service.ts',
