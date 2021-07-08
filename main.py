@@ -26,6 +26,7 @@ from core.controllers import android_e2e_config
 from core.controllers import base
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
+from core.controllers import blog_homepage
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
@@ -419,6 +420,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
+
+    get_redirect_route(
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogHomepageDataHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'

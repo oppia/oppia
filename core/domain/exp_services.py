@@ -1734,10 +1734,14 @@ def get_composite_change_list(exp_id, frontend_version, backend_version):
             'of exploration to version %s. Please reload and try again.'
             % (frontend_version, backend_version))
 
-    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    version_nums = list(python_utils.RANGE(
+        frontend_version + 1, backend_version + 1))
+    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, version_nums, allow_deleted=False)
+
     composite_change_list_dict = []
-    for i in python_utils.RANGE(frontend_version, backend_version):
-        composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
+    for snapshot in snapshots_metadata:
+        composite_change_list_dict += snapshot['commit_cmds']
 
     composite_change_list = [
         exp_domain.ExplorationChange(change)

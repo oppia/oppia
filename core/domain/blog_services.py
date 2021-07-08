@@ -26,7 +26,7 @@ from core.domain import blog_domain
 from core.domain import html_cleaner
 from core.domain import role_services
 from core.platform import models
-
+import feconf
 import python_utils
 import utils
 
@@ -74,25 +74,6 @@ def get_blog_post_by_id(blog_post_id, strict=True):
         return get_blog_post_from_model(blog_post_model)
     else:
         return None
-
-
-def get_blog_posts_by_ids(blog_post_ids):
-    """Returns a list of blog posts matching the IDs provided.
-
-    Args:
-        blog_post_ids: list(str). List of IDs to get blog posts for.
-
-    Returns:
-        list(BlogPost|None). The list of blog posts corresponding to given IDs
-        (with None in place of blog post IDs corresponding to deleted blog
-        posts).
-    """
-    all_blog_post_models = (
-        blog_models.BlogPostModel.get_multi(blog_post_ids))
-    blog_posts = [
-        get_blog_post_from_model(model) if model is not None else None
-        for model in all_blog_post_models]
-    return blog_posts
 
 
 def get_blog_post_by_url_fragment(url_fragment):
@@ -277,23 +258,30 @@ def get_blog_post_rights(blog_post_id, strict=True):
     return get_blog_post_rights_from_model(model)
 
 
-def get_blog_post_rights_by_user_id(user_id):
-    """Retrieves the rights object for all blog posts for which the given
-    user is an editor.
+def get_published_blog_post_summaries_by_user_id(user_id, max_limit):
+    """Retrieves the summary objects for given number of published blog posts
+    for which the given user is an editor.
 
     Args:
         user_id: str. ID of the user.
+        max_limit: int. The number of models to be fetched.
 
     Returns:
-        list(BlogPostRights). The rights objects associated with the
+        list(BlogPostSummary). The summary objects associated with the
         blog posts assigned to given user.
     """
-    blog_post_rights_models = (
-        blog_models.BlogPostRightsModel.get_by_user(user_id))
-    return [
-        get_blog_post_rights_from_model(model)
-        for model in blog_post_rights_models
-        if model is not None]
+    blog_rights_models = (
+        blog_models.BlogPostRightsModel.get_published_models_by_user(
+            user_id, max_limit))
+    if not blog_rights_models:
+        return None
+    blog_post_ids = [model.id for model in blog_rights_models]
+    blog_summary_models = (
+        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model)
+        for model in blog_summary_models]
+    return blog_post_summaries
 
 
 def does_blog_post_with_url_fragment_exist(url_fragment):
@@ -600,3 +588,30 @@ def create_new_blog_post(author_id):
     _save_blog_post_summary(new_blog_post_summary_model)
 
     return new_blog_post
+
+
+def get_published_blog_post_summaries(offset=0):
+    """Returns published BlogPostSummaries list.
+
+    Args:
+        offset: int. Number of query results to skip from top.
+
+    Returns:
+        list(BlogPostSummaries) | None . These are sorted in order of the date
+        published. None if no blog post is published.
+    """
+    max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    blog_post_rights_models = blog_models.BlogPostRightsModel.query(
+        blog_models.BlogPostRightsModel.blog_post_is_published == True).order( # pylint: disable=singleton-comparison
+            -blog_models.BlogPostRightsModel.last_updated).fetch(
+                max_limit, offset=offset)
+    if len(blog_post_rights_models) == 0:
+        return None
+    blog_post_ids = [model.id for model in blog_post_rights_models]
+    blog_post_summary_models = (
+        blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
+    blog_post_summaries = []
+    blog_post_summaries = [
+        get_blog_post_summary_from_model(model) if model is not None else None
+        for model in blog_post_summary_models]
+    return blog_post_summaries
