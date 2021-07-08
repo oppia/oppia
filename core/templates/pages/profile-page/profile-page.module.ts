@@ -45,11 +45,13 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
     SharedComponentsModule
   ],
   declarations: [
+    EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent
   ],
   entryComponents: [
+    EditProfilePictureModalComponent,
     OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent
@@ -79,6 +81,7 @@ export class ProfilePageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { EditProfilePictureModalComponent } from 'pages/preferences-page/modal-templates/edit-profile-picture-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

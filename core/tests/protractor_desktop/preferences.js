@@ -112,12 +112,12 @@ describe('Preferences', function() {
     await waitFor.pageToFullyLoad();
 
     await preferencesPage.expectPreferredAudioLanguageToBe('Hindi');
-    await preferencesPage.selectPreferredAudioLanguage('Arabic');
-    await preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    await preferencesPage.selectPreferredAudioLanguage('Hungarian');
+    await preferencesPage.expectPreferredAudioLanguageToBe('Hungarian');
     await browser.refresh();
     await waitFor.pageToFullyLoad();
 
-    await preferencesPage.expectPreferredAudioLanguageToBe('Arabic');
+    await preferencesPage.expectPreferredAudioLanguageToBe('Hungarian');
   });
 
   it('should change prefered site language of the learner', async function() {
