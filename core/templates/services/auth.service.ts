@@ -21,6 +21,7 @@ import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import firebase from 'firebase/app';
+import 'firebase/auth';
 import { md5 } from 'hash-wasm';
 
 import { AppConstants } from 'app.constants';
