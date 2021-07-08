@@ -24,11 +24,11 @@ import { Injectable } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
 
-interface ViewContributionBackendResponse {
+export interface ViewContributionBackendResponse {
   usernames: string[];
 }
 
-interface ContributionRightsBackendResponse {
+export interface ContributionRightsBackendResponse {
   'can_review_questions': boolean,
   'can_review_translation_for_language_codes': string[],
   'can_review_voiceover_for_language_codes': string[],

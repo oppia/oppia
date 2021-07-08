@@ -43,16 +43,42 @@ class AddContributionRightsHandler(base.BaseHandler):
     """Handles adding contribution rights for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'category': {
+            'schema': {
+                'type': 'basestring',
+                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_manage_contributors_role
     def post(self, category):
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
             raise self.InvalidInputException('Invalid username: %s' % username)
 
-        language_code = self.payload.get('language_code', None)
+        language_code = self.normalized_payload.get('language_code', None)
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
             if not utils.is_supported_audio_language_code(language_code):
@@ -92,10 +118,36 @@ class RemoveContributionRightsHandler(base.BaseHandler):
     """Handles removing contribution rights for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'category': {
+            'schema': {
+                'type': 'basestring',
+                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_manage_contributors_role
     def put(self, category):
-        username = self.payload.get('username', None)
+        username = self.normalized_payload.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
@@ -103,7 +155,7 @@ class RemoveContributionRightsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = self.payload.get('language_code', None)
+        language_code = self.normalized_payload.get('language_code', None)
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
@@ -151,10 +203,31 @@ class ContributorUsersListHandler(base.BaseHandler):
     """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'category': {
+            'schema': {
+                'type': 'basestring',
+                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_manage_contributors_role
     def get(self, category):
-        language_code = self.request.get('language_code', None)
+        language_code = self.normalized_request.get('language_code')
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
@@ -169,10 +242,20 @@ class ContributionRightsDataHandler(base.BaseHandler):
     """Handler to show the contribution rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self):
-        username = self.request.get('username', None)
+        username = self.normalized_request.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)

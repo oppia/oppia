@@ -290,14 +290,14 @@ describe('Contributor dashboard admin page contribution rights form', () => {
 
     await users.createAndLoginAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
+
+    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.updateRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
-
-    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
-    await adminPage.updateRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await users.logout();
   });
 

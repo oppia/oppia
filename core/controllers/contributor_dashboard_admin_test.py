@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -125,19 +126,6 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.assertTrue(user_services.can_review_translation_suggestions(
             self.translation_reviewer_id, language_code='hi'))
-
-    def test_add_translation_reviewer_in_invalid_language_raise_error(self):
-        self.login(self.TRANSLATION_ADMIN_EMAIL)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.post_json(
-            '/addcontributionrightshandler/translation', {
-                'username': 'translator',
-                'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
 
     def test_assigning_same_language_for_translation_review_raise_error(self):
         self.login(self.TRANSLATION_ADMIN_EMAIL)
@@ -248,7 +236,10 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
-            response['error'], 'Invalid category: invalid')
+            response['error'],
+            'Schema validation for \'category\' failed: Received invalid which '
+            'is not in the allowed range of choices: %s' % (
+                constants.CONTRIBUTION_RIGHT_CATEGORIES))
 
 
 class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
@@ -277,16 +268,6 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         user_services.update_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
-
-    def test_add_reviewer_without_username_raise_error(self):
-        self.login(self.QUESTION_ADMIN_EMAIL)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '/removecontributionrightshandler/question', {
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(response['error'], 'Missing username param')
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
         self.login(self.QUESTION_ADMIN_EMAIL)
@@ -318,19 +299,6 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.assertFalse(user_services.can_review_translation_suggestions(
             self.translation_reviewer_id, language_code='hi'))
-
-    def test_remove_translation_reviewer_in_invalid_language_raise_error(self):
-        self.login(self.TRANSLATION_ADMIN_EMAIL)
-
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '/removecontributionrightshandler/translation', {
-                'username': 'translator',
-                'language_code': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertEqual(
-            response['error'], 'Invalid language_code: invalid')
 
     def test_remove_unassigned_translation_reviewer_raise_error(self):
         self.assertFalse(
@@ -468,17 +436,6 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('question' in response['usernames'])
         self.logout()
 
-    def test_check_contribution_reviewer_with_invalid_language_code_raise_error(
-            self):
-        self.login(self.TRANSLATION_ADMIN_EMAIL)
-        response = self.get_json(
-            '/getcontributorusershandler/translation', params={
-                'language_code': 'invalid'
-            }, expected_status_int=400)
-
-        self.assertEqual(response['error'], 'Invalid language_code: invalid')
-        self.logout()
-
 
 class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     """Tests ContributionRightsDataHandler."""
@@ -559,13 +516,4 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             }, expected_status_int=400)
 
         self.assertEqual(response['error'], 'Invalid username: invalid')
-        self.logout()
-
-    def test_check_contribution_reviewer_rights_without_username(self):
-        self.login(self.QUESTION_ADMIN)
-        response = self.get_json(
-            '/contributionrightsdatahandler', params={},
-            expected_status_int=400)
-
-        self.assertEqual(response['error'], 'Missing username param')
         self.logout()
