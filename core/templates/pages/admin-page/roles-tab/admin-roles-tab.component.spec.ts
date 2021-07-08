@@ -567,7 +567,9 @@ describe('Admin roles tab component ', function() {
     it('should successfully show stats of the user', fakeAsync(() => {
       const adminBackendServiceSpy = spyOn(
         adminBackendApiService, 'viewTranslationContributionStatsAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve({
+          translation_contribution_stats: []
+        }));
       const viewStatsAction: ViewTranslationContributionStatsAction = {
         isValid: () => true,
         username: 'user1'
@@ -577,8 +579,7 @@ describe('Admin roles tab component ', function() {
       tick();
 
       expect(adminBackendServiceSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Success.');
+      expect(statusMessageSpy).toHaveBeenCalledWith('Success.');
     }));
 
     it('should not send request to backend if a task ' +
@@ -847,7 +848,7 @@ describe('Admin roles tab component ', function() {
         component.refreshFormData();
         fixture.detectChanges();
 
-        component.formData.viewTranslationContributionStats.username = '';
+        component.formData.viewTranslationContributionStats.username = 'user1';
         fixture.detectChanges();
 
         const result = (
@@ -860,8 +861,7 @@ describe('Admin roles tab component ', function() {
         component.refreshFormData();
         fixture.detectChanges();
 
-        // Setting category to be null.
-        component.formData.viewTranslationContributionStats.username = 'user1';
+        component.formData.viewTranslationContributionStats.username = '';
         fixture.detectChanges();
 
         const result = (
