@@ -19,13 +19,19 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core.domain import blog_services
 from core.platform import models
+from jobs import blog_validation_errors
+from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
+import apache_beam as beam
+
 (blog_models, user_models) = models.Registry.import_models([
-    models.NAMES.blog, models.Names.user])
+    models.NAMES.blog, models.NAMES.user])
 
 
 @validation_decorators.AuditsExisting(
@@ -51,6 +57,47 @@ class ValidateBlogModelDomainObjectsInstances(
             return base_validation.VALIDATION_MODES.strict
 
         return base_validation.VALIDATION_MODES.non_strict
+
+
+@validation_decorators.AuditsExisting(
+    blog_models.BlogPostModel,
+    blog_models.BlogPostSummaryModel)
+class ValidateModelPublishTimestamps(beam.DoFn):
+    """DoFn to check whether created_on and last_updated timestamps are valid.
+    """
+
+    def process(self, input_model):
+        """Function that validates that the published timestamp of the blog post
+        models is either None or is greater than created on time, is less than
+        current datetime and is equal to or greater than the last updated
+        timestamp.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            ModelMutatedDuringJobError. Error for models mutated during the job.
+            InconsistentTimestampsError. Error for models with inconsistent
+            timestamps.
+        """
+        model = job_utils.clone_model(input_model)
+        if model.published_on is None:
+            return
+
+        if model.created_on > (
+                model.published_on + base_validation.MAX_CLOCK_SKEW_SECS):
+            yield blog_validation_errors.InconsistentPublishTimestampsError(
+                model)
+
+        current_datetime = datetime.datetime.utcnow()
+        if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
+                current_datetime):
+            yield blog_validation_errors.ModelMutatedDuringJobError(
+                model)
+
+        if (model.last_updated - base_validation.MAX_CLOCK_SKEW_SECS) > (
+                model.published_on):
+            yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) #pylint: disable=line-too-long
 
 
 @validation_decorators.RelationshipsOf(blog_models.BlogPostModel)

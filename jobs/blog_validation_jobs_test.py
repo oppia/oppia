@@ -72,3 +72,141 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
                 blog_post_model_2
             ),
         ])
+
+
+class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = blog_validation_jobs.BlogPostSummaryTitleUniquenessJob
+
+    def test_run_with_same_titles_for_blog_posts(self):
+        blog_post_summary_model_1 = self.create_model(
+            blog_models.BlogPostSummaryModel,
+            id='validblogid1',
+            deleted=False,
+            title='Sample Title',
+            summary='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url_fragment_1')
+        blog_post_summary_model_2 = self.create_model(
+            blog_models.BlogPostSummaryModel,
+            id='validblogid2',
+            deleted=False,
+            title='Sample Title',
+            summary='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='url_fragment_2')
+        blog_post_summary_model_3 = self.create_model(
+            blog_models.BlogPostSummaryModel,
+            id='validblogid3',
+            deleted=False,
+            title='Sample Diff Title',
+            summary='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='url_fragment_2')
+
+        self.put_multi([
+            blog_post_summary_model_1,
+            blog_post_summary_model_2,
+            blog_post_summary_model_3,
+        ])
+
+        self.assert_job_output_is([
+            blog_validation_errors.DuplicateBlogTitleError(
+                blog_post_summary_model_1
+            ),
+            blog_validation_errors.DuplicateBlogTitleError(
+                blog_post_summary_model_2
+            ),
+        ])
+
+
+class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = blog_validation_jobs.BlogPostUrlUniquenessJob
+
+    def test_run_with_same_url_for_blog_posts(self):
+        blog_post_model_1 = self.create_model(
+            blog_models.BlogPostModel,
+            id='validblogid1',
+            deleted=False,
+            title='Sample Title 1',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url_fragment')
+        blog_post_model_2 = self.create_model(
+            blog_models.BlogPostModel,
+            id='validblogid2',
+            deleted=False,
+            title='Sample Title 2',
+            content='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='url_fragment')
+        blog_post_model_3 = self.create_model(
+            blog_models.BlogPostModel,
+            id='validblogid3',
+            deleted=False,
+            title='Sample Diff Title',
+            content='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='diff_url_fragment')
+
+        self.put_multi([
+            blog_post_model_1,
+            blog_post_model_2,
+            blog_post_model_3,
+        ])
+
+        self.assert_job_output_is([
+            blog_validation_errors.DuplicateBlogUrlError(
+                blog_post_model_1
+            ),
+            blog_validation_errors.DuplicateBlogUrlError(
+                blog_post_model_2
+            ),
+        ])
+
+
+class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
+
+    JOB_CLASS = blog_validation_jobs.BlogPostSummaryUrlUniquenessJob
+
+    def test_run_with_same_url_for_blog_posts(self):
+        blog_post_summary_model_1 = self.create_model(
+            blog_models.BlogPostSummaryModel,
+            id='validblogid1',
+            deleted=False,
+            title='Sample Title 1',
+            summary='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url_fragment')
+        blog_post_summary_model_2 = self.create_model(
+            blog_models.BlogPostSummaryModel,
+            id='validblogid2',
+            deleted=False,
+            title='Sample Title 2',
+            summary='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='url_fragment')
+        blog_post_summary_model_3 = self.create_model(
+            blog_models.BlogPostSummaryModel,
+            id='validblogid3',
+            deleted=False,
+            title='Sample Diff Title',
+            summary='<p>hello tho</p>,',
+            author_id='user',
+            url_fragment='diff_url_fragment')
+
+        self.put_multi([
+            blog_post_summary_model_1,
+            blog_post_summary_model_2,
+            blog_post_summary_model_3,
+        ])
+
+        self.assert_job_output_is([
+            blog_validation_errors.DuplicateBlogUrlError(
+                blog_post_summary_model_1
+            ),
+            blog_validation_errors.DuplicateBlogUrlError(
+                blog_post_summary_model_2
+            ),
+        ])

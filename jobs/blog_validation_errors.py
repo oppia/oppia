@@ -37,3 +37,33 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
     def __init__(self, model):
         message = 'url=%s is not unique' % utils.quoted(model.url_fragment)
         super(DuplicateBlogUrlError, self).__init__(message, model)
+
+
+class InconsistentPublishTimestampsError(base_validation_errors.BaseAuditError):
+    """Error class for models with inconsistent timestamps."""
+
+    def __init__(self, model):
+        message = 'created_on=%r is later than published_on=%r' % (
+            model.created_on, model.published_on)
+        super(InconsistentPublishTimestampsError, self).__init__(message, model)
+
+
+class InconsistentPublishLastUpdatedTimestampsError(
+        base_validation_errors.BaseAuditError):
+    """Error class for models with inconsistent timestamps."""
+
+    def __init__(self, model):
+        message = 'last_updated=%r is later than published_on=%r' % (
+            model.last_updated, model.published_on)
+        super(InconsistentPublishLastUpdatedTimestampsError, self).__init__(
+            message, model)
+
+
+class ModelMutatedDuringJobError(base_validation_errors.BaseAuditError):
+    """Error class for models mutated during a job."""
+
+    def __init__(self, model):
+        message = (
+            'published_on=%r is later than the audit job\'s start time' % (
+                model.published_on))
+        super(ModelMutatedDuringJobError, self).__init__(message, model)
