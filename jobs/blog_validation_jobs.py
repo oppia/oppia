@@ -25,7 +25,7 @@ from jobs import blog_validation_errors
 from jobs.io import ndb_io
 
 import apache_beam as beam
-(blog_models) = models.Registry.import_models([models.NAMES.blog, ])
+(blog_models,) = models.Registry.import_models([models.NAMES.blog, ])
 
 
 class BlogPostTitleUniquenessJob(base_jobs.JobBase):
