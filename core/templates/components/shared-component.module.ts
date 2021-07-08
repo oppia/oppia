@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
@@ -85,17 +85,17 @@ import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edi
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective } from '../base-components/base-content.component';
+import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective, BaseContentPageFooterDirective } from '../base-components/base-content.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
-import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
 import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 
 
 // Directives.
@@ -169,6 +169,7 @@ const toastrConfig = {
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
+    NgbDropdownModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
@@ -233,11 +234,11 @@ const toastrConfig = {
     AlertMessageComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -252,7 +253,6 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -267,6 +267,7 @@ const toastrConfig = {
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
@@ -299,7 +300,6 @@ const toastrConfig = {
     AlertMessageComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
@@ -329,12 +329,12 @@ const toastrConfig = {
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
-    I18nLanguageSelectorComponent,
     OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
     SummaryListHeaderComponent,
@@ -372,10 +372,10 @@ const toastrConfig = {
     AttributionGuideComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -388,7 +388,6 @@ const toastrConfig = {
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
@@ -401,6 +400,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
+    SearchBarComponent,
     QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,

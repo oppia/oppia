@@ -18,7 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
@@ -151,6 +151,7 @@ describe('Rte Helper Modal Controller', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -188,6 +189,7 @@ describe('Rte Helper Modal Controller', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
       spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      spyOn(ContextService, 'getEntityType').and.returnValue('exploration');
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {

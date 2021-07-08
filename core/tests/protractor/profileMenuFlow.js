@@ -95,18 +95,6 @@ describe('Profile menu flow', function() {
       expect(await links.count()).toEqual(0);
     });
 
-    it('should visit the notifications page from the profile dropdown menu',
-      async function() {
-        var notificationsDashboardLink = element(by.css(
-          '.protractor-test-notifications-link'));
-        await action.click(
-          'Notifications Dashboard Link',
-          notificationsDashboardLink);
-        await waitFor.pageToFullyLoad();
-        expect(await browser.getCurrentUrl()).toEqual(
-          'http://localhost:9001/notifications');
-      });
-
     it('should visit the preferences page from the profile dropdown menu',
       async function() {
         var preferencesLink = element(by.css(
