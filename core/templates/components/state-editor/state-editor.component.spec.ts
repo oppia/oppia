@@ -21,7 +21,7 @@ import { fakeAsync, tick } from '@angular/core/testing';
 import { State } from 'domain/state/StateObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-fdescribe('StateEditorComponent', () => {
+describe('StateEditorComponent', () => {
   let ctrl = null;
   let $rootScope = null;
   let $scope = null;
