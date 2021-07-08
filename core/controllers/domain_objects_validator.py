@@ -22,6 +22,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import blog_domain
+from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 import python_utils
@@ -37,7 +38,7 @@ def validate_exploration_change(obj):
         obj: dict. Data that needs to be validated.
     """
     # No explicit call to validate_dict method is necessary, because
-    # ExplorationChange calls it while initialization.
+    # ExplorationChange calls validate method while initialization.
     exp_domain.ExplorationChange(obj)
 
 
@@ -83,3 +84,15 @@ def validate_change_dict_for_blog_post(change_dict):
         if not all(tag in list_of_default_tags for tag in change_dict['tags']):
             raise Exception(
                 'Invalid tags provided. Tags not in default tags list.')
+
+
+def validate_collection_change(obj):
+    # type: (Dict[String, Any]) -> None
+    """Validates collection change.
+
+    Args:
+        obj: dict. Data that needs to be validated.
+    """
+    # No explicit call to validate_dict method is necessary, because
+    # CollectionChange calls validate method while initialization.
+    collection_domain.CollectionChange(obj)

@@ -23,12 +23,12 @@ from core.tests import test_utils
 import utils
 
 
-class ValidateExplorationChangeTests(test_utils.GenericTestBase):
+class ValidateChangeDictTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
 
     def test_incorrect_object_raises_exception(self):
         # type: () -> None
-        exploration_change = {
+        incorrect_change_dict = {
             'old_value': '',
             'property_name': 'title',
             'new_value': 'newValue'
@@ -36,17 +36,24 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Missing cmd key in change dict'):
             domain_objects_validator.validate_exploration_change(
-                exploration_change)
+                incorrect_change_dict)
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'Missing cmd key in change dict'):
+            domain_objects_validator.validate_collection_change(
+                incorrect_change_dict)
 
     def test_correct_object_do_not_raises_exception(self):
         # type: () -> None
-        exploration_change = {
+        correct_change_dict = {
             'cmd': 'edit_exploration_property',
             'new_value': 'arbitary_new_value',
             'old_value': '',
             'property_name': 'title'
         }
-        domain_objects_validator.validate_exploration_change(exploration_change)
+        domain_objects_validator.validate_exploration_change(
+            correct_change_dict)
+        domain_objects_validator.validate_collection_change(
+            correct_change_dict)
 
 
 class ValidateNewConfigPropertyValuesTests(test_utils.GenericTestBase):
