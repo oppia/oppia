@@ -32,7 +32,6 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import user_domain
-from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -45,29 +44,6 @@ import requests_mock
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 bulk_email_services = models.Registry.import_bulk_email_services()
-
-
-class MockUserStatsAggregator(
-        user_jobs_continuous.UserStatsAggregator):
-    """A modified UserStatsAggregator that does not start a new
-     batch job when the previous one has finished.
-    """
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockUserStatsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class MockUserStatsMRJobManager(
-        user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockUserStatsAggregator
 
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
@@ -1643,18 +1619,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
         self.assertEqual(
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.owner_id),
-            {
-                'total_plays': 0,
-                'num_ratings': 0,
-                'average_ratings': None
-            })
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.owner_id),
+            user_services.get_dashboard_stats(self.owner_id),
             {
                 'total_plays': 1,
                 'num_ratings': 0,
@@ -1681,7 +1646,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
-                    'total_plays': 0,
+                    'total_plays': 1,
                     'num_ratings': 0,
                     'average_ratings': None
                 }
@@ -1708,8 +1673,6 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         self.process_and_flush_pending_tasks()
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
