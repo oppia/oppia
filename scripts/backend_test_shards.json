@@ -113,6 +113,7 @@
         "core.domain.blog_services_test",
         "core.controllers.blog_admin_test",
         "core.controllers.blog_dashboard_test",
+        "core.controllers.blog_homepage_test",
         "core.domain.learner_goals_services_test",
         "core.domain.skill_jobs_one_off_test",
         "scripts.check_if_pr_is_low_risk_test",
