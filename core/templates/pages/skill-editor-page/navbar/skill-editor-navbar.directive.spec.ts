@@ -22,7 +22,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { AlertsService } from 'services/alerts.service';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { EventEmitter } from '@angular/core';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -34,7 +33,6 @@ describe('Skill Editor Navbar Directive', function() {
   let directive = null;
   let $uibModal = null;
   let $q = null;
-  let alertsService: AlertsService = null;
   let skillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillObjectFactory: SkillObjectFactory = null;
@@ -60,7 +58,6 @@ describe('Skill Editor Navbar Directive', function() {
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
     directive = $injector.get('skillEditorNavbarDirective')[0];
-    alertsService = $injector.get('AlertsService');
     skillObjectFactory = $injector.get('SkillObjectFactory');
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillEditorRoutingService = $injector.get('SkillEditorRoutingService');
