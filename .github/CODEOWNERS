@@ -101,6 +101,7 @@
 # Blog project
 /core/domain/blog*.py @iamprayush @aks681
 /core/controllers/blog_dashboard*.py @aks681
+/core/controllers/blog_homepage*.py @aks681
 
 
 # Collection project.

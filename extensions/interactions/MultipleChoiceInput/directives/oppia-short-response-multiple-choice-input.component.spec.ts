@@ -30,7 +30,7 @@ describe('ShortResponseMultipleChoiceInputComponent', () => {
 
   class mockHtmlEscaperService {
     escapedJsonToObj(answer): string {
-      return answer;
+      return JSON.parse(answer);
     }
   }
 
@@ -55,11 +55,11 @@ describe('ShortResponseMultipleChoiceInputComponent', () => {
     fixture = TestBed
       .createComponent(ShortResponseMultipleChoiceInputComponent);
     component = fixture.componentInstance;
-    component.answer = 1;
-    component.choices = ['opt1', 'opt2', 'opt3', 'opt4'];
+    component.answer = '1';
+    component.choices = '["opt1", "opt2", "opt3", "opt4"]';
   });
 
-  it('should create', () => {
+  it('should initialise component when user submits answer', () => {
     spyOn(convertToPlainTextPipe, 'transform').and.callFake((response) => {
       return response;
     });
