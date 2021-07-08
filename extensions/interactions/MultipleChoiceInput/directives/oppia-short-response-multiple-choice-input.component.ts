@@ -31,9 +31,12 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   templateUrl: './multiple-choice-input-short-response.component.html'
 })
 export class ShortResponseMultipleChoiceInputComponent implements OnInit {
-  @Input() answer;
-  @Input() choices;
-  response;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  @Input() choices!: string;
+  response!: string;
 
   constructor(
     private htmlEscaperService: HtmlEscaperService,
@@ -44,7 +47,8 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as string;
-    const _choices = this.htmlEscaperService.escapedJsonToObj(this.choices);
+    const _choices = this.htmlEscaperService.escapedJsonToObj(
+      this.choices) as Record<string, string>;
     const response = this.convertToPlainText.transform(_choices[_answer]);
     this.response = this.truncateAtFirstLine.transform(response);
   }
