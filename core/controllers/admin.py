@@ -1060,10 +1060,6 @@ class ContributionRightsHandler(base.BaseHandler):
                 'Invalid username: %s' % username)
 
         language_code = self.normalized_request.get('language_code', None)
-        if language_code is not None and not (
-                utils.is_supported_audio_language_code(language_code)):
-            raise self.InvalidInputException(
-                'Invalid language_code: %s' % language_code)
 
         removal_type = self.normalized_request.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
