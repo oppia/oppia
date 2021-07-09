@@ -25,8 +25,8 @@ describe('ResponseMultipleChoiceInputComponent', () => {
   let fixture: ComponentFixture<ResponseMultipleChoiceInputComponent>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer): string {
-      return answer;
+    escapedJsonToObj(answer: string): string {
+      return JSON.parse(answer);
     }
   }
 
@@ -46,20 +46,20 @@ describe('ResponseMultipleChoiceInputComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ResponseMultipleChoiceInputComponent);
     component = fixture.componentInstance;
-    component.answer = 1;
-    component.choices = [{
-      _html: 'opt1',
-      contentId: 'ca_choices_9'
-    }, {
-      _html: 'opt2',
-      contentId: 'ca_choices_10'
-    }, {
-      _html: 'opt3',
-      contentId: 'ca_choices_11'
-    }, {
-      _html: 'opt4',
-      contentId: 'ca_choices_12'
-    }];
+    component.answer = '1';
+    component.choices = '[{' +
+      '"_html": "opt1",' +
+      '"contentId": "ca_choices_9"' +
+    '}, {' +
+      '"_html": "opt2",' +
+      '"contentId": "ca_choices_10"' +
+    '}, {' +
+      '"_html": "opt3",' +
+      '"contentId": "ca_choices_11"' +
+    '}, {' +
+      '"_html": "opt4",' +
+      '"contentId": "ca_choices_12"' +
+    '}]';
   });
 
   it('should initialise component when user submits answer', () => {

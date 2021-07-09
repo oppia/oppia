@@ -17,18 +17,24 @@
  */
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
+type Choice = { val: string };
+
 @Component({
   selector: 'set-of-translatable-html-content-ids-editor',
   templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
   styleUrls: []
 })
 export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
-  @Input() initArgs;
-  @Input() modalId: symbol;
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() initArgs!: { choices: Choice[] };
+  @Input() modalId!: symbol;
+  @Input() value!: string[];
   @Output() valueChanged = new EventEmitter();
-  choices;
-  selections;
+  choices!: Choice[];
+  selections!: boolean[];
   SCHEMA = {
     type: 'list',
     items: {

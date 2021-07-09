@@ -19,7 +19,7 @@ import { ExplorationMetadata } from
   'domain/exploration/exploration-metadata.model';
 
 describe('Exploration Metadata model', () => {
-  let sampleExplorationMetadata: ExplorationMetadata = null;
+  let sampleExplorationMetadata: ExplorationMetadata;
 
   beforeEach(() => {
     let sampleExplorationMetadataBackendDict: ExplorationMetadata = {
