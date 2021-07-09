@@ -306,6 +306,9 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
 class CronTranslationContributionStatsHandler(base.BaseHandler):
     """Handler for running the translation contribution stats populate job."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
