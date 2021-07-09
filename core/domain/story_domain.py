@@ -1065,8 +1065,8 @@ class Story(python_utils.OBJECT):
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
-            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = None # pylint: disable=line-too-long
+        for node in story_contents_dict['nodes']:
+            node['thumbnail_size_in_bytes'] = None
         return story_contents_dict
 
     @classmethod
