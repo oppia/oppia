@@ -31,7 +31,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { Collection } from 'domain/collection/collection.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
-import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Collection player page directive', function() {
   let $scope = null;
@@ -75,7 +74,7 @@ describe('Collection player page directive', function() {
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => false
-  } as UserInfo;
+  };
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
