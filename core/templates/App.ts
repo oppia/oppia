@@ -72,10 +72,6 @@ require('services/user.service.ts');
 
 require('google-analytics.initializer.ts');
 
-// The following file uses constants in app.constants.ts and hence needs to be
-// loaded *after* app.constants.ts.
-require('base-components/i18n-language-selector.component.ts');
-
 // Default to passive event listeners.
 require('default-passive-events');
 
@@ -258,22 +254,6 @@ angular.module('oppia').config(['$provide', function($provide) {
     ]);
 }]);
 
-angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
-  angular.extend(toastrConfig, {
-    allowHtml: false,
-    iconClasses: {
-      error: 'toast-error',
-      info: 'toast-info',
-      success: 'toast-success',
-      warning: 'toast-warning'
-    },
-    positionClass: 'toast-bottom-right',
-    messageClass: 'toast-message',
-    progressBar: false,
-    tapToDismiss: true,
-    titleClass: 'toast-title'
-  });
-}]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).

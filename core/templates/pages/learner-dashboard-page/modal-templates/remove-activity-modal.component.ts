@@ -51,6 +51,11 @@ export class RemoveActivityModalComponent implements OnInit {
         .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
         .COLLECTIONS) {
       activityType = constants.ACTIVITY_TYPE_COLLECTION;
+    } else if (this.subsectionName ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .LEARN_TOPIC) {
+      activityType = constants.ACTIVITY_TYPE_LEARN_TOPIC;
     } else {
       throw new Error('Subsection name is not valid.');
     }
@@ -66,6 +71,11 @@ export class RemoveActivityModalComponent implements OnInit {
         .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
       removeActivityUrlPrefix =
         '/learnerincompleteactivityhandler/';
+    } else if (this.sectionNameI18nId ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.CURRENT_GOALS) {
+      removeActivityUrlPrefix =
+        '/learnergoalshandler/';
     } else {
       throw new Error('Section name is not valid.');
     }

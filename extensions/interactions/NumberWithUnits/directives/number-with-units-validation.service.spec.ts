@@ -18,31 +18,40 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+import { Unit } from 'interactions/answer-defs';
+import { FractionDict } from 'domain/objects/fraction.model';
 
 describe('NumberWithUnitsValidationService', () => {
-  var validatorService, WARNING_TYPES;
-
-  var currentState;
-  var answerGroups, goodDefaultOutcome;
-  var equalsTwoRule, equalsTwoByThreeRule, equivalentToTwoThousandRule,
-    equivalentToTwoByThreeRule, equivalentToTwoRule;
-  var oof, agof, rof;
+  let validatorService: NumberWithUnitsValidationService;
+  let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
+  let currentState: string;
+  let answerGroups: AnswerGroup[];
+  let goodDefaultOutcome: Outcome;
+  let equalsTwoRule: Rule;
+  let equalsTwoByThreeRule: Rule;
+  let equivalentToTwoThousandRule: Rule;
+  let equivalentToTwoByThreeRule: Rule;
+  let equivalentToTwoRule: Rule;
+  let oof: OutcomeObjectFactory;
+  let agof: AnswerGroupObjectFactory;
+  let rof: RuleObjectFactory;
 
   beforeEach(() => {
-    validatorService = TestBed.get(NumberWithUnitsValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(NumberWithUnitsValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
-        isNegative, wholeNumber, numerator, denominator) => {
+        isNegative: boolean, wholeNumber: number, numerator: number,
+        denominator: number) => {
       return {
         isNegative: isNegative,
         wholeNumber: wholeNumber,
@@ -52,7 +61,8 @@ describe('NumberWithUnitsValidationService', () => {
     };
 
     var createNumberWithUnitsDict = (
-        type, real, fractionDict, unitList) => {
+        type: string, real: number, fractionDict: FractionDict,
+        unitList: Unit[]) => {
       return {
         type: type,
         real: real,
@@ -65,12 +75,13 @@ describe('NumberWithUnitsValidationService', () => {
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
-        html: '',
-        audio_translations: {}
+        content_id: null,
+        html: ''
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     equalsTwoRule = rof.createFromBackendDict({
@@ -124,7 +135,8 @@ describe('NumberWithUnitsValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsTwoRule, equalsTwoByThreeRule],
       goodDefaultOutcome,
-      false
+      [],
+      null
     )];
   });
 
