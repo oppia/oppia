@@ -155,7 +155,9 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class StoryThumbnailSizeAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Audit job that output the thumbnail size of all the story nodes in story."""
+    """Audit job that output the thumbnail size of all 
+    the story nodes in story.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
