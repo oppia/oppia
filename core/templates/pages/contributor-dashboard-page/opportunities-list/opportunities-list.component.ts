@@ -54,6 +54,10 @@ export class OpportunitiesListComponent {
     private readonly contributionOpportunitiesService:
       ContributionOpportunitiesService,
     private readonly translationLanguageService: TranslationLanguageService) {
+    this.init();
+  }
+
+  init(): void {
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(
         () => this.ngOnInit()));

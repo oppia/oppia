@@ -20,10 +20,11 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
+import { StateAndContent, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 
 describe('TranslateTextService', () => {
-  let translateTextService;
+  let translateTextService: TranslateTextService;
+  let stateContent: StateAndContent;
   let httpTestingController;
 
   beforeEach(() => {
@@ -32,6 +33,8 @@ describe('TranslateTextService', () => {
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextService = TestBed.inject(TranslateTextService);
+    stateContent = new StateAndContent(
+      'stateName', 'contentId', 'contentText', 'pending', 'translationHtml');
   });
 
   afterEach(() => {
@@ -162,5 +165,36 @@ describe('TranslateTextService', () => {
 
         expect(textAndAvailability).toEqual(textAndPreviousAvailability);
       }));
+  });
+
+  // Testing setters and getters of StateAndContent class.
+  it('should update state name', () => {
+    expect(stateContent.stateName).toBe('stateName');
+    stateContent.stateName = 'newStateName';
+    expect(stateContent.stateName).toBe('newStateName');
+  });
+
+  it('should update content id', () => {
+    expect(stateContent.contentID).toBe('contentId');
+    stateContent.contentID = 'newContentId';
+    expect(stateContent.contentID).toBe('newContentId');
+  });
+
+  it('should update content text', () => {
+    expect(stateContent.contentText).toBe('contentText');
+    stateContent.contentText = 'newContentText';
+    expect(stateContent.contentText).toBe('newContentText');
+  });
+
+  it('should update state and content status', () => {
+    expect(stateContent.status).toBe('pending');
+    stateContent.status = 'submitted';
+    expect(stateContent.status).toBe('submitted');
+  });
+
+  it('should update translation html', () => {
+    expect(stateContent.translationHtml).toBe('translationHtml');
+    stateContent.translationHtml = 'newTranslationHtml';
+    expect(stateContent.translationHtml).toBe('newTranslationHtml');
   });
 });

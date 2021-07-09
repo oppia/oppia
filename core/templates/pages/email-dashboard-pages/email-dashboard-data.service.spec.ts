@@ -339,5 +339,43 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(0);
       })
     );
+
+    it('should return true if next page is available', () => {
+      // This will return true if the number of queries
+      // are greater than number of queries per page.
+      emailDashboardDataService.queries.length = 30;
+      emailDashboardDataService.currentPageIndex = 1;
+      let result = emailDashboardDataService.isNextPageAvailable();
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false if next page is not available', () => {
+      // This will return false if the number of queries
+      // are less than number of queries per page.
+      emailDashboardDataService.queries.length = 10;
+      emailDashboardDataService.currentPageIndex = 1;
+      let result = emailDashboardDataService.isNextPageAvailable();
+
+      expect(result).toBe(false);
+    });
+
+    it('should return true if previous page is available', () => {
+      // This will return true if current page index
+      // is greater than zero.
+      emailDashboardDataService.currentPageIndex = 1;
+      let result = emailDashboardDataService.isPreviousPageAvailable();
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true if previous page is not available', () => {
+      // This will return true if current page index
+      // is less than zero.
+      emailDashboardDataService.currentPageIndex = -1;
+      let result = emailDashboardDataService.isPreviousPageAvailable();
+
+      expect(result).toBe(false);
+    });
   });
 });

@@ -87,7 +87,7 @@ describe('Compare versions service', function() {
             }
           },
           interaction: {
-            id: null,
+            id: 'EndExploration',
             answer_groups: [],
             default_outcome: {
               dest: 'default',
