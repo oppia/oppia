@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -317,7 +319,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = self.normalized_request.get('q')
+        query_string = base64.b64decode(self.normalized_request.get('q'))
 
         search_offset = self.normalized_request.get('cursor')
 
