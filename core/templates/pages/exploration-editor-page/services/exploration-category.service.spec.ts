@@ -21,20 +21,18 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
+import { TestBed } from '@angular/core/testing';
+import { ExplorationCategoryService } from './exploration-category.service';
+
 require(
   'pages/exploration-editor-page/services/exploration-category.service.ts');
 
 describe('Exploration Category Service', function() {
-  let ecs = null;
+  let ecs: ExplorationCategoryService = null;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
   importAllAngularServices();
-  beforeEach(function() {
-    angular.mock.inject(function($injector) {
-      ecs = $injector.get('ExplorationCategoryService');
-    });
+  beforeEach(() => {
+    ecs = TestBed.inject(ExplorationCategoryService);
   });
 
   it('should test the child object properties', function() {

@@ -369,6 +369,9 @@ import { ExplorationTagsService } from 'pages/exploration-editor-page/services/e
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
+import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
+import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
+import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -453,6 +456,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationCategoryService', ExplorationCategoryService],
   ['ExplorationCreationBackendApiService',
     ExplorationCreationBackendApiService],
   ['ExplorationCreationService',
@@ -474,6 +478,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
+  ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
   ['ExplorationPlayerStateService', ExplorationPlayerStateService],
@@ -485,6 +490,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExplorationTagsService', ExplorationTagsService],
+  ['ExplorationTitleService', ExplorationTitleService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],

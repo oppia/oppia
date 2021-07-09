@@ -16,23 +16,18 @@
  * @fileoverview Unit tests for the ExplorationTitleService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
-
-require(
-  'pages/exploration-editor-page/services/exploration-title.service.ts');
+import { ExplorationTitleService } from './exploration-title.service';
 
 describe('Exploration Title Service', function() {
-  let ets = null;
+  let ets: ExplorationTitleService = null;
 
-  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ets = $injector.get('ExplorationTitleService');
-  }));
+  beforeEach(() => {
+    ets = TestBed.inject(ExplorationTitleService);
+  });
 
   it('should test the child object properties', function() {
     expect(ets.propertyName).toBe('title');

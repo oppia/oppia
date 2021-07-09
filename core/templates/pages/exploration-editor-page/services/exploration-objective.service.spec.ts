@@ -21,18 +21,17 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
-require(
-  'pages/exploration-editor-page/services/exploration-objective.service.ts');
+import { TestBed } from '@angular/core/testing';
+import { ExplorationObjectiveService } from './exploration-objective.service';
 
 describe('Exploration Objective Service', function() {
-  let eos = null;
+  let eos: ExplorationObjectiveService = null;
 
-  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
-    eos = $injector.get('ExplorationObjectiveService');
-  }));
+  beforeEach(() => {
+    eos = TestBed.inject(ExplorationObjectiveService);
+  });
 
   it('should test the child object properties', function() {
     expect(eos.propertyName).toBe('objective');
