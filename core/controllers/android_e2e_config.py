@@ -161,7 +161,6 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
             exp_id
         )
-
         story.update_node_thumbnail_filename(
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
             'test_svg.svg')
