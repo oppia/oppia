@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
@@ -220,11 +221,8 @@ class SubtopicThumbnailSizeAuditOneOffJobTest(test_utils.GenericTestBase):
         """Tests that SubtopicThumbnailSizeAuditOneOffJob skips deleted
         topic.
         """
-        self.save_new_topic_with_subtopic_schema_v1(
-            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
-            'a name', 'description', 'Image.svg',
-            '#C6DCDA', [], [], [], 2,
-            language_code='invalid_language_code')
+        self.save_new_topic(self.TOPIC_ID, self.albert_id)
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
         # Start migration job on sample topic.
         job_id = (
@@ -235,16 +233,33 @@ class SubtopicThumbnailSizeAuditOneOffJobTest(test_utils.GenericTestBase):
         # This running without errors indicates that deleted topics are
         # skipped.
         self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected_output = []
+        self.assertEqual(
+            expected_output, [ast.literal_eval(x) for x in actual_output])
 
     def test_job_logs_thumbnail_filename_and_size_for_subtopics(self):
         """Test that SubtopicThumbnailSizeAuditOneOffJob logs the
         thumbnail_filename and thumbnail_size_in_bytes for all the subtopics.
         """
-        self.save_new_topic_with_subtopic_schema_v1(
-            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
-            'a name', 'description', 'Image.svg',
-            '#C6DCDA', [], [], [], 2,
-            language_code='invalid_language_code')
+        subtopic_schema_v4 = topic_domain.Subtopic.from_dict(
+            {
+                'id': 0,
+                'title': 'subtopic title',
+                'skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color':
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'thumbnail_size_in_bytes': 21131,
+                'url_fragment': 'dummy-subtopic-one'
+            }
+        )
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, subtopics=[subtopic_schema_v4],
+            next_subtopic_id=1)
 
         # Start migration job on sample topic.
         job_id = (
@@ -255,3 +270,10 @@ class SubtopicThumbnailSizeAuditOneOffJobTest(test_utils.GenericTestBase):
         # This running without errors indicates that deleted topics are
         # skipped.
         self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected_output = [[u'topic_id', [u'image.svg 21131']]]
+        self.assertEqual(
+            expected_output, [ast.literal_eval(x) for x in actual_output])
