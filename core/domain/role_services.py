@@ -123,7 +123,7 @@ UPDATABLE_ROLES = [
 #   role for a separate user account, but rather a profile within the account.
 VIEWABLE_ROLES = [
     feconf.ROLE_ID_BLOG_ADMIN,
-    feconf.ROLE_ID_BLOG_POST_EDITOR
+    feconf.ROLE_ID_BLOG_POST_EDITOR,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_CURRICULUM_ADMIN,
     feconf.ROLE_ID_MODERATOR,
