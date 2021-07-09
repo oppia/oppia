@@ -186,6 +186,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'skill_ids': ['skill_id_2'],
             'id': 2,
             'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title 2',
             'url_fragment': 'sub-url-frag-two'
         }
@@ -215,6 +216,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'skill_ids': ['skill_id_1'],
             'id': 1,
             'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title',
             'url_fragment': 'sub-url-frag-one'
         }

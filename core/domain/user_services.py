@@ -2058,6 +2058,18 @@ def remove_translation_review_rights_in_language(user_id, language_code):
     _update_user_contribution_rights(user_contribution_rights)
 
 
+def remove_blog_editor(user_id):
+    """Removes the role of user as blog editor.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    if feconf.ROLE_ID_BLOG_POST_EDITOR == user_settings.role:
+        update_user_role(user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+    return
+
+
 def allow_user_to_review_voiceover_in_language(user_id, language_code):
     """Allows the user with the given user id to review voiceover applications
     in the given language_code.
@@ -2256,3 +2268,35 @@ def unmark_user_banned(user_id):
         ))
 
     _save_user_settings(user_settings)
+
+
+def get_dashboard_stats(user_id):
+    """Returns the dashboard stats associated with the given user_id.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        dict. Has the keys:
+            total_plays: int. Number of times the user's explorations were
+                played.
+            num_ratings: int. Number of times the explorations have been
+                rated.
+            average_ratings: float. Average of average ratings across all
+                explorations.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        total_plays = 0
+        num_ratings = 0
+        average_ratings = None
+    else:
+        total_plays = user_stats_model.total_plays
+        num_ratings = user_stats_model.num_ratings
+        average_ratings = user_stats_model.average_ratings
+
+    return {
+        'total_plays': total_plays,
+        'num_ratings': num_ratings,
+        'average_ratings': average_ratings
+    }

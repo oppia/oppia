@@ -152,6 +152,7 @@ describe('Splash Page', () => {
 
   it('should evaluate if user is logged in', fakeAsync(() => {
     const UserInfoObject = {
+      roles: ['USER_ROLE'],
       is_moderator: false,
       is_curriculum_admin: false,
       is_super_admin: false,
@@ -172,6 +173,7 @@ describe('Splash Page', () => {
 
   it('should evaluate if user is not logged in', fakeAsync(() => {
     const UserInfoObject = {
+      roles: ['USER_ROLE'],
       is_moderator: false,
       is_curriculum_admin: false,
       is_super_admin: false,

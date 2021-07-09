@@ -117,7 +117,14 @@ class ExplorationHandler(EditorHandler):
         """Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
+        if version is None:
+            raise base.BaseHandler.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+        if version > exploration.version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of exploration from version %s, '
+                'which is not possible. Please reload the page and try again.'
+                % (exploration.version, version))
 
         commit_message = self.payload.get('commit_message')
 
@@ -137,6 +144,8 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            exploration_id, version, change_list)
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
@@ -145,10 +154,10 @@ class ExplorationHandler(EditorHandler):
             self.user, exploration_rights)
 
         try:
-            if can_edit:
+            if can_edit and changes_are_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message)
-            elif can_voiceover:
+            elif can_voiceover and changes_are_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
                     is_by_voice_artist=True)
@@ -649,9 +658,6 @@ class ResolveIssueHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
-    # The string to prefix to the filename (before tacking the whole thing on
-    # to the end of 'assets/').
-    _FILENAME_PREFIX = 'image'
     _decorator = None
 
     @acl_decorators.can_edit_entity
@@ -662,7 +668,7 @@ class ImageUploadHandler(EditorHandler):
         filename = self.payload.get('filename')
         filename_prefix = self.payload.get('filename_prefix')
         if filename_prefix is None:
-            filename_prefix = self._FILENAME_PREFIX
+            filename_prefix = constants.ASSET_TYPE_IMAGE
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
@@ -673,7 +679,8 @@ class ImageUploadHandler(EditorHandler):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))
-        filepath = '%s/%s' % (filename_prefix, filename)
+        filepath = '%s/%s' % (
+            filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
@@ -739,12 +746,14 @@ class EditorAutosaveHandler(ExplorationHandler):
         exp_user_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
         # If the draft_change_list_id is False, have the user discard the draft
-        # changes. We save the draft to the datastore even if the version is
-        # invalid, so that it is available for recovery later.
+        # changes. We save the draft to the datastore even if the changes are
+        # not mergeable, so that it is available for recovery later.
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, version)})
+                exploration_id, version),
+            'changes_are_mergeable': exp_services.are_changes_mergeable(
+                exploration_id, version, change_list)})
 
     @acl_decorators.can_save_exploration
     def post(self, exploration_id):

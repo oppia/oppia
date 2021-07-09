@@ -32,7 +32,6 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import suggestion_services
 from core.domain import user_domain
-from core.domain import user_jobs_continuous
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -45,29 +44,6 @@ import requests_mock
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 bulk_email_services = models.Registry.import_bulk_email_services()
-
-
-class MockUserStatsAggregator(
-        user_jobs_continuous.UserStatsAggregator):
-    """A modified UserStatsAggregator that does not start a new
-     batch job when the previous one has finished.
-    """
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockUserStatsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class MockUserStatsMRJobManager(
-        user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockUserStatsAggregator
 
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
@@ -698,6 +674,79 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_roles_from_id(user_id), [
                 feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR])
+
+    def test_remove_blog_editor(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        user_services.remove_blog_editor(user_id)
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+    def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
+            self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+    def test_assign_ban_user_to_exp_editor_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
 
     def test_adding_other_roles_to_full_user_updates_roles(self):
         auth_id = 'test_id'
@@ -1568,18 +1617,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'state_stats_mapping': {}
             })
         self.assertEqual(
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.owner_id),
-            {
-                'total_plays': 0,
-                'num_ratings': 0,
-                'average_ratings': None
-            })
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
-                self.owner_id),
+            user_services.get_dashboard_stats(self.owner_id),
             {
                 'total_plays': 1,
                 'num_ratings': 0,
@@ -1606,7 +1644,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
-                    'total_plays': 0,
+                    'total_plays': 1,
                     'num_ratings': 0,
                     'average_ratings': None
                 }
@@ -1633,8 +1671,6 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
         self.process_and_flush_pending_tasks()
-        MockUserStatsAggregator.start_computation()
-        self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
@@ -2581,6 +2617,22 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.get_contributor_usernames(
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
+
+    def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
+            self):
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            language_code='hi')
+        self.assertEqual(usernames, [])
+
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            language_code='hi')
+
+        self.assertEqual(usernames, [self.VOICE_ARTIST_USERNAME])
 
     def test_get_contributor_usernames_with_invalid_category_raises(
             self):

@@ -74,6 +74,7 @@ describe('User Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
       is_moderator: false,
       is_curriculum_admin: false,
       is_super_admin: false,
@@ -133,6 +134,7 @@ describe('User Api Service', () => {
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
       is_moderator: false,
       is_curriculum_admin: false,
       is_super_admin: false,
@@ -163,6 +165,7 @@ describe('User Api Service', () => {
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_curriculum_admin: false,
       is_super_admin: false,

@@ -18,35 +18,42 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule} from '@angular/material/slide-toggle';
-import { MatSliderModule } from '@angular/material/slider';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
+import { MatSliderModule } from '@angular/material/slider';
+import { MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   imports: [
     BrowserAnimationsModule,
     CommonModule,
+    NgxMatSelectSearchModule,
+    MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
-    MatDividerModule,
-    MatFormFieldModule,
     MatIconModule,
-    MatInputModule,
     MatListModule,
+    MatChipsModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule,
     MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
@@ -54,6 +61,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDividerModule
   ],
   exports: [
     BrowserAnimationsModule,
@@ -61,11 +71,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
-    MatDividerModule,
-    MatFormFieldModule,
     MatIconModule,
-    MatInputModule,
     MatListModule,
+    NgxMatSelectSearchModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule,
     MatListModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
@@ -73,6 +89,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatSelectModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDividerModule
   ]
 })
 export class MaterialModule {}

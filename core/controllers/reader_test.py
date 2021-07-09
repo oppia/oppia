@@ -1150,7 +1150,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Save a new topic and story.
         self.subtopic = topic_domain.Subtopic(
             0, 'Title', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'dummy-subtopic-one')
         self.save_new_topic(
             self.TOPIC_ID, self.owner_id, name='Topic',
