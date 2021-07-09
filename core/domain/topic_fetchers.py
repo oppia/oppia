@@ -137,6 +137,7 @@ def get_topic_from_model(topic_model):
         topic_model.url_fragment,
         topic_model.thumbnail_filename,
         topic_model.thumbnail_bg_color,
+        topic_model.thumbnail_size_in_bytes,
         topic_model.description, [
             topic_domain.StoryReference.from_dict(reference)
             for reference in versioned_canonical_story_references[

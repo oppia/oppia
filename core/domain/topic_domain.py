@@ -26,6 +26,8 @@ import re
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
 import feconf
@@ -477,14 +479,13 @@ class Topic(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, name, abbreviated_name, url_fragment,
-            thumbnail_filename, thumbnail_bg_color, description,
-            canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, subtopics, subtopic_schema_version,
-            next_subtopic_id, language_code, version,
-            story_reference_schema_version, meta_tag_content,
-            practice_tab_is_displayed, page_title_fragment_for_web,
-            created_on=None,
-            last_updated=None):
+            thumbnail_filename, thumbnail_bg_color, thumbnail_size_in_bytes,
+            description, canonical_story_references,
+            additional_story_references, uncategorized_skill_ids,
+            subtopics, subtopic_schema_version, next_subtopic_id,
+            language_code, version, story_reference_schema_version,
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web, created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -495,6 +496,8 @@ class Topic(python_utils.OBJECT):
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size of the topic
+                in bytes.
             description: str. The description of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
@@ -530,6 +533,7 @@ class Topic(python_utils.OBJECT):
         self.url_fragment = url_fragment
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_references = canonical_story_references
@@ -560,6 +564,7 @@ class Topic(python_utils.OBJECT):
             'url_fragment': self.url_fragment,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -635,7 +640,8 @@ class Topic(python_utils.OBJECT):
             topic_dict['abbreviated_name'],
             topic_dict['url_fragment'],
             topic_dict['thumbnail_filename'],
-            topic_dict['thumbnail_bg_color'], topic_dict['description'],
+            topic_dict['thumbnail_bg_color'],
+            topic_dict['thumbnail_size_in_bytes'], topic_dict['description'],
             [
                 StoryReference.from_dict(reference_dict)
                 for reference_dict in topic_dict['canonical_story_references']
@@ -1131,7 +1137,7 @@ class Topic(python_utils.OBJECT):
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, name, url_fragment, None, None,
+            topic_id, name, name, url_fragment, None, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
@@ -1259,13 +1265,25 @@ class Topic(python_utils.OBJECT):
         self.url_fragment = new_url_fragment
 
     def update_thumbnail_filename(self, new_thumbnail_filename):
-        """Updates the thumbnail filename of a topic object.
+        """Updates the thumbnail filename and file size of a topic object.
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
         """
-        self.thumbnail_filename = new_thumbnail_filename
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, self.id))
+
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.thumbnail_filename = new_thumbnail_filename
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
+        else:
+            raise Exception(
+                'The thumbnail %s for topic with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_thumbnail_bg_color(self, new_thumbnail_bg_color):
         """Updates the thumbnail background color of a topic object.

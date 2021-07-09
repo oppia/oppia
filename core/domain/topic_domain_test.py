@@ -20,12 +20,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
 from constants import constants
+from core.domain import fs_domain
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -64,6 +67,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'abbrev',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'description': 'description',
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -821,8 +825,29 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The thumbnail img.svg for topic with id %s does not exist'
+            ' in the filesystem.' % (self.topic_id)):
+            self.topic.update_thumbnail_filename('img.svg')
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.topic.id))
+        fs.commit(
+            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Test successful update of thumbnail present in the filesystem.
         self.topic.update_thumbnail_filename('img.svg')
         self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
+        self.assertEqual(self.topic.thumbnail_size_in_bytes, len(raw_image))
 
     def test_update_thumbnail_bg_color(self):
         self.assertEqual(self.topic.thumbnail_bg_color, None)
