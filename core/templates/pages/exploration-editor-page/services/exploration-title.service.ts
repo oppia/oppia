@@ -43,7 +43,7 @@ export class ExplorationTitleService extends ExplorationPropertyService {
     super(alertsService, changeListService, loggerService);
   }
   _normalize(value: string): string {
-    return this.whitespaceNormalize.transform('normalizeWhitespace');
+    return this.whitespaceNormalize.transform(value);
   }
 
   _isValid(value: string): boolean {
