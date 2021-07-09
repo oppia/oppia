@@ -29,7 +29,7 @@ describe('ShortResponseMultipleChoiceInputComponent', () => {
   let truncateAtFirstLinePipe: TruncateAtFirstLinePipe;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer): string {
+    escapedJsonToObj(answer: string): string {
       return JSON.parse(answer);
     }
   }
