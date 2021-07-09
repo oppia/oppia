@@ -1811,7 +1811,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_333'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -2025,7 +2025,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_333'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)

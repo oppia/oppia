@@ -67,7 +67,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'subtopic-name'))
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.svg'
@@ -162,6 +162,7 @@ class TopicPageDataHandlerTests(
             'subtopics': [{
                 u'thumbnail_filename': u'image.svg',
                 u'thumbnail_bg_color': u'#FFFFFF',
+                u'thumbnail_size_in_bytes': 21131,
                 u'skill_ids': [self.skill_id_2],
                 u'id': 1,
                 u'title': u'subtopic_name',
@@ -228,6 +229,7 @@ class TopicPageDataHandlerTests(
                 'subtopics': [{
                     u'thumbnail_filename': u'image.svg',
                     u'thumbnail_bg_color': u'#FFFFFF',
+                    u'thumbnail_size_in_bytes': 21131,
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name',

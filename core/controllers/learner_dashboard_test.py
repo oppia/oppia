@@ -88,12 +88,12 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
     subtopic_1 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
     def setUp(self):

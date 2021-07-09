@@ -200,6 +200,7 @@ class TopicAssignmentsHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'skill_ids': [skill_id],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-url'
         })
         self.save_new_topic(
