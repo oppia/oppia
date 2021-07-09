@@ -115,7 +115,6 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_url_fragment('test-topic')
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')
-
         # Save the dummy image to the filesystem to be used as thumbnail.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
