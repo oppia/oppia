@@ -80,7 +80,7 @@ describe('Changes in Human Readable Form Directive', () => {
     let result = removeComments(html);
 
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Added state: ' + component.lostChanges[0].stateName + ' </span>' +
@@ -104,7 +104,7 @@ describe('Changes in Human Readable Form Directive', () => {
     let result = removeComments(html);
 
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Renamed state: ' + component.lostChanges[0].oldStateName +
@@ -128,7 +128,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Deleted state: ' +
@@ -161,12 +161,19 @@ describe('Changes in Human Readable Form Directive', () => {
 
       let result = removeComments(html);
       expect(result).toBe(
-        '<div class="oppia-lost-changes">' +
+        '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
         '<ul>' +
         '<li>' +
-        '<div> ' +
-        'Edits to state: ' + component.lostChanges[0].stateName +
+        '<div>' +
+        '<strong>' +
+        'Edits to state:' +
+        '</strong> ' + component.lostChanges[0].stateName +
         ' <div>' +
+        '<strong>' +
+        'Edits to property:' +
+        '</strong> ' + component.lostChanges[0].propertyName +
+        ' </div>' +
+        '<div>' +
         '<div class="state-edit-desc">' +
         '<strong>Edited content: </strong>' +
         // eslint-disable-next-line dot-notation
@@ -198,12 +205,19 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      ' Edits to state: ' + component.lostChanges[0].stateName +
-      ' <div class="state-edit-desc">' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
+      ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div class="state-edit-desc">' +
       '<span> Ended Exploration </span>' +
       '</div>' +
       '</div>' +
@@ -230,14 +244,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      ' Edits to state: ' + component.lostChanges[0].stateName +
-      ' <div class="state-edit-desc">' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
+      ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div class="state-edit-desc">' +
       '<span>' +
-      '<strong>Added Interaction: </strong> ' +
+      '<strong>' +
+      'Added Interaction: </strong> ' +
       component.lostChanges[0].newValue +
       ' </span>' +
       '</div>' +
@@ -265,12 +287,19 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      ' Edits to state: ' + component.lostChanges[0].stateName +
-      ' <div class="state-edit-desc">' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
+      ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div class="state-edit-desc">' +
       '<span>' +
       '<strong>Deleted Interaction: </strong> ' +
       component.lostChanges[0].oldValue +
@@ -302,13 +331,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      ' Edits to state: ' + component.lostChanges[0].stateName +
-      ' <div class="state-edit-desc">' +
-      '<span> Added Interaction Customizations </span>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
+      ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div class="state-edit-desc">' +
+      '<span> ' +
+      'Added Interaction Customizations ' +
+      '</span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -336,13 +374,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      ' Edits to state: ' + component.lostChanges[0].stateName +
-      ' <div class="state-edit-desc">' +
-      '<span> Removed Interaction Customizations </span>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
+      ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div class="state-edit-desc">' +
+      '<span> ' +
+      'Removed Interaction Customizations ' +
+      '</span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -372,13 +419,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
-      ' Edits to state: ' + component.lostChanges[0].stateName +
-      ' <div class="state-edit-desc">' +
-      '<span> Edited Interaction Customizations </span>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
+      ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div class="state-edit-desc">' +
+      '<span> ' +
+      'Edited Interaction Customizations ' +
+      '</span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -418,36 +474,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      '<div>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
       ' <div>' +
-      '<div class="state-edit-desc answer-group">' +
-      '<strong>Added answer group: </strong>' +
-      '<p class="sub-edit"><i>Destination: </i>' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['outcome'].dest + ' </p>' +
-      '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback"> ' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['outcome'].feedback.html +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
       ' </div>' +
-      '</div>' +
-      '<div class="sub-edit"><i>Rules: </i>' +
-      '<ol class="rules-list">' +
-      '<li>' +
-      '<p>Type: ' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['rules'][0].type +
-      '</p>' +
-      '<p>Value: <span></span>' +
-      ' input1,  input2 ' +
-      '</p>' +
-      '</li>' +
-      '</ol>' +
-      '</div>' +
-      '</div>' +
+      '<div class="state-edit-desc">' +
+      '<span> ' +
+      'Added answer group ' +
+      '</span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -503,36 +545,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      '<div>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
       ' <div>' +
-      '<div class="state-edit-desc answer-group">' +
-      '<strong>Edited answer group: </strong>' +
-      '<p class="sub-edit"><i>Destination: </i> ' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['outcome'].dest + ' </p>' +
-      '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback"> ' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['outcome'].feedback.html +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
       ' </div>' +
-      '</div>' +
-      '<div class="sub-edit"><i>Rules: </i>' +
-      '<ol class="rules-list">' +
-      '<li>' +
-      '<p>Type: ' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['rules'][0].type +
-      '</p>' +
-      '<p>Value: <span></span>' +
-      ' input1,  input2 ' +
-      '</p>' +
-      '</li>' +
-      '</ol>' +
-      '</div>' +
-      '</div>' +
+      '<div class="state-edit-desc">' +
+      '<span> ' +
+      'Edited answer group ' +
+      '</span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -573,14 +601,22 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      '<div>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
       ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
       '<div class="state-edit-desc">' +
-      ' Deleted answer group ' +
-      '</div>' +
+      '<span> ' +
+      'Deleted answer group ' +
+      '</span>' +
       '</div>' +
       '</div>' +
       '</li>' +
@@ -612,21 +648,32 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      '<div>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
       ' <div>' +
-      '<div class="state-edit-desc default-outcome">' +
-      ' Added default outcome: ' +
-      '<p class="sub-edit"><i>Destination: </i>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + 'default_outcome' +
+      ' </div>' +
+      '<div>' +
+      '<div class="state-edit-desc default-outcome"> ' +
+      'Added default outcome: ' +
+      '<p class="sub-edit">' +
+      '<i>Destination: ' +
+      '</i>' +
       // eslint-disable-next-line dot-notation
       component.lostChanges[0].newValue['dest'] + ' </p>' +
-      '<div class="sub-edit"><i>Feedback: </i>' +
+      '<div class="sub-edit">' +
+      '<i>Feedback: ' +
+      '</i>' +
       '<div class="feedback"> ' +
       // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['feedback'].html +
-      ' </div>' +
+      component.lostChanges[0].newValue['feedback'].html + ' </div>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -666,22 +713,26 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      '<div>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
       ' <div>' +
-      '<div class="state-edit-desc default-outcome">' +
-      ' Edited default outcome: ' +
-      '<p class="sub-edit"><i>Destination: </i>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + 'default_outcome' +
+      ' </div>' +
+      '<div>' +
+      '<div class="state-edit-desc default-outcome"> ' +
+      'Edited default outcome: ' +
+      '<p class="sub-edit">' +
+      '<i>Destination: ' +
+      '</i>' +
       // eslint-disable-next-line dot-notation
       component.lostChanges[0].newValue['dest'] + ' </p>' +
-      '<div class="sub-edit"><i>Feedback: </i>' +
-      '<div class="feedback"> ' +
-      // eslint-disable-next-line dot-notation
-      component.lostChanges[0].newValue['feedback'].html +
-      ' </div>' +
-      '</div>' +
       '</div>' +
       '</div>' +
       '</div>' +
@@ -723,11 +774,19 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
-      '<div> Edits to state: ' + component.lostChanges[0].stateName +
+      '<div>' +
+      '<strong>' +
+      'Edits to state:' +
+      '</strong> ' + component.lostChanges[0].stateName +
       ' <div>' +
+      '<strong>' +
+      'Edits to property:' +
+      '</strong> ' + component.lostChanges[0].propertyName +
+      ' </div>' +
+      '<div>' +
       '<div class="state-edit-desc">' +
       ' Deleted default outcome ' +
       '</div>' +
