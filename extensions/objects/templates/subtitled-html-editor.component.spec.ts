@@ -41,8 +41,6 @@ describe('SubtitledHtmlEditorComponent', () => {
     component = fixture.componentInstance;
 
     component.schema = {
-      type: 'custom',
-      obj_type: 'SubtitledHtml',
       replacement_ui_config: {
         html: {
           hide_complex_extensions: true,
