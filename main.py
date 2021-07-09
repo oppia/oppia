@@ -26,12 +26,14 @@ from core.controllers import android_e2e_config
 from core.controllers import base
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
+from core.controllers import blog_homepage
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import concept_card_viewer
 from core.controllers import contributor_dashboard
+from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
@@ -238,17 +240,20 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionrightshandler',
-        admin.AddContributionRightsHandler),
+        r'/addcontributionrightshandler/<category>',
+        contributor_dashboard_admin.AddContributionRightsHandler),
     get_redirect_route(
-        r'/removecontributionrightshandler',
-        admin.RemoveContributionRightsHandler),
+        r'/removecontributionrightshandler/<category>',
+        contributor_dashboard_admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributorusershandler',
-        admin.ContributorUsersListHandler),
+        r'/getcontributorusershandler/<category>',
+        contributor_dashboard_admin.ContributorUsersListHandler),
     get_redirect_route(
         r'/contributionrightsdatahandler',
-        admin.ContributionRightsDataHandler),
+        contributor_dashboard_admin.ContributionRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+        contributor_dashboard_admin.ContributorDashboardAdminPage),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
@@ -419,6 +424,17 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
+
+    get_redirect_route(
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogHomepageDataHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'

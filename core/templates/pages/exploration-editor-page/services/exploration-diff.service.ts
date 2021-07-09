@@ -32,7 +32,7 @@ import {
 } from 'domain/exploration/exploration-draft.model';
 import { StateObjectsDict } from 'domain/exploration/StatesObjectFactory';
 
-interface ExplorationGraphChangeList {
+export interface ExplorationGraphChangeList {
   changeList: ExplorationChange[];
   directionForwards: boolean;
 }

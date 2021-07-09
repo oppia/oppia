@@ -50,12 +50,12 @@ describe('NumericInputValidationService', () => {
       providers: [NumericInputValidationService]
     });
 
-    validatorService = TestBed.get(NumericInputValidationService);
+    validatorService = TestBed.inject(NumericInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
@@ -123,7 +123,7 @@ describe('NumericInputValidationService', () => {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      null,
+      [],
       null
     )];
   });
@@ -240,10 +240,6 @@ describe('NumericInputValidationService', () => {
 
 
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString(undefined)).toEqual(
-      'Please enter a valid number.');
-    expect(validatorService.getErrorString(null)).toEqual(
-      'Please enter a valid number.');
     expect(validatorService.getErrorString(1200000000E+27)).toEqual(
       'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
     expect(validatorService.getErrorString(1200000000E-27)).toEqual(
