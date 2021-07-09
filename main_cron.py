@@ -25,7 +25,7 @@ import main
 import webapp2
 
 
-transaction_services = models.Registry.import_transaction_services()
+transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [

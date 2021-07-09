@@ -50,6 +50,27 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Command invalid is not allowed'):
             exp_domain.ExplorationChange({'cmd': 'invalid'})
 
+    def test_exp_change_object_with_deprecated_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.DeprecatedCommandError, 'Command clone is deprecated'):
+            exp_domain.ExplorationChange({
+                'cmd': 'clone',
+                'property_name': 'content',
+                'old_value': 'old_value'
+            })
+
+    def test_exp_change_object_with_deprecated_cmd_argument(self):
+        with self.assertRaisesRegexp(
+            utils.DeprecatedCommandError,
+            'Value for property_name in cmd edit_state_property: '
+            'fallbacks is deprecated'):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'Introduction',
+                'property_name': 'fallbacks',
+                'new_value': 'foo',
+            })
+
     def test_exp_change_object_with_missing_attribute_in_cmd(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, (

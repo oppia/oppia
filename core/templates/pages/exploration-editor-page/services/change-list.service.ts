@@ -28,6 +28,7 @@ import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,6 +82,7 @@ export class ChangeListService implements OnInit {
   DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
   constructor(
+    private windowRef: WindowRef,
     private alertsService: AlertsService,
     private autosaveInfoModalsService: AutosaveInfoModalsService,
     private explorationDataService: ExplorationDataService,
@@ -100,18 +102,22 @@ export class ChangeListService implements OnInit {
     // If error is present -> Check for the type of error occurred
     // (Display the corresponding modals in both cases, if not already
     // opened):
-    // - Version Mismatch.
+    // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList,
       response => {
-        if (!response.is_version_of_draft_valid) {
+        if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
               explorationChangeList);
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
+        if (!response.is_version_of_draft_valid &&
+          response.changes_are_mergeable) {
+          this.windowRef.nativeWindow.location.reload();
+        }
       },
       () => {
         this.alertsService.clearWarnings();

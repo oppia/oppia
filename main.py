@@ -22,7 +22,11 @@ from constants import constants
 
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import android_e2e_config
 from core.controllers import base
+from core.controllers import blog_admin
+from core.controllers import blog_dashboard
+from core.controllers import blog_homepage
 from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
@@ -37,6 +41,7 @@ from core.controllers import features
 from core.controllers import feedback
 from core.controllers import improvements
 from core.controllers import learner_dashboard
+from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -72,7 +77,9 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-transaction_services = models.Registry.import_transaction_services()
+from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
+
+transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -85,18 +92,20 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @acl_decorators.open_access
+    @acl_decorators.open_access # type: ignore[misc]
     def post(self):
+        # type: () -> None
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
-        self.render_json(self.values)
+        self.render_json(self.values) # type: ignore[no-untyped-call]
 
 
 class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
-    @acl_decorators.open_access
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self):
+        # type: () -> None
         """Handles GET warmup requests."""
         pass
 
@@ -106,30 +115,32 @@ class HomePageRedirectPage(base.BaseHandler):
     redirect them appropriately.
     """
 
-    @acl_decorators.open_access
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self):
-        if self.user_id and user_services.has_fully_registered_account(
+        # type: () -> None
+        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
                 self.user_id):
-            user_settings = user_services.get_user_settings(
-                self.user_id)
+            user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
             default_dashboard = user_settings.default_dashboard
             if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
                 self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
                 self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
-            self.render_template('splash-page.mainpage.html')
+            self.render_template('splash-page.mainpage.html') # type: ignore[no-untyped-call]
 
 
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    @acl_decorators.open_access
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self):
+        # type: () -> None
         self.redirect('/')
 
 
 def get_redirect_route(regex_route, handler, defaults=None):
+    # type: (Text, Type[base.BaseHandler], Optional[Dict[Any, Any]]) -> routes.RedirectRoute
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs
@@ -152,6 +163,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
 
 def authorization_wrapper(self, *args, **kwargs):
+    # type: (Any, *Any, **Any) -> None
     """This request handler wrapper only admits internal requests from
     taskqueue workers. If the request is invalid, it leads to a 403 Error page.
     """
@@ -165,6 +177,7 @@ def authorization_wrapper(self, *args, **kwargs):
 
 
 def ui_access_wrapper(self, *args, **kwargs):
+    # type: (Any, *Any, **Any) -> None
     """This request handler wrapper directly serves UI pages
     for MapReduce dashboards.
     """
@@ -240,21 +253,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
-
-    get_redirect_route(
-        '/notifications_dashboard',
-        creator_dashboard.OldNotificationsDashboardRedirectPage),
     get_redirect_route(
         '/contributor_dashboard',
         creator_dashboard.OldContributorDashboardRedirectPage),
-    get_redirect_route(
-        feconf.NOTIFICATIONS_DASHBOARD_URL,
-        creator_dashboard.NotificationsDashboardPage),
-    get_redirect_route(
-        r'/notificationsdashboardhandler/data',
-        creator_dashboard.NotificationsDashboardHandler),
-    get_redirect_route(
-        r'/notificationshandler', creator_dashboard.NotificationsHandler),
     get_redirect_route(
         '/creator_dashboard',
         creator_dashboard.OldCreatorDashboardRedirectPage),
@@ -413,8 +414,23 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.LearnerIncompleteActivityHandler),
 
     get_redirect_route(
+        r'%s/<activity_type>/<topic_id>' % feconf.LEARNER_GOALS_DATA_URL,
+        learner_goals.LearnerGoalsHandler),
+
+    get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
         learner_playlist.LearnerPlaylistHandler),
+
+    get_redirect_route(
+        r'%s/<author_username>' %
+        feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
+        blog_homepage.AuthorsPageHandler),
+    get_redirect_route(
+        r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        blog_homepage.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
+        blog_homepage.BlogHomepageDataHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
@@ -471,6 +487,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
+    get_redirect_route(
+        r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+        profile.BulkEmailWebhookEndpoint),
     get_redirect_route(
         feconf.PREFERENCES_DATA_URL, profile.PreferencesHandler),
     get_redirect_route(
@@ -839,6 +858,21 @@ URLS = MAPREDUCE_HANDLERS + [
         improvements.ExplorationImprovementsConfigHandler),
 
     get_redirect_route(
+        r'%s' % feconf.BLOG_ADMIN_PAGE_URL, blog_admin.BlogAdminPage),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
+        blog_admin.BlogAdminRolesHandler),
+    get_redirect_route(
+        r'/blogadminhandler', blog_admin.BlogAdminHandler),
+
+    get_redirect_route(
+        r'%s/<blog_post_id>' % feconf.BLOG_EDITOR_DATA_URL_PREFIX,
+        blog_dashboard.BlogPostHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
+        blog_dashboard.BlogDashboardDataHandler),
+
+    get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
 
     get_redirect_route(
@@ -865,6 +899,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+
+    get_redirect_route(
+        r'/voice_artist_management_handler/<entity_type>/<entity_id>',
+        voice_artist.VoiceArtistManagementHandler),
 ]
 
 # Adding redirects for topic landing pages.
@@ -875,10 +913,16 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
                 r'/%s/%s' % (subject, topic),
                 custom_landing_pages.TopicLandingPage))
 
+if constants.DEV_MODE:
+    URLS.append(
+        get_redirect_route(
+            r'/initialize_android_test_data',
+            android_e2e_config.InitializeAndroidTestDataHandler))
+
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
     webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
 
-firebase_auth_services.establish_firebase_connection()
+firebase_auth_services.establish_firebase_connection() # type: ignore[no-untyped-call]

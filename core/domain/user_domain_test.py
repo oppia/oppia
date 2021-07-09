@@ -391,6 +391,14 @@ class UserContributionsTests(test_utils.GenericTestBase):
             user_services.create_user_contributions(
                 feconf.MIGRATION_BOT_USER_ID, [], []))
 
+    def test_update_user_contributions(self):
+        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
+
+        contributions = user_services.get_user_contributions(self.owner_id)
+        self.assertEqual(contributions.user_id, self.owner_id)
+        self.assertEqual(contributions.created_exploration_ids, ['e1'])
+        self.assertEqual(contributions.edited_exploration_ids, ['e2'])
+
     def test_cannot_create_user_contributions_with_existing_user_id(self):
         with self.assertRaisesRegexp(
             Exception,
@@ -816,6 +824,44 @@ class CompletedActivitiesTests(test_utils.GenericTestBase):
 
         self.assertListEqual(
             completed_activities.learnt_topic_ids, [])
+
+
+class LearnerGoalsTests(test_utils.GenericTestBase):
+    """Testing domain object for learner goals model."""
+
+    def test_initialization(self):
+        """Testing init method."""
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0'])
+
+    def test_add_topic_id_to_learn(self):
+        """Testing add_topic_id_to_learn."""
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0'])
+
+        learner_goals.add_topic_id_to_learn('topic_id1')
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0', 'topic_id1'])
+
+    def test_remove_topic_id_to_learn(self):
+        """Testing remove_topic_id_to_learn."""
+        learner_goals = (
+            user_domain.LearnerGoals('user_id0', ['topic_id0'], []))
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, ['topic_id0'])
+
+        learner_goals.remove_topic_id_from_learn('topic_id0')
+
+        self.assertListEqual(
+            learner_goals.topic_ids_to_learn, [])
 
 
 class LearnerPlaylistTests(test_utils.GenericTestBase):

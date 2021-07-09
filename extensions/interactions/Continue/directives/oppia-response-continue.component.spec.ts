@@ -25,7 +25,7 @@ describe('OppiaResponseContinueComponent', () => {
   let fixture: ComponentFixture<OppiaResponseContinueComponent>;
 
   class mockHtmlEscaperService {
-    escapedJsonToObj(answer): string {
+    escapedJsonToObj(answer: string): string {
       return answer;
     }
   }

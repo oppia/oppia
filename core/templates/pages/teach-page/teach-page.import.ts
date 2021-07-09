@@ -13,24 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the teach page.
+ * @fileoverview Directive scripts for the teach page.
  */
 
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
+import 'pages/mock-ajs';
+import 'Polyfills.ts';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { TeachPageModule } from './teach-page.module';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
 
-require('Polyfills.ts');
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/teach-page/teach-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+platformBrowserDynamic().bootstrapModule(TeachPageModule).catch(
+  // eslint-disable-next-line no-console
+  (err) => console.error(err)
+);
 
-require('base-components/base-content.component.ts');
+window.name = '';
