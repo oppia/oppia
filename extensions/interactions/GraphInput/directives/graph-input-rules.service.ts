@@ -163,12 +163,18 @@ export class GraphInputRulesService {
     // the second graph with the same sum of weights of outgoing edges.
     var degrees1 = adj1.map(function(value) {
       return value.reduce(function(prev, cur) {
+        if (prev === null || cur === null) {
+          return null;
+        }
         return prev + cur;
       });
     }).sort();
 
     var degrees2 = adj2.map(function(value) {
       return value.reduce(function(prev, cur) {
+        if (prev === null || cur === null) {
+          return null;
+        }
         return prev + cur;
       });
     }).sort();
@@ -179,14 +185,15 @@ export class GraphInputRulesService {
 
     // Check against every permutation of vectices.
     var numVertices = graph2.vertices.length;
-    var permutation = [];
+    var permutation: number[] | null = [];
     for (var i = 0; i < numVertices; i++) {
       permutation.push(i);
     }
     while (permutation !== null) {
       var doLabelsMatch = (!graph1.isLabeled && !graph2.isLabeled) ||
-        graph2.vertices.every(function(vertex, index) {
-          return vertex.label === graph1.vertices[permutation[index]].label;
+        graph2.vertices.every((vertex, index) => {
+          const _permutation = <number[]> permutation;
+          return vertex.label === graph1.vertices[_permutation[index]].label;
         });
       if (doLabelsMatch &&
           this.gus.areAdjacencyMatricesEqualWithPermutation(

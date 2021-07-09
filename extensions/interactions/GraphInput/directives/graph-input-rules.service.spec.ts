@@ -22,7 +22,7 @@ import { TestBed } from '@angular/core/testing';
 import { GraphAnswer } from 'interactions/answer-defs';
 
 describe('Graph Input service', () => {
-  let girs: GraphInputRulesService = null;
+  let girs: GraphInputRulesService;
   beforeEach(() => {
     girs = TestBed.get(GraphInputRulesService);
   });

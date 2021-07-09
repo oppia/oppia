@@ -601,7 +601,13 @@
     "core/templates/services/speech-synthesis-chunker.service.ts",
     "core/templates/services/speech-synthesis-chunker.service.spec.ts",
     "extensions/interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service.ts",
-    "extensions/interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service.spec.ts"
+    "extensions/interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service.spec.ts",
+    "extensions/interactions/FractionInput/directives/oppia-response-fraction-input.component.ts",
+    "extensions/interactions/FractionInput/directives/oppia-response-fraction-input.component.spec.ts",
+    "extensions/interactions/ImageClickInput/directives/oppia-short-response-image-click-input.component.ts",
+    "extensions/interactions/ImageClickInput/directives/oppia-short-response-image-click-input.component.spec.ts",
+    "extensions/interactions/GraphInput/directives/graph-input-rules.service.ts",
+    "extensions/interactions/GraphInput/directives/graph-input-rules.service.spec.ts"
   ],
   "include": [
     "core/templates/pages/delete-account-page/services/*.ts",
