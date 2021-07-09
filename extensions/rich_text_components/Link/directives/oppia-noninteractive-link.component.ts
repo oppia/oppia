@@ -62,8 +62,8 @@ export class NoninteractiveLink implements OnInit, OnChanges {
     let untrustedUrl = encodeURI(this.htmlEscaperService.escapedJsonToObj(
       this.urlWithValue) as string);
     if (
-      untrustedUrl.startsWith('http://') &&
-      untrustedUrl.startsWith('https://')
+      !untrustedUrl.startsWith('http://') &&
+      !untrustedUrl.startsWith('https://')
     ) {
       untrustedUrl = 'https://' + untrustedUrl;
     }
