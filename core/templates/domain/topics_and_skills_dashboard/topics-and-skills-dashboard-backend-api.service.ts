@@ -118,10 +118,14 @@ export class TopicsAndSkillsDashboardBackendApiService {
   async fetchDashboardDataAsync(): Promise<TopicsAndSkillDashboardData> {
     return this.http.get<TopicsAndSkillsDashboardDataBackendDict>(
       '/topics_and_skills_dashboard/data').toPromise().then(response => {
-      let categorizedSkills = {};
+      let categorizedSkills: CategorizedSkills = {};
       for (let topic in response.categorized_skills_dict) {
         let subtopicSkillsDict = response.categorized_skills_dict[topic];
-        let subtopicSkills = {};
+        let subtopicSkills:
+         { [subtopicName: string]: ShortSkillSummary[];
+           uncategorized: ShortSkillSummary[]; } = {
+             uncategorized: []
+           };
         for (let subtopic in subtopicSkillsDict) {
           subtopicSkills[subtopic] = (
             subtopicSkillsDict[subtopic].map(
@@ -164,6 +168,9 @@ export class TopicsAndSkillsDashboardBackendApiService {
       '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
         skill_id: skillId
       });
+    if (assignSkillDataUrl === null) {
+      throw new Error('Assign Skill DataUrl is possibly null+');
+    }
     return this.http.get<AssignedSkillDataBackendDict>(
       assignSkillDataUrl).toPromise().then(dict => {
       return dict.topic_assignment_dicts.map(

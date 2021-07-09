@@ -19,7 +19,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { icon, latLng, LeafletEvent, LeafletMouseEvent, marker, tileLayer } from 'leaflet';
+import { icon, LatLng, latLng, LeafletEvent, LeafletMouseEvent, Marker, marker, TileLayer, tileLayer } from 'leaflet';
 @Component({
   selector: 'coord-two-dim-editor',
   templateUrl: './coord-two-dim-editor.component.html',
@@ -29,16 +29,18 @@ export class CoordTwoDimEditorComponent implements OnInit {
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-  @Input() value;
-  @Output() valueChanged: EventEmitter<[number, number]> = new EventEmitter<
-  [number, number]>();
+  @Input() value!: number[];
+  @Output() valueChanged: EventEmitter<[number, number]> =
+   new EventEmitter<[number, number]>();
 
-  mapMarkers;
+  // Class Marker is of type Marker<P=any> therefore type
+  // cannot be determined.
+  mapMarkers!: Marker<unknown>;
   optionsSpec = {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
-  options;
+  options!: { layers: TileLayer[]; zoom: number; center: LatLng; };
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 
   leafletClick(e: LeafletMouseEvent): void {
@@ -54,7 +56,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
     this.valueChanged.emit([e.target._latlng.lat, e.target._latlng.lng]);
   }
 
-  private updateMarker(lat, lng) {
+  private updateMarker(lat: number, lng: number) {
     const newMarker = marker(
       [lat, lng],
       {

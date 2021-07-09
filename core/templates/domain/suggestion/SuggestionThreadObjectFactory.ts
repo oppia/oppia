@@ -37,7 +37,9 @@ export class SuggestionThread {
   lastUpdatedMsecs: number;
   messageCount: number;
   threadId: string;
-  suggestion: Suggestion;
+  // A suggestion will be null when suggestionType is not equal
+  // to 'edit_exploration_state_content'.
+  suggestion: Suggestion | null;
   lastNonemptyMessageSummary: ThreadMessageSummary;
   messages: ThreadMessage[] = [];
 
@@ -46,7 +48,7 @@ export class SuggestionThread {
       originalAuthorName: string, lastUpdatedMsecs: number,
       messageCount: number, threadId: string,
       lastNonemptyMessageSummary: ThreadMessageSummary,
-      suggestion: Suggestion) {
+      suggestion: Suggestion | null) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -83,9 +85,10 @@ export class SuggestionThread {
   }
 
   setSuggestionStatus(status: string): void {
-    if (this.suggestion) {
+    if (this.suggestion && status) {
       this.suggestion.status = status;
     }
+    throw new Error('Suggestion status is null');
   }
 
   getSuggestionStatus(): string | null {
@@ -100,7 +103,7 @@ export class SuggestionThread {
     return true;
   }
 
-  getSuggestion(): Suggestion {
+  getSuggestion(): Suggestion | null {
     return this.suggestion;
   }
 }
@@ -108,7 +111,7 @@ export class SuggestionThread {
 @Injectable({providedIn: 'root'})
 export class SuggestionThreadObjectFactory {
   private createEditExplorationStateContentSuggestionFromBackendDict(
-      suggestionBackendDict: SuggestionBackendDict): Suggestion {
+      suggestionBackendDict: SuggestionBackendDict): Suggestion | null {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
       return null;

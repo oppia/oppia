@@ -50,10 +50,14 @@ describe('Utils Service', () => {
 
   it('should check if the input is an error', () => {
     // A custom Error.
-    var NotImplementedError = function(message) {
-      this.name = 'NotImplementedError';
-      this.message = (message || '');
-    };
+    class NotImplementedError {
+      name: string;
+      message: string;
+      constructor(message: string) {
+        this.name = 'NotImplementedError';
+        this.message = (message || '');
+      }
+    }
     NotImplementedError.prototype = Error.prototype;
     expect(uts.isError(new Error())).toBeTrue();
     expect(uts.isError(new NotImplementedError('abc'))).toBeTrue();
@@ -109,19 +113,19 @@ describe('Utils Service', () => {
   });
 
   it('should determine when an element is overflowing', () => {
-    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', null, {
+    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 500, scrollHeight: 300,
     });
     expect(uts.isOverflowing(elWithHorizontalOverflow)).toBeTrue();
 
-    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', null, {
+    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 600,
     });
     expect(uts.isOverflowing(elWithVerticalOverflow)).toBeTrue();
 
-    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', null, {
+    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 300,
     });

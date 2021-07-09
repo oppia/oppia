@@ -21,9 +21,10 @@ import { Injectable } from '@angular/core';
 
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface PredictionService {
-  predict(classifierData, answer): number;
+  predict(classifierData: ArrayBuffer, answer: InteractionAnswer): number;
 }
 
 type AlgorithmIdPredictionServiceMap = (
@@ -43,12 +44,18 @@ export class PredictionAlgorithmRegistryService {
   }
 
   getPredictionService(
-      algorithmId: string, dataSchemaVersion: number): PredictionService {
+      algorithmId: string, dataSchemaVersion: number):
+       PredictionService | null {
     if (this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
       const predictionServicesByDataSchemaVersion = (
         this.algorithmIdPredictionServiceMapping.get(algorithmId));
-      if (predictionServicesByDataSchemaVersion.has(dataSchemaVersion)) {
-        return predictionServicesByDataSchemaVersion.get(dataSchemaVersion);
+      if (predictionServicesByDataSchemaVersion &&
+        predictionServicesByDataSchemaVersion.has(dataSchemaVersion)) {
+        let predictionService =
+         predictionServicesByDataSchemaVersion.get(dataSchemaVersion);
+        if (predictionService) {
+          return predictionService;
+        }
       }
     }
     return null;
@@ -60,8 +67,11 @@ export class PredictionAlgorithmRegistryService {
     if (!this.algorithmIdPredictionServiceMapping.has(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }
-    this.algorithmIdPredictionServiceMapping.get(algorithmId)
-      .set(dataSchemaVersion, service);
+    let _algorithmId =
+     this.algorithmIdPredictionServiceMapping.get(algorithmId);
+    if (_algorithmId) {
+      _algorithmId.set(dataSchemaVersion, service);
+    }
   }
 }
 
