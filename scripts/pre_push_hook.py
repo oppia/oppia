@@ -56,6 +56,7 @@ GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 # CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
 LINTER_MODULE = 'scripts.linters.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
+MYPY_TYPE_CHECK_MODULE = 'scripts.run_mypy_checks'
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
