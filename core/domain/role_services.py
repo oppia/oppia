@@ -119,19 +119,19 @@ UPDATABLE_ROLES = [
 
 # Users can be viewed by following list of role IDs via admin interface.
 #
-# NOTE: Do not include LEARNER role in this list as it does not represent
+# NOTE: Do not include MOBILE_LEARNER role in this list as it does not represent
 #   role for a separate user account, but rather a profile within the account.
 VIEWABLE_ROLES = [
-    feconf.ROLE_ID_CURRICULUM_ADMIN,
-    feconf.ROLE_ID_COLLECTION_EDITOR,
-    feconf.ROLE_ID_QUESTION_ADMIN,
-    feconf.ROLE_ID_TRANSLATION_ADMIN,
-    feconf.ROLE_ID_VOICEOVER_ADMIN,
-    feconf.ROLE_ID_MODERATOR,
-    feconf.ROLE_ID_RELEASE_COORDINATOR,
-    feconf.ROLE_ID_TOPIC_MANAGER,
     feconf.ROLE_ID_BLOG_ADMIN,
     feconf.ROLE_ID_BLOG_POST_EDITOR
+    feconf.ROLE_ID_COLLECTION_EDITOR,
+    feconf.ROLE_ID_CURRICULUM_ADMIN,
+    feconf.ROLE_ID_MODERATOR,
+    feconf.ROLE_ID_QUESTION_ADMIN,
+    feconf.ROLE_ID_RELEASE_COORDINATOR,
+    feconf.ROLE_ID_TOPIC_MANAGER,
+    feconf.ROLE_ID_TRANSLATION_ADMIN,
+    feconf.ROLE_ID_VOICEOVER_ADMIN,
 ]
 
 # The string corresponding to role IDs that should be visible to admin.

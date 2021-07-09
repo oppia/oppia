@@ -844,7 +844,7 @@ class AdminRoleHandler(base.BaseHandler):
 
 
 class BannedUsersHandler(base.BaseHandler):
-    """Handler for roles tab of admin page. Used to view and update roles."""
+    """Handler mark/unmark a banned user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
