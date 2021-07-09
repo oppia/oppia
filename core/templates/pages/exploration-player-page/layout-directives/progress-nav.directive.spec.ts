@@ -30,6 +30,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { EventEmitter } from '@angular/core';
 
 fdescribe('Progress nav directive', function() {
   let $scope = null;
@@ -55,6 +56,10 @@ fdescribe('Progress nav directive', function() {
     focusManagerService = TestBed.get(FocusManagerService);
   });
 
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
@@ -73,10 +78,18 @@ fdescribe('Progress nav directive', function() {
       $rootScope: $scope,
       $scope: $scope
     });
-    ctrl.$onInit();
+
   }));
 
-  it('should initialize the letiables', function() {
-
+  it('should set properties when initialized', function() {
+    let mockEventEmitter = new EventEmitter()
+    spyOn(playerPositionService, 'onHelpCardAvailable')
+      .and.returnValue(mockEventEmitter);
+    let helpCard = {
+      hasContinueButton: true
+    };
+    ctrl.$onInit();
+    $scope.$digest();
+    mockEventEmitter.emit(helpCard);
   });
 });

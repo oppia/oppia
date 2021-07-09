@@ -22,6 +22,8 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -30,6 +32,9 @@ import { StatsReportingService } from '../services/stats-reporting.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ContextService } from 'services/context.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+
 // ^^^ This block is to be removed.
 
 fdescribe('Learner view info directive', function() {
@@ -50,6 +55,7 @@ fdescribe('Learner view info directive', function() {
   let urlService: UrlService = null;
 
   let explorationBackendResponse = null;
+  let storyBackendDict = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -59,6 +65,8 @@ fdescribe('Learner view info directive', function() {
       imports: [HttpClientTestingModule]
     });
     focusManagerService = TestBed.get(FocusManagerService);
+    OppiaAngularRootComponent.storyViewerBackendApiService = TestBed.inject(
+      StoryViewerBackendApiService)
   });
 
 
@@ -70,9 +78,9 @@ fdescribe('Learner view info directive', function() {
     directive = $injector.get('learnerViewInfoDirective')[0];
     contextService = $injector.get('ContextService');
     learnerViewInfoBackendApiService = $injector.get(
-        'LearnerViewInfoBackendApiService');
+      'LearnerViewInfoBackendApiService');
     readOnlyExplorationBackendApiService = $injector.get(
-        'ReadOnlyExplorationBackendApiService');
+      'ReadOnlyExplorationBackendApiService');
     siteAnalyticsService = $injector.get('SiteAnalyticsService');
     statsReportingService= $injector.get('StatsReportingService');
     focusManagerService = $injector.get('FocusManagerService');
@@ -80,41 +88,54 @@ fdescribe('Learner view info directive', function() {
     urlInterpolationService = $injector.get('UrlInterpolationService');
 
     explorationBackendResponse = {
-        can_edit: true,
-        exploration: {
-          init_state_name: 'state_name',
-          param_changes: [],
-          param_specs: {},
-          states: {},
-          title: '',
-          language_code: '',
-          objective: '',
-          correctness_feedback_enabled: false
-        },
-        exploration_id: 'test_id',
-        is_logged_in: true,
-        session_id: 'test_session',
-        version: 1,
-        preferred_audio_language_code: 'en',
-        preferred_language_codes: [],
-        auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
-        record_playthrough_probability: 1
-      };
+      can_edit: true,
+      exploration: {
+        init_state_name: 'state_name',
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: '',
+        language_code: '',
+        objective: '',
+        correctness_feedback_enabled: false
+      },
+      exploration_id: 'test_id',
+      is_logged_in: true,
+      session_id: 'test_session',
+      version: 1,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1
+    };
 
+    storyBackendDict = StoryPlaythrough.createFromBackendDict({
+      story_id: 'id',
+      story_nodes: [],
+      story_title: 'title',
+      story_description: 'description',
+      topic_name: 'topic_1',
+      meta_tag_content: 'this is a meta tag content'
+    });
+
+    spyOn(ctrl.storyViewerBackendApiService, 'fetchStoryDataAsync')
+      .and.resolveTo(storyBackendDict)
     spyOn(contextService, 'getExplorationId').and.returnValue('expId');
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
-        .and.returnValue(Promise.resolve(explorationBackendResponse));
+      .and.returnValue(Promise.resolve(explorationBackendResponse));
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+      .and.returnValue('topicUrlFragment');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('classroomUrlFragment');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
       $scope: $scope
     });
-
   }));
 
-  it('should initialize the letiables', fakeAsync(function() {
+  it('should set properties when initialized', function() {
     ctrl.$onInit();
-    tick();
   }));
 });
