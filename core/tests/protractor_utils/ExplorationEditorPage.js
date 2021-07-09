@@ -89,6 +89,10 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-confirm-discard-changes'));
   var discardChangesButton = element(
     by.css('.protractor-test-discard-changes'));
+  var discardLostChangesButton = element(
+    by.css('.protractor-test-discard-lost-changes-button'));
+  var discardAndExportLostChangesButton = element(
+    by.css('.protractor-test-discard-and-export-lost-changes-button'));
   var navigateToImprovementsTabButton = element(
     by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
@@ -110,6 +114,8 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-save-draft-button'));
   var saveDraftButtonTextContainer = element(
     by.css('.protractor-test-save-draft-message'));
+  var recommendationPromptSaveButton = element(
+    by.css('.protractor-test-recommendation-prompt-save-button'));
   var publishChangesButtonTextContainer = element(
     by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
@@ -262,6 +268,25 @@ var ExplorationEditorPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.discardLostChanges = async function() {
+    await action.click('Discard Lost Changes button', discardLostChangesButton);
+    // Expect editor page to completely reload.
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.discardAndExportLostChanges = async function() {
+    await action.click(
+      'Discard Lost Changes button', discardAndExportLostChangesButton);
+    await browser.driver.get('chrome://downloads/');
+    var items = (
+      await browser.executeScript(
+        'return downloads.Manager.get().items_'));
+    expect(items.length).toBe(1);
+    expect(items[0].file_name).toBe('lostChanges.txt');
+    // Expect editor page to completely reload.
+    await waitFor.pageToFullyLoad();
+  };
+
   this.expectCannotSaveChanges = async function() {
     await action.waitForAutosave();
     expect(await saveChangesButton.isPresent()).toBeFalsy();
@@ -275,6 +300,22 @@ var ExplorationEditorPage = function() {
   this.expectCannotPublishChanges = async function() {
     await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
+  };
+
+  this.acceptSaveRecommendationPrompt = async function(commitMessage) {
+    await action.click(
+      'Recommendation prompt Save button', recommendationPromptSaveButton);
+    await waitFor.invisibilityOf(
+      element(by.css('.protractor-test-save-prompt-modal')),
+      'Save Recommendation Prompt modal does not disappear.');
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-exploration-save-modal')),
+      'Exploration Save Modal taking too long to appear');
+    if (commitMessage) {
+      await action.sendKeys(
+        'Commit message input', commitMessageInput, commitMessage);
+    }
+    await action.click('Save draft button', commitChangesButton);
   };
 
   // ---- NAVIGATION ----
