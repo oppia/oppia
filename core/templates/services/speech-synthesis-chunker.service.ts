@@ -29,6 +29,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ServicesConstants } from 'services/services.constants';
 
+type RTEComponentSpecsKey = keyof typeof ServicesConstants.RTE_COMPONENT_SPECS;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -46,7 +48,9 @@ export class SpeechSynthesisChunkerService {
     Link: '',
     Math: '',
     Tabs: '',
-    Video: ''
+    Video: '',
+    Skillreview: '',
+    Svgdiagram: '',
   };
 
   // Punctuation marks that should result in an audible pause when playing
@@ -71,7 +75,7 @@ export class SpeechSynthesisChunkerService {
   _speechUtteranceChunker(
       utterance: SpeechSynthesisUtterance, offset: number,
       callback: () => void): void {
-    var newUtterance;
+    var newUtterance: SpeechSynthesisUtterance;
     var text = (
     offset !== undefined ? utterance.text.substring(offset) : utterance.text);
 
@@ -99,11 +103,17 @@ export class SpeechSynthesisChunkerService {
 
     // Copy properties from the current utterance to the next utterance,
     // excluding the text being spoken.
-    for (var property in utterance) {
+    const utteranceProps = (
+      <(keyof SpeechSynthesisUtterance)[]> Object.keys(utterance));
+    utteranceProps.forEach(property => {
       if (property !== 'text') {
-        newUtterance[property] = utterance[property];
+        Object.defineProperty(
+          newUtterance, property, {
+            value: utterance[property]
+          }
+        );
       }
-    }
+    });
     newUtterance.onend = () => {
       if (this.cancelRequested) {
         this.cancelRequested = false;
@@ -161,7 +171,9 @@ export class SpeechSynthesisChunkerService {
   }
 
   _convertToSpeakableText(html: string): string {
-    Object.keys(ServicesConstants.RTE_COMPONENT_SPECS).forEach(
+    const rteCompSpecsKeys = <(RTEComponentSpecsKey)[]> Object.keys(
+      ServicesConstants.RTE_COMPONENT_SPECS);
+    rteCompSpecsKeys.forEach(
       (componentSpec) => {
         this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
@@ -173,31 +185,41 @@ export class SpeechSynthesisChunkerService {
     var elt = $('<div>' + html + '</div>');
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
-      .replaceWith(function() {
+      .replaceWith(function(this: HTMLElement) {
         var element = <HTMLElement> this;
-        if (element.attributes['text-with-value'] !== undefined) {
-          const newTextContent = element.attributes[
-            'text-with-value'].textContent.replace(/&quot;/g, '');
+        const _newTextAttr = element.attributes[
+            <keyof NamedNodeMap> 'text-with-value'] as Attr;
+        if (_newTextAttr !== undefined) {
+          // 'Node.textContent' only returns 'null' if the Node is a
+          // 'document' or a 'DocType'. '_newTextAttr' is neither.
+          const newTextContent = _newTextAttr.textContent?.replace(
+            /&quot;/g, '');
           // Variable newTextContent ends with a " character, so this is being
           // ignored in the condition below.
           return newTextContent && newTextContent !== '"' ?
             newTextContent + ' ' : '';
         }
+        return element;
       });
 
     var _this = this;
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
-      .replaceWith(function() {
+      .replaceWith(function(this: HTMLElement) {
         var element = <HTMLElement> this;
-        if (element.attributes['math_content-with-value'] !== undefined) {
-          var mathContent = <MathExpressionContent>(
-            _this.htmlEscaper.escapedJsonToObj(
-              element.attributes['math_content-with-value'].textContent));
+        const _mathContentAttr = element.attributes[
+          <keyof NamedNodeMap> 'math_content-with-value'] as Attr;
+        if (_mathContentAttr !== undefined) {
+          var mathContent = (
+            <MathExpressionContent>(_this.htmlEscaper.escapedJsonToObj(
+              // 'Node.textContent' only returns 'null' if the Node is a
+              // 'document' or a 'DocType'. '_mathContentAttr' is neither.
+              <string> _mathContentAttr.textContent)));
           const latexSpeakableText = _this._formatLatexToSpeakableText(
             mathContent.raw_latex);
           return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
         }
+        return element;
       });
 
     html = elt.html();

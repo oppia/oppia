@@ -31,6 +31,7 @@ import { RatioExpressionInputRulesService } from
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { AppConstants } from 'app.constants';
+import { RatioInputAnswer } from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +43,7 @@ export class RatioExpressionInputValidationService {
 
   getCustomizationArgsWarnings(
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
-    var isNonNegativeInt = function(number) {
+    var isNonNegativeInt = function(number: number) {
       return angular.isNumber(number) && number % 1 === 0 && number >= 0;
     };
     var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
@@ -84,7 +85,7 @@ export class RatioExpressionInputValidationService {
       customizationArgs: RatioExpressionInputCustomizationArgs,
       answerGroups: AnswerGroup[],
       defaultOutcome: Outcome): Warning[] {
-    let warningsList = [];
+    let warningsList: Warning[] = [];
     let ratioRulesService = (
       new RatioExpressionInputRulesService());
     var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
@@ -121,8 +122,8 @@ export class RatioExpressionInputValidationService {
       let rules = answerGroups[i].rules;
       for (let j = 0; j < rules.length; j++) {
         let currentRuleType = <string> rules[j].type;
-        let currentInput = null;
-        var ratio: Ratio = null;
+        let currentInput: number[] | number;
+        var ratio: Ratio;
         if (currentRuleType === 'HasNumberOfTermsEqualTo') {
           currentInput = <number> rules[j].inputs.y;
         } else if (currentRuleType === 'HasSpecificTermEqualTo') {
@@ -149,7 +150,8 @@ export class RatioExpressionInputValidationService {
               });
             }
           } else if (currentRuleType === 'HasSpecificTermEqualTo') {
-            let termIndex = currentInput[0]; // Note: termIndex is 1-indexed.
+            const _currentInput = <number[]> currentInput;
+            let termIndex = _currentInput[0]; // Note: termIndex is 1-indexed.
             if (termIndex > expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
@@ -195,7 +197,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType !== 'IsEquivalent' &&
             currentRuleType !== 'HasNumberOfTermsEqualTo' && (
               ratioRulesService.Equals(
-                seenInput, {x: currentInput}))) {
+                <RatioInputAnswer> seenInput, {x: <number[]> currentInput}))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -209,7 +211,8 @@ export class RatioExpressionInputValidationService {
             seenRuleType === 'HasSpecificTermEqualTo' &&
             currentRuleType === 'Equals' && (
               ratioRulesService.HasSpecificTermEqualTo(
-                currentInput, seenRule.inputs))) {
+                <RatioInputAnswer> currentInput,
+                <{x: number, y: number}> seenRule.inputs))) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
@@ -224,7 +227,7 @@ export class RatioExpressionInputValidationService {
             currentRuleType !== 'HasNumberOfTermsEqualTo' &&
             currentRuleType !== 'HasSpecificTermEqualTo' && (
               ratioRulesService.IsEquivalent(
-                seenInput, {x: currentInput}))) {
+                <RatioInputAnswer> seenInput, {x: <number[]> currentInput}))) {
             // This rule will make the following inputs with
             // IsEquivalent rule obsolete.
             warningsList.push({
@@ -237,7 +240,8 @@ export class RatioExpressionInputValidationService {
           } else if (
             seenRuleType === 'HasNumberOfTermsEqualTo' &&
             hasLessNumberOfTerms(
-              currentRuleType, seenRuleType, currentInput, seenInput
+              currentRuleType, seenRuleType,
+              <number[]> currentInput, <number> seenInput
             )
           ) {
             // This rule will make the following inputs with

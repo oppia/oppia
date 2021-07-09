@@ -64,11 +64,17 @@ export class CollectionCreationService {
 
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href =
+            // The function 'interpolateUrl' will never return 'null' since
+            // the object passed as a second argument contains the key
+            // 'collection_id' which is the only variable required within the
+            // 'CREATE_NEW_COLLECTION_URL_TEMPLATE'.
+            // Non-null assertion is used to make the TypeScript typing happy.
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.urlInterpolationService.interpolateUrl(
               this.CREATE_NEW_COLLECTION_URL_TEMPLATE, {
                 collection_id: response.collectionId
               }
-            );
+            )!;
           CollectionCreationService.collectionCreationInProgress = false;
         }, 150);
       }, () => {

@@ -108,7 +108,7 @@ describe('RatioExpressionInputValidationService', () => {
       }
     }, 'RatioExpressionInput');
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -263,6 +263,10 @@ describe('RatioExpressionInputValidationService', () => {
   });
 
   it('should catch undefined value for # terms', () => {
+    // This throws "Type 'undefined' is not assignable to type 'number'
+    // ." We need to suppress this error because of the need to test
+    // validations if an invalid 'undefined' value is set for terms.
+    // @ts-ignore
     customizationArgs.numberOfTerms.value = undefined;
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,

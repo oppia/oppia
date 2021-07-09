@@ -26,25 +26,24 @@ import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Exploration Summary Backend Api Service', () => {
-  let explorationSummaryBackendApiService:
-    ExplorationSummaryBackendApiService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
-  let alertsService: AlertsService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
+  let alertsService: AlertsService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    explorationSummaryBackendApiService = TestBed.get(
+    explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
-    alertsService = TestBed.get(AlertsService);
-    httpTestingController = TestBed.get(
+    csrfService = TestBed.inject(CsrfTokenService);
+    alertsService = TestBed.inject(AlertsService);
+    httpTestingController = TestBed.inject(
       HttpTestingController
     );
 
@@ -66,6 +65,11 @@ describe('Exploration Summary Backend Api Service', () => {
     const alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
     explorationSummaryBackendApiService.loadPublicExplorationSummariesAsync(
+      // This throws "Argument of type '(string | null)[]' is not assignable
+      // to parameter of type 'string[]'." We need to suppress this error
+      // because of the need to test validations when the 'ExplorationId' is
+      // not defined or invalid.
+      // @ts-ignore
       explorationIds).then(successHandler, failHandler);
 
     flushMicrotasks();

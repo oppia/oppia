@@ -591,7 +591,17 @@
     "extensions/objects/templates/svg-filename-editor.constants.ajs.ts",
     "extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component.ts",
     "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts",
-    "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts"
+    "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts",
+    "core/templates/domain/summary/exploration-summary-backend-api.service.ts",
+    "core/templates/domain/summary/exploration-summary-backend-api.service.spec.ts",
+    "core/templates/components/entity-creation-services/collection-creation.service.ts",
+    "core/templates/components/entity-creation-services/collection-creation.service.spec.ts",
+    "core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts",
+    "core/templates/components/common-layout-directives/common-elements/sharing-links.component.spec.ts",
+    "core/templates/services/speech-synthesis-chunker.service.ts",
+    "core/templates/services/speech-synthesis-chunker.service.spec.ts",
+    "extensions/interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service.ts",
+    "extensions/interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service.spec.ts"
   ],
   "include": [
     "core/templates/pages/delete-account-page/services/*.ts",
