@@ -2870,20 +2870,45 @@ title: Title
             url_fragment: str. The URL fragment for the story.
             meta_tag_content: str. The meta tag content of the story.
         """
+        story_content_v5 = {
+                'nodes': [{
+                    'outline': (
+                        '<p>Value</p>'
+                        '<oppia-noninteractive-math math_content-with-value="{'
+                        '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                        '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                        '}">'
+                        '</oppia-noninteractive-math>'),
+                    'exploration_id': None,
+                    'destination_node_ids': [],
+                    'outline_is_finalized': False,
+                    'acquired_skill_ids': [],
+                    'id': 'node_1',
+                    'title': 'Chapter 1',
+                    'description': '',
+                    'prerequisite_skill_ids': [],
+                    'thumbnail_filename': 'image.svg',
+                    'thumbnail_bg_color': None,
+                    'thumbnail_size_in_bytes': 21131,
+                }],
+                'initial_node_id': 'node_1',
+                'next_node_id': 'node_2',
+        }
         story_model = story_models.StoryModel(
             id=story_id, thumbnail_filename=thumbnail_filename,
             thumbnail_bg_color=thumbnail_bg_color,
             thumbnail_size_in_bytes=thumbnail_size_in_bytes,
             description=description, title=title,
             language_code=language_code,
-            story_contents_schema_version=1, notes=notes,
+            story_contents_schema_version=5, notes=notes,
             corresponding_topic_id=corresponding_topic_id,
-            story_contents=self.VERSION_5_STORY_CONTENTS_DICT,
+            story_contents=story_content_v5,
             url_fragment=url_fragment, meta_tag_content=meta_tag_content)
         commit_message = 'New story created with title \'%s\'.' % title
         story_model.commit(
             owner_id, commit_message,
             [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+        story_services.create_story_summary(story_id)
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
         """Creates an Oppia subtopic and saves it.

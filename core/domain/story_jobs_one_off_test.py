@@ -430,12 +430,16 @@ class StoryThumbnailSizeAuditOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
     STORY_ID = 'story_id'
+    NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_2 = 'node_2'
 
     def setUp(self):
         super(StoryThumbnailSizeAuditOneOffJobTests, self).setUp()
         # Setup user who will own the test story nodes.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.story_id_1 = 'story_id_1'
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, name='Name',
             description='Description',
@@ -450,16 +454,13 @@ class StoryThumbnailSizeAuditOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_story_with_story_contents_schema_v5(
             self.STORY_ID, 'image.svg', '#F8BF74', 21131, self.albert_id,
             'A title', 'A description', 'A note', self.TOPIC_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         topic_services.add_canonical_story(
-            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+            self.albert_id, self.TOPIC_ID, story.id)
 
         # Delete the story before migration occurs.
         story_services.delete_story(
             self.albert_id, self.STORY_ID)
-
-        # Ensure the story is deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_fetchers.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story nodes.
         job_id = (
@@ -471,14 +472,10 @@ class StoryThumbnailSizeAuditOneOffJobTests(test_utils.GenericTestBase):
         # skipped.
         self.process_and_flush_pending_mapreduce_tasks()
 
-        # Ensure the story is still deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_fetchers.get_story_by_id(self.STORY_ID)
-
         output = (
             story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.get_output(
                 job_id))
-        expected = [[u'None', [u'None None']]]
+        expected = []
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_job_logs_thumbnail_filename_and_size_for_story_node(self):
@@ -489,8 +486,9 @@ class StoryThumbnailSizeAuditOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_story_with_story_contents_schema_v5(
             self.STORY_ID, 'image.svg', '#F8BF74', 21131, self.albert_id,
             'A title', 'A description', 'A note', self.TOPIC_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
         topic_services.add_canonical_story(
-            self.albert_id, self.TOPIC_ID, self.STORY_ID)
+            self.albert_id, self.TOPIC_ID, story.id)
 
         # Start migration job on sample story nodes.
         job_id = (
