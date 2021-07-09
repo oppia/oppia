@@ -54,7 +54,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
-require('components/state-editor/state-editor.directive.ts');
+require('components/state-editor/state-editor.component.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-card-is-checkpoint.service.ts');

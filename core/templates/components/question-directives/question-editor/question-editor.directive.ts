@@ -19,7 +19,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-require('components/state-editor/state-editor.directive.ts');
+require('components/state-editor/state-editor.component.ts');
 
 require('domain/question/question-update.service.ts');
 require(
