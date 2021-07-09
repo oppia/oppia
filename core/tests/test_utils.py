@@ -2871,28 +2871,28 @@ title: Title
             meta_tag_content: str. The meta tag content of the story.
         """
         story_content_v5 = {
-                'nodes': [{
-                    'outline': (
-                        '<p>Value</p>'
-                        '<oppia-noninteractive-math math_content-with-value="{'
-                        '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
-                        '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
-                        '}">'
-                        '</oppia-noninteractive-math>'),
-                    'exploration_id': None,
-                    'destination_node_ids': [],
-                    'outline_is_finalized': False,
-                    'acquired_skill_ids': [],
-                    'id': 'node_1',
-                    'title': 'Chapter 1',
-                    'description': '',
-                    'prerequisite_skill_ids': [],
-                    'thumbnail_filename': 'image.svg',
-                    'thumbnail_bg_color': None,
-                    'thumbnail_size_in_bytes': 21131,
-                }],
-                'initial_node_id': 'node_1',
-                'next_node_id': 'node_2',
+            'nodes': [{
+                'outline': (
+                    '<p>Value</p>'
+                    '<oppia-noninteractive-math math_content-with-value="{'
+                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                    '}">'
+                    '</oppia-noninteractive-math>'),
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': None,
+                'thumbnail_size_in_bytes': 21131,
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
         }
         story_model = story_models.StoryModel(
             id=story_id, thumbnail_filename=thumbnail_filename,
