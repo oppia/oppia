@@ -320,9 +320,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_story_node_thumbnail_size_in_bytes_validation(self):
+        self.story.story_contents.nodes[0].thumbnail_filename = 'image.svg'
+        self.story.story_contents.nodes[0].thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
         self.story.story_contents.nodes[0].thumbnail_size_in_bytes = 0
         self._assert_validation_error(
-            'Story Node thumbnail size in bytes cannot be zero.')
+            'Story node thumbnail size in bytes cannot be zero.')
 
     def test_story_node_update_thumbnail_filename(self):
         # Test successful update of thumbnail_filename when the thumbnail
@@ -338,17 +341,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             '%s/new_image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
 
-        self.story.update_node_thumbnail_filename(0, 'new_image.svg')
+        self.story.update_node_thumbnail_filename(
+            self.NODE_ID_1,
+            'new_image.svg')
+        node_index = self.story.story_contents.get_node_index(self.NODE_ID_1)
         self.assertEqual(
-            self.story.story_contents.nodes[0].thumbnail_filename,
+            self.story.story_contents.nodes[node_index].thumbnail_filename,
             'new_image.svg')
         self.assertEqual(
-            self.story.story_contents.nodes[0].thumbnail_size_in_bytes,
+            self.story.story_contents.nodes[node_index].thumbnail_size_in_bytes,
             len(raw_image))
 
         with self.assertRaisesRegexp(
             Exception,
-            'The story node with id invalid_id does not exist.'):
+            'The node with id invalid_id is not part of this story'):
             self.story.update_node_thumbnail_filename(
                 'invalid_id', 'invalid_thumbnail.svg')
 
