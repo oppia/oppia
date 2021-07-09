@@ -22,11 +22,12 @@ import { DocumentAttributeCustomizationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Document Attribute Customization Service', () => {
-  let dacs, wrs;
+  let dacs: DocumentAttributeCustomizationService;
+  let wrs: WindowRef;
 
   beforeEach(() => {
-    dacs = TestBed.get(DocumentAttributeCustomizationService);
-    wrs = TestBed.get(WindowRef);
+    dacs = TestBed.inject(DocumentAttributeCustomizationService);
+    wrs = TestBed.inject(WindowRef);
   });
 
   it('should add a atribute', () => {

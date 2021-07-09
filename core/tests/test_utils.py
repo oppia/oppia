@@ -1542,6 +1542,10 @@ class GenericTestBase(AppEngineTestBase):
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
     ADMIN_USERNAME = 'adm'
+    BLOG_ADMIN_EMAIL = 'blogadmin@example.com'
+    BLOG_ADMIN_USERNAME = 'blogadm'
+    BLOG_EDITOR_EMAIL = 'blogeditor@example.com'
+    BLOG_EDITOR_USERNAME = 'blogeditor'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
     RELEASE_COORDINATOR_EMAIL = 'releasecoordinator@example.com'
@@ -1554,6 +1558,8 @@ class GenericTestBase(AppEngineTestBase):
     TOPIC_MANAGER_USERNAME = 'topicmanager'
     VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
     VOICE_ARTIST_USERNAME = 'voiceartist'
+    VOICEOVER_ADMIN_EMAIL = 'voiceoveradm@example.com'
+    VOICEOVER_ADMIN_USERNAME = 'voiceoveradm'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -2040,6 +2046,15 @@ title: Title
         for name in moderator_usernames:
             self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
 
+    def set_voiceover_admin(self, voiceover_admin_username):
+        """Sets role of given users as VOICEOVER ADMIN.
+
+        Args:
+            voiceover_admin_username: list(str). List of usernames.
+        """
+        for name in voiceover_admin_username:
+            self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
+
     def set_banned_users(self, banned_usernames):
         """Sets role of given users as BANNED_USER.
 
@@ -2243,12 +2258,37 @@ title: Title
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, payload, csrf_token=None, expected_status_int=200,
-            upload_files=None):
-        """Post an object to the server by JSON; return the received object."""
-        data = {'payload': json.dumps(payload)}
+            self, url, data, csrf_token=None, expected_status_int=200,
+            upload_files=None, use_payload=True, source=None):
+        """Post an object to the server by JSON; return the received object.
+
+        Args:
+            url: str. The URL to send the POST request to.
+            data: dict. The dictionary that acts as the body of the request.
+            csrf_token: str. The csrf token to identify the user.
+            expected_status_int: int. Expected return status of the POST
+                request.
+            upload_files: list(tuple). List of
+                (fieldname, filename, file_content) tuples. Can also provide
+                just (fieldname, filename) to have the file contents be
+                read from disk.
+            use_payload: bool. If true, a new dict is created (which is sent as
+                the body of the POST request) with one key - 'payload' - and the
+                dict passed in 'data' is used as the value for that key. If
+                false, the dict in 'data' is directly passed as the body of the
+                request. For all requests called from the frontend, this should
+                be set to 'true'.
+            source: unicode. The url from which the post call is requested.
+
+        Returns:
+            dict. The JSON response for the request in dict form.
+        """
+        if use_payload:
+            data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
+        if source:
+            data['source'] = source
 
         expect_errors = expected_status_int >= 400
 
@@ -2718,7 +2758,8 @@ title: Title
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, thumbnail_filename, thumbnail_bg_color,
-            owner_id, title, description, notes, corresponding_topic_id,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
             meta_tag_content='story meta tag content'):
@@ -2738,6 +2779,8 @@ title: Title
             thumbnail_filename: str|None. Thumbnail filename for the story.
             thumbnail_bg_color: str|None. Thumbnail background color for the
                 story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -2752,8 +2795,10 @@ title: Title
         """
         story_model = story_models.StoryModel(
             id=story_id, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color, description=description,
-            title=title, language_code=language_code,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
             story_contents_schema_version=1, notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
@@ -2794,6 +2839,7 @@ title: Title
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+            thumbnail_size_in_bytes=21131,
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
@@ -2812,6 +2858,8 @@ title: Title
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the topic.
             description: str. The description of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -2845,8 +2893,9 @@ title: Title
         subtopics = subtopics or []
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids, subtopics,
+            thumbnail_bg_color, thumbnail_size_in_bytes, description,
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,

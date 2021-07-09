@@ -82,7 +82,7 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-add-chapter-description'));
   var nodeOutlineEditor = element(
     by.css('.protractor-test-add-chapter-outline'));
-  var nodeOutlineEditorRteContent = element.all(by.css('.oppia-rte'));
+  var nodeOutlineEditorRteContent = element.all(by.css('.protractor-test-rte'));
   var nodeOutlineFinalizeCheckbox = element(
     by.css('.protractor-test-finalize-outline'));
   var nodeOutlineSaveButton = element(
@@ -108,15 +108,19 @@ var StoryEditorPage = function() {
   var warningTextElements = element.all(
     by.css('.protractor-test-warnings-text'));
   var storyThumbnailImageElement = element(
-    by.css('.story-thumbnail .protractor-test-custom-photo'));
+    by.css('.protractor-test-story-thumbnail .protractor-test-custom-photo'));
   var storyThumbnailButton = element(
-    by.css('.story-thumbnail .protractor-test-photo-button'));
+    by.css('.protractor-test-story-thumbnail .protractor-test-photo-button'));
   var chapterThumbnailImageElement = element(
-    by.css('.story-node-thumbnail .protractor-test-custom-photo'));
+    by.css(
+      '.protractor-test-story-node-thumbnail .protractor-test-custom-photo'));
   var chapterThumbnailButton = element(
-    by.css('.story-node-thumbnail .protractor-test-photo-button'));
+    by.css(
+      '.protractor-test-story-node-thumbnail .protractor-test-photo-button'));
   var createChapterThumbnailButton = element(
-    by.css('.chapter-input-thumbnail .protractor-test-photo-button'));
+    by.css(
+      '.protractor-test-chapter-input-thumbnail .protractor-test-photo-button')
+  );
   var explorationAlreadyPresentMsg = element(
     by.css('.protractor-test-invalid-exp-id'));
   var discardOption = element(by.css('.protractor-test-show-discard-option'));
@@ -226,7 +230,7 @@ var StoryEditorPage = function() {
 
   this.dragChapterToAnotherChapter = (async function(chapter1, chapter2) {
     await waitFor.visibilityOf(
-      await chapterTitles.first(),
+      chapterTitles.first(),
       'Chapter titles taking too long to appear.');
     var matchFound = false;
     for (var i = 0; i < await chapterTitles.count(); i++) {
@@ -399,7 +403,7 @@ var StoryEditorPage = function() {
     // Function scrollToTop is added to prevent chapterTitles from being hidden
     // by the navbar.
     await general.scrollToTop();
-    var chapterTitleButton = await chapterTitles.get(index);
+    var chapterTitleButton = chapterTitles.get(index);
     await chapterTitleButton.click();
   };
 
@@ -460,12 +464,12 @@ var StoryEditorPage = function() {
   };
 
   this.deleteAcquiredSkillByIndex = async function(index) {
-    var deleteButton = await deleteAcquiredSkillButton.get(index);
+    var deleteButton = deleteAcquiredSkillButton.get(index);
     await action.click('Delete Acquired Skill Button', deleteButton);
   };
 
   this.deletePrerequisiteSkillByIndex = async function(index) {
-    var deleteButton = await deletePrerequisiteSkillButton.get(index);
+    var deleteButton = deletePrerequisiteSkillButton.get(index);
     await action.click('Delete Prerequisite Skill Button', deleteButton);
   };
 
@@ -498,7 +502,8 @@ var StoryEditorPage = function() {
     var warningElemCount = await warningTextElements.count();
     var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
-      var text = await warningTextElements.get(i).getText();
+      var text = await action.getText(
+        'Warning Text', warningTextElements.get(i));
       if (warning.test(text)) {
         matchFound = true;
         break;

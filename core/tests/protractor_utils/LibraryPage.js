@@ -37,18 +37,14 @@ var LibraryPage = function() {
   };
 
   var categorySelector = forms.MultiSelectEditor(
-    element(by.css(
-      '.protractor-library-page-search-bar ' +
-      '.protractor-test-search-bar-category-selector')));
+    element(by.css('.protractor-test-search-bar-category-selector')));
   var explorationObjective = element(
     by.css('.protractor-test-exp-summary-tile-objective'));
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
   var languageSelector = forms.MultiSelectEditor(
-    element(by.css(
-      '.protractor-library-page-search-bar ' +
-      '.protractor-test-search-bar-language-selector')));
+    element(by.css('.protractor-test-search-bar-language-selector')));
   var searchInputs = element.all(
     by.css('.protractor-test-search-input'));
   var mainHeader = element(by.css('.protractor-test-library-main-header'));
@@ -75,8 +71,8 @@ var LibraryPage = function() {
 
     // Function get is a zero-based index.
     var searchInput = (
-      browser.isMobile ? await searchInputs.get(1) :
-      await searchInputs.first());
+      browser.isMobile ? searchInputs.get(1) :
+      searchInputs.first());
     await action.clear('Search input', searchInput);
     await action.sendKeys('Search input', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isPresent();
