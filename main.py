@@ -906,7 +906,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
 
     get_redirect_route(
-        r'%s' % feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
+        r'%s' % feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
         incoming_app_feedback_report.IncomingAndroidFeedbackReportHandler),
     get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',

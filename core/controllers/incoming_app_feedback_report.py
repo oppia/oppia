@@ -28,6 +28,9 @@ import utils
 class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests.

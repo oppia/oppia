@@ -853,7 +853,7 @@ FRACTIONS_LANDING_PAGE_URL = '/fractions'
 IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
 IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
-INCOMING_APP_FEEDBACK_REPORT_URL = (
+INCOMING_ANDROID_FEEDBACK_REPORT_URL = (
     '/app_feedback_report/incoming_android_report')
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')

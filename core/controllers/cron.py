@@ -306,6 +306,9 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
 class CronAppFeedbackReportsScrubberHandler(base.BaseHandler):
     """Handler for scrubbing app feedback reports that are expiring."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests to scrub reports. This cron handler scrubs all
