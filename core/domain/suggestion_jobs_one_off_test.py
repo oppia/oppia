@@ -1055,11 +1055,6 @@ class PopulateTranslationContributionStatsOneOffJobTests(
             """Used to mock the get_content_html method for explorations."""
             return '<p>This is html to translate.</p>'
 
-    # A mock exploration created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
-    ]
-
     class MockOpportunity(python_utils.OBJECT):
         """Mocks an exploration opportunity. To be used only for testing."""
 
@@ -1136,7 +1131,6 @@ class PopulateTranslationContributionStatsOneOffJobTests(
     def _run_job_and_verify_output(self, expected_output):
         """Runs the PopulateTranslationContributionStatsOneOffJob and verifies
         that the output matches the expected output.
-
         Args:
             expected_output: list(str). The expected output from the one off
                 job.

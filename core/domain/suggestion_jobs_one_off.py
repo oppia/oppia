@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import datetime
 
 from constants import constants
 from core import jobs
@@ -352,10 +353,6 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class ContentSuggestionFormatUpdateOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that migrates the format of content suggestions."""
-
 class PopulateTranslationContributionStatsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to populate translation
@@ -370,10 +367,8 @@ class PopulateTranslationContributionStatsOneOffJob(
     def map(item):
         """Implements the map function (generator). Computes word counts of
         translations suggestions and outputs suggestion metadata.
-
         Args:
             item: GeneralSuggestionModel. An instance of GeneralSuggestionModel.
-
         Yields:
             tuple(key, recent_activity_commits). Where:
                 key: str. The entity ID of the corresponding
@@ -423,7 +418,6 @@ class PopulateTranslationContributionStatsOneOffJob(
     def reduce(key, stringified_values):
         """Updates the TranslationContributionStatsModel for the given key
         and stringified_values.
-
         Args:
             key: str. Entity ID for a TranslationContributionStatsModel.
             stringified_values: list(dict(str, str)). A list of stringified
@@ -435,7 +429,6 @@ class PopulateTranslationContributionStatsOneOffJob(
                         suggestion content HTML.
                     last_updated_date: date. The last updated date of the
                         translation suggestion.
-
         Yields:
             tuple(key, count). Where:
                 key: str. TranslationContributionStatsModel entity ID.
