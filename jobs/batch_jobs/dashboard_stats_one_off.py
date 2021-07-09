@@ -65,6 +65,8 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
             | beam.Filter(
                 lambda models: len(models) == 1 and
                 job_utils.get_model_kind(models[0]) == 'UserSettingsModel')
+            # Choosing the first element
+            | beam.Map(lambda model_list: model_list[0])
             # Creates the missing UserStatsModels.
             | beam.ParDo(CreateUserStatsModel())
         )
@@ -87,7 +89,7 @@ class DashboardStatsOneOffJob(base_jobs.JobBase):
 class CreateUserStatsModel(beam.DoFn):
 
     def process(self, user_settings_model):
-        model = job_utils.clone_model(user_settings_model[0])
+        model = job_utils.clone_model(user_settings_model)
         user_stats_model = user_models.UserStatsModel(id=model.id)
         user_stats_model.update_timestamps()
         yield user_stats_model
