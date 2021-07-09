@@ -612,6 +612,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
             self.TOPIC_ID)
 
+        # Save a dummy image on filesystem, to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit(
+            '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         # Test whether an admin can edit a topic.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -665,6 +677,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.abbreviated_name, 'short-name')
         self.assertEqual(topic.url_fragment, 'url-name')
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic.thumbnail_size_in_bytes, len(raw_image))
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic.practice_tab_is_displayed, True)
@@ -673,6 +686,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
+
+        # Test whether a topic_manager can update a dummy thumbnail_filename.
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+            'old_value': '',
+            'new_value': 'dummy_thumbnail.svg'
+        })]
+        with self.assertRaisesRegexp(Exception, (
+            'The thumbnail dummy_thumbnail.svg for topic with id '
+            '%s does not exist in the filesystem.' % self.TOPIC_ID)):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Updated thumbnail filename.')
 
         # Test whether a topic_manager can edit a topic.
         changelist = [topic_domain.TopicChange({

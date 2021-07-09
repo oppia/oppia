@@ -115,16 +115,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_url_fragment('test-topic')
         topic.update_meta_tag_content('tag')
         topic.update_page_title_fragment_for_web('page title for topic')
-        topic.update_thumbnail_filename('test_svg.svg')
-        topic.update_thumbnail_bg_color('#C6DCDA')
 
-        # Add other structures to the topic.
-        topic.add_canonical_story(story_id)
-        topic.add_uncategorized_skill_id(skill_id)
-        topic.add_subtopic(1, 'Test Subtopic Title')
-
-        # Save the dummy image to the filesystem to be used as thumbnail for
-        # subtopic.
+        # Save the dummy image to the filesystem to be used as thumbnail.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb', encoding=None) as f:
@@ -135,6 +127,15 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         fs.commit(
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
+        # Update thumbnail properties.
+        topic.update_thumbnail_filename('test_svg.svg')
+        topic.update_thumbnail_bg_color('#C6DCDA')
+
+        # Add other structures to the topic.
+        topic.add_canonical_story(story_id)
+        topic.add_uncategorized_skill_id(skill_id)
+        topic.add_subtopic(1, 'Test Subtopic Title')
+
         # Update and validate subtopic.
         topic.update_subtopic_thumbnail_filename(1, 'test_svg.svg')
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
