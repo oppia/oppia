@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for partnerships page.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { PartnershipsPageComponent } from './partnerships-page.component';
 import { UrlInterpolationService } from
@@ -27,7 +28,8 @@ describe('Partnerships page', () => {
       declarations: [PartnershipsPageComponent],
       providers: [
         UrlInterpolationService,
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   });
 
@@ -48,9 +50,10 @@ describe('Partnerships page', () => {
     component.ngOnInit();
 
     expect(component.partnershipsImgUrl).toBe(
-      '/general/partnerships_hero_image.png');
-    expect(component.formIconUrl).toBe('/icons/icon_form.png');
-    expect(component.callIconUrl).toBe('/icons/icon_call.png');
-    expect(component.changeIconUrl).toBe('/icons/icon_change.png');
+      '/assets/images/general/partnerships_hero_image.png');
+    expect(component.formIconUrl).toBe('/assets/images/icons/icon_form.png');
+    expect(component.callIconUrl).toBe('/assets/images/icons/icon_call.png');
+    expect(component.changeIconUrl).toBe(
+      '/assets/images/icons/icon_change.png');
   });
 });
