@@ -22,7 +22,7 @@ require(
   'background-banner.component.ts');
 require(
   'components/question-directives/question-player/' +
-  'question-player.directive.ts');
+  'question-player.component.ts');
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
