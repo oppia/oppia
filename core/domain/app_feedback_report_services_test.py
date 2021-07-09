@@ -672,9 +672,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             old_ticket_id, old_ticket_name, self.PLATFORM_ANDROID,
             None, None, self.REPORT_SUBMITTED_TIMESTAMP,
             [self.android_report_id])
-        old_ticket_model = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-                old_ticket_id))
         self.android_report_model.ticket_id = old_ticket_id
         self.android_report_model.update_timestamps()
         self.android_report_model.put()
