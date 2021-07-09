@@ -200,3 +200,58 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'Topic topic_id failed validation: '
                       'Invalid language code: invalid_language_code']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class SubtopicThumbnailSizeAuditOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for the SubtopicThumbnailSizeAuditOneOffJob."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(SubtopicThumbnailSizeAuditOneOffJobTest, self).setUp()
+        # Setup user who will own the test topics.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_skips_deleted_topics(self):
+        """Tests that SubtopicThumbnailSizeAuditOneOffJob skips deleted
+        topic.
+        """
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
+            'a name', 'description', 'Image.svg',
+            '#C6DCDA', [], [], [], 2,
+            language_code='invalid_language_code')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.create_new()
+        )
+        topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_logs_thumbnail_filename_and_size_for_subtopics(self):
+        """Test that SubtopicThumbnailSizeAuditOneOffJob logs the
+        thumbnail_filename and thumbnail_size_in_bytes for all the subtopics.
+        """
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
+            'a name', 'description', 'Image.svg',
+            '#C6DCDA', [], [], [], 2,
+            language_code='invalid_language_code')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.create_new()
+        )
+        topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
