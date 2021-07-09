@@ -23,11 +23,9 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { ExplorationRightsService } from './exploration-rights.service';
+import { ExplorationRightsService } from './exploration-rights-backend-api.service';
 
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-
-describe('Exploration rights service', function() {
+describe('Exploration rights service', () => {
   let ers: ExplorationRightsService = null;
   let httpTestingController: HttpTestingController = null;
   let als: AlertsService = null;
@@ -84,7 +82,7 @@ describe('Exploration rights service', function() {
     httpTestingController.verify();
   });
 
-  it('should correctly initializes the service', function() {
+  it('should correctly initializes the service', () => {
     expect(ers.ownerNames).toBeUndefined();
     expect(ers.editorNames).toBeUndefined();
     expect(ers.voiceArtistNames).toBeUndefined();
@@ -119,7 +117,7 @@ describe('Exploration rights service', function() {
       sampleDataResults.rights.viewable_if_private);
   });
 
-  it('should reports the correct cloning status', function() {
+  it('should reports the correct cloning status', () => {
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.isCloned()).toBe(true);
     expect(ers.clonedFrom()).toEqual('1234');
@@ -129,7 +127,7 @@ describe('Exploration rights service', function() {
     expect(ers.clonedFrom()).toBeNull();
   });
 
-  it('should reports the correct community-owned status', function() {
+  it('should reports the correct community-owned status', () => {
     ers.init(['abc'], [], [], [], 'public', '1234', false, false);
     expect(ers.isCommunityOwned()).toBe(false);
 
@@ -137,7 +135,7 @@ describe('Exploration rights service', function() {
     expect(ers.isCommunityOwned()).toBe(true);
   });
 
-  it('should reports the correct derived statuses', function() {
+  it('should reports the correct derived statuses', () => {
     ers.init(['abc'], [], [], [], 'private', 'e1234', true, false);
     expect(ers.isPrivate()).toBe(true);
     expect(ers.isPublic()).toBe(false);
@@ -148,7 +146,7 @@ describe('Exploration rights service', function() {
   });
 
   it('should reports correcty if exploration rights is viewable when private',
-    function() {
+    () => {
       ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
       expect(ers.viewableIfPrivate()).toBe(true);
 
@@ -158,15 +156,16 @@ describe('Exploration rights service', function() {
 
   it('should change community owned to true', fakeAsync(() => {
     ers.init(['abc'], [], [], [], 'private', 'e1234', false, true);
+    ers.makeCommunityOwned();
 
     const req = httpTestingController.expectOne('/createhandler/rights/12345');
     expect(req.request.method).toEqual('PUT');
     req.flush(sampleDataResults);
+
     flushMicrotasks();
-    ers.makeCommunityOwned().then(() => {
-      expect(clearWarningsSpy).toHaveBeenCalled();
-      expect(ers.isCommunityOwned()).toBe(true);
-    });
+
+    expect(clearWarningsSpy).toHaveBeenCalled();
+    expect(ers.isCommunityOwned()).toBe(true);
   }));
 
   it('should use reject handler when changing community owned to true fails',
@@ -261,7 +260,7 @@ describe('Exploration rights service', function() {
       sampleDataResultsCopy.rights.viewer_names);
   }));
 
-  it('should save a new voice artist', function() {
+  it('should save a new voice artist', fakeAsync(() => {
     ers.init(['abc'], [], [], [], 'public', '1234', true, false);
     expect(ers.voiceArtistNames).toEqual([]);
 
@@ -276,9 +275,9 @@ describe('Exploration rights service', function() {
     flushMicrotasks();
 
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
-  });
+  }));
 
-  it('should remove existing voice artist', function() {
+  it('should remove existing voice artist', fakeAsync(() => {
     ers.init(['abc'], [], ['voiceArtist'], [], 'public', '1234', true, false);
     expect(ers.voiceArtistNames).toEqual(['voiceArtist']);
 
@@ -297,9 +296,9 @@ describe('Exploration rights service', function() {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ers.voiceArtistNames).toEqual([]);
-  });
+  }));
 
-  it('should check user already has roles', function() {
+  it('should check user already has roles', () => {
     let sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');
@@ -324,7 +323,7 @@ describe('Exploration rights service', function() {
     expect(ers.checkUserAlreadyHasRoles('notInAllUsersList')).toBeFalsy();
   });
 
-  it('should check oldrole of user', function() {
+  it('should check oldrole of user', () => {
     let sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.owner_names.push('newOwner');
     sampleDataResultsCopy.rights.viewer_names.push('newViewer');

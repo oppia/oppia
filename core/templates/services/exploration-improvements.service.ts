@@ -27,7 +27,7 @@ import { NeedsGuidingResponsesTask } from
   'domain/improvements/needs-guiding-response-task.model';
 import { State } from 'domain/state/StateObjectFactory';
 
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/services/' +

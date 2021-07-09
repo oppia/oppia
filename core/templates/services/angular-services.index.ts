@@ -368,6 +368,7 @@ import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -479,6 +480,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
+  ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
   ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],

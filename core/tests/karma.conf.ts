@@ -96,7 +96,7 @@ module.exports = function(config) {
       // To print debugging information, use `console.error`. We don't
       // output `log` level logs to avoid printing out success messages
       // for every passing spec.
-      level: 'error',
+      level: 'log',
       format: '%b %T: %m',
       terminal: true
     },

@@ -168,7 +168,7 @@ export class ExplorationRightsService {
     });
   }
 
-  async saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
+  saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
     let explorationModeratorRightsUrl = (
       '/createhandler/moderatorrights/' +
       this.explorationDataService.explorationId);
@@ -184,6 +184,10 @@ export class ExplorationRightsService {
         data.rights.voice_artist_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from,
         data.rights.community_owned, data.rights.viewable_if_private);
+    }).catch(() => {
+      this.init(
+        undefined, undefined, undefined, undefined,
+        undefined, undefined, undefined, undefined);
     });
   }
 
