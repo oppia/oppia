@@ -25,7 +25,6 @@ require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require('services/schema-form-submitted.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('interactions/NumericInput/directives/oppia-interactive-numeric-input.component.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
   function() {
@@ -114,8 +113,10 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.onDownKeyPress = function(event) {
-            var inputGreaterThanZeroWithValue=localStorage.getItem('checkInputGreaterThanZero');
-            if (inputGreaterThanZeroWithValue === "true" && ctrl.localValue < 1) {
+            var inputGreaterThanZeroWithValue = localStorage.getItem(
+              'checkInputGreaterThanZero');
+            if (inputGreaterThanZeroWithValue === 'true' &&
+             ctrl.localValue < 1) {
               if (event.keyCode === 40) {
                 event.preventDefault();
               }
