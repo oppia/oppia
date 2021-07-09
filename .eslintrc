@@ -148,6 +148,7 @@
     "oppia/comment-style": "error",
     "oppia/disallow-flags": "error",
     "oppia/disallow-angularjs-properties": "error",
+    "oppia/import-lodash": "error",
     "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
     "oppia/directive-scope": "error",
