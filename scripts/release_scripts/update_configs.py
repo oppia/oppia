@@ -150,7 +150,7 @@ def verify_feconf(release_feconf_path, verify_email_api_keys):
 
     Args:
         release_feconf_path: str. The path to feconf file in release
-                directory.
+            directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
     """

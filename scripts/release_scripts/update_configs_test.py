@@ -420,7 +420,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# NOTE TO DEVELOPERS: This format should not be changed, '
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
-            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' %  (
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key))
         with python_utils.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
