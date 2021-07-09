@@ -424,11 +424,10 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.set_collection_editors([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
-        collection_id = collection_services.get_new_collection_id()
         exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
 
-        response_dict = self.get_json(
+        self.get_json(
             '/exploration/metadata_search?q=%s' % exploration_id)
         self.logout()
