@@ -134,6 +134,7 @@ describe('Exploration Summary Tile Component', () => {
   let windowRef: MockWindowRef;
 
   let userInfo = {
+    _role: 'USER_ROLE',
     _isModerator: true,
     _isAdmin: false,
     _isTopicManager: false,
@@ -147,6 +148,8 @@ describe('Exploration Summary Tile Component', () => {
     isAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',

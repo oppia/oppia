@@ -64,6 +64,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'ConceptCardObjectFactory.ts',
     'contribution-and-review.service.ts',
     'contributions-and-review.component.ts',
+    'contributor-dashboard-admin-page.component.ts',
     'conversation-skin.directive.ts',
     'conversion.ts',
     'convert-to-plain-text.pipe.ts',

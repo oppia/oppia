@@ -70,6 +70,7 @@ describe('CreateActivityButtonComponent', () => {
   let ngbModal: NgbModal;
 
   let userInfoForCollectionCreator = {
+    _role: 'USER_ROLE',
     _isModerator: true,
     _isAdmin: false,
     _isTopicManager: false,
@@ -83,6 +84,8 @@ describe('CreateActivityButtonComponent', () => {
     isAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -91,6 +94,7 @@ describe('CreateActivityButtonComponent', () => {
   };
 
   let userInfoForNonCollectionCreator = {
+    _role: 'USER_ROLE',
     _isModerator: true,
     _isAdmin: false,
     _isTopicManager: false,
@@ -104,6 +108,8 @@ describe('CreateActivityButtonComponent', () => {
     isAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isQuestionAdmin: () => false,
     canCreateCollections: () => false,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',

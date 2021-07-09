@@ -1277,6 +1277,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
+            'role': 'EXPLORATION_EDITOR',
             'is_moderator': False,
             'is_admin': False,
             'is_topic_manager': False,

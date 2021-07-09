@@ -941,6 +941,101 @@ def can_access_admin_page(handler):
     return test_super_admin
 
 
+def can_access_contributor_dashboard_admin_page(handler):
+    """Decorator that checks if the user can access the contributor dashboard
+    admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks user can
+        access the contributor dashboard admin page.
+    """
+
+    def test_can_access_contributor_dashboard_admin_page(self, **kwargs):
+        """Checks if the user can access the contributor dashboard admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannot access the contributor
+                dashboard admin page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE in (
+                self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access contributor dashboard '
+            'admin page.')
+
+    test_can_access_contributor_dashboard_admin_page.__wrapped__ = True
+
+    return test_can_access_contributor_dashboard_admin_page
+
+
+def can_manage_contributors_role(handler):
+    """Decorator that checks if the current user can modify contributor's role
+    for the contributor dashboard page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can modify contributor's role for the contributor dashboard page.
+    """
+
+    def test_can_manage_contributors_role(self, category, **kwargs):
+        """Checks if the user can modify contributor's role for the contributor
+        dashboard page.
+
+        Args:
+            category: str. The category of contribution.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user cannnot modify contributor's
+                role for the contributor dashboard page.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if category in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+            if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, category, **kwargs)
+        elif category == (
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
+            if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
+                    self.user.actions):
+                return handler(self, category, **kwargs)
+        else:
+            raise self.InvalidInputException(
+                'Invalid category: %s' % category)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to modify contributor\'s role.')
+    test_can_manage_contributors_role.__wrapped__ = True
+
+    return test_can_manage_contributors_role
+
+
 def can_delete_any_user(handler):
     """Decorator that checks if the current user can delete any user.
 

@@ -83,6 +83,7 @@ describe('Create Activity Modal Component', () =>{
   it('should evalute component properties after component is initialized',
     fakeAsync(() => {
       const UserInfoObject = {
+        role: 'USER_ROLE',
         is_moderator: false,
         is_admin: false,
         is_super_admin: false,

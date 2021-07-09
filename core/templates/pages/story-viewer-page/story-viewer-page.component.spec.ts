@@ -51,6 +51,7 @@ describe('Story Viewer Page component', () => {
   let windowRef: WindowRef;
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
+    role: 'USER_ROLE',
     is_moderator: false,
     is_admin: false,
     is_super_admin: false,

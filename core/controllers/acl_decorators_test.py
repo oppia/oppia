@@ -1682,6 +1682,133 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+    QUESTION_ADMIN_EMAIL = 'questionExpert@app.com'
+    QUESTION_ADMIN_USERNAME = 'questionExpert'
+    TRANSLATION_ADMIN_EMAIL = 'translatorExpert@app.com'
+    TRANSLATION_ADMIN_USERNAME = 'translationExpert'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'category': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.can_manage_contributors_role
+        def get(self, unused_category):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanManageContributorsRoleDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.TRANSLATION_ADMIN_EMAIL, self.TRANSLATION_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
+
+        self.set_user_role(
+            self.TRANSLATION_ADMIN_USERNAME, feconf.ROLE_ID_TRANSLATION_ADMIN)
+
+        self.set_user_role(
+            self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/can_manage_contributors_role/<category>', self.MockHandler)
+            ], debug=feconf.DEBUG))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to modify contributor\'s role.')
+        self.logout()
+
+    def test_guest_user_cannot_manage_contributors_role(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_translation_admin_can_manage_translation_role(self):
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_translation_admin_cannot_manage_question_role(self):
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/question',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to modify contributor\'s role.')
+        self.logout()
+
+    def test_question_admin_can_manage_question_role(self):
+        self.login(self.QUESTION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/question')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_question_admin_cannot_manage_translation_role(self):
+        self.login(self.QUESTION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to modify contributor\'s role.')
+        self.logout()
+
+    def test_invalid_category_raise_error(self):
+        self.login(self.QUESTION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/invalid',
+                expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid category: invalid')
+        self.logout()
+
+
 class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     username = 'user'

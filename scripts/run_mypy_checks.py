@@ -65,6 +65,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/concept_card_viewer_test.py',
     'core/controllers/contributor_dashboard.py',
     'core/controllers/contributor_dashboard_test.py',
+    'core/controllers/contributor_dashboard_admin.py',
+    'core/controllers/contributor_dashboard_admin_test.py',
     'core/controllers/creator_dashboard.py',
     'core/controllers/creator_dashboard_test.py',
     'core/controllers/cron.py',

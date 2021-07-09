@@ -63,6 +63,7 @@ describe('Delete account modal', () => {
     userService = TestBed.inject(UserService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     const UserInfoObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
