@@ -42,6 +42,9 @@ MAX_JOBS_TO_REPORT_ON = 50
 class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
@@ -81,6 +84,9 @@ class JobStatusMailerHandler(base.BaseHandler):
 class CronDashboardStatsHandler(base.BaseHandler):
     """Handler for appending dashboard stats to a list."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
@@ -90,6 +96,9 @@ class CronDashboardStatsHandler(base.BaseHandler):
 
 class CronUserDeletionHandler(base.BaseHandler):
     """Handler for running the user deletion one off job."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -102,6 +111,9 @@ class CronUserDeletionHandler(base.BaseHandler):
 class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
     """Handler for running the fully complete user deletion one off job."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
@@ -112,6 +124,9 @@ class CronFullyCompleteUserDeletionHandler(base.BaseHandler):
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):
     """Handler for computing exploration recommendations."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -124,6 +139,9 @@ class CronExplorationRecommendationsHandler(base.BaseHandler):
 class CronActivitySearchRankHandler(base.BaseHandler):
     """Handler for computing activity search ranks."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
@@ -133,6 +151,9 @@ class CronActivitySearchRankHandler(base.BaseHandler):
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
     """Handler for cleaning up data items of completed map/reduce jobs."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -183,6 +204,9 @@ class CronModelsCleanupHandler(base.BaseHandler):
     specific types of models as deleted.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Cron handler that hard-deletes all models that were marked as deleted
@@ -202,6 +226,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
     """Handler for mailing reviewers suggestions on the Contributor
     Dashboard that need review.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
@@ -233,6 +260,9 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
     """Handler for mailing admins if there are bottlenecks that are causing a
     longer reviewer turnaround time on the Contributor Dashboard.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
