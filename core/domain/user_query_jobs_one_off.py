@@ -24,7 +24,6 @@ import datetime
 from constants import constants
 from core import jobs
 from core.domain import email_manager
-from core.domain import exp_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -141,28 +140,6 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             collection_models.CollectionRightsModel.owner_ids == user_id
         ).get()
         return collection is not None
-
-    @staticmethod
-    def _is_used_logic_proof_interaction_query_satisfied(
-            user_settings_model, _):
-        """Determines whether a user has used logic proof
-        interaction in any of the explorations created by the user.
-        """
-        user_id = user_settings_model.id
-        user_contributions = user_models.UserContributionsModel.get(
-            user_id, strict=False)
-        if user_contributions is None:
-            return False
-        exploration_ids = user_contributions.created_exploration_ids
-        exploration_instances = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                [('ExplorationModel', exploration_ids)]))[0]
-        for item in exploration_instances:
-            exploration = exp_fetchers.get_exploration_from_model(item)
-            for _, state in exploration.states.items():
-                if state.interaction.id == 'LogicProof':
-                    return True
-        return False
 
     @classmethod
     def entity_classes_to_map_over(cls):

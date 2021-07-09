@@ -5897,18 +5897,6 @@ export default {
         }]
       },
       "default_value": false
-    },
-    {
-      "backend_id": "used_logic_proof_interaction",
-      "backend_attr": "used_logic_proof_interaction",
-      "description": "Has used LogicProof interaction in any exploration",
-      "schema": {
-        "type": "bool",
-        "validators": [{
-          "id": "is_nonempty"
-        }]
-      },
-      "default_value": false
     }
   ],
 
