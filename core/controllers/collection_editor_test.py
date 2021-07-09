@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
+
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -422,11 +424,11 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_can_search_exploration_with_exploration_id(self):
         self.set_collection_editors([self.OWNER_USERNAME])
-
         self.login(self.OWNER_EMAIL)
         exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
+        exploration_id = base64.b64encode(exploration_id)
 
         self.get_json(
             '/exploration/metadata_search?q=%s' % exploration_id)
