@@ -22,7 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -90,5 +93,64 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         elif key == TopicMigrationOneOffJob._MIGRATED_KEY:
             yield (key, ['%d topics successfully migrated.' % (
                 sum(ast.literal_eval(v) for v in values))])
+        else:
+            yield (key, values)
+
+
+class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate the thumbnail_size_in_bytes attribute in topic
+     models.
+     """
+
+    _DELETED_KEY = 'topic_deleted'
+    _ERROR_KEY = 'thumbnail_size_update_error'
+    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_exists'
+    _NEW_SUCCESS_KEY = 'thumbnail_size_newly_added'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield (PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1)
+            return
+
+        if item.thumbnail_size_in_bytes is None:
+
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_TOPIC, item.id))
+
+            filepath = '%s/%s' % (
+                constants.ASSET_TYPE_THUMBNAIL,
+                item.thumbnail_filename)
+
+            if fs.isfile(filepath):
+                item.thumbnail_size_in_bytes = len(fs.get(filepath))
+                item.update_timestamps(update_last_updated_time=False)
+                topic_models.TopicModel.put_multi([item])
+                yield (
+                    PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
+            else:
+                yield (
+                    PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY,
+                    'Thumbnail %s for topic %s not found on the filesystem' % (
+                        item.thumbnail_filename,
+                        item.id
+                    ))
+        else:
+            # The attribute thumbnail_size_in_bytes is already updated.
+            yield (
+                PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if (key == PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY or
+                key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
+                key == PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY
+           ):
+            yield (key, len(values))
         else:
             yield (key, values)
