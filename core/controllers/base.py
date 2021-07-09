@@ -23,6 +23,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 
 from core.controllers import payload_validator
@@ -37,7 +38,6 @@ import utils
 
 import backports.functools_lru_cache
 import webapp2
-
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -148,7 +148,6 @@ class BaseHandler(webapp2.RequestHandler):
 
     URL_PATH_ARGS_SCHEMAS = None
     HANDLER_ARGS_SCHEMAS = None
-    ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION = ['csrf_token']
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -341,9 +340,20 @@ class BaseHandler(webapp2.RequestHandler):
         payload_arg_keys = []
         request_arg_keys = []
         for arg in self.request.arguments():
-            if arg in self.ARGS_WHICH_DO_NOT_NEED_SCHEMA_VALIDATION:
+            if arg == 'csrf_token':
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
                 continue
-            if arg == 'payload':
+            elif arg == 'source':
+                source_url = self.request.get('source')
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
+            elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
                     payload_arg_keys = payload_args.keys()

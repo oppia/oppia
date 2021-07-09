@@ -85,12 +85,3 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
         job2.put()
         self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType2'))
-
-
-class ContinuousComputationModelTest(test_utils.GenericTestBase):
-    """Tests for Oppia continuous computation models."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            job_models.ContinuousComputationModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
