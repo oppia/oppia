@@ -300,7 +300,8 @@ class NewExplorationHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         title = self.normalized_payload.get('title')
-        title = title is None ? feconf.DEFAULT_EXPLORATION_TITLE
+        if title is None:
+            title = feconf.DEFAULT_EXPLORATION_TITLE
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
