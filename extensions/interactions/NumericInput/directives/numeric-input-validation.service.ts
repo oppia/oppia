@@ -100,7 +100,7 @@ export class NumericInputValidationService {
       });
     };
     var raiseWarningForinputGreaterThanZero = function(
-        ruleIndex, input) {
+        ruleIndex: number, input: number) {
       if (input < 0 && customizationArgs.inputGreaterThanZero.value) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
