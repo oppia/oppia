@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, flush } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 

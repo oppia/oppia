@@ -17,8 +17,6 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
