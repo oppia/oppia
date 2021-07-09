@@ -48,9 +48,7 @@ class OldContributorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old contributor dashboard URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -62,9 +60,7 @@ class OldCreatorDashboardRedirectPage(base.BaseHandler):
     """Redirects the old creator dashboard URL to the new one."""
 
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
