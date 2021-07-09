@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import logging
 
 from constants import constants
@@ -53,11 +52,10 @@ import python_utils
 import utils
 
 (
-    audit_models, exp_models, opportunity_models, suggestion_models,
-    user_models
+    audit_models, exp_models, opportunity_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.exploration, models.NAMES.opportunity,
-    models.NAMES.suggestion, models.NAMES.user
+    models.NAMES.user
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'

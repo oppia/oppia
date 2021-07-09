@@ -17,10 +17,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from constants import constants
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
+
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
@@ -538,7 +543,9 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             '/translationcontributionstatshandler', params={},
             expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Missing username param')
+        self.assertEqual(
+            response['error'],
+            'Missing key in handler args: username.')
 
     def test_get_stats_with_invalid_username_raises_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
