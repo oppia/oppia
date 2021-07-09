@@ -2634,8 +2634,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     PROPERTIES_RELATED_TO_CUST_ARGS = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]
 
     # PROPERTIES_RELATED_TO_ANSWER_GROUPS: List of the properties
     # related (affected by or affecting) answer groups. This list
@@ -2644,7 +2643,6 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     PROPERTIES_RELATED_TO_ANSWER_GROUPS = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
-        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS]
 
     # PROPERTIES_RELATED_TO_SOLUTION: List of the properties
@@ -2652,7 +2650,6 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     # can be changed when any new property is added or deleted which
     # affects or is affected by solution.
     PROPERTIES_RELATED_TO_SOLUTION = [
-        STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS]
@@ -2668,8 +2665,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-        STATE_PROPERTY_RECORDED_VOICEOVERS]
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
 
     def is_change_list_mergeable(
             self, change_list,
@@ -2783,11 +2779,14 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                     if state_name in changed_properties:
                         if (old_exp_states.interaction.id ==
                                 current_exp_states.interaction.id):
-                            if (STATE_PROPERTY_INTERACTION_CUST_ARGS not in
+                            if (STATE_PROPERTY_INTERACTION_CUST_ARGS
+                                    not in
                                     changed_properties[state_name] and
-                                    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS not in # pylint: disable=line-too-long
+                                    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                                    not in
                                     changed_properties[state_name] and
-                                    STATE_PROPERTY_INTERACTION_SOLUTION not in
+                                    STATE_PROPERTY_INTERACTION_SOLUTION
+                                    not in
                                     changed_properties[state_name]):
                                 change_is_mergeable = True
                     else:
@@ -2815,7 +2814,10 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                                     for property in
                                     self.PROPERTIES_RELATED_TO_CUST_ARGS) and
                                     change.property_name not in
-                                    changed_translations[state_name]):
+                                    changed_translations[state_name] and
+                                    STATE_PROPERTY_INTERACTION_CUST_ARGS
+                                    not in
+                                    changed_properties[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2827,9 +2829,13 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                             if (all(property not in
                                     changed_properties[state_name]
                                     for property in
-                                    self.PROPERTIES_RELATED_TO_ANSWER_GROUPS) and # pylint: disable=line-too-long
+                                    self.PROPERTIES_RELATED_TO_ANSWER_GROUPS)
+                                    and
                                     change.property_name not in
-                                    changed_translations[state_name]):
+                                    changed_translations[state_name] and
+                                    STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+                                    not in
+                                    changed_properties[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2879,7 +2885,9 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                                     for property in
                                     self.PROPERTIES_RELATED_TO_SOLUTION) and
                                     change.property_name not in
-                                    changed_translations[state_name]):
+                                    changed_translations[state_name] and
+                                    STATE_PROPERTY_INTERACTION_SOLUTION not in
+                                    changed_properties[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2899,10 +2907,12 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                 elif (change.property_name ==
                       STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if state_name in changed_properties:
-                        if all(property not in
-                               changed_properties[state_name]
-                               for property in
-                               self.PROPERTIES_RELATED_TO_VOICEOVERS):
+                        if (all(property not in
+                                changed_properties[state_name]
+                                for property in
+                                self.PROPERTIES_RELATED_TO_VOICEOVERS) and
+                                STATE_PROPERTY_RECORDED_VOICEOVERS not in
+                                changed_properties[state_name]):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2940,7 +2950,8 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                           STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                         if (STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME not in
                                 changed_properties[state_name] and
-                                STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME not in # pylint: disable=line-too-long
+                                STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                                not in
                                 changed_translations[state_name]):
                             change_is_mergeable = True
                     elif (change.content_id ==
