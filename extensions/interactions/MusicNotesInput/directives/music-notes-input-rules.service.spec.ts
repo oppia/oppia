@@ -21,7 +21,7 @@ import { MusicNotesInputRulesService } from
 import { UtilsService } from 'services/utils.service';
 
 describe('Music Notes Input rules service', () => {
-  let mnirs: MusicNotesInputRulesService = null;
+  let mnirs: MusicNotesInputRulesService;
   beforeEach(() => {
     mnirs = new MusicNotesInputRulesService(new UtilsService());
   });

@@ -25,8 +25,11 @@ import re
 
 import python_utils
 
+from typing import Any, Dict, Text, TextIO # isort:skip # pylint: disable=unused-import
+
 
 def parse_json_from_js(js_file):
+    # type: (TextIO) -> Dict[Text, Any]
     """Extracts JSON object from JS file.
 
     Args:
@@ -40,10 +43,12 @@ def parse_json_from_js(js_file):
     json_start = text_without_comments.find('{\n')
     # Add 1 to index returned because the '}' is part of the JSON object.
     json_end = text_without_comments.rfind('}') + 1
-    return json.loads(text_without_comments[json_start:json_end])
+    json_dict = json.loads(text_without_comments[json_start:json_end]) # type: Dict[Text, Any]
+    return json_dict
 
 
 def remove_comments(text):
+    # type: (Text) -> Text
     """Removes comments from given text.
 
     Args:
@@ -55,14 +60,20 @@ def remove_comments(text):
     return re.sub(r'  //.*\n', r'', text)
 
 
-class Constants(dict):
+class Constants(dict): # type: ignore[type-arg]
     """Transforms dict to object, attributes can be accessed by dot notation."""
 
-    __getattr__ = dict.__getitem__
+    def __setattr__(self, name, value):
+        # type: (Text, Any) -> None
+        self[name] = value
+
+    def __getattr__(self, name):
+        # type: (Text) -> Any
+        return self[name]
 
 
-with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f:
+with python_utils.open_file(os.path.join('assets', 'constants.ts'), 'r') as f: # type: ignore[no-untyped-call]
     constants = Constants(parse_json_from_js(f))  # pylint:disable=invalid-name
 
-with python_utils.open_file('release_constants.json', 'r') as f:
+with python_utils.open_file('release_constants.json', 'r') as f: # type: ignore[no-untyped-call]
     release_constants = Constants(json.loads(f.read()))  # pylint:disable=invalid-name
