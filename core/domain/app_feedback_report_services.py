@@ -259,7 +259,7 @@ def _update_report_stats_model_in_transaction(
         app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
             stats_id))
     if stats_model is None:
-        assert(delta > 0)
+        assert delta > 0
         # Create new stats model entity. These are the individual report fields
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.

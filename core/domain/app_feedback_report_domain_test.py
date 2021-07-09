@@ -1254,8 +1254,8 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
         }
         self._assert_validation_error(
             self.stats_obj,
-            'The parameter %s is not a valid parameter to aggregate stats on' % (
-                'invalid_stat_name'))
+            'The parameter %s is not a valid parameter to aggregate stats '
+            'on' % 'invalid_stat_name')
 
     def test_validation_parameter_value_counts_objects_are_invalid_fails(self):
         self.stats_obj.daily_param_stats = {

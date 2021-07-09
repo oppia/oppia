@@ -1379,8 +1379,8 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
                 'received: %r' % self.total_reports_submitted)
         if self.total_reports_submitted < 0:
             raise utils.ValidationError(
-                'The total number of submitted reports should be a non-negative '
-                'int, received: %d' % self.total_reports_submitted)
+                'The total number of submitted reports should be a non-negative'
+                ' int, received: %d' % self.total_reports_submitted)
         self.require_valid_daily_param_stats(self.daily_param_stats)
 
     @classmethod
