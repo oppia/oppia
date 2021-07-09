@@ -23,7 +23,6 @@ from core.controllers import base
 from core.domain import email_manager
 from core.domain import user_services
 import feconf
-import utils
 
 
 class ContributorDashboardAdminPage(base.BaseHandler):
@@ -81,9 +80,6 @@ class AddContributionRightsHandler(base.BaseHandler):
         language_code = self.normalized_payload.get('language_code', None)
 
         if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
-            if not utils.is_supported_audio_language_code(language_code):
-                raise self.InvalidInputException(
-                    'Invalid language_code: %s' % language_code)
             if user_services.can_review_translation_suggestions(
                     user_id, language_code=language_code):
                 raise self.InvalidInputException(
@@ -148,18 +144,12 @@ class RemoveContributionRightsHandler(base.BaseHandler):
     @acl_decorators.can_manage_contributors_role
     def put(self, category):
         username = self.normalized_payload.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
         language_code = self.normalized_payload.get('language_code', None)
-        if language_code is not None and not (
-                utils.is_supported_audio_language_code(language_code)):
-            raise self.InvalidInputException(
-                'Invalid language_code: %s' % language_code)
 
         if (category ==
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
@@ -184,9 +174,6 @@ class RemoveContributionRightsHandler(base.BaseHandler):
                     '%s does not have rights to submit question.' % (
                         username))
             user_services.remove_question_submit_rights(user_id)
-        else:
-            raise self.InvalidInputException(
-                'Invalid category: %s' % category)
 
         if category in [
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
@@ -228,11 +215,6 @@ class ContributorUsersListHandler(base.BaseHandler):
     @acl_decorators.can_manage_contributors_role
     def get(self, category):
         language_code = self.normalized_request.get('language_code')
-        if language_code is not None and not (
-                utils.is_supported_audio_language_code(language_code)):
-            raise self.InvalidInputException(
-                'Invalid language_code: %s' % language_code)
-
         usernames = user_services.get_contributor_usernames(
             category, language_code=language_code)
         self.render_json({'usernames': usernames})
@@ -256,8 +238,6 @@ class ContributionRightsDataHandler(base.BaseHandler):
     @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self):
         username = self.normalized_request.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
