@@ -2509,109 +2509,113 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
         # Added_state_names: list(str). Names of the states added to the
         # exploration from prev_exp_version to current_exp_version. It
         # stores the latest name of the added state.
-        added_state_names = []
+        self.added_state_names = []
 
         # Deleted_state_names: list(str). Names of the states deleted from
         # the exploration from prev_exp_version to current_exp_version.
         # It stores the initial name of the deleted state from
         # pre_exp_version.
-        deleted_state_names = []
+        self.deleted_state_names = []
 
         # New_to_old_state_names: dict. Dictionary mapping state names of
         # current_exp_version to the state names of prev_exp_version.
         # It doesn't include the name changes of added/deleted states.
-        new_to_old_state_names = {}
+        self.new_to_old_state_names = {}
 
         # Changed_properties: dict. List of all the properties changed
         # according to the state and property name.
-        changed_properties = {}
+        self.changed_properties = {}
 
         # Changed_translations: dict. List of all the translations changed
         # according to the state and content_id name.
-        changed_translations = {}
+        self.changed_translations = {}
 
         for change in composite_change_list:
-            if change.cmd == CMD_ADD_STATE:
-                added_state_names.append(change.state_name)
-            elif change.cmd == CMD_DELETE_STATE:
-                state_name = change.state_name
-                if state_name in added_state_names:
-                    added_state_names.remove(state_name)
-                else:
-                    original_state_name = state_name
-                    if original_state_name in new_to_old_state_names:
-                        original_state_name = new_to_old_state_names.pop(
-                            original_state_name)
-                    deleted_state_names.append(original_state_name)
-            elif change.cmd == CMD_RENAME_STATE:
-                old_state_name = change.old_state_name
-                new_state_name = change.new_state_name
-                if old_state_name in added_state_names:
-                    added_state_names.remove(old_state_name)
-                    added_state_names.append(new_state_name)
-                elif old_state_name in new_to_old_state_names:
-                    new_to_old_state_names[new_state_name] = (
-                        new_to_old_state_names.pop(old_state_name))
-                else:
-                    new_to_old_state_names[new_state_name] = old_state_name
+            self._parse_change_list(change)
 
-            elif change.cmd == CMD_EDIT_STATE_PROPERTY:
-                # A condition to store the name of the properties changed
-                # in changed_properties dict.
-                state_name = change.state_name
-                if state_name in new_to_old_state_names:
-                    state_name = new_to_old_state_names[change.state_name]
-                if state_name in changed_properties:
-                    if (change.property_name not in
-                            changed_properties[state_name]):
-                        changed_properties[state_name].append(
-                            change.property_name)
-                else:
-                    changed_properties[state_name] = [change.property_name]
-            elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
-                changed_property = None
-                if change.content_id == STATE_PROPERTY_CONTENT:
-                    changed_property = STATE_PROPERTY_CONTENT
-                elif change.content_id[:14] == 'ca_placeholder':
-                    changed_property = STATE_PROPERTY_INTERACTION_CUST_ARGS
-                elif (change.content_id ==
-                      STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                    changed_property = (
-                        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME)
-                elif change.content_id == STATE_PROPERTY_INTERACTION_SOLUTION:
-                    changed_property = STATE_PROPERTY_INTERACTION_SOLUTION
-                elif change.content_id[:4] == 'hint':
-                    changed_property = STATE_PROPERTY_INTERACTION_HINTS
-                elif change.content_id[:8] == 'feedback':
-                    changed_property = STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                elif change.content_id[:10] == 'rule_input':
-                    changed_property = STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                # A condition to store the name of the properties changed
-                # in changed_properties dict.
-                state_name = change.state_name
-                if state_name in new_to_old_state_names:
-                    state_name = new_to_old_state_names[change.state_name]
-                if state_name in changed_translations:
-                    if (changed_property not in
-                            changed_translations[state_name]):
-                        changed_translations[state_name].append(
-                            changed_property)
-                else:
-                    changed_translations[state_name] = [changed_property]
-                if state_name in changed_properties:
-                    if (STATE_PROPERTY_WRITTEN_TRANSLATIONS not in
-                            changed_properties[state_name]):
-                        changed_properties[state_name].append(
-                            STATE_PROPERTY_WRITTEN_TRANSLATIONS)
-                else:
-                    changed_properties[state_name] = [
-                        STATE_PROPERTY_WRITTEN_TRANSLATIONS]
+    def _parse_change_list(self, change):
+        """This function take the change and according to the cmd
+        add the property name in the lists defined above.
 
-        self.added_state_names = added_state_names
-        self.deleted_state_names = deleted_state_names
-        self.new_to_old_state_names = new_to_old_state_names
-        self.changed_properties = changed_properties
-        self.changed_translations = changed_translations
+        Args:
+            change: obj(ExplorationChange). A change from the
+                composite_change_list.
+        """
+        if change.cmd == CMD_ADD_STATE:
+            self.added_state_names.append(change.state_name)
+        elif change.cmd == CMD_DELETE_STATE:
+            state_name = change.state_name
+            if state_name in self.added_state_names:
+                self.added_state_names.remove(state_name)
+            else:
+                original_state_name = state_name
+                if original_state_name in self.new_to_old_state_names:
+                    original_state_name = self.new_to_old_state_names.pop(
+                        original_state_name)
+                self.deleted_state_names.append(original_state_name)
+        elif change.cmd == CMD_RENAME_STATE:
+            old_state_name = change.old_state_name
+            new_state_name = change.new_state_name
+            if old_state_name in self.added_state_names:
+                self.added_state_names.remove(old_state_name)
+                self.added_state_names.append(new_state_name)
+            elif old_state_name in self.new_to_old_state_names:
+                self.new_to_old_state_names[new_state_name] = (
+                    self.new_to_old_state_names.pop(old_state_name))
+            else:
+                self.new_to_old_state_names[new_state_name] = old_state_name
+
+        elif change.cmd == CMD_EDIT_STATE_PROPERTY:
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
+            state_name = change.state_name
+            if state_name in self.new_to_old_state_names:
+                state_name = self.new_to_old_state_names[change.state_name]
+            if state_name in self.changed_properties:
+                if (change.property_name not in
+                        self.changed_properties[state_name]):
+                    self.changed_properties[state_name].append(
+                        change.property_name)
+            else:
+                self.changed_properties[state_name] = [change.property_name]
+        elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
+            changed_property = None
+            if change.content_id == STATE_PROPERTY_CONTENT:
+                changed_property = STATE_PROPERTY_CONTENT
+            elif change.content_id[:3] == 'ca_':
+                changed_property = STATE_PROPERTY_INTERACTION_CUST_ARGS
+            elif (change.content_id ==
+                  STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                changed_property = (
+                    STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME)
+            elif change.content_id == STATE_PROPERTY_INTERACTION_SOLUTION:
+                changed_property = STATE_PROPERTY_INTERACTION_SOLUTION
+            elif change.content_id[:4] == 'hint':
+                changed_property = STATE_PROPERTY_INTERACTION_HINTS
+            elif change.content_id[:8] == 'feedback':
+                changed_property = STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+            elif change.content_id[:10] == 'rule_input':
+                changed_property = STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
+            state_name = change.state_name
+            if state_name in self.new_to_old_state_names:
+                state_name = self.new_to_old_state_names[change.state_name]
+            if state_name in self.changed_translations:
+                if (changed_property not in
+                        self.changed_translations[state_name]):
+                    self.changed_translations[state_name].append(
+                        changed_property)
+            else:
+                self.changed_translations[state_name] = [changed_property]
+            if state_name in self.changed_properties:
+                if (STATE_PROPERTY_WRITTEN_TRANSLATIONS not in
+                        self.changed_properties[state_name]):
+                    self.changed_properties[state_name].append(
+                        STATE_PROPERTY_WRITTEN_TRANSLATIONS)
+            else:
+                self.changed_properties[state_name] = [
+                    STATE_PROPERTY_WRITTEN_TRANSLATIONS]
 
     # NOTE: List PROPERTIES_RELATED_TO_CUST_ARGS,
     # PROPERTIES_RELATED_TO_ANSWER_GROUPS, and
@@ -2627,41 +2631,45 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
     # related (affected by or affecting) customization args. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by customization args.
-    PROPERTIES_RELATED_TO_CUST_ARGS = [STATE_PROPERTY_INTERACTION_SOLUTION,
-                                       STATE_PROPERTY_RECORDED_VOICEOVERS,
-                                       STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                                       STATE_PROPERTY_INTERACTION_CUST_ARGS]
+    PROPERTIES_RELATED_TO_CUST_ARGS = [
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
 
     # PROPERTIES_RELATED_TO_ANSWER_GROUPS: List of the properties
     # related (affected by or affecting) answer groups. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by answer groups.
-    PROPERTIES_RELATED_TO_ANSWER_GROUPS = [STATE_PROPERTY_INTERACTION_SOLUTION,
-                                           STATE_PROPERTY_RECORDED_VOICEOVERS,
-                                           STATE_PROPERTY_INTERACTION_ANSWER_GROUPS, # pylint: disable=line-too-long
-                                           STATE_PROPERTY_INTERACTION_CUST_ARGS]
+    PROPERTIES_RELATED_TO_ANSWER_GROUPS = [
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
 
     # PROPERTIES_RELATED_TO_SOLUTION: List of the properties
     # related (affected by or affecting) solution. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by solution.
-    PROPERTIES_RELATED_TO_SOLUTION = [STATE_PROPERTY_INTERACTION_SOLUTION,
-                                      STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-                                      STATE_PROPERTY_RECORDED_VOICEOVERS,
-                                      STATE_PROPERTY_INTERACTION_CUST_ARGS]
+    PROPERTIES_RELATED_TO_SOLUTION = [
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
 
     # PROPERTIES_RELATED_TO_VOICEOVERS: List of the properties
     # related (affected by or affecting) voiceovers. This list
     # can be changed when any new property is added or deleted which
     # affects or is affected by voiceovers.
-    PROPERTIES_RELATED_TO_VOICEOVERS = [STATE_PROPERTY_CONTENT,
-                                        STATE_PROPERTY_INTERACTION_SOLUTION,
-                                        STATE_PROPERTY_INTERACTION_HINTS,
-                                        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
-                                        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS, # pylint: disable=line-too-long
-                                        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME, # pylint: disable=line-too-long
-                                        STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                                        STATE_PROPERTY_RECORDED_VOICEOVERS]
+    PROPERTIES_RELATED_TO_VOICEOVERS = [
+        STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_INTERACTION_HINTS,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS,
+        STATE_PROPERTY_RECORDED_VOICEOVERS]
 
     def is_change_list_mergeable(
             self, change_list,
@@ -2710,10 +2718,10 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
             # situations and can figure out the way if it’s possible to
             # handle these cases.
 
-            return {
+            return ({
                 'changes_are_mergeable': False,
                 'send_email': True
-            }
+            })
 
         changes_are_mergeable = False
 
@@ -2737,51 +2745,50 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                         old_to_new_state_names):
                     change_is_mergeable = True
             elif change.cmd == CMD_EDIT_STATE_PROPERTY:
-                old_state_name = change.state_name
-                new_state_name = change.state_name
+                state_name = change.state_name
                 if change.state_name in state_names_of_renamed_states:
-                    old_state_name = (
+                    state_name = (
                         state_names_of_renamed_states[change.state_name])
-                if old_state_name in old_to_new_state_names:
+                if state_name in old_to_new_state_names:
                     # Here we will send the changelist, frontend_version,
                     # backend_version and exploration to the admin, so
                     # that the changes related to state renames can be
                     # reviewed and the proper conditions can be written
                     # to handle those cases.
-                    return {
+                    return ({
                         'changes_are_mergeable': False,
                         'send_email': True
-                    }
+                    })
 
-                if old_state_name not in changed_translations:
-                    changed_translations[old_state_name] = []
-                frontend_exp_states = (
-                    exp_at_change_list_version.states[old_state_name])
+                if state_name not in changed_translations:
+                    changed_translations[state_name] = []
+                old_exp_states = (
+                    exp_at_change_list_version.states[state_name])
                 current_exp_states = (
-                    current_exploration.states[old_state_name])
+                    current_exploration.states[state_name])
                 if (change.property_name ==
                         STATE_PROPERTY_CONTENT):
-                    if old_state_name in changed_properties:
-                        if (frontend_exp_states.content.html ==
+                    if state_name in changed_properties:
+                        if (old_exp_states.content.html ==
                                 current_exp_states.content.html):
                             if (STATE_PROPERTY_CONTENT not in
-                                    changed_translations[old_state_name] and
+                                    changed_translations[state_name] and
                                     STATE_PROPERTY_RECORDED_VOICEOVERS not in
-                                    changed_properties[old_state_name]):
+                                    changed_properties[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_ID):
-                    if old_state_name in changed_properties:
-                        if (frontend_exp_states.interaction.id ==
+                    if state_name in changed_properties:
+                        if (old_exp_states.interaction.id ==
                                 current_exp_states.interaction.id):
                             if (STATE_PROPERTY_INTERACTION_CUST_ARGS not in
-                                    changed_properties[old_state_name] and
+                                    changed_properties[state_name] and
                                     STATE_PROPERTY_INTERACTION_ANSWER_GROUPS not in # pylint: disable=line-too-long
-                                    changed_properties[old_state_name] and
+                                    changed_properties[state_name] and
                                     STATE_PROPERTY_INTERACTION_SOLUTION not in
-                                    changed_properties[old_state_name]):
+                                    changed_properties[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2800,40 +2807,40 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                 # individual fields.
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    if old_state_name in changed_properties:
-                        if (frontend_exp_states.interaction.id ==
+                    if state_name in changed_properties:
+                        if (old_exp_states.interaction.id ==
                                 current_exp_states.interaction.id):
                             if (all(property not in
-                                    changed_properties[old_state_name]
+                                    changed_properties[state_name]
                                     for property in
                                     self.PROPERTIES_RELATED_TO_CUST_ARGS) and
                                     change.property_name not in
-                                    changed_translations[old_state_name]):
+                                    changed_translations[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    if old_state_name in changed_properties:
-                        if (frontend_exp_states.interaction.id ==
+                    if state_name in changed_properties:
+                        if (old_exp_states.interaction.id ==
                                 current_exp_states.interaction.id):
                             if (all(property not in
-                                    changed_properties[old_state_name]
+                                    changed_properties[state_name]
                                     for property in
                                     self.PROPERTIES_RELATED_TO_ANSWER_GROUPS) and # pylint: disable=line-too-long
                                     change.property_name not in
-                                    changed_translations[old_state_name]):
+                                    changed_translations[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
                      ):
-                    if old_state_name in changed_properties:
+                    if state_name in changed_properties:
                         if (change.property_name not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 change.property_name not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
@@ -2854,34 +2861,34 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                 # So it will not be possible to find out the exact change.
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_HINTS):
-                    if old_state_name in changed_properties:
+                    if state_name in changed_properties:
                         if (change.property_name not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 change.property_name not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_SOLUTION):
-                    if old_state_name in changed_properties:
-                        if (frontend_exp_states.interaction.id ==
+                    if state_name in changed_properties:
+                        if (old_exp_states.interaction.id ==
                                 current_exp_states.interaction.id):
                             if (all(property not in
-                                    changed_properties[old_state_name]
+                                    changed_properties[state_name]
                                     for property in
                                     self.PROPERTIES_RELATED_TO_SOLUTION) and
                                     change.property_name not in
-                                    changed_translations[old_state_name]):
+                                    changed_translations[state_name]):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
-                    if old_state_name in changed_properties:
-                        if (frontend_exp_states.interaction.id ==
+                    if state_name in changed_properties:
+                        if (old_exp_states.interaction.id ==
                                 current_exp_states.interaction.id and
-                                frontend_exp_states.solicit_answer_details ==
+                                old_exp_states.solicit_answer_details ==
                                 current_exp_states.solicit_answer_details):
                             change_is_mergeable = True
                     else:
@@ -2891,76 +2898,75 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                     change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if old_state_name in changed_properties:
+                    if state_name in changed_properties:
                         if all(property not in
-                               changed_properties[old_state_name]
+                               changed_properties[state_name]
                                for property in
                                self.PROPERTIES_RELATED_TO_VOICEOVERS):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True
             elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
-                old_state_name = change.state_name
-                new_state_name = change.state_name
+                state_name = change.state_name
                 if change.state_name in state_names_of_renamed_states:
-                    old_state_name = (
+                    state_name = (
                         state_names_of_renamed_states[change.state_name])
-                if old_state_name in old_to_new_state_names:
+                if state_name in old_to_new_state_names:
                     # Here we will send the changelist, frontend_version,
                     # backend_version and exploration to the admin, so
                     # that the changes related to state renames can be
                     # reviewed and the proper conditions can be written
                     # to handle those cases.
-                    return {
+                    return ({
                         'changes_are_mergeable': False,
                         'send_email': True
-                    }
-                if old_state_name not in changed_translations:
-                    changed_translations[old_state_name] = []
-                if old_state_name in changed_properties:
+                    })
+                if state_name not in changed_translations:
+                    changed_translations[state_name] = []
+                if state_name in changed_properties:
                     if change.content_id == STATE_PROPERTY_CONTENT:
                         if (STATE_PROPERTY_CONTENT not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_CONTENT not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
-                    elif change.content_id[:14] == 'ca_placeholder':
+                    elif change.content_id[:3] == 'ca_':
                         if (STATE_PROPERTY_INTERACTION_CUST_ARGS not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_INTERACTION_CUST_ARGS not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     elif (change.content_id ==
                           STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                         if (STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME not in # pylint: disable=line-too-long
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     elif (change.content_id ==
                           STATE_PROPERTY_INTERACTION_SOLUTION):
                         if (STATE_PROPERTY_INTERACTION_SOLUTION not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_INTERACTION_SOLUTION not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     elif change.content_id[:4] == 'hint':
                         if (STATE_PROPERTY_INTERACTION_HINTS not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_INTERACTION_HINTS not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     elif change.content_id[:8] == 'feedback':
                         if (STATE_PROPERTY_INTERACTION_ANSWER_GROUPS not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                     elif change.content_id[:10] == 'rule_input':
                         if (STATE_PROPERTY_INTERACTION_ANSWER_GROUPS not in
-                                changed_properties[old_state_name] and
+                                changed_properties[state_name] and
                                 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS not in
-                                changed_translations[old_state_name]):
+                                changed_translations[state_name]):
                             change_is_mergeable = True
                 else:
                     change_is_mergeable = True
@@ -3016,7 +3022,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                 changes_are_mergeable = False
                 break
 
-        return {
+        return ({
             'changes_are_mergeable': changes_are_mergeable,
             'send_email': False,
-        }
+        })
