@@ -30,6 +30,15 @@ import { Outcome } from
 
 import { AppConstants } from 'app.constants';
 
+interface Range {
+      answerGroupIndex: number,
+      ruleIndex: number,
+      lb: number,
+      ub: number,
+      lbi: boolean,
+      ubi: boolean,
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -47,7 +56,7 @@ export class NumericInputValidationService {
       stateName: string,
       customizationArgs: NumericInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -62,13 +71,14 @@ export class NumericInputValidationService {
       ubi: bool, is upper bound inclusive
     }
     */
-    var setLowerAndUpperBounds = (range, lb, ub, lbi, ubi) => {
+    var setLowerAndUpperBounds = (
+        range: Range, lb: number, ub: number, lbi: boolean, ubi: boolean) => {
       range.lb = lb;
       range.ub = ub;
       range.lbi = lbi;
       range.ubi = ubi;
     };
-    var isEnclosedBy = (ra, rb) => {
+    var isEnclosedBy = (ra: Range, rb: Range) => {
       // Checks if range ra is enclosed by range rb.
       var lowerBoundConditionIsSatisfied =
           (rb.lb < ra.lb) || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
@@ -80,7 +90,7 @@ export class NumericInputValidationService {
 
     var ranges = [];
     var raiseWarningForRuleIsInclusivelyBetween = function(
-        ruleIndex, answerGroupIndex) {
+        ruleIndex: number, answerGroupIndex: number) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: (
@@ -96,8 +106,8 @@ export class NumericInputValidationService {
         var range = {
           answerGroupIndex: i,
           ruleIndex: j,
-          lb: null,
-          ub: null,
+          lb: 0,
+          ub: 0,
           lbi: false,
           ubi: false,
         };
@@ -107,8 +117,8 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, x, x, true, true);
             break;
           case 'IsInclusivelyBetween':
-            var a = rule.inputs.a;
-            var b = rule.inputs.b;
+            var a = <number> rule.inputs.a;
+            var b = <number> rule.inputs.b;
             if (a > b) {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
@@ -159,11 +169,8 @@ export class NumericInputValidationService {
 
     return warningsList;
   }
-
-  getErrorString(value: number): string {
-    if (value === undefined || value === null) {
-      return 'Please enter a valid number.';
-    }
+  // Returns 'undefined' when no error occurs.
+  getErrorString(value: number): string | undefined {
     let stringValue = null;
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
@@ -190,8 +197,8 @@ export class NumericInputValidationService {
         stringValue = str + z;
       }
     }
-
-    if (stringValue.match(/\d/g).length > 15) {
+    const stringValueRegExp = stringValue.match(/\d/g);
+    if (stringValueRegExp === null || stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
         '(. or -).';
     }
