@@ -129,6 +129,7 @@
 /core/storage/translation/ @seanlip
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
+/core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
 
 
 # Core documentation
@@ -603,6 +604,7 @@
 /core/templates/pages/get-started-page/ @jameesjohn
 /core/templates/pages/landing-pages/ @jameesjohn
 /core/templates/pages/maintenance-page/ @jameesjohn
+/core/templates/pages/partnerships-page/ @jameesjohn
 /core/templates/pages/pending-account-deletion-page/ @jameesjohn
 /core/templates/pages/preferences-page/ @jameesjohn
 /core/templates/pages/signup-page/ @jameesjohn

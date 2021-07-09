@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for job-data.model.
  */
 
-import { Job } from 'domain/admin/job.model';
+import { Job, JobDataBackendDict } from 'domain/admin/job.model';
 
 describe('Job Data Model', () => {
   it('should correctly convert backend dict to JobData object.', () => {
-    let backendDict = {
+    let backendDict: JobDataBackendDict = {
       human_readable_time_started: 'June 04 12:17:36',
       time_started_msec: 1591273056433.883,
       job_type: 'ActivityContributorsSummaryOneOffJob',
