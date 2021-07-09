@@ -155,7 +155,7 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class StoryThumbnailSizeAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Audit job that output the thumbnail size of all 
+    """Audit job that output the thumbnail size of all
     the story nodes in story.
     """
 
