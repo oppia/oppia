@@ -51,7 +51,7 @@ export class StateAndContent {
     return this._stateName;
   }
 
-  set StateName(newStateName: string) {
+  set stateName(newStateName: string) {
     this._stateName = newStateName;
   }
 
