@@ -144,21 +144,28 @@ def check_updates_to_terms_of_service(
                 f.write(line)
 
 
-def verify_feconf(release_feconf_path, verify_mailgun_api):
+def verify_feconf(release_feconf_path, verify_email_api_keys):
     """Verifies that feconf is updated correctly to include
-    mailgun api key and redishost.
+    mailgun api key, mailchimp api key and redishost.
 
     Args:
-        verify_mailgun_api: bool. Whether to verify mailgun api key.
         release_feconf_path: str. The path to feconf file in release
             directory.
+        verify_email_api_keys: bool. Whether to verify both mailgun and
+            mailchimp api keys.
     """
     feconf_contents = python_utils.open_file(
         release_feconf_path, 'r').read()
-    if verify_mailgun_api and (
+    if verify_email_api_keys and (
             'MAILGUN_API_KEY' not in feconf_contents or
             'MAILGUN_API_KEY = None' in feconf_contents):
         raise Exception('The mailgun API key must be added before deployment.')
+
+    if verify_email_api_keys and (
+            'MAILCHIMP_API_KEY' not in feconf_contents or
+            'MAILCHIMP_API_KEY = None' in feconf_contents):
+        raise Exception(
+            'The mailchimp API key must be added before deployment.')
 
     if ('REDISHOST' not in feconf_contents or
             'REDISHOST = \'localhost\'' in feconf_contents):
@@ -196,6 +203,38 @@ def add_mailgun_api_key(release_feconf_path):
             f.write(line)
 
 
+def add_mailchimp_api_key(release_feconf_path):
+    """Adds mailchimp api key to feconf config file.
+
+    Args:
+        release_feconf_path: str. The path to feconf file in release
+            directory.
+    """
+    mailchimp_api_key = getpass.getpass(
+        prompt=('Enter mailchimp api key from the release process doc.'))
+    mailchimp_api_key = mailchimp_api_key.strip()
+
+    while re.match('^[a-z0-9]{32}-us18$', mailchimp_api_key) is None:
+        mailchimp_api_key = getpass.getpass(
+            prompt=(
+                'You have entered an invalid mailchimp api '
+                'key: %s, please retry.' % mailchimp_api_key))
+        mailchimp_api_key = mailchimp_api_key.strip()
+
+    feconf_lines = []
+    with python_utils.open_file(release_feconf_path, 'r') as f:
+        feconf_lines = f.readlines()
+
+    error_text = 'Missing mailchimp API key'
+    assert 'MAILCHIMP_API_KEY = None\n' in feconf_lines, error_text
+
+    with python_utils.open_file(release_feconf_path, 'w') as f:
+        for line in feconf_lines:
+            if line == 'MAILCHIMP_API_KEY = None\n':
+                line = line.replace('None', '\'%s\'' % mailchimp_api_key)
+            f.write(line)
+
+
 def main(
         release_dir_path, deploy_data_path, personal_access_token,
         prompt_for_mailgun_and_terms_update):
@@ -226,6 +265,7 @@ def main(
         except Exception:
             raise Exception('Terms mainpage does not exist on Github.')
         add_mailgun_api_key(release_feconf_path)
+        add_mailchimp_api_key(release_feconf_path)
         check_updates_to_terms_of_service(
             release_feconf_path, personal_access_token)
 
