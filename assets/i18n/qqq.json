@@ -399,6 +399,7 @@
 	"I18N_MODAL_CANCEL_BUTTON": "Text that is displayed in a button of a modal. On clicking it the modal closes.\n{{Identical|Cancel}}",
 	"I18N_MODAL_CONTINUE_BUTTON": "Text that is displayed in a button of a modal. On clicking it the user confirms to continue with the action.\n{{Identical|Continue}}",
 	"I18N_ONE_SUBSCRIBER_TEXT": "Text displayed under the subscribers tab in creator dashboard. If the creator has one subscriber, this text is displayed which informs him/her about the same.",
+	"I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Text displayed in the Partnerships page. - Text shown in the top left corner of the nav bar.",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_BREADCRUMB": "Text displayed in the Pending Account Deletion page. - Text shown in the top left corner of the nav bar.",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "Heading of the Pending Account Deletion page that explains to the user that their account is going to be deleted.\n{{Identical|Pending account deletion}}",
 	"I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1": "Text on the Pending Account Deletion page that explains to the user that their account is going to be deleted.",

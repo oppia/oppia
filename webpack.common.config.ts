@@ -110,6 +110,8 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
+    partnerships:
+      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -154,9 +156,9 @@ module.exports = {
   },
 
   /**
-   * TODO(#13079): Remove the hybrid field from the html webpack plugin options
-   * once angularjs is removed from corresponding pages.
-   */
+  * TODO(#13079): Remove the hybrid field from the html webpack plugin options
+  * once angularjs is removed from corresponding pages.
+  */
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
@@ -521,6 +523,16 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['partnerships'],
+      filename: 'partnerships-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/partnerships-page/' +
+          'partnerships-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

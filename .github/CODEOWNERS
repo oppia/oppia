@@ -597,6 +597,7 @@
 /core/templates/pages/get-started-page/ @jameesjohn
 /core/templates/pages/landing-pages/ @jameesjohn
 /core/templates/pages/maintenance-page/ @jameesjohn
+/core/templates/pages/partnerships-page/ @jameesjohn
 /core/templates/pages/pending-account-deletion-page/ @jameesjohn
 /core/templates/pages/preferences-page/ @jameesjohn
 /core/templates/pages/signup-page/ @jameesjohn
