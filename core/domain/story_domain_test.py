@@ -319,6 +319,39 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_thumbnail_filename_for_story_node(
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
+    def test_story_node_thumbnail_size_in_bytes_validation(self):
+        self.story.story_contents.nodes[0].thumbnail_size_in_bytes = 0
+        self._assert_validation_error(
+            'Story Node thumbnail size in bytes cannot be zero.')
+
+    def test_story_node_update_thumbnail_filename(self):
+        # Test successful update of thumbnail_filename when the thumbnail
+        # is found in the filesystem.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs.commit(
+            '%s/new_image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        self.story.update_node_thumbnail_filename(0, 'new_image.svg')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].thumbnail_filename,
+            'new_image.svg')
+        self.assertEqual(
+            self.story.story_contents.nodes[0].thumbnail_size_in_bytes,
+            len(raw_image))
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The story node with id invalid_id does not exist.'):
+            self.story.update_node_thumbnail_filename(
+                'invalid_id', 'invalid_thumbnail.svg')
+
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
