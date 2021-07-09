@@ -99,8 +99,8 @@ export class InteractiveNumericInput implements OnInit {
       this.getAttributesObject()
     ) as NumericInputCustomizationArgs;
     this.inputGreaterThanZero = inputGreaterThanZero.value;
-    window.localStorage.setItem('checkInputGreaterThanZero',
-     this.inputGreaterThanZeroWithValue);
+    window.localStorage.setItem(
+      'checkInputGreaterThanZero', this.inputGreaterThanZeroWithValue);
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
