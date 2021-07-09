@@ -47,39 +47,7 @@ export interface ConfigPropertiesBackendResponse {
   [key: string]: ConfigProperty;
 }
 
-<<<<<<< HEAD
-export interface ViewContributionBackendResponse {
-  usernames: string[];
-}
-
-export interface ContributionRightsBackendResponse {
-  'can_review_questions': boolean,
-  'can_review_translation_for_language_codes': string[],
-  'can_review_voiceover_for_language_codes': string[],
-  'can_submit_questions': boolean
-}
-
-export interface TranslationContributionStatsBackendResponse {
-  'translation_contribution_stats': TranslationContributionStats[];
-}
-
-export interface TranslationContributionStats {
-  'language': string,
-  'topic_name': string,
-  'submitted_translations_count': number,
-  'submitted_translation_word_count': number,
-  'accepted_translations_count': number,
-  'accepted_translations_without_reviewer_edits_count': number,
-  'accepted_translation_word_count': number,
-  'rejected_translations_count': number,
-  'rejected_translation_word_count': number,
-  'contribution_months': string[]
-}
-
-export interface PendingDeletionRequestBackendResponse {
-=======
 interface PendingDeletionRequestBackendResponse {
->>>>>>> upstream/develop
   'number_of_pending_deletion_models': string
 }
 

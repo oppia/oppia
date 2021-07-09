@@ -320,7 +320,7 @@ class TranslationContributionStatsHandler(base.BaseHandler):
             for stats_dict in translation_contribution_stats_dicts
         ]
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
-        topic_name_by_topic_id= {}
+        topic_name_by_topic_id = {}
         for topic_summary in topic_summaries:
             if topic_summary is None:
                 continue

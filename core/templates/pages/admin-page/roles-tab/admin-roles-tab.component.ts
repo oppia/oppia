@@ -19,7 +19,7 @@
 import { Component, Output, EventEmitter} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { AdminBackendApiService, RoleToActionsBackendResponse, TranslationContributionStats, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, RoleToActionsBackendResponse, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
