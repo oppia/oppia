@@ -149,10 +149,10 @@ def verify_feconf(release_feconf_path, verify_email_api_keys):
     mailgun api key, mailchimp api key and redishost.
 
     Args:
+        release_feconf_path: str. The path to feconf file in release
+                directory.
         verify_email_api_keys: bool. Whether to verify both mailgun and
             mailchimp api keys.
-        release_feconf_path: str. The path to feconf file in release
-            directory.
     """
     feconf_contents = python_utils.open_file(
         release_feconf_path, 'r').read()

@@ -389,7 +389,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             f.write(feconf_text)
         update_configs.verify_feconf(temp_feconf_path, True)
 
-    def test_feconf_verification_with_key_absent(self):
+    def test_feconf_verification_with_mailgun_key_absent(self):
         temp_feconf_path = tempfile.NamedTemporaryFile().name
         feconf_text = (
             'REDISHOST = \'192.13.2.1\'\n'
@@ -405,6 +405,27 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             f.write(feconf_text)
         with self.assertRaisesRegexp(
             Exception, 'The mailgun API key must be added before deployment.'):
+            update_configs.verify_feconf(temp_feconf_path, True)
+
+    def test_feconf_verification_with_mailchimp_key_absent(self):
+        temp_feconf_path = tempfile.NamedTemporaryFile().name
+        mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
+        feconf_text = (
+            'MAILGUN_API_KEY = \'%s\'\n'
+            'REDISHOST = \'192.13.2.1\'\n'
+            '# When the site terms were last updated, in UTC.\n'
+            'REGISTRATION_PAGE_LAST_UPDATED_UTC = '
+            'datetime.datetime(2015, 10, 14, 2, 40, 0)\n'
+            '# Format of string for dashboard statistics logs.\n'
+            '# NOTE TO DEVELOPERS: This format should not be changed, '
+            'since it is used in\n'
+            '# the existing storage models for UserStatsModel.\n'
+            'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' %  (
+                mailgun_api_key))
+        with python_utils.open_file(temp_feconf_path, 'w') as f:
+            f.write(feconf_text)
+        with self.assertRaisesRegexp(
+            Exception, 'The mailchimp API key must be added before deployment'):
             update_configs.verify_feconf(temp_feconf_path, True)
 
     def test_feconf_verification_with_key_absent_and_verification_disabled(
