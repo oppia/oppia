@@ -1,0 +1,120 @@
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+/**
+ * @fileoverview Unit tests for the Learner view info directive.
+ */
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { StatsReportingService } from '../services/stats-reporting.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { ContextService } from 'services/context.service';
+// ^^^ This block is to be removed.
+
+fdescribe('Learner view info directive', function() {
+  let $scope = null;
+  let ctrl = null;
+  let $rootScope = null;
+  let $timeout = null;
+  let directive = null;
+  let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService = null;
+  let $uibModal = null;
+  let focusManagerService = null;
+  let contextService: ContextService = null;
+  let readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService = null;
+  let siteAnalyticsService: SiteAnalyticsService = null;
+  let statsReportingService: StatsReportingService = null
+  let urlInterpolationService: UrlInterpolationService = null;
+  let urlService: UrlService = null;
+
+  let explorationBackendResponse = null;
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    focusManagerService = TestBed.get(FocusManagerService);
+  });
+
+
+  beforeEach(angular.mock.inject(function($injector) {
+    $rootScope = $injector.get('$rootScope');
+    $timeout = $injector.get('$timeout');
+    $scope = $rootScope.$new();
+    $uibModal = $injector.get('$uibModal');
+    directive = $injector.get('learnerViewInfoDirective')[0];
+    contextService = $injector.get('ContextService');
+    learnerViewInfoBackendApiService = $injector.get(
+        'LearnerViewInfoBackendApiService');
+    readOnlyExplorationBackendApiService = $injector.get(
+        'ReadOnlyExplorationBackendApiService');
+    siteAnalyticsService = $injector.get('SiteAnalyticsService');
+    statsReportingService= $injector.get('StatsReportingService');
+    focusManagerService = $injector.get('FocusManagerService');
+    urlService = $injector.get('UrlService');
+    urlInterpolationService = $injector.get('UrlInterpolationService');
+
+    explorationBackendResponse = {
+        can_edit: true,
+        exploration: {
+          init_state_name: 'state_name',
+          param_changes: [],
+          param_specs: {},
+          states: {},
+          title: '',
+          language_code: '',
+          objective: '',
+          correctness_feedback_enabled: false
+        },
+        exploration_id: 'test_id',
+        is_logged_in: true,
+        session_id: 'test_session',
+        version: 1,
+        preferred_audio_language_code: 'en',
+        preferred_language_codes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        record_playthrough_probability: 1
+      };
+
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
+        .and.returnValue(Promise.resolve(explorationBackendResponse));
+
+    ctrl = $injector.instantiate(directive.controller, {
+      $rootScope: $scope,
+      $scope: $scope
+    });
+
+  }));
+
+  it('should initialize the letiables', fakeAsync(function() {
+    ctrl.$onInit();
+    tick();
+  }));
+});
