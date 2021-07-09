@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import functools
 import json
 import re
 
@@ -373,6 +374,10 @@ class StoryNode(python_utils.OBJECT):
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Chapter thumbnail background color is not specified.')
+        if self.thumbnail_filename is not None and (
+                self.thumbnail_size_in_bytes == 0):
+            raise utils.ValidationError(
+                'Story node thumbnail size in bytes cannot be zero.')
         if self.exploration_id == '':
             raise utils.ValidationError(
                 'Expected exploration ID to not be an empty string, '
@@ -1054,11 +1059,13 @@ class Story(python_utils.OBJECT):
         return story_contents_dict
 
     @classmethod
-    def _convert_story_contents_v4_dict_to_v5_dict(cls, story_contents_dict):
+    def _convert_story_contents_v4_dict_to_v5_dict(
+            cls, story_id, story_contents_dict):
         """Converts v4 Story Contents schema to the modern v5 schema.
         v5 schema introduces the thumbnail_size_in_bytes for Story Nodes.
 
         Args:
+            story_id: str. The unique ID of the story.
             story_contents_dict: dict. A dict used to initialize a Story
                 Contents domain object.
 
@@ -1066,12 +1073,19 @@ class Story(python_utils.OBJECT):
             dict. The converted story_contents_dict.
         """
         for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
-            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = None # pylint: disable=line-too-long
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_STORY, story_id))
+            filepath = '%s/%s' % (
+                constants.ASSET_TYPE_THUMBNAIL,
+                story_contents_dict['nodes'][index]['thumbnail_filename'])
+            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = (
+                len(fs.get(filepath)) if fs.isfile(filepath) else None)
         return story_contents_dict
 
     @classmethod
     def update_story_contents_from_model(
-            cls, versioned_story_contents, current_version):
+            cls, versioned_story_contents, current_version, story_id):
         """Converts the story_contents blob contained in the given
         versioned_story_contents dict from current_version to
         current_version + 1. Note that the versioned_story_contents being
@@ -1084,12 +1098,17 @@ class Story(python_utils.OBJECT):
                 - story_contents: dict. The dict comprising the story
                     contents.
             current_version: int. The current schema version of story_contents.
+            story_id: str. The unique ID of the story.
         """
         versioned_story_contents['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
             cls, '_convert_story_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
+
+        if current_version == 4:
+            conversion_fn = functools.partial(conversion_fn, story_id)
+
         versioned_story_contents['story_contents'] = conversion_fn(
             versioned_story_contents['story_contents'])
 

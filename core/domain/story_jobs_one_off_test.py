@@ -64,6 +64,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'description': '',
             'thumbnail_bg_color': None,
             'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'Chapter 1'
         }]
     }
@@ -194,7 +195,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                 }]
             })
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents_schema_version, 4)
+        self.assertEqual(story.story_contents_schema_version, 5)
         self.assertEqual(
             story.story_contents.to_dict(),
             self.MIGRATED_STORY_CONTENTS_DICT)

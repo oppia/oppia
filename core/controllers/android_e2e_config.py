@@ -161,6 +161,19 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
             exp_id
         )
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, story_id))
+        fs.commit(
+            '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         story.update_node_thumbnail_filename(
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
             'test_svg.svg')
