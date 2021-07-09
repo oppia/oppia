@@ -34,10 +34,10 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
-  skillRights: SkillRights;
-  skill: Skill;
-  skillDescriptionEditorIsShown: boolean;
-  tmpSkillDescription: string;
+  skillRights: SkillRights = null;
+  skill: Skill = null;
+  skillDescriptionEditorIsShown: boolean = null;
+  tmpSkillDescription: string = null;
   constructor(
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,

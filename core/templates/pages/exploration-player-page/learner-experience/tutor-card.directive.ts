@@ -111,7 +111,6 @@ angular.module('oppia').directive('tutorCard', [
             TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var updateDisplayedCard = function() {
             $scope.arePreviousResponsesShown = false;
             $scope.lastAnswer = null;
@@ -229,6 +228,7 @@ angular.module('oppia').directive('tutorCard', [
             $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
               '/avatar/user_blue_72px.png');
 
+            var _editorPreviewMode = ContextService.isInExplorationEditorPage();
             if (!_editorPreviewMode) {
               UserService.getProfileImageDataUrlAsync()
                 .then(function(dataUrl) {
