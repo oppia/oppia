@@ -33,7 +33,7 @@ declare var angular: ng.IAngularStatic;
 export const importAllAngularServices = (): void => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, CookieModule.forRoot(),],
+      imports: [HttpClientTestingModule, CookieModule.forRoot()],
       providers: [CookieService, {provide: AngularFireAuth, useValue: null}],
     });
   });
