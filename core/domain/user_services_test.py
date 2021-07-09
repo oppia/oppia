@@ -2620,6 +2620,22 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 language_code='hi')
 
+    def test_get_contributor_usernames_in_voiceover_category_returns_correctly(
+            self):
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            language_code='hi')
+        self.assertEqual(usernames, [])
+
+        user_services.allow_user_to_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+
+        usernames = user_services.get_contributor_usernames(
+            constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+            language_code='hi')
+
+        self.assertEqual(usernames, [self.VOICE_ARTIST_USERNAME])
+
     def test_get_contributor_usernames_with_invalid_category_raises(
             self):
         with self.assertRaisesRegexp(

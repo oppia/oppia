@@ -579,6 +579,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -622,6 +623,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -655,6 +657,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
