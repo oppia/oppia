@@ -24,6 +24,6 @@ export const ContributorDashboardAdminPageConstants = {
   REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL: (
     '/removecontributionrightshandler/<category>'),
   TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL: (
-    'translationcontributionstatshandler'
+    '/translationcontributionstatshandler'
   )
 } as const;

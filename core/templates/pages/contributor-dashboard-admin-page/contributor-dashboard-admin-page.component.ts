@@ -177,7 +177,7 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
 
         ctrl.submitViewTranslationContributionStatsForm = function(
             formResponse) {
-          if (this.adminTaskManagerService.isTaskRunning()) {
+          if (taskRunningInBackground) {
             return;
           }
           ctrl.statusMessage = 'Processing query...';

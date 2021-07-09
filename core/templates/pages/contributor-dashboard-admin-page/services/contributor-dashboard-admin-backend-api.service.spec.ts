@@ -317,7 +317,7 @@ describe('Contributor dashboard admin backend api service', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/gettranslationcontributionstatshandler' +
+      '/translationcontributionstatshandler' +
       '?username=' + username);
     expect(req.request.method).toEqual('GET');
     req.flush(result, {
@@ -337,7 +337,7 @@ describe('Contributor dashboard admin backend api service', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
-      '/gettranslationcontributionstatshandler' +
+      '/translationcontributionstatshandler' +
       '?username=' + username);
     expect(req.request.method).toEqual('GET');
     const errorMessage = 'Invalid username: ' + username;

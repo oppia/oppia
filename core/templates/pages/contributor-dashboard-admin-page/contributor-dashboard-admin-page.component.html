@@ -203,7 +203,7 @@
       </button>
     </form>
 
-    <div *ngIf="$ctrl.translationContributionStatsFetched">
+    <div ng-if="$ctrl.translationContributionStatsFetched">
       <table class="table text-center view-results-table">
         <thead>
           <tr>
@@ -218,7 +218,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let stats of $ctrl.translationContributionStatsResults">
+          <tr ng-repeat="stats in $ctrl.translationContributionStatsResults">
             <td class="protractor-test-roles-result-rows">{{ stats.contribution_months }}</td>
             <td>{{ stats.language }}</td>
             <td>{{ stats.topic_name }}</td>

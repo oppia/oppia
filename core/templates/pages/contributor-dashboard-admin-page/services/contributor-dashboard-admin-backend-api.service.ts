@@ -35,6 +35,23 @@ export interface ContributionRightsBackendResponse {
   'can_submit_questions': boolean
 }
 
+export interface TranslationContributionStatsBackendResponse {
+  'translation_contribution_stats': TranslationContributionStats[];
+}
+
+interface TranslationContributionStats {
+  'language': string,
+  'topic_name': string,
+  'submitted_translations_count': number,
+  'submitted_translation_word_count': number,
+  'accepted_translations_count': number,
+  'accepted_translations_without_reviewer_edits_count': number,
+  'accepted_translation_word_count': number,
+  'rejected_translations_count': number,
+  'rejected_translation_word_count': number,
+  'contribution_months': string[]
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -122,7 +139,7 @@ export class ContributorDashboardAdminBackendApiService {
       username: string): Promise<TranslationContributionStatsBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<TranslationContributionStatsBackendResponse>(
-        AdminPageConstants.ADMIN_GET_TRANSLATION_CONTRIBUTION_STATS_HANDLER, {
+        PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL, {
           params: {
             username: username
           }
@@ -130,6 +147,7 @@ export class ContributorDashboardAdminBackendApiService {
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
+        console.log(errorResponse);
         reject(errorResponse.error.error);
       });
     });

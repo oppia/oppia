@@ -276,9 +276,9 @@ class TranslationContributionStatsHandler(base.BaseHandler):
         }
     }
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_access_contributor_dashboard_admin_page
     def get(self):
-        username = self.request.get('username', None)
+        username = self.normalized_request.get('username', None)
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -324,8 +324,7 @@ class TranslationContributionStatsHandler(base.BaseHandler):
         for topic_summary in topic_summaries:
             if topic_summary is None:
                 continue
-            topic_name_by_topic_id[topic_summary['topic_id']] = (
-                topic_summary['name'])
+            topic_name_by_topic_id[topic_summary.id] = topic_summary.name
         for stats_dict in translation_contribution_stats_dicts:
             stats_dict['topic_name'] = topic_name_by_topic_id.get(
                 stats_dict['topic_id'], 'UNKNOWN')
