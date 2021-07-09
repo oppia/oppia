@@ -1768,7 +1768,7 @@ def are_changes_mergeable(exp_id, change_list_version, change_list):
     current_exploration = exp_fetchers.get_exploration_by_id(exp_id)
     if current_exploration.version == change_list_version:
         return True
-    elif current_exploration.version < change_list_version:
+    if current_exploration.version < change_list_version:
         return False
 
     # A complete list of changes from one version to another
@@ -1780,12 +1780,12 @@ def are_changes_mergeable(exp_id, change_list_version, change_list):
     exp_at_change_list_version = exp_fetchers.get_exploration_by_id(
         exp_id, version=change_list_version)
 
-    response_dict = exp_domain.ExplorationChangeMergeVerifier(
+    changes_are_mergeable, send_email = exp_domain.ExplorationChangeMergeVerifier(
         composite_change_list).is_change_list_mergeable(
             change_list, exp_at_change_list_version,
             current_exploration)
 
-    if response_dict['send_email']:
+    if send_email:
         change_list_dict = [change.to_dict() for change in change_list]
         (
             email_manager
@@ -1793,7 +1793,7 @@ def are_changes_mergeable(exp_id, change_list_version, change_list):
                 exp_id, change_list_version,
                 current_exploration.version,
                 change_list_dict))
-    return response_dict['changes_are_mergeable']
+    return changes_are_mergeable
 
 
 def is_version_of_draft_valid(exp_id, version):
