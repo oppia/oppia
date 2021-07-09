@@ -55,4 +55,3 @@ export class ExplorationTitleService extends ExplorationPropertyService {
 angular.module('oppia').factory(
   'ExplorationTitleService', downgradeInjectable(
     ExplorationTitleService));
-

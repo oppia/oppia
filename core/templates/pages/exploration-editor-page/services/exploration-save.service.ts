@@ -57,7 +57,9 @@ require(
   'exploration-language-code.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-objective.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights-backend-api.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights-backend-api.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
 require('pages/exploration-editor-page/services/exploration-title.service.ts');
