@@ -2839,6 +2839,7 @@ title: Title
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+            thumbnail_size_in_bytes=21131,
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
@@ -2857,6 +2858,8 @@ title: Title
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the topic.
             description: str. The description of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -2890,8 +2893,9 @@ title: Title
         subtopics = subtopics or []
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids, subtopics,
+            thumbnail_bg_color, thumbnail_size_in_bytes, description,
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
