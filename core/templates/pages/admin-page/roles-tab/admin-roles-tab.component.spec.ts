@@ -98,8 +98,7 @@ describe('Admin roles tab component ', function() {
       providers: [
         AdminBackendApiService,
         AdminDataService,
-        AdminTaskManagerService,
-        LanguageUtilService
+        AdminTaskManagerService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -112,7 +111,6 @@ describe('Admin roles tab component ', function() {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminDataService = TestBed.inject(AdminDataService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
-    languageUtilService = TestBed.inject(LanguageUtilService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
       .and.returnValue(null);
