@@ -419,7 +419,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
-        fs.commit('thumbnail/image.svg', raw_image, mimetype='image/svg+xml')
+        fs.commit(
+            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
