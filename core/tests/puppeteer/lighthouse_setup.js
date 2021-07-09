@@ -127,7 +127,7 @@ const setRole = async function(browser, page, role) {
       ').some(' +
       '  (statusMessageElem) => statusMessageElem.innerText.includes(' +
       '    "' + role + '"))', {
-        polling: 500
+        polling: 250
       }
     );
   } catch (e) {
