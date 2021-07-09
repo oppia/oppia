@@ -588,6 +588,7 @@
     "extensions/interactions/rule-input-defs.ts",
     "extensions/objects/templates/boolean-editor.component.ts",
     "extensions/objects/templates/code-string-editor.component.ts",
+    "extensions/objects/templates/coord-two-dim-editor.component.ts",
     "extensions/objects/templates/drag-and-drop-positive-int-editor.component.ts",
     "extensions/objects/templates/graph-editor.component.ts",
     "extensions/objects/templates/html-editor.component.ts",
@@ -609,8 +610,7 @@
     "extensions/objects/templates/svg-filename-editor.constants.ajs.ts",
     "extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component.ts",
     "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts",
-    "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts", 
-    "extensions/objects/templates/coord-two-dim-editor.component.ts"
+    "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts"
   ],
   "include": [
     "core/templates/pages/delete-account-page/services/*.ts",
