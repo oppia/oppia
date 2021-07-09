@@ -17,206 +17,239 @@
  * about the rights for this exploration.
  */
 
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/alerts.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { ExplorationDataService } from
+  'pages/exploration-editor-page/services/exploration-data.service';
+import { AlertsService } from 'services/alerts.service';
+import { HttpClient } from '@angular/common/http';
+import constants from 'assets/constants';
 
-angular.module('oppia').factory('ExplorationRightsService', [
-  '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
-  'ACTIVITY_STATUS_PUBLIC', 'ROLE_EDITOR', 'ROLE_OWNER', 'ROLE_VIEWER',
-  'ROLE_VOICE_ARTIST',
-  function(
-      $http, AlertsService, ExplorationDataService,
-      ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, ROLE_EDITOR, ROLE_OWNER,
-      ROLE_VIEWER, ROLE_VOICE_ARTIST) {
-    return {
-      init: function(
-          ownerNames, editorNames, voiceArtistNames, viewerNames, status,
-          clonedFrom, isCommunityOwned, viewableIfPrivate) {
-        this.ownerNames = ownerNames;
-        this.editorNames = editorNames;
-        this.voiceArtistNames = voiceArtistNames;
-        this.viewerNames = viewerNames;
-        this._status = status;
-        // This is null if the exploration was not cloned from anything,
-        // otherwise it is the exploration ID of the source exploration.
-        this._clonedFrom = clonedFrom;
-        this._isCommunityOwned = isCommunityOwned;
-        this._viewableIfPrivate = viewableIfPrivate;
-      },
-      clonedFrom: function() {
-        return this._clonedFrom;
-      },
-      isCloned: function() {
-        return Boolean(this._clonedFrom);
-      },
-      isPrivate: function() {
-        return this._status === ACTIVITY_STATUS_PRIVATE;
-      },
-      isPublic: function() {
-        return this._status === ACTIVITY_STATUS_PUBLIC;
-      },
-      isCommunityOwned: function() {
-        return this._isCommunityOwned;
-      },
-      viewableIfPrivate: function() {
-        return this._viewableIfPrivate;
-      },
-      makeCommunityOwned: function() {
-        var that = this;
-        var requestUrl = (
-          '/createhandler/rights/' + ExplorationDataService.explorationId);
-
-        return $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          make_community_owned: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
-      },
-      setViewability: function(viewableIfPrivate) {
-        var that = this;
-        var requestUrl = (
-          '/createhandler/rights/' + ExplorationDataService.explorationId);
-
-        return $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          viewable_if_private: viewableIfPrivate
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
-      },
-      saveRoleChanges: function(newMemberUsername, newMemberRole) {
-        var that = this;
-        var requestUrl = (
-          '/createhandler/rights/' + ExplorationDataService.explorationId);
-
-        return $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          new_member_role: newMemberRole,
-          new_member_username: newMemberUsername
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
-      },
-      removeRoleAsync: function(memberUsername) {
-        var that = this;
-        var requestUrl = (
-          '/createhandler/rights/' + ExplorationDataService.explorationId);
-
-        return $http.delete(requestUrl, {
-          params: {
-            username: memberUsername
-          }
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
-      },
-      assignVoiceArtistRoleAsync: function(newVoiceArtistUsername) {
-        var that = this;
-        var requestUrl = (
-          '/voice_artist_management_handler/' + 'exploration/' +
-          ExplorationDataService.explorationId);
-
-        return $http.post(requestUrl, {
-          username: newVoiceArtistUsername}).then(() => {
-          AlertsService.clearWarnings();
-          that.voiceArtistNames.push(newVoiceArtistUsername);
-        });
-      },
-      removeVoiceArtistRoleAsync: function(voiceArtistUsername) {
-        var that = this;
-        var requestUrl = (
-          '/voice_artist_management_handler/' + 'exploration/' +
-          ExplorationDataService.explorationId);
-        return $http.delete(requestUrl, {
-          params: {
-            voice_artist: voiceArtistUsername
-          }
-        }).then(function(response) {
-          AlertsService.clearWarnings();
-          that.voiceArtistNames.forEach((username, index) => {
-            if (username === voiceArtistUsername) {
-              that.voiceArtistNames.splice(index, 1);
-            }
-          });
-        });
-      },
-      checkUserAlreadyHasRoles: function(username) {
-        return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
-          ...this.voiceArtistNames].includes(username);
-      },
-      getOldRole: function(username) {
-        if (this.ownerNames.includes(username)) {
-          return ROLE_OWNER;
-        } else if (this.editorNames.includes(username)) {
-          return ROLE_EDITOR;
-        } else if (this.voiceArtistNames.includes(username)) {
-          return ROLE_VOICE_ARTIST;
-        } else {
-          return ROLE_VIEWER;
-        }
-      },
-      publish: function() {
-        var that = this;
-        var requestUrl = (
-          '/createhandler/status/' + ExplorationDataService.explorationId);
-
-        return $http.put(requestUrl, {
-          make_public: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
-      },
-      saveModeratorChangeToBackendAsync: async function(
-          emailBody) {
-        var that = this;
-        var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' +
-          ExplorationDataService.explorationId);
-
-        return $http.put(explorationModeratorRightsUrl, {
-          email_body: emailBody,
-          version: ExplorationDataService.data.version
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.voice_artist_names, data.rights.viewer_names,
-            data.rights.status, data.rights.cloned_from,
-            data.rights.community_owned, data.rights.viewable_if_private);
-        });
-      }
-    };
+export interface ExplorationRightsBackendResponse {
+  rights: {
+    'editor_names': string[],
+    'owner_names': string[],
+    'voice_artist_names': string[],
+    'viewer_names': string[],
+    'status': string,
+    'cloned_from': string,
+    'community_owned': boolean,
+    'viewable_if_private': boolean
   }
-]);
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationRightsService {
+  ownerNames: string[] = undefined;
+  editorNames: string[] = undefined;
+  voiceArtistNames: string[] = undefined;
+  viewerNames: string[] = undefined;
+  _status: string = undefined;
+  _clonedFrom: string = undefined;
+  _isCommunityOwned: boolean = undefined;
+  _viewableIfPrivate: boolean = undefined;
+  constructor(
+    private alertsService: AlertsService,
+    private explorationDataService: ExplorationDataService,
+    private httpClient: HttpClient
+  ) {}
+
+  init(
+      ownerNames: string[], editorNames: string[], voiceArtistNames: string[],
+      viewerNames: string[], status: string, clonedFrom: string,
+      isCommunityOwned: boolean, viewableIfPrivate: boolean): void {
+    this.ownerNames = ownerNames;
+    this.editorNames = editorNames;
+    this.voiceArtistNames = voiceArtistNames;
+    this.viewerNames = viewerNames;
+    this._status = status;
+    // This is null if the exploration was not cloned from anything,
+    // otherwise it is the exploration ID of the source exploration.
+    this._clonedFrom = clonedFrom;
+    this._isCommunityOwned = isCommunityOwned;
+    this._viewableIfPrivate = viewableIfPrivate;
+  }
+
+  clonedFrom(): string {
+    return this._clonedFrom;
+  }
+
+  isCloned(): boolean {
+    return Boolean(this._clonedFrom);
+  }
+
+  isPrivate(): boolean {
+    return this._status === constants.ACTIVITY_STATUS_PRIVATE;
+  }
+
+  isPublic(): boolean {
+    return this._status === constants.ACTIVITY_STATUS_PUBLIC;
+  }
+
+  isCommunityOwned(): boolean {
+    return this._isCommunityOwned;
+  }
+
+  viewableIfPrivate(): boolean {
+    return this._viewableIfPrivate;
+  }
+
+  makeCommunityOwned(): Promise<void> {
+    let requestUrl = (
+      '/createhandler/rights/' + this.explorationDataService.explorationId);
+    return this.httpClient.put(requestUrl, {
+      version: this.explorationDataService.data.version,
+      make_community_owned: true
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+
+  setViewability(
+      viewableIfPrivate: boolean): Promise<void> {
+    let requestUrl = (
+      '/createhandler/rights/' + this.explorationDataService.explorationId);
+
+    return this.httpClient.put(requestUrl, {
+      version: this.explorationDataService.data.version,
+      viewable_if_private: viewableIfPrivate
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+  saveRoleChanges(
+      newMemberUsername: string,
+      newMemberRole: string): Promise<void> {
+    let requestUrl = (
+      '/createhandler/rights/' + this.explorationDataService.explorationId);
+
+    return this.httpClient.put(requestUrl, {
+      version: this.explorationDataService.data.version,
+      new_member_role: newMemberRole,
+      new_member_username: newMemberUsername
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+  publish(): Promise<void> {
+    let requestUrl = (
+      '/createhandler/status/' + this.explorationDataService.explorationId);
+
+    return this.httpClient.put(requestUrl, {
+      make_public: true
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+
+  async saveModeratorChangeToBackendAsync(emailBody: string): Promise<void> {
+    let explorationModeratorRightsUrl = (
+      '/createhandler/moderatorrights/' +
+      this.explorationDataService.explorationId);
+
+    return this.httpClient.put(explorationModeratorRightsUrl, {
+      email_body: emailBody,
+      version: this.explorationDataService.data.version
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+
+  removeRoleAsync(memberUsername: string): Promise<void> {
+    let requestUrl = (
+      '/createhandler/rights/' + this.explorationDataService.explorationId);
+
+    return this.httpClient.delete(requestUrl, {
+      params: {
+        username: memberUsername
+      }
+    }).toPromise().then((response: ExplorationRightsBackendResponse) => {
+      let data = response;
+      this.alertsService.clearWarnings();
+      this.init(
+        data.rights.owner_names, data.rights.editor_names,
+        data.rights.voice_artist_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from,
+        data.rights.community_owned, data.rights.viewable_if_private);
+    });
+  }
+
+  assignVoiceArtistRoleAsync(newVoiceArtistUsername: string): Promise<void> {
+    let requestUrl = (
+      '/voice_artist_management_handler/' + 'exploration/' +
+      this.explorationDataService.explorationId);
+
+    return this.httpClient.post(requestUrl, {
+      username: newVoiceArtistUsername}).toPromise().then(() => {
+      this.alertsService.clearWarnings();
+      this.voiceArtistNames.push(newVoiceArtistUsername);
+    });
+  }
+
+  removeVoiceArtistRoleAsync(voiceArtistUsername: string): Promise<void> {
+    let requestUrl = (
+      '/voice_artist_management_handler/' + 'exploration/' +
+      this.explorationDataService.explorationId);
+    return this.httpClient.delete(requestUrl, {
+      params: {
+        voice_artist: voiceArtistUsername
+      }
+    }).toPromise().then((response) => {
+      this.alertsService.clearWarnings();
+      this.voiceArtistNames.forEach((username, index) => {
+        if (username === voiceArtistUsername) {
+          this.voiceArtistNames.splice(index, 1);
+        }
+      });
+    });
+  }
+  checkUserAlreadyHasRoles(username: string): boolean {
+    return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
+      ...this.voiceArtistNames].includes(username);
+  }
+  getOldRole(username: string): string {
+    if (this.ownerNames.includes(username)) {
+      return constants.ROLE_OWNER;
+    } else if (this.editorNames.includes(username)) {
+      return constants.ROLE_EDITOR;
+    } else if (this.voiceArtistNames.includes(username)) {
+      return constants.ROLE_VOICE_ARTIST;
+    } else {
+      return constants.ROLE_VIEWER;
+    }
+  }
+}
+angular.module('oppia').factory(
+  'ExplorationRightsService', downgradeInjectable(ExplorationRightsService));
