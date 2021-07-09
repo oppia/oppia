@@ -1780,10 +1780,11 @@ def are_changes_mergeable(exp_id, change_list_version, change_list):
     exp_at_change_list_version = exp_fetchers.get_exploration_by_id(
         exp_id, version=change_list_version)
 
-    changes_are_mergeable, send_email = exp_domain.ExplorationChangeMergeVerifier(
-        composite_change_list).is_change_list_mergeable(
-            change_list, exp_at_change_list_version,
-            current_exploration)
+    changes_are_mergeable, send_email = (
+        exp_domain.ExplorationChangeMergeVerifier(
+            composite_change_list).is_change_list_mergeable(
+                change_list, exp_at_change_list_version,
+                current_exploration))
 
     if send_email:
         change_list_dict = [change.to_dict() for change in change_list]
