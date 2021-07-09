@@ -57,6 +57,7 @@ describe('Admin roles tab component ', function() {
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#C6DCDA',
     is_published: false,
+    can_edit_topic: true
   };
 
   const sampleTopicSummary: CreatorTopicSummary = (

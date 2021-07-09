@@ -31,18 +31,12 @@ var PreferencesPage = function() {
     by.css('.protractor-test-feedback-message-email-checkbox'));
   var navBar = element(by.css('.protractor-test-navbar-dropdown-toggle'));
   var pageHeader = element(by.css('.protractor-test-preferences-title'));
-  var preferredAudioLanguageSelector = element(
-    by.css('.protractor-test-preferred-audio-language-selector'));
-  var selectedAudioLanguageElement = preferredAudioLanguageSelector.element(
-    by.css('.select2-selection__rendered'));
+  var audioLanguageSelector = (
+    element(by.css('.protractor-test-audio-language-selector')));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
-  var systemLanguageSelector = element.all(
-    by.css('.protractor-test-system-language-selector')).first();
   var userBioElement = element(by.css('.protractor-test-user-bio'));
-  var userInterestsElement = element(
-    by.css('.protractor-test-interests-dropdown'));
-  var userInterestsInput = userInterestsElement.element(
-    by.css('.select2-search__field'));
+  var userInterestsInput = element(
+    by.css('.protractor-test-subject-interests-input'));
   var createrDashboardRadio = element(
     by.css('.protractor-test-creator-dashboard-radio'));
   var learnerDashboardRadio = element(
@@ -113,14 +107,20 @@ var PreferencesPage = function() {
   };
 
   this.selectSystemLanguage = async function(language) {
-    await action.select2(
-      'System language selector', systemLanguageSelector, language);
+    var languageSelector = element(
+      by.css('.protractor-test-site-language-selector'));
+    await action.click('system language selector', languageSelector);
+    var dropdownOption = element(
+      by.cssContainingText('mat-option .mat-option-text', language));
+    await action.click('clickable', dropdownOption);
     await saveNewChanges('System Language');
   };
 
   this.selectPreferredAudioLanguage = async function(language) {
-    await action.select2(
-      'Audio language selector', preferredAudioLanguageSelector, language);
+    await action.click('clickable', audioLanguageSelector);
+    var dropdownOption = element(
+      by.cssContainingText('mat-option .mat-option-text', language));
+    await action.click('clickable', dropdownOption);
     await saveNewChanges('Preferred Audio Language');
   };
 
@@ -177,8 +177,8 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredSiteLanguageToBe = async function(language) {
-    var selectedLanguageElement = systemLanguageSelector.element(
-      by.css('.select2-selection__rendered'));
+    var selectedLanguageElement = element(
+      by.css('.protractor-test-site-language-selector'));
     await waitFor.visibilityOf(
       selectedLanguageElement,
       'selectedLanguageElement taking too long to appear.');
@@ -187,16 +187,16 @@ var PreferencesPage = function() {
 
   this.expectPreferredAudioLanguageToBe = async function(language) {
     await waitFor.visibilityOf(
-      selectedAudioLanguageElement,
-      'selectedAudioLanguageElement taking too long to appear.');
-    expect(await selectedAudioLanguageElement.getText()).toEqual(language);
+      audioLanguageSelector,
+      'audio language selector taking too long to appear.');
+    expect(await audioLanguageSelector.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageNotToBe = async function(language) {
     await waitFor.visibilityOf(
-      selectedAudioLanguageElement,
-      'selectedAudioLanguageElement taking too long to appear.');
-    expect(await selectedAudioLanguageElement.getText()).not.toEqual(language);
+      audioLanguageSelector,
+      'audio language selector taking too long to appear.');
+    expect(await audioLanguageSelector.getText()).not.toEqual(language);
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {

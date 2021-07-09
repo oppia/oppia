@@ -66,24 +66,7 @@ class JobsHandler(base.BaseHandler):
                 klass.__name__ in queued_or_running_job_types)
         } for klass in jobs_registry.AUDIT_JOB_MANAGERS]
 
-        continuous_computations_data = jobs.get_continuous_computations_info(
-            jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS)
-        for computation in continuous_computations_data:
-            if computation['last_started_msec']:
-                computation['human_readable_last_started'] = (
-                    utils.get_human_readable_time_string(
-                        computation['last_started_msec']))
-            if computation['last_stopped_msec']:
-                computation['human_readable_last_stopped'] = (
-                    utils.get_human_readable_time_string(
-                        computation['last_stopped_msec']))
-            if computation['last_finished_msec']:
-                computation['human_readable_last_finished'] = (
-                    utils.get_human_readable_time_string(
-                        computation['last_finished_msec']))
-
         self.render_json({
-            'continuous_computations_data': continuous_computations_data,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
@@ -112,18 +95,6 @@ class JobsHandler(base.BaseHandler):
                         jobs_registry.AUDIT_JOB_MANAGERS)):
                 if klass.__name__ == job_type:
                     klass.cancel(job_id, self.user_id)
-                    break
-        elif action == 'start_computation':
-            computation_type = self.payload.get('computation_type')
-            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                if klass.__name__ == computation_type:
-                    klass.start_computation()
-                    break
-        elif action == 'stop_computation':
-            computation_type = self.payload.get('computation_type')
-            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                if klass.__name__ == computation_type:
-                    klass.stop_computation(self.user_id)
                     break
         else:
             raise self.InvalidInputException('Invalid action: %s' % action)
