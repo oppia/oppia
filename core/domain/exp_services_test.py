@@ -6957,6 +6957,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': 
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
             'old_value': [],
             'property_name': 'answer_groups',
             'new_value':
@@ -7220,6 +7238,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None,
             'property_name': 'widget_id',
             'new_value': 'NumericInput',
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Intro-rename',
+            'old_value':
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': 
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': False
+                }
+            },
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -9010,6 +9046,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None,
             'new_value': 'NumericInput'
         }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': 
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
             'property_name': 'next_content_id_index',
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
@@ -9409,6 +9463,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id',
             'old_value': None
+        }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': 
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': 3,
@@ -11020,6 +11092,24 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 'NumericInput',
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value':
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': True
+                }
+            },
+            'property_name': 'widget_customization_args',
+            'new_value': 
+            {
+                'inputGreaterThanZero':
+                {
+                    'value': False
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
             'old_value': 1,
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
@@ -11426,6 +11516,24 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'widget_id',
                 'new_value': 'NumericInput',
                 'state_name': 'Introduction'
+            }), exp_domain.ExplorationChange({
+                'state_name': 'Introduction',
+                'old_value':
+                {
+                    'inputGreaterThanZero':
+                    {
+                        'value': True
+                    }
+                },
+                'property_name': 'widget_customization_args',
+                'new_value': 
+                {
+                    'inputGreaterThanZero':
+                    {
+                        'value': False
+                    }
+                },
+                'cmd': 'edit_state_property'
             }), exp_domain.ExplorationChange({
                 'old_value': 1,
                 'cmd': 'edit_state_property',
