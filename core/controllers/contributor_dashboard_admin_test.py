@@ -535,6 +535,9 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
+        user_services.update_user_role(
+            self.get_user_id_from_email(self.ADMIN_EMAIL),
+            feconf.ROLE_ID_TRANSLATION_ADMIN)
 
     def test_get_stats_without_username_raises_error(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
