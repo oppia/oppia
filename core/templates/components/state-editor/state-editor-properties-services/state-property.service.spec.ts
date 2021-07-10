@@ -29,8 +29,7 @@ class MockStatePropertyService extends
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('State Property Service', () => {
+describe('State Property Service', () => {
   let sps: MockStatePropertyService;
   let alertsService: AlertsService;
   let utilsService: UtilsService;
