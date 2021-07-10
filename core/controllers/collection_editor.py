@@ -24,6 +24,7 @@ import base64
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -47,11 +48,23 @@ def _require_valid_version(version_from_payload, collection_version):
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
 
-    pass
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {}
 
 
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_collection
     def get(self, _):
@@ -63,6 +76,44 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
     """A data handler for collections which supports writing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'commit_message': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
+                    }]
+                },
+                'default_value': None
+            },
+            'change_list': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'object_dict',
+                        'validation_method': (
+                            domain_objects_validator.validate_collection_change)
+                    }
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
@@ -84,18 +135,11 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         """Updates properties of the given collection."""
 
         collection = collection_services.get_collection_by_id(collection_id)
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
-        commit_message = self.payload.get('commit_message')
-
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
-            raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
-
-        change_list = self.payload.get('change_list')
+        commit_message = self.normalized_payload.get('commit_message')
+        change_list = self.normalized_payload.get('change_list')
 
         collection_services.update_collection(
             self.user_id, collection_id, change_list, commit_message)
@@ -117,6 +161,16 @@ class CollectionRightsHandler(CollectionEditorHandler):
     """Handles management of collection editing rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
@@ -145,11 +199,29 @@ class CollectionRightsHandler(CollectionEditorHandler):
 class CollectionPublishHandler(base.BaseHandler):
     """Handles the publication of the given collection."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_publish_collection
     def put(self, collection_id):
         """Publishes the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
         collection.validate(strict=True)
@@ -179,11 +251,29 @@ class CollectionPublishHandler(base.BaseHandler):
 class CollectionUnpublishHandler(base.BaseHandler):
     """Handles the unpublication of the given collection."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'version': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_unpublish_collection
     def put(self, collection_id):
         """Unpublishes the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
-        version = self.payload.get('version')
+        version = self.normalized_payload.get('version')
         _require_valid_version(version, collection.version)
 
         rights_manager.unpublish_collection(self.user, collection_id)
@@ -209,13 +299,29 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     """Provides data for exploration search."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'q': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = base64.b64decode(self.request.get('q'))
+        query_string = base64.b64decode(self.normalized_request.get('q'))
 
-        search_offset = self.request.get('cursor', None)
+        search_offset = self.normalized_request.get('cursor')
 
         collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
