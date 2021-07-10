@@ -209,7 +209,7 @@ class ValidateBlogModelDomainObjectsInstancesTests(
             self.pipeline
             | beam.Create([blog_model, blog_summary_model])
             | beam.ParDo(
-                .ValidateBlogModelDomainObjectsInstances())
+                blog_validation.ValidateBlogModelDomainObjectsInstances())
         )
 
         self.assert_pcoll_equal(output, [])
