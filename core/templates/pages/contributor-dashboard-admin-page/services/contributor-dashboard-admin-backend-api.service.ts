@@ -147,7 +147,6 @@ export class ContributorDashboardAdminBackendApiService {
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
-        console.log(errorResponse);
         reject(errorResponse.error.error);
       });
     });
