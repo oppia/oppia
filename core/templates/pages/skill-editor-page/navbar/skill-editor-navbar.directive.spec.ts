@@ -177,7 +177,7 @@ describe('Skill Editor Navbar Directive', function() {
   });
 
   it('should navigate to main tab when ' +
-    'calling \'selectMainTab\'', function() {
+    'calling \'selectPreviewTab\'', function() {
     let navigateToPreviewTabSpy = spyOn(
       skillEditorRoutingService, 'navigateToPreviewTab')
       .and.returnValue(null);
