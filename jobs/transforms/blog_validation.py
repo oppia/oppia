@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from core.domain import blog_domain
 from core.domain import blog_services
 from core.platform import models
 from jobs import blog_validation_errors
@@ -34,12 +35,31 @@ import apache_beam as beam
     models.NAMES.blog, models.NAMES.user])
 
 
-@validation_decorators.AuditsExisting(
-    blog_models.BlogPostModel,
-    blog_models.BlogPostSummaryModel)
-class ValidateBlogModelDomainObjectsInstances(
+@validation_decorators.AuditsExisting(blog_models.BlogPostModel)
+class ValidateBlogPostModelDomainObjectsInstances(
         base_validation.ValidateModelDomainObjectInstances):
     """Provides the validation type for validating blog post objects."""
+
+    def _get_model_domain_object_instance(self, blog_post_model):
+        """Returns blog post domain object instance created from the model.
+
+        Args:
+            blog_post_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            BlogPost. A domain object to validate.
+        """
+        return blog_domain.BlogPost(
+            blog_post_model.id,
+            blog_post_model.author_id,
+            blog_post_model.title,
+            blog_post_model.content,
+            blog_post_model.url_fragment,
+            blog_post_model.tags,
+            blog_post_model.thumbnail_filename,
+            blog_post_model.last_updated,
+            blog_post_model.published_on
+        )
 
     def _get_domain_object_validation_type(self, item):
         """Returns the type of domain object validation to be performed.
@@ -98,6 +118,50 @@ class ValidateModelPublishTimestamps(beam.DoFn):
         if (model.last_updated - base_validation.MAX_CLOCK_SKEW_SECS) > (
                 model.published_on):
             yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) #pylint: disable=line-too-long
+
+
+@validation_decorators.AuditsExisting(blog_models.BlogPostSummaryModel)
+class ValidateBlogSummaryModelDomainObjectsInstances(
+        base_validation.ValidateModelDomainObjectInstances):
+    """Provides the validation type for validating blog post objects."""
+
+    def _get_model_domain_object_instance(self, summary_model):
+        """Returns blog post domain object instance created from the model.
+
+        Args:
+            summary_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            BlogPost. A domain object to validate.
+        """
+        return blog_domain.BlogPostSummary(
+            summary_model.id,
+            summary_model.author_id,
+            summary_model.title,
+            summary_model.summary,
+            summary_model.url_fragment,
+            summary_model.tags,
+            summary_model.thumbnail_filename,
+            summary_model.last_updated,
+            summary_model.published_on
+        )
+
+    def _get_domain_object_validation_type(self, item):
+        """Returns the type of domain object validation to be performed.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            str. The type of validation mode: strict or non strict.
+        """
+        blog_post_rights = blog_services.get_blog_post_rights(
+            item.id, strict=True)
+
+        if blog_post_rights.blog_post_is_published:
+            return base_validation.VALIDATION_MODES.strict
+
+        return base_validation.VALIDATION_MODES.non_strict
 
 
 @validation_decorators.RelationshipsOf(blog_models.BlogPostModel)
