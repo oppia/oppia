@@ -328,6 +328,14 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Story node thumbnail size in bytes cannot be zero.')
 
     def test_story_node_update_thumbnail_filename(self):
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The thumbnail img.svg for story node with id %s does not exist'
+            ' in the filesystem.' % (self.STORY_ID)):
+            self.story.update_node_thumbnail_filename(
+                self.NODE_ID_1, 'img.svg')
+
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
         with python_utils.open_file(
