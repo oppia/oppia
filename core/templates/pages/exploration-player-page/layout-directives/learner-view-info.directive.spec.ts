@@ -25,7 +25,6 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -39,7 +38,6 @@ describe('Learner view info directive', function() {
   let directive = null;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService = null;
   let $uibModal = null;
-  let focusManagerService = null;
   let contextService: ContextService = null;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService = null;
@@ -55,7 +53,6 @@ describe('Learner view info directive', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
 

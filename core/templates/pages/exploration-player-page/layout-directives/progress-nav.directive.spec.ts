@@ -23,7 +23,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -45,7 +44,6 @@ describe('Progress nav directive', function() {
   let browserCheckerService: BrowserCheckerService = null;
   let playerPositionService: PlayerPositionService = null;
   let playerTranscriptService: PlayerTranscriptService = null;
-  let focusManagerService: FocusManagerService = null;
   let urlService: UrlService = null;
   let windowDimensionsService: WindowDimensionsService = null;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory = null;
@@ -64,7 +62,6 @@ describe('Progress nav directive', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   afterEach(function() {
@@ -314,8 +311,8 @@ describe('Progress nav directive', function() {
     expect(result).toBe(false);
   });
 
-  it('should throw an error if generic button is submitted with invalid interaction id' +
-    '', function() {
+  it('should throw an error if generic button is submitted ' +
+    'with invalid interaction id', function() {
     $scope.interactionId = -1;
     expect(() => {
       $scope.shouldGenericSubmitButtonBeShown();
