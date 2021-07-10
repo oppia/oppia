@@ -52,7 +52,8 @@ import python_utils
 import utils
 
 (
-    audit_models, exp_models, opportunity_models, user_models
+    audit_models, exp_models, opportunity_models,
+    user_models
 ) = models.Registry.import_models([
     models.NAMES.audit, models.NAMES.exploration, models.NAMES.opportunity,
     models.NAMES.user

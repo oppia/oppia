@@ -38,11 +38,6 @@ export interface UpdateRoleAction {
   isValid: () => boolean;
 }
 
-export interface ViewTranslationContributionStatsAction {
-  username: string;
-  isValid: () => boolean;
-}
-
 export interface AdminRolesFormData {
   viewUserRoles: ViewUserRolesAction;
   updateRole: UpdateRoleAction;
