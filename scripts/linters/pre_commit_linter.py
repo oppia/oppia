@@ -514,8 +514,7 @@ def _print_summary_of_error_messages(lint_messages):
             'Please fix the errors below:',
             '----------------------------------------',
             ] + lint_messages
-        linter_utils.print_failure_message(
-            '\n'.join(error_message_lines).encode('utf-8'))
+        linter_utils.print_failure_message('\n'.join(error_message_lines))
 
 
 def _get_task_output(lint_messages, failed, task):
