@@ -20,9 +20,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from constants import constants
-from core.domain import user_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -545,6 +545,12 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
     def _publish_topic(self, topic_id, topic_name):
+        """Creates and publishes a topic.
+
+        Args:
+            topic_id: str. Topic ID.
+            topic_name: str. Topic name.
+        """
         topic = topic_domain.Topic.create_default_topic(
             topic_id, topic_name, 'abbrev', 'description')
         topic.thumbnail_filename = 'thumbnail.svg'
