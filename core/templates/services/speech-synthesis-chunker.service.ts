@@ -103,17 +103,16 @@ export class SpeechSynthesisChunkerService {
 
     // Copy properties from the current utterance to the next utterance,
     // excluding the text being spoken.
-    const utteranceProps = (
-      <(keyof SpeechSynthesisUtterance)[]> Object.keys(utterance));
-    utteranceProps.forEach(property => {
-      if (property !== 'text') {
+    for (var property in utterance) {
+      const _property = property as keyof SpeechSynthesisUtterance;
+      if (_property !== 'text') {
         Object.defineProperty(
-          newUtterance, property, {
-            value: utterance[property]
+          newUtterance, _property, {
+            value: utterance[_property]
           }
         );
       }
-    });
+    }
     newUtterance.onend = () => {
       if (this.cancelRequested) {
         this.cancelRequested = false;
