@@ -1,5 +1,149 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.1.2 (10 Jul 2021)
+------------------------
+Contributor Pages
+* Fix #13173: Modify translation submission validation to check for custom tags (#13309)
+* Fix part of #12184: Create translation contribution stats storage model and corresponding population one off job (#13201)
+* CP fixes for June release (#13198)
+
+Angular Migration
+* Fix N/A: Optimize Story-Summary-Tile change detection cycles (#13064)
+* Fix #7359: Use transclusion components in exploration editor page (#13040)
+* Fix part of #9749: Migrate Oppia footer directive. (#13003)
+* Fix part #9749: Migrate svg filename editor (#12977)
+* Fix part of #9749: Migrate Profile page. (#12926)
+* Fix part of #9749: Migrate I18nFooter Directive (#12925)
+* Migrate ckeditor directives to Angular. (#12881)
+* Fix part of #9749: Migrate Preview thumbnail. (#12870)
+* Fix part of #9749: Migrate input response pair. (#12853)
+* Introduce ngx-translate as a replacement for translate pipe (#12790)
+* Fix part of #9749 Migrated Services and Modals for Exploration Editor Page (#12781)
+* Fix part of #9749: Migrate remaining object editors in extensions. (#12775)
+* Fix part of #9749: Migrate audio bar directive (#12766)
+* Fix part of #9749, #8472: Migrate Display hint modal service and dependencies. (#12756)
+* Fix Part Of #9749: Migrates Navbar Of Story-Editor-Page to Angular (#12741)
+* Fix Part of #9749: Migrate story-summary-tile to Angular (#12728)
+* Fix part of #9749: Migrate Exploration Footer and dependencies (#12703)
+* Fix part of #8472: Topic editor state service migrated. (#12664)
+* Fix part of #9749: Migrates Top-Navigation-Bar to Angular (#12584)
+* Fix of #9749: Migrate non-negative-int, numeric-expression, position-of-terms, positive-int, ratio-expression, real, sanitized-url, set-of-algebraic-identifier, set-of-translatable-html-content-ids, subtitled-html editors (#12554)
+* Fix part of #9749: Migrate base-content (#12371)
+* Fix part of #9749: Migrate all oppia-non-interactive-* (#12294)
+
+Translations
+* Routine update of translations (#13089)
+* Routine update of translations. (#13012)
+
+Miscellaneous
+* Remove classroom page accessible flag config property (#12988)
+* Adds correct structure for topic landing page (#12972)
+
+Release team
+* Increase memory for webpack (#13000)
+* Adds new release coordinator role and a separate page for release coordinator's work (#12884)
+
+Developer UX
+* Fix Part of #10474: Cover some files with TS strict checks - 5 (#13057)
+* Fix Part of #10474: Cover some files with TS strict checks - 2 (#13050)
+* Fix Part of #10474: Cover some files with TS strict checks - 4 (#13047)
+* Routine upgrade of frontend libraries (#13030)
+* Fix part of #10816: Migrate all comment related JS/TS lint checks to custom eslint checks  (#13022)
+* Fix part of #10816: Migrate check constants declaration (#13011)
+* Fixes part of #10816: Migrate lint check for match line breaks in controller dependencies (#12994)
+* Fix part of #10816: migrate sorted dependencies lint check to eslint (#12983)
+* Fix part of #10816: migrate check directive scope lint check to eslint (#12979)
+* Fix part of #10816: Disallow multiple component in a file (#12974)
+* Fix Part Of #10474: Make TypeScript checks strict for some files (#12965)
+* Remove and disallow usage of `import _ from lodash` (#12963)
+* Fix Part of #10474: Cover more files with TS strict checks (#12962)
+* Fix part of #8668: Document exploration-category & exploration-title service files with jsdoc (#12948)
+* Export JSON from Karma coverage reports (#12923)
+* Fix part of #10474: Cover GraphUtilsService with strict checks (#12716)
+
+Data handling
+* Fix part of #12792, #11475 implement the _get_change_domain_class for other models: platform-parameter (#12958)
+* Refactoring of filter_skills_by_mastery (#12924)
+* Fix part of #11572: Using exception instead of error in controllers (#12611)
+
+Bug fixes
+* Fix #13142: Fix author profiles dropdown (#13238)
+* Fix for 'Failed to load resource: net::ERR_UNKNOWN_URL_SCHEME' console error flake. (#13032)
+* Fix for console errors on admin roles tab (#13018)
+* Fix the wrong usage of pluralization syntax in `learner-dashboard-page.component.html` file (#12856)
+
+Python Migration
+* Fix part of #11475: Migrates _validate_composite_entity_id (#13085)
+* Fix part of #11475: Prepare API of JobRunResults for writing to storage (#13027)
+* Fix part of #11475: Migrates  _validate_archived_models_marked_deleted (#13019)
+* Fix part of #11475: Add Apache Beam domain and services (#12954)
+* Fix part of #11475: Move datastoreio stub into JobBase (#12947)
+* Fix part of #11475: Add JobRunResult type for Beam Jobs (#12940)
+* Fix part of #11475: Add gae_models for Apache Beam jobs (#12939)
+* Fix part of #11475: Add RelationshipsOf unit tests and stabalize ModelProperty implementation (#12890)
+* Fix part of #11475: Add query support to the datastoreio stub (#12880)
+* Fix part of #11475: Use SimpleXMLRPCServer to implement the datastoreio stub (#12851)
+
+Learner/Creator Pages
+* UI changes to library and story viewer page (#13216)
+* Preloads skill images; Adds a job to copy question images to the correct storage path; Make 'coming soon' topic tiles not clickable (#13184)
+* Fix #13067, #13068, #12951 and #12857 - Moved language selector to navbar, fixed URLs and translations (#13074)
+* Fix Browser Library button on the teach page (#13033)
+* Fix #8983: Use base64 instead of blob for caching images and use the SVG sanitizer for base64 SVG urls (#13013)
+* Redesigning and Updating the Learner Dashboard page Milestone-1.1 (#13006)
+* Milestone 1.1: Add Storage Models for Blog Posts (#12933)
+* Fix #12630: Force pasting plain text in RTE editor (#12861)
+* Editor frontend changes for card is checkpoint field (#12817)
+* Fix math expression RTE copy (#12806)
+* Adding limit to text message in feedback thread (#12746)
+* Fix part of #6271: Update subparts of interaction answer group. (#12636)
+* New About page (#11420)
+
+Automated QA Team
+* Added unit tests for exploration player state service (#13062)
+* Added unit tests for story editor navbar component (#13039)
+* Temporarily Transfer Code Ownership from @U8NWXD to @krishnarao22 (#12986)
+* Stop Printing Frontend Test Success Messages (#12955)
+* Add emaildashboard E2E Test Rerun policy and Ensure Tests Fail on Missing Policies (#12953)
+* Graph layout service test (#12946)
+* Create activity button component frontend unit tests (#12936)
+* Resolving E2E Flake: StateContentEditor Taking Too Long to Appear to Set Content (#12919)
+* Add @krishnarao22 to Automated QA CODEOWNER files (#12915)
+* Introduces a check for whether a PR is low risk in `e2e Admin Page Test` and `e2e Publication Test` (#12906)
+* Add waitFor in forms.js to Fix Extensions Suite E2E Flake (#12904)
+* Resolving e2e flake "no element found using locator: by(css selector, option:checked)" (#12842)
+* Implement Suite-Specific E2E Test Rerun Policy (#12839)
+* Merge from Base Branch Before E2E Runs on GitHub Actions (#12829)
+* Fix part of #10798: Fix explorationEditorMainTab with action.js and waitfor.js (#12700)
+
+Miscellaneos fixes
+* Add Marathi (मराठी) and Ganda (Luganda) to supported languages (#13315)
+* Fixes regression in copy tool: Fix filepath editor validity (#13115)
+* Reducing flakiness in the Topic and Story Editor E2E Suite (#13092)
+* Call dispatchEvent on windowRef provided to the tested component instead of 'window' (#13072)
+* Update naming for lighthouse checks, add logging for exported URLs, fix some flakiness with lighthouse accessibility test and extensions e2e test. (#13066)
+* Mock runOutsideAngular so that callback can be tested (#13058)
+* Optimize exploration tile change detection and fix filepath uploader form validity (#13038)
+* Update codeowners file (#13037)
+* Fix #12911: Updates not allowed suggestion exception message and fixes possible flake causes (#13020)
+* Controlling the Video Recorder  (#12984)
+* Fix #12694: Revert #12696 (#12967)
+* Fixes: #12943 Added unit tests for question player engine service (#12944)
+* Resolving the 'Expected 0 to equal 2' flake in AdminPage (#12927)
+* Fixes issues #11758, #11683 and #11472: validates the translation, disables paragraph copy to translation and adds how-to-use copy tool doc link (#12909)
+* Fix rule input voiceover status (#12905)
+* Added frontend tests for topic questions tab component (#12893)
+* Fix #12846: Adds a modal to prompt the user to save the exploration changes. (#12879)
+* Fix #12824: Make allowKeywords property set to True in .eslintrc file (#12860)
+* Fix #12451  The review modal title does not update when reviewing multiple suggestions  (#12845)
+* Moving final e2e tests to GitHub Actions (#12835)
+* Fix part of #9749: Migrate interactive map, logic proof, multiple choice input, set input and text input interactions. (#12788)
+* Fix part of #9749: Migrate svg-file-name-editor-component (#12764)
+* Fetch_page to fetch (#12763)
+* Fix #12698 Migrates files to use preventpageunload service (#12742)
+* Fix #12547: Granularise translation commit commands (#12719)
+
+
 v3.1.1 (10 Jun 2021)
 ------------------------
 Miscellaneous
