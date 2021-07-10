@@ -299,9 +299,8 @@ class NewExplorationHandler(base.BaseHandler):
     @acl_decorators.can_create_exploration
     def post(self):
         """Handles POST requests."""
-        title = self.normalized_payload.get('title')
-        if title is None:
-            title = feconf.DEFAULT_EXPLORATION_TITLE
+        title = self.normalized_payload.get(
+            'title', feconf.DEFAULT_EXPLORATION_TITLE)
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
