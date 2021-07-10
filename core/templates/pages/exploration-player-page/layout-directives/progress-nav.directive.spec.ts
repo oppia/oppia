@@ -21,11 +21,9 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -38,15 +36,13 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 
-fdescribe('Progress nav directive', function() {
+describe('Progress nav directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
   let $timeout = null;
   let directive = null;
   let browserCheckerService: BrowserCheckerService = null;
-  let explorationEngineService: ExplorationEngineService = null;
-  let explorationPlayerStateService: ExplorationPlayerStateService = null;
   let playerPositionService: PlayerPositionService = null;
   let playerTranscriptService: PlayerTranscriptService = null;
   let focusManagerService: FocusManagerService = null;
@@ -80,10 +76,6 @@ fdescribe('Progress nav directive', function() {
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     browserCheckerService = $injector.get('BrowserCheckerService');
-    focusManagerService = $injector.get('FocusManagerService');
-    explorationEngineService = $injector.get('ExplorationEngineService');
-    explorationPlayerStateService = $injector.get(
-        'ExplorationPlayerStateService');
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = $injector.get('PlayerTranscriptService');
     urlService = $injector.get('UrlService');
@@ -218,7 +210,7 @@ fdescribe('Progress nav directive', function() {
             },
             {
               content_id: 'ca_choices_5',
-              html: '<p>No, not right now. I need to confer with my colleague.</p>'
+              html: '<p>No, not right now.'
             },
             {
               content_id: 'ca_choices_6',
@@ -258,7 +250,7 @@ fdescribe('Progress nav directive', function() {
   }));
 
   it('should set properties when initialized', function() {
-    let mockEventEmitter = new EventEmitter()
+    let mockEventEmitter = new EventEmitter();
     spyOnProperty(playerPositionService, 'onHelpCardAvailable')
       .and.returnValue(mockEventEmitter);
     let helpCard = {
@@ -322,7 +314,7 @@ fdescribe('Progress nav directive', function() {
     expect(result).toBe(false);
   });
 
-  it('should generic button throw an error' +
+  it('should throw an error if generic button is submitted with invalid interaction id' +
     '', function() {
     $scope.interactionId = -1;
     expect(() => {
@@ -341,10 +333,13 @@ fdescribe('Progress nav directive', function() {
 
   it('should change card when calling \'changeCard\' if current ' +
     'state has been completed sucessfully', function() {
-    spyOn(playerPositionService, 'recordNavigationButtonClick').and.returnValue(null);
+    spyOn(playerPositionService, 'recordNavigationButtonClick')
+      .and.returnValue(null);
     spyOn(playerPositionService, 'setDisplayedCardIndex').and.returnValue(null);
-    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('stateName');
-    let changeCardSpy = spyOn(playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('stateName');
+    let changeCardSpy = spyOn(
+      playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
 
     ctrl.$onInit();
     $scope.$digest();
@@ -356,7 +351,8 @@ fdescribe('Progress nav directive', function() {
 
   it('should not change card when calling \'changeCard\' if given ' +
     'index is out of bound', function() {
-    let changeCardSpy = spyOn(playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
+    let changeCardSpy = spyOn(
+      playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
 
     expect(() => {
       $scope.changeCard(-10);

@@ -28,9 +28,6 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StatsReportingService } from '../services/stats-reporting.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ContextService } from 'services/context.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
@@ -39,8 +36,6 @@ describe('Learner view info directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
-  let $timeout = null;
-  let $q = null;
   let directive = null;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService = null;
   let $uibModal = null;
@@ -48,9 +43,6 @@ describe('Learner view info directive', function() {
   let contextService: ContextService = null;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService = null;
-  let siteAnalyticsService: SiteAnalyticsService = null;
-  let statsReportingService: StatsReportingService = null
-  let urlInterpolationService: UrlInterpolationService = null;
   let urlService: UrlService = null;
 
   let explorationBackendResponse = null;
@@ -69,21 +61,15 @@ describe('Learner view info directive', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
-    $q = $injector.get('$q');
     directive = $injector.get('learnerViewInfoDirective')[0];
     contextService = $injector.get('ContextService');
     learnerViewInfoBackendApiService = $injector.get(
       'LearnerViewInfoBackendApiService');
     readOnlyExplorationBackendApiService = $injector.get(
       'ReadOnlyExplorationBackendApiService');
-    siteAnalyticsService = $injector.get('SiteAnalyticsService');
-    statsReportingService= $injector.get('StatsReportingService');
-    focusManagerService = $injector.get('FocusManagerService');
     urlService = $injector.get('UrlService');
-    urlInterpolationService = $injector.get('UrlInterpolationService');
     OppiaAngularRootComponent.storyViewerBackendApiService = $injector.get(
       'StoryViewerBackendApiService');
 
@@ -119,8 +105,9 @@ describe('Learner view info directive', function() {
       meta_tag_content: 'this is a meta tag content'
     });
 
-    spyOn(OppiaAngularRootComponent.storyViewerBackendApiService, 'fetchStoryDataAsync')
-      .and.resolveTo(storyBackendDict)
+    spyOn(
+      OppiaAngularRootComponent.storyViewerBackendApiService,
+      'fetchStoryDataAsync').and.resolveTo(storyBackendDict);
     spyOn(contextService, 'getExplorationId').and.returnValue('expId');
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve(explorationBackendResponse));
@@ -137,12 +124,12 @@ describe('Learner view info directive', function() {
 
   it('should set properties when initialized', fakeAsync(function() {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
-    .and.returnValue('topicUrlFragment');
+      .and.returnValue('topicUrlFragment');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
       .and.returnValue('classroomUrlFragment');
 
     expect(ctrl.explorationTitle).toBe(undefined);
-    expect(ctrl.isLinkedToTopic ).toBe(undefined);
+    expect(ctrl.isLinkedToTopic).toBe(undefined);
 
     ctrl.$onInit();
     tick();
@@ -154,7 +141,7 @@ describe('Learner view info directive', function() {
 
   it('should set \'isLinkedToTopic\' property to false ' +
     'when error is occured while initializing', function() {
-    expect(ctrl.isLinkedToTopic ).toBe(undefined);
+    expect(ctrl.isLinkedToTopic).toBe(undefined);
 
     ctrl.$onInit();
 
@@ -165,7 +152,7 @@ describe('Learner view info directive', function() {
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.resolveTo({
         summaries: ['summary1']
-      })
+      });
     const modalSpy = spyOn($uibModal, 'open').and.callThrough();
 
     // First card.
@@ -182,7 +169,7 @@ describe('Learner view info directive', function() {
   }));
 
   it('should fail to open information card modal if there is an ' +
-  'error while loading an info card', fakeAsync(function() {
+    'error while loading an info card', fakeAsync(function() {
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());
     const modalSpy = spyOn($uibModal, 'open').and.callThrough();
