@@ -35,7 +35,8 @@ import python_utils
     [models.NAMES.story, models.NAMES.user])
 
 
-def _migrate_story_contents_to_latest_schema(versioned_story_contents):
+def _migrate_story_contents_to_latest_schema(
+        versioned_story_contents, story_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the story structure based on the schema version of the input
     story dictionary. If the current story_contents schema changes, a new
@@ -47,6 +48,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
           - schema_version: str. The schema version for the story_contents dict.
           - story_contents: dict. The dict comprising the story
               contents.
+        story_id: str. The unique ID of the story.
 
     Raises:
         Exception. The schema version of the story_contents is outside of what
@@ -62,7 +64,7 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
     while (story_contents_schema_version <
            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         story_domain.Story.update_story_contents_from_model(
-            versioned_story_contents, story_contents_schema_version)
+            versioned_story_contents, story_contents_schema_version, story_id)
         story_contents_schema_version += 1
 
 
@@ -89,7 +91,7 @@ def get_story_from_model(story_model):
     if (story_model.story_contents_schema_version !=
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
         _migrate_story_contents_to_latest_schema(
-            versioned_story_contents)
+            versioned_story_contents, story_model.id)
 
     return story_domain.Story(
         story_model.id, story_model.title, story_model.thumbnail_filename,

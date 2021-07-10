@@ -64,6 +64,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             'description': '',
             'thumbnail_bg_color': None,
             'thumbnail_filename': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'Chapter 1'
         }]
     }
@@ -194,7 +195,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
                 }]
             })
         story = story_fetchers.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents_schema_version, 4)
+        self.assertEqual(story.story_contents_schema_version, 5)
         self.assertEqual(
             story.story_contents.to_dict(),
             self.MIGRATED_STORY_CONTENTS_DICT)
@@ -420,4 +421,87 @@ class PopulateStoryThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
         expected = [[u'thumbnail_size_update_error',
                      [u'Thumbnail image.svg for story story_id not'
                       ' found on the filesystem']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+
+class StoryThumbnailSizeAuditOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the StoryThumbnailSizeAuditOneOffJob."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+    STORY_ID = 'story_id'
+    NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_2 = 'node_2'
+
+    def setUp(self):
+        super(StoryThumbnailSizeAuditOneOffJobTests, self).setUp()
+        # Setup user who will own the test story nodes.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.story_id_1 = 'story_id_1'
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='Name',
+            description='Description',
+            canonical_story_ids=[self.story_id_1]
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_skips_deleted_story(self):
+        """Tests that StoryThumbnailSizeAuditOneOffJob skips deleted
+        story.
+        """
+        self.save_new_story_with_story_contents_schema_v5(
+            self.STORY_ID, 'image.svg', '#F8BF74', 21131, self.albert_id,
+            'A title', 'A description', 'A note', self.TOPIC_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+
+        # Delete the story before migration occurs.
+        story_services.delete_story(
+            self.albert_id, self.STORY_ID)
+
+        # Start migration job on sample story nodes.
+        job_id = (
+            story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.create_new()
+        )
+        story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted story are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected = []
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_logs_thumbnail_filename_and_size_for_story_node(self):
+        """Test that StoryThumbnailSizeAuditOneOffJob logs the
+        thumbnail_filename and thumbnail_size_in_bytes for all
+        the story nodes.
+        """
+        self.save_new_story_with_story_contents_schema_v5(
+            self.STORY_ID, 'image.svg', '#F8BF74', 21131, self.albert_id,
+            'A title', 'A description', 'A note', self.TOPIC_ID)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
+
+        # Start migration job on sample story nodes.
+        job_id = (
+            story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.create_new()
+        )
+        story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted story are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected = [[u'story_id', [u'image.svg 21131']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

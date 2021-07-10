@@ -152,3 +152,28 @@ class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class StoryThumbnailSizeAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Audit job that output the thumbnail size of all
+    the story nodes in story.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        story = story_fetchers.get_story_from_model(item)
+        for node in story.story_contents.nodes:
+            thumbnail_filename_and_size_value = '%s %s' % (
+                node.thumbnail_filename, node.thumbnail_size_in_bytes)
+            yield (item.id, thumbnail_filename_and_size_value)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

@@ -262,7 +262,7 @@ CURRENT_STATE_SCHEMA_VERSION = 45
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
