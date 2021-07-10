@@ -300,13 +300,15 @@ fdescribe('Progress nav directive', function() {
     expect(result).toBe(false);
   });
 
-  fit('should check if generic button is shown in the user interface ' +
+  it('should check if generic button is shown in the user interface ' +
     'when interactions has special case for mobile', function() {
     spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
     $scope.getDisplayedCard = function() {
       return sampleCard2;
     };
     ctrl.$onInit();
+    $scope.$digest();
+    $scope.$apply();
 
     let result = $scope.shouldGenericSubmitButtonBeShown();
 
@@ -320,9 +322,9 @@ fdescribe('Progress nav directive', function() {
     expect(result).toBe(false);
   });
 
-  fit('should generic button throw an error' +
+  it('should generic button throw an error' +
     '', function() {
-    $scope.interactionId = null;
+    $scope.interactionId = -1;
     expect(() => {
       $scope.shouldGenericSubmitButtonBeShown();
     }).toThrowError('');
@@ -345,7 +347,7 @@ fdescribe('Progress nav directive', function() {
     let changeCardSpy = spyOn(playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
 
     ctrl.$onInit();
-    $scope.$apply();
+    $scope.$digest();
     $scope.changeCard(1);
     $scope.$apply();
 
