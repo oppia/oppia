@@ -279,6 +279,8 @@ angular.module('oppia').factory('ExplorationStatesService', [
     return {
       init: function(statesBackendDict) {
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+        console.log(statesBackendDict)
+        console.log(JSON.stringify(statesBackendDict.correct.interaction))
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
         _states.getStateNames().forEach(function(stateName) {

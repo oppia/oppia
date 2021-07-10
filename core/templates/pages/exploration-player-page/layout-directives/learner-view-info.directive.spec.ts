@@ -20,6 +20,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+// ^^^ This block is to be removed.
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -33,15 +34,13 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UrlService } from 'services/contextual/url.service';
 import { ContextService } from 'services/context.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 
-// ^^^ This block is to be removed.
-
-fdescribe('Learner view info directive', function() {
+describe('Learner view info directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
   let $timeout = null;
+  let $q = null;
   let directive = null;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService = null;
   let $uibModal = null;
@@ -65,8 +64,6 @@ fdescribe('Learner view info directive', function() {
       imports: [HttpClientTestingModule]
     });
     focusManagerService = TestBed.get(FocusManagerService);
-    OppiaAngularRootComponent.storyViewerBackendApiService = TestBed.inject(
-      StoryViewerBackendApiService)
   });
 
 
@@ -75,6 +72,7 @@ fdescribe('Learner view info directive', function() {
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
+    $q = $injector.get('$q');
     directive = $injector.get('learnerViewInfoDirective')[0];
     contextService = $injector.get('ContextService');
     learnerViewInfoBackendApiService = $injector.get(
@@ -86,6 +84,8 @@ fdescribe('Learner view info directive', function() {
     focusManagerService = $injector.get('FocusManagerService');
     urlService = $injector.get('UrlService');
     urlInterpolationService = $injector.get('UrlInterpolationService');
+    OppiaAngularRootComponent.storyViewerBackendApiService = $injector.get(
+      'StoryViewerBackendApiService');
 
     explorationBackendResponse = {
       can_edit: true,
@@ -94,7 +94,7 @@ fdescribe('Learner view info directive', function() {
         param_changes: [],
         param_specs: {},
         states: {},
-        title: '',
+        title: 'Title',
         language_code: '',
         objective: '',
         correctness_feedback_enabled: false
@@ -119,15 +119,11 @@ fdescribe('Learner view info directive', function() {
       meta_tag_content: 'this is a meta tag content'
     });
 
-    spyOn(ctrl.storyViewerBackendApiService, 'fetchStoryDataAsync')
+    spyOn(OppiaAngularRootComponent.storyViewerBackendApiService, 'fetchStoryDataAsync')
       .and.resolveTo(storyBackendDict)
     spyOn(contextService, 'getExplorationId').and.returnValue('expId');
     spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
       .and.returnValue(Promise.resolve(explorationBackendResponse));
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
-      .and.returnValue('topicUrlFragment');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('classroomUrlFragment');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -135,7 +131,67 @@ fdescribe('Learner view info directive', function() {
     });
   }));
 
-  it('should set properties when initialized', function() {
+  afterEach(function() {
+    ctrl.$onDestroy();
+  });
+
+  it('should set properties when initialized', fakeAsync(function() {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+    .and.returnValue('topicUrlFragment');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+      .and.returnValue('classroomUrlFragment');
+
+    expect(ctrl.explorationTitle).toBe(undefined);
+    expect(ctrl.isLinkedToTopic ).toBe(undefined);
+
     ctrl.$onInit();
+    tick();
+    $scope.$apply();
+
+    expect(ctrl.explorationTitle).toBe('Title');
+    expect(ctrl.isLinkedToTopic).toBe(true);
+  }));
+
+  it('should set \'isLinkedToTopic\' property to false ' +
+    'when error is occured while initializing', function() {
+    expect(ctrl.isLinkedToTopic ).toBe(undefined);
+
+    ctrl.$onInit();
+
+    expect(ctrl.isLinkedToTopic).toBe(false);
+  });
+
+  it('should open information card modal', fakeAsync(function() {
+    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
+      .and.resolveTo({
+        summaries: ['summary1']
+      })
+    const modalSpy = spyOn($uibModal, 'open').and.callThrough();
+
+    // First card.
+    ctrl.showInformationCard();
+    tick();
+    $scope.$apply();
+
+    // Second card.
+    ctrl.showInformationCard();
+    tick();
+    $scope.$apply();
+
+    expect(modalSpy).toHaveBeenCalledTimes(2);
+  }));
+
+  it('should fail to open information card modal if there is an ' +
+  'error while loading an info card', fakeAsync(function() {
+    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
+      .and.returnValue(Promise.reject());
+    const modalSpy = spyOn($uibModal, 'open').and.callThrough();
+
+    // First card.
+    ctrl.showInformationCard();
+    tick();
+    $scope.$apply();
+
+    expect(modalSpy).not.toHaveBeenCalled();
   }));
 });
