@@ -158,7 +158,25 @@ export class RteOutputDisplayComponent implements AfterViewInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.rteString &&
         changes.rteString.previousValue !== changes.rteString.currentValue) {
+      /**
+       * The following serves as an excellent example of why we shouldn't use
+       * js and elementRef.nativeElement to manipulate the DOM. When doing so,
+       * angular has no reference to the node we create and attach to the DOM.
+       * So angular won't be able to clear the nodes out during change detection
+       * runs. And since we were relying on angular to do so and not manually
+       * deleting, this creates a memory leak. We will still have stale elements
+       * in the dom. To get around this, there is variable called show, that is
+       * used as an expression of ngIf. Whenever this is false, all the children
+       * inside it will be destroyed (irrespective of wether angular created it
+       * or us). The setTimeout is to make sure that a changeDetection cycle
+       * runs and we only start showing the content after it. If the setTimeout
+       * is removed, angular won't register a change in this.show as this.show
+       * is set to false and then back to true on the same change detection
+       * cycle and hence, we will still have the problem.
+       */
+      this.show = false;
       this._updateNode();
+      setTimeout(() => this.show = true, 0);
     }
   }
 }
