@@ -36,7 +36,6 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_model_1 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -44,7 +43,6 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_model_2 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid2',
-            deleted=False,
             title='Sample Title',
             content='<p>hello tho</p>,',
             author_id='user',
@@ -52,7 +50,6 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_model_3 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid3',
-            deleted=False,
             title='Sample Diff Title',
             content='<p>hello tho</p>,',
             author_id='user',
@@ -82,7 +79,6 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_summary_model_1 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             summary='<p>hello</p>,',
             author_id='user',
@@ -90,7 +86,6 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_summary_model_2 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid2',
-            deleted=False,
             title='Sample Title',
             summary='<p>hello tho</p>,',
             author_id='user',
@@ -98,7 +93,6 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_summary_model_3 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid3',
-            deleted=False,
             title='Sample Diff Title',
             summary='<p>hello tho</p>,',
             author_id='user',
@@ -128,7 +122,6 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_model_1 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid1',
-            deleted=False,
             title='Sample Title 1',
             content='<p>hello</p>,',
             author_id='user',
@@ -136,7 +129,6 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_model_2 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid2',
-            deleted=False,
             title='Sample Title 2',
             content='<p>hello tho</p>,',
             author_id='user',
@@ -144,7 +136,6 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_model_3 = self.create_model(
             blog_models.BlogPostModel,
             id='validblogid3',
-            deleted=False,
             title='Sample Diff Title',
             content='<p>hello tho</p>,',
             author_id='user',
@@ -174,7 +165,6 @@ class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_summary_model_1 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid1',
-            deleted=False,
             title='Sample Title 1',
             summary='<p>hello</p>,',
             author_id='user',
@@ -182,7 +172,6 @@ class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_summary_model_2 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid2',
-            deleted=False,
             title='Sample Title 2',
             summary='<p>hello tho</p>,',
             author_id='user',
@@ -190,7 +179,6 @@ class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
         blog_post_summary_model_3 = self.create_model(
             blog_models.BlogPostSummaryModel,
             id='validblogid3',
-            deleted=False,
             title='Sample Diff Title',
             summary='<p>hello tho</p>,',
             author_id='user',

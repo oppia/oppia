@@ -70,7 +70,6 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
     def test_reports_model_created_on_timestamp_relationship_error(self):
         invalid_timestamp = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -93,7 +92,6 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
     def test_reports_model_last_updated_timestamp_relationship_error(self):
         invalid_timestamp = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -117,7 +115,6 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
     def test_process_reports_model_mutated_during_job_error(self):
         invalid_timestamp = blog_models.BlogPostModel(
             id='124',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -144,8 +141,7 @@ class ValidateBlogModelDomainObjectsInstancesTests(
     def test_validation_type_for_domain_object_non_strict(self):
         blog_model = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
-            title='Sample Title',
+            title='',
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url_fragment_1',
@@ -155,8 +151,7 @@ class ValidateBlogModelDomainObjectsInstancesTests(
 
         blog_summary_model = blog_models.BlogPostSummaryModel(
             id='validblogid1',
-            deleted=False,
-            title='Sample Title',
+            title='',
             summary='<p>hello</p>,',
             author_id='user',
             url_fragment='url_fragment_1',
@@ -175,15 +170,15 @@ class ValidateBlogModelDomainObjectsInstancesTests(
         output = (
             self.pipeline
             | beam.Create([blog_model, blog_summary_model])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(
+                blog_validation.ValidateBlogModelDomainObjectsInstances())
         )
 
         self.assert_pcoll_equal(output, [])
 
     def test_validation_type_for_domain_object_strict(self):
         blog_model = blog_models.BlogPostModel(
-            id='validblogid1',
-            deleted=False,
+            id='validblogid2',
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -193,8 +188,7 @@ class ValidateBlogModelDomainObjectsInstancesTests(
             published_on=self.NOW)
 
         blog_summary_model = blog_models.BlogPostSummaryModel(
-            id='validblogid1',
-            deleted=False,
+            id='validblogid2',
             title='Sample Title',
             summary='<p>hello</p>,',
             author_id='user',
@@ -204,7 +198,7 @@ class ValidateBlogModelDomainObjectsInstancesTests(
             published_on=self.NOW)
 
         blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid1',
+            id='validblogid2',
             editor_ids=['user'],
             blog_post_is_published=True,
             created_on=self.YEAR_AGO,
@@ -214,7 +208,8 @@ class ValidateBlogModelDomainObjectsInstancesTests(
         output = (
             self.pipeline
             | beam.Create([blog_model, blog_summary_model])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(
+                .ValidateBlogModelDomainObjectsInstances())
         )
 
         self.assert_pcoll_equal(output, [])

@@ -55,7 +55,7 @@ class BlogPostTitleUniquenessJob(base_jobs.JobBase):
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
-                    for model in models
+                    for model in models if model.title != ''
                 ])
         )
 
@@ -87,7 +87,7 @@ class BlogPostUrlUniquenessJob(base_jobs.JobBase):
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
-                    for model in models
+                    for model in models if model.url_fragment != ''
                 ])
         )
 
@@ -120,7 +120,7 @@ class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
-                    for model in models
+                    for model in models if model.title != ''
                 ])
         )
 
@@ -154,6 +154,6 @@ class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
-                    for model in models
+                    for model in models if model.url_fragment != ''
                 ])
         )

@@ -35,7 +35,6 @@ class DuplicateBlogTitleErrorTests(
     def test_message(self):
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -55,7 +54,6 @@ class DuplicateBlogUrlErrorTests(
     def test_message(self):
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -75,7 +73,6 @@ class InconsistentPublishTimestampsErrorTests(
     def test_message(self):
         model = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -98,7 +95,6 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
     def test_message(self):
         model = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
@@ -123,7 +119,6 @@ class ModelMutatedDuringJobErrorTests(
     def test_message(self):
         model = blog_models.BlogPostModel(
             id='validblogid1',
-            deleted=False,
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
