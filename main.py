@@ -33,6 +33,7 @@ from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import concept_card_viewer
 from core.controllers import contributor_dashboard
+from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
@@ -239,17 +240,20 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionrightshandler',
-        admin.AddContributionRightsHandler),
+        r'/addcontributionrightshandler/<category>',
+        contributor_dashboard_admin.AddContributionRightsHandler),
     get_redirect_route(
-        r'/removecontributionrightshandler',
-        admin.RemoveContributionRightsHandler),
+        r'/removecontributionrightshandler/<category>',
+        contributor_dashboard_admin.RemoveContributionRightsHandler),
     get_redirect_route(
-        r'/getcontributorusershandler',
-        admin.ContributorUsersListHandler),
+        r'/getcontributorusershandler/<category>',
+        contributor_dashboard_admin.ContributorUsersListHandler),
     get_redirect_route(
         r'/contributionrightsdatahandler',
-        admin.ContributionRightsDataHandler),
+        contributor_dashboard_admin.ContributionRightsDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+        contributor_dashboard_admin.ContributorDashboardAdminPage),
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
         contributor_dashboard.ContributorDashboardPage),
