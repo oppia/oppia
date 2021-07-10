@@ -28,11 +28,12 @@ import utils
 class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[None, None]
+    HANDLER_ARGS_SCHEMAS = {'POST': {}}  # type: Dict[Text, None]
 
     @acl_decorators.open_access
     def post(self):
+         # type: () -> None
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the
@@ -59,6 +60,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         return self.render_json({})
 
     def _has_valid_android_request_headers(self, headers):
+         # type: (List[str]) -> bool
         """Verifies the headers from the incoming request.
 
         Args:

@@ -24,7 +24,7 @@ from core.platform import models
 import python_utils
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.app_feedback_report])
+    [models.NAMES.base_model, models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
 
 
 PLATFORM_CHOICE_ANDROID = app_feedback_report_models.PLATFORM_CHOICE_ANDROID
@@ -49,23 +49,24 @@ TICKET_ID_DELIMITER = '.'
 STATS_ID_DELIMITER = ':'
 ANDROID_VERSION_NAME_DELIMITER = '-'
 
-REPORT_TYPE = python_utils.create_enum('suggestion', 'issue', 'crash')
+# Ignoring the untyped call error because python_utils is untyped.
+REPORT_TYPE = python_utils.create_enum('suggestion', 'issue', 'crash') # type: ignore[no-untyped-call]
 CATEGORY = python_utils.create_enum(
     'feature_suggestion', 'language_suggestion', 'other_suggestion',
     'lesson_question_issue', 'language_general_issue', 'language_audio_issue',
     'language_text_issue', 'topics_issue', 'profile_issue', 'other_issue',
     'lesson_player_crash', 'practice_questions_crash', 'options_page_crash',
-    'profile_page_crash', 'other_crash')
+    'profile_page_crash', 'other_crash') # type: ignore[no-untyped-call]
 ENTRY_POINT = python_utils.create_enum(
-    'navigation_drawer', 'lesson_player', 'revision_card', 'crash')
+    'navigation_drawer', 'lesson_player', 'revision_card', 'crash') # type: ignore[no-untyped-call]
 STATS_PARAMETER_NAMES = python_utils.create_enum(
     'platform', 'report_type', 'country_locale_code',
     'entry_point_name', 'text_language_code', 'audio_language_code',
-    'android_sdk_version', 'version_name')
+    'android_sdk_version', 'version_name') # type: ignore[no-untyped-call]
 ANDROID_TEXT_SIZE = python_utils.create_enum(
     'text_size_unspecified', 'small_text_size', 'medium_text_size',
-    'large_text_size', 'extra_large_text_size')
-ANDROID_NETWORK_TYPES = python_utils.create_enum('wifi', 'cellular', 'none')
+    'large_text_size', 'extra_large_text_size') # type: ignore[no-untyped-call]
+ANDROID_NETWORK_TYPES = python_utils.create_enum('wifi', 'cellular', 'none') # type: ignore[no-untyped-call]
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [

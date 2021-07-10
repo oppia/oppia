@@ -32,7 +32,7 @@ import python_utils
 import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+    [models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
 
 
 class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
@@ -141,6 +141,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     }
 
     def setUp(self):
+        # type: () -> None
         super(AppFeedbackReportServicesUnitTests, self).setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
@@ -180,11 +181,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.android_ticket_model))
 
     def test_get_reports_returns_same_report(self):
+        # type: () -> None
         report_models = app_feedback_report_services.get_report_models(
             [self.android_report_id])
         self.assertEqual(report_models[0].id, self.android_report_id)
 
     def test_get_multiple_reports_returns_all_reports(self):
+        # type: () -> None
         new_report_id_1 = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
@@ -221,11 +224,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(new_report_id_2 in report_ids)
 
     def test_get_nonexistent_report_returns_no_report(self):
+        # type: () -> None
         report_models = app_feedback_report_services.get_report_models(
             ['bad_id'])
         self.assertIsNone(report_models[0])
 
     def test_get_report_from_model_has_same_report_info(self):
+        # type: () -> None
         self.assertEqual(
             self.android_report_model.id, self.android_report_obj.report_id)
         self.assertEqual(
@@ -235,6 +240,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.android_report_model.scrubbed_by, None)
 
     def test_get_web_report_raises_error(self):
+        # type: () -> None
         mock_web_report_model = self.android_report_obj
         mock_web_report_model.platform = self.PLATFORM_WEB
 
@@ -245,6 +251,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 mock_web_report_model)
 
     def test_get_report_from_model_has_same_user_supplied_feedback_info(self):
+        # type: () -> None
         user_supplied_feedback = self.android_report_obj.user_supplied_feedback
 
         self.assertEqual(
@@ -261,6 +268,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 'user_feedback_other_text_input'])
 
     def test_get_report_from_model_has_same_device_system_info(self):
+        # type: () -> None
         device_system_context = self.android_report_obj.device_system_context
 
         self.assertTrue(isinstance(
@@ -292,6 +300,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 'network_type'])
 
     def test_get_report_from_model_has_same_app_info(self):
+        # type: () -> None
         app_context = self.android_report_obj.app_context
 
         self.assertTrue(isinstance(
@@ -328,6 +337,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_model.android_report_info['logcat_logs'])
 
     def test_save_android_report_and_get_from_model_has_new_info(self):
+        # type: () -> None
         self.assertIsNone(self.android_report_obj.scrubbed_by)
 
         # Add a user in the scrubbed_by field and verify that the updated model
@@ -344,6 +354,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(scrubbed_report_obj.scrubbed_by, self.user_id)
 
     def test_save_web_report_raises_exception(self):
+        # type: () -> None
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
@@ -354,6 +365,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 mock_web_report_obj)
 
     def test_get_ticket_from_model_has_same_ticket_info(self):
+        # type: () -> None
         self.assertEqual(
             self.android_ticket_obj.ticket_id, self.android_ticket_model.id)
         self.assertEqual(
@@ -374,6 +386,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_ticket_model.report_ids)
 
     def test_get_ticket_from_model_with_github_info_has_same_ticket_info(self):
+        # type: () -> None
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP))
@@ -405,6 +418,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(ticket_obj.reports, ticket_model.report_ids)
 
     def test_get_ticket_from_model_is_archived_has_same_ticket_info(self):
+        # type: () -> None
         self.android_ticket_model.archived = True
         self.android_ticket_model.update_timestamps()
         self.android_ticket_model.put()
@@ -429,6 +443,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             ticket_obj.reports, self.android_ticket_model.report_ids)
 
     def test_create_android_report_from_json_is_correct_object(self):
+        # type: () -> None
         report_obj = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
@@ -445,8 +460,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             report_obj.submitted_on_timestamp, self.REPORT_SUBMITTED_TIMESTAMP)
 
-    def test_save_new_android_report_from_json_saves_model_to_storage(
-            self):
+    def test_save_new_android_report_from_json_saves_model_to_storage(self):
+        # type: () -> None
         report_obj = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
@@ -468,6 +483,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             actual_model.entry_point, self.ENTRY_POINT_NAVIGATION_DRAWER.name)
 
     def test_new_reports_added_updates_unticketed_stats_model_correctly(self):
+        # type: () -> None
         report_obj_1 = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
@@ -517,6 +533,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             unticketed_stats_model.daily_param_stats, expected_json)
 
     def test_new_report_added_updates_all_reports_stats_model_correctly(self):
+        # type: () -> None
         report_obj_1 = (
             app_feedback_report_services.create_android_report_from_json(
                 self.REPORT_JSON))
@@ -567,6 +584,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             all_reports_stats_model.daily_param_stats, expected_json)
 
     def test_get_all_expiring_reports(self):
+        # type: () -> None
         expiring_report_id_1 = (
             self._add_expiring_android_report_with_no_scrubber())
         expiring_report_id_2 = (
@@ -581,6 +599,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(expiring_report_id_2 in expiring_report_ids)
 
     def test_get_all_filter_options(self):
+        # type: () -> None
         filter_options = app_feedback_report_services.get_all_filter_options()
         filter_fields = [
             filter_obj.filter_field for filter_obj in filter_options]
@@ -635,6 +654,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     self.COUNTRY_LOCALE_CODE_INDIA)
 
     def test_edit_ticket_name_updates_ticket_model(self):
+        # type: () -> None
         self.android_report_obj.ticket_id = self.android_ticket_id
         new_ticket_name = 'a ticket name'
         app_feedback_report_services.edit_ticket_name(
@@ -649,6 +669,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.android_report_obj.ticket_id, new_ticket_model.id)
 
     def test_edit_ticket_name_does_not_change_ticket_id(self):
+        # type: () -> None
         new_ticket_name = 'a new ticket name'
         app_feedback_report_services.edit_ticket_name(
             self.android_ticket_obj, new_ticket_name)
@@ -663,6 +684,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_obj.platform, new_ticket_model.platform)
 
     def test_edit_ticket_name_does_not_change_stats_model(self):
+        # type: () -> None
         self.android_ticket_obj.reports = []
         old_ticket_name = 'old ticket name'
         old_ticket_id = (
@@ -726,6 +748,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             old_stats_model.daily_param_stats)
 
     def test_reassign_report_to_ticket_updates_increasing_stats_model(self):
+        # type: () -> None
         new_ticket_id = self._add_new_android_ticket(
             'ticket_name', ['report_id'])
         new_ticket_model = (
@@ -783,6 +806,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             expected_json)
 
     def test_reassign_ticket_updates_decreasing_stats_model(self):
+        # type: () -> None
         new_ticket_id = self._add_new_android_ticket(
             'ticket_name', ['report_id'])
         new_ticket_model = (
@@ -835,6 +859,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             expected_json)
 
     def test_reassign_ticket_does_not_change_all_report_stats_model(self):
+        # type: () -> None
         new_ticket_id = self._add_new_android_ticket(
             'ticket_name', ['report_id'])
         new_ticket_model = (
@@ -868,6 +893,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             old_all_reports_stats_model.daily_param_stats)
 
     def test_reassign_web_ticket_raises_error(self):
+        # type: () -> None
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
@@ -877,8 +903,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_services.reassign_ticket(
                 mock_web_report_obj, None)
 
-    def test_reassign_ticket_with_invalid_stats_model_raises_error(
-            self):
+    def test_reassign_ticket_with_invalid_stats_model_raises_error(self):
+        # type: () -> None
         # Set an invalid ticket_id so that the stats model calculates an invalid
         # id for this ticket's stats model.
         self.android_report_obj.ticket_id = 'invalid_id'
@@ -889,6 +915,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.android_report_obj, None)
 
     def test_scrub_android_report_removes_info(self):
+        # type: () -> None
         app_feedback_report_services.scrub_single_app_feedback_report(
             self.android_report_obj, self.user_id)
         scrubbed_report_model = (
@@ -914,8 +941,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             scrubbed_report_model.android_report_info, expected_report_dict)
 
-    def test_scrubbing_on_current_and_expired_reports_only_scrubs_expired(
-            self):
+    def test_scrubbing_on_current_and_expired_reports_only_scrubs_expired(self):
+        # type: () -> None
         current_report_id = self._add_current_report()
         expired_report_id = self._add_expiring_android_report_with_no_scrubber()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
@@ -931,8 +958,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_scrubbed(scrubbed_model, self.user_id)
         self._verify_report_is_not_scrubbed(current_model)
 
-    def test_scrubbing_with_no_reports_in_storage_does_not_scrub_storage(
-            self):
+    def test_scrubbing_with_no_reports_in_storage_does_not_scrub_storage(self):
+        # type: () -> None
         current_models_query = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_all())
         current_models = current_models_query.fetch()
@@ -946,6 +973,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(stored_models), 0)
 
     def test_scrubbing_on_only_current_reports_does_not_scrub_models(self):
+        # type: () -> None
         current_report_id = self._add_current_report()
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             self.user_id)
@@ -956,6 +984,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_not_scrubbed(current_model)
 
     def test_scrubbing_on_all_expired_models_updates_all_models(self):
+        # type: () -> None
         android_report_id_1 = (
             self._add_expiring_android_report_with_no_scrubber())
         android_report_id_2 = (
@@ -973,8 +1002,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_scrubbed(android_model_1, self.user_id)
         self._verify_report_is_scrubbed(android_model_2, self.user_id)
 
-    def test_scrubbing_on_already_scrubbed_models_does_not_change_models(
-            self):
+    def test_scrubbing_on_already_scrubbed_models_does_not_change_models(self):
+        # type: () -> None
         report_id = self._add_scrubbed_report('scrubber_user')
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             self.user_id)
@@ -986,6 +1015,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_scrubbed(scrubbed_model, 'scrubber_user')
 
     def test_scrubbing_on_newly_added_expired_models_scrubs_new_models(self):
+        # type: () -> None
         expired_report_id = (
             self._add_expiring_android_report_with_no_scrubber())
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
@@ -1011,12 +1041,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             scrubbed_android_model, self.user_id)
 
     def test_get_report_type_from_string_returns_expected_report_type(self):
+        # type: () -> None
         for report_type in constants.REPORT_TYPE:
             self.assertEqual(
                 app_feedback_report_services.get_report_type_from_string(
                     report_type.name), report_type)
 
     def test_get_report_type_from_string_with_invalid_string_raises_error(self):
+        # type: () -> None
         invalid_report_type = 'invalid_report_type'
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
@@ -1025,12 +1057,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 invalid_report_type)
 
     def test_get_category_from_string_returns_expected_category(self):
+        # type: () -> None
         for category in constants.ALLOWED_CATEGORIES:
             self.assertEqual(
                 app_feedback_report_services.get_category_from_string(
                     category.name), category)
 
     def test_get_category_from_string_with_invalid_string_raises_error(self):
+        # type: () -> None
         invalid_category = 'invalid_category'
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
@@ -1039,6 +1073,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 invalid_category)
 
     def test_get_android_text_size_from_string_returns_expected_text_size(self):
+        # type: () -> None
         for text_size in constants.ALLOWED_ANDROID_TEXT_SIZES:
             self.assertEqual(
                 app_feedback_report_services.get_android_text_size_from_string(
@@ -1046,6 +1081,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_android_text_size_from_string_with_invalid_string_raises_error(
             self):
+        # type: () -> None
         invalid_text_size = 'invalid_text_size'
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
@@ -1055,6 +1091,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 invalid_text_size)
 
     def test_get_entry_point_from_json_returns_expected_entry_point_obj(self):
+        # type: () -> None
         entry_point_json = {
             'entry_point_name': '',
             'entry_point_topic_id': 'topic_id',
@@ -1102,8 +1139,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             isinstance(
                 crash_obj, app_feedback_report_domain.CrashEntryPoint))
 
-    def test_get_entry_point_from_json_with_invalid_json_raises_error(
-            self):
+    def test_get_entry_point_from_json_with_invalid_json_raises_error(self):
+        # type: () -> None
         invalid_json = {
             'entry_point_name': 'invalid_entry_point_name'
         }
@@ -1116,6 +1153,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self):
+        # type: () -> None
         for network_type in constants.ANDROID_NETWORK_TYPES:
             self.assertEqual(
                 app_feedback_report_services.get_android_network_type_from_string( # pylint: disable=line-too-long
@@ -1123,6 +1161,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_android_network_type_from_string_invalid_string_raises_error(
             self):
+        # type: () -> None
         invalid_network_type = 'invalid_text_size'
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
@@ -1132,6 +1171,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 invalid_network_type)
 
     def test_store_incoming_report_stats_with_web_platform_raises_error(self):
+        # type: () -> None
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = constants.PLATFORM_CHOICE_WEB
 
@@ -1144,6 +1184,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_calculate_new_stats_count_for_parameter_adds_new_stats_val_to_dict(
             self):
+        # type: () -> None
         stats_map = {
             'parameter_name': {
                 'value_1': 1
@@ -1158,6 +1199,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_stats_map['value_2'], delta)
 
     def test_calculate_new_stats_count_with_invalid_delta_raises_error(self):
+        # type: () -> None
         stats_map = {
             'parameter_name': {
                 'current_value': 1
@@ -1173,17 +1215,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 stats_map, 'value_2', delta)
 
     def _verify_report_is_scrubbed(self, model_entity, scrubber):
+        # type: (app_feedback_report_models.AppFeedbackReportModel, str) -> None
         """Verifies the report model is scrubbed."""
         self.assertIsNotNone(model_entity)
         self.assertEqual(
             model_entity.scrubbed_by, scrubber)
 
     def _verify_report_is_not_scrubbed(self, model_entity):
+        # type: (app_feedback_report_models.AppFeedbackReportModel) -> None
         """Verifies the report model is not scrubbed."""
         self.assertIsNotNone(model_entity)
         self.assertIsNone(model_entity.scrubbed_by)
 
     def _add_current_report(self):
+        # type: () -> None
         """Adds reports to the model that should not be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1215,6 +1260,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return report_id
 
     def _add_expiring_android_report_with_no_scrubber(self):
+        # type: () -> None
         """Adds reports to the model that should be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1246,6 +1292,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return report_id
 
     def _add_scrubbed_report(self, scrubber_user):
+        # type: (str) -> None
         """Add an already-scrubbed report to the model."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1278,6 +1325,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return report_id
 
     def _add_new_android_ticket(self, ticket_name, report_ids):
+        # type: (str, List[str]) -> None
         """Create an Android report ticket."""
         android_ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1288,6 +1336,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return android_ticket_id
 
     def _verify_stats_model(self, stats_json, expected_json):
+        # type: (Dict[str, Dict[str, int]) -> None
         """Verify the fields of the feedback report stats model."""
         self.assertEqual(
             stats_json['report_type'],
