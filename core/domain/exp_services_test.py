@@ -6965,7 +6965,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': 
+            'new_value':
             {
                 'inputGreaterThanZero':
                 {
@@ -7249,7 +7249,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': 
+            'new_value':
             {
                 'inputGreaterThanZero':
                 {
@@ -9055,7 +9055,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': 
+            'new_value':
             {
                 'inputGreaterThanZero':
                 {
@@ -9473,7 +9473,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': 
+            'new_value':
             {
                 'inputGreaterThanZero':
                 {
@@ -11101,7 +11101,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': 
+            'new_value':
             {
                 'inputGreaterThanZero':
                 {
@@ -11526,7 +11526,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     }
                 },
                 'property_name': 'widget_customization_args',
-                'new_value': 
+                'new_value':
                 {
                     'inputGreaterThanZero':
                     {
