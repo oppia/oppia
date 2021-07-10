@@ -19,11 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import inspect
 import logging
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feedback_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
@@ -31,8 +31,10 @@ from core.platform import models
 import feconf
 import python_utils
 
-(stats_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback])
+(feedback_models, stats_models, user_models) = models.Registry.import_models([
+    models.NAMES.feedback, models.NAMES.statistics, models.NAMES.user])
+
+transaction_services = models.Registry.import_transaction_services()
 
 
 class BaseEventHandler(python_utils.OBJECT):
@@ -41,16 +43,6 @@ class BaseEventHandler(python_utils.OBJECT):
     # A string denoting the type of the event. Should be specified by
     # subclasses and considered immutable.
     EVENT_TYPE = None
-
-    @classmethod
-    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
-        """Dispatch events asynchronously to continuous computation realtime
-        layers that are listening for them.
-        """
-        taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
-            taskqueue_services.QUEUE_NAME_EVENTS, cls.EVENT_TYPE, *args,
-            **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
@@ -66,7 +58,6 @@ class BaseEventHandler(python_utils.OBJECT):
 
         Callers of event handlers should call this method, not _handle_event().
         """
-        cls._notify_continuous_computation_listeners_async(*args, **kwargs)
         cls._handle_event(*args, **kwargs)
 
 
@@ -104,12 +95,6 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
     EVENT_TYPE = feconf.EVENT_TYPE_ANSWER_SUBMITTED
-
-    @classmethod
-    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
-        # Disable this method until we can deal with large answers, otherwise
-        # the data that is being placed on the task queue is too large.
-        pass
 
     @classmethod
     def _handle_event(
@@ -176,6 +161,7 @@ class StartExplorationEventHandler(BaseEventHandler):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
+        handle_exploration_start(exp_id)
 
 
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
@@ -212,9 +198,10 @@ class RateExplorationEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_RATE_EXPLORATION
 
     @classmethod
-    def _handle_event(cls, exploration_id, user_id, rating, old_rating):
+    def _handle_event(cls, exp_id, user_id, rating, old_rating):
         stats_models.RateExplorationEventLogEntryModel.create(
-            exploration_id, user_id, rating, old_rating)
+            exp_id, user_id, rating, old_rating)
+        handle_exploration_rating(exp_id, rating, old_rating)
 
 
 class StateHitEventHandler(BaseEventHandler):
@@ -267,7 +254,7 @@ class FeedbackThreadCreatedEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exp_id):
-        pass
+        feedback_services.handle_new_thread_created(exp_id)
 
 
 class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
@@ -277,35 +264,84 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
 
     @classmethod
     def _handle_event(cls, exp_id, old_status, new_status):
-        pass
+        feedback_services.handle_thread_status_changed(
+            exp_id, old_status, new_status)
 
 
-class Registry(python_utils.OBJECT):
-    """Registry of event handlers."""
+def handle_exploration_start(exp_id):
+    """Handles a user's start of an exploration.
 
-    # Dict mapping event types to their classes.
-    _event_types_to_classes = {}
+    Args:
+        exp_id: str. The exploration which has been started.
+    """
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+    if exp_summary:
+        for user_id in exp_summary.owner_ids:
+            _increment_total_plays_count_transactional(user_id)
 
-    @classmethod
-    def _refresh_registry(cls):
-        """Regenerates the event handler registry."""
-        cls._event_types_to_classes.clear()
 
-        # Find all subclasses of BaseEventHandler in the current module.
-        for obj_name, obj in globals().items():
-            if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
-                if obj_name == 'BaseEventHandler':
-                    continue
+def handle_exploration_rating(exp_id, rating, old_rating):
+    """Handles a new rating for an exploration.
 
-                cls._event_types_to_classes[obj.EVENT_TYPE] = obj
+    Args:
+        exp_id: str. The exploration which has been rated.
+        rating: int. The new rating of the exploration.
+        old_rating: int. The old rating of the exploration before
+            refreshing.
+    """
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+    if exp_summary:
+        for user_id in exp_summary.owner_ids:
+            _refresh_average_ratings_transactional(user_id, rating, old_rating)
 
-    @classmethod
-    def get_event_class_by_type(cls, event_type):
-        """Gets an event handler class by its type.
 
-        Refreshes once if the event type is not found; subsequently, throws an
-        error.
-        """
-        if event_type not in cls._event_types_to_classes:
-            cls._refresh_registry()
-        return cls._event_types_to_classes[event_type]
+@transaction_services.run_in_transaction_wrapper
+def _refresh_average_ratings_transactional(user_id, new_rating, old_rating):
+    """Refreshes the average rating for a user.
+
+    Args:
+        user_id: str. The id of the user.
+        new_rating: int. The new rating of the exploration.
+        old_rating: int|None. The old rating of the exploration before
+            refreshing, or None if the exploration hasn't been rated by the user
+            yet.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        user_models.UserStatsModel(
+            id=user_id, average_ratings=new_rating, num_ratings=1).put()
+        return
+
+    num_ratings = user_stats_model.num_ratings
+    average_ratings = user_stats_model.average_ratings
+    if average_ratings is None:
+        average_ratings = new_rating
+        num_ratings += 1
+    else:
+        sum_of_ratings = (average_ratings * num_ratings) + new_rating
+        if old_rating is None:
+            num_ratings += 1
+        else:
+            sum_of_ratings -= old_rating
+        average_ratings = python_utils.divide(
+            sum_of_ratings, float(num_ratings))
+    user_stats_model.average_ratings = average_ratings
+    user_stats_model.num_ratings = num_ratings
+    user_stats_model.update_timestamps()
+    user_stats_model.put()
+
+
+@transaction_services.run_in_transaction_wrapper
+def _increment_total_plays_count_transactional(user_id):
+    """Increments the total plays count of the exploration.
+
+    Args:
+        user_id: str. The id of the user.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        user_models.UserStatsModel(id=user_id, total_plays=1).put()
+    else:
+        user_stats_model.total_plays += 1
+        user_stats_model.update_timestamps()
+        user_stats_model.put()

@@ -45,8 +45,7 @@
 
 
 # Android team
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/android_validation_constants*.py @rt4914
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -99,7 +98,9 @@
 
 
 # Blog project
-/core/domain/blog*.py @iamprayush
+/core/domain/blog*.py @iamprayush @aks681
+/core/controllers/blog_dashboard*.py @aks681
+/core/controllers/blog_homepage*.py @aks681
 
 
 # Collection project.
@@ -122,28 +123,25 @@
 /core/storage/translation/ @seanlip
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
+/core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
 
 
 # Core documentation
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/AUTHORS @seanlip
+/AUTHORS @seanlip @BenHenning
 /CHANGELOG @seanlip
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/about-page/about-page.constants.ts @seanlip
+/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
 /core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/license-page/license-page.component.html @seanlip
+/core/templates/pages/license-page/license-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/privacy-page/privacy-page.component.html @seanlip
-/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/terms-page/terms-page.component.html @seanlip
+/core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
 
 
 # Dashboard pages.
@@ -164,7 +162,6 @@
 /core/templates/pages/creator-dashboard-page/ @nithusha21
 /core/templates/pages/email-dashboard-pages/ @nithusha21
 /core/templates/pages/learner-dashboard-page/ @nithusha21
-/core/templates/pages/notifications-dashboard-page/ @nithusha21
 
 
 # Dev workflow team.
@@ -491,8 +488,6 @@
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
-/core/templates/base-components/i18n-language-selector.component.ts @nithusha21
-/core/templates/base-components/i18n-language-selector.component.html @nithusha21
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
@@ -500,8 +495,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/redis.conf @seanlip
+/redis.conf @seanlip @BenHenning
 /release_constants.json @nithusha21
 /.firebase.json @brianrodri
 
@@ -530,12 +524,15 @@
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
+/core/controllers/blog_admin*.py @DubeySandeep
 /core/controllers/moderator*.py @DubeySandeep
 /core/controllers/recent_commits*.py @DubeySandeep
 /core/domain/moderator_services*.py @DubeySandeep
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
+/core/templates/domain/blog-admin/ @DubeySandeep
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
+/core/templates/pages/blog-admin-page/ @DubeySandeep @nithusha21
 
 
 # Release team.
@@ -552,7 +549,7 @@
 /core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @DubeySandeep @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681
@@ -599,6 +596,7 @@
 /core/templates/pages/get-started-page/ @jameesjohn
 /core/templates/pages/landing-pages/ @jameesjohn
 /core/templates/pages/maintenance-page/ @jameesjohn
+/core/templates/pages/partnerships-page/ @jameesjohn
 /core/templates/pages/pending-account-deletion-page/ @jameesjohn
 /core/templates/pages/preferences-page/ @jameesjohn
 /core/templates/pages/signup-page/ @jameesjohn
@@ -653,14 +651,13 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/controllers/platform_feature*.py @vinitamurthi
-/core/domain/platform_feature_services*.py @vinitamurthi
-/core/domain/platform_parameter*.py @vinitamurthi
-/core/platform_feature*.py @vinitamurthi
-/core/templates/domain/platform_feature/ @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @vinitamurthi
-/core/templates/services/platform-feature*.ts @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
+/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
@@ -673,10 +670,17 @@
 /core/domain/draft_upgrade_services*.py @DubeySandeep
 
 
+# Data stability.
+# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
+/core/controllers/domain_objects_validator*.py @rohitkatlaa
+/core/controllers/payload_validator*.py @rohitkatlaa
+
+
 # QA team.
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/controllers/android_e2e_config*.py @BenHenning
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /core/templates/karma.module.ts @nithusha21
 # TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
@@ -711,16 +715,15 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24 (up to /core/domain/user*.py).
-/core/templates/services/svg-sanitizer.service.ts @seanlip
-/scripts/linters/warranted_angular_security_bypasses.py @seanlip
-/core/controllers/acl_decorators*.py @seanlip
-/core/controllers/base*.py @seanlip
-/core/domain/html*.py @seanlip
-/core/domain/rights_manager*.py @seanlip
-/core/domain/role_services*.py @seanlip
-/core/storage/ @seanlip
-/core/domain/user*.py @seanlip
+/core/templates/services/svg-sanitizer.service.ts @seanlip @BenHenning
+/scripts/linters/warranted_angular_security_bypasses.py @seanlip @BenHenning
+/core/controllers/acl_decorators*.py @seanlip @BenHenning
+/core/controllers/base*.py @seanlip @BenHenning
+/core/domain/html*.py @seanlip @BenHenning
+/core/domain/rights_manager*.py @seanlip @BenHenning
+/core/domain/role_services*.py @seanlip @BenHenning
+/core/storage/ @seanlip @BenHenning
+/core/domain/user*.py @seanlip @BenHenning
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06 (up to /scripts/install_third_party_libs.py)
 /requirements.txt @DubeySandeep
 /requirements.in @DubeySandeep
