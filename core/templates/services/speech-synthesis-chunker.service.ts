@@ -188,7 +188,7 @@ export class SpeechSynthesisChunkerService {
         var element = <HTMLElement> this;
         const _newTextAttr = element.attributes[
             <keyof NamedNodeMap> 'text-with-value'] as Attr;
-        if (_newTextAttr !== undefined) {
+        if (_newTextAttr) {
           // 'Node.textContent' only returns 'null' if the Node is a
           // 'document' or a 'DocType'. '_newTextAttr' is neither.
           const newTextContent = _newTextAttr.textContent?.replace(
@@ -208,7 +208,7 @@ export class SpeechSynthesisChunkerService {
         var element = <HTMLElement> this;
         const _mathContentAttr = element.attributes[
           <keyof NamedNodeMap> 'math_content-with-value'] as Attr;
-        if (_mathContentAttr !== undefined) {
+        if (_mathContentAttr) {
           var mathContent = (
             <MathExpressionContent>(_this.htmlEscaper.escapedJsonToObj(
               // 'Node.textContent' only returns 'null' if the Node is a
