@@ -26,6 +26,7 @@ from core.domain import learner_progress_services
 
 class LearnerPlaylistHandler(base.BaseHandler):
     """Handles operations related to the learner playlist."""
+
     URL_PATH_ARGS_SCHEMAS = {
         'activity_type': {
             'schema': {

@@ -349,7 +349,6 @@ class UploadExplorationHandler(base.BaseHandler):
         }
     }
 
-
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
