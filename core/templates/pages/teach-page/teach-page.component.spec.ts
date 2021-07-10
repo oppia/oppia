@@ -127,6 +127,7 @@ describe('Teach Page', () => {
 
   it('should check if user is logged in or not', fakeAsync(() => {
     const UserInfoObject = {
+      role: 'EXPLORATION_EDITOR',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,

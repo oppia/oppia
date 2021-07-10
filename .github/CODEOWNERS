@@ -123,6 +123,7 @@
 /core/storage/translation/ @seanlip
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
+/core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
 
 
 # Core documentation
@@ -554,7 +555,6 @@
 /core/templates/services/autoplayed-videos.service*.ts @aks681
 /core/templates/services/external-save.service*.ts @srijanreddy98
 /core/templates/services/external-rte-save.service*.ts @srijanreddy98
-/core/templates/services/oppia-rte-parser.service.ts @srijanreddy98 @aks681
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
@@ -562,7 +562,6 @@
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
 /core/domain/rte_component_registry*.py @aks681
 /extensions/ckeditor_plugins/ @aks681
-/extensions/rich_text_components/rte-output-display.component* @srijanreddy98 @aks681
 /extensions/rich_text_components/ @aks681
 /assets/rich_text_components_definitions.ts @aks681
 
@@ -597,6 +596,7 @@
 /core/templates/pages/get-started-page/ @jameesjohn
 /core/templates/pages/landing-pages/ @jameesjohn
 /core/templates/pages/maintenance-page/ @jameesjohn
+/core/templates/pages/partnerships-page/ @jameesjohn
 /core/templates/pages/pending-account-deletion-page/ @jameesjohn
 /core/templates/pages/preferences-page/ @jameesjohn
 /core/templates/pages/signup-page/ @jameesjohn

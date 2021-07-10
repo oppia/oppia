@@ -239,7 +239,7 @@ describe('Contribution Opportunities backend API service', function() {
   );
 
   it('should fail to fetch the voiceover opportunities data ' +
-    'given invali language code ' +
+    'given invalid language code ' +
     'when calling \'fetchVoiceoverOpportunitiesAsync\'', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
