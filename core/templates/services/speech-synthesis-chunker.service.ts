@@ -188,17 +188,14 @@ export class SpeechSynthesisChunkerService {
         var element = <HTMLElement> this;
         const _newTextAttr = element.attributes[
             <keyof NamedNodeMap> 'text-with-value'] as Attr;
-        if (_newTextAttr) {
           // 'Node.textContent' only returns 'null' if the Node is a
           // 'document' or a 'DocType'. '_newTextAttr' is neither.
-          const newTextContent = _newTextAttr.textContent?.replace(
-            /&quot;/g, '');
+        const newTextContent = _newTextAttr.textContent?.replace(
+          /&quot;/g, '');
           // Variable newTextContent ends with a " character, so this is being
           // ignored in the condition below.
-          return newTextContent && newTextContent !== '"' ?
+        return newTextContent && newTextContent !== '"' ?
             newTextContent + ' ' : '';
-        }
-        return element;
       });
 
     var _this = this;
@@ -208,17 +205,14 @@ export class SpeechSynthesisChunkerService {
         var element = <HTMLElement> this;
         const _mathContentAttr = element.attributes[
           <keyof NamedNodeMap> 'math_content-with-value'] as Attr;
-        if (_mathContentAttr) {
-          var mathContent = (
+        var mathContent = (
             <MathExpressionContent>(_this.htmlEscaper.escapedJsonToObj(
               // 'Node.textContent' only returns 'null' if the Node is a
               // 'document' or a 'DocType'. '_mathContentAttr' is neither.
               <string> _mathContentAttr.textContent)));
-          const latexSpeakableText = _this._formatLatexToSpeakableText(
-            mathContent.raw_latex);
-          return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
-        }
-        return element;
+        const latexSpeakableText = _this._formatLatexToSpeakableText(
+          mathContent.raw_latex);
+        return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
       });
 
     html = elt.html();
