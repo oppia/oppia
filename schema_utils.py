@@ -94,6 +94,10 @@ def normalize_against_schema(
     normalized_obj = None # type: Any
 
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
+        if obj == 'true':
+            obj = True
+        elif obj == 'false':
+            obj = False
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
