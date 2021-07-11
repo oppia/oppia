@@ -493,7 +493,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['license'],
       filename: 'license.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'License terms that Oppia is attributed under.'
@@ -514,7 +513,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['logout'],
       filename: 'logout-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/logout-page/logout-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -523,7 +521,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['maintenance'],
       filename: 'maintenance-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
