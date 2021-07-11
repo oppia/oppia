@@ -22,5 +22,8 @@ export const ContributorDashboardAdminPageConstants = {
   CONTRIBUTION_RIGHTS_HANDLER_URL: '/contributionrightsdatahandler',
   GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler/<category>',
   REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL: (
-    '/removecontributionrightshandler/<category>')
+    '/removecontributionrightshandler/<category>'),
+  TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL: (
+    '/translationcontributionstatshandler'
+  )
 } as const;

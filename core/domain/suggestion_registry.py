@@ -1384,6 +1384,57 @@ class CommunityContributionStats(python_utils.OBJECT):
                     self.question_reviewer_count)))
 
 
+class TranslationContributionStats(python_utils.OBJECT):
+    """Domain object for the TranslationContributionStatsModel."""
+
+    def __init__(
+            self, language_code, contributor_user_id, topic_id,
+            submitted_translations_count, submitted_translation_word_count,
+            accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count,
+            accepted_translation_word_count, rejected_translations_count,
+            rejected_translation_word_count, contribution_dates):
+        self.language_code = language_code
+        self.contributor_user_id = contributor_user_id
+        self.topic_id = topic_id
+        self.submitted_translations_count = submitted_translations_count
+        self.submitted_translation_word_count = submitted_translation_word_count
+        self.accepted_translations_count = accepted_translations_count
+        self.accepted_translations_without_reviewer_edits_count = (
+            accepted_translations_without_reviewer_edits_count
+        )
+        self.accepted_translation_word_count = accepted_translation_word_count
+        self.rejected_translations_count = rejected_translations_count
+        self.rejected_translation_word_count = rejected_translation_word_count
+        self.contribution_dates = contribution_dates
+
+    def to_dict(self):
+        """Returns a dict representation of a TranslationContributionStats
+        domain object.
+
+        Returns:
+            dict. A dict representation of a TranslationContributionStats
+            domain object.
+        """
+        return {
+            'language_code': self.language_code,
+            'contributor_user_id': self.contributor_user_id,
+            'topic_id': self.topic_id,
+            'submitted_translations_count': self.submitted_translations_count,
+            'submitted_translation_word_count': (
+                self.submitted_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.accepted_translations_without_reviewer_edits_count),
+            'accepted_translation_word_count': (
+                self.accepted_translation_word_count),
+            'rejected_translations_count': self.rejected_translations_count,
+            'rejected_translation_word_count': (
+                self.rejected_translation_word_count),
+            'contribution_dates': self.contribution_dates
+        }
+
+
 class ReviewableSuggestionEmailInfo(python_utils.OBJECT):
     """Stores key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
