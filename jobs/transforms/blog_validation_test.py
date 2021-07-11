@@ -73,7 +73,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.NOW,
             last_updated=self.YEAR_AGO,
             published_on=self.YEAR_AGO)
@@ -95,7 +95,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=self.YEAR_AGO)
@@ -112,13 +112,32 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
                 invalid_timestamp),
         ])
 
+    def test_process_reports_no_error_if_published_on_is_none(self):
+        valid_timestamp = blog_models.BlogPostModel(
+            id='124',
+            title='Sample Title',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            published_on=None)
+
+        output = (
+            self.pipeline
+            | beam.Create([valid_timestamp])
+            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
     def test_process_reports_model_mutated_during_job_error(self):
         invalid_timestamp = blog_models.BlogPostModel(
             id='124',
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.NOW,
             last_updated=self.NOW,
             published_on=self.YEAR_LATER)
@@ -144,7 +163,7 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
             title='',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=self.NOW,
@@ -170,11 +189,11 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
     def test_validation_type_for_domain_object_strict(self):
 
         blog_model = blog_models.BlogPostModel(
-            id='validblogid1',
+            id='validblogid2',
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=self.NOW,
@@ -205,18 +224,18 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
     def test_validation_type_for_domain_object_non_strict(self):
 
         blog_summary_model = blog_models.BlogPostSummaryModel(
-            id='validblogid2',
+            id='validblogid3',
             title='Sample Title',
             summary='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=self.NOW,
             tags=['learners'])
 
         blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid2',
+            id='validblogid3',
             editor_ids=['user'],
             blog_post_is_published=False,
             created_on=self.YEAR_AGO,
@@ -235,11 +254,11 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
     def test_validation_type_for_domain_object_strict(self):
 
         blog_summary_model = blog_models.BlogPostSummaryModel(
-            id='validblogid2',
+            id='validblogid4',
             title='Sample Title',
             summary='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=self.NOW,
@@ -247,7 +266,7 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
             tags=['learners'])
 
         blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid2',
+            id='validblogid4',
             editor_ids=['user'],
             blog_post_is_published=True,
             created_on=self.YEAR_AGO,
