@@ -38,8 +38,6 @@ import {
   InteractiveMapCustomizationArgsBackendDict,
   ItemSelectionInputCustomizationArgs,
   ItemSelectionInputCustomizationArgsBackendDict,
-  LogicProofCustomizationArgs,
-  LogicProofCustomizationArgsBackendDict,
   MathEquationInputCustomizationArgs,
   MathEquationInputCustomizationArgsBackendDict,
   MultipleChoiceInputCustomizationArgs,
@@ -165,14 +163,6 @@ type TestItemSelectionInputCustomizationArgsInterfacesMatch = AssertTrue<
     ItemSelectionInputCustomizationArgsBackendDict,
     {choices: {value: SubtitledHtml[]}},
     ItemSelectionInputCustomizationArgs
-  >
->;
-
-type TestLogicProofCustomizationArgsInterfacesMatch = AssertTrue<
-  IsExactAfterReplacement<
-    LogicProofCustomizationArgsBackendDict,
-    {},
-    LogicProofCustomizationArgs
   >
 >;
 

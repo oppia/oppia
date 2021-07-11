@@ -325,7 +325,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: Logic Proof
+          dest: Number Input
           feedback:
             content_id: feedback_1
             html: <p>Penta-penta-pentagon!</p>
@@ -936,67 +936,6 @@ states:
         feedback_1: {}
         feedback_2: {}
         feedback_3: {}
-  Logic Proof:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Logic Proof. From p we have what?</p>
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: Number Input
-          feedback:
-            content_id: feedback_1
-            html: <p>You proved p!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs: {}
-          rule_type: Correct
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        question:
-          value:
-            assumptions:
-            - arguments: []
-              dummies: []
-              top_kind_name: variable
-              top_operator_name: p
-            default_proof_string: ''
-            results:
-            - arguments: []
-              dummies: []
-              top_kind_name: variable
-              top_operator_name: p
-      default_outcome:
-        dest: Logic Proof
-        feedback:
-          content_id: default_outcome
-          html: <p>Given p, we have p. Try again.</p>
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: LogicProof
-      solution: null
-    next_content_id_index: 2
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
   Math Equation Input:
     classifier_model_id: null
     content:
