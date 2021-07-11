@@ -33,6 +33,7 @@ import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-
 
 import { LearnerLocalNavComponent } from './learner-local-nav.component';
 import { FlagExplorationModalComponent } from '../modals/flag-exploration-modal.component';
+import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Learner Local Nav Component ', () => {
   let component: LearnerLocalNavComponent;
@@ -89,7 +90,7 @@ describe('Learner Local Nav Component ', () => {
     getUsername: () => null,
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => false
-  };
+  } as UserInfo;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
