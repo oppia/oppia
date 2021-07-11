@@ -127,6 +127,14 @@ export class BaseContentComponent {
 })
 export class BaseContentNavBarBreadCrumbDirective {}
 
+/**
+ * This directive is used as selector for navbar pre logo action transclusion.
+ */
+@Directive({
+  selector: 'navbar-pre-logo-action'
+})
+export class BaseContentNavBarPreLogoActionDirective {}
+
 
 /**
  * This directive is used as selector for page footer transclusion.
