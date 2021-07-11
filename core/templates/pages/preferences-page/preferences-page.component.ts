@@ -16,7 +16,7 @@
  * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
