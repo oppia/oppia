@@ -20,6 +20,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+export type DataFormat =
+  'html' | 'unicode' | 'set_of_normalized_string' | 'set_of_unicode_string';
+
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
 export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING = (
@@ -41,7 +44,7 @@ export interface TranslationBackendDict {
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: string,
+      public dataFormat: DataFormat,
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
@@ -96,7 +99,7 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(dataFormat: string): WrittenTranslation {
+  createNew(dataFormat: DataFormat): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
@@ -108,7 +111,7 @@ export class WrittenTranslationObjectFactory {
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.data_format,
+      translationBackendDict.data_format as DataFormat,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }

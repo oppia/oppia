@@ -51,7 +51,7 @@ export class ExtensionTagAssemblerService {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
     ): Object[] | Object => {
-      let result: Object[] | Object;
+      let result: Object[] | Object | undefined = undefined;
 
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         result = value.toBackendDict();
@@ -59,21 +59,24 @@ export class ExtensionTagAssemblerService {
         result = value.map(
           element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
+        type KeyOfValue = keyof typeof value;
+        let _result: Record<KeyOfValue, Object> = {};
         result = {};
-        Object.keys(value).forEach(key => {
-          result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
+        let keys = <KeyOfValue[]>Object.keys(value);
+        keys.forEach(key => {
+          _result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
         });
+        result = _result as Object;
       }
 
       return result || value;
     };
 
-    const customizationArgsBackendDict:
-      InteractionCustomizationArgsBackendDict = {};
-    Object.keys(customizationArgs).forEach(caName => {
+    const customizationArgsBackendDict: Record<string, Object> = {};
+    Object.entries(customizationArgs).forEach(([caName, caValue]) => {
       customizationArgsBackendDict[caName] = {
         value: traverseSchemaAndConvertSubtitledToDicts(
-          customizationArgs[caName].value)
+          caValue.value)
       };
     });
 
@@ -84,13 +87,15 @@ export class ExtensionTagAssemblerService {
       element: JQuery,
       customizationArgs: InteractionCustomizationArgs
   ): JQuery {
+    const caBackendDict = <Record<string, {value: Object}>> (
+      this._convertCustomizationArgsToBackendDict(customizationArgs));
     for (const caName in customizationArgs) {
-      const caBackendDict = (
-        this._convertCustomizationArgsToBackendDict(customizationArgs));
-      let caBackendDictValue = caBackendDict[caName].value;
-      element.attr(
-        this.camelCaseToHyphens.transform(caName) + '-with-value',
-        this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
+      if ('value' in caBackendDict[caName]) {
+        let caBackendDictValue = caBackendDict[caName].value;
+        element.attr(
+          this.camelCaseToHyphens.transform(caName) + '-with-value',
+          this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
+      }
     }
     return element;
   }

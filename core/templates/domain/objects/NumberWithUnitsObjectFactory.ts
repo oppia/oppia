@@ -144,6 +144,9 @@ export class NumberWithUnitsObjectFactory {
     var units = '';
     var value = '';
 
+    type CurrencyUnitKeys = (
+      keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[ ];
+
     // Allow validation only when rawInput is not null or an empty string.
     if (rawInput !== '' && rawInput !== null) {
       // Start with digit when there is no currency unit.
@@ -158,7 +161,8 @@ export class NumberWithUnitsObjectFactory {
           units = rawInput.substr(ind).trim();
         }
 
-        var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+        var keys =
+          <CurrencyUnitKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
         for (var i = 0; i < keys.length; i++) {
           for (var j = 0;
             j < (
@@ -175,7 +179,8 @@ export class NumberWithUnitsObjectFactory {
         }
       } else {
         var startsWithCorrectCurrencyUnit = false;
-        var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+        var keys =
+          <CurrencyUnitKeys>Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
         for (var i = 0; i < keys.length; i++) {
           for (var j = 0;
             j < ObjectsDomainConstants.CURRENCY_UNITS[

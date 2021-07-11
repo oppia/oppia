@@ -47,7 +47,7 @@ import {
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 export interface ExplanationBackendDict {
-  'content_id': string;
+  'content_id': string | null;
   'html': string;
 }
 
@@ -64,7 +64,7 @@ export interface ShortAnswerResponse {
 
 export class Solution {
   ehfs: ExplorationHtmlFormatterService;
-  shof: SubtitledHtml;
+  shof!: SubtitledHtml;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;

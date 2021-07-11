@@ -71,28 +71,29 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
 export interface InteractionBackendDict {
-  'default_outcome': OutcomeBackendDict;
+  'default_outcome': OutcomeBackendDict | null;
   'answer_groups': readonly AnswerGroupBackendDict[];
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
   'id': string;
-  'solution': SolutionBackendDict;
+  'solution': SolutionBackendDict | null;
 }
 
 export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
   customizationArgs: InteractionCustomizationArgs;
-  defaultOutcome: Outcome;
+  defaultOutcome: Outcome | null;
   hints: Hint[];
   id: string;
-  solution: Solution;
+  solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
       confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
-      defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
+      defaultOutcome: Outcome | null,
+      hints: Hint[], id: string, solution: Solution | null) {
     this.answerGroups = answerGroups;
     this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
     this.customizationArgs = customizationArgs;
@@ -143,7 +144,7 @@ export class Interaction {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
     ): Object[] | Object => {
-      let result: Object[] | Object;
+      let result: Object[] | Object | undefined = undefined;
 
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         result = value.toBackendDict();
@@ -151,21 +152,24 @@ export class Interaction {
         result = value.map(
           element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
+        type KeyOfValue = keyof typeof value;
+        let _result: Record<KeyOfValue, Object> = {};
         result = {};
-        Object.keys(value).forEach(key => {
-          result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
+        let keys = <KeyOfValue[]>Object.keys(value);
+        keys.forEach(key => {
+          _result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
         });
+        result = _result as Object;
       }
 
       return result || value;
     };
 
-    const customizationArgsBackendDict:
-      InteractionCustomizationArgsBackendDict = {};
-    Object.keys(customizationArgs).forEach(caName => {
+    const customizationArgsBackendDict: Record<string, Object> = {};
+    Object.entries(customizationArgs).forEach(([caName, caValue]) => {
       customizationArgsBackendDict[caName] = {
         value: traverseSchemaAndConvertSubtitledToDicts(
-          customizationArgs[caName].value)
+          caValue.value)
       };
     });
 
@@ -184,8 +188,8 @@ export class Interaction {
    */
   static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
-  ): string[] {
-    const contentIds = [];
+  ): (string | null)[] {
+    const contentIds: (string | null)[] = [];
 
     const traverseValueAndRetrieveContentIdsFromSubtitled = (
         value: Object[] | Object
@@ -196,15 +200,21 @@ export class Interaction {
         value.forEach(
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
       } else if (value instanceof Object) {
-        Object.keys(value).forEach(key => {
+        type KeyOfValue = keyof typeof value;
+        let keys = <KeyOfValue[]>Object.keys(value);
+        keys.forEach(key => {
           traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
         });
       }
     };
 
-    Object.keys(customizationArgs).forEach(
-      caName => traverseValueAndRetrieveContentIdsFromSubtitled(
-        customizationArgs[caName].value)
+    Object.values(customizationArgs).forEach(
+      caValue => {
+        if ('value' in caValue) {
+          traverseValueAndRetrieveContentIdsFromSubtitled(
+            caValue.value);
+        }
+      }
     );
 
     return contentIds;
