@@ -80,7 +80,7 @@ describe('Changes in Human Readable Form Directive', () => {
     let result = removeComments(html);
 
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Added state: ' + component.lostChanges[0].stateName + ' </span>' +
@@ -104,7 +104,7 @@ describe('Changes in Human Readable Form Directive', () => {
     let result = removeComments(html);
 
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Renamed state: ' + component.lostChanges[0].oldStateName +
@@ -128,7 +128,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<span> Deleted state: ' +
@@ -161,7 +161,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
       let result = removeComments(html);
       expect(result).toBe(
-        '<div class="oppia-lost-changes">' +
+        '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
         '<ul>' +
         '<li>' +
         '<div>' +
@@ -205,7 +205,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -244,7 +244,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -287,7 +287,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -331,7 +331,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -374,7 +374,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -419,7 +419,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -474,7 +474,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -545,7 +545,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -601,7 +601,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -648,7 +648,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -713,7 +713,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +
@@ -774,7 +774,7 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let result = removeComments(html);
     expect(result).toBe(
-      '<div class="oppia-lost-changes">' +
+      '<div class="oppia-lost-changes protractor-test-oppia-lost-changes">' +
       '<ul>' +
       '<li>' +
       '<div>' +

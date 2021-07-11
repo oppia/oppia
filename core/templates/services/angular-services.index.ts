@@ -212,6 +212,7 @@ import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-ma
 import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service';
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
@@ -364,7 +365,6 @@ import { ExplorationPlayerStateService } from 'pages/exploration-player-page/ser
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
-import { OppiaRteParserService } from './oppia-rte-parser.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
@@ -428,6 +428,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
+  ['ContributorDashboardAdminBackendApiService',
+    ContributorDashboardAdminBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
   ['ChangeListService', ChangeListService],
@@ -586,7 +588,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
-  ['OppiaRteParserService', OppiaRteParserService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],

@@ -22,7 +22,7 @@ import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFact
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 /**
- * @fileoverview Unit tests for paramChangesEditor.
+ * @fileoverview Unit tests for StateResponsesComponent.
  */
 
 describe('StateResponsesComponent', () => {

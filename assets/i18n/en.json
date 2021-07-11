@@ -399,6 +399,7 @@
     "I18N_MODAL_CANCEL_BUTTON": "Cancel",
     "I18N_MODAL_CONTINUE_BUTTON": "Continue",
     "I18N_ONE_SUBSCRIBER_TEXT": "You have 1 subscriber.",
+    "I18N_PARTNERSHIPS_PAGE_BREADCRUMB": "Partnerships",
     "I18N_PENDING_ACCOUNT_DELETION_PAGE_BREADCRUMB": "Pending Account Deletion",
     "I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING": "Account To Be Deleted",
     "I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1": "Your account is scheduled for deletion, and will be deleted in around 24 hours. You will be notified by email after the deletion is completed.",
