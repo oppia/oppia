@@ -179,6 +179,59 @@
       </button>
     </form>
   </md-card>
+
+  <md-card class="oppia-page-card oppia-long-text">
+    <form class="form-horizontal"
+          ng-submit="$ctrl.submitViewTranslationContributionStatsForm($ctrl.formData.viewTranslationContributionStats)">
+      <legend class="text-center">View Translation Contribution Stats</legend>
+      <div class="d-xl-inline-flex form-group">
+        <label for="label-target-form-translation-contributor-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+          <input type="text"
+                 id="label-target-form-translation-contributor-username"
+                 class="form-control protractor-test-username-value"
+                 placeholder="Enter username"
+                 ng-model="$ctrl.formData.viewTranslationContributionStats.username">
+        </div>
+      </div>
+
+      <button type="submit"
+              class="btn btn-success protractor-test-role-success"
+              [disabled]="!$ctrl.formData.viewTranslationContributionStats.isValid()"
+              value="view stats">
+        View Stats
+      </button>
+    </form>
+
+    <div ng-if="$ctrl.translationContributionStatsFetched">
+      <table class="table text-center view-results-table">
+        <thead>
+          <tr>
+            <td><strong>Months</strong></td>
+            <td><strong>Language</strong></td>
+            <td><strong>Topic Name</strong></td>
+            <td><strong>Submitted Translation Cards</strong></td>
+            <td><strong>Submitted Translation Word Count</strong></td>
+            <td><strong>Accepted Translation Cards</strong></td>
+            <td><strong>Accepted Translation Cards Without Reviewer Edits</strong></td>
+            <td><strong>Accepted Translation Word Count</strong></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="stats in $ctrl.translationContributionStatsResults">
+            <td class="protractor-test-roles-result-rows">{{ stats.contribution_months }}</td>
+            <td>{{ stats.language }}</td>
+            <td>{{ stats.topic_name }}</td>
+            <td>{{ stats.submitted_translations_count }}</td>
+            <td>{{ stats.submitted_translation_word_count }}</td>
+            <td>{{ stats.accepted_translations_count }}</td>
+            <td>{{ stats.accepted_translations_without_reviewer_edits_count }}</td>
+            <td>{{ stats.accepted_translation_word_count }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </md-card>
 </div>
 <style>
   .oppia-contributor-dashboard-admin-page-tabs-container {
