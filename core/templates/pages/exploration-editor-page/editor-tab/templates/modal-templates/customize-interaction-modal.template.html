@@ -20,6 +20,7 @@
         <br>
         <div ng-repeat="interactionId in category.interaction_ids"
              ng-click="onChangeInteractionId(interactionId)"
+             ng-if="interactionId !== 'LogicProof'"
              class="oppia-interaction-tile protractor-test-interaction-tile-<[interactionId]>"
              title="<[INTERACTION_SPECS[interactionId].description]>">
           <img ng-src="<[getInteractionThumbnailImageUrl(interactionId)]>">
