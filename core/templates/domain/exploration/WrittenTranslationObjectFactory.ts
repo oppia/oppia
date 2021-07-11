@@ -21,7 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export type DataFormat =
-  'html' | 'unicode' | 'set_of_normalized_string' | 'set_of_unicode_string';
+  'html' | 'unicode' | 'set_of_normalized_string' | 'set_of_unicode_string'
+  | 'invalid';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
@@ -35,6 +36,8 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING]: [],
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
+
+type DataFormatToDefaultValuesKey = keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
 
 export interface TranslationBackendDict {
   'data_format': string;
@@ -78,7 +81,8 @@ export class WrittenTranslation {
 
   setTranslation(translation: string|string[]): void {
     if (typeof translation !==
-        typeof DATA_FORMAT_TO_DEFAULT_VALUES[this.dataFormat]) {
+        typeof DATA_FORMAT_TO_DEFAULT_VALUES[
+          <DataFormatToDefaultValuesKey> this.dataFormat]) {
       throw new Error(
         'This translation is not of the correct type for data format ' +
         this.dataFormat);
@@ -100,12 +104,14 @@ export class WrittenTranslation {
 })
 export class WrittenTranslationObjectFactory {
   createNew(dataFormat: DataFormat): WrittenTranslation {
-    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
+    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat) ||
+        dataFormat === 'invalid') {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
 
     return new WrittenTranslation(
-      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat], false);
+      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[
+        <DataFormatToDefaultValuesKey> dataFormat], false);
   }
 
   createFromBackendDict(

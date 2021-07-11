@@ -35,14 +35,16 @@ export interface WrittenTranslationsBackendDict {
   }
 }
 
+interface TranslationMappingDict {
+    [contentId: string]: {
+      [langCode: string]: TranslationBackendDict
+    }
+}
+
 interface WrittenTranslationsMapping {
   [contentId: string]: {
     [langCode: string]: WrittenTranslation
   }
-}
-
-interface LanguageToWrittenTranslationDict {
-  [lang: string]: TranslationBackendDict
 }
 
 export class WrittenTranslations {
@@ -138,12 +140,11 @@ export class WrittenTranslations {
   }
 
   toBackendDict(): WrittenTranslationsBackendDict {
-    let translationsMappingDict:
-      {[contentId: string]: LanguageToWrittenTranslationDict} = {};
-    for (let contentId in this.translationsMapping) {
-      let languageToWrittenTranslation = this.translationsMapping[contentId];
-      let languageToWrittenTranslationDict:
-        LanguageToWrittenTranslationDict = {};
+    var translationsMappingDict: TranslationMappingDict = {};
+    for (var contentId in this.translationsMapping) {
+      var languageToWrittenTranslation = this.translationsMapping[contentId];
+      var languageToWrittenTranslationDict:
+        Record<string, TranslationBackendDict> = {};
       Object.keys(languageToWrittenTranslation).forEach((lang) => {
         languageToWrittenTranslationDict[lang] = (
           languageToWrittenTranslation[lang].toBackendDict());
@@ -165,7 +166,7 @@ export class WrittenTranslationsObjectFactory {
   createFromBackendDict(
       writtenTranslationsDict: WrittenTranslationsBackendDict):
       WrittenTranslations {
-    let translationsMapping: WrittenTranslationsMapping = {};
+    var translationsMapping: WrittenTranslationsMapping = {};
     Object.keys(writtenTranslationsDict.translations_mapping).forEach(
       (contentId) => {
         translationsMapping[contentId] = {};

@@ -20,6 +20,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 
 describe('User info model', () => {
   let sampleUserInfoBackendObject = {
+    role: 'USER_ROLE',
     is_moderator: true,
     is_admin: false,
     is_super_admin: false,
@@ -39,6 +40,8 @@ describe('User info model', () => {
     expect(userInfo.isAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
+    expect(userInfo.isTranslationAdmin()).toBe(false);
+    expect(userInfo.isQuestionAdmin()).toBe(false);
     expect(userInfo.canCreateCollections()).toBe(true);
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('en');
     expect(userInfo.getUsername()).toBe('tester');
