@@ -120,10 +120,6 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
     expect(suggestionThread.getSuggestion()).toBeNull();
-
-    expect(() => {
-      suggestionThread.setSuggestionStatus('');
-    }).toThrowError('Suggestion status is null');
   });
 
   describe('.setMessages', () => {

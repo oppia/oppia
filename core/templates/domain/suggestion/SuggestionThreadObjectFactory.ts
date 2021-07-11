@@ -86,10 +86,9 @@ export class SuggestionThread {
   }
 
   setSuggestionStatus(status: string): void {
-    if (this.suggestion && status) {
+    if (this.suggestion) {
       this.suggestion.status = status;
     }
-    throw new Error('Suggestion status is null');
   }
 
   getSuggestionStatus(): string | null {
