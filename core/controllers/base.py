@@ -411,6 +411,16 @@ class BaseHandler(webapp2.RequestHandler):
             arg: normalized_value.get(arg) for arg in request_arg_keys
         }
 
+        default_value_keys = list(
+            set(normalized_value.keys()) -
+            set(payload_arg_keys + request_arg_keys)
+        )
+        for arg in default_value_keys:
+            if request_method in ['GET', 'DELETE']:
+                self.normalized_request[arg] = normalized_value.get(arg)
+            else:
+                self.normalized_payload[arg] = normalized_value.get(arg)
+
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 
