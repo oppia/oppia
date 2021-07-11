@@ -1850,6 +1850,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         def get(self):
             exploration_id = self.normalized_request.get('exploration_id')
+            if exploration_id != 'random_exp_id':
+                raise self.InvalidInputException(
+                    'Expected exploration_id to be random_exp_id received %s'
+                    % exploration_id)
             return self.render_json({'exploration_id': exploration_id})
 
     class MockHandlerWithDefaultPutSchema(base.BaseHandler):
@@ -1868,6 +1872,10 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
         def put(self):
             exploration_id = self.normalized_payload.get('exploration_id')
+            if exploration_id != 'random_exp_id':
+                raise self.InvalidInputException(
+                    'Expected exploration_id to be random_exp_id received %s'
+                    % exploration_id)
             return self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
@@ -1926,7 +1934,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp3):
-            response = self.get_json('/mock_play_exploration')
+            self.get_json('/mock_play_exploration')
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp4):
