@@ -129,9 +129,9 @@
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.constants.ts @seanlip
+/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
 /core/templates/pages/license-page/ @vojtechjelinek
-/core/templates/pages/license-page/license-page.component.html @seanlip
+/core/templates/pages/license-page/license-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/privacy-page.component.ts @seanlip @BenHenning
@@ -596,6 +596,7 @@
 /core/templates/pages/header_css_libs.html @vojtechjelinek
 /core/templates/pages/header_js_libs.html @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @vojtechjelinek
+/core/templates/services/cookie.service*.ts @nithusha21
 /core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
 /.lighthouserc.js @jimbyo @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo @vojtechjelinek
