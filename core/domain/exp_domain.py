@@ -2772,12 +2772,10 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                       STATE_PROPERTY_INTERACTION_ID):
                     if (old_exp_states.interaction.id ==
                             current_exp_states.interaction.id):
-                        if all(property not in
-                               self.changed_properties[state_name]
-                               for property in
-                               (self
-                                .PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES
-                               )):
+                        if not self.changed_properties[state_name].intersection(
+                                (self
+                                 .PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES
+                                )):
                             change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
@@ -2798,36 +2796,24 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                       STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     if (old_exp_states.interaction.id ==
                             current_exp_states.interaction.id):
-                        if (all(property not in
-                                self.changed_properties[state_name]
-                                for property in
-                                (self
-                                 .PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES
-                                )) and
-                                change.property_name not in
-                                self.changed_translations[state_name] and
-                                STATE_PROPERTY_INTERACTION_CUST_ARGS
-                                not in
-                                self.changed_properties[state_name]):
-                            change_is_mergeable = True
+                        if not self.changed_properties[state_name].intersection(
+                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                                [STATE_PROPERTY_INTERACTION_CUST_ARGS]):
+                            if (change.property_name not in
+                                    self.changed_translations[state_name]):
+                                change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                     if (old_exp_states.interaction.id ==
                             current_exp_states.interaction.id):
-                        if (all(property not in
-                                self.changed_properties[state_name]
-                                for property in
-                                (self
-                                 .PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES
-                                )) and
-                                change.property_name not in
-                                self.changed_translations[state_name] and
-                                STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
-                                not in
-                                self.changed_properties[state_name]):
-                            change_is_mergeable = True
+                        if not self.changed_properties[state_name].intersection(
+                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                                [STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]):
+                            if (change.property_name not in
+                                    self.changed_translations[state_name]):
+                                change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name ==
@@ -2861,17 +2847,12 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                       STATE_PROPERTY_INTERACTION_SOLUTION):
                     if (old_exp_states.interaction.id ==
                             current_exp_states.interaction.id):
-                        if (all(property not in
-                                self.changed_properties[state_name]
-                                for property in
-                                (self
-                                 .PROPERTIES_CONFLICTING_SOLUTION_CHANGES
-                                )) and
-                                change.property_name not in
-                                self.changed_translations[state_name] and
-                                STATE_PROPERTY_INTERACTION_SOLUTION not in
-                                self.changed_properties[state_name]):
-                            change_is_mergeable = True
+                        if not self.changed_properties[state_name].intersection(
+                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                                [STATE_PROPERTY_INTERACTION_SOLUTION]):
+                            if (change.property_name not in
+                                    self.changed_translations[state_name]):
+                                change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name ==
@@ -2885,14 +2866,9 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
                         change_is_mergeable = True
                 elif (change.property_name ==
                       STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if (all(property not in
-                            self.changed_properties[state_name]
-                            for property in
-                            (self
-                             .PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES
-                            )) and
-                            STATE_PROPERTY_RECORDED_VOICEOVERS not in
-                            self.changed_properties[state_name]):
+                    if not self.changed_properties[state_name].intersection(
+                            self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
+                            [STATE_PROPERTY_RECORDED_VOICEOVERS]):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
