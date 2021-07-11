@@ -615,6 +615,7 @@
 /core/templates/pages/header_css_libs.html @jameesjohn
 /core/templates/pages/header_js_libs.html @jameesjohn
 /core/templates/services/csrf-token.service*.ts @jameesjohn
+/core/templates/services/cookie.service*.ts @nithusha21
 /core/templates/third-party-imports/ @nithusha21
 /.lighthouserc.js @jimbyo @jameesjohn
 /.lighthouserc-accessibility.js @jimbyo

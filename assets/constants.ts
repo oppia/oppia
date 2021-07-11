@@ -5913,6 +5913,9 @@ export default {
     }
   ],
 
+  // When the site cookie policy was last updated in UNIX time milliseconds.
+  "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+
   "DEV_MODE": true,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",

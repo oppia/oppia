@@ -23,6 +23,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
+import { CookieModule, CookieService } from 'ngx-cookie';
 
 import { angularServices } from 'services/angular-services.index';
 
@@ -32,8 +33,8 @@ declare var angular: ng.IAngularStatic;
 export const importAllAngularServices = (): void => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{provide: AngularFireAuth, useValue: null}],
+      imports: [HttpClientTestingModule, CookieModule.forRoot()],
+      providers: [CookieService, {provide: AngularFireAuth, useValue: null}],
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
