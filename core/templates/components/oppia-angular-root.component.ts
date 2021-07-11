@@ -176,13 +176,13 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           componentMap[rteKey].component_class,
           {injector: this.injector});
         customElements.define(
-          'oppia-noninteractive-ckeditor-' +
+          'oppia-noninteractive-' +
           ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
           rteElement
         );
       }
-      areRteElementsInitialized = true;
     }
+    areRteElementsInitialized = true;
   }
 
   public ngAfterViewInit(): void {

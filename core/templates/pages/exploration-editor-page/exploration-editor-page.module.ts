@@ -35,6 +35,7 @@ import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
+import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -55,6 +56,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
+    SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
   ],
@@ -65,6 +67,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,
+    SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
     LostChangesModalComponent,
   ],

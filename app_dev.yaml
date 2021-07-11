@@ -175,6 +175,17 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
+- url: /partnerships
+  static_files: webpack_bundles/partnerships-page.mainpage.html
+  upload: webpack_bundles/partnerships-page.mainpage.html
+  http_headers:
+    Pragma: no-cache
+    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "DENY"
+    X-Xss-Protection: "1; mode=block"
+  secure: always
+  expiration: "0"
 - url: /get-started
   static_files: webpack_bundles/get-started-page.mainpage.html
   upload: webpack_bundles/get-started-page.mainpage.html
