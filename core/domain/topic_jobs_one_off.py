@@ -154,3 +154,26 @@ class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class SubtopicThumbnailSizeAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that outputs the thumbnail sizes of all subtopics in a topic."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        topic = topic_fetchers.get_topic_from_model(item)
+        for subtopic in topic.subtopics:
+            thumbnail_filename_and_size_value = '%s %s' % (
+                subtopic.thumbnail_filename, subtopic.thumbnail_size_in_bytes)
+            yield (item.id, thumbnail_filename_and_size_value)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
