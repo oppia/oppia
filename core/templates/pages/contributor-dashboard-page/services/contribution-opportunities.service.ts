@@ -26,7 +26,7 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-class SkillOpportunitiesDict {
+export class SkillOpportunitiesDict {
   opportunities: SkillOpportunity[];
   more: boolean;
 }
@@ -45,8 +45,8 @@ export class ContributionOpportunitiesService {
       ContributionOpportunitiesBackendApiService,
       private readonly modalService: NgbModal) {}
 
-  public readonly reloadOpportunitiesEventEmitter = new EventEmitter<void>();
-  public readonly removeOpportunitiesEventEmitter = new EventEmitter();
+  private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+  private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
   private _skillOpportunitiesCursor: string = null;
   private _translationOpportunitiesCursor: string = null;
   private _voiceoverOpportunitiesCursor: string = null;
@@ -126,6 +126,14 @@ export class ContributionOpportunitiesService {
       return this._getVoiceoverOpportunitiesAsync(
         languageCode, this._voiceoverOpportunitiesCursor);
     }
+  }
+
+  get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
+    return this._reloadOpportunitiesEventEmitter;
+  }
+
+  get removeOpportunitiesEventEmitter(): EventEmitter<string[]> {
+    return this._removeOpportunitiesEventEmitter;
   }
 }
 

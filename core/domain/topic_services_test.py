@@ -19,8 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -34,8 +37,8 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
+import python_utils
 
 (
     topic_models, suggestion_models
@@ -408,6 +411,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'Title')
 
+        # Store a dummy image in filesystem.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit(
+            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': 'title',
@@ -597,6 +612,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
             self.TOPIC_ID)
 
+        # Save a dummy image on filesystem, to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit(
+            '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
         # Test whether an admin can edit a topic.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -650,6 +677,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.abbreviated_name, 'short-name')
         self.assertEqual(topic.url_fragment, 'url-name')
         self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(topic.thumbnail_size_in_bytes, len(raw_image))
         self.assertEqual(topic.thumbnail_bg_color, '#C6DCDA')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic.practice_tab_is_displayed, True)
@@ -658,6 +686,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
+
+        # Test whether a topic_manager can update a dummy thumbnail_filename.
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+            'old_value': '',
+            'new_value': 'dummy_thumbnail.svg'
+        })]
+        with self.assertRaisesRegexp(Exception, (
+            'The thumbnail dummy_thumbnail.svg for topic with id '
+            '%s does not exist in the filesystem.' % self.TOPIC_ID)):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Updated thumbnail filename.')
 
         # Test whether a topic_manager can edit a topic.
         changelist = [topic_domain.TopicChange({
@@ -1626,10 +1668,11 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'title': 'subtopic_title',
             'skill_ids': []
         }
-        subtopic_v3_dict = {
+        subtopic_v4_dict = {
             'id': 1,
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'title': 'subtopic_title',
             'skill_ids': [],
             'url_fragment': 'subtopictitle'
@@ -1653,18 +1696,18 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
 
         swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 4)
 
         with swap_topic_object, current_schema_version_swap:
             topic = topic_fetchers.get_topic_from_model(model)
 
-        self.assertEqual(topic.subtopic_schema_version, 3)
+        self.assertEqual(topic.subtopic_schema_version, 4)
         self.assertEqual(topic.name, 'name')
         self.assertEqual(topic.canonical_name, 'name')
         self.assertEqual(topic.next_subtopic_id, 1)
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
-        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v3_dict)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v4_dict)
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):
