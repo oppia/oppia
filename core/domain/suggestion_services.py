@@ -1180,6 +1180,59 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
+def create_translation_contribution_stats_from_model(
+        translation_contribution_stats_model):
+    """Creates a domain object representing the supplied
+    TranslationContributionStatsModel.
+
+    Args:
+        translation_contribution_stats_model: TranslationContributionStatsModel.
+            The model to convert to a domain object.
+
+    Returns:
+        TranslationContributionStats. The corresponding
+        TranslationContributionStats domain object.
+    """
+    return suggestion_registry.TranslationContributionStats(
+        translation_contribution_stats_model.language_code,
+        translation_contribution_stats_model.contributor_user_id,
+        translation_contribution_stats_model.topic_id,
+        translation_contribution_stats_model.submitted_translations_count,
+        translation_contribution_stats_model.submitted_translation_word_count,
+        translation_contribution_stats_model.accepted_translations_count,
+        (
+            translation_contribution_stats_model
+            .accepted_translations_without_reviewer_edits_count
+        ),
+        translation_contribution_stats_model.accepted_translation_word_count,
+        translation_contribution_stats_model.rejected_translations_count,
+        translation_contribution_stats_model.rejected_translation_word_count,
+        translation_contribution_stats_model.contribution_dates
+    )
+
+
+def get_all_translation_contribution_stats(user_id):
+    """Gets all TranslationContributionStatsModels corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        list(TranslationContributionStats). TranslationContributionStats domain
+        objects corresponding to the supplied user.
+    """
+    translation_contribution_stats_models = (
+        suggestion_models.TranslationContributionStatsModel.get_all_by_user_id(
+            user_id
+        )
+    )
+    return [
+        create_translation_contribution_stats_from_model(model)
+        for model in translation_contribution_stats_models
+    ]
+
+
 def get_suggestion_types_that_need_reviewers():
     """Uses the community contribution stats to determine which suggestion
     types need more reviewers. Suggestion types need more reviewers if the

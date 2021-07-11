@@ -175,6 +175,29 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           taskRunningInBackground = false;
         };
 
+        ctrl.submitViewTranslationContributionStatsForm = function(
+            formResponse) {
+          if (taskRunningInBackground) {
+            return;
+          }
+          ctrl.statusMessage = 'Processing query...';
+          taskRunningInBackground = true;
+          ContributorDashboardAdminBackendApiService
+            .viewTranslationContributionStatsAsync(
+              formResponse.username
+            ).then(response => {
+              ctrl.translationContributionStatsResults = (
+                response.translation_contribution_stats);
+              ctrl.translationContributionStatsFetched = true;
+              ctrl.statusMessage = 'Success.';
+              refreshFormData();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular.
+              $rootScope.$apply();
+            }, handleErrorResponse);
+          taskRunningInBackground = false;
+        };
+
         var refreshFormData = function() {
           ctrl.formData = {
             viewContributionReviewers: {
@@ -228,6 +251,15 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
                 }
                 return true;
               }
+            },
+            viewTranslationContributionStats: {
+              username: '',
+              isValid: function() {
+                if (this.username === '') {
+                  return false;
+                }
+                return true;
+              }
             }
           };
         };
@@ -254,6 +286,8 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
           refreshFormData();
           ctrl.contributionReviewersDataFetched = false;
           ctrl.contributionReviewersResult = {};
+          ctrl.translationContributionStatsFetched = false;
+          ctrl.translationContributionStatsResults = [];
           ctrl.statusMessage = '';
 
           ctrl.languageCodesAndDescriptions = (
