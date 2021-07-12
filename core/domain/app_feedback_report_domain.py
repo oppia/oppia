@@ -1283,8 +1283,8 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         self.require_valid_report_ids(self.reports)
 
     @classmethod
-    # type: (str) -> None
     def require_valid_ticket_id(cls, ticket_id):
+    # type: (str) -> None
         """Checks whether the ticket id is a valid one.
 
         Args:
