@@ -92,8 +92,7 @@ var LibraryPage = function() {
       '.protractor-test-add-to-playlist-btn')
     );
 
-    await browser.actions().mouseMove(element(by.css(
-      '.protractor-test-exp-summary-tile-title'))).perform();
+    await browser.actions().mouseMove(addToPlayLaterListButton).perform();
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
