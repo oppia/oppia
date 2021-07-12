@@ -45,16 +45,6 @@ class BaseEventHandler(python_utils.OBJECT):
     EVENT_TYPE = None
 
     @classmethod
-    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
-        """Dispatch events asynchronously to continuous computation realtime
-        layers that are listening for them.
-        """
-        taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_DISPATCH_EVENT,
-            taskqueue_services.QUEUE_NAME_EVENTS, cls.EVENT_TYPE, *args,
-            **kwargs)
-
-    @classmethod
     def _handle_event(cls, *args, **kwargs):
         """Perform in-request processing of an incoming event."""
         raise NotImplementedError(
@@ -68,7 +58,6 @@ class BaseEventHandler(python_utils.OBJECT):
 
         Callers of event handlers should call this method, not _handle_event().
         """
-        cls._notify_continuous_computation_listeners_async(*args, **kwargs)
         cls._handle_event(*args, **kwargs)
 
 
@@ -106,12 +95,6 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
     EVENT_TYPE = feconf.EVENT_TYPE_ANSWER_SUBMITTED
-
-    @classmethod
-    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
-        # Disable this method until we can deal with large answers, otherwise
-        # the data that is being placed on the task queue is too large.
-        pass
 
     @classmethod
     def _handle_event(

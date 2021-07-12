@@ -143,6 +143,7 @@ describe('Login Page', () => {
 
   it('should redirect to home page when already logged in', fakeAsync(() => {
     userService.getUserInfoAsync.and.resolveTo(UserInfo.createFromBackendDict({
+      role: 'EXPLORATION_EDITOR',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,

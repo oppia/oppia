@@ -92,7 +92,7 @@ simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
 six==1.15.0               # via -r requirements.in, bleach, fasteners, firebase-admin, google-api-core, google-api-python-client, google-apitools, google-auth, google-auth-httplib2, google-cloud-bigquery, google-cloud-core, google-resumable-media, grpcio, hdfs, html5lib, mock, oauth2client, packaging, protobuf, pyarrow, python-dateutil, requests-mock, webapp2
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
 typing-extensions==3.7.4.3  # via apache-beam
-typing==3.7.4.3           # via apache-beam, typing-extensions
+typing==3.7.4.3           # via -r requirements.in, apache-beam, typing-extensions
 uritemplate==3.0.1        # via google-api-python-client
 urllib3==1.25.11          # via elasticsearch, requests
 webapp2==3.0.0b1          # via -r requirements.in
