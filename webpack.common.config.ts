@@ -700,7 +700,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['story_viewer'],
       filename: 'story-viewer-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/story-viewer-page/' +
