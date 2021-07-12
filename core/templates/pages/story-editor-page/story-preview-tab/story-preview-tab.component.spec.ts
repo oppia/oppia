@@ -18,7 +18,10 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
@@ -46,25 +49,36 @@ describe('Story Preview tab', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [StoryPreviewTabComponent, MockTranslatePipe],
-      providers: [{
-        StoryObjectFactory,
-        StoryEditorNavigationService,
-        provide: [
-          {
-            provide: StoryEditorNavigationService,
-            UseClass: MockStoryEditorNavigationService
-          }
-        ]
-      }]
-    }).compileComponents();
+      providers: [StoryObjectFactory, StoryEditorNavigationService,
+        EditableStoryBackendApiService]
+    });
   });
-  beforeEach(() => {
-    fixture = TestBed.createComponent(StoryPreviewTabComponent);
-    component = fixture.componentInstance;
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
-    storyEditorStateService = TestBed.get(StoryEditorStateService);
-    story = storyObjectFactory.createFromBackendDict({
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
+    $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
+    $provide.value(
+      'StoryEditorNavigationService',
+      TestBed.get(StoryEditorNavigationService));
+  }));
+
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    var $rootScope = $injector.get('$rootScope');
+    var StoryObjectFactory = $injector.get('StoryObjectFactory');
+    var StoryEditorStateService = $injector.get('StoryEditorStateService');
+    $scope = $rootScope.$new();
+    MockStoryEditorNavigationService = {
+      activeTab: 'story_preview',
+      getActiveTab: () => this.activeTab,
+      getChapterId: () => 'node_1',
+      getChapterIndex: () => null,
+      navigateToStoryEditor: () => {
+        this.activeTab = 'story';
+      }
+    };
+
+    story = StoryObjectFactory.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',
       description: 'Story Description',

@@ -21,6 +21,11 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
+import { NewlyCreatedStoryObjectFactory } from
+  'domain/topic/NewlyCreatedStoryObjectFactory';
+
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import CONSTANTS from 'assets/constants';
@@ -35,8 +40,6 @@ describe('Create New Story Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -47,6 +50,8 @@ describe('Create New Story Modal Controller', function() {
     $provide.value(
       'EditableStoryBackendApiService',
       TestBed.get(EditableStoryBackendApiService));
+    $provide.value(
+      'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
