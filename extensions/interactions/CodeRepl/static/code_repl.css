@@ -22,10 +22,6 @@
 }
 .cm-s-preview .CodeMirror-linenumber {
   /* Without this, Line-number in preview CodeRepl will be overlapped. */
-  padding: 0 3px 0 5px;
-  min-width: 20px;
-  text-align: right;
-  color: #999;
   white-space: nowrap;
 }
 .cm-s-preview .CodeMirror-code pre {
