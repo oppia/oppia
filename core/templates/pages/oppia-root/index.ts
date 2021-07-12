@@ -25,13 +25,13 @@ import 'Polyfills.ts';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
-import { OppiaRootModule } from './app.module';
+import { AppModule } from './app.module';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(OppiaRootModule).catch(
+platformBrowserDynamic().bootstrapModule(AppModule).catch(
   // eslint-disable-next-line no-console
   (err) => console.error(err)
 );

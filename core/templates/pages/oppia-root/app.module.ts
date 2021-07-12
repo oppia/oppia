@@ -30,11 +30,13 @@ import { OppiaRootComponent } from './oppia-root.component';
 // Miscellaneous.
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { CookieModule } from 'ngx-cookie';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CookieModule.forRoot(),
     HttpClientModule,
     AppRoutingModule,
   ],
@@ -59,4 +61,4 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
   ],
   bootstrap: [OppiaRootComponent]
 })
-export class OppiaRootModule {}
+export class AppModule {}

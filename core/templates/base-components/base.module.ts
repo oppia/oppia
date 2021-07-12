@@ -82,7 +82,7 @@ const toastrConfig = {
 @NgModule({
   imports: [
     CommonModule,
-    CookieModule.forRoot(),
+    CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
     SharedPipesModule,
