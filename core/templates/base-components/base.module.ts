@@ -13,30 +13,42 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the base components.
+ * @fileoverview Module having all essentials for creating a oppia page.
  */
 
+// Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { CookieModule } from 'ngx-cookie';
+import { ToastrModule } from 'ngx-toastr';
 
-// Miscenellous.
-import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { DirectivesModule } from 'directives/directives.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { I18nModule } from 'i18n/i18n.module';
+
+// Components.
 import { CreateActivityButtonComponent } from 'components/button-directives/create-activity-button.component';
 import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
 import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
 import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component';
 import { SideNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.component';
-import { DirectivesModule } from 'directives/directives.module';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import * as hammer from 'hammerjs';
-import { I18nModule } from 'i18n/i18n.module';
-import { ToastrModule } from 'ngx-toastr';
-import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective, BaseContentPageFooterDirective } from './base-content.component';
 import { LoadingMessageComponent } from './loading-message.component';
 import { OppiaFooterComponent } from './oppia-footer.component';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
+// Directives.
+import { BaseContentComponent,
+  BaseContentNavBarBreadCrumbDirective,
+  BaseContentPageFooterDirective } from './base-content.component';
+
+// Miscenellous.
+import * as hammer from 'hammerjs';
+import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+
+// Configurations.
+
+// Config for hammer gestures.
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = {
     swipe: { direction: hammer.DIRECTION_HORIZONTAL },
@@ -51,6 +63,7 @@ export class MyHammerConfig extends HammerGestureConfig {
   };
 }
 
+// Config for ToastrModule (helps in flashing messages and alerts).
 const toastrConfig = {
   allowHtml: false,
   iconClasses: {
@@ -69,6 +82,7 @@ const toastrConfig = {
 @NgModule({
   imports: [
     CommonModule,
+    CookieModule.forRoot(),
     DirectivesModule,
     I18nModule,
     SharedPipesModule,
@@ -111,18 +125,24 @@ const toastrConfig = {
   ],
 
   exports: [
+    // Modules.
+    CookieModule,
+    DirectivesModule,
+    I18nModule,
+    SharedPipesModule,
+
+    // Components and Directives.
     AlertMessageComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
+    OppiaFooterComponent,
     SideNavigationBarComponent,
     SocialButtonsComponent,
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
-    OppiaFooterComponent
   ],
 })
-
-export class BaseComponentsModule { }
+export class BaseModule { }

@@ -24,20 +24,16 @@ import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
-import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
-import { CookieModule } from 'ngx-cookie';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
-import { I18nModule } from 'i18n/i18n.module';
-import { BaseComponentsModule } from '../base-components/base-components.module';
+import { BaseModule } from '../base-components/base.module';
 import { NgBootstrapModule } from 'modules/ng-boostrap.module';
 
 // Components.
@@ -104,23 +100,19 @@ import { AuthService } from 'services/auth.service';
 
 @NgModule({
   imports: [
-    BaseComponentsModule,
+    BaseModule,
     CommonModule,
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    CookieModule.forRoot(),
     MaterialModule,
     NgBootstrapModule,
-    DirectivesModule,
     DynamicContentModule,
     FormsModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     SharedFormsModule,
-    SharedPipesModule,
-    I18nModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
   ],
@@ -234,20 +226,17 @@ import { AuthService } from 'services/auth.service';
 
   exports: [
     // Modules.
-    BaseComponentsModule,
+    BaseModule,
     CommonElementsModule,
     CodeMirrorModule,
     DynamicContentModule,
-    DirectivesModule,
     FormsModule,
-    I18nModule,
     MaterialModule,
     NgBootstrapModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     SharedFormsModule,
-    SharedPipesModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioBarComponent,
