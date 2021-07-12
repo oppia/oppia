@@ -613,8 +613,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
     var scrollBarWebElement = null;
     if (codeMirrorPaneToScroll === 'first') {
+      console.log('first text');
       scrollBarWebElement = await scrollBarElements.first().getWebElement();
     } else {
+      console.log('second text');
       scrollBarWebElement = await scrollBarElements.last().getWebElement();
     }
     while (true) {
@@ -640,6 +642,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       for (var i = 0; i < totalCount; i++) {
         var lineNumberElement = await lineNumberElements.get(i);
         var lineNumber = await lineNumberElement.getText();
+        if(i==25)
+        {
+          console.log(lineNumber);
+        }
         if (lineNumber && !compareDict.hasOwnProperty(lineNumber)) {
           throw new Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -648,6 +654,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var isHighlighted = await lineDivElement.element(
           by.css('.CodeMirror-linebackground')).isPresent();
         var text = await lineElement.getText();
+        if(i==25)
+        {
+          console.log(text);
+        }
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
@@ -656,6 +666,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       scrollTo = scrollTo + lineHeight * NUMBER_OF_LINES_TO_SCROLL;
     }
     for (var lineNumber in compareDict) {
+      console.log('actual dict');
+      console.log(actualDiffDict[lineNumber].text);
+      console.log('comparing dict');
+      console.log(compareDict[lineNumber].text);
       expect(actualDiffDict[lineNumber].text).toEqual(
         compareDict[lineNumber].text);
       if (compareHightlighting) {
@@ -676,6 +690,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * expectTextToBe() function should be used when possible.
      */
     expectTextWithHighlightingToBe: async function(expectedTextDict) {
+      console.log('start comparing version');
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
@@ -688,8 +703,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     expectTextToBe: async function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
+      console.log('aaaa');
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
         lineNumber++) {
+        console.log(expectedTextArray[lineNumber - 1]);
         expectedDict[lineNumber] = {
           text: expectedTextArray[lineNumber - 1],
           checked: false

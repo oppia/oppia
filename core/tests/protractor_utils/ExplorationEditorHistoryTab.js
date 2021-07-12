@@ -241,10 +241,12 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
+        console.log('first version start');
         await forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).first(),
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
+        console.log('second version start');
         await forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).last(),
           'last'
