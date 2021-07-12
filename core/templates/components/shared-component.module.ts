@@ -31,6 +31,7 @@ import { MaterialModule } from '../modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { CookieModule } from 'ngx-cookie';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
@@ -108,6 +109,7 @@ import { AuthService } from 'services/auth.service';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
+    CookieModule.forRoot(),
     MaterialModule,
     NgBootstrapModule,
     DirectivesModule,
