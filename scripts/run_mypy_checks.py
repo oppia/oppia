@@ -808,7 +808,7 @@ def install_mypy_prerequisites():
     output_stderr = process.communicate()[1]
     if 'can\'t combine user with prefix' in output_stderr:
         cmd += ['--user', '--prefix=', '--system']
-        return subprocess.call(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        return subprocess.call(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return process.returncode
 
 
