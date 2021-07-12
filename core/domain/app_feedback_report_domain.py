@@ -1284,7 +1284,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
 
     @classmethod
     def require_valid_ticket_id(cls, ticket_id):
-    # type: (str) -> None
+        # type: (str) -> None
         """Checks whether the ticket id is a valid one.
 
         Args:
