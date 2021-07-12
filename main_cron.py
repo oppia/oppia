@@ -57,6 +57,9 @@ URLS = [
     main.get_redirect_route(
         r'/cron/app_feedback_report/scrub_expiring_reports',
         cron.CronAppFeedbackReportsScrubberHandler),
+    main.get_redirect_route(
+        r'/cron/suggestions/translation_contribution_stats',
+        cron.CronTranslationContributionStatsHandler),
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

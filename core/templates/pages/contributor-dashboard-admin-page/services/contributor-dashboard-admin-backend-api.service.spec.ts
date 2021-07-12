@@ -146,7 +146,7 @@ describe('Contributor dashboard admin backend api service', () => {
   }));
 
   it('should fail to get the data of contribution rights when category does' +
-  'not exists when calling viewContributionReviewersAsync', fakeAsync(() => {
+  'not exist when calling viewContributionReviewersAsync', fakeAsync(() => {
     let category = 'InvalidCategory';
     let languageCode = 'en';
     cdabas.viewContributionReviewersAsync(
@@ -196,7 +196,7 @@ describe('Contributor dashboard admin backend api service', () => {
   }));
 
   it('should fail to get the data of contribution rights when username does' +
-  'not exists when calling contributionReviewerRightsAsync', fakeAsync(() => {
+  'not exist when calling contributionReviewerRightsAsync', fakeAsync(() => {
     let username = 'InvalidUsername';
     cdabas.contributionReviewerRightsAsync(username)
       .then(successHandler, failHandler);
@@ -219,7 +219,7 @@ describe('Contributor dashboard admin backend api service', () => {
   }));
 
   it('should remove user contribution rights given the username' +
-    'when calling emoveContributionReviewerAsync', fakeAsync(() => {
+    'when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
     let languageCode = null;
     let username = 'validUser';
@@ -243,7 +243,7 @@ describe('Contributor dashboard admin backend api service', () => {
   }));
 
   it('should fail to remove user contribution rights when user does' +
-    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
+    'not exist when calling removeContributionReviewerAsync', fakeAsync(() => {
     let category = 'translation';
     let languageCode = null;
     let username = 'InvalidUser';
@@ -293,4 +293,63 @@ describe('Contributor dashboard admin backend api service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should return translation contribution stats given the username when ' +
+    'calling viewTranslationContributionStatsAsync', fakeAsync(() => {
+    const username = 'validUsername';
+    const result = {
+      translation_contribution_stats: [
+        {
+          language: 'English',
+          topic_name: 'Topic Name',
+          submitted_translations_count: 2,
+          submitted_translation_word_count: 50,
+          accepted_translations_count: 1,
+          accepted_translations_without_reviewer_edits_count: 1,
+          accepted_translation_word_count: 50,
+          rejected_translations_count: 1,
+          rejected_translation_word_count: 150,
+          contribution_months: ['May 2021', 'Jun 2021']
+        }
+      ]
+    };
+    cdabas.viewTranslationContributionStatsAsync(username)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translationcontributionstatshandler' +
+      '?username=' + username);
+    expect(req.request.method).toEqual('GET');
+    req.flush(result, {
+      status: 200, statusText: 'Success.'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should fail to get translation contribution stats for invalid username' +
+    ' when calling viewTranslationContributionStatsAsync', fakeAsync(() => {
+    const username = 'InvalidUsername';
+    cdabas.viewTranslationContributionStatsAsync(username)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/translationcontributionstatshandler' +
+      '?username=' + username);
+    expect(req.request.method).toEqual('GET');
+    const errorMessage = 'Invalid username: ' + username;
+    req.flush({
+      error: errorMessage
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(errorMessage);
+  }
+  ));
 });

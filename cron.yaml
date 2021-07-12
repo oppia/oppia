@@ -32,3 +32,6 @@ cron:
 - description: daily scrubber to scrub expiring feedback reports
   url: /cron/app_feedback_report/scrub_expiring_reports
   schedule: every day 1:00
+- description: daily job to populate translation contribution stats
+  url: /cron/suggestions/translation_contribution_stats
+  schedule: every day 16:00

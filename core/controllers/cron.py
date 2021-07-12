@@ -28,6 +28,7 @@ from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
+from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_jobs_one_off
@@ -318,3 +319,20 @@ class CronAppFeedbackReportsScrubberHandler(base.BaseHandler):
         """
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+
+
+class CronTranslationContributionStatsHandler(base.BaseHandler):
+    """Handler for running the translation contribution stats populate job."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        (
+            suggestion_jobs_one_off
+            .PopulateTranslationContributionStatsOneOffJob.enqueue(
+                suggestion_jobs_one_off
+                .PopulateTranslationContributionStatsOneOffJob.create_new())
+        )
