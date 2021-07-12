@@ -443,7 +443,7 @@ def get_stats_from_model(stats_model):
 
 
 def create_app_daily_stats_from_model_json(daily_param_stats):
-    # type: (Dict[String, Dict[String, int]], Dict[String, app_feedback_report_domain.ReportStatsParameterValueCounts]) ->
+    # type: (Dict[String, Dict[String, int]]) -> Dict[String, app_feedback_report_domain.ReportStatsParameterValueCounts])
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
@@ -753,7 +753,7 @@ def edit_ticket_name(ticket, new_name):
 
 
 def _save_ticket(ticket):
-    # type: () -> app_feedback_report_domain.AppFeedbackReportTicket
+    # type: (app_feedback_report_domain.AppFeedbackReportTicket) -> app_feedback_report_domain.AppFeedbackReportTicket
     """Saves the ticket to persistent storage.
 
     Returns:

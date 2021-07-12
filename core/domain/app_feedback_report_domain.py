@@ -42,7 +42,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             self, report_id, schema_version, platform, submitted_on_timestamp,
             local_timezone_offset_hrs, ticket_id, scrubbed_by,
             user_supplied_feedback, device_system_context, app_context):
-        # type: (str, int, str, datetime.datetime, str, Optional[str], UserSuppliedFeedback, DeviceSystemContext, AppContext) -> None
+        # type: (str, int, str, datetime.datetime, int, Optional[str], str, UserSuppliedFeedback, DeviceSystemContext, AppContext) -> None
         """Constructs an AppFeedbackReport domain object.
 
         Args:
@@ -493,7 +493,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             self, version_name, package_version_code,
             device_country_locale_code, device_language_locale_code,
             device_model, sdk_version, build_fingerprint, network_type):
-        # type: (str, int, str, str, str, str, Type[constants.ANDROID_NETWORK_TYPE]) -> None
+        # type: (str, int, str, str, str, int, str, Type[constants.ANDROID_NETWORK_TYPE]) -> None
         """Constructs an AndroidDeviceSystemContext domain object.
 
         Args:
@@ -1380,7 +1380,7 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
     def __init__(
             self, stats_id, ticket, platform, stats_tracking_date,
             total_reports_submitted, daily_param_stats):
-        # type: (str, str, AppFeedbackReportTicket, int, Dict[str, ReportStatsParameterValueCounts]) -> None
+        # type: (str, str, AppFeedbackReportTicket, datetime.date, int, Dict[str, ReportStatsParameterValueCounts]) -> None
         """Constructs a AppFeedbackReportDailyStats domain object.
 
         Args:
