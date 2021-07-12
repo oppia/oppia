@@ -16,94 +16,94 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
- import { NO_ERRORS_SCHEMA } from '@angular/core';
- import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
- import { MaterialModule } from 'components/material.module';
- import { StorySummary } from 'domain/story/story-summary.model';
- import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
- import { TopicEditorStateService } from '../services/topic-editor-state.service';
- import { TopicPreviewTabComponent } from './topic-preview-tab.component';
- 
- describe('Topic Preview Tab Component', () => {
-   let fixture: ComponentFixture<TopicPreviewTabComponent>;
-   let componentInstance: TopicPreviewTabComponent;
-   let testName = 'test_name';
-   let mockUrl = 'mock_url';
-   let storySummaries = [new StorySummary(
-     null, null, [], null, null, null, null, [], null, [], '', '', '')];
- 
-   class MockTopicEditorStateService {
-     getTopic() {
-       return {
-         getName(): string {
-           return testName;
-         },
-         getSubtopics() {
-           return [];
-         },
-       };
-     }
- 
-     getCanonicalStorySummaries() {
-       return storySummaries;
-     }
-   }
- 
-   class MockUrlInterpolationService {
-     getStaticImageUrl(imagePath: string): string {
-       return mockUrl;
-     }
-   }
- 
-   beforeEach(waitForAsync(() => {
-     TestBed.configureTestingModule({
-       imports: [
-         MaterialModule
-       ],
-       declarations: [
-         TopicPreviewTabComponent,
-       ],
-       providers: [
-         {
-           provide: TopicEditorStateService,
-           useClass: MockTopicEditorStateService
-         },
-         {
-           provide: UrlInterpolationService,
-           useClass: MockUrlInterpolationService
-         }
-       ],
-       schemas: [NO_ERRORS_SCHEMA]
-     }).compileComponents();
-   }));
- 
-   beforeEach(() => {
-     fixture = TestBed.createComponent(TopicPreviewTabComponent);
-     componentInstance = fixture.componentInstance;
-   });
- 
-   it('should create', () => {
-     expect(componentInstance).toBeDefined();
-   });
- 
-   it('should initialize', () => {
-     componentInstance.ngOnInit();
-     expect(componentInstance.topicName).toEqual(testName);
-     expect(componentInstance.subtopics).toEqual([]);
-     expect(componentInstance.cannonicalStorySummaries).toEqual(storySummaries);
-     expect(componentInstance.chapterCount).toEqual(0);
-   });
- 
-   it('should get static image url', () => {
-     expect(componentInstance.getStaticImageUrl('image_path')).toEqual(mockUrl);
-   });
- 
-   it('should navigate among preview tabs', () => {
-     componentInstance.changePreviewTab('story');
-     expect(componentInstance.activeTab).toEqual('story');
-     componentInstance.changePreviewTab('subtopic');
-     expect(componentInstance.activeTab).toEqual('subtopic');
-     componentInstance.changePreviewTab('practice');
-     expect(componentInstance.activeTab).toEqual('practice');
-   });
- });
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { MaterialModule } from 'components/material.module';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import { TopicPreviewTabComponent } from './topic-preview-tab.component';
+
+describe('Topic Preview Tab Component', () => {
+  let fixture: ComponentFixture<TopicPreviewTabComponent>;
+  let componentInstance: TopicPreviewTabComponent;
+  let testName = 'test_name';
+  let mockUrl = 'mock_url';
+  let storySummaries = [new StorySummary(
+    null, null, [], null, null, null, null, [], null, [], '', '', '')];
+
+  class MockTopicEditorStateService {
+    getTopic() {
+      return {
+        getName(): string {
+          return testName;
+        },
+        getSubtopics() {
+          return [];
+        },
+      };
+    }
+
+    getCanonicalStorySummaries() {
+      return storySummaries;
+    }
+  }
+
+  class MockUrlInterpolationService {
+    getStaticImageUrl(imagePath: string): string {
+      return mockUrl;
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        MaterialModule
+      ],
+      declarations: [
+        TopicPreviewTabComponent,
+      ],
+      providers: [
+        {
+          provide: TopicEditorStateService,
+          useClass: MockTopicEditorStateService
+        },
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TopicPreviewTabComponent);
+    componentInstance = fixture.componentInstance;
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', () => {
+    componentInstance.ngOnInit();
+    expect(componentInstance.topicName).toEqual(testName);
+    expect(componentInstance.subtopics).toEqual([]);
+    expect(componentInstance.cannonicalStorySummaries).toEqual(storySummaries);
+    expect(componentInstance.chapterCount).toEqual(0);
+  });
+
+  it('should get static image url', () => {
+    expect(componentInstance.getStaticImageUrl('image_path')).toEqual(mockUrl);
+  });
+
+  it('should navigate among preview tabs', () => {
+    componentInstance.changePreviewTab('story');
+    expect(componentInstance.activeTab).toEqual('story');
+    componentInstance.changePreviewTab('subtopic');
+    expect(componentInstance.activeTab).toEqual('subtopic');
+    componentInstance.changePreviewTab('practice');
+    expect(componentInstance.activeTab).toEqual('practice');
+  });
+});
