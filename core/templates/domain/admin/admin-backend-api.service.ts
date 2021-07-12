@@ -239,7 +239,7 @@ export class AdminBackendApiService {
             role: newRole,
             username: username,
             topic_id: topicId,
-            remove_from_all_topics: removeFromAllTopics ? 'true' : 'false'
+            remove_from_all_topics: removeFromAllTopics.toString()
           }
         }
       ).toPromise().then(resolve, errorResponse => {

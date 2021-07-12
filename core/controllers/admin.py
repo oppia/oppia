@@ -784,7 +784,7 @@ class AdminRoleHandler(base.BaseHandler):
         role = self.payload.get('role')
         topic_id = self.payload.get('topic_id')
         user_settings = user_services.get_user_settings_from_username(username)
-
+        print "Checkkkkkk"*20, username, role
         if user_settings is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')

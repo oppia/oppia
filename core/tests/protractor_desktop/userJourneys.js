@@ -91,7 +91,7 @@ describe('Basic user journeys', function() {
   });
 });
 
-describe('Site language', function() {
+fdescribe('Site language', function() {
   var adminPage = null;
   var collectionId = null;
   var creatorDashboardPage = null;

@@ -328,6 +328,9 @@ var AdminPage = function() {
 
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
+    // await waitFor.visibilityOf(
+    //   element(by.css(`protractor-test-${newRole}-remove-button-container`)),
+    //   'New role removal button is taking too long to appear.');
   };
 
   this.getUsersAsssignedToRole = async function(role) {
