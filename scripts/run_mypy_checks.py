@@ -846,6 +846,8 @@ def main(args=None):
         env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
     env['PYTHONPATH'] = MYPY_TOOLS_DIR
 
+    print(subprocess.call(['ls', 'third_party/python3_libs',]))
+
     cmd = get_mypy_cmd(getattr(parsed_args, 'files'))
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
