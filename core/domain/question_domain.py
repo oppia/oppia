@@ -1096,6 +1096,30 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
+        """Converts from version 45 to 46. Version 46 adds inputGreaterThanzero
+        customization arg to NumericInput interaction which allows
+        creators to set input range greater than or equal to zero.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'NumericInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'inputGreaterThanZero': {
+                    'value': True
+                }
+            })
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

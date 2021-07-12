@@ -411,8 +411,16 @@ export interface NumericExpressionInputCustomizationArgs {
 }
 
 
-export interface NumericInputCustomizationArgsBackendDict { }
-export interface NumericInputCustomizationArgs { }
+export interface NumericInputCustomizationArgsBackendDict {
+  inputGreaterThanZero: {
+    value: boolean;
+  };
+}
+export interface NumericInputCustomizationArgs {
+  inputGreaterThanZero: {
+    value: boolean;
+  };
+}
 
 
 export interface NumberWithUnitsCustomizationArgsBackendDict { }
