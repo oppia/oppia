@@ -25,6 +25,8 @@ import os
 
 from constants import constants
 
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
@@ -165,6 +167,7 @@ ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
 ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
 ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 
+ENTITY_TYPE_BLOG_POST = 'blog_post'
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
@@ -259,7 +262,7 @@ CURRENT_STATE_SCHEMA_VERSION = 45
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
@@ -271,7 +274,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -335,14 +338,14 @@ DEFAULT_RECORDED_VOICEOVERS = {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -421,6 +424,7 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
+    # type: () -> Dict[Text, int]
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -634,6 +638,18 @@ MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
 
+# The maximum number of blog post cards to be visible on each page in blog
+# homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in author
+# specific blog post page.
+MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+
+# The maximum number of blog post cards to be visible as suggestions on the
+# blog post page.
+MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = 2
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -768,7 +784,15 @@ TASK_URL_DEFERRED = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+BLOG_ADMIN_PAGE_URL = '/blog-admin'
+BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
+BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+BLOG_DASHBOARD_URL = '/blog-dashboard'
+BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
 BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
+BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
+BLOG_HOMEPAGE_URL = '/blog'
+AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -780,6 +804,7 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
@@ -841,7 +866,6 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -1021,22 +1045,37 @@ HANDLER_TYPE_JSON = 'json'
 HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
-ROLE_ID_GUEST = 'GUEST'
-ROLE_ID_BANNED_USER = 'BANNED_USER'
-ROLE_ID_LEARNER = 'LEARNER'
-ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
-ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
-ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
-ROLE_ID_MODERATOR = 'MODERATOR'
-ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
-ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 ROLE_ID_ADMIN = 'ADMIN'
+ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
+ROLE_ID_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR'
+ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_LEARNER = 'LEARNER'
+ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_QUESTION_ADMIN = 'QUESTION_ADMIN'
+ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
+ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
+ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 
 ALLOWED_USER_ROLES = [
-    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
-    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
-    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
-    ROLE_ID_VOICEOVER_ADMIN, ROLE_ID_ADMIN]
+    ROLE_ID_ADMIN,
+    ROLE_ID_BANNED_USER,
+    ROLE_ID_BLOG_ADMIN,
+    ROLE_ID_BLOG_POST_EDITOR,
+    ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_EXPLORATION_EDITOR,
+    ROLE_ID_GUEST,
+    ROLE_ID_LEARNER,
+    ROLE_ID_MODERATOR,
+    ROLE_ID_QUESTION_ADMIN,
+    ROLE_ID_RELEASE_COORDINATOR,
+    ROLE_ID_TOPIC_MANAGER,
+    ROLE_ID_TRANSLATION_ADMIN,
+    ROLE_ID_VOICEOVER_ADMIN
+]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.

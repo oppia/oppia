@@ -31,10 +31,12 @@ describe('Entity creation service', function() {
   var $rootScope = null;
   var $uibModal = null;
   var $q = null;
+  var topic = null;
   var TopicObjectFactory = null;
   var TopicEditorStateService = null;
   var TopicEditorRoutingService = null;
   var EntityCreationService = null;
+  var CreateNewSkillModalService = null;
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -44,13 +46,17 @@ describe('Entity creation service', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     EntityCreationService = $injector.get('EntityCreationService');
+    CreateNewSkillModalService = $injector.get('CreateNewSkillModalService');
 
-    var topic = TopicObjectFactory.createInterstitialTopic();
+    topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
-    var subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
-    var subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
+    var subtopic2 = Subtopic.createFromTitle(2, 'Subtopic2');
+    var subtopic3 = Subtopic.createFromTitle(3, 'Subtopic3');
     topic.getSubtopics = function() {
       return [subtopic1, subtopic2, subtopic3];
+    };
+    topic.getId = function() {
+      return '1';
     };
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
   }));
@@ -75,4 +81,32 @@ describe('Entity creation service', function() {
 
     expect(spy).toHaveBeenCalled();
   });
+
+  it('should close create subtopic modal when cancel button is clicked',
+    function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      var routingSpy = (
+        spyOn(TopicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
+
+      EntityCreationService.createSubtopic();
+      $rootScope.$apply();
+
+      expect(routingSpy).not.toHaveBeenCalledWith('1');
+    });
+
+  it('should call CreateNewSkillModalService to navigate to skill editor',
+    function() {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve('1')
+      });
+      spyOn(CreateNewSkillModalService, 'createNewSkill');
+
+      EntityCreationService.createSkill();
+      $rootScope.$apply();
+
+      expect(CreateNewSkillModalService.createNewSkill)
+        .toHaveBeenCalledWith(['1']);
+    });
 });

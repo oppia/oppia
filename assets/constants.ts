@@ -40,7 +40,7 @@ export default {
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
-  "ACTIVITY_TYPE_LEARN_TOPIC": "learn topic",
+  "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -4817,6 +4817,10 @@ export default {
     "description": "français (French)",
     "direction": "ltr"
   }, {
+    "code": "lg",
+    "description": "Luganda (Ganda)",
+    "direction": "ltr"
+  }, {
     "code": "de",
     "description": "Deutsch (German)",
     "direction": "ltr"
@@ -4867,6 +4871,10 @@ export default {
   }, {
     "code": "lt",
     "description": "lietuvių (Lithuanian)",
+    "direction": "ltr"
+  }, {
+    "code": "mr",
+    "description": "मराठी (Marathi)",
     "direction": "ltr"
   }, {
     "code": "no",
@@ -5103,6 +5111,11 @@ export default {
     "relatedLanguages": ["fr"],
     "direction": "ltr"
   }, {
+    "id": "lg",
+    "description": "Ganda",
+    "relatedLanguages": ["lg"],
+    "direction": "ltr"
+  }, {
     "id": "de",
     "description": "German",
     "relatedLanguages": ["de"],
@@ -5171,6 +5184,11 @@ export default {
     "id": "lt",
     "description": "Lithuanian",
     "relatedLanguages": ["lt"],
+    "direction": "ltr"
+  }, {
+    "id": "mr",
+    "description": "Marathi",
+    "relatedLanguages": ["mr"],
     "direction": "ltr"
   }, {
     "id": "no",
@@ -5435,6 +5453,9 @@ export default {
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
   "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
+  "CONTRIBUTION_RIGHT_CATEGORIES": [
+    "translation", "voiceover", "question", "submit_question"
+  ],
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
   "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
@@ -5447,6 +5468,8 @@ export default {
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
+
+  "MAX_CURRENT_GOALS_COUNT": 5,
 
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
@@ -5890,6 +5913,12 @@ export default {
     }
   ],
 
+  // When the site cookie policy was last updated in UNIX time milliseconds.
+  "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+
   "DEV_MODE": true,
-  "EMULATOR_MODE": true
+  "EMULATOR_MODE": true,
+  "ASSET_TYPE_AUDIO": "audio",
+  "ASSET_TYPE_IMAGE": "image",
+  "ASSET_TYPE_THUMBNAIL": "thumbnail"
 } as const;
