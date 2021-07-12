@@ -2668,7 +2668,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
             # in changed_properties dict.
             state_name = change.state_name
             if state_name in self.new_to_old_state_names:
-                state_name = self.new_to_old_state_names[change.state_name]
+                state_name = self.new_to_old_state_names.get(change.state_name)
             self.changed_properties[state_name].add(
                 change.property_name)
         elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
@@ -2678,7 +2678,7 @@ class ExplorationChangeMergeVerifier(python_utils.OBJECT):
             # in changed_properties dict.
             state_name = change.state_name
             if state_name in self.new_to_old_state_names:
-                state_name = self.new_to_old_state_names[change.state_name]
+                state_name = self.new_to_old_state_names.get(change.state_name)
             self.changed_translations[state_name].add(
                 changed_property)
             self.changed_properties[state_name].add(
