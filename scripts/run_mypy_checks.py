@@ -800,11 +800,20 @@ def install_mypy_prerequisites():
     """
     cmd = [
         PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_FILE_PATH,
-        '--target', MYPY_TOOLS_DIR, '--upgrade',
+        '--target', MYPY_TOOLS_DIR, '--upgrade'
     ]
-    process = subprocess.call(
-        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    return process
+    process = subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    output_stderr = process.communicate()[1]
+    if 'can\'t combine user with prefix' in output_stderr:
+        cmd += ['--user', '--prefix=', '--system']
+        process = subprocess.Popen(
+            cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    return process.returncode
 
 
 def main(args=None):
@@ -831,6 +840,7 @@ def main(args=None):
         'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
+
     _paths_to_insert = [
         MYPY_TOOLS_DIR,
         os.path.join(MYPY_TOOLS_DIR, 'bin'),
