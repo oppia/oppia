@@ -226,7 +226,8 @@ def delete_users_pending_to_be_deleted():
         )
 
     email_subject = 'User Deletion job result'
-    email_manager.send_mail_to_admin(email_subject, email_message)
+    if not feconf.CAN_SEND_EMAILS:
+        email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def check_completion_of_user_deletion():
@@ -250,20 +251,18 @@ def check_completion_of_user_deletion():
         # or 'FAILURE'.
         completion_status = run_user_deletion_completion(
             pending_deletion_request)
-        email_message += '\n'
-        email_message += '-----------------------------------'
-        email_message += '\n'
-        email_message += (
-            'PendingDeletionRequestModel ID: %s'
-            'User ID: %s'
-            'Completion status: %s'
-        ) % (
-            request_model.id, pending_deletion_request.user_id,
-            completion_status
-        )
-
-        email_subject = 'Completion of User Deletion job result'
-        email_manager.send_mail_to_admin(email_subject, email_message)
+        if not feconf.CAN_SEND_EMAILS:
+            email_message += '\n-----------------------------------\n'
+            email_message += (
+                'PendingDeletionRequestModel ID: %s\n'
+                'User ID: %s\n'
+                'Completion status: %s\n'
+            ) % (
+                request_model.id, pending_deletion_request.user_id,
+                completion_status
+            )
+            email_subject = 'Completion of User Deletion job result'
+            email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def run_user_deletion(pending_deletion_request):
@@ -310,12 +309,18 @@ def run_user_deletion_completion(pending_deletion_request):
         if pending_deletion_request.normalized_long_term_username is not None:
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username)
-        email_manager.send_account_deleted_email(
-            pending_deletion_request.user_id, pending_deletion_request.email)
+            if not feconf.CAN_SEND_EMAILS:
+                email_manager.send_account_deleted_email(
+                    pending_deletion_request.user_id,
+                    pending_deletion_request.email
+                )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
-        email_manager.send_account_deletion_failed_email(
-            pending_deletion_request.user_id, pending_deletion_request.email)
+        if not feconf.CAN_SEND_EMAILS:
+            email_manager.send_account_deletion_failed_email(
+                pending_deletion_request.user_id,
+                pending_deletion_request.email
+            )
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE
