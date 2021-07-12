@@ -35,7 +35,7 @@ ruleTester.run('no-relative-import', rule, {
       code:
       'var forms = require("../protractor_utils/forms.js");',
       errors: [{
-        message: "Please, don't use relative imports in require()."
+        message: "Please don't use relative imports in require()."
       }],
     },
   ]

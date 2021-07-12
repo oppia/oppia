@@ -29,7 +29,7 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowRelativeImport: "Please, don't use relative imports in require()."
+      disallowRelativeImport: "Please don't use relative imports in require()."
     }
   },
 
@@ -37,7 +37,7 @@ module.exports = {
     var requireSelector = (
       'CallExpression[callee.name=require][arguments.length=1]');
 
-    var catchAndDisallowRelativeImport = function(node) {
+    var catchAndReportRelativeImport = function(node) {
       if (node.arguments[0].type === 'Literal' &&
        node.arguments[0].value.startsWith('..')) {
         context.report({
@@ -49,7 +49,7 @@ module.exports = {
 
     return {
       [requireSelector]: function(node) {
-        catchAndDisallowRelativeImport(node);
+        catchAndReportRelativeImport(node);
       }
     };
   }
