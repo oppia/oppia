@@ -803,10 +803,7 @@ def install_mypy_prerequisites():
         '--target', MYPY_TOOLS_DIR, '--upgrade'
     ]
     process = subprocess.Popen(
-        cmd,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     output_stderr = process.communicate()[1]
     if 'can\'t combine user with prefix' in output_stderr:
