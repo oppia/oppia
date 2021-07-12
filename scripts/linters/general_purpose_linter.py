@@ -140,12 +140,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': re.compile(r'require\(.*\.\..*\);'),
-        'message': 'Please, don\'t use relative imports in require().',
-        'excluded_files': (),
-        'excluded_dirs': ('core/tests/',)
-    },
-    {
         'regexp': re.compile(r':\n? *HttpClient'),
         'message': (
             'An instance of HttpClient is found in this file. You are not '
