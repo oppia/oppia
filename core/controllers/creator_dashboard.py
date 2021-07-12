@@ -289,7 +289,7 @@ class NewExplorationHandler(base.BaseHandler):
         'POST': {
             'title': {
                 'schema': {
-                    'type': 'unicode'
+                    'type': 'basestring'
                 },
                 'default_value': feconf.DEFAULT_EXPLORATION_TITLE
             }
@@ -299,8 +299,7 @@ class NewExplorationHandler(base.BaseHandler):
     @acl_decorators.can_create_exploration
     def post(self):
         """Handles POST requests."""
-        title = self.normalized_payload.get(
-            'title', feconf.DEFAULT_EXPLORATION_TITLE)
+        title = self.normalized_payload.get('title')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
