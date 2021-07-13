@@ -31,7 +31,7 @@ import { StorySummary } from 'domain/story/story-summary.model';
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary: StorySummary;
-  @Input() topicName: string;
+  @Input() topicName?: string;
   nodeCount: number;
   completedNodeCount: number;
   storyProgress: number;
