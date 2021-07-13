@@ -554,6 +554,10 @@ def apply_change_list(exploration_id, change_list):
                         'version %s, received %s' % (
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
+
+        # Calculate the size of exp.
+        proto_size_in_bytes = 0
+        exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 
     except Exception as e:

@@ -213,6 +213,9 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
+    # This proto size of the exploration.
+    proto_size_in_bytes = datastore_services.IntegerProperty(
+        default=0, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -242,7 +245,8 @@ class ExplorationModel(base_models.VersionedModel):
             'param_changes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'auto_tts_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'correctness_feedback_enabled':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'proto_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

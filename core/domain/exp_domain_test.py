@@ -2133,6 +2133,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
+    def test_validate_exploration_proto_size_in_bytes(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.validate()
+
+        exploration.proto_size_in_bytes = '1'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected proto size to be a int, received 1'):
+            exploration.validate()
+
     def test_validate_exploration_param_specs(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',

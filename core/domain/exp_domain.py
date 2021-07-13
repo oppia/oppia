@@ -540,7 +540,7 @@ class Exploration(python_utils.OBJECT):
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            created_on=None, last_updated=None):
+            proto_size_in_bytes, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -572,6 +572,7 @@ class Exploration(python_utils.OBJECT):
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
+            proto_size_in_bytes: int. Size of exploration.
         """
         self.id = exploration_id
         self.title = title
@@ -601,6 +602,7 @@ class Exploration(python_utils.OBJECT):
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
         self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     @classmethod
     def create_default_exploration(
@@ -637,11 +639,14 @@ class Exploration(python_utils.OBJECT):
             init_state_name: init_state_dict
         }
 
+        # Calculate proto_size_in_bytes.
+        proto_size_in_bytes = 0
+
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False, proto_size_in_bytes)
 
     @classmethod
     def from_dict(
@@ -676,6 +681,8 @@ class Exploration(python_utils.OBJECT):
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
+        exploration.proto_size_in_bytes = exploration_dict[
+            'proto_size_in_bytes']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -909,6 +916,11 @@ class Exploration(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected correctness_feedback_enabled to be a bool, received '
                 '%s' % self.correctness_feedback_enabled)
+
+        if not isinstance(self.proto_size_in_bytes, int):
+            raise utils.ValidationError(
+                'Expected proto size to be a int, received %s'
+                % self.proto_size_in_bytes)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, python_utils.BASESTRING):
@@ -1420,6 +1432,14 @@ class Exploration(python_utils.OBJECT):
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
+
+    def update_proto_size_in_bytes(self, proto_size_in_bytes):
+        """Update exploration's size in proto.
+
+        Args:
+            proto_size_in_bytes: int. Size of exploration.
+        """
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -2103,6 +2123,7 @@ class Exploration(python_utils.OBJECT):
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
             'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'proto_size_in_bytes': self.proto_size_in_bytes,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
