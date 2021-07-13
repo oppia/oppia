@@ -113,6 +113,9 @@ class TopicModel(base_models.VersionedModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the topic.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
+    # The thumbnail size in bytes of the topic.
+    thumbnail_size_in_bytes = (
+        datastore_services.IntegerProperty(indexed=True))
     # The description of the topic.
     description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
@@ -245,6 +248,7 @@ class TopicModel(base_models.VersionedModel):
             'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_story_references':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,

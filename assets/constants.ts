@@ -5453,6 +5453,9 @@ export default {
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER": "voiceover",
   "CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION": "question",
   "CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION": "submit_question",
+  "CONTRIBUTION_RIGHT_CATEGORIES": [
+    "translation", "voiceover", "question", "submit_question"
+  ],
 
   "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
   "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
@@ -5910,6 +5913,12 @@ export default {
     }
   ],
 
+  // When the site cookie policy was last updated in UNIX time milliseconds.
+  "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+
   "DEV_MODE": true,
-  "EMULATOR_MODE": true
+  "EMULATOR_MODE": true,
+  "ASSET_TYPE_AUDIO": "audio",
+  "ASSET_TYPE_IMAGE": "image",
+  "ASSET_TYPE_THUMBNAIL": "thumbnail"
 } as const;

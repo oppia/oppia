@@ -135,11 +135,19 @@
       "unit-test-utils.ajs.ts",
       "mathjax.directive.ts",
       "math-expression-content-editor.component.ts",
-      "rte-output-display.component.spec.ts",
       "core/tests/*"
       ],
       "rules": {
         "oppia/no-inner-html": "error"
+      }
+    },
+    {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": [
+      "core/tests/**"
+      ],
+      "rules": {
+        "oppia/no-relative-import": "error"
       }
     }
   ],
@@ -149,6 +157,7 @@
     "oppia/comment-style": "error",
     "oppia/disallow-flags": "error",
     "oppia/disallow-angularjs-properties": "error",
+    "oppia/import-lodash": "error",
     "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
     "oppia/directive-scope": "error",

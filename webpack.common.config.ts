@@ -59,6 +59,8 @@ module.exports = {
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
+    blog_admin:
+      commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.import.ts',
     collection_editor:
@@ -75,6 +77,9 @@ module.exports = {
     contributor_dashboard:
       commonPrefix + '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
+    contributor_dashboard_admin:
+      commonPrefix + '/pages/contributor-dashboard-admin-page/' +
+      'contributor-dashboard-admin-page.import.ts',
     delete_account:
       commonPrefix + '/pages/delete-account-page/' +
         'delete-account-page.import.ts',
@@ -108,6 +113,8 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
+    partnerships:
+      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -152,9 +159,9 @@ module.exports = {
   },
 
   /**
-   * TODO(#13079): Remove the hybrid field from the html webpack plugin options
-   * once angularjs is removed from corresponding pages.
-   */
+  * TODO(#13079): Remove the hybrid field from the html webpack plugin options
+  * once angularjs is removed from corresponding pages.
+  */
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
@@ -184,6 +191,23 @@ module.exports = {
           'education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['blog_admin'],
+      filename: 'blog-admin-page.mainpage.html',
+      hybrid: true,
+      meta: {
+        name: defaultMeta.name,
+        description: 'With Oppia, you can access free lessons on ' +
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
+      },
+      template:
+        commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -265,6 +289,17 @@ module.exports = {
       template:
         commonPrefix + '/pages/creator-dashboard-page/' +
         'creator-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['contributor_dashboard_admin'],
+      filename: 'contributor-dashboard-admin-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
+        'contributor-dashboard-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -502,6 +537,16 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['partnerships'],
+      filename: 'partnerships-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/partnerships-page/' +
+          'partnerships-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
