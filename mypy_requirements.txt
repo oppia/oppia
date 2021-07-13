@@ -8,7 +8,6 @@ types-certifi==0.1.4
 types-enum34==0.1.8
 types-futures==0.1.6
 types-protobuf==0.1.13
->>>>>>> aa89cb1c400ba2c9893141b05a81ea75aa938fea
 types-PyYAML==0.1.6
 types-redis==3.5.4
 types-requests==2.25.0
