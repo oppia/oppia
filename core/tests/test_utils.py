@@ -2007,7 +2007,7 @@ title: Title
             }, csrf_token=self.get_new_csrf_token())
 
     def add_user_role(self, username, user_role, topic_id=None):
-        """Sets the given role for this user.
+        """Adds the given role to the user account with the given username.
 
         Args:
             username: str. Username of the given user.
@@ -2022,7 +2022,7 @@ title: Title
             }, csrf_token=self.get_new_csrf_token())
 
     def set_curriculum_admins(self, curriculum_admin_usernames):
-        """Sets role of given users as ADMIN.
+        """Sets role of given users as CURRICULUM_ADMIN.
 
         Args:
             curriculum_admin_usernames: list(str). List of usernames.
@@ -2050,7 +2050,6 @@ title: Title
         for name in moderator_usernames:
             self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-
     def set_voiceover_admin(self, voiceover_admin_username):
         """Sets role of given users as VOICEOVER ADMIN.
 
@@ -2060,15 +2059,15 @@ title: Title
         for name in voiceover_admin_username:
             self.add_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
-    def mark_user_banned(self, banned_username):
+    def mark_user_banned(self, username):
         """Marks a user banned.
 
         Args:
-            banned_username: str. The username of the user..
+            username: str. The username of the user to ban.
         """
         with self.super_admin_context():
             self.put_json('/bannedusershandler', {
-                'username': banned_username
+                'username': username
             }, csrf_token=self.get_new_csrf_token())
 
     def set_collection_editors(self, collection_editor_usernames):

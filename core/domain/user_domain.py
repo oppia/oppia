@@ -205,7 +205,7 @@ class UserSettings(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Role %s does not exist.' % role)
 
-                if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
+                if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
                     default_roles.append(role)
 
             if len(default_roles) != 1:

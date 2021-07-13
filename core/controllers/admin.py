@@ -210,7 +210,10 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_to_actions': role_services.get_role_actions(),
+            'role_to_actions': {
+                role_services.HUMAN_READABLE_ROLES[role]: actions
+                for role, actions in role_services.get_role_actions().items()
+            },
             'feature_flags': feature_flag_dicts,
         })
 

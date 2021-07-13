@@ -857,8 +857,8 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
-    def test_admin_can_access_email_dashboard(self):
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
+    def test_super_admin_can_access_email_dashboard(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)

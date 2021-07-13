@@ -1045,7 +1045,7 @@ HANDLER_TYPE_JSON = 'json'
 HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
-# TODO(#<id>): The role id variable name doesn't match the string value,
+# TODO(#13388): The role id variable name doesn't match the string value,
 # write a one-off job to update the string value in the datastore.
 ROLE_ID_CURRICULUM_ADMIN = 'ADMIN'
 ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
@@ -1061,7 +1061,7 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
 
-POSSIBLE_REGISTERED_USER_DEFAULT_ROLES = [
+ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
     ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
 
 ALLOWED_USER_ROLES = [
