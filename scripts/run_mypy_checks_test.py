@@ -23,6 +23,7 @@ import os
 import subprocess
 
 from core.tests import test_utils
+import python_utils
 from scripts import install_third_party_libs
 from scripts import run_mypy_checks
 
@@ -46,12 +47,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             mock_install_third_party_libs_main)
 
         process_success = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE)
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_success(
                 unused_cmd, stdout=None, stdin=None, stderr=None, env=None):  # pylint: disable=unused-argument
             return process_success
 
-        process_failure = subprocess.Popen(['test'], stdout=subprocess.PIPE)
+        process_failure = subprocess.Popen(
+            ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_failure(
                 unused_cmd, stdout=None, stdin=None, stderr=None, env=None):  # pylint: disable=unused-argument
             return process_failure
@@ -75,8 +77,32 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites_success)
 
+        def mock_popen_user_prefix_error_call(
+                unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object that gives user-prefix error."""
+
+                def __init__(self):
+                    if '--user' in unused_cmd_tokens:
+                        self.returncode = 0
+                    else:
+                        self.returncode = 1
+                def communicate(self):
+                    """Return user-prefix error as stderr."""
+                    return '', 'can\'t combine user with prefix'
+            return Ret()
+
+        self.popen_swap_user_prefix_error = self.swap(
+            subprocess, 'Popen', mock_popen_user_prefix_error_call)
+
         self.mypy_cmd_path = os.path.join(
             os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
+
+        def mock_install_mypy_prerequisites(ci): # pylint: disable=unused-argument
+            return 0
+        self.mypy_install_swap = self.swap_with_checks(
+            run_mypy_checks, 'install_mypy_prerequisites',
+            mock_install_mypy_prerequisites)
 
     def test_install_third_party_libraries_with_skip_install_as_true(self):
         run_mypy_checks.install_third_party_libraries(True)
@@ -120,6 +146,11 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_install_mypy_prerequisites_for_ci(self):
         with self.popen_swap_success:
             code = run_mypy_checks.install_mypy_prerequisites(True)
+            self.assertEqual(code, 0)
+
+    def test_install_mypy_prerequisites_with_user_prefix_error(self):
+        with self.popen_swap_user_prefix_error:
+            code = run_mypy_checks.install_mypy_prerequisites(False)
             self.assertEqual(code, 0)
 
     def test_install_mypy_prerequisites_with_wrong_script(self):
@@ -170,8 +201,9 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_install_prerequisites_success(self):
         with self.popen_swap_success, self.install_swap:
-            process = run_mypy_checks.main(args=[])
-            self.assertEqual(process, 0)
+            with self.mypy_install_swap:
+                process = run_mypy_checks.main(args=[])
+                self.assertEqual(process, 0)
 
     def test_main_with_install_prerequisites_failure(self):
         with self.popen_swap_failure, self.install_swap:

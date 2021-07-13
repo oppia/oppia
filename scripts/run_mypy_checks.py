@@ -820,11 +820,18 @@ def install_mypy_prerequisites(ci):
         cmd = [
             PYTHON3_CMD, '-m', 'pip', 'install', '-r',
             MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
-            '--upgrade', '--user', '--prefix=', '--system'
+            '--upgrade'
         ]
-    process = subprocess.call(
-        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    return process
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = process.communicate()
+    if 'can\'t combine user with prefix' in output[1]:
+        uextention_text = ['--user', '--prefix=', '--system']
+        process = subprocess.Popen(
+            cmd + uextention_text, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+
+    return process.returncode
 
 
 def main(args=None):
@@ -864,9 +871,8 @@ def main(args=None):
 
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    output = process.communicate()
-    python_utils.PRINT(output[1])
-    python_utils.PRINT(output[0])
+    process.communicate()
+
     if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
