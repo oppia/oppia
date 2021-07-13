@@ -84,6 +84,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
         LocalStorageService.updateLastSelectedTranslationLanguageCode(
           ctrl.languageCode);
+        $rootScope.$applyAsync();
       };
 
       ctrl.showLanguageSelector = function() {
