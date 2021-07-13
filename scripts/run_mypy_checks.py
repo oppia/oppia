@@ -28,8 +28,8 @@ import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 
-from typing import List, Optional
-
+from typing import List
+from typing import Optional
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
