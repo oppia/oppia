@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './subtopic-summary-tile.component.html'
 })
 export class SubtopicSummaryTileComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() classroomUrlFragment!: string;
   @Input() subtopic!: Subtopic;
   @Input() topicId!: string;
@@ -39,9 +42,9 @@ export class SubtopicSummaryTileComponent implements OnInit {
   subtopicTitle !: string;
 
   constructor(
-    private windowRef: WindowRef,
+    private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private windowRef: WindowRef
   ) {}
 
   openSubtopicPage(): void {
@@ -76,5 +79,6 @@ export class SubtopicSummaryTileComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaSubtopicSummaryTile', downgradeComponent(
-    {component: SubtopicSummaryTileComponent}));
+  'oppiaSubtopicSummaryTile', downgradeComponent({
+    component: SubtopicSummaryTileComponent
+  }) as angular.IDirectiveFactory);
