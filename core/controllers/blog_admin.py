@@ -169,7 +169,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
-        user_services.update_user_role(user_id, role)
+        user_services.add_user_role(user_id, role)
         role_services.log_role_query(
             self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
             username=username)

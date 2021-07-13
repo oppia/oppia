@@ -689,7 +689,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
         self.assertFalse(user_settings_model.banned)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_BANNED_USER)
 
         self.assertEqual(
@@ -707,7 +707,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_BANNED_USER)
 
         self.assertEqual(
@@ -716,7 +716,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.roles, [])
         self.assertTrue(user_settings_model.banned)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
         self.assertEqual(

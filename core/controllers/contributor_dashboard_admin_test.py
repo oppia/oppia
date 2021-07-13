@@ -37,10 +37,10 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
         self.signup(self.QUESTION_ADMIN_EMAIL, 'questionExpert')
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
 
@@ -90,10 +90,10 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
 
@@ -262,10 +262,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
 
@@ -398,10 +398,10 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
 
@@ -450,10 +450,10 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATION_ADMIN, 'translationAdmen')
         self.signup(self.QUESTION_ADMIN, 'questionAdmen')
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN),
             feconf.ROLE_ID_QUESTION_ADMIN)
 
