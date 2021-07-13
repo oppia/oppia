@@ -1881,11 +1881,11 @@ class Exploration(python_utils.OBJECT):
                     state_dict['interaction']['id'],
                     state_dict['interaction']['customization_args']))
             for ca_name in customisation_args:
-                list_of_subtitled_unicode_content_ids.append(
+                list_of_subtitled_unicode_content_ids.extend(
                     state_domain.InteractionCustomizationArg
                     .traverse_by_schema_and_get(
-                        customisation_args[ca_name]['schema'],
-                        customisation_args[ca_name]['value'],
+                        customisation_args[ca_name].schema,
+                        customisation_args[ca_name].value,
                         [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
                         lambda subtitled_unicode: subtitled_unicode.content_id
                     )
