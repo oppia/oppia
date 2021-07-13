@@ -37,7 +37,7 @@ import { MissingTranslationCustomHandler } from 'i18n/missing-translation-custom
  * 1. Look for translation in primary language (fetched from backend)
  * 2. Look for translation in default language (fetched from backend)
  * 3. Look for translation present in AppConstants.ts (
- *    used until translations after fetched from backend)
+ *    used until translations are fetched from backend)
  * 4. shows the key, if the translation is not found.
  */
 
