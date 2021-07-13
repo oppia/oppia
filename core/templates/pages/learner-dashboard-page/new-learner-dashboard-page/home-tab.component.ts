@@ -16,14 +16,16 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
  @Component({
    selector: 'oppia-home-tab',
    templateUrl: './home-tab.component.html'
  })
 export class HomeTabComponent {
+  @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() untrackedTopics: LearnerTopicSummary[];
   @Input() username: string;
@@ -42,5 +44,10 @@ export class HomeTabComponent {
       return 'afternoon';
     }
     return 'evening';
+  }
+
+  changeActiveSection(): void {
+    this.setActiveSection.emit(
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS);
   }
 }

@@ -5,8 +5,11 @@
   <p class="continue-where-you-left-off-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
   </p>
   <div class="empty-continue-where-you-left-off-section" *ngIf="currentGoals.length === 0">
-    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
     </p>
+    <a class="setting-a-goal-link" (click)="changeActiveSection()">
+      setting a goal!
+    </a>
   </div>
   <div class="continue-where-you-left-off-section" *ngIf="currentGoals.length !== 0">
     <div *ngFor="let topicSummaryTile of currentGoals">
@@ -82,6 +85,13 @@
   position: relative;
   width: 144px;
   z-index: 5;
+}
+.empty-continue-where-you-left-off-section-text {
+  display: inline-block;
+}
+.setting-a-goal-link {
+  color: #00645C;
+  font-weight: bold;
 }
 .empty-suggested-for-you-section {
   color: #333333;

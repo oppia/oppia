@@ -280,7 +280,7 @@
     "I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_COLLECTIONS": "It looks like you haven't completed any collections yet. Head over to the library to start an exciting new collection!",
     "I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_EXPLORATIONS": "It looks like you haven't completed any explorations yet. Head over to the library to start an exciting new exploration!",
     "I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_GOALS_SECTION": "Complete a Goal from above and see your progress here when it is completed!",
-    "I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "Hmm this looks empty... Start a lesson by <a href=\"#\" class=\"inline-links\">setting a goal</a>!",
+    "I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION": "Hmm this looks empty... Start a lesson by ",
     "I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION": "Hmm this looks empty... Start a lesson by selecting a goal from below!",
     "I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST": "It looks like there aren't any explorations in your 'Play Later' list. Head over to the library and build your own curated playlist!",
     "I18N_LEARNER_DASHBOARD_EMPTY_FEEDBACK_THREADS": "It looks like you don't have any active feedback threads. Your feedback helps us improve the quality of our lessons. Head over to the library to learn something exciting and submit your valuable feedback!",

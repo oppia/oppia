@@ -236,7 +236,8 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME && newLearnerDashboardPageIsDisplayed">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [untrackedTopics]="untrackedTopics"
-                          [username]="username">
+                          [username]="username"
+                          (setActiveSection)="setActiveSection($event)">
           </oppia-home-tab>
         </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS && newLearnerDashboardPageIsDisplayed">
