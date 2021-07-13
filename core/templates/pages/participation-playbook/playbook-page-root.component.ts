@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Playbook Page Root.
+ * @fileoverview Root component for Playbook Page.
  */
 
 import { Component } from '@angular/core';

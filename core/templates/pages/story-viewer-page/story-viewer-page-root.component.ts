@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Story Viewer Page Root.
+ * @fileoverview Root component for Story Viewer Page.
  */
 
 import { Component } from '@angular/core';

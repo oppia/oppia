@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Classroom Page Root.
+ * @fileoverview Root component for Classroom Page.
  */
 
 import { Component } from '@angular/core';

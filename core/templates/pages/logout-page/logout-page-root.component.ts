@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Logout Page.
+ * @fileoverview Root component for Logout Page.
  */
 
 import { Component } from '@angular/core';

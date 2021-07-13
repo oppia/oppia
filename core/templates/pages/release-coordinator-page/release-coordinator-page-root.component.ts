@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Release Coordinator Page Root.
+ * @fileoverview Root component for Release Coordinator Page.
  */
 
 import { Component } from '@angular/core';

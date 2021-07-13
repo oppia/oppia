@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Preferences Page Root.
+ * @fileoverview Root component for Preferences Page.
  */
 
 import { Component } from '@angular/core';

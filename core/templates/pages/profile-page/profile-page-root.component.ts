@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Profile Page Root.
+ * @fileoverview Root component for Profile Page.
  */
 
 import { Component } from '@angular/core';
