@@ -193,7 +193,7 @@ class UserSettingsModel(base_models.BaseModel):
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
 
-            # The role is a deprecated field and doesn't contains any correct
+            # The role is a deprecated field and doesn't contain any correct
             # information related to user settings.
             'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })

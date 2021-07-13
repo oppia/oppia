@@ -675,28 +675,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(user_id), [
                 feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR])
 
-    def test_remove_blog_editor(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_EXPLORATION_EDITOR)
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_BLOG_POST_EDITOR)
-
-        user_services.remove_blog_editor(user_id)
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_EXPLORATION_EDITOR)
-
     def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
             self):
         auth_id = 'test_id'
@@ -868,7 +846,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_roles_from_id(profile_user_id),
             [feconf.ROLE_ID_MOBILE_LEARNER])
-        error_msg = 'The role of a Learner cannot be changed.'
+        error_msg = 'The role of a Mobile Learner cannot be changed.'
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.add_user_role(
                 profile_user_id, feconf.ROLE_ID_FULL_USER)

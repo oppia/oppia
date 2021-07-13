@@ -86,7 +86,7 @@ class UserSettings(python_utils.OBJECT):
             user_id: str. The unique ID of the user.
             email: str. The user email.
             roles: list(str). Roles of the user.
-            banned: bool. Whetehr the uses is banned.
+            banned: bool. Whether the uses is banned.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -192,25 +192,23 @@ class UserSettings(python_utils.OBJECT):
                     'Expected roles for banned user to be empty, '
                     'recieved %s.' % self.roles)
         else:
-            defalut_roles = []
+            default_roles = []
             if len(self.roles) != len(set(self.roles)):
                 raise utils.ValidationError(
                     'Roles contains duplicate values: %s' % self.roles)
             for role in self.roles:
                 if not isinstance(role, python_utils.BASESTRING):
                     raise utils.ValidationError(
-                        'Expected roles to be a string, received %s' %
-                        self.pin
-                    )
+                        'Expected roles to be a string, received %s' % role)
 
                 if role not in feconf.ALLOWED_USER_ROLES:
                     raise utils.ValidationError(
                         'Role %s does not exist.' % role)
 
                 if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
-                    defalut_roles.append(role)
+                    default_roles.append(role)
 
-            if len(defalut_roles) != 1:
+            if len(default_roles) != 1:
                 raise utils.ValidationError(
                     'Expected roles to contains one default role.')
 

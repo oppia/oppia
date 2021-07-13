@@ -136,7 +136,7 @@
                       <mat-icon matListIcon>edit</mat-icon>
                     </button>
                     <div class="protractor-test-{{UPDATABLE_ROLES[role]}}-remove-button-container">
-                      <button *ngIf="VIEWABLE_ROLES.includes(role)"
+                      <button *ngIf="VIEWABLE_ROLES.hasOwnProperty(role)"
                               mat-button matSuffix mat-icon-button
                               aria-label="Clear"
                               (click)="removeRole(role)">

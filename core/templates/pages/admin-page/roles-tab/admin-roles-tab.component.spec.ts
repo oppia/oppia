@@ -111,9 +111,6 @@ describe('Admin roles tab component ', function() {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminDataService = TestBed.inject(AdminDataService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
-
-    statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue(null);
   });
 
   it('should retrieve data from the backend and ' +

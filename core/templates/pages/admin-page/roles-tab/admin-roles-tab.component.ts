@@ -16,19 +16,19 @@
  * @fileoverview Component for editing user roles.
  */
 
- import { Component, OnInit } from '@angular/core';
- import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { AdminDataService } from '../services/admin-data.service';
- import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
- import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
- import { AlertsService } from 'services/alerts.service';
+import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AdminDataService } from '../services/admin-data.service';
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
+import { AlertsService } from 'services/alerts.service';
 
  @Component({
    selector: 'oppia-admin-roles-tab',
    templateUrl: './admin-roles-tab.component.html'
  })
- export class AdminRolesTabComponent implements OnInit {
+export class AdminRolesTabComponent implements OnInit {
    UPDATABLE_ROLES = null;
    VIEWABLE_ROLES = null;
    topicSummaries = null;
@@ -59,7 +59,7 @@
        'username', null, this.username).then((userRoles) => {
        this.rolesFetched = true;
        this.userRoles = userRoles.roles;
-       this.managerInTopicsWithId = userRoles.topic_ids;
+       this.managerInTopicsWithId = userRoles.managed_topic_ids;
        this.userIsBanned = userRoles.banned;
      });
    }
@@ -177,9 +177,9 @@
        this.roleToActions = adminDataObject.roleToActions;
      });
    }
- }
+}
 
- angular.module('oppia').directive('oppiaAdminRolesTab',
+angular.module('oppia').directive('oppiaAdminRolesTab',
    downgradeComponent({
      component: AdminRolesTabComponent
    }) as angular.IDirectiveFactory);

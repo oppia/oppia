@@ -205,7 +205,10 @@ class AdminHandler(base.BaseHandler):
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.UPDATABLE_ROLES
             },
-            'viewable_roles': role_services.VIEWABLE_ROLES,
+            'viewable_roles': {
+                role: role_services.HUMAN_READABLE_ROLES[role]
+                for role in role_services.VIEWABLE_ROLES
+            },
             'topic_summaries': topic_summary_dicts,
             'role_to_actions': role_services.get_role_actions(),
             'feature_flags': feature_flag_dicts,
@@ -731,7 +734,8 @@ class AdminRoleHandler(base.BaseHandler):
             },
             'remove_from_all_topics': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': ['true', 'false']
                 },
                 'default_value': None
             }
@@ -766,14 +770,14 @@ class AdminRoleHandler(base.BaseHandler):
 
             user_settings = user_services.get_user_settings(user_id)
             user_roles = user_settings.roles
-            topic_ids = []
+            managed_topic_ids = []
             if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
-                topic_ids = [
-                    t_r.id for t_r in topic_fetchers.get_topic_rights_with_user(
-                        user_id)]
+                managed_topic_ids = [
+                    topic_right.id for topic_right in
+                    topic_fetchers.get_topic_rights_with_user(user_id)]
             user_roles_dict = {
                 'roles': user_roles,
-                'topic_ids': topic_ids,
+                'managed_topic_ids': managed_topic_ids,
                 'banned': user_settings.banned
             }
             self.render_json(user_roles_dict)
@@ -784,7 +788,7 @@ class AdminRoleHandler(base.BaseHandler):
         role = self.payload.get('role')
         topic_id = self.payload.get('topic_id')
         user_settings = user_services.get_user_settings_from_username(username)
-        print "Checkkkkkk"*20, username, role
+
         if user_settings is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
@@ -807,8 +811,7 @@ class AdminRoleHandler(base.BaseHandler):
         username = self.request.get('username')
         role = self.request.get('role')
         topic_id = self.request.get('topic_id')
-        remove_from_all_topics = self.request.get(
-            'remove_from_all_topics', False)
+        remove_from_all_topics = self.request.get('remove_from_all_topics')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -820,7 +823,7 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json({})
             return
 
-        if remove_from_all_topics:
+        if remove_from_all_topics == 'true':
             topic_services.deassign_user_from_all_topics(
                 user_services.get_system_user(), user_id)
             user_services.remove_user_role(user_id, role)
@@ -828,11 +831,11 @@ class AdminRoleHandler(base.BaseHandler):
             return
 
         topic_ids = [
-            t_r.id for t_r in topic_fetchers.get_topic_rights_with_user(
-                user_id)]
+            topic_right.id for topic_right in
+            topic_fetchers.get_topic_rights_with_user(user_id)]
         if topic_id not in topic_ids:
             raise self.InvalidInputException(
-                'User does no have rights in the give topic.')
+                'User does not have rights in the given topic.')
 
         topic_services.deassign_manager_role_from_topic(
             user_services.get_system_user(), user_id, topic_id)
@@ -844,7 +847,7 @@ class AdminRoleHandler(base.BaseHandler):
 
 
 class BannedUsersHandler(base.BaseHandler):
-    """Handler mark/unmark a banned user."""
+    """Handler to ban and unban users."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}

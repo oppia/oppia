@@ -1240,7 +1240,7 @@ def add_user_role(user_id, role):
     """
     user_settings = get_user_settings(user_id, strict=True)
     if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
-        raise Exception('The role of a Learner cannot be changed.')
+        raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
         raise Exception('Adding a %s role is not allowed.' % role)
 
@@ -1264,7 +1264,7 @@ def remove_user_role(user_id, role):
     """
     user_settings = get_user_settings(user_id, strict=True)
     if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
-        raise Exception('The role of a Learner cannot be changed.')
+        raise Exception('The role of a Mobile Learner cannot be changed.')
     if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
         raise Exception('Removing a default role is not allowed.')
 
@@ -2056,18 +2056,6 @@ def remove_translation_review_rights_in_language(user_id, language_code):
     user_contribution_rights.can_review_translation_for_language_codes.remove(
         language_code)
     _update_user_contribution_rights(user_contribution_rights)
-
-
-def remove_blog_editor(user_id):
-    """Removes the role of user as blog editor.
-
-    Args:
-        user_id: str. The unique ID of the user.
-    """
-    user_settings = get_user_settings(user_id, strict=True)
-    if feconf.ROLE_ID_BLOG_POST_EDITOR == user_settings.role:
-        update_user_role(user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
-    return
 
 
 def allow_user_to_review_voiceover_in_language(user_id, language_code):

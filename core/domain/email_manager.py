@@ -336,7 +336,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_MARKETING: user_services.is_curriculum_admin,
+    feconf.EMAIL_INTENT_MARKETING: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
@@ -356,18 +357,20 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_curriculum_admin,
+    feconf.BULK_EMAIL_INTENT_MARKETING: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
         user_services.is_curriculum_admin),
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
         user_services.is_curriculum_admin),
     feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
-        user_services.is_curriculum_admin),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
-        user_services.is_curriculum_admin),
-    feconf.BULK_EMAIL_INTENT_TEST: user_services.is_curriculum_admin
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
 

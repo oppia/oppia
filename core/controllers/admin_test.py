@@ -1207,7 +1207,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             })
         self.logout()
 
-    def test_adding_new_topic_to_a_topic_manger(self):
+    def test_adding_new_topic_to_a_topic_manager(self):
         user_email = 'usernew@example.com'
         username = 'usernew'
 

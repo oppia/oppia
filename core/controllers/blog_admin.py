@@ -185,6 +185,6 @@ class BlogAdminRolesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        user_services.remove_blog_editor(user_id)
+        user_services.remove_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
         blog_services.deassign_user_from_all_blog_posts(user_id)
         self.render_json({})

@@ -37,7 +37,7 @@ import { Schema } from 'services/schema-default-value.service';
 
 export interface UserRolesBackendResponse {
   roles: string[];
-  topic_ids: string[];
+  'managed_topic_ids': string[];
   banned: boolean;
 }
 
@@ -123,7 +123,7 @@ export interface AdminPageDataBackendDict {
   'updatable_roles': UpdatableRolesBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': string[];
+  'viewable_roles': UpdatableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
@@ -135,7 +135,7 @@ export interface AdminPageData {
   updatableRoles: UpdatableRolesBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
-  viewableRoles: string[];
+  viewableRoles: UpdatableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }

@@ -98,7 +98,7 @@ module.exports = function(config) {
       // for every passing spec.
       level: 'error',
       format: '%b %T: %m',
-      terminal: false
+      terminal: true
     },
     // Continue running in the background after running tests.
     singleRun: true,

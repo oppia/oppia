@@ -453,7 +453,7 @@ def can_manage_email_dashboard(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.user.actions:
+        if self.current_user_is_super_admin:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
