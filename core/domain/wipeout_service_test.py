@@ -550,11 +550,24 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     def test_run_user_deletion_completion_with_user_properly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
-        self.assertEqual(
-            wipeout_service.run_user_deletion_completion(
-                self.pending_deletion_request),
-            wipeout_domain.USER_VERIFICATION_SUCCESS
+
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_account_deleted_email',
+            lambda x, y: None,
+            expected_args=[(
+                self.pending_deletion_request.user_id,
+                self.pending_deletion_request.email
+            )]
         )
+
+        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_SUCCESS
+            )
+
         self.assertIsNotNone(
             user_models.DeletedUserModel.get_by_id(self.user_1_id))
         self.assertTrue(user_services.is_username_taken(self.USER_1_USERNAME))

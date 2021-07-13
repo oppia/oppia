@@ -307,11 +307,11 @@ def run_user_deletion_completion(pending_deletion_request):
         if pending_deletion_request.normalized_long_term_username is not None:
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username)
-            if feconf.CAN_SEND_EMAILS:
-                email_manager.send_account_deleted_email(
-                    pending_deletion_request.user_id,
-                    pending_deletion_request.email
-                )
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_account_deleted_email(
+                pending_deletion_request.user_id,
+                pending_deletion_request.email
+            )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
         if feconf.CAN_SEND_EMAILS:
