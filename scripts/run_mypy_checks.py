@@ -871,7 +871,7 @@ def main(args=None):
 
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    process.communicate()
+    output = process.communicate()
     python_utils.PRINT(output[1])
     python_utils.PRINT(output[0])
     if process.returncode == 0:
