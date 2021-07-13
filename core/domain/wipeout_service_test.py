@@ -570,7 +570,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(
                 self.user_1_id))
 
-    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
+            self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
@@ -589,7 +590,29 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             expected_args=[('WIPEOUT: Account deletion failed', email_content)]
         )
 
-        with send_email_swap:
+        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_FAILURE)
+
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_disabled(
+            self):
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
+        ).put()
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -4935,9 +4958,13 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.can_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_repeated_deletion_is_successful(self):
-        with self.send_mail_to_admin_swap:
+    def test_repeated_deletion_is_successful_when_emails_enabled(self):
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertIn('SUCCESS', self.email_bodies[0])
             self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -4945,8 +4972,15 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn('ALREADY DONE', self.email_bodies[1])
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
+    def test_repeated_deletion_is_successful_when_emails_disabled(self):
+        with self.send_mail_to_admin_swap, self.cannot_send_email_swap:
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+
     def test_regular_deletion_is_successful(self):
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5008,12 +5042,21 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.can_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_verification_when_user_is_not_deleted(self):
-        with self.send_mail_to_admin_swap:
+    def test_verification_when_user_is_not_deleted_emails_enabled(self):
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('NOT DELETED', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
+
+    def test_verification_when_user_is_not_deleted_emails_disabled(self):
+        with self.send_mail_to_admin_swap, self.cannot_send_email_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertEqual(len(self.email_bodies), 0)
 
     def test_verification_when_user_is_deleted_is_successful(self):
         pending_deletion_request = (
@@ -5023,7 +5066,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5044,7 +5087,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             story_ids=[], learnt_topic_ids=[]
         ).put()
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])
