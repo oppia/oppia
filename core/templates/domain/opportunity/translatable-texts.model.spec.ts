@@ -16,6 +16,7 @@
  * @fileoverview Tests for TranslatableTexts.
  */
 
+import { WrittenTranslation } from 'domain/exploration/WrittenTranslationObjectFactory';
 import {
   StateNamesToContentIdMapping,
   TranslatableTexts,
@@ -25,16 +26,23 @@ import {
 
 describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
+  let getWrittenTranslation = (text) => {
+    return {
+      'data_format': 'html',
+      'translation': text,
+      'needs_update': false
+    };
+  };
 
   beforeEach(() => {
     const sampleBackendDict: TranslatableTextsBackendDict = {
       state_names_to_content_id_mapping: {
         state1: {
-          1: 'text1',
-          2: 'text2'
+          1: getWrittenTranslation('text1'),
+          2: getWrittenTranslation('text2')
         },
         state2: {
-          1: 'text3'
+          1: getWrittenTranslation('text3')
         }
       },
       version: '1'
@@ -43,14 +51,14 @@ describe('Translatable Texts model', () => {
       .createFromBackendDict(sampleBackendDict);
   });
 
-  it('should get state name to content id mapping', () => {
-    const expectedStatewiseContents: StateNamesToContentIdMapping = {
+  fit('should get state name to content id mapping', () => {
+    const expectedStatewiseContents = {
       state1: {
-        1: 'text1',
-        2: 'text2'
+        1: new WrittenTranslation('html', 'text1', false),
+        2: new WrittenTranslation('html', 'text2', false)
       },
       state2: {
-        1: 'text3'
+        1: new WrittenTranslation('html', 'text3', false)
       }
     };
     expect(sampleTranslatableTexts.stateWiseContents)

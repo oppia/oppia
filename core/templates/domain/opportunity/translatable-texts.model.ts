@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { TranslationBackendDict, WrittenTranslation } from "domain/exploration/WrittenTranslationObjectFactory";
+
 /**
  * @fileoverview Frontend Model for translatable texts
  */
 
 export interface ContentIdToContentMapping {
-  [contentId: string]: string
+  [contentId: string]: TranslationBackendDict
 }
 
 export interface StateNamesToContentIdMapping {
@@ -37,8 +39,21 @@ export class TranslatableTexts {
 
   static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {
+    let stateNamesToContentIdMapping = {};
+    for (let stateName in backendDict.state_names_to_content_id_mapping) {
+      let contentIdToWrittenTranslationMapping = (
+        backendDict.state_names_to_content_id_mapping[stateName]);
+      let contentIdMapping = {};
+      for (let contentId in contentIdToWrittenTranslationMapping) {
+        contentIdMapping[contentId] = new WrittenTranslation(
+            contentIdToWrittenTranslationMapping[contentId].data_format,
+            contentIdToWrittenTranslationMapping[contentId].translation,
+            contentIdToWrittenTranslationMapping[contentId].needs_update);
+      }
+      stateNamesToContentIdMapping[stateName] = contentIdMapping;
+    }
     return new TranslatableTexts(
-      backendDict.state_names_to_content_id_mapping,
+      stateNamesToContentIdMapping,
       backendDict.version
     );
   }

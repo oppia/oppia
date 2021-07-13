@@ -15,7 +15,8 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals
+from collections import defaultdict  # pylint: disable=import-only-modules
 
 import json
 
@@ -261,10 +262,17 @@ class TranslatableTextHandler(base.BaseHandler):
                     exp_id, language_code)
             )
         )
-
+        state_names_to_content_id_mapping_serialized = defaultdict(lambda: {})
+        for state_name in state_names_to_not_in_review_content_id_mapping:
+            content_id_to_written_translations = (
+                state_names_to_not_in_review_content_id_mapping[state_name])
+            for content_id in content_id_to_written_translations:
+                state_names_to_content_id_mapping_serialized[state_name][
+                    content_id
+                ] = content_id_to_written_translations[content_id].to_dict()
         self.values = {
             'state_names_to_content_id_mapping': (
-                state_names_to_not_in_review_content_id_mapping),
+                state_names_to_content_id_mapping_serialized),
             'version': exp.version
         }
 
@@ -276,24 +284,25 @@ class TranslatableTextHandler(base.BaseHandler):
         minus any contents found in suggestions.
 
         Args:
-            state_names_to_content_id_mapping: dict(str, dict(str, str)). A dict
-                where state_name is the key and a dict with content_id as the
-                key and html content as value.
+            state_names_to_content_id_mapping: dict(str, dict(str,
+                WrittenTranslation)). A dict where state_name is the key and a
+                dict with content_id as the key and WrittenTranslation as value.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
+            dict(str, dict(str, WrittenTranslation)). A dict where state_name is
+            the key and a dict with content_id as the key and WrittenTranslation
+            as value.
         """
         final_mapping = {}
         for state_name in state_names_to_content_id_mapping:
-            content_id_to_text = dict(
+            content_id_to_written_translation = dict(
                 state_names_to_content_id_mapping[state_name])
-            for content_id in content_id_to_text.keys():
+            for content_id in content_id_to_written_translation.keys():
                 if self._content_in_review(state_name, content_id, suggestions):
-                    del content_id_to_text[content_id]
-            if content_id_to_text:
-                final_mapping[state_name] = content_id_to_text
+                    del content_id_to_written_translation[content_id]
+            if content_id_to_written_translation:
+                final_mapping[state_name] = content_id_to_written_translation
         return final_mapping
 
     def _content_in_review(self, state_name, content_id, suggestions):
@@ -403,15 +412,16 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             target_language_code)
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
-        content_id_to_text_mapping = (
+        content_id_to_written_translation_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts = {}
         for content_id in content_ids:
-            if content_id not in content_id_to_text_mapping:
+            if content_id not in content_id_to_written_translation_mapping:
                 translated_texts[content_id] = None
                 continue
 
-            source_text = content_id_to_text_mapping[content_id]
+            source_text = content_id_to_written_translation_mapping[
+                content_id].translation
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
                     exp.language_code, target_language_code, source_text)

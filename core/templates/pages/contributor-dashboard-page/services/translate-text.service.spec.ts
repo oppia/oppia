@@ -26,6 +26,13 @@ describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
   let httpTestingController;
+  let getWrittenTranslation = (text) => {
+    return {
+      'data_format': 'html',
+      'translation': text,
+      'needs_update': false
+    };
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,7 +41,8 @@ describe('TranslateTextService', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     translateTextService = TestBed.inject(TranslateTextService);
     stateContent = new StateAndContent(
-      'stateName', 'contentId', 'contentText', 'pending', 'translationHtml');
+      'stateName', 'contentId', 'contentText', 'pending', 'translation',
+      'html');
   });
 
   afterEach(() => {
@@ -45,8 +53,11 @@ describe('TranslateTextService', () => {
     it('should return all texts per state', fakeAsync(() => {
       let textAndAvailability;
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1', contentId2: 'text2'},
-        stateName2: {contentId3: 'text3'}
+        stateName1: {
+          contentId1: getWrittenTranslation('text1'),
+          contentId2: getWrittenTranslation('text2')
+        },
+        stateName2: {contentId3: getWrittenTranslation('text3')}
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
@@ -62,28 +73,32 @@ describe('TranslateTextService', () => {
         text: 'text3',
         more: false,
         status: 'pending',
-        translationHtml: ''
+        translation: '',
+        dataFormat: 'html'
       };
 
       const expectedTextAndAvailability2 = {
         text: 'text2',
         more: true,
         status: 'pending',
-        translationHtml: ''
+        translation: '',
+        dataFormat: 'html'
       };
 
       const expectedTextAndAvailability1 = {
         text: 'text1',
         more: true,
         status: 'pending',
-        translationHtml: ''
+        translation: '',
+        dataFormat: 'html'
       };
 
       const expectedTextAndPreviousAvailability1 = {
         text: 'text1',
         more: false,
         status: 'pending',
-        translationHtml: ''
+        translation: '',
+        dataFormat: 'html'
       };
 
       textAndAvailability = translateTextService.getTextToTranslate();
@@ -113,11 +128,12 @@ describe('TranslateTextService', () => {
           text: 'text1',
           more: false,
           status: 'pending',
-          translationHtml: ''
+          translation: '',
+          dataFormat: 'html'
         };
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: 'text1'},
-          stateName2: {contentId2: ''}
+          stateName1: {contentId1: getWrittenTranslation('text1')},
+          stateName2: {contentId2: getWrittenTranslation('')}
         };
         translateTextService.init('1', 'en', () => {});
         const req = httpTestingController.expectOne(
@@ -140,11 +156,12 @@ describe('TranslateTextService', () => {
           text: null,
           more: false,
           status: 'pending',
-          translationHtml: ''
+          translation: '',
+          dataFormat: undefined
         };
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: ''},
-          stateName2: {contentId2: ''}
+          stateName1: {contentId1: getWrittenTranslation('')},
+          stateName2: {contentId2: getWrittenTranslation('')}
         };
         translateTextService.init('1', 'en', () => {});
         const req = httpTestingController.expectOne(
@@ -193,8 +210,8 @@ describe('TranslateTextService', () => {
   });
 
   it('should update translation html', () => {
-    expect(stateContent.translationHtml).toBe('translationHtml');
-    stateContent.translationHtml = 'newTranslationHtml';
-    expect(stateContent.translationHtml).toBe('newTranslationHtml');
+    expect(stateContent.translation).toBe('translation');
+    stateContent.translation = 'newTranslation';
+    expect(stateContent.translation).toBe('newTranslation');
   });
 });

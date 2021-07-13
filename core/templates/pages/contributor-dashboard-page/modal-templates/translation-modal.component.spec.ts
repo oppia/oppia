@@ -54,6 +54,13 @@ describe('Translation Modal Component', () => {
     progressPercentage: '20',
     actionButtonTitle: 'Action Button'
   };
+  let getWrittenTranslation = (text) => {
+    return {
+      'data_format': 'html',
+      'translation': text,
+      'needs_update': false
+    };
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -167,8 +174,8 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: {contentId1: getWrittenTranslation('text1')},
+        stateName2: {contentId2: getWrittenTranslation('text2')}
       };
 
       const req = httpTestingController.expectOne(
@@ -273,8 +280,8 @@ describe('Translation Modal Component', () => {
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: 'text1'},
-          stateName2: {contentId2: 'text2'}
+          stateName1: {contentId1: getWrittenTranslation('text1')},
+          stateName2: {contentId2: getWrittenTranslation('text2')}
         };
 
         const req = httpTestingController.expectOne(
@@ -318,8 +325,8 @@ describe('Translation Modal Component', () => {
       component.ngOnInit();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: {contentId1: getWrittenTranslation('text1')},
+        stateName2: {contentId2: getWrittenTranslation('text2')}
       };
 
       const req = httpTestingController.expectOne(
@@ -368,7 +375,8 @@ describe('Translation Modal Component', () => {
         text: 'abc',
         more: true,
         status: 'submitted',
-        translationHtml: 'cba'
+        translation: 'cba',
+        dataFormat: 'html'
       });
       expect(component.isSubmitted()).toBeFalse();
 
