@@ -69,13 +69,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks, 'EXCLUDED_DIRECTORIES',
             ['dir1/', 'dir2/'])
 
-        def mock_install_mypy_prerequisites_success(ci):
+        def mock_install_mypy_prerequisites_success(ci): # pylint: disable=unused-argument
             return 0
         self.swap_install_success = self.swap(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites_success)
 
-        self.mypy_cmd_path =  os.path.join(
+        self.mypy_cmd_path = os.path.join(
             os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
 
     def test_install_third_party_libraries_with_skip_install_as_true(self):
@@ -103,7 +103,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_get_mypy_cmd_with_files(self):
         expected_cmd = [
-            self.mypy_cmd_path , '--config-file', './mypy.ini',
+            self.mypy_cmd_path, '--config-file', './mypy.ini',
             'file1.py', 'file2.py'
         ]
         with self.files_swap:
