@@ -442,6 +442,7 @@ class BaseHandler(webapp2.RequestHandler):
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
+        self.error(404)
         self._render_exception(
             404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
@@ -548,7 +549,6 @@ class BaseHandler(webapp2.RequestHandler):
         """
 
         method = self.request.environ['REQUEST_METHOD']
-        self.response.set_status(values['status_code'])
 
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
