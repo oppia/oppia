@@ -391,7 +391,7 @@ var MultiSelectEditor = function(elem) {
     }
 
     if (filteredElementsCount !== texts.length) {
-      throw (
+      throw new Error(
         'Could not toggle element selection. Values requested: ' + texts +
       '. Found ' + filteredElementsCount + ' matching elements.');
     }
@@ -506,11 +506,8 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
     expect(
       await (await arrayOfElems.get(arrayPointer)).getTagName()
     ).toBe(tagName);
-    // Remove comments introduced by angular for bindings using replace.
     expect(
-      (
-        await (await arrayOfElems.get(arrayPointer)).getAttribute('innerHTML')
-      ).replace(/<!--[^>]*-->/g, '').trim()
+      await (await arrayOfElems.get(arrayPointer)).getAttribute('innerHTML')
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;

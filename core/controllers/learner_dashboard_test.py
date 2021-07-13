@@ -88,12 +88,12 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
     subtopic_0 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
     subtopic_1 = topic_domain.Subtopic(
         0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
         'dummy-subtopic-zero')
 
     def setUp(self):
@@ -333,11 +333,11 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
-    def test_can_see_new_topics(self):
+    def test_can_see_untracked_topics(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['new_topics_list']), 0)
+        self.assertEqual(len(response['untracked_topics_list']), 0)
 
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
@@ -372,9 +372,9 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['new_topics_list']), 1)
+        self.assertEqual(len(response['untracked_topics_list']), 1)
         self.assertEqual(
-            response['new_topics_list'][0]['id'], self.TOPIC_ID_1)
+            response['untracked_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_exploration_playlist(self):
