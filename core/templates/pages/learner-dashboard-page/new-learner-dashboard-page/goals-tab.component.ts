@@ -17,34 +17,34 @@
  */
 
 import constants from 'assets/constants';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
 
  @Component({
    selector: 'oppia-goals-tab',
    templateUrl: './goals-tab.component.html'
  })
-export class GoalsTabComponent {
+export class GoalsTabComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private learnerDashboardActivityBackendApiService: (
-      LearnerDashboardActivityBackendApiService),
-    private learnerDashboardIdsBackendApiService:
-      LearnerDashboardIdsBackendApiService) {
+      LearnerDashboardActivityBackendApiService)) {
   }
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
   @Input() completedGoals: LearnerTopicSummary[];
-  @Input() newTopics: LearnerTopicSummary[];
+  @Input() untrackedTopics: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics: string[];
   learnerDashboardActivityIds: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH: number;
+  pawImageUrl: string = '';
+  bookImageUrl: string = '';
+  starImageUrl: string = '';
   currentGoalsStoryIsShown: boolean[];
   topicBelongToCurrentGoals: boolean[] = [];
   topicIdsInCompletedGoals: string[] = [];
@@ -55,19 +55,34 @@ export class GoalsTabComponent {
     NEITHER: 2
   };
   activityType: string = constants.ACTIVITY_TYPE_LEARN_TOPIC;
+  editGoalsTopicPageUrl: string[] = [];
+  completedGoalsTopicPageUrl: string[] = [];
+  editGoalsTopicClassification: number[] = [];
+  editGoalsTopicBelongToLearntToPartiallyLearntTopic: boolean[] = [];
 
   ngOnInit(): void {
-    this.learnerDashboardIdsBackendApiService.
-      fetchLearnerDashboardIdsAsync().then(
-        (learnerDashboardActivityIds) => {
-          this.topicIdsInCompletedGoals = (
-            learnerDashboardActivityIds.learntTopicIds);
-          this.topicIdsInCurrentGoals = (
-            learnerDashboardActivityIds.topicIdsToLearn);
-        }
-      );
     this.MAX_CURRENT_GOALS_LENGTH = constants.MAX_CURRENT_GOALS_COUNT;
     this.currentGoalsStoryIsShown = [];
+    this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
+    this.bookImageUrl = this.getStaticImageUrl('/learner_dashboard/book.svg');
+    this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
+    let topic: LearnerTopicSummary;
+    for (topic of this.currentGoals) {
+      this.topicIdsInCurrentGoals.push(topic.id);
+    }
+    for (topic of this.completedGoals) {
+      this.topicIdsInCompletedGoals.push(topic.id);
+      this.completedGoalsTopicPageUrl.push(this.getTopicPageUrl(
+        topic.urlFragment, topic.classroom));
+    }
+    for (topic of this.editGoals) {
+      this.editGoalsTopicPageUrl.push(this.getTopicPageUrl(
+        topic.urlFragment, topic.classroom));
+      this.editGoalsTopicClassification.push(
+        this.getTopicClassification(topic.id));
+      this.editGoalsTopicBelongToLearntToPartiallyLearntTopic.push(
+        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name));
+    }
   }
 
   getTopicPageUrl(
@@ -93,7 +108,7 @@ export class GoalsTabComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  topicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
+  doesTopicBelongToLearntToPartiallyLearntTopics(topicName: string): boolean {
     if (this.learntToPartiallyLearntTopics.includes(topicName)) {
       return true;
     }
@@ -120,11 +135,13 @@ export class GoalsTabComponent {
         this.currentGoalsStoryIsShown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
-        let indexInNewTopics = this.newTopics.findIndex(
+        let indexInNewTopics = this.untrackedTopics.findIndex(
           topic => topic.id === topicId);
         if (indexInNewTopics !== -1) {
-          this.newTopics.splice(indexInNewTopics, 1);
+          this.untrackedTopics.splice(indexInNewTopics, 1);
         }
+        this.editGoalsTopicClassification.splice(
+          index, 1, this.getTopicClassification(topic.id));
       }
     }
   }
@@ -147,8 +164,10 @@ export class GoalsTabComponent {
         this.topicIdsInCurrentGoals.splice(index, 1);
         if (!this.topicIdsInCompletedGoals.includes(topicId) &&
           !this.topicIdsInCurrentGoals.includes(topicId)) {
-          this.newTopics.push(topic);
+          this.untrackedTopics.push(topic);
         }
+        this.editGoalsTopicClassification.splice(
+          index, 1, this.getTopicClassification(topicId));
       });
   }
 }

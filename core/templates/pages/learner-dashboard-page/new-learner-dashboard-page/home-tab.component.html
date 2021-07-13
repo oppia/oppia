@@ -1,7 +1,7 @@
 <div class="greeting">
   Good {{getTimeOfDay()}}, {{username}}!
 </div>
-<div class="continue-where-you-left-off" *ngIf="newTopics.length !== 0 || currentGoals.length !== 0">
+<div class="continue-where-you-left-off" *ngIf="untrackedTopics.length !== 0 || currentGoals.length !== 0">
   <p class="continue-where-you-left-off-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
   </p>
   <div class="empty-continue-where-you-left-off-section" *ngIf="currentGoals.length === 0">
@@ -23,12 +23,12 @@
   <p class="suggested-for-you-heading"
     [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
   </p>
-  <div class="empty-suggested-for-you-section" *ngIf="newTopics.length === 0">
+  <div class="empty-suggested-for-you-section" *ngIf="untrackedTopics.length === 0">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
     </p>
   </div>
-  <div class="suggested-for-you-section" *ngIf="newTopics.length !== 0">
-    <div *ngFor="let topicSummaryTile of newTopics">
+  <div class="suggested-for-you-section" *ngIf="untrackedTopics.length !== 0">
+    <div *ngFor="let topicSummaryTile of untrackedTopics">
       <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
       </oppia-learner-topic-summary-tile>
     </div>

@@ -208,7 +208,7 @@ class EditorTests(BaseEditorControllerTests):
         # A request with the wrong version number is invalid.
         response_dict = _put_and_expect_400_error(
             _get_payload('New state', version=123))
-        self.assertIn('which is too old', response_dict['error'])
+        self.assertIn('which is not possible', response_dict['error'])
 
         # A request with an empty state name is invalid.
         response_dict = _put_and_expect_400_error(
@@ -1841,6 +1841,59 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertEqual(
             response['error'], 'No change was made to this exploration.')
 
+    def test_can_not_assign_roles_with_invalid_payload_version(self):
+         # Create collaborator user.
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+
+        csrf_token = self.get_new_csrf_token()
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        # Raises error as version from payload is None.
+        response_dict = self.put_json(
+            rights_url, {
+                'version': None,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Invalid POST request: a version must be specified.')
+
+        # Raises error as version from payload does not match the exploration
+        # version.
+        response_dict = self.put_json(
+            rights_url, {
+                'version': 2,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Trying to update version 1 of exploration from version 2, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
 
 class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
@@ -2586,6 +2639,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
+        self.assertTrue(response['changes_are_mergeable'])
 
     def test_draft_updated_version_invalid(self):
         payload = {
@@ -2600,6 +2654,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertFalse(response['changes_are_mergeable'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):

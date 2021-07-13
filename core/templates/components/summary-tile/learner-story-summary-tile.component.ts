@@ -41,6 +41,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyTitle: string;
   nextIncompleteNodeTitle: string;
   thumbnailBgColor: string;
+  topicName: string;
+  storyCompleted: boolean = false;
+  starImageUrl: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -65,6 +68,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.completedNodeCount = this.storySummary.getCompletedNodeTitles().length;
     this.storyProgress = Math.floor(
       (this.completedNodeCount / this.nodeCount) * 100);
+    if (this.storyProgress === 100) {
+      this.storyCompleted = true;
+    }
 
     if (this.storySummary.getThumbnailFilename()) {
       this.thumbnailUrl = (
@@ -79,6 +85,12 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.completedNodeCount];
     this.nextIncompleteNodeTitle = (
       `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
+    this.topicName = this.storySummary.getTopicName();
+    this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
 

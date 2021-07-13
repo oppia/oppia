@@ -25,14 +25,9 @@ import os
 import subprocess
 import sys
 
-
+import python_utils
 from scripts import common
 from scripts import install_third_party_libs
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
-install_third_party_libs.main()
-
-import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 # List of directories whose files won't be type-annotated ever.
@@ -44,18 +39,20 @@ EXCLUDED_DIRECTORIES = [
 
 # List of files who should be type-annotated but are not.
 NOT_FULLY_COVERED_FILES = [
-    'android_validation_constants.py',
-    'android_validation_constants_test.py',
-    'appengine_config.py',
-    'appengine_config_test.py',
-    'constants.py',
-    'constants_test.py',
     'core/controllers/acl_decorators.py',
     'core/controllers/acl_decorators_test.py',
     'core/controllers/admin.py',
     'core/controllers/admin_test.py',
+    'core/controllers/android_e2e_config.py',
+    'core/controllers/android_e2e_config_test.py',
     'core/controllers/base.py',
     'core/controllers/base_test.py',
+    'core/controllers/blog_admin.py',
+    'core/controllers/blog_admin_test.py',
+    'core/controllers/blog_dashboard.py',
+    'core/controllers/blog_dashboard_test.py',
+    'core/controllers/blog_homepage.py',
+    'core/controllers/blog_homepage_test.py',
     'core/controllers/classifier.py',
     'core/controllers/classifier_test.py',
     'core/controllers/classroom.py',
@@ -68,12 +65,16 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/concept_card_viewer_test.py',
     'core/controllers/contributor_dashboard.py',
     'core/controllers/contributor_dashboard_test.py',
+    'core/controllers/contributor_dashboard_admin.py',
+    'core/controllers/contributor_dashboard_admin_test.py',
     'core/controllers/creator_dashboard.py',
     'core/controllers/creator_dashboard_test.py',
     'core/controllers/cron.py',
     'core/controllers/cron_test.py',
     'core/controllers/custom_landing_pages.py',
     'core/controllers/custom_landing_pages_test.py',
+    'core/controllers/domain_objects_validator.py',
+    'core/controllers/domain_objects_validator_test.py',
     'core/controllers/editor.py',
     'core/controllers/editor_test.py',
     'core/controllers/email_dashboard.py',
@@ -162,11 +163,13 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/auth_validators_test.py',
     'core/domain/base_model_validators.py',
     'core/domain/base_model_validators_test.py',
+    'core/domain/beam_job_domain.py',
     'core/domain/beam_job_domain_test.py',
     'core/domain/beam_job_services.py',
     'core/domain/beam_job_services_test.py',
     'core/domain/beam_job_validators.py',
     'core/domain/beam_job_validators_test.py',
+    'core/domain/blog_domain.py',
     'core/domain/blog_domain_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
@@ -232,8 +235,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/expression_parser_test.py',
     'core/domain/feedback_domain.py',
     'core/domain/feedback_domain_test.py',
-    'core/domain/feedback_jobs_continuous.py',
-    'core/domain/feedback_jobs_continuous_test.py',
     'core/domain/feedback_jobs_one_off.py',
     'core/domain/feedback_jobs_one_off_test.py',
     'core/domain/feedback_services.py',
@@ -407,8 +408,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/translation_validators_test.py',
     'core/domain/user_domain.py',
     'core/domain/user_domain_test.py',
-    'core/domain/user_jobs_continuous.py',
-    'core/domain/user_jobs_continuous_test.py',
     'core/domain/user_jobs_one_off.py',
     'core/domain/user_jobs_one_off_test.py',
     'core/domain/user_query_domain.py',
@@ -587,7 +586,6 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/value_generators/models/generators.py',
     'extensions/value_generators/models/generators_test.py',
     'extensions/visualizations/models.py',
-    'feconf.py',
     'jobs/base_jobs.py',
     'jobs/base_jobs_test.py',
     'jobs/batch_jobs/validation_jobs.py',
@@ -644,13 +642,8 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/types/topic_validation_errors_test.py',
     'jobs/types/user_validation_errors.py',
     'jobs/types/user_validation_errors_test.py',
-    'main.py',
-    'main_cron.py',
-    'main_taskqueue.py',
     'python_utils.py',
     'python_utils_test.py',
-    'schema_utils.py',
-    'schema_utils_test.py',
     'scripts/build.py',
     'scripts/build_test.py',
     'scripts/check_e2e_tests_are_captured_in_ci.py',
@@ -754,11 +747,26 @@ _PARSER = argparse.ArgumentParser(
 )
 
 _PARSER.add_argument(
+    '--skip-install',
+    help='If true, skips installing dependencies. The default value is false.',
+    action='store_true')
+
+_PARSER.add_argument(
     '--files',
     help='Files to type-check',
     action='store',
     nargs='+'
 )
+
+
+def install_third_party_libraries(skip_install):
+    """Run the installation script.
+
+    Args:
+        skip_install: bool. Whether to skip running the installation script.
+    """
+    if not skip_install:
+        install_third_party_libs.main()
 
 
 def get_mypy_cmd(files):
@@ -798,6 +806,13 @@ def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
+        sys.path.insert(1, directory)
+
+    install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')

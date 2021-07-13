@@ -25,7 +25,7 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
  })
 export class HomeTabComponent {
   @Input() currentGoals: LearnerTopicSummary[];
-  @Input() newTopics: LearnerTopicSummary[];
+  @Input() untrackedTopics: LearnerTopicSummary[];
   @Input() username: string;
   nextIncompleteNodeTitles: string[] = [];
 
