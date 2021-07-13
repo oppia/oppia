@@ -743,9 +743,10 @@ NOT_FULLY_COVERED_FILES = [
 
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
 # TODO(#13113): Change mypy command to mypy path after Python3 migration.
-MYPY_CMD = 'mypy'
+MYPY_CMD = os.path.join(
+    os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
 MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
-MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'mypy_requirements')
+MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
 PYTHON3_CMD = 'python3'
 
 
