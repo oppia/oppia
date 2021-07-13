@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, flush } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -87,7 +87,6 @@ describe('Exploration editor page component', function() {
   var sers = null;
   var ses = null;
   var sts = null;
-  var stass = null;
   var stfts = null;
   var tds = null;
   var ueps = null;
@@ -262,7 +261,6 @@ describe('Exploration editor page component', function() {
     sers = $injector.get('StateEditorRefreshService');
     ses = $injector.get('StateEditorService');
     sts = $injector.get('StateTutorialFirstTimeService');
-    stass = $injector.get('StateTopAnswersStatsService');
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
     ueps = $injector.get('UserExplorationPermissionsService');
@@ -291,7 +289,6 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
@@ -510,7 +507,6 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
@@ -677,7 +673,6 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync')
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
@@ -720,95 +715,5 @@ describe('Exploration editor page component', function() {
       mockEnterEditorForTheFirstTime.emit();
       expect(ctrl.showWelcomeExplorationModal).toHaveBeenCalled();
     });
-  });
-
-  describe('State-change registration', () => {
-    beforeEach(() => {
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue($q.resolve({}));
-      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
-      spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: false}));
-      $scope.$apply();
-
-      explorationData.is_version_of_draft_valid = true;
-
-      ctrl.$onInit();
-    });
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    it('should callback state-added method for stats', fakeAsync(() => {
-      let onStateAddedSpy = spyOn(stass, 'onStateAdded');
-      spyOn(cls, 'addState');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.addState('Prologue');
-
-      flushMicrotasks();
-      expect(onStateAddedSpy).toHaveBeenCalledWith('Prologue');
-    }));
-
-    it('should callback state-deleted method for stats', fakeAsync(() => {
-      let onStateDeletedSpy = spyOn(stass, 'onStateDeleted');
-      spyOn(cls, 'deleteState');
-      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.deleteState('Final');
-
-      flushMicrotasks();
-      expect(onStateDeletedSpy).toHaveBeenCalledWith('Final');
-    }));
-
-    it('should callback state-renamed method for stats', fakeAsync(() => {
-      let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
-      spyOn(cls, 'renameState');
-
-      $scope.$apply();
-      flush();
-
-      ess.renameState('Introduction', 'Start');
-      $scope.$apply();
-      flush();
-
-      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
-    }));
-
-    it('should callback interaction-changed method for stats', fakeAsync(() => {
-      let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');
-      spyOn(cls, 'editStateProperty');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.saveInteractionAnswerGroups('Introduction', []);
-
-      flushMicrotasks();
-      expect(onStateInteractionSavedSpy)
-        .toHaveBeenCalledWith(ess.getState('Introduction'));
-    }));
   });
 });

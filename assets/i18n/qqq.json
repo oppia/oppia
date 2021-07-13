@@ -105,7 +105,7 @@
 	"I18N_CONTACT_PAGE_PARAGRAPH_9_HEADING": "Heading for the text on Oppia's Contact page.",
 	"I18N_CONTINUE_REGISTRATION": "Text displayed on a button that, when clicked, allows the user to continue the signup process.",
 	"I18N_COOKIE_BANNER_ACKNOWLEDGE": "Text displayed on a button at the bottom of the cookie banner. It allows the user to acknowledge and dismiss the banner.",
-    "I18N_COOKIE_BANNER_EXPLANATION": "Text shown in the cookie banner at the bottom of the page.",
+	"I18N_COOKIE_BANNER_EXPLANATION": "Text shown in the cookie banner at the bottom of the page.",
 	"I18N_CORRECT_FEEDBACK": "Text shown in the congratulatory message shown to the learner when they get a correct answer.",
 	"I18N_CREATE_ACTIVITY_QUESTION": "Text displayed as the first sentence in a dialog. - The dialog appears when the user clicks the I18N_CREATE_EXPLORATION_CREATE button.",
 	"I18N_CREATE_ACTIVITY_TITLE": "Text displayed in the header of a dialog. - The dialog appears when the user clicks the I18N_CREATE_EXPLORATION_CREATE button.",
