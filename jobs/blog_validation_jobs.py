@@ -26,19 +26,28 @@ from jobs import job_utils
 from jobs.io import ndb_io
 
 import apache_beam as beam
-(blog_models,) = models.Registry.import_models([models.NAMES.blog, ])
+
+from typing import Any, Text,
+
+(blog_models,) = models.Registry.import_models([ # type: ignore[no-untyped-call]
+    models.NAMES.blog, ])
 
 
-class GetModelsWithDuplicatePropertyValues(beam.PTransform):
+class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc]
     """Helper class to retrive models with duplicate properties."""
 
     def __init__(self, property_name):
+        # type: (Text) -> None
         super(GetModelsWithDuplicatePropertyValues, self).__init__()
         self._property_name = property_name
 
     def expand(self, blog_model_pcoll):
+        # type: (Any) -> Any # type: ignore[no-any-return]
         return (
             blog_model_pcoll
+            | 'Discard models with empty property value' >> (
+                beam.Filter(lambda model: self.get_property_value(model) != ''
+                ))
             | 'Generate (%s, model) key value pairs' % self._property_name >> (
                 beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
             | 'Group pairs by their %s' % self._property_name >> (
@@ -49,6 +58,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
         )
 
     def get_property_value(self, model):
+        # type: (Any) -> Any # type: ignore[no-any-return]
         """Returns value of the given property of model
 
         Args:
@@ -57,29 +67,22 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
         Returns:
             value. The value of the property of model.
         """
-        return job_utils.get_model_property(model, self._property_name)
+        return job_utils.get_model_property( # type: ignore[no-untyped-call]
+            model, self._property_name)
 
 
 class BlogPostTitleUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique title."""
 
     def run(self):
-        blog_model_pcoll = (
+        # type: () -> base_jobs.JobBase.pipeline
+        return (
             self.pipeline
             | 'Get every Blog Model' >> (
-                ndb_io.GetModels(
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
                     blog_models.BlogPostModel.query(), self.datastoreio_stub
                 ))
-            | 'Discard models with empty property value' >> (
-                beam.Filter(lambda model: model.title != ''))
-        )
-
-        blogs_with_duplicate_titles = (
-            blog_model_pcoll | GetModelsWithDuplicatePropertyValues('title')
-        )
-
-        return (
-            blogs_with_duplicate_titles
+            | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
@@ -92,23 +95,14 @@ class BlogPostUrlUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Posts have unique url."""
 
     def run(self):
-        blog_model_pcoll = (
+        # type: () -> base_jobs.JobBase.pipeline
+        return (
             self.pipeline
             | 'Get every Blog Post Model' >> (
-                ndb_io.GetModels(
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
                     blog_models.BlogPostModel.query(), self.datastoreio_stub
                 ))
-            | 'Discard models with empty property value' >> (
-                beam.Filter(lambda model: model.url_fragment != ''))
-        )
-
-        blogs_with_duplicate_url_fragment = (
-            blog_model_pcoll | GetModelsWithDuplicatePropertyValues(
-                'url_fragment')
-        )
-
-        return (
-            blogs_with_duplicate_url_fragment
+            | GetModelsWithDuplicatePropertyValues('url_fragment')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
@@ -121,24 +115,15 @@ class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique title."""
 
     def run(self):
-        blog_summary_model_pcoll = (
+        # type: () -> base_jobs.JobBase.pipeline
+        return (
             self.pipeline
             | 'Get every Blog Summary Model' >> (
-                ndb_io.GetModels(
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
                     blog_models.BlogPostSummaryModel.query(),
                     self.datastoreio_stub
                 ))
-            | 'Discard models with empty property value' >> (
-                beam.Filter(lambda model: model.title != ''))
-        )
-
-        blog_summary_with_duplicate_titles = (
-            blog_summary_model_pcoll | GetModelsWithDuplicatePropertyValues(
-                'title')
-        )
-
-        return (
-            blog_summary_with_duplicate_titles
+            | GetModelsWithDuplicatePropertyValues('title')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
@@ -151,24 +136,15 @@ class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
     """Validates that all the Blog Post Summary Model have unique url."""
 
     def run(self):
-        blog_summary_model_pcoll = (
+        # type: () -> base_jobs.JobBase.pipeline
+        return (
             self.pipeline
             | 'Get every Blog Post Summary Model' >> (
-                ndb_io.GetModels(
+                ndb_io.GetModels( # type: ignore[no-untyped-call]
                     blog_models.BlogPostSummaryModel.query(),
                     self.datastoreio_stub
                 ))
-            | 'Discard models with empty property value' >> (
-                beam.Filter(lambda model: model.url_fragment != ''))
-        )
-
-        blog_summary_with_duplicate_url_fragment = (
-            blog_summary_model_pcoll | GetModelsWithDuplicatePropertyValues(
-                'url_fragment')
-        )
-
-        return (
-            blog_summary_with_duplicate_url_fragment
+            | GetModelsWithDuplicatePropertyValues('url_fragment')
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)

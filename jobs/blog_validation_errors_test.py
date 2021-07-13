@@ -24,15 +24,18 @@ from jobs import blog_validation_errors
 from jobs.types import base_validation_errors_test
 import utils
 
-(blog_models,) = models.Registry.import_models([models.NAMES.blog])
+(blog_models,) = models.Registry.import_models([ # type: ignore[no-untyped-call]
+    models.NAMES.blog])
 
-datastore_services = models.Registry.import_datastore_services()
+datastore_services = (
+    models.Registry.import_datastore_services()) # type: ignore[no-untyped-call]
 
 
 class DuplicateBlogTitleErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
+        # type: () -> None
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -52,6 +55,7 @@ class DuplicateBlogUrlErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
+        # type: () -> None
         blog_post_model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -71,6 +75,7 @@ class InconsistentPublishTimestampsErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
+        # type: () -> None
         model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -93,6 +98,7 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
+        # type: () -> None
         model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
@@ -117,6 +123,7 @@ class ModelMutatedDuringJobErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
+        # type: () -> None
         model = blog_models.BlogPostModel(
             id='validblogid1',
             title='Sample Title',
