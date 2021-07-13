@@ -774,35 +774,39 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, ci=False):
+def get_mypy_cmd(files, ci):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
+        ci: bool. Whether to test is for CI.
 
     Returns:
         list(str). List of command line arguments.
     """
     # TODO(#13113): Change mypy command to mypy path after Python3 migration.
     if ci:
-        MYPY_CMD = 'mypy'
+        mypy_cmd = 'mypy'
     else:
-        MYPY_CMD = os.path.join(
+        mypy_cmd = os.path.join(
             os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
     if files:
-        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files
+        cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
             '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
         cmd = [
-            MYPY_CMD, '--exclude', excluded_files_regex,
+            mypy_cmd, '--exclude', excluded_files_regex,
             '--config-file', CONFIG_FILE_PATH, '.'
         ]
     return cmd
 
 
-def install_mypy_prerequisites(ci=False):
+def install_mypy_prerequisites(ci):
     """Install mypy and type stubs from mypy_requirements.txt.
+
+    Args:
+        ci: bool. Whether to test is for CI.
 
     Returns:
         int. The return code from installing prerequisites.
@@ -814,9 +818,9 @@ def install_mypy_prerequisites(ci=False):
         ]
     else:
         cmd = [
-            PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_FILE_PATH,
-            '--target', MYPY_TOOLS_DIR, '--upgrade', '--user', '--prefix=',
-            '--system'
+            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
+            MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
+            '--upgrade', '--user', '--prefix=', '--system'
         ]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
