@@ -34,6 +34,18 @@
     }
   },
   "files": [
+    "core/templates/domain/collection/search-explorations-backend-api.service.ts",
+    "core/templates/domain/collection/search-explorations-backend-api.service.spec.ts",
+    "core/templates/domain/collection/collection-rights-backend-api.service.ts",
+    "core/templates/domain/collection/collection-rights-backend-api.service.spec.ts",
+    "core/templates/domain/classroom/classroom-backend-api.service.ts",
+    "core/templates/domain/classroom/classroom-backend-api.service.spec.ts",
+    "core/templates/domain/admin/admin-backend-api.service.ts",
+    "core/templates/domain/admin/admin-backend-api.service.spec.ts",
+    "extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts",
+    "extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.spec.ts",
+    "extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component.ts",
+    "extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component.spec.ts",
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "core/templates/app-events/app-events.ts",

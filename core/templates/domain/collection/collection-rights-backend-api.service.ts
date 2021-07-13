@@ -29,12 +29,16 @@ import { CollectionRights } from
 import { CollectionRightsBackendDict } from
   'domain/collection/collection-rights.model';
 
+interface CollectionRightsCache {
+  [key: string]: CollectionRights;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CollectionRightsBackendApiService {
   // Maps previously loaded collection rights to their IDs.
-  collectionRightsCache: Object = {};
+  collectionRightsCache: CollectionRightsCache = {};
 
   constructor(
     private http: HttpClient,
@@ -49,20 +53,22 @@ export class CollectionRightsBackendApiService {
         CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
           collection_id: collectionId
         });
-
-    this.http.get<CollectionRightsBackendDict>(collectionRightsUrl).toPromise()
-      .then(response => {
-        if (successCallback) {
-          successCallback(
-            CollectionRights.create(response)
-          );
-        }
-      },
-      errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+    if (collectionRightsUrl) {
+      this.http.get<CollectionRightsBackendDict>(
+        collectionRightsUrl).toPromise().then(
+        response => {
+          if (successCallback) {
+            successCallback(
+              CollectionRights.create(response)
+            );
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        });
+    }
   }
 
   private _setCollectionStatus(
@@ -87,21 +93,22 @@ export class CollectionRightsBackendApiService {
 
     let requestUrl = (
       isPublic ? collectionPublishUrl : collectionUnpublishUrl);
+    if (requestUrl) {
+      this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
+        .toPromise().then(response => {
+          let collectionRights = CollectionRights.create(response);
+          this.collectionRightsCache[collectionId] = collectionRights;
 
-    this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
-      .toPromise().then(response => {
-        let collectionRights = CollectionRights.create(response);
-        this.collectionRightsCache[collectionId] = collectionRights;
-
-        if (successCallback) {
-          successCallback(collectionRights);
-        }
-      },
-      errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+          if (successCallback) {
+            successCallback(collectionRights);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        });
+    }
   }
 
   private _isCached(collectionId: string): boolean {
