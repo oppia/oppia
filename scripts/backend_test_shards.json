@@ -151,7 +151,10 @@
         "core.storage.topic.gae_models_test",
         "scripts.release_scripts.cut_release_or_hotfix_branch_test",
         "scripts.linters.css_linter_test",
-        "core.platform.email.dev_mode_email_services_test"
+        "core.platform.email.dev_mode_email_services_test",
+        "jobs.blog_validation_errors_test",
+        "jobs.blog_validation_jobs_test",
+        "jobs.transforms.blog_validation_test"
     ],
     "6": [
         "core.domain.object_registry_test",
