@@ -736,9 +736,6 @@ NOT_FULLY_COVERED_FILES = [
 
 
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
-# TODO(#13113): Change mypy command to mypy path after Python3 migration.
-MYPY_CMD = os.path.join(
-    os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
 MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
 MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
 PYTHON3_CMD = 'python3'
@@ -751,6 +748,12 @@ _PARSER = argparse.ArgumentParser(
 _PARSER.add_argument(
     '--skip-install',
     help='If true, skips installing dependencies. The default value is false.',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--ci',
+    help='If true, installs mypy and its requirements globally.'
+    ' The default value is false.',
     action='store_true')
 
 _PARSER.add_argument(
@@ -771,7 +774,7 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files):
+def get_mypy_cmd(files, ci=False):
     """Return the appropriate command to be run.
 
     Args:
@@ -780,6 +783,12 @@ def get_mypy_cmd(files):
     Returns:
         list(str). List of command line arguments.
     """
+    # TODO(#13113): Change mypy command to mypy path after Python3 migration.
+    if ci:
+        MYPY_CMD = 'mypy'
+    else:
+        MYPY_CMD = os.path.join(
+            os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
     if files:
         cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files
     else:
@@ -792,17 +801,23 @@ def get_mypy_cmd(files):
     return cmd
 
 
-def install_mypy_prerequisites():
+def install_mypy_prerequisites(ci=False):
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Returns:
         int. The return code from installing prerequisites.
     """
-    cmd = [
-        PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_FILE_PATH,
-        '--target', MYPY_TOOLS_DIR, '--upgrade', '--user', '--prefix=',
-        '--system'
-    ]
+    if ci:
+        cmd = [
+            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
+            MYPY_REQUIREMENTS_FILE_PATH
+        ]
+    else:
+        cmd = [
+            PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_FILE_PATH,
+            '--target', MYPY_TOOLS_DIR, '--upgrade', '--user', '--prefix=',
+            '--system'
+        ]
     process = subprocess.call(
         cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     return process
@@ -822,7 +837,7 @@ def main(args=None):
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
-    return_code = install_mypy_prerequisites()
+    return_code = install_mypy_prerequisites(parsed_args.ci)
     if return_code != 0:
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
@@ -832,7 +847,7 @@ def main(args=None):
         'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(parsed_args, 'files'))
+    cmd = get_mypy_cmd(getattr(parsed_args, 'files'), parsed_args.ci)
 
     _paths_to_insert = [
         MYPY_TOOLS_DIR,
