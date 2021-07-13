@@ -25,7 +25,7 @@ import {
 
 describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
-  let getWrittenTranslation = (text) => {
+  let getWrittenTranslation = (text: string) => {
     return {
       data_format: 'html',
       translation: text,

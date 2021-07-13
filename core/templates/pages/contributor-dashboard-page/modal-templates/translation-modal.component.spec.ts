@@ -212,6 +212,10 @@ describe('Translation Modal Component', () => {
         expect(component.getHtmlSchema().ui_config.language)
           .toBe('ar');
       }));
+
+    it('should get the unicode schema', () => {
+      expect(component.getUnicodeSchema()).toEqual({type: 'unicode'});
+    });
   });
 
   describe('when clicking on the translatable content', () => {

@@ -97,6 +97,7 @@ export class TranslationModalComponent {
     'type': string;
     'ui_config': UiConfig;
   };
+  UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
   hasImgCopyError = false;
@@ -184,7 +185,7 @@ export class TranslationModalComponent {
   }
 
   getUnicodeSchema(): UnicodeSchema {
-    return { type: 'unicode' };
+    return this.UNICODE_SCHEMA;
   }
 
   onContentClick(event: MouseEvent): boolean | void {

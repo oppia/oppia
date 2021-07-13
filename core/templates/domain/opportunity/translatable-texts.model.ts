@@ -18,8 +18,15 @@ import { TranslationBackendDict, WrittenTranslation } from 'domain/exploration/W
  * @fileoverview Frontend Model for translatable texts
  */
 
-export interface ContentIdToContentMapping {
+export interface ContentIdToContentBackendDictMapping {
   [contentId: string]: TranslationBackendDict
+}
+
+export interface StateNamesToContentIdBackendDictMapping {
+  [state: string]: ContentIdToContentBackendDictMapping
+}
+export interface ContentIdToContentMapping {
+  [contentId: string]: WrittenTranslation
 }
 
 export interface StateNamesToContentIdMapping {
@@ -27,7 +34,7 @@ export interface StateNamesToContentIdMapping {
 }
 
 export interface TranslatableTextsBackendDict {
-  'state_names_to_content_id_mapping': StateNamesToContentIdMapping;
+  'state_names_to_content_id_mapping': StateNamesToContentIdBackendDictMapping;
   'version': string;
 }
 
@@ -39,11 +46,11 @@ export class TranslatableTexts {
 
   static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {
-    let stateNamesToContentIdMapping = {};
+    let stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
     for (let stateName in backendDict.state_names_to_content_id_mapping) {
       let contentIdToWrittenTranslationMapping = (
         backendDict.state_names_to_content_id_mapping[stateName]);
-      let contentIdMapping = {};
+      let contentIdMapping: ContentIdToContentMapping = {};
       for (let contentId in contentIdToWrittenTranslationMapping) {
         contentIdMapping[contentId] = new WrittenTranslation(
           contentIdToWrittenTranslationMapping[contentId].data_format,
