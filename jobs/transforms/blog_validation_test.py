@@ -88,10 +88,12 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            blog_validation_errors.InconsistentPublishTimestampsError(
-                invalid_timestamp),
-        ])
+        self.assert_pcoll_equal(output, # type: ignore[no-untyped-call]
+            [
+                blog_validation_errors.InconsistentPublishTimestampsError(
+                    invalid_timestamp),
+            ]
+        )
 
     def test_reports_model_last_updated_timestamp_relationship_error(self):
         # type: () -> None
@@ -111,11 +113,13 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            blog_validation_errors
-            .InconsistentPublishLastUpdatedTimestampsError(
-                invalid_timestamp),
-        ])
+        self.assert_pcoll_equal(output, # type: ignore[no-untyped-call]
+            [
+                blog_validation_errors
+                .InconsistentPublishLastUpdatedTimestampsError(
+                    invalid_timestamp),
+            ]
+        )
 
     def test_process_reports_no_error_if_published_on_is_none(self):
         # type: () -> None
@@ -155,10 +159,12 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            blog_validation_errors.ModelMutatedDuringJobError(
-                invalid_timestamp),
-        ])
+        self.assert_pcoll_equal(output, # type: ignore[no-untyped-call]
+            [
+                blog_validation_errors.ModelMutatedDuringJobError(
+                    invalid_timestamp),
+            ]
+        )
 
 
 class ValidateBlogPostModelDomainObjectsInstancesTests(

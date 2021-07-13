@@ -27,10 +27,10 @@ from jobs.io import ndb_io
 
 import apache_beam as beam
 
-from typing import Any, Text,
+from typing import Any, Text # isort:skip # pylint: disable=unused-import
 
-(blog_models,) = models.Registry.import_models([ # type: ignore[no-untyped-call]
-    models.NAMES.blog, ])
+(blog_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+    [models.NAMES.blog, ])
 
 
 class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc]
@@ -46,8 +46,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform): # type: ignore[misc
         return (
             blog_model_pcoll
             | 'Discard models with empty property value' >> (
-                beam.Filter(lambda model: self.get_property_value(model) != ''
-                ))
+                beam.Filter(lambda model: self.get_property_value(model) != ''))
             | 'Generate (%s, model) key value pairs' % self._property_name >> (
                 beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
             | 'Group pairs by their %s' % self._property_name >> (

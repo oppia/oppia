@@ -31,10 +31,10 @@ from jobs.transforms import base_validation
 
 import apache_beam as beam
 
-from typing import Any
+from typing import Any # pylint: disable=unused-import
 
-(blog_models, user_models) = models.Registry.import_models([  # type: ignore[no-untyped-call]
-    models.NAMES.blog, models.NAMES.user])
+(blog_models, user_models) = models.Registry.import_models(  # type: ignore[no-untyped-call]
+    [models.NAMES.blog, models.NAMES.user])
 
 
 @validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
@@ -77,7 +77,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
         """
         blog_post_rights = (
             blog_services.get_blog_post_rights( # type: ignore[no-untyped-call]
-            item.id, strict=True))
+                item.id, strict=True))
 
         if blog_post_rights.blog_post_is_published:
             return base_validation.VALIDATION_MODES.strict

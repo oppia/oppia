@@ -56,11 +56,13 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='url_fragment_2')
 
-        self.put_multi([ # type: ignore[no-untyped-call]
-            blog_post_model_1,
-            blog_post_model_2,
-            blog_post_model_3,
-        ])
+        self.put_multi( # type: ignore[no-untyped-call]
+            [
+                blog_post_model_1,
+                blog_post_model_2,
+                blog_post_model_3,
+            ]
+        )
 
         self.assert_job_output_is([ # type: ignore[no-untyped-call]
             blog_validation_errors.DuplicateBlogTitleError(
@@ -100,20 +102,23 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='url_fragment_2')
 
-        self.put_multi([ # type: ignore[no-untyped-call]
-            blog_post_summary_model_1,
-            blog_post_summary_model_2,
-            blog_post_summary_model_3,
+        self.put_multi( # type: ignore[no-untyped-call]
+            [
+                blog_post_summary_model_1,
+                blog_post_summary_model_2,
+                blog_post_summary_model_3,
         ])
 
-        self.assert_job_output_is([ # type: ignore[no-untyped-call]
-            blog_validation_errors.DuplicateBlogTitleError(
-                blog_post_summary_model_1
-            ),
-            blog_validation_errors.DuplicateBlogTitleError(
-                blog_post_summary_model_2
-            ),
-        ])
+        self.assert_job_output_is( # type: ignore[no-untyped-call]
+            [
+                blog_validation_errors.DuplicateBlogTitleError(
+                    blog_post_summary_model_1
+                ),
+                blog_validation_errors.DuplicateBlogTitleError(
+                    blog_post_summary_model_2
+                ),
+            ]
+        )
 
 
 class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
@@ -144,11 +149,13 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='diff_url_fragment')
 
-        self.put_multi([ # type: ignore[no-untyped-call]
-            blog_post_model_1,
-            blog_post_model_2,
-            blog_post_model_3,
-        ])
+        self.put_multi( # type: ignore[no-untyped-call]
+            [ 
+                blog_post_model_1,
+                blog_post_model_2,
+                blog_post_model_3,
+            ]
+        )
 
         self.assert_job_output_is([ # type: ignore[no-untyped-call]
             blog_validation_errors.DuplicateBlogUrlError(
@@ -188,11 +195,13 @@ class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
             author_id='user',
             url_fragment='diff_url_fragment')
 
-        self.put_multi([ # type: ignore[no-untyped-call]
-            blog_post_summary_model_1,
-            blog_post_summary_model_2,
-            blog_post_summary_model_3,
-        ])
+        self.put_multi( # type: ignore[no-untyped-call]
+            [
+                blog_post_summary_model_1,
+                blog_post_summary_model_2,
+                blog_post_summary_model_3,
+            ]
+        )
 
         self.assert_job_output_is([ # type: ignore[no-untyped-call]
             blog_validation_errors.DuplicateBlogUrlError(
