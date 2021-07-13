@@ -33,7 +33,7 @@ import apache_beam as beam
 class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = (
+        valid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
@@ -46,7 +46,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
@@ -216,7 +216,7 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_subtopic_page_model(self):
-        invalid_commit_cmd_model = (
+        valid_commit_cmd_model = (
             subtopic_models.SubtopicPageCommitLogEntryModel(
                 id='subtopicpage_id123',
                 created_on=self.YEAR_AGO,
@@ -231,7 +231,7 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 subtopic_validation.ValidateSubtopicPageCommitLogEntryModel())
         )

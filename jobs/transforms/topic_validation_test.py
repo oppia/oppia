@@ -88,7 +88,7 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
 class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
+        valid_commit_cmd_model = topic_models.TopicSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
@@ -99,7 +99,7 @@ class ValidateTopicSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 topic_validation.ValidateTopicSnapshotMetadataModel())
         )
@@ -470,7 +470,7 @@ class ValidateTopicRightsSnapshotMetadataModelTests(
 class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_rights_model(self):
-        invalid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
+        valid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
             id='rights_id123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
@@ -483,7 +483,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 topic_validation.ValidateTopicCommitLogEntryModel())
         )
@@ -491,7 +491,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_validate_topic_model(self):
-        invalid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
+        valid_commit_cmd_model = topic_models.TopicCommitLogEntryModel(
             id='topic_id123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
@@ -504,7 +504,7 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 topic_validation.ValidateTopicCommitLogEntryModel())
         )
