@@ -1867,3 +1867,35 @@ def send_email_to_removed_contribution_reviewer(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_REVIEWER, email_subject, email_body,
             feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_not_mergeable_change_list_to_admin_for_review(
+        exp_id, frontend_version, backend_version, change_list_dict):
+    """Sends an email to the admin to review the not mergeable change list
+    to improve the functionality in future if possible.
+
+    Args:
+        exp_id: str. The ID of an exploration on which the change list was
+            to be applied.
+        frontend_version: int. Version of an exploration from frontend on
+            which a user is working.
+        backend_version: int. Latest version of an exploration on which the
+            change list can not be applied.
+        change_list_dict: dict. Dict of the changes made by the
+            user on the frontend, which are not mergeable.
+    """
+    email_subject = 'Some changes were rejected due to a conflict'
+    email_body_template = (
+        'Hi Admin,<br><br>'
+        'Some draft changes were rejected in exploration %s because the '
+        'changes were conflicting and could not be saved. Please see the '
+        'rejected change list below:<br>'
+        'Discarded change list: %s <br><br>'
+        'Frontend Version: %s<br>'
+        'Backend Version: %s<br><br>'
+        'Thanks!')
+
+    if feconf.CAN_SEND_EMAILS:
+        email_body = email_body_template % (
+            exp_id, change_list_dict, frontend_version, backend_version)
+        send_mail_to_admin(email_subject, email_body)

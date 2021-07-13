@@ -17,6 +17,7 @@
  */
 
 export interface UserInfoBackendDict {
+  'role': string;
   'is_moderator': boolean;
   'is_admin': boolean;
   'is_super_admin': boolean;
@@ -29,6 +30,7 @@ export interface UserInfoBackendDict {
 }
 
 export class UserInfo {
+  _role: string;
   _isModerator: boolean;
   _isAdmin: boolean;
   _isTopicManager: boolean;
@@ -42,10 +44,11 @@ export class UserInfo {
   _isLoggedIn: boolean;
 
   constructor(
-      isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
-      isTopicManager: boolean, canCreateCollections: boolean,
-      preferredSiteLanguageCode: string | null, username: string | null,
-      email: string | null, isLoggedIn: boolean) {
+      role: string, isModerator: boolean, isAdmin: boolean,
+      isSuperAdmin: boolean, isTopicManager: boolean,
+      canCreateCollections: boolean, preferredSiteLanguageCode: string | null,
+      username: string | null, email: string | null, isLoggedIn: boolean) {
+    this._role = role;
     this._isModerator = isModerator;
     this._isAdmin = isAdmin;
     this._isTopicManager = isTopicManager;
@@ -60,14 +63,14 @@ export class UserInfo {
   static createFromBackendDict(
       data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
-      data.is_moderator, data.is_admin, data.is_super_admin,
+      data.role, data.is_moderator, data.is_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
   }
   static createDefault(): UserInfo {
     return new UserInfo(
-      false, false, false, false, false, null, null, null, false);
+      'GUEST', false, false, false, false, false, null, null, null, false);
   }
 
   isModerator(): boolean {
@@ -76,6 +79,14 @@ export class UserInfo {
 
   isAdmin(): boolean {
     return this._isAdmin;
+  }
+
+  isTranslationAdmin(): boolean {
+    return this._role.includes('TRANSLATION_ADMIN');
+  }
+
+  isQuestionAdmin(): boolean {
+    return this._role.includes('QUESTION_ADMIN');
   }
 
   isTopicManager(): boolean {
