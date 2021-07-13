@@ -18,7 +18,7 @@
 
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'pages/exploration-editor-page/history-tab/modal-templates/' +
   'revert-exploration-modal.controller.ts');
