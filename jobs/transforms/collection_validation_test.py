@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 from jobs import job_test_utils
@@ -32,19 +33,17 @@ import apache_beam as beam
     [models.NAMES.base_model, models.NAMES.collection])
 
 
-class ValidateCollectionCommitCmdsSchemaTests(
+class ValidateCollectionSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
         invalid_commit_cmd_model = (
-            collection_models.CollectionCommitLogEntryModel(
-                id='123',
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                committer_id='committer_id',
+                commit_type='delete',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                collection_id='123',
-                post_commit_status='private',
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -53,21 +52,19 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation.ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
 
     def test_collection_change_object_with_missing_cmd(self):
         invalid_commit_cmd_model = (
-            collection_models.CollectionCommitLogEntryModel(
+            collection_models.CollectionSnapshotMetadataModel(
                 id='123',
+                committer_id='committer_id',
+                commit_type='create',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                collection_id='123',
-                post_commit_status='private',
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -75,7 +72,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation.ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -87,14 +84,12 @@ class ValidateCollectionCommitCmdsSchemaTests(
 
     def test_collection_change_object_with_invalid_cmd(self):
         invalid_commit_cmd_model = (
-            collection_models.CollectionCommitLogEntryModel(
+            collection_models.CollectionSnapshotMetadataModel(
                 id='123',
+                committer_id='committer_id',
+                commit_type='create',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                collection_id='123',
-                post_commit_status='private',
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
@@ -102,7 +97,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation.ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -115,14 +110,11 @@ class ValidateCollectionCommitCmdsSchemaTests(
     def test_collection_change_object_with_missing_attribute_in_cmd(self):
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
-                id='model_id-1',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
+                id='123',
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
                 commit_cmds=[{
                     'cmd': 'edit_collection_node_property',
                     'property_name': 'category',
@@ -134,7 +126,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation.ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -152,14 +144,11 @@ class ValidateCollectionCommitCmdsSchemaTests(
     def test_collection_change_object_with_extra_attribute_in_cmd(self):
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
-                id='model_id-1',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
+                id='123',
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
                 commit_cmds=[{
                     'cmd': 'edit_collection_node_property',
                     'exploration_id': 'exploration_id',
@@ -174,7 +163,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation.ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -194,14 +183,11 @@ class ValidateCollectionCommitCmdsSchemaTests(
     def test_collection_change_object_with_invalid_collection_property(self):
         invalid_commit_cmd_model = (
             collection_models.CollectionSnapshotMetadataModel(
-                id='model_id-1',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
+                id='123',
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
                 commit_cmds=[{
                     'cmd': 'edit_collection_property',
                     'property_name': 'invalid',
@@ -214,7 +200,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation.ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -238,3 +224,263 @@ class RelationshipsOfTests(test_utils.TestBase):
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'CollectionSummaryModel', 'id'),
             ['CollectionModel', 'CollectionRightsModel'])
+
+
+class ValidateCollectionRightsSnapshotMetadataModelTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_collection_rights_change_object_with_missing_cmd(self):
+        commit_dict = {'invalid': 'data'}
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Missing cmd key in change dict')
+        ])
+
+    def test_collection_rights_change_object_with_invalid_cmd(self):
+        commit_dict = {'cmd': 'invalid'}
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Command invalid is not allowed')
+        ])
+
+    def test_collection_rights_change_object_with_missing_attribute_in_cmd(
+            self):
+        commit_dict = {
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+        }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'The following required attributes are missing: '
+                'new_role, old_role')
+        ])
+
+    def test_collection_rights_change_object_with_extra_attribute_in_cmd(self):
+        commit_dict = {
+            'cmd': 'change_private_viewability',
+            'old_viewable_if_private': 'old_viewable_if_private',
+            'new_viewable_if_private': 'new_viewable_if_private',
+            'invalid': 'invalid'
+        }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'The following extra attributes are present: invalid')
+        ])
+
+    def test_collection_rights_change_object_with_invalid_role(self):
+        commit_dict = {
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': rights_domain.ROLE_OWNER,
+            'new_role': 'invalid',
+        }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Value for new_role in cmd change_role: '
+                'invalid is not allowed')
+        ])
+
+    def test_collection_rights_change_object_with_invalid_status(self):
+        commit_dict = {
+            'cmd': 'change_collection_status',
+            'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+            'new_status': 'invalid'
+        }
+        invalid_commit_cmd_model = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation
+                .ValidateCollectionRightsSnapshotMetadataModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                commit_dict,
+                'Value for new_status in cmd change_collection_status: '
+                'invalid is not allowed')
+        ])
+
+
+class ValidateCollectionCommitLogEntryModelTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_validate_rights_model(self):
+        invalid_commit_cmd_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='rights_id123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                collection_id='collection_id',
+                user_id='',
+                commit_type='test-type',
+                post_commit_status='private',
+                commit_cmds=[{'cmd': 'create_new'}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation.ValidateCollectionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validate_collection_model(self):
+        invalid_commit_cmd_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='collection_id123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                collection_id='collection_id',
+                user_id='',
+                commit_type='test-type',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation.ValidateCollectionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_raises_commit_cmd_none_error(self):
+        invalid_commit_cmd_model = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='model_id123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                collection_id='collection_id',
+                user_id='',
+                commit_type='test-type',
+                post_commit_status='private',
+                commit_cmds=[{'cmd': 'create_new'}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                collection_validation.ValidateCollectionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
+        ])
