@@ -710,6 +710,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['subtopic_viewer'],
       filename: 'subtopic-viewer-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/subtopic-viewer-page/' +
