@@ -639,15 +639,16 @@ class Exploration(python_utils.OBJECT):
             init_state_name: init_state_dict
         }
 
-        # Calculate proto_size_in_bytes.
-        proto_size_in_bytes = 0
-
         exploration = cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False, proto_size_in_bytes)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
+        # Calculate proto_size_in_bytes.
+        proto_size_in_bytes = 0
+
+        exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 
     @classmethod
@@ -2007,6 +2008,22 @@ class Exploration(python_utils.OBJECT):
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 45
 
+        return exploration_dict
+
+    @classmethod
+    def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
+        """Converts a v50 exploration dict into a v51 exploration dict.
+        Version 51 contains exploration size.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v40.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v51.
+        """
+        exploration_dict['proto_size_in_bytes'] = None
         return exploration_dict
 
     @classmethod
