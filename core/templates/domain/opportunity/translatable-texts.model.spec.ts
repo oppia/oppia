@@ -51,7 +51,7 @@ describe('Translatable Texts model', () => {
       .createFromBackendDict(sampleBackendDict);
   });
 
-  fit('should get state name to content id mapping', () => {
+  it('should get state name to content id mapping', () => {
     const expectedStatewiseContents = {
       state1: {
         1: new WrittenTranslation('html', 'text1', false),
