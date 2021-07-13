@@ -262,7 +262,7 @@ export class LearnerDashboardPageComponent implements OnInit {
         this.collectionPlaylist = responseData.collectionPlaylist;
         this.activeSection = (
           LearnerDashboardPageConstants
-            .LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME);
+            .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE);
         this.activeSubsection = (
           LearnerDashboardPageConstants
             .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);

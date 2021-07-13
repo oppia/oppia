@@ -15,7 +15,6 @@
     <div *ngFor="let topicSummaryTile of currentGoals">
       <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index" class="story-summary-tile">
         <oppia-learner-story-summary-tile [storySummary]="storySummaryTile"
-                                          [topicTitle]="topicSummaryTile.name"
                                           [displayArea]="'homeTab'">
         </oppia-learner-story-summary-tile>
       </div>

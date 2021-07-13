@@ -212,7 +212,6 @@ describe('Goals tab Component', () => {
     component.completedGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict3)];
     component.learntToPartiallyLearntTopics = [];
-    component.MAX_CURRENT_GOALS_LENGTH = 5;
     component.currentGoalsStoryIsShown = [];
     component.topicBelongToCurrentGoals = [];
     component.topicIdsInCompletedGoals = [];
