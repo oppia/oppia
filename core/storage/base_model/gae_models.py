@@ -264,8 +264,8 @@ class BaseModel(datastore_services.Model):
             entities.insert(index, None)
 
         if not include_deleted:
-            for i in python_utils.RANGE(len(entities)):
-                if entities[i] and entities[i].deleted:
+            for i, entity in enumerate(entities):
+                if entity and entity.deleted:
                     entities[i] = None
         return entities
 
@@ -379,7 +379,8 @@ class BaseModel(datastore_services.Model):
         for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
-                ID_LENGTH)
+                ID_LENGTH
+            )
             if not cls.get_by_id(new_id):
                 return new_id
 
@@ -421,7 +422,7 @@ class BaseModel(datastore_services.Model):
             page_size, start_cursor=start_cursor)
         return (
             result[0],
-            (result[1].urlsafe() if result[1] else None),
+            (result[1].urlsafe().decode('utf-8') if result[1] else None),
             result[2])
 
 

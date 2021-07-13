@@ -133,6 +133,18 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/thanks-page.mainpage.html'
 )
 
+# These are the env vars that need to be removed from the app.yaml when we are
+# deploying to production.
+ENV_VARS_TO_REMOVE_FROM_DEPLOY_APP_YAML = (
+    'FIREBASE_AUTH_EMULATOR_HOST',
+    'DATASTORE_DATASET',
+    'DATASTORE_EMULATOR_HOST',
+    'DATASTORE_EMULATOR_HOST_PATH',
+    'DATASTORE_HOST',
+    'DATASTORE_PROJECT_ID',
+    'DATASTORE_USE_PROJECT_ID_AS_APP_ID'
+)
+
 # NOTE: These pages manage user sessions. Thus, we should never reject or
 # replace them when running in maintenance mode; otherwise admins will be unable
 # to access the site.
@@ -221,7 +233,8 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         content = content.replace('version: default', '')
         # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
         # test locally, and MUST NOT be included in the deployed file.
-        content = re.sub('  FIREBASE_AUTH_EMULATOR_HOST: ".*"\n', '', content)
+        for env_variable in ENV_VARS_TO_REMOVE_FROM_DEPLOY_APP_YAML:
+            content = re.sub('  %s: ".*"\n' % env_variable, '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
@@ -755,7 +768,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                 # The path in hashes.json file is in posix style,
                 # see the comment above HASHES_JSON_FILENAME for details.
                 relative_path = common.convert_to_posixpath(
-                    os.path.relpath(source_path, source))
+                    os.path.relpath(source_path, start=source))
                 if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
                     relative_path = (
@@ -818,7 +831,7 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
     for root, _, filenames in os.walk(source_dir):
         for filename in filenames:
             filepath = os.path.join(root, filename)
-            relative_filepath = os.path.relpath(filepath, source_dir)
+            relative_filepath = os.path.relpath(filepath, start=source_dir)
             if should_file_be_built(filepath) and any(
                     filename.endswith(p) for p in file_extensions):
                 filepaths.append(relative_filepath)
@@ -853,7 +866,7 @@ def get_file_hashes(directory_path):
                 complete_filepath = common.convert_to_posixpath(
                     os.path.join(root, filename))
                 relative_filepath = common.convert_to_posixpath(os.path.relpath(
-                    complete_filepath, directory_path))
+                    complete_filepath, start=directory_path))
                 file_hashes[relative_filepath] = generate_md5_hash(
                     complete_filepath)
 
@@ -1042,7 +1055,7 @@ def generate_delete_tasks_to_remove_deleted_files(
                 # hashes is in posix style, we need to convert it so the check
                 # can run correctly.
                 relative_path = common.convert_to_posixpath(
-                    os.path.relpath(target_path, staging_directory))
+                    os.path.relpath(target_path, start=staging_directory))
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
@@ -1220,7 +1233,7 @@ def _verify_hashes(output_dirnames, file_hashes):
                 if hash_should_be_inserted(converted_filepath):
                     # Obtain the same filepath format as the hash dict's key.
                     relative_filepath = os.path.relpath(
-                        os.path.join(root, filename), built_dir)
+                        os.path.join(root, filename), start=built_dir)
                     _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
@@ -1305,10 +1318,10 @@ def generate_build_directory(hashes):
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
         THIRD_PARTY_GENERATED_OUT_DIR, WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
     assert len(copy_input_dirs) == len(copy_output_dirs)
-    for i in python_utils.RANGE(len(copy_input_dirs)):
+    for i, copy_input_dir in enumerate(copy_input_dirs):
         safe_delete_directory_tree(copy_output_dirs[i])
         copy_tasks += generate_copy_tasks_to_copy_from_source_to_target(
-            copy_input_dirs[i], copy_output_dirs[i], hashes)
+            copy_input_dir, copy_output_dirs[i], hashes)
     _execute_tasks(copy_tasks)
 
     _verify_hashes(copy_output_dirs, hashes)

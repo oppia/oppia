@@ -185,12 +185,19 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             A tuple containing the list of the ClassifierTrainingJobModels
             with status new or pending and the offset value.
         """
-        query = cls.query(cls.status.IN([
-            feconf.TRAINING_JOB_STATUS_NEW,
-            feconf.TRAINING_JOB_STATUS_PENDING])).filter(
-                cls.next_scheduled_check_time <= (
-                    datetime.datetime.utcnow())).order(
-                        cls.next_scheduled_check_time, cls._key)
+        query = (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.status.IN([
+                        feconf.TRAINING_JOB_STATUS_NEW,
+                        feconf.TRAINING_JOB_STATUS_PENDING
+                    ]),
+                    cls.next_scheduled_check_time <= datetime.datetime.utcnow()
+                )
+            )
+            .order(cls.next_scheduled_check_time)
+        )
 
         job_models = query.fetch(
             NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
@@ -285,8 +292,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         Returns:
             str. ID of the new Classifier Exploration Mapping instance.
         """
-        new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return python_utils.convert_to_bytes(new_id)
+        return '%s.%s.%s' % (exp_id, exp_version, state_name)
 
     @classmethod
     def get_models(cls, exp_id, exp_version, state_names):

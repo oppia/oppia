@@ -17,7 +17,7 @@
 """Tests interface for storage model switching."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
@@ -148,7 +148,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_models_recommendations(self):
         """Tests import_models function with recommendations option."""
-        from core.storage.recommendations import gae_models as recommendations_models # pylint: disable=line-too-long
+        from core.storage.recommendations import gae_models as recommendations_models  # isort:skip pylint: disable=line-too-long
         expected_recommendations_models = (recommendations_models,)
         self.assertEqual(
             expected_recommendations_models,
@@ -242,17 +242,17 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_datastore_services(self):
         """Tests import datastore services function."""
-        from core.platform.datastore import gae_datastore_services
+        from core.platform.datastore import cloud_datastore_services
         self.assertEqual(
             self.registry_instance.import_datastore_services(),
-            gae_datastore_services)
+            cloud_datastore_services)
 
     def test_import_transaction_services(self):
         """Tests import transaction services function."""
-        from core.platform.transactions import gae_transaction_services
+        from core.platform.transactions import cloud_transaction_services
         self.assertEqual(
             self.registry_instance.import_transaction_services(),
-            gae_transaction_services)
+            cloud_transaction_services)
 
     def test_import_auth_services(self):
         """Tests import auth services function."""
@@ -291,7 +291,8 @@ class RegistryUnitTest(test_utils.TestBase):
                 self.swap(constants, 'DEV_MODE', False)):
             with self.assertRaisesRegexp(
                 Exception,
-                'Invalid email service provider: invalid service provider'):
+                'Invalid email service provider: invalid service provider'
+            ):
                 self.registry_instance.import_email_services()
 
     def test_import_bulk_email_services_mailchimp(self):
@@ -330,12 +331,6 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
-        with self.swap(constants, 'EMULATOR_MODE', False):
-            from core.platform.taskqueue import cloud_taskqueue_services
-            self.assertEqual(
-                self.registry_instance.import_taskqueue_services(),
-                cloud_taskqueue_services)
-
         from core.platform.taskqueue import dev_mode_taskqueue_services
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
@@ -348,8 +343,7 @@ class RegistryUnitTest(test_utils.TestBase):
             self.assertEqual(
                 self.registry_instance.import_cloud_translate_services(),
                 cloud_translate_services)
-        from core.platform.cloud_translate import (
-            dev_mode_cloud_translate_services)
+        from core.platform.cloud_translate import dev_mode_cloud_translate_services  # isort:skip pylint: disable=line-too-long
         self.assertEqual(
             self.registry_instance.import_cloud_translate_services(),
             dev_mode_cloud_translate_services)

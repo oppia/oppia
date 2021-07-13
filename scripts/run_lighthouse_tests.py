@@ -67,15 +67,15 @@ def run_lighthouse_puppeteer_script():
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-        for line in stdout.split('\n'):
-            export_url(line)
+        for line in stdout.split(b'\n'):
+            export_url(line.decode('utf-8'))
         python_utils.PRINT('Puppeteer script completed successfully.')
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
-        python_utils.PRINT(stdout)
+        python_utils.PRINT(stdout.decode('utf-8'))
         python_utils.PRINT('ERROR:')
-        python_utils.PRINT(stderr)
+        python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Puppeteer script failed. More details can be found above.')
         sys.exit(1)
@@ -92,7 +92,6 @@ def run_webpack_compilation():
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
-            return
         if os.path.isdir(webpack_bundles_dir_name):
             break
     if not os.path.isdir(webpack_bundles_dir_name):
@@ -147,9 +146,9 @@ def run_lighthouse_checks(lighthouse_mode):
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
-        python_utils.PRINT(stdout)
+        python_utils.PRINT(stdout.decode('utf-8'))
         python_utils.PRINT('ERROR:')
-        python_utils.PRINT(stderr)
+        python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
@@ -188,6 +187,7 @@ def main(args=None):
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
+            stack.enter_context(servers.managed_cloud_datastore_emulator())
 
         stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],

@@ -24,10 +24,8 @@ import os
 import re
 
 from constants import constants
-from core import jobs
 from core.domain import auth_domain
 from core.domain import param_domain
-from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import python_utils
@@ -349,31 +347,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             test_utils.FailingFunction(function, MockError, -1)
 
 
-class FailingMapReduceJobManager(jobs.BaseMapReduceJobManager):
-    """Test job that fails because map is a classmethod."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return []
-
-    @classmethod
-    def map(cls):
-        pass
-
-
 class TestUtilsTests(test_utils.GenericTestBase):
-
-    def test_failing_job(self):
-        self.assertIsNone(FailingMapReduceJobManager.map())
-
-        job_id = FailingMapReduceJobManager.create_new()
-        FailingMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(None), 1)
-        self.assertRaisesRegexp(
-            RuntimeError, 'MapReduce task failed: Task<.*>',
-            self.process_and_flush_pending_mapreduce_tasks)
 
     def test_get_static_asset_url(self):
         asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
@@ -483,11 +457,14 @@ class TestUtilsTests(test_utils.GenericTestBase):
         obj = mock.Mock()
         obj.func = lambda: python_utils.divide(1, 0)
 
-        self.assertRaisesRegexp(
-            ZeroDivisionError, 'integer division or modulo by zero', obj.func)
+        with self.assertRaisesRegexp(
+            ZeroDivisionError, 'integer division or modulo by zero'
+        ):
+            obj.func()
 
         with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
-            self.assertRaisesRegexp(ValueError, 'abc', obj.func)
+            with self.assertRaisesRegexp(ValueError, 'abc'):
+                obj.func()
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
@@ -609,7 +586,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             NotImplementedError,
             'self.assertRaises should not be used in these tests. Please use '
-            'self.assertRaisesRegexp instead.'):
+            'self.assertRaisesRegexp instead.'
+        ):
             self.assertRaises(Exception, mock_exception_func)
 
     def test_assert_raises_regexp_with_empty_string(self):
@@ -619,7 +597,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Please provide a sufficiently strong regexp string to '
-            'validate that the correct error is being raised.'):
+            'validate that the correct error is being raised.'
+        ):
             self.assertRaisesRegexp(Exception, '', mock_exception_func)
 
 

@@ -33,9 +33,9 @@ class MockJobMetaclass(base_jobs.JobMetaclass):
     _JOB_REGISTRY = {}
 
     @classmethod
-    def clear(mcs):
+    def clear(cls):
         """Clears the registry of jobs."""
-        mcs._JOB_REGISTRY.clear()
+        cls._JOB_REGISTRY.clear()
 
 
 class JobMetaclassTests(test_utils.TestBase):

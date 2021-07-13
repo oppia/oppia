@@ -420,7 +420,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             observed_log_messages[0],
             'ValidationError Command invalid command is not allowed '
-            'collection_id [{u\'cmd\': u\'invalid command\'}]')
+            'collection_id [{\'cmd\': \'invalid command\'}]')
 
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
@@ -1227,10 +1227,9 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             collection_services.load_demo('invalid_collection_id')
 
     def test_demo_file_path_ends_with_yaml(self):
-        for collection_id in feconf.DEMO_COLLECTIONS:
+        for collection_path in feconf.DEMO_COLLECTIONS.values():
             demo_filepath = os.path.join(
-                feconf.SAMPLE_COLLECTIONS_DIR,
-                feconf.DEMO_COLLECTIONS[collection_id])
+                feconf.SAMPLE_COLLECTIONS_DIR, collection_path)
 
             self.assertTrue(demo_filepath.endswith('yaml'))
 

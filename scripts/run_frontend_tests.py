@@ -133,7 +133,7 @@ def main(args=None):
         if len(line) == 0 and task.poll() is not None:
             break
         if line:
-            python_utils.PRINT(line, end='')
+            python_utils.PRINT(line.decode('utf-8'), end='')
             output_lines.append(line)
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)

@@ -147,7 +147,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertEqual(filenames, ['img.svg', 'img2.svg'])
+        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -1114,7 +1114,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, '\'unicode\' object has no attribute \'cmd\'')
+            Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(

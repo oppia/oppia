@@ -19,9 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
-
-from google.appengine.api import app_identity
+import os
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
@@ -29,13 +27,10 @@ _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 def get_application_id():
     """Returns the application's App Engine ID.
 
-    For more information, see
-    https://cloud.google.com/appengine/docs/python/appidentity/
-
     Returns:
         str. The application ID.
     """
-    return app_identity.get_application_id()
+    return os.getenv('GOOGLE_CLOUD_PROJECT')
 
 
 def get_gcs_resource_bucket_name():
@@ -53,12 +48,4 @@ def get_gcs_resource_bucket_name():
     Returns:
         str. The bucket name for the application's GCS resources.
     """
-    if constants.EMULATOR_MODE:
-        return get_default_gcs_bucket_name()
-    else:
-        return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX
-
-
-def get_default_gcs_bucket_name():
-    """Gets the default Google Cloud Storage bucket name for the app."""
-    return app_identity.get_default_gcs_bucket_name()
+    return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX

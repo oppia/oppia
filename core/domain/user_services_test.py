@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import logging
 import os
+import re
 
 from constants import constants
 from core.domain import auth_services
@@ -245,8 +246,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             (None, 'Expected email to be a string, received None'),
             (
                 ['a', '@', 'b.com'],
-                r'Expected email to be a string, received '
-                r'\[u\'a\', u\'@\', u\'b.com\'\]')]
+                re.escape(
+                    'Expected email to be a string, received '
+                    '[\'a\', \'@\', \'b.com\']'
+                )
+            )
+        ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)
@@ -277,7 +282,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                python_utils.convert_to_bytes(ind), actual_email)
+                python_utils.UNICODE(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_user_id_from_username(self):
@@ -2248,6 +2253,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_1_id, 'hi')
+        self.process_and_flush_pending_tasks()
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)

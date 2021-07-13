@@ -108,9 +108,11 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         with self.print_swap:
             task.start()
             task.join()
-        self.assertTrue(
-            'test_function() takes exactly 1 argument '
-            '(0 given)' in self.task_stdout)
+        self.assertIn(
+            'test_function() missing 1 required '
+            'positional argument: \'unused_arg\'',
+            self.task_stdout
+        )
 
     def test_task_thread_with_verbose_mode_enabled(self):
         class HelperTests(python_utils.OBJECT):
@@ -188,6 +190,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
-        self.assertTrue(
-            'test_function() takes exactly 1 argument '
-            '(0 given)' in self.task_stdout)
+        self.assertIn(
+            'test_function() missing 1 required '
+            'positional argument: \'unused_arg\'',
+            self.task_stdout
+        )

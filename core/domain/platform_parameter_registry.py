@@ -136,10 +136,7 @@ class Registry(python_utils.OBJECT):
         if parameter_from_cache is not None:
             return parameter_from_cache
 
-        parameter = None
-
-        parameter_from_storage = cls.load_platform_parameter_from_storage(
-            name)
+        parameter_from_storage = cls.load_platform_parameter_from_storage(name)
         if parameter_from_storage is not None:
             parameter = parameter_from_storage
         elif name in cls.parameter_registry:

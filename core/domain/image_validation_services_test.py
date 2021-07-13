@@ -65,7 +65,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
             'The svg tag does not contains the \'xmlns\' attribute.')
 
         self._assert_validation_error(
-            'not an image', 'image.png', 'Image not recognized')
+            b'not an image', 'image.png', 'Image not recognized')
 
         self._assert_validation_error(
             self.raw_image, '.png', 'Invalid filename')

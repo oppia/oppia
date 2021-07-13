@@ -43,7 +43,7 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
-sys.path.insert(0, _YAML_PATH) # type: ignore[arg-type]
+sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
@@ -53,7 +53,7 @@ PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
-T = TypeVar('T')
+T = TypeVar('T') # pylint: disable=invalid-name
 
 # TODO(#13059): Every use of constants is followed by
 # 'type: ignore[attr-defined]' because mypy is not able to identify the
@@ -210,8 +210,7 @@ def to_ascii(input_string):
     Returns:
         str. String containing the ascii representation of the input string.
     """
-    return unicodedata.normalize(
-        'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
+    return unicodedata.normalize('NFKD', python_utils.UNICODE(input_string))
 
 
 def dict_from_yaml(yaml_str):
@@ -309,13 +308,12 @@ def convert_png_data_url_to_binary(image_data_url):
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
             python_utils.urllib_unquote( # type: ignore[no-untyped-call]
-                image_data_url[len(PNG_DATA_URL_PREFIX):]))
+                image_data_url[len(PNG_DATA_URL_PREFIX):])).decode('utf-8')
     else:
         raise Exception('The given string does not represent a PNG data URL.')
 
 
-def convert_png_binary_to_data_url(content):
-    # type: (Text) -> Text
+def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
@@ -333,7 +331,7 @@ def convert_png_binary_to_data_url(content):
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(content.encode('utf-8'))) # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -459,9 +457,9 @@ def convert_to_hash(input_string, max_length):
         hashlib.sha1(
             python_utils.convert_to_bytes(input_string)).digest(), # type: ignore[no-untyped-call]
         altchars=b'ab'
-    ).replace('=', 'c')
+    ).replace(b'=', b'c')
 
-    return encoded_string[:max_length]
+    return encoded_string[:max_length].decode('utf-8')
 
 
 def base64_from_int(value):
@@ -474,8 +472,9 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']' # type: ignore[no-untyped-call]
-    return base64.b64encode(byte_value)
+    byte_value = (
+        b'[' + python_utils.UNICODE(value).encode(encoding='utf-8') + b']')
+    return base64.b64encode(byte_value).decode('utf-8')
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -616,7 +615,7 @@ def generate_random_string(length):
     Returns:
         str. Random string of specified length.
     """
-    return base64.urlsafe_b64encode(os.urandom(length))[:length]
+    return base64.urlsafe_b64encode(os.urandom(length))[:length].decode('utf-8')
 
 
 def generate_new_session_id():
@@ -970,7 +969,7 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string).decode('utf-8') # type: ignore[no-any-return, no-untyped-call]
+    return python_utils.urllib_unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str):
@@ -1075,7 +1074,7 @@ def compute_list_difference(list_a, list_b):
     Returns:
         list. List of the set difference of list_a - list_b.
     """
-    return list(set(list_a) - set(list_b))
+    return list(sorted(set(list_a) - set(list_b)))
 
 
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic

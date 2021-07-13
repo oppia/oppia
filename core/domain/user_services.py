@@ -207,7 +207,7 @@ def get_gravatar_url(email):
     """
     return (
         'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' %
-        (hashlib.md5(email).hexdigest(), GRAVATAR_SIZE_PX))
+        (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
 def fetch_gravatar(email):
@@ -498,6 +498,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
     if not past_user_contribution_rights.can_review_questions and (
             future_user_contribution_rights.can_review_questions):
         stats_model.question_reviewer_count += 1
+
     # Update translation reviewer counts.
     for language_code in languages_that_reviewer_can_no_longer_review:
         stats_model.translation_reviewer_counts_by_lang_code[
@@ -1357,20 +1358,6 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
-def update_last_logged_in(user_settings, new_last_logged_in):
-    """Updates last_logged_in to the new given datetime for the user with
-    given user_settings. Should only be used by tests.
-
-    Args:
-        user_settings: UserSettings. The UserSettings domain object.
-        new_last_logged_in: datetime or None. The new datetime of the last
-            logged in session.
-    """
-
-    user_settings.last_logged_in = new_last_logged_in
-    _save_user_settings(user_settings)
-
-
 def record_user_edited_an_exploration(user_id):
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
@@ -1773,6 +1760,19 @@ def parse_date_from_string(datetime_str):
     }
 
 
+def get_user_stats_model(user_id):
+    """Gets the user stats model for the given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        UserStatsModel|None. The user stats model associated with
+        the given user_id.
+    """
+    return user_models.UserStatsModel.get(user_id, strict=False)
+
+
 def get_user_impact_score(user_id):
     """Gets the user impact score for the given user_id.
 
@@ -1891,10 +1891,7 @@ def is_at_least_moderator(user_id):
         bool. True if user is atleast a moderator, False otherwise.
     """
     user_role = get_user_role_from_id(user_id)
-    if (user_role == feconf.ROLE_ID_MODERATOR or
-            user_role == feconf.ROLE_ID_ADMIN):
-        return True
-    return False
+    return user_role in (feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN)
 
 
 def is_admin(user_id):
@@ -1907,9 +1904,7 @@ def is_admin(user_id):
         bool. True if user is an admin, False otherwise.
     """
     user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_ADMIN:
-        return True
-    return False
+    return user_role == feconf.ROLE_ID_ADMIN
 
 
 def is_topic_manager(user_id):
@@ -1922,9 +1917,7 @@ def is_topic_manager(user_id):
         bool. Whether the user is a topic manager.
     """
     user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
-        return True
-    return False
+    return user_role == feconf.ROLE_ID_TOPIC_MANAGER
 
 
 def can_review_translation_suggestions(user_id, language_code=None):
@@ -2022,19 +2015,22 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
     _save_user_contribution_rights(user_contribution_rights)
 
 
-def remove_translation_review_rights_in_language(user_id, language_code):
+def remove_translation_review_rights_in_language(
+        user_id, language_code_to_remove):
     """Removes the user's review rights to translation suggestions in the given
     language_code.
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language. Callers should ensure that
-            the user already has rights to review translations in the given
-            language code.
+        language_code_to_remove: str. The code of the language. Callers should
+            ensure that the user already has rights to review translations in
+            the given language code.
     """
     user_contribution_rights = get_user_contribution_rights(user_id)
-    user_contribution_rights.can_review_translation_for_language_codes.remove(
-        language_code)
+    user_contribution_rights.can_review_translation_for_language_codes = [
+        lang_code for lang_code
+        in user_contribution_rights.can_review_translation_for_language_codes
+        if lang_code != language_code_to_remove]
     _update_user_contribution_rights(user_contribution_rights)
 
 
@@ -2047,7 +2043,6 @@ def remove_blog_editor(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     if feconf.ROLE_ID_BLOG_POST_EDITOR == user_settings.role:
         update_user_role(user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
-    return
 
 
 def allow_user_to_review_voiceover_in_language(user_id, language_code):

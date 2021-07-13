@@ -359,10 +359,11 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_2), expected_status_int=302)
             self.assertEqual(
-                'http://localhost/explore/1?topic_url_fragment=topic'
-                '&story_url_fragment=title-one&node_id=node_1'
-                '&classroom_url_fragment=staging',
-                response.headers['location'])
+                'http://localhost/explore/1?classroom_url_fragment=staging'
+                '&topic_url_fragment=topic&story_url_fragment=title-one'
+                '&node_id=node_1',
+                response.headers['location']
+            )
 
     def test_post_fails_when_new_structures_not_enabled(self):
         csrf_token = self.get_new_csrf_token()

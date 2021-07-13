@@ -852,9 +852,8 @@ class Exploration(python_utils.OBJECT):
                 'Expected states to be a dict, received %s' % self.states)
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
-        for state_name in self.states:
+        for state_name, state in self.states.items():
             self._validate_state_name(state_name)
-            state = self.states[state_name]
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
@@ -1020,11 +1019,11 @@ class Exploration(python_utils.OBJECT):
                 interaction = state.interaction
                 if interaction.is_terminal:
                     if state_name != self.init_state_name:
-                        if self.states[state_name].card_is_checkpoint:
+                        if state.card_is_checkpoint:
                             raise utils.ValidationError(
                                 'Expected card_is_checkpoint of terminal state '
                                 'to be False but found it to be %s'
-                                % self.states[state_name].card_is_checkpoint
+                                % state.card_is_checkpoint
                             )
 
             # Check if checkpoint count is between 1 and 8, inclusive.
@@ -1470,8 +1469,7 @@ class Exploration(python_utils.OBJECT):
             self.update_init_state_name(new_state_name)
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
-        for other_state_name in self.states:
-            other_state = self.states[other_state_name]
+        for other_state in self.states.values():
             other_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in other_outcomes:
                 if outcome.dest == old_state_name:
@@ -1496,8 +1494,7 @@ class Exploration(python_utils.OBJECT):
 
         # Find all destinations in the exploration which equal the deleted
         # state, and change them to loop back to their containing state.
-        for other_state_name in self.states:
-            other_state = self.states[other_state_name]
+        for other_state_name, other_state in self.states.items():
             all_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in all_outcomes:
                 if outcome.dest == state_name:
@@ -1548,7 +1545,7 @@ class Exploration(python_utils.OBJECT):
         }
         new_states = self.states
 
-        for new_state_name in new_states:
+        for new_state_name in sorted(new_states):
             new_state = new_states[new_state_name]
             if not new_state.can_undergo_classification():
                 continue

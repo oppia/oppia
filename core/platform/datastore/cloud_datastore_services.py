@@ -26,25 +26,37 @@ import functools
 from core.platform import models
 import python_utils
 
-from google.appengine.api import datastore_types
-from google.appengine.datastore import datastore_query
-from google.appengine.datastore import datastore_stub_util
-from google.appengine.ext import ndb
+from google.cloud import ndb
 
 transaction_services = models.Registry.import_transaction_services()
+
 Model = ndb.Model
 Key = ndb.Key
 Property = ndb.Property
 Query = ndb.Query
+RedisCache = ndb.RedisCache
 
 BooleanProperty = ndb.BooleanProperty
 DateProperty = ndb.DateProperty
-ComputedProperty = ndb.ComputedProperty
 DateTimeProperty = ndb.DateTimeProperty
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
 JsonProperty = ndb.JsonProperty
-UserProperty = ndb.UserProperty
+
+CLIENT = ndb.Client()
+
+
+def get_ndb_context(**kwargs):
+    """Get the context of the Cloud NDB. This context need to be entered in
+    order to do any Cloud NDB operations.
+
+    Returns:
+        ndb.context.Context. Cloud NDB context.
+    """
+    context = ndb.get_context(raise_context_error=False)
+    return (
+        CLIENT.context(**kwargs) if context is None else
+        contextlib.nullcontext(enter_result=context))
 
 
 @functools.wraps(ndb.StringProperty)
@@ -129,31 +141,9 @@ def delete_multi(keys):
     return ndb.delete_multi(keys)
 
 
-def transaction(callback):
-    """Run a callback in a transaction.
-
-    To pass arguments to a callback function, use a lambda, for example:
-
-    def my_callback(key, inc): do_something()
-    transaction(lambda: my_callback(Key(...), 1))
-
-    Args:
-        callback: callable. A function or tasklet to be called.
-
-    Returns:
-        *. Whatever callback() returns.
-
-    Raises:
-        Exception. Whatever callback() raises, or
-            datastore_errors.TransactionFailedError when the transaction failed.
-    """
-    return ndb.transaction(
-        callback, xg=True, propagation=ndb.TransactionOptions.ALLOWED)
-
-
-def query_everything():
+def query_everything(**kwargs):
     """Returns a query that targets every single entity in the datastore."""
-    return ndb.Query()
+    return ndb.Query(**kwargs)
 
 
 def all_of(*nodes):
@@ -204,7 +194,7 @@ def make_cursor(urlsafe_cursor=None):
     Returns:
         datastore_query.Cursor. A cursor into an arbitrary query.
     """
-    return datastore_query.Cursor(urlsafe=urlsafe_cursor)
+    return ndb.Cursor(urlsafe=urlsafe_cursor)
 
 
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):
@@ -239,16 +229,6 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     return all_models_grouped_by_model_type
 
 
-def make_instantaneous_global_consistency_policy():
-    """Returns a policy that always gives the same sequence of consistency
-    decisions.
-
-    Returns:
-        datastore_stub_util.PseudoRandomHRConsistencyPolicy. The policy.
-    """
-    return datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1.0)
-
-
 @contextlib.contextmanager
 def mock_datetime_for_datastore(mocked_now):
     """Mocks parts of the datastore to accept a fake datetime type that always
@@ -274,41 +254,26 @@ def mock_datetime_for_datastore(mocked_now):
 
     old_datetime_type = datetime.datetime
 
-    class MockDatetimeType(type):
+    class MockDatetimeType(type(datetime.datetime)):
         """Pretends to be a datetime.datetime object."""
 
-        def __instancecheck__(cls, other):
+        def __instancecheck__(self, other):
             """Validates whether the given instance is a datetime instance."""
             return isinstance(other, old_datetime_type)
 
-    class MockDatetime( # pylint: disable=inherit-non-class
+    class MockDatetime( # pylint: disable=inherit-non-class, invalid-metaclass
             python_utils.with_metaclass(MockDatetimeType, old_datetime_type)):
         """Always returns mocked_now as the current time."""
 
         @classmethod
         def utcnow(cls):
             """Returns the mocked datetime."""
-
             return mocked_now
 
     setattr(datetime, 'datetime', MockDatetime)
     setattr(ndb.DateTimeProperty, 'data_type', MockDatetime)
-
-    # Updates datastore types for MockDatetime to ensure that validation of ndb
-    # datetime properties does not fail.
-    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] = ( # pylint: disable=protected-access
-        datastore_types.ValidatePropertyNothing)
-    datastore_types._PACK_PROPERTY_VALUES[MockDatetime] = ( # pylint: disable=protected-access
-        datastore_types.PackDatetime)
-    datastore_types._PROPERTY_MEANINGS[MockDatetime] = ( # pylint: disable=protected-access
-        datastore_types.entity_pb.Property.GD_WHEN)
-
     try:
         yield
     finally:
-        # Resets the datastore types to forget the mocked types.
-        del datastore_types._PROPERTY_MEANINGS[MockDatetime] # pylint: disable=protected-access
-        del datastore_types._PACK_PROPERTY_VALUES[MockDatetime] # pylint: disable=protected-access
-        del datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime] # pylint: disable=protected-access
-        setattr(ndb.DateTimeProperty, 'data_type', datetime.datetime)
         setattr(datetime, 'datetime', old_datetime_type)
+        setattr(ndb.DateTimeProperty, 'data_type', old_datetime_type)

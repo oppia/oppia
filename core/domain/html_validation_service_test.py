@@ -20,13 +20,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import re
 
-import bs4
 from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.tests import test_utils
 import feconf
 import python_utils
+
+import bs4
 
 
 class ContentMigrationTests(test_utils.GenericTestBase):
@@ -145,7 +147,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ]
         }
 
-        self.assertEqual(
+        self.assertItemsEqual(
             actual_output_for_ckeditor, expected_output_for_ckeditor)
 
     def test_validate_soup_for_rte(self):
@@ -500,7 +502,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'url-with-value="&amp;quot;http://google.com&amp;quot;">'
                 '</oppia-noninteractive-link></p>'
             )],
-            'Missing keys: [u\'title\'], Extra keys: [u\'url\']': [(
+            'Missing keys: [\'title\'], Extra keys: [\'url\']': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value="'
                 '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
                 'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'
@@ -509,7 +511,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
                 '&amp;quot;Savjet 1&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
-            'Could not convert unicode to int: Hello': [(
+            'Could not convert str to int: Hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
                 'end-with-value="0" start-with-value="&amp;quot;Hello&amp;'
                 'quot;" video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
@@ -536,8 +538,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )]}
 
         self.assertEqual(set(actual_output.keys()), set(expected_output.keys()))
-        for key in expected_output:
-            self.assertEqual(set(actual_output[key]), set(expected_output[key]))
+        for key, expected in expected_output.items():
+            self.assertEqual(set(actual_output[key]), set(expected))
 
     def test_validate_customization_args_in_tag(self):
         test_cases = [{
@@ -580,7 +582,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'or \'https://\'; received htt://link.com'
             )],
             ['Missing attributes: alt-with-value, Extra attributes: '],
-            [u'Expected dict, received [1, 2, 3]']
+            ['Expected dict, received [1, 2, 3]']
         ]
         for test_case in test_cases:
             html_string = test_case['html_string']
@@ -779,7 +781,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
         with self.assertRaisesRegexp(
-            Exception, 'No JSON object could be decoded'
+            Exception, re.escape('Expecting value: line 1 column 1 (char 0)')
         ):
             html_validation_service.add_math_content_to_math_rte_components(
                 invalid_cases[0]['html_content'])
@@ -1173,12 +1175,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'alid_4d123_width_23d122_vertical_2d123.svg')
             }]
 
-        self.assertEqual(
-            sorted(
-                html_validation_service.
-                validate_math_content_attribute_in_html(
-                    html_string_with_filename_having_invalid_format)), sorted(
-                        expected_output))
+        self.assertItemsEqual(
+            html_validation_service.validate_math_content_attribute_in_html(
+                html_string_with_filename_having_invalid_format
+            ),
+            expected_output
+        )
 
     def test_check_for_math_component_in_html(self):
         """Test that the check_for_math_component_in_html method checks for

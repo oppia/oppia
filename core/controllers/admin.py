@@ -273,7 +273,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif action == 'update_feature_flag_rules':
+            elif self.payload.get('action') == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rule_dicts = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')
@@ -309,11 +309,10 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
-            exp_services.load_demo(python_utils.convert_to_bytes(
-                exploration_id))
+            exp_services.load_demo(python_utils.UNICODE(exploration_id))
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    exploration_id))
+                user_services.get_system_user(),
+                python_utils.UNICODE(exploration_id))
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -617,11 +616,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(
-                python_utils.convert_to_bytes(collection_id))
+            collection_services.load_demo(collection_id)
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    collection_id))
+                user_services.get_system_user(), collection_id)
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -843,8 +840,11 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
+        topic_similarities = (
+            recommendations_services.get_topic_similarities_as_csv()
+        )
         self.render_downloadable_file(
-            recommendations_services.get_topic_similarities_as_csv(),
+            topic_similarities.encode('utf-8'),
             'topic_similarities.csv', 'text/csv')
 
 

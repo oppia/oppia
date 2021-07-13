@@ -22,18 +22,14 @@ breaching the 10k file limit on App Engine.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import fnmatch
 import os
 import sys
 
 import python_utils
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
-sys.path.insert(0, _YAML_PATH)
-
-import yaml  # isort:skip  #pylint: disable=wrong-import-position
-
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
-THIRD_PARTY_SIZE_LIMIT = 13500
+THIRD_PARTY_SIZE_LIMIT = 15000
 
 
 def _get_skip_files_list():
@@ -48,17 +44,10 @@ def _get_skip_files_list():
         IOError. If failed to open app_dev.yaml in read mode.
     """
     try:
-        with python_utils.open_file('./app_dev.yaml', 'r') as app_dev_yaml:
-            try:
-                app_dev_yaml_dict = yaml.safe_load(app_dev_yaml)
-            except yaml.YAMLError as yaml_exception:
-                python_utils.PRINT(yaml_exception)
-                sys.exit(1)
-            skip_files_list = app_dev_yaml_dict.get('skip_files')
-
-            skip_files_list = [os.getcwd() + '/' + skip_files_dir
-                               for skip_files_dir in skip_files_list]
-
+        with python_utils.open_file('.gcloudignore', 'r') as gcloudignore:
+            gcloudignore_lines = gcloudignore.read().split('\n')
+            skip_files_list = [os.getcwd() + '/' + gcloudignore_line
+                               for gcloudignore_line in gcloudignore_lines]
         return skip_files_list
     except IOError as io_error:
         python_utils.PRINT(io_error)
@@ -85,7 +74,12 @@ def _check_size_in_dir(dir_path, skip_files_list):
         if file_path in skip_files_list:
             continue
         if os.path.isfile(file_path):
-            number_of_files_in_dir += 1
+            matches_skip_files = any(
+                fnmatch.fnmatch(file_path, pattern)
+                for pattern in skip_files_list
+            )
+            if not matches_skip_files:
+                number_of_files_in_dir += 1
         elif os.path.isdir(file_path):
             number_of_files_in_dir += _check_size_in_dir(
                 file_path, skip_files_list)

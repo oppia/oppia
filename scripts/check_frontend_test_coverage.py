@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import fnmatch
+import logging
 import os
 import re
 import sys
@@ -28,7 +29,7 @@ LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 EXCLUDED_DIRECTORIES = [
     'node_modules/*',
-    'extensions/classifiers/proto/*'
+    'extensions/classifiers/proto_files/*'
 ]
 
 # Contains the name of all files that is not 100% coverage.
@@ -315,9 +316,10 @@ def check_not_fully_covered_filenames_list_is_sorted():
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
             NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
-        sys.exit(
+        logging.error(
             'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
             ' kept in alphabetical order.')
+        sys.exit(1)
 
 
 def check_coverage_changes():
@@ -378,7 +380,8 @@ def check_coverage_changes():
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')
         python_utils.PRINT('------------------------------------')
-        sys.exit(errors)
+        logging.error(errors)
+        sys.exit(1)
     else:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('All Frontend Coverage Checks Passed.')

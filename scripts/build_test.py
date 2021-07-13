@@ -19,7 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import collections
+import contextlib
 import os
 import random
 import re
@@ -32,6 +34,8 @@ import python_utils
 
 from . import build
 from . import common
+from . import scripts_test_utils
+from . import servers
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -448,8 +452,8 @@ class BuildTests(test_utils.GenericTestBase):
                 build.save_hashes_to_file(hashes)
                 with python_utils.open_file(hashes_path, 'r') as hashes_file:
                     self.assertEqual(
-                        hashes_file.read(),
-                        '{"/file.min.js": "654321", "/file.js": "123456"}\n')
+                        ast.literal_eval(hashes_file.read()),
+                        {'/file.min.js': '654321', '/file.js': '123456'})
                 os.remove(hashes_path)
 
     def test_execute_tasks(self):
@@ -1153,12 +1157,16 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_using_webpack_command(self):
-        def mock_check_call(cmd, **unused_kwargs):
-            expected_command = '%s --max-old-space-size=2400 %s --config %s' % (
-                common.NODE_BIN_PATH, build.WEBPACK_FILE,
-                build.WEBPACK_PROD_CONFIG
-            )
-            self.assertEqual(cmd, expected_command)
 
-        with self.swap(subprocess, 'check_call', mock_check_call):
+        @contextlib.contextmanager
+        def mock_managed_webpack_compiler(config_path, max_old_space_size):
+            self.assertEqual(config_path, build.WEBPACK_PROD_CONFIG)
+            self.assertEqual(max_old_space_size, 4096)
+            yield scripts_test_utils.PopenStub()
+
+        with self.swap(
+                servers,
+                'managed_webpack_compiler',
+                mock_managed_webpack_compiler
+        ):
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)

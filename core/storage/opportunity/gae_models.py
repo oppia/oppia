@@ -116,7 +116,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.incomplete_translation_language_codes == language_code).order(
                 cls.incomplete_translation_language_codes).fetch_page(
                     page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        return (
+            results,
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more
+        )
 
     @classmethod
     def get_all_voiceover_opportunities(
@@ -155,7 +159,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         results, cursor, more = cls.query(
             cls.language_codes_needing_voice_artists == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        return (
+            results,
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more
+        )
 
     @classmethod
     def get_by_topic(cls, topic_id):
@@ -241,7 +249,11 @@ class SkillOpportunityModel(base_models.BaseModel):
 
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        return (
+            results,
+            (cursor.urlsafe().decode('utf-8') if cursor else None),
+            more
+        )
 
     @classmethod
     def delete_all(cls):

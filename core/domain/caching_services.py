@@ -135,9 +135,9 @@ def _get_memcache_key(namespace, sub_namespace, obj_id):
         sub_namespace_key_string, MEMCACHE_KEY_DELIMITER, obj_id)
 
 
-def flush_memory_cache():
-    """Flushes the memory cache by wiping all of the data."""
-    memory_cache_services.flush_cache()
+def flush_memory_caches():
+    """Flushes the memory caches by wiping all of the data."""
+    memory_cache_services.flush_caches()
 
 
 def get_multi(namespace, sub_namespace, obj_ids):

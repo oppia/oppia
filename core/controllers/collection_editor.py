@@ -319,7 +319,8 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = base64.b64decode(self.normalized_request.get('q'))
+        q = self.normalized_request.get('q').encode('utf-8')
+        query_string = base64.b64decode(q).decode('utf-8')
 
         search_offset = self.normalized_request.get('cursor')
 

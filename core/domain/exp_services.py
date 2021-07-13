@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
+import io
 import logging
 import math
 import os
@@ -180,8 +181,8 @@ def get_exploration_ids_matching_query(
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_offset is None):
             break
-        else:
-            logging.error(
+
+        logging.error(
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
@@ -291,9 +292,9 @@ def export_to_zip_file(exploration_id, version=None):
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
 
-    temp_file = python_utils.string_io()
+    temp_file = io.BytesIO()
     with zipfile.ZipFile(
-        temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
+            temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
@@ -307,11 +308,8 @@ def export_to_zip_file(exploration_id, version=None):
             if not filepath.startswith(asset_dirs_to_include_in_downloads):
                 continue
             file_contents = fs.get(filepath)
-
             str_filepath = 'assets/%s' % filepath
-            assert isinstance(str_filepath, python_utils.UNICODE)
-            unicode_filepath = str_filepath.decode('utf-8')
-            zfile.writestr(unicode_filepath, file_contents)
+            zfile.writestr(str_filepath, file_contents)
 
     return temp_file.getvalue()
 
@@ -1788,12 +1786,9 @@ def are_changes_mergeable(exp_id, change_list_version, change_list):
 
     if send_email:
         change_list_dict = [change.to_dict() for change in change_list]
-        (
-            email_manager
-            .send_not_mergeable_change_list_to_admin_for_review(
-                exp_id, change_list_version,
-                current_exploration.version,
-                change_list_dict))
+        email_manager.send_not_mergeable_change_list_to_admin_for_review(
+            exp_id, change_list_version, current_exploration.version,
+            change_list_dict)
     return changes_are_mergeable
 
 

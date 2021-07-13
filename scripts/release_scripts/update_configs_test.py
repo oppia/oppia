@@ -77,9 +77,16 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             raise Exception('Not found.')
         url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         with url_open_swap, self.assertRaisesRegexp(
-            Exception, 'Terms mainpage does not exist on Github.'):
+            Exception, 'Terms mainpage does not exist on Github.'
+        ):
             update_configs.main(
-                'test-release-dir', 'test-deploy-dir', 'test-token', True)
+                args=[
+                    '--release_dir_path', 'test-release-dir',
+                    '--deploy_data_path', 'test-deploy-dir',
+                    '--personal_access_token', 'test-token',
+                    '--prompt_for_mailgun_and_terms_update'
+                ]
+            )
 
     def test_invalid_user_input(self):
         print_msgs = []
@@ -558,8 +565,12 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             with apply_changes_swap, verify_feconf_swap:
                 with add_mailchimp_api_key_swap:
                     update_configs.main(
-                        'test-release-dir', 'test-deploy-dir', 'test-token',
-                        True)
+                        args=[
+                            '--release_dir_path', 'test-release-dir',
+                            '--deploy_data_path', 'test-deploy-dir',
+                            '--personal_access_token', 'test-token',
+                            '--prompt_for_mailgun_and_terms_update',
+                        ])
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls_without_prompt_for_feconf_and_terms_update(self):
@@ -594,5 +605,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'verify_feconf', mock_verify_feconf)
         with apply_changes_swap, verify_feconf_swap:
             update_configs.main(
-                'test-release-dir', 'test-deploy-dir', 'test-token', False)
+                args=[
+                    '--release_dir_path', 'test-release-dir',
+                    '--deploy_data_path', 'test-deploy-dir',
+                    '--personal_access_token', 'test-token'
+                ]
+            )
         self.assertEqual(check_function_calls, expected_check_function_calls)

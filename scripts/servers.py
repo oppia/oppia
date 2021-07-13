@@ -73,8 +73,8 @@ def managed_process(
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
     human_readable_command = command if shell else ' '.join(command)
-    python_utils.PRINT(
-        'Starting new %s: %s' % (human_readable_name, human_readable_command))
+    msg = 'Starting new %s: %s' % (human_readable_name, human_readable_command)
+    python_utils.PRINT(msg)
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
 
     try:
@@ -166,10 +166,10 @@ def managed_dev_appserver(
     # OK to use shell=True here because we are not passing anything that came
     # from an untrusted user, only other callers of the script, so there's no
     # risk of shell-injection attacks.
-    proc_context = managed_process(
-        dev_appserver_args, human_readable_name='GAE Development Server',
-        shell=True, env=env)
-    with proc_context as proc:
+    with python_utils.ExitStack() as stack:
+        proc = stack.enter_context(managed_process(
+            dev_appserver_args, human_readable_name='GAE Development Server',
+            shell=True, env=env))
         common.wait_for_port_to_be_in_use(port)
         yield proc
 
@@ -285,6 +285,8 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
             'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
         stack.enter_context(common.swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
+        stack.enter_context(common.swap_env(
+            'GOOGLE_CLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
 
         yield proc
 
@@ -394,25 +396,21 @@ def managed_webpack_compiler(
             stdout=subprocess.PIPE))
 
         if watch_mode:
-            # Iterate until an empty string is printed, which signals the end of
-            # the process.
-            for line in iter(proc.stdout.readline, ''):
-                sys.stdout.write(line)
+            for line in iter(lambda: proc.stdout.readline() or None, None):
+                common.write_stdout_safe(line)
                 # Message printed when a compilation has succeeded. We break
                 # after the first one to ensure the site is ready to be visited.
-                if 'Built at: ' in line:
+                if b'Built at: ' in line:
                     break
             else:
-                # If the code never ran `break`, raise an error because a build
-                # hasn't finished successfully.
+                # If the none of the lines contained the string 'Built at',
+                # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 
         def print_proc_output():
             """Prints the proc's output until it is exhausted."""
-            # Iterate until an empty string is printed, which signals the end of
-            # the output.
-            for line in iter(proc.stdout.readline, ''):
-                sys.stdout.write(line)
+            for line in iter(lambda: proc.stdout.readline() or None, None):
+                common.write_stdout_safe(line)
 
         # Start a thread to print the rest of the compiler's output to stdout.
         printer_thread = threading.Thread(target=print_proc_output)
@@ -455,8 +453,8 @@ def managed_portserver():
     ]
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    proc_context = (
-        managed_process(portserver_args, human_readable_name='Portserver'))
+    proc_context = managed_process(
+        portserver_args, human_readable_name='Portserver', shell=True)
     with proc_context as proc:
         try:
             yield proc
@@ -469,7 +467,7 @@ def managed_portserver():
             except OSError:
                 # Raises when the process has already shutdown, in which case we
                 # can just return immediately.
-                pass
+                return  # pylint: disable=lost-exception
             else:
                 # Otherwise, give the portserver 10 seconds to shut down after
                 # sending CTRL-C (SIGINT).
@@ -520,12 +518,13 @@ def managed_webdriver_server(chrome_version=None):
                 'https://chromedriver.chromium.org/downloads/version-selection'
                 % chrome_command.replace(' ', r'\ '))
 
-        installed_version_parts = ''.join(re.findall(r'[0-9\.]', output))
-        installed_version = '.'.join(installed_version_parts.split('.')[:-1])
+        installed_version_parts = b''.join(re.findall(rb'[0-9.]', output))
+        installed_version = '.'.join(
+            installed_version_parts.decode(encoding='utf-8').split('.')[:-1])
         response = python_utils.url_open(
             'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
                 installed_version))
-        chrome_version = response.read()
+        chrome_version = response.read().decode('utf-8')
 
     python_utils.PRINT('\n\nCHROME VERSION: %s' % chrome_version)
     subprocess.check_call([

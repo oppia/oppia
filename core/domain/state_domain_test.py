@@ -344,7 +344,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with rules_registry_swap, interaction_registry_swap:
             html_list = state.get_all_html_content_strings()
 
-        self.assertEqual(
+        self.assertItemsEqual(
             html_list,
             [
                 '<p>state written_translation solution-hi</p>',
@@ -4194,9 +4194,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
-                'Equals\'} has the wrong type. It should be a TranslatableSetOf'
-                'NormalizedString.'
+                'Value has the wrong type. It should be a TranslatableSetOf'
+                'NormalizedString. The value is'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -4233,7 +4232,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_answer_groups(
             [state_answer_group])
 
-        with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
+        with logging_swap, self.assertRaisesRegexp(KeyError, '\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
                 .rule_specs[0].validate([], {})
@@ -4243,7 +4242,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             observed_log_messages,
             [
                 'RuleSpec \'Contains\' has inputs which are not recognized '
-                'parameter names: set([u\'x\'])'
+                'parameter names: {\'x\'}'
             ]
         )
 
@@ -4406,7 +4405,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations.add_content_id_for_translation('feedback_1')
         written_translations.add_content_id_for_translation('feedback_2')
-        self.assertEqual(
+        self.assertItemsEqual(
             written_translations.get_content_ids_for_text_translation(), [
                 'feedback_2', 'feedback_1'])
 
@@ -4632,7 +4631,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state written_translations to match the listed '
                 'content ids [\'invalid_content\']')):
-            written_translations.validate([b'invalid_content'])
+            written_translations.validate(['invalid_content'])
 
     def test_get_content_ids_that_are_correctly_translated(self):
         written_translations_dict = {
@@ -4741,8 +4740,9 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 
         recorded_voiceovers.add_content_id_for_voiceover('feedback_1')
         recorded_voiceovers.add_content_id_for_voiceover('feedback_2')
-        self.assertEqual(recorded_voiceovers.get_content_ids_for_voiceovers(), [
-            'feedback_2', 'feedback_1'])
+        self.assertItemsEqual(
+            recorded_voiceovers.get_content_ids_for_voiceovers(),
+            ['feedback_2', 'feedback_1'])
 
     def test_add_content_id_for_voiceovers_adds_content_id(self):
         recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict({
@@ -4930,7 +4930,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape(
                 'Expected state recorded_voiceovers to match the listed '
                 'content ids [\'invalid_content\']')):
-            recorded_voiceovers.validate([b'invalid_content'])
+            recorded_voiceovers.validate(['invalid_content'])
 
 
 class VoiceoverDomainTests(test_utils.GenericTestBase):

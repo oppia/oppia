@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
 import argparse
 import os
 import subprocess
@@ -28,6 +27,8 @@ import sys
 import python_utils
 from scripts import common
 from scripts import install_third_party_libs
+
+from typing import List, Optional
 
 
 # List of directories whose files won't be type-annotated ever.
@@ -432,9 +433,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
-    'core/jobs.py',
-    'core/jobs_registry.py',
-    'core/jobs_test.py',
     'core/platform/app_identity/gae_app_identity_services.py',
     'core/platform/app_identity/gae_app_identity_services_test.py',
     'core/platform/auth/firebase_auth_services.py',
@@ -451,6 +449,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/cloud_translate/cloud_translate_services_test.py',
     'core/platform/cloud_translate/dev_mode_cloud_translate_services.py',
     'core/platform/cloud_translate/dev_mode_cloud_translate_services_test.py',
+    'core/platform/datastore/cloud_datastore_services.py',
+    'core/platform/datastore/cloud_datastore_services_test.py',
     'core/platform/datastore/gae_datastore_services.py',
     'core/platform/datastore/gae_datastore_services_test.py',
     'core/platform/email/dev_mode_email_services.py',
@@ -463,6 +463,11 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/search/elastic_search_services_test.py',
     'core/platform/search/gae_search_services.py',
     'core/platform/search/gae_search_services_test.py',
+    'core/platform/storage/cloud_storage_emulator.py',
+    'core/platform/storage/cloud_storage_emulator_test.py',
+    'core/platform/storage/cloud_storage_services.py',
+    'core/platform/storage/dev_mode_storage_services.py',
+    'core/platform/storage/dev_mode_storage_services_test.py',
     'core/platform/taskqueue/cloud_taskqueue_services.py',
     'core/platform/taskqueue/cloud_taskqueue_services_test.py',
     'core/platform/taskqueue/cloud_tasks_emulator.py',
@@ -470,6 +475,7 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/taskqueue/dev_mode_taskqueue_services.py',
     'core/platform/taskqueue/dev_mode_taskqueue_services_test.py',
     'core/platform/transactions/gae_transaction_services.py',
+    'core/platform/transactions/cloud_transaction_services.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
     'core/storage/activity/gae_models.py',
@@ -596,8 +602,6 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/io/job_io_test.py',
     'jobs/io/ndb_io.py',
     'jobs/io/ndb_io_test.py',
-    'jobs/io/stub_io.py',
-    'jobs/io/stub_io_test.py',
     'jobs/job_options.py',
     'jobs/job_options_test.py',
     'jobs/job_test_utils.py',
@@ -738,7 +742,6 @@ NOT_FULLY_COVERED_FILES = [
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
 # TODO(#13113): Change mypy command to mypy path after Python3 migration.
 MYPY_CMD = 'mypy'
-MYPY_REQUIREMENTS_PATH = os.path.join('.', 'mypy_requirements.txt')
 PYTHON3_CMD = 'python3'
 
 
@@ -759,7 +762,7 @@ _PARSER.add_argument(
 )
 
 
-def install_third_party_libraries(skip_install):
+def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
@@ -769,11 +772,11 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files):
+def get_mypy_cmd(files: List[str]) -> List[str]:
     """Return the appropriate command to be run.
 
     Args:
-        files: list(list(str)). List having first element as list of string.
+        files: list(str). List having first element as list of string.
 
     Returns:
         list(str). List of command line arguments.
@@ -790,19 +793,7 @@ def get_mypy_cmd(files):
     return cmd
 
 
-def install_mypy_prerequisites():
-    """Install mypy and type stubs from mypy_requirements.txt.
-
-    Returns:
-        int. The return code from installing prerequisites.
-    """
-    cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
-    process = subprocess.call(
-        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    return process
-
-
-def main(args=None):
+def main(args: Optional[List[str]] = None) -> int:
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
@@ -814,16 +805,6 @@ def main(args=None):
 
     install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
-
-    python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
-    return_code = install_mypy_prerequisites()
-    if return_code != 0:
-        python_utils.PRINT(
-            'Cannot install Mypy and stubs for third party libraries.')
-        sys.exit(1)
-
-    python_utils.PRINT(
-        'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
     cmd = get_mypy_cmd(getattr(parsed_args, 'files'))

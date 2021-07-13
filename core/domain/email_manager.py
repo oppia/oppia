@@ -37,8 +37,8 @@ import utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
-app_identity_services = models.Registry.import_app_identity_services()
 transaction_services = models.Registry.import_transaction_services()
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 def log_new_error(*args, **kwargs):
@@ -1482,7 +1482,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     '<li><b>%s</b></li><br>' % (
                         utils.get_supported_audio_language_description(
                             language_code)) for language_code in
-                    language_codes_that_need_reviewers
+                    sorted(language_codes_that_need_reviewers)
                 ]
             )
             suggestion_types_needing_reviewers_paragraphs.append(

@@ -21,12 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
-import bs4
 import constants
 from extensions.objects.models import objects
 import feconf
 import python_utils
 import utils
+
+import bs4
 
 
 class BaseRteComponent(python_utils.OBJECT):

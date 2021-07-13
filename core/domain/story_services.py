@@ -377,8 +377,7 @@ def validate_explorations_for_story(exp_ids, strict):
                 sample_exp_id = exp_id
                 break
         common_exp_category = exps_dict[sample_exp_id].category
-        for exp_id in exps_dict:
-            exp = exps_dict[exp_id]
+        for exp_id, exp in exps_dict.items():
             if exp.category != common_exp_category:
                 error_string = (
                     'All explorations in a story should be of the '

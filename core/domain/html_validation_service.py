@@ -24,7 +24,6 @@ import logging
 import re
 import xml
 
-import bs4
 from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
@@ -34,6 +33,8 @@ from extensions.rich_text_components import components
 import feconf
 import python_utils
 import utils
+
+import bs4
 
 
 def escape_html(unescaped_html_data):
@@ -278,8 +279,7 @@ def validate_customization_args(html_list):
             for tag in soup.findAll(name=tag_name):
                 tags_to_original_html_strings[tag] = html_string
 
-    for tag in tags_to_original_html_strings:
-        html_string = tags_to_original_html_strings[tag]
+    for tag, html_string in tags_to_original_html_strings.items():
         err_msg_list = list(validate_customization_args_in_tag(tag))
         for err_msg in err_msg_list:
             if err_msg:
@@ -369,7 +369,7 @@ def validate_svg_filenames_in_math_rich_text(
             fs = fs_domain.AbstractFileSystem(
                 file_system_class(entity_type, entity_id))
             filepath = 'image/%s' % svg_filename
-            if not fs.isfile(filepath.encode('utf-8')):
+            if not fs.isfile(filepath):
                 error_list.append(python_utils.UNICODE(math_tag))
     return error_list
 

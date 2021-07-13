@@ -17,7 +17,6 @@
  */
 
 const { browser } = require('protractor');
-var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
@@ -40,34 +39,6 @@ describe('Email Dashboard', function() {
       'management@emaildashboard.com', 'management');
     await browser.get(EMAIL_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
-  });
-
-  it('should query for users', async function() {
-    var schemaEditorElement = element(
-      by.css('.protractor-test-email-dashboard-input-3'));
-    var inputElement = schemaEditorElement.element(by.tagName('input'));
-    var submitButton = element(by.css('.protractor-test-submit-query-button'));
-
-    await waitFor.visibilityOf(inputElement, 'Input Element not displayed');
-    await action.clear('Email dashboard input 3', inputElement);
-    await action.sendKeys('Email dashboard input 3', inputElement, '1');
-    await action.click('Submit Query button', submitButton);
-    var checkStatusButton = element(
-      by.css('.protractor-test-check-status-button-0'));
-    while (true) {
-      // eslint-disable-next-line oppia/protractor-practices
-      await browser.sleep(1000);
-      await action.click('Check Status Button', checkStatusButton);
-      var statusElement = element(by.css('.protractor-test-status-0'));
-      await waitFor.visibilityOf(statusElement, 'Status Text not displayed');
-      if (await statusElement.getText() === 'completed') {
-        break;
-      }
-    }
-    var numberOfUsers = element(by.css('.protractor-test-number-of-users-0'));
-    await waitFor.visibilityOf(
-      numberOfUsers, 'Number of qualified users not displayed');
-    expect(await numberOfUsers.getText()).toBe('1');
   });
 
   afterEach(async function() {

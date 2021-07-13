@@ -1364,8 +1364,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Expected target_version_at_submission to be an int, received <type'
-            ' \'unicode\'>')
+            'Expected target_version_at_submission to be an int, '
+            'received <class \'str\'>'
+        )
         self.assertEqual(len(suggestions), 1)
         self.logout()
 
@@ -2082,7 +2083,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             '%s/' % feconf.SUGGESTION_URL_PREFIX, {
                 'suggestion_type': (
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
                 'change': {

@@ -137,7 +137,7 @@ def compile_all_ts_files():
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
         './tsconfig.json', COMPILED_TYPESCRIPT_TMP_PATH)
-    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    subprocess.call(cmd, stdout=subprocess.PIPE, shell=True)
 
 
 class JsTsLintChecksManager(python_utils.OBJECT):
@@ -281,8 +281,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 if is_corresponding_angularjs_filepath:
                     compiled_js_filepath = self._get_compiled_ts_filepath(
                         corresponding_angularjs_filepath)
-                    file_content = self.file_cache.read(
-                        compiled_js_filepath).decode('utf-8')
+                    file_content = self.file_cache.read(compiled_js_filepath)
 
                     parsed_script = (
                         _parse_js_or_ts_file(filepath, file_content))

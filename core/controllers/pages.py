@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 import feconf
-import python_utils
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -29,7 +28,7 @@ class ForumRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(python_utils.convert_to_bytes(feconf.GOOGLE_GROUP_URL))
+        self.redirect(feconf.GOOGLE_GROUP_URL)
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -38,7 +37,7 @@ class AboutRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(python_utils.convert_to_bytes('/about'))
+        self.redirect('/about')
 
 
 class FoundationRedirectPage(base.BaseHandler):
@@ -47,8 +46,7 @@ class FoundationRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(python_utils.convert_to_bytes(feconf.FOUNDATION_SITE_URL))
-        return
+        self.redirect(feconf.FOUNDATION_SITE_URL)
 
 
 class TeachRedirectPage(base.BaseHandler):
@@ -57,7 +55,7 @@ class TeachRedirectPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.redirect(python_utils.convert_to_bytes('/teach'))
+        self.redirect('/teach')
 
 
 class ConsoleErrorPage(base.BaseHandler):

@@ -22,13 +22,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import logging
 
+from constants import constants
 import feconf
 
+from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-CLIENT = tasks_v2.CloudTasksClient()
+CLIENT = tasks_v2.CloudTasksClient(
+    credentials=(
+        auth.credentials.AnonymousCredentials()
+        if constants.EMULATOR_MODE else auth.default()))
 
 
 def create_http_task(

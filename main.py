@@ -35,6 +35,7 @@ from core.controllers import concept_card_viewer
 from core.controllers import contributor_dashboard
 from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
+from core.controllers import cron
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
@@ -64,6 +65,7 @@ from core.controllers import story_viewer
 from core.controllers import subscriptions
 from core.controllers import subtopic_viewer
 from core.controllers import suggestion
+from core.controllers import tasks
 from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
@@ -73,13 +75,13 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
-from mapreduce import main as mapreduce_main
-from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
 from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
+datastore_services = models.Registry.import_datastore_services()
+cache_services = models.Registry.import_cache_services()
 transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
@@ -185,40 +187,8 @@ def ui_access_wrapper(self, *args, **kwargs):
     self.real_dispatch(*args, **kwargs)
 
 
-MAPREDUCE_HANDLERS = []
-
-for path, handler_class in mapreduce_main.create_handlers_map():
-    if path.startswith('.*/pipeline'):
-        if 'pipeline/rpc/' in path or path == '.*/pipeline(/.+)':
-            path = path.replace('.*/pipeline', '/mapreduce/ui/pipeline')
-        else:
-            path = path.replace('.*/pipeline', '/mapreduce/worker/pipeline')
-    else:
-        if '_callback' in path:
-            path = path.replace('.*', '/mapreduce/worker', 1)
-        elif '/list_configs' in path:
-            continue
-        else:
-            path = path.replace('.*', '/mapreduce/ui', 1)
-
-    if '/ui/' in path or path.endswith('/ui'):
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = ui_access_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-    else:
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = authorization_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-
-# Tell map/reduce internals that this is now the base path to use.
-mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
-
 # Register the URLs with the classes responsible for handling them.
-URLS = MAPREDUCE_HANDLERS + [
+URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
@@ -528,9 +498,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
-    get_redirect_route(
-        r'/joboutputhandler', release_coordinator.JobOutputHandler),
-    get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
     get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
@@ -913,8 +880,8 @@ URLS = MAPREDUCE_HANDLERS + [
 ]
 
 # Adding redirects for topic landing pages.
-for subject in feconf.AVAILABLE_LANDING_PAGES:
-    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+for subject, topics in feconf.AVAILABLE_LANDING_PAGES.items():
+    for topic in topics:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
@@ -926,10 +893,58 @@ if constants.DEV_MODE:
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
 
+# Add cron urls.
+URLS.extend((
+    get_redirect_route(
+        r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    get_redirect_route(
+        r'/cron/mail/admins/contributor_dashboard_bottlenecks',
+        cron.CronMailAdminContributorDashboardBottlenecksHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/contributor_dashboard_suggestions',
+        cron.CronMailReviewersContributorDashboardSuggestionsHandler),
+))
+
+# Add tasks urls.
+URLS.extend((
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
+        tasks.UnsentFeedbackEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
+        tasks.SuggestionEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
+        tasks.FlagExplorationEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
+        tasks.InstantFeedbackMessageEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
+        tasks.FeedbackThreadStatusChangeEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_DEFERRED,
+        tasks.DeferredTasksHandler),
+))
+
+
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
 
-firebase_auth_services.establish_firebase_connection() # type: ignore[no-untyped-call]
+class NdbWsgiMiddleware:
+    """Wraps the WSGI application into the NDB client context."""
+
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        global_cache = datastore_services.RedisCache(
+            cache_services.CLOUD_NDB_REDIS_CLIENT)
+        with datastore_services.get_ndb_context(global_cache=global_cache):
+            return self.wsgi_app(environ, start_response)
+
+
+app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
+app = NdbWsgiMiddleware(app_without_context)
+firebase_auth_services.establish_firebase_connection()

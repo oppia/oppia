@@ -47,7 +47,7 @@ class RecentCommitsHandler(base.BaseHandler):
         else:
             raise self.PageNotFoundException
 
-        exp_ids = set([commit.exploration_id for commit in all_commits])
+        exp_ids = set(commit.exploration_id for commit in all_commits)
         exp_ids_to_exp_data = (
             exp_services.get_exploration_titles_and_categories(exp_ids))
 

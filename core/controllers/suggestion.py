@@ -47,7 +47,7 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
         dict. Dict mapping target_id to corresponding exploration opportunity
         summary dict.
     """
-    target_ids = set([s.target_id for s in suggestions])
+    target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in (
@@ -67,7 +67,7 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     Returns:
         dict. Dict mapping target_id to corresponding skill opportunity dict.
     """
-    target_ids = set([s.target_id for s in suggestions])
+    target_ids = set(s.target_id for s in suggestions)
     opportunity_id_to_opportunity_dict = {
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(

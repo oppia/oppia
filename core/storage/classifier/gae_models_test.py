@@ -114,7 +114,8 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     def test_query_new_and_pending_training_jobs_with_non_zero_offset(self):
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
-            next_scheduled_check_time = datetime.datetime.utcnow()
+            next_scheduled_check_time = (
+                datetime.datetime.utcnow() - datetime.timedelta(minutes=1))
             # Creating 6 jobs out of which 4 will be fetched in steps.
             classifier_models.ClassifierTrainingJobModel.create(
                 'TextClassifier', 'TextInput', 'exp_id01', 1,
@@ -123,7 +124,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
             classifier_models.ClassifierTrainingJobModel.create(
                 'TextClassifier', 'TextInput', 'exp_id02', 2,
-                next_scheduled_check_time,
+                next_scheduled_check_time + datetime.timedelta(seconds=1),
                 [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
                 'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
             classifier_models.ClassifierTrainingJobModel.create(
@@ -139,12 +140,12 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, 1)
             classifier_models.ClassifierTrainingJobModel.create(
                 'TextClassifier', 'TextInput', 'exp_id05', 1,
-                next_scheduled_check_time,
+                next_scheduled_check_time + datetime.timedelta(seconds=2),
                 [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
                 'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
             classifier_models.ClassifierTrainingJobModel.create(
                 'TextClassifier', 'TextInput', 'exp_id06', 1,
-                next_scheduled_check_time,
+                next_scheduled_check_time + datetime.timedelta(seconds=3),
                 [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
                 'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
 
@@ -183,7 +184,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(training_jobs[0].exp_version, 1)
             self.assertEqual(
                 training_jobs[0].next_scheduled_check_time,
-                next_scheduled_check_time)
+                next_scheduled_check_time + datetime.timedelta(seconds=2))
             self.assertEqual(training_jobs[0].state_name, 'state_name2')
             self.assertEqual(
                 training_jobs[0].status,
@@ -315,27 +316,21 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
                     'exp_id1', 2, 'state_name4', {'algorithm_id': 'job_id4'}))
 
         # Test that state names with unicode characters get saved correctly.
-        state_name1 = u'Klüft'
+        state_name1 = 'Klüft'
         mapping_id = (
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, state_name1, {'algorithm_id': 'job_id4'}))
 
-        mapping = classifier_models.StateTrainingJobsMappingModel.get(
-            mapping_id)
+        classifier_models.StateTrainingJobsMappingModel.get(mapping_id)
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % state_name1)
 
-        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
-            encoding='utf-8')))
-
-        state_name2 = u'टेक्स्ट'
+        state_name2 = 'टेक्स्ट'
         mapping_id = (
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, state_name2, {'algorithm_id': 'job_id4'}))
 
-        mapping = classifier_models.StateTrainingJobsMappingModel.get(
-            mapping_id)
-
-        self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
-            encoding='utf-8')))
+        classifier_models.StateTrainingJobsMappingModel.get(mapping_id)
+        self.assertEqual(mapping_id, 'exp_id1.2.%s' % state_name2)
 
     def test_get_model_from_exploration_attributes(self):
         exp_id = 'exp_id1'

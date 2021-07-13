@@ -52,11 +52,11 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 }
             }, [
                 'Schema validation for \'version\' failed: '
-                'Could not convert unicode to int: random_string']),
+                'Could not convert str to int: random_string']),
             ({
                 'exploration_id': 'any_exp_id'
             }, {}, [
-                'Found extra args: [u\'exploration_id\'].']),
+                'Found extra args: [\'exploration_id\'].']),
             ({}, {
                 'exploration_id': {
                     'schema': {

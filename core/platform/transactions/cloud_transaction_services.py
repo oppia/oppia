@@ -21,7 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
-from google.appengine.ext import ndb
+from google.cloud import datastore
+
+
+CLIENT = datastore.Client()
 
 
 def run_in_transaction_wrapper(fn):
@@ -41,27 +44,7 @@ def run_in_transaction_wrapper(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         """Wrapper for the transaction."""
-        return ndb.transaction(
-            lambda: fn(*args, **kwargs),
-            xg=True,
-            propagation=ndb.TransactionOptions.ALLOWED,
-        )
+        with CLIENT.transaction():
+            return fn(*args, **kwargs)
 
     return wrapper
-
-
-def toplevel_wrapper(*args, **kwargs):
-    """Enables a WSGI application to not exit until all its asynchronous
-    requests have finished.
-
-    For more information, see
-    https://developers.google.com/appengine/docs/python/ndb/async#intro
-
-    Args:
-        *args: list(*). Variable length argument list.
-        **kwargs: *. Arbitrary keyword arguments.
-
-    Returns:
-        app. The entire app toplevel.
-    """
-    return ndb.toplevel(*args, **kwargs)

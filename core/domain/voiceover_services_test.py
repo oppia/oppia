@@ -235,7 +235,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         opportunities, _, more = (
             opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
-        self.assertFalse(more)
 
         voiceover_services.accept_voiceover_application(
             user_voiceover_applications[0].voiceover_application_id,
@@ -335,10 +334,9 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_IN_REVIEW)
 
-        opportunities, _, more = (
+        opportunities, _, _ = (
             opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
-        self.assertFalse(more)
 
         voiceover_services.reject_voiceover_application(
             user_voiceover_applications[0].voiceover_application_id,
@@ -352,10 +350,9 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_REJECTED)
 
-        opportunities, _, more = (
+        opportunities, _, _ = (
             opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
-        self.assertFalse(more)
 
     def test_author_rejects_own_voiceover_application_raise_exception(self):
         voiceover_services.create_new_voiceover_application(

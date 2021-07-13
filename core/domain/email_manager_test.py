@@ -74,7 +74,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             # Make sure emails are sent.
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
-            expected_subject = 'Failed ML Job'
+            expected_subject = b'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
             messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
@@ -114,8 +114,8 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
             self.assertEqual(messages[0].to, ['admin@system.com'])
-            self.assertEqual(messages[0].subject, 'Dummy Subject')
-            self.assertIn('Dummy Body', messages[0].html)
+            self.assertEqual(messages[0].subject, b'Dummy Subject')
+            self.assertIn(b'Dummy Body', messages[0].html)
 
 
 class DummyMailTest(test_utils.EmailTestBase):
@@ -189,9 +189,9 @@ class EmailRightsTest(test_utils.GenericTestBase):
                 True, True, True, False),
         }
 
-        for intent in expected_validation_results:
+        for intent, results in expected_validation_results.items():
             for ind, sender_id in enumerate(sender_ids_to_test):
-                if expected_validation_results[intent][ind]:
+                if results[ind]:
                     email_manager.require_sender_id_is_valid(
                         intent, sender_id)
                 else:
@@ -805,7 +805,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 messages[0].sender,
                 'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
             self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
-            self.assertEqual(messages[0].subject, 'Welcome!')
+            self.assertEqual(messages[0].subject, b'Welcome!')
             self.assertEqual(
                 messages[0].body.decode(), self.expected_text_email_content)
             self.assertEqual(
@@ -5202,7 +5202,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
             'You can change your email preferences via the Preferences page.')
 
         expected_admin_email_text_body = (
-            '(Sent from dummy-cloudsdk-project-id)\n\n'
+            '(Sent from dev-project-id)\n\n'
             'Query job with qid query id has failed in its execution.\n'
             'Query parameters:\n\n'
             'key1: val1\n'

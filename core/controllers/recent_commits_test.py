@@ -99,7 +99,6 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'all_non_private_commits'})
-        self.assertFalse(response_dict['more'])
         for i in python_utils.RANGE(feconf.COMMIT_LIST_PAGE_SIZE * 2):
             entity_id = 'my_entity_%s' % i
             exp_id = 'exp_%s' % i
@@ -115,9 +114,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             params={'query_type': 'all_non_private_commits'})
 
         self.assertEqual(
-            len(response_dict['results']),
-            feconf.COMMIT_LIST_PAGE_SIZE)
-        self.assertTrue(response_dict['more'])
+            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE)
 
         cursor = response_dict['cursor']
         response_dict = self.get_json(
@@ -129,7 +126,6 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(response_dict['results']),
             feconf.COMMIT_LIST_PAGE_SIZE)
-        self.assertTrue(response_dict['more'])
         cursor = response_dict['cursor']
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
@@ -137,7 +133,6 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
                 'query_type': 'all_non_private_commits',
                 'cursor': cursor
             })
-        self.assertFalse(response_dict['more'])
         self.assertEqual(len(response_dict['results']), 2)
         self.logout()
 

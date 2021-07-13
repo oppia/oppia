@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import io
 import json
 import logging
 import re
@@ -34,7 +35,6 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
 import feconf
-import python_utils
 import utils
 
 
@@ -453,7 +453,7 @@ class ExportAccountHandler(base.BaseHandler):
             user_images = []
 
         # Create zip file.
-        temp_file = python_utils.string_io()
+        temp_file = io.BytesIO()
         with zipfile.ZipFile(
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)

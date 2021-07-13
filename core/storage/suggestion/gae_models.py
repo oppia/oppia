@@ -310,7 +310,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         query = (
             cls.get_all()
-            .order(cls.key)
             .filter(
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id.IN(exp_ids))

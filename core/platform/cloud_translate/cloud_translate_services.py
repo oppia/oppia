@@ -19,11 +19,17 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
+
 # To use cloud translate in a local dev environment, use
 # cloud_translate_emulator.
+from google import auth
 from google.cloud import translate_v2 as translate
 
-CLIENT = translate.Client()
+CLIENT = translate.Client(
+    credentials=(
+        auth.credentials.AnonymousCredentials()
+        if constants.EMULATOR_MODE else auth.default()))
 
 # List of languages with adequate Google Translate accuracy.
 LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')

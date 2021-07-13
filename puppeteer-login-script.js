@@ -99,7 +99,6 @@ const setRole = async function(page, role) {
   }
 };
 
-
 const createCollections = async function(context, page) {
   try {
     // eslint-disable-next-line no-console

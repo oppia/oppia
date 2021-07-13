@@ -31,11 +31,9 @@ from scripts import install_third_party_libs
 from scripts import servers
 
 MAX_RETRY_COUNT = 3
-OPPIA_SERVER_PORT = 8181
 GOOGLE_APP_ENGINE_PORT = 9001
 ELASTICSEARCH_SERVER_PORT = 9200
 PORTS_USED_BY_OPPIA_PROCESSES = [
-    OPPIA_SERVER_PORT,
     GOOGLE_APP_ENGINE_PORT,
     ELASTICSEARCH_SERVER_PORT,
 ]
@@ -261,6 +259,7 @@ def run_tests(args):
         stack.enter_context(servers.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
+            stack.enter_context(servers.managed_cloud_datastore_emulator())
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(servers.managed_dev_appserver(
@@ -269,7 +268,10 @@ def run_tests(args):
             log_level=args.server_log_level,
             clear_datastore=True,
             skip_sdk_update_check=True,
-            env={'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH}))
+            env={
+                **os.environ,
+                'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+            }))
 
         stack.enter_context(servers.managed_webdriver_server(
             chrome_version=args.chrome_driver_version))
@@ -296,10 +298,10 @@ def run_tests(args):
                     # Although our unit tests always provide unicode strings,
                     # the actual server needs this failsafe since it can output
                     # non-unicode strings.
-                    line = line.decode('utf-8') # pragma: nocover
+                    line = line.encode('utf-8')  # pragma: nocover
                 output_lines.append(line.rstrip())
                 # Replaces non-ASCII characters with '?'.
-                sys.stdout.write(line.encode('ascii', errors='replace'))
+                common.write_stdout_safe(line.decode('ascii', errors='replace'))
             # The poll() method returns None while the process is running,
             # otherwise it returns the return code of the process (an int).
             if proc.poll() is not None:

@@ -115,7 +115,6 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
             'next_cursor': next_cursor,
             'more': more
         }
-
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(self, cursor):
@@ -289,7 +288,7 @@ class TranslatableTextHandler(base.BaseHandler):
         for state_name in state_names_to_content_id_mapping:
             content_id_to_text = dict(
                 state_names_to_content_id_mapping[state_name])
-            for content_id in content_id_to_text.keys():
+            for content_id in list(content_id_to_text.keys()):
                 if self._content_in_review(state_name, content_id, suggestions):
                     del content_id_to_text[content_id]
             if content_id_to_text:

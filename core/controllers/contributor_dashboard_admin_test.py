@@ -473,7 +473,8 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
                 'username': 'reviewer'
             })
         self.assertEqual(
-            response.keys(), ['can_review_translation_for_language_codes'])
+            list(response.keys()),
+            ['can_review_translation_for_language_codes'])
         self.assertEqual(
             response['can_review_translation_for_language_codes'], [])
 
@@ -487,7 +488,8 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
                 'username': 'reviewer'
             })
         self.assertEqual(
-            response.keys(), ['can_review_translation_for_language_codes'])
+            list(response.keys()),
+            ['can_review_translation_for_language_codes'])
         self.assertEqual(
             response['can_review_translation_for_language_codes'], ['hi'])
 
@@ -498,7 +500,8 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
                 'username': 'reviewer'
             })
         self.assertEqual(
-            response.keys(), ['can_review_questions', 'can_submit_questions'])
+            list(response.keys()),
+            ['can_review_questions', 'can_submit_questions'])
         self.assertEqual(response['can_review_questions'], False)
 
         user_services.allow_user_to_review_translation_in_language(
@@ -511,7 +514,8 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
                 'username': 'reviewer'
             })
         self.assertEqual(
-            response.keys(), ['can_review_questions', 'can_submit_questions'])
+            list(response.keys()),
+            ['can_review_questions', 'can_submit_questions'])
         self.assertEqual(response['can_review_questions'], True)
         self.assertEqual(response['can_submit_questions'], True)
 
