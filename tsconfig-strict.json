@@ -82,6 +82,8 @@
     "core/templates/components/state-directives/answer-group-editor/summary-list-header.component.ts",
     "core/templates/components/state-editor/state-editor-properties-services/state-name.service.ts",
     "core/templates/components/state-editor/state-editor-properties-services/state-name.service.spec.ts",
+    "core/templates/components/state-editor/state-editor-properties-services/state-property.service.ts",
+    "core/templates/components/state-editor/state-editor-properties-services/state-property.service.spec.ts",
     "core/templates/components/summary-tile/collection-summary-tile.component.ts",
     "core/templates/components/summary-tile/collection-summary-tile.component.spec.ts",
     "core/templates/components/summary-tile/story-summary-tile.component.ts",

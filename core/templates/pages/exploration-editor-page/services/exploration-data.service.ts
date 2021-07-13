@@ -108,7 +108,7 @@ export class ExplorationDataService {
   async autosaveChangeListAsync(
       changeList: ExplorationChange[],
       successCallback: (response: DraftAutoSaveResponse) => void,
-      errorCallback = () => {}
+      errorCallback: () => void
   ): Promise<void> {
     return this._autosaveChangeListAsync(changeList).then(
       (response) => {
