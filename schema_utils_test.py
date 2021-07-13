@@ -1094,18 +1094,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 
-    def test_bool_schema_with_string_object(self):
-        # type: () -> None
-        schema = {
-            'type': SCHEMA_TYPE_BOOL
-        }
-
-        mappings = [('true', True), ('false', False)]
-        invalid_values_with_error_messages = [] # type: List[Tuple[Any, unicode]]
-
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
-
     def test_notification_user_ids_list_validator(self):
         # type: () -> None
         schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
