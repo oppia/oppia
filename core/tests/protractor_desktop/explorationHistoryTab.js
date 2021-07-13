@@ -64,7 +64,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  fit('should display the history', async function() {
+  it('should display the history', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration(true);

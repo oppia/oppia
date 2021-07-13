@@ -613,10 +613,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
     var scrollBarWebElement = null;
     if (codeMirrorPaneToScroll === 'first') {
-      console.log('first text');
       scrollBarWebElement = await scrollBarElements.first().getWebElement();
     } else {
-      console.log('second text');
       scrollBarWebElement = await scrollBarElements.last().getWebElement();
     }
     while (true) {
@@ -651,10 +649,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var isHighlighted = await lineDivElement.element(
           by.css('.CodeMirror-linebackground')).isPresent();
         var text = await lineElement.getText();
-        if(i==25)
-        {
-          console.log(text);
-        }
+        console.log(text);
         actualDiffDict[lineNumber] = {
           text: text,
           highlighted: isHighlighted
