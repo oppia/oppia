@@ -540,7 +540,7 @@ class Exploration(python_utils.OBJECT):
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            proto_size_in_bytes, created_on=None, last_updated=None):
+            proto_size_in_bytes=None, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -642,11 +642,13 @@ class Exploration(python_utils.OBJECT):
         # Calculate proto_size_in_bytes.
         proto_size_in_bytes = 0
 
-        return cls(
+        exploration = cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False, proto_size_in_bytes)
+
+        return exploration
 
     @classmethod
     def from_dict(

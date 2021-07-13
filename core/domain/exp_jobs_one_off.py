@@ -29,6 +29,8 @@ from core.platform import models
 import feconf
 import python_utils
 
+import apache_beam as beam
+
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
@@ -176,3 +178,23 @@ class ExpSnapshotsMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class FetchAndCalculateExplorationSizeDoFn(beam.DoFn):
+    """ A beam job to update proto size of exploration."""
+
+    def process(self, exploration_id):
+        """Returns an exploration object.
+        The exploration is a exp_domain object.
+
+        Args:
+            exploration_id: int. Id of the exploration.
+
+        Returns:
+            Exploration. Exploration Domain Object.
+        """
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        # Calculate the size of exploration and update proto_size_in_bytes.
+        proto_size_in_bytes = 0
+        exploration.update_proto_size_in_bytes(proto_size_in_bytes)
+        return exploration

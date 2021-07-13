@@ -213,7 +213,7 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
-    # This proto size of the exploration.
+    # Proto size of the exploration.
     proto_size_in_bytes = datastore_services.IntegerProperty(
         default=0, indexed=True)
 
