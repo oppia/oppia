@@ -77,7 +77,7 @@ module.exports = function(config) {
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
-    reporters: ['dots', 'coverage-istanbul'],
+    reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
@@ -99,7 +99,7 @@ module.exports = function(config) {
       // for every passing spec.
       level: 'error',
       format: '%b %T: %m',
-      terminal: false
+      terminal: argv.debugMode
     },
     // Continue running in the background after running tests.
     singleRun: true,
