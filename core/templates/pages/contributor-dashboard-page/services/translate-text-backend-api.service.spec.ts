@@ -28,9 +28,9 @@ describe('TranslateTextBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let getWrittenTranslation = (text) => {
     return {
-      'data_format': 'html',
-      'translation': text,
-      'needs_update': false
+      data_format: 'html',
+      translation: text,
+      needs_update: false
     };
   };
 

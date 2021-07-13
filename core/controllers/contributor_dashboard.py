@@ -284,9 +284,9 @@ class TranslatableTextHandler(base.BaseHandler):
         minus any contents found in suggestions.
 
         Args:
-            state_names_to_content_id_mapping: dict(str, dict(str,
-                WrittenTranslation)). A dict where state_name is the key and a
-                dict with content_id as the key and WrittenTranslation as value.
+            state_names_to_content_id_mapping: dict(str, dict(str, WrittenTranslation)). A dict # pylint: disable=line-too-long
+                where state_name is the key and a dict with content_id as
+                the key and WrittenTranslation as value.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:

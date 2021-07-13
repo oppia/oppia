@@ -126,7 +126,8 @@ export class TranslateTextService {
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
     this.activeContentId = this.stateAndContent[this.activeIndex].contentID;
-    this.activeContentText = this.stateAndContent[this.activeIndex].contentText;    
+    this.activeContentText = (
+      this.stateAndContent[this.activeIndex].contentText);
     return this.activeContentText;
   }
 
@@ -233,7 +234,7 @@ export class TranslateTextService {
 
   suggestTranslatedText(
       translation: string, languageCode: string, imagesData:
-      ImagesData[], dataFormat, successCallback: () => void,
+      ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: () => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,

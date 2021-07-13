@@ -18,7 +18,6 @@
 
 import { WrittenTranslation } from 'domain/exploration/WrittenTranslationObjectFactory';
 import {
-  StateNamesToContentIdMapping,
   TranslatableTexts,
   TranslatableTextsBackendDict
 } from
@@ -28,9 +27,9 @@ describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
   let getWrittenTranslation = (text) => {
     return {
-      'data_format': 'html',
-      'translation': text,
-      'needs_update': false
+      data_format: 'html',
+      translation: text,
+      needs_update: false
     };
   };
 

@@ -28,9 +28,9 @@ describe('TranslateTextService', () => {
   let httpTestingController;
   let getWrittenTranslation = (text) => {
     return {
-      'data_format': 'html',
-      'translation': text,
-      'needs_update': false
+      data_format: 'html',
+      translation: text,
+      needs_update: false
     };
   };
 

@@ -21,8 +21,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
 
-import { TRANSLATION_DATA_FORMAT_HTML } from 'domain/exploration/WrittenTranslationObjectFactory';
-
 @Injectable({
   providedIn: 'root'
 })
