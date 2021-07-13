@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
 import subprocess
 
 from core.tests import test_utils
@@ -68,11 +69,14 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks, 'EXCLUDED_DIRECTORIES',
             ['dir1/', 'dir2/'])
 
-        def mock_install_mypy_prerequisites_success():
+        def mock_install_mypy_prerequisites_success(ci):
             return 0
         self.swap_install_success = self.swap(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites_success)
+
+        self.mypy_cmd_path =  os.path.join(
+            os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
 
     def test_install_third_party_libraries_with_skip_install_as_true(self):
         run_mypy_checks.install_third_party_libraries(True)
@@ -83,26 +87,39 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_get_mypy_cmd_without_files(self):
         expected_cmd = [
-            'mypy', '--exclude', 'file1.py|file2.py|dir1/|dir2/',
+            self.mypy_cmd_path, '--exclude', 'file1.py|file2.py|dir1/|dir2/',
             '--config-file', './mypy.ini', '.'
         ]
         with self.files_swap:
             with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(None)
+                cmd = run_mypy_checks.get_mypy_cmd(None, False)
                 self.assertEqual(cmd, expected_cmd)
+
+    def test_get_mypy_cmd_for_ci(self):
+        with self.files_swap:
+            with self.directories_swap:
+                cmd = run_mypy_checks.get_mypy_cmd(None, True)
+                self.assertEqual(cmd[0], 'mypy')
 
     def test_get_mypy_cmd_with_files(self):
         expected_cmd = [
-            'mypy', '--config-file', './mypy.ini', 'file1.py', 'file2.py'
+            self.mypy_cmd_path , '--config-file', './mypy.ini',
+            'file1.py', 'file2.py'
         ]
         with self.files_swap:
             with self.directories_swap:
-                cmd = run_mypy_checks.get_mypy_cmd(['file1.py', 'file2.py'])
+                cmd = run_mypy_checks.get_mypy_cmd(
+                    ['file1.py', 'file2.py'], False)
                 self.assertEqual(cmd, expected_cmd)
 
     def test_install_mypy_prerequisites(self):
         with self.popen_swap_success:
-            code = run_mypy_checks.install_mypy_prerequisites()
+            code = run_mypy_checks.install_mypy_prerequisites(False)
+            self.assertEqual(code, 0)
+
+    def test_install_mypy_prerequisites_for_ci(self):
+        with self.popen_swap_success:
+            code = run_mypy_checks.install_mypy_prerequisites(True)
             self.assertEqual(code, 0)
 
     def test_install_mypy_prerequisites_with_wrong_script(self):
@@ -110,7 +127,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             with self.swap(
                 run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH',
                 'scripts.wrong'):
-                code = run_mypy_checks.install_mypy_prerequisites()
+                code = run_mypy_checks.install_mypy_prerequisites(False)
                 self.assertEqual(code, 1)
 
     def test_running_script_without_mypy_errors(self):
