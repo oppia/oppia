@@ -411,9 +411,9 @@ class BaseHandler(webapp2.RequestHandler):
             arg: normalized_arg_values.get(arg) for arg in request_arg_keys
         }
 
-        # The args which are absent in request/payload but their schema contains
-        # a default_value, so normalized_payload/normalized_request must be
-        # updated with these args.
+        # To accommodate the args, which are absent in request/payload
+        # but present in normalized_arg_values because these args are
+        # populated from their default_value by SVS architecture.
         default_value_keys = list(
             set(normalized_arg_values.keys()) -
             set(payload_arg_keys + request_arg_keys)
