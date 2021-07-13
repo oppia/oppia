@@ -32,6 +32,7 @@ import { StorySummary } from 'domain/story/story-summary.model';
 export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary: StorySummary;
   @Input() displayArea: string;
+  @Input() topicName?: string;
   nodeCount: number;
   completedNodeCount: number;
   storyProgress: number;
@@ -40,7 +41,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyTitle: string;
   nextIncompleteNodeTitle: string;
   thumbnailBgColor: string;
-  topicName: string;
   storyCompleted: boolean = false;
   starImageUrl: string = '';
 
@@ -84,7 +84,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.completedNodeCount];
     this.nextIncompleteNodeTitle = (
       `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
-    this.topicName = this.storySummary.getTopicName();
+    if (!this.topicName) {
+      this.topicName = this.storySummary.getTopicName();
+    }
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
