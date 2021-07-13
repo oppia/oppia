@@ -236,7 +236,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'unit-test-utils.ajs.ts', # Please don't try to cover this file.
     'url-interpolation.service.ts',
     'utils.service.ts',
-    'version-diff-visualization.component.ts',
     'voiceover-recording.service.ts',
     'worked-example-editor.directive.ts',
 ]
