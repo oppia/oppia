@@ -111,7 +111,8 @@ export class UrlInterpolationService {
    *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
    *
    * If a URL requires a value which is not keyed within the
-   * interpolationValues object, this will return null.
+   * interpolationValues object, the function execution will stop
+   * after throwing an error.
    */
   interpolateUrl(
       urlTemplate: string,
