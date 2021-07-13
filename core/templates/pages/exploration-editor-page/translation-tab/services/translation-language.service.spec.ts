@@ -20,7 +20,6 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TestBed } from '@angular/core/testing';
 
-
 describe('Translation language service', () => {
   let translationLanguageService: TranslationLanguageService;
   let languageUtilService: LanguageUtilService;
@@ -32,7 +31,7 @@ describe('Translation language service', () => {
       ['en', 'hi']);
     spyOn(languageUtilService, 'getAudioLanguageDescription').and.callFake(
       (activeLanguageCode: string) => {
-        let descriptions = {
+        let descriptions: Record<string, string> = {
           en: 'English'
         };
         return descriptions[activeLanguageCode];
@@ -50,7 +49,7 @@ describe('Translation language service', () => {
     it('should not allow invalid state names to be set', () => {
       translationLanguageService.setActiveLanguageCode('eng');
       expect(
-        translationLanguageService.getActiveLanguageCode()).toBeNull();
+        translationLanguageService?.getActiveLanguageCode()).toBeNull();
 
       translationLanguageService.setActiveLanguageCode(null);
       expect(

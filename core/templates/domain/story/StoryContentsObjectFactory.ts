@@ -102,7 +102,8 @@ export class StoryContents {
     });
   }
 
-  getNodeIndex(nodeId: string): number {
+  // If the node id is null, empty or undefined the function returns -1.
+  getNodeIndex(nodeId: string | null | undefined): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
         return i;

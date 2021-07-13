@@ -163,7 +163,7 @@ export class LanguageUtilService {
     return language ? language.description : null;
   }
 
-  getLanguageDirection(languageCode: string): string {
+  getLanguageDirection(languageCode: string | null): string {
     // The backend constants tests guarantee that SUPPORTED_CONTENT_LANGUAGES
     // and SUPPORTED_AUDIO_LANGUAGES do not conflict and contain at most one
     // entry per language code.
