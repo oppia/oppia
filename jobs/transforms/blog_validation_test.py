@@ -88,8 +88,8 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, # type: ignore[no-untyped-call]
-            [
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
                 blog_validation_errors.InconsistentPublishTimestampsError(
                     invalid_timestamp),
             ]
@@ -113,8 +113,8 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, # type: ignore[no-untyped-call]
-            [
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
                 blog_validation_errors
                 .InconsistentPublishLastUpdatedTimestampsError(
                     invalid_timestamp),
@@ -159,8 +159,8 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, # type: ignore[no-untyped-call]
-            [
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
                 blog_validation_errors.ModelMutatedDuringJobError(
                     invalid_timestamp),
             ]

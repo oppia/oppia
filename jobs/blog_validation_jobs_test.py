@@ -64,14 +64,16 @@ class BlogPostTitleUniquenessJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        self.assert_job_output_is([ # type: ignore[no-untyped-call]
-            blog_validation_errors.DuplicateBlogTitleError(
-                blog_post_model_1
-            ),
-            blog_validation_errors.DuplicateBlogTitleError(
-                blog_post_model_2
-            ),
-        ])
+        self.assert_job_output_is( # type: ignore[no-untyped-call]
+            [
+                blog_validation_errors.DuplicateBlogTitleError(
+                    blog_post_model_1
+                ),
+                blog_validation_errors.DuplicateBlogTitleError(
+                    blog_post_model_2
+                ),
+            ]
+        )
 
 
 class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
@@ -107,7 +109,7 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
                 blog_post_summary_model_1,
                 blog_post_summary_model_2,
                 blog_post_summary_model_3,
-        ])
+            ])
 
         self.assert_job_output_is( # type: ignore[no-untyped-call]
             [
@@ -117,8 +119,7 @@ class BlogPostSummaryTitleUniquenessJobTests(job_test_utils.JobTestBase):
                 blog_validation_errors.DuplicateBlogTitleError(
                     blog_post_summary_model_2
                 ),
-            ]
-        )
+            ])
 
 
 class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
@@ -150,21 +151,21 @@ class BlogPostUrlUniquenessJobTests(job_test_utils.JobTestBase):
             url_fragment='diff_url_fragment')
 
         self.put_multi( # type: ignore[no-untyped-call]
-            [ 
+            [
                 blog_post_model_1,
                 blog_post_model_2,
                 blog_post_model_3,
-            ]
-        )
+            ])
 
-        self.assert_job_output_is([ # type: ignore[no-untyped-call]
-            blog_validation_errors.DuplicateBlogUrlError(
-                blog_post_model_1
-            ),
-            blog_validation_errors.DuplicateBlogUrlError(
-                blog_post_model_2
-            ),
-        ])
+        self.assert_job_output_is( # type: ignore[no-untyped-call]
+            [
+                blog_validation_errors.DuplicateBlogUrlError(
+                    blog_post_model_1
+                ),
+                blog_validation_errors.DuplicateBlogUrlError(
+                    blog_post_model_2
+                ),
+            ])
 
 
 class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
@@ -203,11 +204,12 @@ class BlogPostSummaryUrlUniquenessJobTests(job_test_utils.JobTestBase):
             ]
         )
 
-        self.assert_job_output_is([ # type: ignore[no-untyped-call]
-            blog_validation_errors.DuplicateBlogUrlError(
-                blog_post_summary_model_1
-            ),
-            blog_validation_errors.DuplicateBlogUrlError(
-                blog_post_summary_model_2
-            ),
-        ])
+        self.assert_job_output_is(# type: ignore[no-untyped-call]
+            [
+                blog_validation_errors.DuplicateBlogUrlError(
+                    blog_post_summary_model_1
+                ),
+                blog_validation_errors.DuplicateBlogUrlError(
+                    blog_post_summary_model_2
+                ),
+            ])

@@ -22,6 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from jobs.types import base_validation_errors
 import utils
 
+from typing import Any # pylint: disable=unused-import
+
 
 class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
     """Error class for blog posts with duplicate titles."""
