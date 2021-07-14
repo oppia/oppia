@@ -879,7 +879,7 @@ def main(args=None):
         python_utils.PRINT('Mypy type checks successful.')
     else:
         python_utils.PRINT(
-            'Mypy type checks unsuccessful. Please fix the errors.'
+            'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
             'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
         sys.exit(1)
