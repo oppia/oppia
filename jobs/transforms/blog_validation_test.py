@@ -170,36 +170,6 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
 class ValidateBlogPostModelDomainObjectsInstancesTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_validation_type_for_domain_object_non_strict(self):
-        # type: () -> None
-        blog_model = blog_models.BlogPostModel(
-            id='validblogid1',
-            title='',
-            content='<p>hello</p>,',
-            author_id='user',
-            url_fragment='url-fragment-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.NOW,
-            tags=['learners'])
-
-        blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid1',
-            editor_ids=['user'],
-            blog_post_is_published=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
-        output = (
-            self.pipeline
-            | beam.Create([blog_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogPostModelDomainObjectsInstances())
-        )
-
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
-
     def test_validation_type_for_domain_object_strict(self):
         # type: () -> None
         blog_model = blog_models.BlogPostModel(
@@ -234,36 +204,6 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
 
 class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
         job_test_utils.PipelinedTestBase):
-
-    def test_validation_type_for_domain_object_non_strict(self):
-        # type: () -> None
-        blog_summary_model = blog_models.BlogPostSummaryModel(
-            id='validblogid3',
-            title='Sample Title',
-            summary='<p>hello</p>,',
-            author_id='user',
-            url_fragment='url-fragment-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.NOW,
-            tags=['learners'])
-
-        blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid3',
-            editor_ids=['user'],
-            blog_post_is_published=False,
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
-        output = (
-            self.pipeline
-            | beam.Create([blog_summary_model])
-            | beam.ParDo(
-                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) #pylint: disable=line-too-long
-        )
-
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
 
     def test_validation_type_for_domain_object_strict(self):
         # type: () -> None

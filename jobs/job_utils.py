@@ -83,30 +83,6 @@ def get_model_class(kind):
     return datastore_services.Model._lookup_model(kind)  # pylint: disable=protected-access
 
 
-def get_model_key(model):
-    """Returns the given model's key.
-
-    TODO(#11475): Delete this function after we can use the real datastoreio
-    module. Until then, we need to maintain this code so we can test queries.
-    We need this because NDB queries that target every model can only be
-    performed when we sort models by key, and we use this function to acquire
-    the key for an NDB model.
-
-    Args:
-        model: datastore_services.Model. The model to inspect.
-
-    Returns:
-        datastore_services.Key. The model's key.
-
-    Raises:
-        TypeError. When the argument is not a model.
-    """
-    if isinstance(model, datastore_services.Model):
-        return model.key
-    else:
-        raise TypeError('%r is not a model instance' % model)
-
-
 def get_model_kind(model):
     """Returns the "kind" of the given model.
 
@@ -261,9 +237,9 @@ def get_beam_query_from_ndb_query(query, namespace=None):
     if query.order_by:
         order = _get_beam_order_from_ndb_order(query.order_by)
     else:
-        order = None
+        order = ()
 
-    if kind is None and order is None:
+    if kind is None and not order:
         order = ('__key__',)
 
     return beam_datastore_types.Query(
