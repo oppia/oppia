@@ -411,14 +411,16 @@ class BaseHandler(webapp2.RequestHandler):
             arg: normalized_arg_values.get(arg) for arg in request_arg_keys
         }
 
-        # To accommodate the args, which are absent in request/payload
-        # but present in normalized_arg_values because these args are
-        # populated from their default_value by SVS architecture.
-        default_value_keys = list(
+        # The following keys are absent in request/payload but present in
+        # normalized_arg_values because these args are populated from their
+        # default_value provided in the schema.
+        keys_that_correspond_to_default_values = list(
             set(normalized_arg_values.keys()) -
             set(payload_arg_keys + request_arg_keys)
         )
-        for arg in default_value_keys:
+        # Populate the payload/request with the default args before passing
+        # execution onwards to the handler.
+        for arg in keys_that_correspond_to_default_values:
             if request_method in ['GET', 'DELETE']:
                 self.normalized_request[arg] = normalized_arg_values.get(arg)
             else:
