@@ -443,7 +443,7 @@ def get_stats_from_model(stats_model):
 
 
 def create_app_daily_stats_from_model_json(daily_param_stats):
-    # type: (Dict[str, Dict[str, int]]) -> Dict[str, app_feedback_report_domain.ReportStatsParameterValueCounts])
+    # type: (Dict[str, Dict[str, int]]) -> Dict[str, app_feedback_report_domain.ReportStatsParameterValueCounts]
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
