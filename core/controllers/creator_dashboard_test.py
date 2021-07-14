@@ -474,19 +474,16 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list, [])
-            print('AAA')
-            print(self.SAMPLE_YAML_CONTENT)
             exp_a_id = self.post_json(
-                '%s?yaml_file=%s' % (
-                    feconf.UPLOAD_EXPLORATION_URL,
-                    self.SAMPLE_YAML_CONTENT), {},
-                csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
+                feconf.UPLOAD_EXPLORATION_URL,
+                {'yaml_file': self.SAMPLE_YAML_CONTENT},
+                csrf_token=csrf_token
+            )[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             exploration = exp_fetchers.get_exploration_by_id(exp_a_id)
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
             self.assertEqual(exploration.to_yaml(), self.SAMPLE_YAML_CONTENT)
-            self.assertFalse(True)
             self.logout()
 
     def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(
@@ -495,9 +492,10 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '%s?yaml_file=%s' % (
-                feconf.UPLOAD_EXPLORATION_URL,
-                self.SAMPLE_YAML_CONTENT), {}, csrf_token=csrf_token,
-            expected_status_int=400)
+            feconf.UPLOAD_EXPLORATION_URL,
+            {'yaml_file': self.SAMPLE_YAML_CONTENT},
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.logout()

@@ -41,7 +41,7 @@ def main(args=None):
 
     sys.path.append('.')
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
+    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.35'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):

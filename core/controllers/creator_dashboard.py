@@ -295,9 +295,7 @@ class UploadExplorationHandler(base.BaseHandler):
     @acl_decorators.can_upload_exploration
     def post(self):
         """Handles POST requests."""
-        yaml_content = self.request.get('yaml_file')
-        print('CCC')
-        print(yaml_content)
+        yaml_content = self.payload.get('yaml_file')
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:

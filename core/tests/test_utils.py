@@ -2287,9 +2287,6 @@ title: Title
         if source:
             data['source'] = source
 
-        print('BBB')
-        print(url)
-
         expect_errors = expected_status_int >= 400
 
         json_response = self._send_post_request(
