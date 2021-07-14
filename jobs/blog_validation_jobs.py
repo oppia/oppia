@@ -84,7 +84,7 @@ class BlogPostTitleUniquenessJob(base_jobs.JobBase):
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
-                    for model in models # pylint: disable=not-an-iterable
+                    for model in models
                 ])
         )
 
@@ -103,7 +103,7 @@ class BlogPostUrlUniquenessJob(base_jobs.JobBase):
             | 'Flatten models into a list of errors' >> beam.FlatMap(
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
-                    for model in models # pylint: disable=not-an-iterable
+                    for model in models
                 ])
         )
 
@@ -123,7 +123,7 @@ class BlogPostSummaryTitleUniquenessJob(base_jobs.JobBase):
                 lambda models: [
                     blog_validation_errors.DuplicateBlogTitleError(model)
                     for model in models
-                ]) # pylint: disable=not-an-iterable
+                ])
         )
 
 
@@ -142,5 +142,5 @@ class BlogPostSummaryUrlUniquenessJob(base_jobs.JobBase):
                 lambda models: [
                     blog_validation_errors.DuplicateBlogUrlError(model)
                     for model in models
-                ]) # pylint: disable=not-an-iterable
+                ])
         )
