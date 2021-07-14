@@ -15,8 +15,8 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals
-from collections import defaultdict  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
+from collections import defaultdict
 
 import json
 
