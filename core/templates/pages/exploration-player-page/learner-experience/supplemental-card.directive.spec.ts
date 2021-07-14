@@ -19,8 +19,8 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AudioPlayerService } from 'services/audio-player.service';
 import { AudioTranslationManagerService } from '../services/audio-translation-manager.service';
@@ -49,14 +49,11 @@ describe('Supplemental card directive', function() {
   let currentInteractionService: CurrentInteractionService = null;
   let interactionObjectFactory: InteractionObjectFactory = null;
   let playerPositionService: PlayerPositionService = null;
-  let windowDimensionsService: WindowDimensionsService = null;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory = null;
 
   let sampleCard: StateCard = null;
   let activeCardChangedEmitter = new EventEmitter();
   let helperCardAvailableEmitter = new EventEmitter();
-  let elementHelpCard: JQLite;
-  let elementContainer: JQLite;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
@@ -84,7 +81,6 @@ describe('Supplemental card directive', function() {
     currentInteractionService = $injector.get('CurrentInteractionService');
     interactionObjectFactory = $injector.get('InteractionObjectFactory');
     playerPositionService = $injector.get('PlayerPositionService');
-    windowDimensionsService = $injector.get('WindowDimensionsService');
     writtenTranslationsObjectFactory = $injector.get(
       'WrittenTranslationsObjectFactory');
     directive = $injector.get('supplementalCardDirective')[0];
@@ -267,8 +263,8 @@ describe('Supplemental card directive', function() {
 
     angular.element(document.body).append(helpCardTemplate);
     angular.element(document.body).append(containerTemplate);
-    elementHelpCard = $compile(helpCardTemplate)($scope);
-    elementContainer = $compile(containerTemplate)($scope);
+    $compile(helpCardTemplate)($scope);
+    $compile(containerTemplate)($scope);
     $rootScope.$digest();
   }));
 
@@ -276,7 +272,7 @@ describe('Supplemental card directive', function() {
     ctrl.$onDestroy();
   });
 
-  it('should set properties when initialized', fakeAsync(function() {
+  it('should set properties when initialized', function() {
     expect($scope.OPPIA_AVATAR_LINK_URL).toBe(undefined);
     expect($scope.CONTINUE_BUTTON_FOCUS_LABEL).toBe(undefined);
     $scope.getDisplayedCard().markAsCompleted();
@@ -290,7 +286,7 @@ describe('Supplemental card directive', function() {
 
     expect($scope.OPPIA_AVATAR_LINK_URL).toBe('oppiaAvaratLinkUrl');
     expect($scope.CONTINUE_BUTTON_FOCUS_LABEL).toBe('continueButtonFocusLabel');
-  }));
+  });
 
   it('should clear help card when initialized', function() {
     let clearHelpCardSpy = spyOn($scope, 'clearHelpCard')
