@@ -286,6 +286,7 @@ import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
+import { OppiaCookieService } from 'services/cookie.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -365,7 +366,6 @@ import { ExplorationPlayerStateService } from 'pages/exploration-player-page/ser
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
 import { NavigationService } from './navigation.service';
-import { OppiaRteParserService } from './oppia-rte-parser.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
@@ -588,8 +588,8 @@ export const angularServices: [string, Type<{}>][] = [
     NumericExpressionInputValidationService],
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
+  ['OppiaCookieService', OppiaCookieService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
-  ['OppiaRteParserService', OppiaRteParserService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],

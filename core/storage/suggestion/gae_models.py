@@ -918,6 +918,21 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         return cls.get_by_id(entity_id)
 
     @classmethod
+    def get_all_by_user_id(cls, user_id):
+        """Gets all TranslationContributionStatsModels matching the supplied
+        user_id.
+
+        Returns:
+            list(TranslationContributionStatsModel). The matching
+            TranslationContributionStatsModels.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.contributor_user_id == user_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether TranslationContributionStatsModel references the
         supplied user.
