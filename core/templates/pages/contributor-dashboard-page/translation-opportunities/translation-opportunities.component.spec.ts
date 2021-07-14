@@ -34,7 +34,6 @@ import { LazyLoadingComponent } from 'components/common-layout-directives/common
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Translation opportunities component', () => {
   let contributionOpportunitiesService: ContributionOpportunitiesService;
@@ -46,11 +45,11 @@ describe('Translation opportunities component', () => {
   let translationModal: NgbModalRef;
   let httpTestingController;
   let loggedInUserInfo = new UserInfo(
-    false, false, false, false, false,
+    'EXPLORATION_EDITOR', false, false, false, false, false,
     'en', 'username', 'test@example.com', true
   );
   const notLoggedInUserInfo = new UserInfo(
-    false, false, false, false, false,
+    'GUEST', false, false, false, false, false,
     'en', null, null, false
   );
 
@@ -76,7 +75,6 @@ describe('Translation opportunities component', () => {
         NgbModal,
         NgbActiveModal
       ],
-      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     translationModal = TestBed.createComponent(
       TranslationModalComponent) as unknown as NgbModalRef;

@@ -20,12 +20,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import functools
 import json
 import re
 
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import subtopic_page_domain
 from core.domain import user_services
 import feconf
@@ -331,7 +334,7 @@ class Subtopic(python_utils.OBJECT):
 
     def __init__(
             self, subtopic_id, title, skill_ids, thumbnail_filename,
-            thumbnail_bg_color, url_fragment):
+            thumbnail_bg_color, thumbnail_size_in_bytes, url_fragment):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -343,6 +346,8 @@ class Subtopic(python_utils.OBJECT):
                 subtopic.
             thumbnail_bg_color: str|None. The thumbnail background color for
                 the subtopic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size of the topic
+                in bytes.
             url_fragment: str. The url fragment for the subtopic.
         """
         self.id = subtopic_id
@@ -350,6 +355,7 @@ class Subtopic(python_utils.OBJECT):
         self.skill_ids = skill_ids
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.url_fragment = url_fragment
 
     def to_dict(self):
@@ -364,6 +370,7 @@ class Subtopic(python_utils.OBJECT):
             'skill_ids': self.skill_ids,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'url_fragment': self.url_fragment
         }
 
@@ -380,7 +387,9 @@ class Subtopic(python_utils.OBJECT):
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
             subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'],
-            subtopic_dict['thumbnail_bg_color'], subtopic_dict['url_fragment'])
+            subtopic_dict['thumbnail_bg_color'],
+            subtopic_dict['thumbnail_size_in_bytes'],
+            subtopic_dict['url_fragment'])
         return subtopic
 
     @classmethod
@@ -395,7 +404,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
             list.
         """
-        return cls(subtopic_id, title, [], None, None, '')
+        return cls(subtopic_id, title, [], None, None, None, '')
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename):
@@ -441,6 +450,11 @@ class Subtopic(python_utils.OBJECT):
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Subtopic thumbnail background color is not specified.')
+        if self.thumbnail_filename is not None and (
+                self.thumbnail_size_in_bytes == 0):
+            raise utils.ValidationError(
+                'Subtopic thumbnail size in bytes cannot be zero.')
+
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)
@@ -477,14 +491,13 @@ class Topic(python_utils.OBJECT):
 
     def __init__(
             self, topic_id, name, abbreviated_name, url_fragment,
-            thumbnail_filename, thumbnail_bg_color, description,
-            canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, subtopics, subtopic_schema_version,
-            next_subtopic_id, language_code, version,
-            story_reference_schema_version, meta_tag_content,
-            practice_tab_is_displayed, page_title_fragment_for_web,
-            created_on=None,
-            last_updated=None):
+            thumbnail_filename, thumbnail_bg_color, thumbnail_size_in_bytes,
+            description, canonical_story_references,
+            additional_story_references, uncategorized_skill_ids,
+            subtopics, subtopic_schema_version, next_subtopic_id,
+            language_code, version, story_reference_schema_version,
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web, created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -495,6 +508,8 @@ class Topic(python_utils.OBJECT):
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size of the topic
+                in bytes.
             description: str. The description of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
@@ -530,6 +545,7 @@ class Topic(python_utils.OBJECT):
         self.url_fragment = url_fragment
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_references = canonical_story_references
@@ -560,6 +576,7 @@ class Topic(python_utils.OBJECT):
             'url_fragment': self.url_fragment,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -635,7 +652,8 @@ class Topic(python_utils.OBJECT):
             topic_dict['abbreviated_name'],
             topic_dict['url_fragment'],
             topic_dict['thumbnail_filename'],
-            topic_dict['thumbnail_bg_color'], topic_dict['description'],
+            topic_dict['thumbnail_bg_color'],
+            topic_dict['thumbnail_size_in_bytes'], topic_dict['description'],
             [
                 StoryReference.from_dict(reference_dict)
                 for reference_dict in topic_dict['canonical_story_references']
@@ -1131,11 +1149,35 @@ class Topic(python_utils.OBJECT):
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name, name, url_fragment, None, None,
+            topic_id, name, name, url_fragment, None, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
+
+    @classmethod
+    def _convert_subtopic_v3_dict_to_v4_dict(cls, topic_id, subtopic_dict):
+        """Converts old Subtopic schema to the modern v4 schema. v4 schema
+        introduces the thumbnail_size_in_bytes field.
+
+        Args:
+            topic_id: str. The id of the topic to which the subtopic is linked
+                to.
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, topic_id))
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, subtopic_dict['thumbnail_filename'])
+        subtopic_dict['thumbnail_size_in_bytes'] = (
+            len(fs.get(filepath)) if fs.isfile(filepath) else None)
+
+        return subtopic_dict
 
     @classmethod
     def _convert_subtopic_v2_dict_to_v3_dict(cls, subtopic_dict):
@@ -1171,7 +1213,8 @@ class Topic(python_utils.OBJECT):
         return subtopic_dict
 
     @classmethod
-    def update_subtopics_from_model(cls, versioned_subtopics, current_version):
+    def update_subtopics_from_model(
+            cls, versioned_subtopics, current_version, topic_id):
         """Converts the subtopics blob contained in the given
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
@@ -1184,12 +1227,17 @@ class Topic(python_utils.OBJECT):
                 - subtopics: list(dict). The list of dicts comprising the
                     subtopics of the topic.
             current_version: int. The current schema version of subtopics.
+            topic_id: str. The topic_id of the topic to which the subtopics
+                are linked to.
         """
         versioned_subtopics['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
             cls, '_convert_subtopic_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
+
+        if current_version == 3:
+            conversion_fn = functools.partial(conversion_fn, topic_id)
 
         updated_subtopics = []
         for subtopic in versioned_subtopics['subtopics']:
@@ -1259,13 +1307,25 @@ class Topic(python_utils.OBJECT):
         self.url_fragment = new_url_fragment
 
     def update_thumbnail_filename(self, new_thumbnail_filename):
-        """Updates the thumbnail filename of a topic object.
+        """Updates the thumbnail filename and file size of a topic object.
 
         Args:
             new_thumbnail_filename: str|None. The updated thumbnail filename
                 for the topic.
         """
-        self.thumbnail_filename = new_thumbnail_filename
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, self.id))
+
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.thumbnail_filename = new_thumbnail_filename
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
+        else:
+            raise Exception(
+                'The thumbnail %s for topic with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_thumbnail_bg_color(self, new_thumbnail_bg_color):
         """Updates the thumbnail background color of a topic object.
@@ -1462,8 +1522,21 @@ class Topic(python_utils.OBJECT):
         if subtopic_index is None:
             raise Exception(
                 'The subtopic with id %s does not exist.' % subtopic_id)
-        self.subtopics[subtopic_index].thumbnail_filename = (
-            new_thumbnail_filename)
+
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_TOPIC, self.id))
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.subtopics[subtopic_index].thumbnail_filename = (
+                new_thumbnail_filename)
+            self.subtopics[subtopic_index].thumbnail_size_in_bytes = (
+                len(fs.get(filepath)))
+        else:
+            raise Exception(
+                'The thumbnail %s for subtopic with topic_id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_subtopic_url_fragment(self, subtopic_id, new_url_fragment):
         """Updates the url fragment of the subtopic.
