@@ -1455,8 +1455,6 @@ def save_new_exploration_from_yaml_and_assets(
     if assets_list is None:
         assets_list = []
 
-    print('BBB')
-    print(yaml_content)
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')

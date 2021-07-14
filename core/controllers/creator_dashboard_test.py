@@ -474,6 +474,8 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list, [])
+            print('AAA')
+            print(self.SAMPLE_YAML_CONTENT)
             exp_a_id = self.post_json(
                 '%s?yaml_file=%s' % (
                     feconf.UPLOAD_EXPLORATION_URL,
@@ -484,6 +486,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             exploration = exp_fetchers.get_exploration_by_id(exp_a_id)
             self.assertEqual(explorations_list[0]['id'], exp_a_id)
             self.assertEqual(exploration.to_yaml(), self.SAMPLE_YAML_CONTENT)
+            self.assertFalse(True)
             self.logout()
 
     def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(
