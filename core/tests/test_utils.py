@@ -2288,7 +2288,7 @@ title: Title
             data['source'] = source
 
         print('BBB')
-        print(data)
+        print(url)
 
         expect_errors = expected_status_int >= 400
 
