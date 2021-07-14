@@ -857,12 +857,16 @@ class BannedUsersHandler(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         },
         'DELETE': {
             'username': {
-                'type': 'basestring'
+                'schema': {
+                    'type': 'basestring'
+                }
             }
         }
     }

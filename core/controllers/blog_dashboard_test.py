@@ -39,9 +39,9 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.signup(
             self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME,
             feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.blog_admin_id = (
@@ -137,9 +137,9 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.signup(
             self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME,
             feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.blog_admin_id = (
@@ -403,7 +403,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
     def test_cannot_delete_post_by_blog_editor(self):
         # Check that blog editor who does not own the blog post can not
         # delete it.
-        self.set_user_role(
+        self.add_user_role(
             self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.user_email)
 

@@ -841,7 +841,6 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
         super(ManageEmailDashboardTests, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
@@ -1161,9 +1160,9 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/blog-admin', self.MockHandler)],
@@ -1234,9 +1233,9 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1309,10 +1308,10 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1390,11 +1389,11 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.set_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -1475,11 +1474,11 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
-        self.set_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -1711,10 +1710,10 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
             self.TRANSLATION_ADMIN_EMAIL, self.TRANSLATION_ADMIN_USERNAME)
         self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.TRANSLATION_ADMIN_USERNAME, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
-        self.set_user_role(
+        self.add_user_role(
             self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
