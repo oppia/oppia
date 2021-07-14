@@ -31,6 +31,10 @@ interface UiConfig {
   'languageDirection'?: string;
 }
 
+interface RteConfig extends CKEDITOR.config {
+  format_heading ?: CKEDITOR.config.styleObject;
+  format_normal?: CKEDITOR.config.styleObject;
+}
 @Component({
   selector: 'ck-editor-4-rte',
   template: '<div><div></div>' +
@@ -42,6 +46,7 @@ interface UiConfig {
 export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
   @Input() uiConfig: UiConfig;
   @Input() value;
+  @Input() headersEnabled = false;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
@@ -72,7 +77,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       sharedSpaces: CKEDITOR.sharedSpace
   ): CKEDITOR.config {
     // Language configs use default language when undefined.
-    const ckConfig: CKEDITOR.config = {
+    const ckConfig: RteConfig = {
       extraPlugins: 'pre,sharedspace,' + pluginNames,
       startupFocus: true,
       removePlugins: 'indentblock',
@@ -98,7 +103,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
             'Pre', '-',
             'Blockquote', '-',
             'Indent', '-',
-            'Outdent'
+            'Outdent',
+            'Format',
           ]
         },
         {
@@ -109,7 +115,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
           name: 'document',
           items: ['Source']
         }
-      ]
+      ],
+      format_tags: 'heading;normal',
+      format_heading: {
+        element:'h1',
+        name: 'Heading'
+      },
+      format_normal: {
+        element:'div',
+        name: 'Normal'
+      },
     };
 
     if (!uiConfig) {
@@ -135,7 +150,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
-
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
         this.uiConfig &&
@@ -230,6 +244,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
             ckConfig
     );
 
+
     // Hide the editor until it is fully loaded after `instanceReady`
     // is fired. This sets the style for `ck-editor-4-rte`.
     this.elementRef.nativeElement.setAttribute('style', 'display: None');
@@ -243,7 +258,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     var componentRe = (
       /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
     );
-
     /**
        * Before data is loaded into CKEditor, we need to wrap every rte
        * component in a span (inline) or div (block).
@@ -297,6 +311,38 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       $('.cke_button_icon')
         .css('height', '24px')
         .css('width', '24px');
+
+      var changeComboPanel = () => {
+        $('.cke_combopanel')
+        .css('height', '100px')
+        .css('width', '120px')
+      };
+
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_combo_button')
+      .css('height', '29px')
+      .css('width', '62px')
+      .on('click', () => {
+        // Timeout is required to ensure that the format dropdown
+        // has been initialized and the iframe has been loaded into DOM.
+        setTimeout(() => changeComboPanel(), 20)
+      })
+
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_combo_open')
+      .css('margin-left', '-20px')
+      .css('margin-top', '2px')
+
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_combo_text')
+      .css('padding', '2px 5px 0px')
+
+      if (!this.headersEnabled) {
+        // TODO(#12882): Remove the use of jQuery.
+        $('.cke_combo_button')
+        .css('display', 'none')
+      }
+
       ck.setData(wrapComponents(this.value));
     });
 
@@ -348,6 +394,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     this.ck = ck;
     this.ckEditorCopyContentService.bindPasteHandler(ck);
   }
+
 
   ngOnDestroy(): void {
     this.ck.destroy();
