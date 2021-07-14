@@ -101,13 +101,9 @@ class TranslationSuggestionUnicodeFixOneOffJob(
         suggestion = suggestion_services.get_suggestion_from_model(item)
 
         exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
-        state_dict = exploration.states[suggestion.change.state_name]
+        state = exploration.states[suggestion.change.state_name]
         subtitled_unicode_content_ids = []
-        customisation_args = (
-            state_domain.InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                state_dict['interaction']['id'],
-                state_dict['interaction']['customization_args']))
+        customisation_args = state.interaction.customization_args
         for ca_name in customisation_args:
             subtitled_unicode_content_ids.extend(
                 state_domain.InteractionCustomizationArg
@@ -121,7 +117,7 @@ class TranslationSuggestionUnicodeFixOneOffJob(
         if suggestion.change.content_id in subtitled_unicode_content_ids:
             suggestion.change.data_format = (
                 schema_utils.SCHEMA_TYPE_UNICODE)
-            suggestion.change.translation = html_cleaner.strip_html_tags(
+            suggestion.change.translation_html = html_cleaner.strip_html_tags(
                 suggestion.change.translation_html)
             item.change_cmd = suggestion.change.to_dict()
             item.update_timestamps(update_last_updated_time=False)
@@ -157,13 +153,9 @@ class TranslationSuggestionUnicodeAuditOneOffJob(
         suggestion = suggestion_services.get_suggestion_from_model(item)
 
         exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
-        state_dict = exploration.states[suggestion.change.state_name]
+        state = exploration.states[suggestion.change.state_name]
         subtitled_unicode_content_ids = []
-        customisation_args = (
-            state_domain.InteractionInstance
-            .convert_customization_args_dict_to_customization_args(
-                state_dict['interaction']['id'],
-                state_dict['interaction']['customization_args']))
+        customisation_args = state.interaction.customization_args
         for ca_name in customisation_args:
             subtitled_unicode_content_ids.extend(
                 state_domain.InteractionCustomizationArg
@@ -174,9 +166,13 @@ class TranslationSuggestionUnicodeAuditOneOffJob(
                     lambda subtitled_unicode: subtitled_unicode.content_id
                 )
             )
-        if suggestion.change.content_id in subtitled_unicode_content_ids:
+        content_id = suggestion.change.content_id
+        data_format = suggestion.change.data_format
+        if (
+                content_id in subtitled_unicode_content_ids and
+                data_format != schema_utils.SCHEMA_TYPE_UNICODE):
             yield (
-                'FOUND', '%s | %s' % (item.id, suggestion.change.content_id))
+                'FOUND', '%s | %s' % (item.id, content_id))
         yield ('PROCESSED', item.id)
 
     @staticmethod
