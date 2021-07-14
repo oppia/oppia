@@ -751,7 +751,7 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
-    '--ci',
+    '--ci-check',
     help='If true, installs mypy and its requirements globally.'
     ' The default value is false.',
     action='store_true')
@@ -774,18 +774,18 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, ci):
+def get_mypy_cmd(files, ci_check):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
-        ci: bool. Whether to test is for CI.
+        ci_check: bool. Whether the test is for CI.
 
     Returns:
         list(str). List of command line arguments.
     """
     # TODO(#13113): Change mypy command to mypy path after Python3 migration.
-    if ci:
+    if ci_check:
         mypy_cmd = 'mypy'
     else:
         mypy_cmd = os.path.join(
@@ -802,16 +802,17 @@ def get_mypy_cmd(files, ci):
     return cmd
 
 
-def install_mypy_prerequisites(ci):
+def install_mypy_prerequisites(ci_check):
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Args:
-        ci: bool. Whether to test is for CI.
+        ci_check: bool. Whether the test is for CI.
 
     Returns:
         int. The return code from installing prerequisites.
     """
-    if ci:
+    # TODO(#13398): Change MyPy installation after Python3 migration.
+    if ci_check:
         cmd = [
             PYTHON3_CMD, '-m', 'pip', 'install', '-r',
             MYPY_REQUIREMENTS_FILE_PATH
@@ -848,7 +849,7 @@ def main(args=None):
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
-    return_code = install_mypy_prerequisites(parsed_args.ci)
+    return_code = install_mypy_prerequisites(parsed_args.ci_check)
     if return_code != 0:
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
@@ -858,7 +859,7 @@ def main(args=None):
         'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(parsed_args, 'files'), parsed_args.ci)
+    cmd = get_mypy_cmd(getattr(parsed_args, 'files'), parsed_args.ci_check)
 
     _paths_to_insert = [
         MYPY_TOOLS_DIR,
