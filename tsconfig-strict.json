@@ -199,6 +199,8 @@
     "core/templates/domain/opportunity/translatable-texts.model.spec.ts",
     "core/templates/domain/platform_feature/client-context.model.ts",
     "core/templates/domain/platform_feature/client-context.model.spec.ts",
+    "core/templates/domain/platform_feature/feature-status-summary.model.ts",
+    "core/templates/domain/platform_feature/feature-status-summary.model.spec.ts",
     "core/templates/domain/platform_feature/platform-feature-admin-backend-api.service.ts",
     "core/templates/domain/platform_feature/platform-feature-admin-backend-api.service.spec.ts",
     "core/templates/domain/platform_feature/platform-feature-dummy-backend-api.service.ts",
