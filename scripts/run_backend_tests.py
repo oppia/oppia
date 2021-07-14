@@ -247,8 +247,10 @@ def _get_all_test_targets_from_shard(shard_name):
     with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
 
-    return [shard_spec for shard_spec in shards_spec.values()]
-
+    ans = []
+    for shard_spec in shards_spec.values():
+        ans += shard_spec
+    return ans
 
 def _check_shards_match_tests(include_load_tests=True):
     """Check whether the test shards match the tests that exist.
@@ -364,6 +366,7 @@ def main(args=None):
             raise Exception(validation_error)
         all_test_targets = _get_all_test_targets_from_shard(
             parsed_args.test_shard)
+        print all_test_targets
     else:
         include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets_from_path(
