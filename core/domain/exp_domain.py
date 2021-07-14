@@ -1942,7 +1942,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 50
+    CURRENT_EXP_SCHEMA_VERSION = 51
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2032,6 +2032,29 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states'] = cls._convert_states_v44_dict_to_v45_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 45
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
+        """Converts a v50 exploration dict into a v51 exploration dict.
+        Version 51 ensures that unicode written_translations are stripped of
+        HTML tags and have data_format field set to unicode.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v50.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v51.
+        """
+
+        exploration_dict['schema_version'] = 51
+
+        exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 46
 
         return exploration_dict
 

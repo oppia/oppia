@@ -413,7 +413,8 @@ class TranslationSuggestionUnicodeFixOneOffJobTests(
         valid_suggestion = suggestion_services.get_suggestion_by_id(
             invalid_suggestion.suggestion_id)
         self.assertEqual(valid_suggestion.change.data_format, 'unicode')
-        self.assertEqual(valid_suggestion.change.translation_html, 'চালিয়ে যান')
+        self.assertEqual(
+            valid_suggestion.change.translation_html, 'চালিয়ে যান')
 
 
 class PopulateTranslationContributionStatsOneOffJobTests(
