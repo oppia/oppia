@@ -288,7 +288,7 @@ describe('Contributor dashboard admin page contribution rights form', () => {
     await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
     await users.createUser(TRANSLATION_ADMIN_EMAIL, TRANSLATION_ADMIN_USERNAME);
 
-    await users.createAndLoginCurriculumAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
 
     await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
@@ -362,7 +362,7 @@ describe('Translation contribution featured languages', () => {
       new ContributorDashboardPage.ContributorDashboardPage());
     contributorDashboardTranslateTextTab = (
       contributorDashboardPage.getTranslateTextTab());
-    await users.createAndLoginCurriculumAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
     var adminPage = new AdminPage.AdminPage();
     await adminPage.editConfigProperty(

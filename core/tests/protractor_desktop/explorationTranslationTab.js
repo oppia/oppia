@@ -49,11 +49,8 @@ describe('Exploration translation and voiceover tab', function() {
     await users.createUser(
       'voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
-    await users.createUser('voiceoverAdmin@exp.com', 'voiceoverManager');
-    await users.createAndLoginCurriculumAdminUser(
-      'superUser@translationTab.com', 'superUser');
-    await adminPage.updateRole('voiceoverManager', 'voiceover admin');
-    await users.logout();
+    await users.createUserWithRole(
+      'voiceoverAdmin@exp.com', 'voiceoverManager', 'voiceover admin');
     await users.login('user@editorTab.com');
     await workflow.createExploration(true);
 

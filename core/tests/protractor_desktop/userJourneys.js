@@ -91,7 +91,7 @@ describe('Basic user journeys', function() {
   });
 });
 
-describe('Site language', function() {
+fdescribe('Site language', function() {
   var adminPage = null;
   var collectionId = null;
   var creatorDashboardPage = null;
@@ -116,15 +116,8 @@ describe('Site language', function() {
     var CREATOR_USERNAME = 'langCreatorExplorations';
     var EDITOR_USERNAME = 'langCollections';
 
-    await users.createUser('lang@collections.com', EDITOR_USERNAME);
-    await users.createAndLoginCurriculumAdminUser(
-      'langCreator@explorations.com', CREATOR_USERNAME);
-    await users.logout();
-    await users.createAndLoginCurriculumAdminUser(
-      'testlangadm@collections.com', 'testlangadm');
-    await adminPage.get();
-    await adminPage.addRole(EDITOR_USERNAME, 'collection editor');
-    await users.logout();
+    await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    await users.createCollectionEditor('lang@collections.com', EDITOR_USERNAME);
 
     await users.login('langCreator@explorations.com');
     await workflow.createExploration(true);

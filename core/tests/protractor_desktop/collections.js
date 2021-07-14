@@ -48,14 +48,10 @@ describe('Collections', function() {
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
     await users.createUser('creator@explorations.com', CREATOR_USERNAME);
-    await users.createUser('player@collections.com', PLAYER_USERNAME);
-    await users.createUser('alice@collections.com', EDITOR_USERNAME);
-    await users.createAndLoginCurriculumAdminUser(
-      'testadm@collections.com', 'testadm');
-    await adminPage.get();
-    await adminPage.addRole(EDITOR_USERNAME, 'collection editor');
-    await adminPage.addRole(PLAYER_USERNAME, 'collection editor');
-    await users.logout();
+    await users.createCollectionEditor(
+      'player@collections.com', PLAYER_USERNAME);
+    await users.createCollectionEditor(
+      'alice@collections.com', EDITOR_USERNAME);
 
     await users.login('creator@explorations.com');
     // Create four test explorations.

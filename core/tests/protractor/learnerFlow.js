@@ -114,7 +114,7 @@ describe('Learner dashboard functionality', function() {
 
   it('should visit the exploration player and play the correct exploration',
     async function() {
-      await users.createAndLoginCurriculumAdminUser(
+      await users.createAndLoginSuperAdminUser(
         'expCreator@learnerDashboard.com', 'expCreator');
       // Create or load an exploration named 'Exploration Player Test'.
       if (browser.isMobile) {
@@ -139,7 +139,7 @@ describe('Learner dashboard functionality', function() {
 
   it('should visit the collection player and play the correct collection',
     async function() {
-      await users.createAndLoginCurriculumAdminUser(
+      await users.createAndLoginSuperAdminUser(
         'expOfCollectionCreator@learnerDashboard.com',
         'expOfCollectionCreator');
       // Create or load a collection named
@@ -157,7 +157,7 @@ describe('Learner dashboard functionality', function() {
         // Update the role of the user to admin since only admin users
         // can create a collection.
         await adminPage.get();
-        await adminPage.addRole('expOfCollectionCreator', 'admin');
+        await adminPage.addRole('expOfCollectionCreator', 'collection editor');
         await workflow.createCollectionAsAdmin();
         await collectionEditorPage.searchForAndAddExistingExploration(
           'Demo Exploration');
@@ -181,7 +181,7 @@ describe('Learner dashboard functionality', function() {
     });
 
   it('should display incomplete and completed explorations', async function() {
-    await users.createAndLoginCurriculumAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'originalCreator@learnerDashboard.com', 'originalCreator');
     // Create or load explorations.
     if (browser.isMobile) {
@@ -265,9 +265,10 @@ describe('Learner dashboard functionality', function() {
     // For desktop, go to the exploration editor page and
     // delete 'Dummy Exploration'.
     if (!browser.isMobile) {
-      // Login as Admin and delete exploration 'Dummy Exploration'.
-      await users.createAndLoginCurriculumAdminUser(
+      // Login as Moderator and delete exploration 'Dummy Exploration'.
+      await users.createModerator(
         'inspector@learnerDashboard.com', 'inspector');
+      await users.login('inspector@learnerDashboard.com');
       await libraryPage.get();
       await libraryPage.findExploration('Dummy Exploration');
       await libraryPage.playExploration('Dummy Exploration');
@@ -292,7 +293,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should display incomplete and completed collections', async function() {
-    await users.createAndLoginCurriculumAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'explorationCreator@learnerDashboard.com', 'explorationCreator');
     // Create or load a collection.
     if (browser.isMobile) {
@@ -308,10 +309,10 @@ describe('Learner dashboard functionality', function() {
         'English',
         false
       );
-      // Update the role of the user to admin since only admin users
-      // can create a collection.
+      // Update the role of the user to collection editor since only collection
+      // editors can create a collection.
       await adminPage.get();
-      await adminPage.addRole('explorationCreator', 'admin');
+      await adminPage.addRole('explorationCreator', 'collection editor');
       // Create new 'Test Collection' containing
       // exploration 'Dummy Exploration'.
       await workflow.createCollectionAsAdmin();

@@ -117,6 +117,12 @@ var createAndLoginCurriculumAdminUser = async function(email, username) {
   await adminPage.addRole(username, ' curriculum admin ');
 };
 
+var createAndLoginSuperAdminUser = async function(email, username) {
+  await _createFirebaseAccount(email, true);
+  await login(email);
+  await _completeSignup(username);
+};
+
 var createAndLoginCurriculumAdminUserMobile = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
@@ -133,13 +139,21 @@ var createUser = async function(email, username) {
   await logout();
 };
 
-var createModerator = async function(email, username) {
+var createUserWithRole = async function(email, username, role) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
   await adminPage.get();
-  await adminPage.addRole(username, 'moderator');
+  await adminPage.addRole(username, role);
   await logout();
+}
+
+var createModerator = async function(email, username) {
+  await createUserWithRole(email, username, 'moderator');
+};
+
+var createCollectionEditor = async function(email, username) {
+  await createUserWithRole(email, username, 'collection editor')
 };
 
 var createAdmin = async function(email, username) {
@@ -147,18 +161,16 @@ var createAdmin = async function(email, username) {
   await logout();
 };
 
-var isCurriculumAdmin = async function() {
-  return await element(by.css('.protractor-test-admin-text')).isPresent();
-};
-
-exports.isCurriculumAdmin = isCurriculumAdmin;
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
 exports.createAndLoginUser = createAndLoginUser;
+exports.createUserWithRole = createUserWithRole;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
+exports.createCollectionEditor = createCollectionEditor;
 exports.createAndLoginCurriculumAdminUser = createAndLoginCurriculumAdminUser;
+exports.createAndLoginSuperAdminUser = createAndLoginSuperAdminUser;
 exports.createAdminMobile = createAdminMobile;
 exports.createAndLoginCurriculumAdminUserMobile = (
   createAndLoginCurriculumAdminUserMobile);

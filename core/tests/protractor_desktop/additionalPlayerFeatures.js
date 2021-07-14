@@ -63,7 +63,7 @@ describe('Full exploration editor', function() {
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
 
-      await workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial(false);
       await explorationEditorMainTab.startTutorial();
       await explorationEditorMainTab.playTutorial();
       await explorationEditorMainTab.finishTutorial();
@@ -219,8 +219,8 @@ describe('Full exploration editor', function() {
 
   it('should give option for redirection when author has specified ' +
       'a refresher exploration ID', async function() {
-    await users.createAndLoginCurriculumAdminUser(
-      'testadm@collections.com', 'testadm');
+    await users.createCollectionEditor('testadm@collections.com', 'testadm');
+    await users.login('testadm@collections.com');
 
     // Create Parent Exploration not added to collection.
     await creatorDashboardPage.get();

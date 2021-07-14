@@ -70,7 +70,7 @@ var openEditRolesForm = async function() {
 
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = async function(welcomeModalIsShown) {
-  await createExplorationAndStartTutorial();
+  await createExplorationAndStartTutorial(false);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   if (welcomeModalIsShown) {
@@ -79,14 +79,12 @@ var createExploration = async function(welcomeModalIsShown) {
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
-var createExplorationAndStartTutorial = async function() {
+var createExplorationAndStartTutorial = async function(isCollectionEditor) {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
-  // Wait for the dashboard to transition the creator into the editor page.
-  var isCurriculumAdmin = await users.isCurriculumAdmin();
 
   await creatorDashboardPage.clickCreateActivityButton();
-  if (isCurriculumAdmin) {
+  if (isCollectionEditor) {
     var activityCreationModal = element(
       by.css('.protractor-test-creation-modal'));
     await waitFor.visibilityOf(

@@ -34,7 +34,7 @@ describe('Admin Page', function() {
       'collectionEdtior1@adminTab.com', 'collectionEditor1');
     await users.createUser(
       'newQuestionReviewer@adminTab.com', 'newQuestionReviewer');
-    await users.createAndLoginCurriculumAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'management@adminTab.com', 'management');
     await adminPage.get();
     await adminPage.addRole('moderator1', 'moderator');
