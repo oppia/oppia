@@ -96,7 +96,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'android_report_info_schema_version': 1,
         'app_context': {
             'entry_point': {
-                'entry_point_name': 'navigation_drawer'
+                'entry_point_name': 'navigation_drawer',
+                'entry_point_exploration_id': None,
+                'entry_point_story_id': None,
+                'entry_point_topic_id': None,
+                'entry_point_subtopic_id': None,
             },
             'text_size': 'large_text_size',
             'text_language_code': 'en',
