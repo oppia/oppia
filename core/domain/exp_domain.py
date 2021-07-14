@@ -2114,6 +2114,11 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 50
 
+        if exploration_schema_version == 50:
+            exploration_dict = cls._convert_v50_dict_to_v51_dict(
+                exploration_dict)
+            exploration_schema_version = 51
+
         return exploration_dict
 
     @classmethod
