@@ -216,7 +216,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'subtopic-summary-tile.directive.ts',
     'subtopic.model.ts',
     'suggestion-modal-for-exploration-editor.service.ts',
-    'supplemental-card.directive.ts',
     'svm-prediction.service.ts',
     'teacher.ts',
     'teacher2.ts',
