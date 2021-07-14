@@ -296,6 +296,8 @@ class UploadExplorationHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         yaml_content = self.request.get('yaml_file')
+        print('AAA')
+        print(yaml_content)
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:
