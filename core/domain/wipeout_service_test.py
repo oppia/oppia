@@ -625,7 +625,14 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             story_ids=[], learnt_topic_ids=[]
         ).put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            called=False  # Func shouldn't be called when emails are disabled.
+        )
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -4986,7 +4993,13 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
     def test_repeated_deletion_is_successful_when_emails_disabled(self):
-        with self.send_mail_to_admin_swap, self.cannot_send_email_swap:
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            called=False  # Func shouldn't be called when emails are disabled.
+        )
+        with send_mail_to_admin_swap, self.cannot_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
             wipeout_service.delete_users_pending_to_be_deleted()
@@ -5067,7 +5080,13 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         self.assertIn(self.user_1_id, self.email_bodies[0])
 
     def test_verification_when_user_is_not_deleted_emails_disabled(self):
-        with self.send_mail_to_admin_swap, self.cannot_send_email_swap:
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            called=False  # Func shouldn't be called when emails are disabled.
+        )
+        with send_mail_to_admin_swap, self.cannot_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
 
