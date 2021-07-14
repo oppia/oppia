@@ -436,7 +436,7 @@ class ExplorationFileDownloader(EditorHandler):
         else:
             init_filename = 'oppia-%s-v%s.zip' % (
                 exploration.title.replace(' ', ''), version)
-        filename = utils.to_ascii(init_filename).decode('utf-8')
+        filename = utils.to_ascii(init_filename)
 
         if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.render_downloadable_file(

@@ -53,18 +53,18 @@ class UtilsTests(test_utils.GenericTestBase):
         # type: () -> None
         """Test to_ascii method."""
         parsed_str = utils.to_ascii('abc')
-        self.assertEqual(parsed_str, b'abc')
+        self.assertEqual(parsed_str, 'abc')
 
-        parsed_str = utils.to_ascii(u'¡Hola!')
-        self.assertEqual(parsed_str, b'Hola!')
+        parsed_str = utils.to_ascii('¡Hola!')
+        self.assertEqual(parsed_str, 'Hola!')
 
         parsed_str = utils.to_ascii(
             u'Klüft skräms inför på fédéral électoral große')
         self.assertEqual(
-            parsed_str, b'Kluft skrams infor pa federal electoral groe')
+            parsed_str, 'Kluft skrams infor pa federal electoral groe')
 
         parsed_str = utils.to_ascii('')
-        self.assertEqual(parsed_str, b'')
+        self.assertEqual(parsed_str, '')
 
     def test_yaml_dict_conversion(self):
         # type: () -> None

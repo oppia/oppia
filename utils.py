@@ -210,7 +210,9 @@ def to_ascii(input_string):
     Returns:
         str. String containing the ascii representation of the input string.
     """
-    return unicodedata.normalize('NFKD', python_utils.UNICODE(input_string))
+    normalized_string = unicodedata.normalize(
+        'NFKD', python_utils.UNICODE(input_string))
+    return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
 def dict_from_yaml(yaml_str):
@@ -308,7 +310,7 @@ def convert_png_data_url_to_binary(image_data_url):
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
             python_utils.urllib_unquote( # type: ignore[no-untyped-call]
-                image_data_url[len(PNG_DATA_URL_PREFIX):])).decode('utf-8')
+                image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
 
@@ -327,11 +329,11 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     """
     # We accept unicode but imghdr.what(file, h) accept 'h' of type str.
     # So we have casted content to be str.
-    content = cast(str, content)
+    content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content.encode('utf-8'))) # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
