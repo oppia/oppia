@@ -784,7 +784,6 @@ def get_mypy_cmd(files, install_globally):
     Returns:
         list(str). List of command line arguments.
     """
-    # TODO(#13113): Change mypy command to mypy path after Python3 migration.
     if install_globally:
         mypy_cmd = 'mypy'
     else:
@@ -861,7 +860,8 @@ def main(args=None):
         'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(parsed_args, 'files'), parsed_args.install_globally)
+    cmd = get_mypy_cmd(
+        getattr(parsed_args, 'files'), parsed_args.install_globally)
 
     _paths_to_insert = [
         MYPY_TOOLS_DIR,
