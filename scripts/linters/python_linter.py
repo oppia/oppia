@@ -93,6 +93,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         """
         pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
         config_pylint = '--rcfile=%s' % pylintrc_path
+        ignore_file = '--ignore=core/domain/exploration_pb2.py'
         config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
 
         files_to_lint = self.all_filepaths
@@ -116,7 +117,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
 
             pylint_report = python_utils.string_io()
             pylinter = lint.Run(
-                current_files_to_lint + [config_pylint],
+                current_files_to_lint + [config_pylint] + [ignore_file],
                 reporter=text.TextReporter(pylint_report),
                 exit=False).linter
 
