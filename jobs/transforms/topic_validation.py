@@ -48,3 +48,11 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
         name = model.name
         if name.lower() != model.canonical_name:
             yield topic_validation_errors.ModelCanonicalNameMismatchError(model)
+
+
+@validation_decorators.RelationshipsOf(topic_models.TopicSummaryModel)
+def topic_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [topic_models.TopicModel]
+    yield model.id, [topic_models.TopicRightsModel]

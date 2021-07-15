@@ -28,7 +28,8 @@ from jobs.types import feedback_validation_errors
 
 import apache_beam as beam
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(exp_models, feedback_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.feedback])
 
 
 @validation_decorators.AuditsExisting(
@@ -50,3 +51,10 @@ class ValidateEntityType(beam.DoFn):
         if (model.entity_type not in
                 feedback_services.TARGET_TYPE_TO_TARGET_MODEL):
             yield feedback_validation_errors.InvalidEntityTypeError(model)
+
+
+@validation_decorators.RelationshipsOf(feedback_models.FeedbackAnalyticsModel)
+def feedback_analytics_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [exp_models.ExplorationModel]

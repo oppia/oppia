@@ -20,7 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import feedback_validation
 from jobs.types import feedback_validation_errors
 
@@ -66,3 +68,11 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
                 feedback_validation.ValidateEntityType())
         )
         self.assert_pcoll_equal(output, [])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_feedback_analytics_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'FeedbackAnalyticsModel', 'id'), ['ExplorationModel'])

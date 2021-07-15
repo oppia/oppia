@@ -25,7 +25,8 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models, skill_models) = models.Registry.import_models(
+    [models.NAMES.question, models.NAMES.skill])
 
 
 @validation_decorators.AuditsExisting(
@@ -45,6 +46,29 @@ class ValidateQuestionSnapshotMetadataModel(
             changes made by commit commands of the model.
         """
         return question_domain.QuestionChange
+
+
+@validation_decorators.RelationshipsOf(question_models.QuestionSkillLinkModel)
+def question_skill_link_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [question_models.QuestionModel]
+    yield model.skill_id, [skill_models.SkillModel]
+
+
+@validation_decorators.RelationshipsOf(
+    question_models.QuestionCommitLogEntryModel)
+def question_commit_log_entry_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.question_id, [question_models.QuestionModel]
+
+
+@validation_decorators.RelationshipsOf(question_models.QuestionSummaryModel)
+def question_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [question_models.QuestionModel]
 
 
 @validation_decorators.AuditsExisting(
