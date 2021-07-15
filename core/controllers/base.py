@@ -375,7 +375,7 @@ class BaseHandler(webapp2.RequestHandler):
                     handler_class_name))
 
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
-        normalized_value, errors = (
+        normalized_arg_values, errors = (
             payload_validator.validate(
                 url_path_args, schema_for_url_path_args, extra_args_are_allowed)
         )
@@ -399,17 +399,32 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
-        normalized_value, errors = (
+        normalized_arg_values, errors = (
             payload_validator.validate(
                 handler_args, schema_for_request_method, extra_args_are_allowed)
         )
 
         self.normalized_payload = {
-            arg: normalized_value.get(arg) for arg in payload_arg_keys
+            arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
         }
         self.normalized_request = {
-            arg: normalized_value.get(arg) for arg in request_arg_keys
+            arg: normalized_arg_values.get(arg) for arg in request_arg_keys
         }
+
+        # The following keys are absent in request/payload but present in
+        # normalized_arg_values because these args are populated from their
+        # default_value provided in the schema.
+        keys_that_correspond_to_default_values = list(
+            set(normalized_arg_values.keys()) -
+            set(payload_arg_keys + request_arg_keys)
+        )
+        # Populate the payload/request with the default args before passing
+        # execution onwards to the handler.
+        for arg in keys_that_correspond_to_default_values:
+            if request_method in ['GET', 'DELETE']:
+                self.normalized_request[arg] = normalized_arg_values.get(arg)
+            else:
+                self.normalized_payload[arg] = normalized_arg_values.get(arg)
 
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
