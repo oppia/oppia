@@ -75,7 +75,7 @@ angular.module('oppia').directive('conceptCard', [function() {
             $rootScope.$apply();
           }, function(errorResponse) {
             ctrl.loadingMessage = 'Oops, it looks like this skill has been ' +
-              'deleted. A message has been sent to the lesson creator';
+              'deleted';
           });
         };
       }
