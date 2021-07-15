@@ -210,7 +210,7 @@ describe('SvgSanitizerService', () => {
     var expectedDimension = {
       height: '1d429',
       width: '1d33',
-      verticalPadding: '0'
+      verticalPadding: ''
     };
     expect(dimensions).toEqual(expectedDimension);
   });
