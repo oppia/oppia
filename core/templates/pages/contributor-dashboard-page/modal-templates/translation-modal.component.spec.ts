@@ -409,23 +409,6 @@ describe('Translation Modal Component', () => {
       });
     });
 
-    describe('when all images are not copied', () => {
-      it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-val' +
-          'ue="&amp;quot;Image description&amp;quot;" caption-with-value="&' +
-          'amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
-          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
-          '</oppia-noninteractive-image>';
-        component.activeWrittenTranslation.html = '';
-        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
-
-        component.suggestTranslatedText();
-
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
-      });
-    });
-
     describe('when alt text is not changed in copied images', () => {
       it('should not submit the translation', () => {
         component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
