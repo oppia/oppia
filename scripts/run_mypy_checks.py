@@ -753,7 +753,7 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--install-globally',
     help='If true, installs mypy and its requirements globally.'
-    ' The default value is false.',
+    ' By default, they are installed to ' + MYPY_TOOLS_DIR,
     action='store_true')
 
 _PARSER.add_argument(
@@ -779,7 +779,8 @@ def get_mypy_cmd(files, install_globally):
 
     Args:
         files: list(list(str)). List having first element as list of string.
-        install_globally: bool. Whether the test is for CI.
+        install_globally: bool. Whether mypy and its requirements are installed
+            globally.
 
     Returns:
         list(str). List of command line arguments.
@@ -805,7 +806,8 @@ def install_mypy_prerequisites(install_globally):
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Args:
-        install_globally: bool. Whether the test is for CI.
+        install_globally: bool. Whether mypy and its requirements are to be
+            installed globally.
 
     Returns:
         int. The return code from installing prerequisites.

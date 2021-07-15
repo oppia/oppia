@@ -71,19 +71,19 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks, 'EXCLUDED_DIRECTORIES',
             ['dir1/', 'dir2/'])
 
-        def mock_install_mypy_prerequisites_success(ci): # pylint: disable=unused-argument
+        def mock_install_mypy_prerequisites_success(unused_ci):
             return 0
         self.swap_install_success = self.swap(
             run_mypy_checks, 'install_mypy_prerequisites',
             mock_install_mypy_prerequisites_success)
 
         def mock_popen_user_prefix_error_call(
-                unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+                cmd_tokens, *unused_args, **unused_kwargs):
             class Ret(python_utils.OBJECT):
                 """Return object that gives user-prefix error."""
 
                 def __init__(self):
-                    if '--user' in unused_cmd_tokens:
+                    if '--user' in cmd_tokens:
                         self.returncode = 0
                     else:
                         self.returncode = 1
@@ -98,7 +98,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.mypy_cmd_path = os.path.join(
             os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
 
-        def mock_install_mypy_prerequisites(ci): # pylint: disable=unused-argument
+        def mock_install_mypy_prerequisites(unused_ci):
             return 0
         self.mypy_install_swap = self.swap_with_checks(
             run_mypy_checks, 'install_mypy_prerequisites',
