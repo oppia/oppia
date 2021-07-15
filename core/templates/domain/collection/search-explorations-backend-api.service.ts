@@ -53,19 +53,17 @@ export class SearchExplorationsBackendApiService {
         query: btoa(searchQuery)
       }
     );
-    if (queryUrl) {
-      this.http.get<SearchExplorationBackendResponse>(
-        queryUrl).toPromise().then(response => {
-        var explorationMetadataBackendList = cloneDeep(
-          response.collection_node_metadata_list);
-        var explorationMetadataList = explorationMetadataBackendList.map(
-          explorationMetaData => ExplorationMetadata.
-            createFromBackendDict(explorationMetaData));
-        successCallback(explorationMetadataList);
-      }, (errorResponse) => {
-        errorCallback(errorResponse.error.error);
-      });
-    }
+    this.http.get<SearchExplorationBackendResponse>(
+      queryUrl).toPromise().then(response => {
+      var explorationMetadataBackendList = cloneDeep(
+        response.collection_node_metadata_list);
+      var explorationMetadataList = explorationMetadataBackendList.map(
+        explorationMetaData => ExplorationMetadata.
+          createFromBackendDict(explorationMetaData));
+      successCallback(explorationMetadataList);
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
   }
 
   /**

@@ -61,23 +61,21 @@ export class ClassroomBackendApiService {
       ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
         classroom_url_fragment: classroomUrlFragment
       });
-    if (classroomDataUrl) {
-      this.http.get<ClassroomDataBackendDict>(
-        classroomDataUrl).toPromise().then(response => {
-        this.classroomData = (
-          ClassroomData.createFromBackendData(
-            response.name, response.topic_summary_dicts,
-            response.course_details,
-            response.topic_list_intro));
-        if (successCallback) {
-          successCallback(this.classroomData);
-        }
-      }, errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
-    }
+    this.http.get<ClassroomDataBackendDict>(
+      classroomDataUrl).toPromise().then(response => {
+      this.classroomData = (
+        ClassroomData.createFromBackendData(
+          response.name, response.topic_summary_dicts,
+          response.course_details,
+          response.topic_list_intro));
+      if (successCallback) {
+        successCallback(this.classroomData);
+      }
+    }, errorResponse => {
+      if (errorCallback) {
+        errorCallback(errorResponse.error.error);
+      }
+    });
   }
 
   _fetchClassroomPromosAreEnabledStatus(
