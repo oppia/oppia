@@ -125,21 +125,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
     {
-        'regexp': re.compile(r'templateUrl: \''),
-        'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/pages/exploration-player-page/'
-            'FeedbackPopupDirective.js',
-            '.component.ts'
-        ),
-        'excluded_dirs': (
-            'extensions/answer_summarizers/',
-            'extensions/classifiers/',
-            'extensions/dependencies/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
-    },
-    {
         'regexp': re.compile(r':\n? *HttpClient'),
         'message': (
             'An instance of HttpClient is found in this file. You are not '
