@@ -26,44 +26,55 @@ import functools
 from core.platform import models
 import python_utils
 
+from typing import Any, Callable, Iterator, List, Optional, Text, Tuple
+
 from google.appengine.api import datastore_types
 from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
-transaction_services = models.Registry.import_transaction_services()
-Model = ndb.Model
-Key = ndb.Key
-Property = ndb.Property
-Query = ndb.Query
+MYPY=False
+if MYPY:
+    from mypy_imports import *
+else:
+    transaction_services = models.Registry.import_transaction_services()
 
-BooleanProperty = ndb.BooleanProperty
-DateProperty = ndb.DateProperty
-ComputedProperty = ndb.ComputedProperty
-DateTimeProperty = ndb.DateTimeProperty
-FloatProperty = ndb.FloatProperty
-IntegerProperty = ndb.IntegerProperty
-JsonProperty = ndb.JsonProperty
-UserProperty = ndb.UserProperty
+
+Model = ndb.Model # type: Any
+Key = ndb.Key # type: Any
+Property = ndb.Property # type: Any
+Query = ndb.Query # type: Any
+
+BooleanProperty = ndb.BooleanProperty # type: Any
+DateProperty = ndb.DateProperty # type: Any
+ComputedProperty = ndb.ComputedProperty # type: Any
+DateTimeProperty = ndb.DateTimeProperty # type: Any
+FloatProperty = ndb.FloatProperty # type: Any
+IntegerProperty = ndb.IntegerProperty # type: Any
+JsonProperty = ndb.JsonProperty # type: Any
+UserProperty = ndb.UserProperty # type: Any
 
 
 @functools.wraps(ndb.StringProperty)
 def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
+    # type: (*Any, **Any) -> ndb.StringProperty
     """Enforces requirement for models to use StringProperty(indexed=True)."""
-    if not kwargs.get('indexed', True):
+    if not kwargs.get('indexed', True): # type: ignore[call-overload]
         raise ValueError('StringProperty(indexed=False) is no longer supported')
     return ndb.StringProperty(*args, **kwargs)
 
 
 @functools.wraps(ndb.TextProperty)
 def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
+    # type: (*Any, **Any) -> ndb.TextProperty
     """Enforces requirement for models to use TextProperty(indexed=False)."""
-    if kwargs.get('indexed', False):
+    if kwargs.get('indexed', False): # type: ignore[call-overload]
         raise ValueError('TextProperty(indexed=True) is no longer supported')
     return ndb.TextProperty(*args, **kwargs)
 
 
 def get_multi(keys):
+    # type: (List[Text]) -> List[Optional[Model]]
     """Fetches models corresponding to a sequence of keys.
 
     Args:
@@ -73,10 +84,11 @@ def get_multi(keys):
         list(datastore_services.Model | None). List whose items are either a
         Model instance or None if the corresponding key wasn't found.
     """
-    return ndb.get_multi(keys)
+    return ndb.get_multi(keys) # type: ignore[no-any-return]
 
 
 def update_timestamps_multi(entities, update_last_updated_time=True):
+    # type: (List[Model], bool) -> None
     """Update the created_on and last_updated fields of all given entities.
 
     Args:
@@ -91,6 +103,7 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
 
 
 def put_multi(entities):
+    # type: (List[Model]) -> List[Text]
     """Stores a sequence of Model instances.
 
     Args:
@@ -99,11 +112,12 @@ def put_multi(entities):
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(entities)
+    return ndb.put_multi(entities) # type: ignore[no-any-return]
 
 
 @transaction_services.run_in_transaction_wrapper
 def delete_multi_transactional(keys):
+    # type: (List[Text]) -> List[None]
     """Deletes models corresponding to a sequence of keys and runs it through
     a transaction. Either all models are deleted, or none of them in the case
     when the transaction fails.
@@ -114,10 +128,11 @@ def delete_multi_transactional(keys):
     Returns:
         list(None). A list of Nones, one per deleted model.
     """
-    return ndb.delete_multi(keys)
+    return ndb.delete_multi(keys) # type: ignore[no-any-return]
 
 
 def delete_multi(keys):
+    # type: (List[Text]) -> List[None]
     """Deletes models corresponding to a sequence of keys.
 
     Args:
@@ -126,10 +141,11 @@ def delete_multi(keys):
     Returns:
         list(None). A list of Nones, one per deleted model.
     """
-    return ndb.delete_multi(keys)
+    return ndb.delete_multi(keys) # type: ignore[no-any-return]
 
 
 def transaction(callback):
+    # type: (Callable[..., Any]) -> Any
     """Run a callback in a transaction.
 
     To pass arguments to a callback function, use a lambda, for example:
@@ -152,11 +168,13 @@ def transaction(callback):
 
 
 def query_everything():
+    # type: () -> Query
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query()
 
 
 def all_of(*nodes):
+    # type: (*Query.node) -> Query.node
     """Returns a query node which performs a boolean AND on their conditions.
 
     Args:
@@ -170,6 +188,7 @@ def all_of(*nodes):
 
 
 def any_of(*nodes):
+    # type: (*Query.node) -> Query.node
     """Returns a query node which performs a boolean OR on their conditions.
 
     Args:
@@ -183,6 +202,7 @@ def any_of(*nodes):
 
 
 def make_cursor(urlsafe_cursor=None):
+    # type: (Optional[Text]) -> datastore_query.Cursor
     """Makes an immutable cursor that points to a relative position in a query.
 
     The position denoted by a Cursor is relative to the result of a query, even
@@ -208,6 +228,7 @@ def make_cursor(urlsafe_cursor=None):
 
 
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):
+    # type: (List[Tuple[Text, List[Text]]]) -> List[List[Model]]
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
 
@@ -220,7 +241,7 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
         to the ids and models. The models corresponding to the same tuple in the
         input are grouped together.
     """
-    entity_keys = []
+    entity_keys = [] # type: List[Key]
     for (model_name, entity_ids) in ids_and_models:
         # Add the keys to the list of keys whose entities we have to fetch.
         entity_keys = (
@@ -240,6 +261,7 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
 
 
 def make_instantaneous_global_consistency_policy():
+    # type: () -> datastore_stub_util.PseudoRandomHRConsistencyPolicy
     """Returns a policy that always gives the same sequence of consistency
     decisions.
 
@@ -251,6 +273,7 @@ def make_instantaneous_global_consistency_policy():
 
 @contextlib.contextmanager
 def mock_datetime_for_datastore(mocked_now):
+    # type: (datetime.datetime) -> Iterator[Any]
     """Mocks parts of the datastore to accept a fake datetime type that always
     returns the same value for utcnow.
 
@@ -278,15 +301,17 @@ def mock_datetime_for_datastore(mocked_now):
         """Pretends to be a datetime.datetime object."""
 
         def __instancecheck__(cls, other):
+            # type: (Any) -> bool
             """Validates whether the given instance is a datetime instance."""
             return isinstance(other, old_datetime_type)
 
     class MockDatetime( # pylint: disable=inherit-non-class
-            python_utils.with_metaclass(MockDatetimeType, old_datetime_type)):
+            python_utils.with_metaclass(MockDatetimeType, old_datetime_type)): # type: ignore[misc]
         """Always returns mocked_now as the current time."""
 
         @classmethod
         def utcnow(cls):
+            # type: () -> datetime.datetime
             """Returns the mocked datetime."""
 
             return mocked_now
