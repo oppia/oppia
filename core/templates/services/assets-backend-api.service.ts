@@ -143,9 +143,6 @@ export class AssetsBackendApiService {
         entity_type: entityType,
         entity_id: entityId
       });
-    if (thumbnailFileUrl === null) {
-      throw new Error('Thumbnail File Url is null');
-    }
     return this.http.post<{filename: string}>(thumbnailFileUrl, form);
   }
 
@@ -197,9 +194,6 @@ export class AssetsBackendApiService {
         asset_type: assetType,
         filename: filename,
       });
-    if (downloadUrl === null) {
-      throw new Error('Download Url is null');
-    }
     return downloadUrl;
   }
 
@@ -261,9 +255,6 @@ export class AssetsBackendApiService {
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
-    if (audioUploadUrl === null) {
-      throw new Error('Audio Upload Url is null');
-    }
     return audioUploadUrl;
   }
 
@@ -272,9 +263,6 @@ export class AssetsBackendApiService {
     let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
-    if (imageUploadUrl === null) {
-      throw new Error('Image Upload Url is null');
-    }
     return imageUploadUrl;
   }
 }
