@@ -182,7 +182,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'set-of-translatable-html-content-ids-editor.component.ts',
     'set-of-unicode-string-editor.component.ts',
     'shared.ts',
-    'skill-concept-card-editor.directive.ts',
     'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-state.service.ts',
     'skill-prerequisite-skills-editor.directive.ts',
