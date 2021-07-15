@@ -51,9 +51,7 @@ export class SkillRightsBackendApiService {
       SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
         skill_id: skillId
       });
-    if (skillRightsUrl === null) {
-      throw new Error('Skill Rights Url is possibly null!');
-    }
+
     this.http.get<SkillRightsBackendDict>(skillRightsUrl).toPromise()
       .then(response => {
         let skillRightsObject = SkillRights.createFromBackendDict(response);

@@ -72,17 +72,12 @@ export class ClassifierDataBackendApiService {
 
   private _getDownloadUrl(
       entityType: string, entityId: string, filename: string): string {
-    let downloadUrl = this.urlInterpolationService.interpolateUrl(
+    return this.urlInterpolationService.interpolateUrl(
       this.classifierDataDownloadUrlTemplate, {
         entity_type: entityType,
         entity_id: entityId,
         filename: filename,
       });
-    if (downloadUrl) {
-      return downloadUrl;
-    } else {
-      throw new Error('Donwload Url is null');
-    }
   }
 
   private async getClassifierMetadataAsync(

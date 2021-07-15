@@ -61,6 +61,11 @@ export interface CategorizedSkills {
   };
 }
 
+interface SubtopicSkills {
+  [subtopicName: string]: ShortSkillSummary[];
+  uncategorized: ShortSkillSummary[];
+}
+
 export interface TopicsAndSkillsDashboardDataBackendDict {
   'all_classroom_names': string[];
   'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
@@ -121,11 +126,9 @@ export class TopicsAndSkillsDashboardBackendApiService {
       let categorizedSkills: CategorizedSkills = {};
       for (let topic in response.categorized_skills_dict) {
         let subtopicSkillsDict = response.categorized_skills_dict[topic];
-        let subtopicSkills:
-         { [subtopicName: string]: ShortSkillSummary[];
-           uncategorized: ShortSkillSummary[]; } = {
-             uncategorized: []
-           };
+        let subtopicSkills: SubtopicSkills = {
+          uncategorized: []
+        };
         for (let subtopic in subtopicSkillsDict) {
           subtopicSkills[subtopic] = (
             subtopicSkillsDict[subtopic].map(
@@ -168,9 +171,6 @@ export class TopicsAndSkillsDashboardBackendApiService {
       '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
         skill_id: skillId
       });
-    if (assignSkillDataUrl === null) {
-      throw new Error('Assign Skill DataUrl is possibly null+');
-    }
     return this.http.get<AssignedSkillDataBackendDict>(
       assignSkillDataUrl).toPromise().then(dict => {
       return dict.topic_assignment_dicts.map(
