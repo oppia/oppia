@@ -796,10 +796,6 @@ class CommonTests(test_utils.GenericTestBase):
             common.write_stdout_safe('test')
 
     def test_write_stdout_safe_with_oserror(self):
-
-        def write_raise_oserror(unused_fileno, unused_bytes):
-            raise OSError('OS error')
-
-        write_swap = self.swap_with_checks(os, 'write', write_raise_oserror)
+        write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))
         with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
             common.write_stdout_safe('test')

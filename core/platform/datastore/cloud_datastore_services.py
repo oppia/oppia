@@ -42,6 +42,9 @@ DateTimeProperty = ndb.DateTimeProperty
 FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
 JsonProperty = ndb.JsonProperty
+StringProperty = ndb.StringProperty
+TextProperty = ndb.TextProperty
+
 
 CLIENT = ndb.Client()
 
@@ -57,22 +60,6 @@ def get_ndb_context(**kwargs):
     return (
         CLIENT.context(**kwargs) if context is None else
         contextlib.nullcontext(enter_result=context))
-
-
-@functools.wraps(ndb.StringProperty)
-def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
-    """Enforces requirement for models to use StringProperty(indexed=True)."""
-    if not kwargs.get('indexed', True):
-        raise ValueError('StringProperty(indexed=False) is no longer supported')
-    return ndb.StringProperty(*args, **kwargs)
-
-
-@functools.wraps(ndb.TextProperty)
-def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
-    """Enforces requirement for models to use TextProperty(indexed=False)."""
-    if kwargs.get('indexed', False):
-        raise ValueError('TextProperty(indexed=True) is no longer supported')
-    return ndb.TextProperty(*args, **kwargs)
 
 
 def get_multi(keys):

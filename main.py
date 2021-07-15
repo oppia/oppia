@@ -165,28 +165,6 @@ def get_redirect_route(regex_route, handler, defaults=None):
         regex_route, handler, name, strict_slash=True, defaults=defaults)
 
 
-def authorization_wrapper(self, *args, **kwargs):
-    # type: (Any, *Any, **Any) -> None
-    """This request handler wrapper only admits internal requests from
-    taskqueue workers. If the request is invalid, it leads to a 403 Error page.
-    """
-    # Internal requests should have an "X-AppEngine-TaskName" header
-    # (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
-    if 'X-AppEngine-TaskName' not in self.request.headers:
-        self.response.out.write('Forbidden')
-        self.response.set_status(403)
-        return
-    self.real_dispatch(*args, **kwargs)
-
-
-def ui_access_wrapper(self, *args, **kwargs):
-    # type: (Any, *Any, **Any) -> None
-    """This request handler wrapper directly serves UI pages
-    for MapReduce dashboards.
-    """
-    self.real_dispatch(*args, **kwargs)
-
-
 # Register the URLs with the classes responsible for handling them.
 URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),

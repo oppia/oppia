@@ -1686,7 +1686,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
         with self.swap(
             user_services, 'get_current_date_as_string',
-            self.mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string
+        ):
             user_services.update_dashboard_stats_log(self.owner_id)
 
         self.assertEqual(
@@ -1697,6 +1698,14 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                     'average_ratings': None
                 }
             }])
+        self.assertEqual(
+            user_services.get_last_week_dashboard_stats(self.owner_id), {
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 1,
+                    'num_ratings': 0,
+                    'average_ratings': None
+                }
+            })
 
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):

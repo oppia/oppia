@@ -1760,19 +1760,6 @@ def parse_date_from_string(datetime_str):
     }
 
 
-def get_user_stats_model(user_id):
-    """Gets the user stats model for the given user_id.
-
-    Args:
-        user_id: str. The unique ID of the user.
-
-    Returns:
-        UserStatsModel|None. The user stats model associated with
-        the given user_id.
-    """
-    return user_models.UserStatsModel.get(user_id, strict=False)
-
-
 def get_user_impact_score(user_id):
     """Gets the user impact score for the given user_id.
 
@@ -1826,7 +1813,6 @@ def get_weekly_dashboard_stats(user_id):
         If the user doesn't exist, then this function returns None.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
-
     if model and model.weekly_creator_stats_list:
         return model.weekly_creator_stats_list
     else:

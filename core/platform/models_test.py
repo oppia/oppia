@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
+import sys
 
 from constants import constants
 from core.platform import models
@@ -331,6 +332,17 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_taskqueue_services(self):
         """Tests import taskqueue services function."""
+
+        class MockCloudTaskqueue():
+            pass
+
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            sys.modules['core.platform.taskqueue.cloud_taskqueue_services'] = (
+                MockCloudTaskqueue
+            )
+            self.assertEqual(
+                self.registry_instance.import_taskqueue_services(),
+                MockCloudTaskqueue)
         from core.platform.taskqueue import dev_mode_taskqueue_services
         self.assertEqual(
             self.registry_instance.import_taskqueue_services(),
@@ -354,6 +366,25 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertEqual(
             self.registry_instance.import_search_services(),
             elastic_search_services)
+
+    def test_import_storage_services(self):
+        """Tests import taskqueue services function."""
+
+        class MockCloudStorage():
+            pass
+
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            # Mock Cloud Storage since importing it fails in emulator env.
+            sys.modules['core.platform.storage.cloud_storage_services'] = (
+                MockCloudStorage
+            )
+            self.assertEqual(
+                self.registry_instance.import_storage_services(),
+                MockCloudStorage)
+        from core.platform.storage import dev_mode_storage_services
+        self.assertEqual(
+            self.registry_instance.import_storage_services(),
+            dev_mode_storage_services)
 
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""

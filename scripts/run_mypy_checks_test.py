@@ -145,6 +145,5 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_install_prerequisites_failure(self):
         with self.popen_swap_failure, self.install_swap:
-            with self.install_mypy_prereq_swap_failure:
-                with self.assertRaisesRegexp(SystemExit, '1'):
-                    run_mypy_checks.main(args=[])
+            with self.assertRaisesRegexp(SystemExit, '1'):
+                run_mypy_checks.main(args=[])
