@@ -23,7 +23,13 @@ from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-datastore_services = models.Registry.import_datastore_services()
+from typing import Any, Dict, Text
+
+MYPY = False
+if MYPY:
+    from mypy_imports import *
+else:
+    datastore_services = models.Registry.import_datastore_services()
 
 
 class ActivityReferencesModel(base_models.BaseModel):
@@ -39,16 +45,19 @@ class ActivityReferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, Any]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -56,6 +65,7 @@ class ActivityReferencesModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, list_name):
+         # type: (Text) -> ActivityReferencesModel
         """This creates the relevant model instance, if it does not already
         exist.
         """
