@@ -240,7 +240,7 @@ describe('Base Content Component', () => {
       // type 'string'.". We need to suppress this error because DateConstructor
       // cannot be mocked without it.
       // @ts-expect-error
-      .withArgs().and.returnValue(new OldDate(NOW_MILLIS))
+      .withArgs().and.returnValue(new oldDate(NOW_MILLIS))
       // This throws "Expected 0 arguments, but got 1.". We need to suppress
       // this error because we pass an argument to the Date constructor in the
       // component code.
