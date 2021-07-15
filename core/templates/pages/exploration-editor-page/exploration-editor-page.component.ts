@@ -17,8 +17,6 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
@@ -176,7 +174,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
+    'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
@@ -199,7 +197,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
+        StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
@@ -370,30 +368,8 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
-          // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and is being played by
-          // learners.
-          if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
-
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
-          }
+          // TODO(#13352): Initialize StateTopAnswersStatsService and register
+          // relevant callbacks.
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
