@@ -485,6 +485,8 @@
     "core/templates/services/stateful/focus-manager.service.spec.ts",
     "core/templates/services/suggestions.service.ts",
     "core/templates/services/suggestions.service.spec.ts",
+    "core/templates/services/svg-sanitizer.service.ts",
+    "core/templates/services/svg-sanitizer.service.spec.ts",
     "core/templates/services/user-backend-api.service.ts",
     "core/templates/services/user-backend-api.service.spec.ts",
     "core/templates/services/user.service.ts",

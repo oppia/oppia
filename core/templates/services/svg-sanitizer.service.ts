@@ -71,21 +71,33 @@ export class SvgSanitizerService {
       // we need to replace these decimals with a letter so that it's easier
       // to process and validate the filenames.
       if (node.tagName.toLowerCase() === 'svg') {
-        dimensions.height = (
-          (node.getAttribute('height').match(/\d+\.*\d*/g)[0]).replace(
-            '.', 'd'));
-        dimensions.width = (
-          (node.getAttribute('width').match(/\d+\.*\d*/g)[0]).replace(
-            '.', 'd'));
+        let attrHeight = node.getAttribute('height');
+        if (attrHeight) {
+          let height = attrHeight.match(/\d+\.*\d*/g);
+          if (height) {
+            dimensions.height = height[0].replace('.', 'd');
+          }
+        }
+        let attrWidth = node.getAttribute('width');
+        if (attrWidth) {
+          let width = attrWidth.match(/\d+\.*\d*/g);
+          if (width) {
+            dimensions.width = width[0].replace('.', 'd');
+          }
+        }
         // This attribute is useful for the vertical alignment of the
         // Math SVG while displaying inline with other text.
         // Math SVGs don't necessarily have a vertical alignment, in that
         // case we assign it zero.
-        let styleValue = node.getAttribute('style').match(/\d+\.*\d*/g);
-        if (styleValue) {
-          dimensions.verticalPadding = styleValue[0].replace('.', 'd');
-        } else {
-          dimensions.verticalPadding = '0';
+        let styleValue: RegExpMatchArray | null;
+        let attrStyle = node.getAttribute('style');
+        if (attrStyle) {
+          styleValue = attrStyle.match(/\d+\.*\d*/g);
+          if (styleValue) {
+            dimensions.verticalPadding = styleValue[0].replace('.', 'd');
+          } else {
+            dimensions.verticalPadding = '0';
+          }
         }
       }
     });
@@ -94,15 +106,23 @@ export class SvgSanitizerService {
 
   private _getInvalidSvgTagsAndAttrs(
       svg: Document): {tags: string[], attrs: string[]} {
-    let invalidTags = [];
-    let invalidAttrs = [];
-    let allowedTags = Object.keys(constants.SVG_ATTRS_WHITELIST);
+    let invalidTags: string[] = [];
+    let invalidAttrs: string[] = [];
+
+    // This throws "The type 'readonly ["about", "alignment-baseline, ... 86
+    // more ..., "writing-mode"]' is 'readonly' and cannot be assigned to the
+    // mutable type 'string[]'." We need to suppress this error because of
+    // stricter type checking.
+    // @ts-ignore
+    let SvgAttrsWhitelist: Record<string, string[]> =
+     constants.SVG_ATTRS_WHITELIST;
+    let allowedTags = Object.keys(SvgAttrsWhitelist);
     let nodeTagName = null;
     svg.querySelectorAll('*').forEach((node) => {
       nodeTagName = node.tagName.toLowerCase();
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
-          if (constants.SVG_ATTRS_WHITELIST[nodeTagName].indexOf(
+          if (SvgAttrsWhitelist[nodeTagName].indexOf(
             node.attributes[i].name.toLowerCase()) === -1) {
             invalidAttrs.push(
               node.tagName + ':' + node.attributes[i].name);
