@@ -19,7 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from collections import defaultdict
+import collections
+
 from constants import constants
 from core.domain import classroom_services
 from core.domain import collection_services
@@ -1525,8 +1526,21 @@ def get_displayable_story_summary_dicts(user_id, story_summaries):
     return summary_dicts
 
 
-def get_displayable_untracked_topic_summary_dict(user_id, untracked_topic_summaries):
-    summary_dict = defaultdict(list)
+def get_displayable_untracked_topic_dicts(user_id, untracked_topic_summaries):
+    """Returns a displayable dict of the the topic summaries
+    given to it.
+
+    Args:
+        user_id: str. The id of the learner.
+        untracked_topic_summaries: list(TopicSummary). A list of the
+            summary domain objects.
+
+    Returns:
+        dict(str, list(dict)). A dict with classname as the key and a list of
+        untracked topic summaries as the value.
+    """
+
+    summary_dict = collections.defaultdict(list)
     topic_ids = [topic.id for topic in untracked_topic_summaries]
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
     for index, topic in enumerate(topics):
@@ -1538,26 +1552,28 @@ def get_displayable_untracked_topic_summary_dict(user_id, untracked_topic_summar
             user_id, all_skill_ids)
         summary_dict[classroom_services.get_classroom_url_fragment_for_topic_id(
             topic.id)].append({
-            'id': topic.id,
-            'name': topic.name,
-            'description': topic.description,
-            'language_code': topic.language_code,
-            'version': topic.version,
-            'story_titles': topic_services.get_story_titles_in_topic(topic),
-            'total_published_node_count': untracked_topic_summaries[index].total_published_node_count,
-            'thumbnail_filename': topic.thumbnail_filename,
-            'thumbnail_bg_color': topic.thumbnail_bg_color,
-            'canonical_story_summary_dict': (
-                topic_fetchers.get_canonical_story_dicts(user_id, topic)),
-            'url_fragment': topic.url_fragment,
-            'classroom': (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id)),
-            'practice_tab_is_displayed': topic.practice_tab_is_displayed,
-            'degrees_of_mastery': degrees_of_mastery,
-            'skill_descriptions': skill_descriptions,
-            'subtopics': topic.get_all_subtopics()
-        })
+                'id': topic.id,
+                'name': topic.name,
+                'description': topic.description,
+                'language_code': topic.language_code,
+                'version': topic.version,
+                'story_titles': topic_services.get_story_titles_in_topic(
+                    topic),
+                'total_published_node_count': untracked_topic_summaries[
+                    index].total_published_node_count,
+                'thumbnail_filename': topic.thumbnail_filename,
+                'thumbnail_bg_color': topic.thumbnail_bg_color,
+                'canonical_story_summary_dict': (
+                    topic_fetchers.get_canonical_story_dicts(user_id, topic)),
+                'url_fragment': topic.url_fragment,
+                'classroom': (
+                    classroom_services.get_classroom_url_fragment_for_topic_id(
+                        topic.id)),
+                'practice_tab_is_displayed': topic.practice_tab_is_displayed,
+                'degrees_of_mastery': degrees_of_mastery,
+                'skill_descriptions': skill_descriptions,
+                'subtopics': topic.get_all_subtopics()
+            })
 
     return summary_dict
 
@@ -1592,7 +1608,8 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             'language_code': topic.language_code,
             'version': topic.version,
             'story_titles': topic_services.get_story_titles_in_topic(topic),
-            'total_published_node_count': topic_summaries[index].total_published_node_count,
+            'total_published_node_count': topic_summaries[
+                index].total_published_node_count,
             'thumbnail_filename': topic.thumbnail_filename,
             'thumbnail_bg_color': topic.thumbnail_bg_color,
             'canonical_story_summary_dict': (

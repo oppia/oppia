@@ -43,7 +43,7 @@
     text-align: left;
   }
   .next-incomplete-chapter {
-    color: #333333;
+    color: #333;
     font-size: 17px;
     font-weight: 500;
     margin: 24px 0 12px 6px;
@@ -51,24 +51,24 @@
   }
   .continue-button {
     background: #00645C 0% 0% no-repeat padding-box;
-    box-shadow: 0px 2px 2px #0000003d;
-    display: none;
     border-radius: 4px;
-    height: 28px;
-    width: 112px;
-    position: relative;
     bottom: 110px;
+    box-shadow: 0 2px 2px #0000003d;
+    display: none;
+    height: 28px;
     left: 40px;
+    position: relative;
+    width: 112px;
   }
   .continue-button-text {
-    text-align: center;
+    color: #FFF;
     font-size: 14px;
-    letter-spacing: 0px;
-    position: relative;
-    top: 6px;
     left: 1px;
-    color: #FFFFFF;
+    letter-spacing: 0;
+    position: relative;
+    text-align: center;
     text-transform: uppercase;
+    top: 6px;
   }
   .oppia-story-dashboard-card .oppia-story-completion {
     background: #000C 0% 0% no-repeat padding-box;
@@ -150,16 +150,16 @@
     height: 144px;
     width: 192px;
   }
-  .story-card:hover + .continue-button {
-    display: block;
-    float: left;
-  }
   .continue-button:hover {
     display: block;
     float: left;
   }
+  .story-card:hover + .continue-button {
+    display: block;
+    float: left;
+  }
   .oppia-story-dashboard-card:hover .oppia-thumbnail-image {
+    -webkit-filter: blur(2px);
     filter: blur(2px);
-    -webkit-filter: blur(2px)
   }
 </style>
