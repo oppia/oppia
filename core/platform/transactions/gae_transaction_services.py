@@ -21,10 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
+from typing import Any, Callable
+
 from google.appengine.ext import ndb
 
 
 def run_in_transaction_wrapper(fn):
+    # type: (Callable[..., Any]) -> Callable[..., Any]
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
 
@@ -40,6 +43,7 @@ def run_in_transaction_wrapper(fn):
     """
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        # type: (*Any, **Any) -> ndb.transaction
         """Wrapper for the transaction."""
         return ndb.transaction(
             lambda: fn(*args, **kwargs),
@@ -51,6 +55,7 @@ def run_in_transaction_wrapper(fn):
 
 
 def toplevel_wrapper(*args, **kwargs):
+    # type: (*Any, **Any) -> ndb.toplevel
     """Enables a WSGI application to not exit until all its asynchronous
     requests have finished.
 
