@@ -31,6 +31,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from jobs.decorators import validation_decorators
 from jobs.transforms import auth_validation  # pylint: disable=unused-import
 from jobs.transforms import base_validation  # pylint: disable=unused-import
+from jobs.transforms import blog_validation  # pylint: disable=unused-import
 from jobs.transforms import user_validation  # pylint: disable=unused-import
 
 

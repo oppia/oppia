@@ -27,6 +27,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from jobs import base_jobs
+from jobs import blog_validation_jobs # pylint: disable=unused-import
 from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
 
 
