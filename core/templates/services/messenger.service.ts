@@ -63,6 +63,19 @@ interface GetPayloadType {
   explorationReset(data: string): {stateName: string};
 }
 
+type PayloadType = (
+  HeightChangeData |
+  ExplorationCompletedData |
+  StateTransitionData |
+  {stateName: string}
+);
+
+type HashDict = {
+  version: string | null,
+  secret: string | null,
+  tagid: string | null
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -158,7 +171,7 @@ export class MessengerService {
       let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
       let hashParts = hash.split('&');
-      let hashDict = {
+      let hashDict: HashDict = {
         version: null,
         secret: null,
         tagid: null
@@ -170,7 +183,9 @@ export class MessengerService {
         }
 
         let separatorLocation = hashParts[i].indexOf('=');
-        hashDict[hashParts[i].substring(0, separatorLocation)] = (
+        const _hashProp = (
+          <keyof HashDict> hashParts[i].substring(0, separatorLocation));
+        hashDict[_hashProp] = (
           hashParts[i].substring(separatorLocation + 1));
       }
 
@@ -181,16 +196,55 @@ export class MessengerService {
 
       if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
         this.loggerService.info('Posting message to parent: ' + messageTitle);
+        let payload: PayloadType;
+        let isValidMessage: boolean;
+        switch (<keyof GetPayloadType> messageTitle) {
+          case 'explorationCompleted':
+            payload = this.getPayload.explorationCompleted(
+              <ExplorationCompletedData> messageData);
+            isValidMessage = (
+              this.MESSAGE_VALIDATORS.explorationCompleted());
+            break;
+          case 'explorationLoaded':
+            payload = this.getPayload.explorationLoaded(
+              <ExplorationLoadedData> messageData);
+            isValidMessage = (
+              this.MESSAGE_VALIDATORS.explorationLoaded());
+            break;
+          case 'explorationReset':
+            payload = this.getPayload.explorationReset(
+              <string> messageData);
+            isValidMessage = (
+              this.MESSAGE_VALIDATORS.explorationReset(payload));
+            break;
+          case 'heightChange':
+            payload = this.getPayload.heightChange(
+              <HeightChangeData> messageData);
+            isValidMessage = (
+              this.MESSAGE_VALIDATORS.heightChange(payload));
+            break;
+          case 'stateTransition':
+            payload = this.getPayload.stateTransition(
+              <StateTransitionData> messageData);
+            isValidMessage = (
+              this.MESSAGE_VALIDATORS.stateTransition(
+                <StateTransitionData> payload));
+            break;
+        }
 
-        let payload = this.getPayload[messageTitle](messageData);
-        if (!this.MESSAGE_VALIDATORS[messageTitle](payload)) {
+        if (!isValidMessage) {
           this.loggerService.error('Error validating payload: ' + payload);
           return;
         }
 
-        this.loggerService.info(payload);
+        this.loggerService.info(payload.toString());
 
-        let objToSendToParent = {
+        let objToSendToParent: {
+          title: string,
+          payload: PayloadType
+          sourceTagId: string | null,
+          secret: string | null
+        } = {
           title: messageTitle,
           payload: payload,
           sourceTagId: null,
