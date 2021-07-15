@@ -355,22 +355,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         thread = feedback_services.get_thread_analytics(self.EXP_ID_1)
-        print(thread)
-        print(dir(thread))
         self.assertEqual(thread.id, 1)
-
-    def test_get_total_open_threads_for_single_exploration(self):
-        feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, None,
-            self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-
-        threads = feedback_services.get_all_threads(
-            'exploration', self.EXP_ID_1, False)
-        self.assertEqual(1, len(threads))
-
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi(
-                [self.EXP_ID_1])), 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
         feedback_services.create_thread(

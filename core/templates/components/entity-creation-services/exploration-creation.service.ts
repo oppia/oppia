@@ -85,7 +85,7 @@ export class ExplorationCreationService {
 
       var form = new FormData();
       form.append('payload', JSON.stringify({
-        'yaml_file': yamlFile
+        yaml_file: yamlFile
       }));
       this.csrfTokenService.getTokenAsync().then((token) => {
         form.append('csrf_token', token);
