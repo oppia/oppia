@@ -233,7 +233,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
     'unit-test-utils.ajs.ts', # Please don't try to cover this file.
-    'url-interpolation.service.ts',
     'utils.service.ts',
     'version-diff-visualization.directive.ts',
     'voiceover-recording.service.ts',
