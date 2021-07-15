@@ -25,7 +25,7 @@ angular.module('oppia').directive('schemaBasedPrimitiveViewer',
         localValue: '='
       },
       template: require(
-        '/components/forms/schema-viewers/' +
+        'components/forms/schema-viewers/' +
         'schema-based-primitive-viewer.directive.html'),
       restrict: 'E',
       controller: ['$scope', function($scope) {
