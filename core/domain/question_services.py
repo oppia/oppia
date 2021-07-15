@@ -561,6 +561,9 @@ def apply_change_list(question_id, change_list):
                     question.update_inapplicable_skill_misconception_ids(
                         change.new_value)
 
+        # Calculate the size of exp.
+        proto_size_in_bytes = 0
+        question.update_proto_size_in_bytes(proto_size_in_bytes)
         return question
 
     except Exception as e:

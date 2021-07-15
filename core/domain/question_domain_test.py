@@ -515,6 +515,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ['skillid-misconceptionid'],
             self.question.inapplicable_skill_misconception_ids)
 
+    def test_update_question_proto_size_in_bytes(self):
+        self.question.update_proto_size_in_bytes(1)
+
+        self.assertEqual(1, self.question.proto_size_in_bytes)
+
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question
         domain object.

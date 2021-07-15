@@ -138,7 +138,7 @@ class Question(python_utils.OBJECT):
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
             linked_skill_ids, inapplicable_skill_misconception_ids,
-            created_on=None, last_updated=None):
+            proto_size_in_bytes=None, created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
@@ -156,6 +156,7 @@ class Question(python_utils.OBJECT):
             inapplicable_skill_misconception_ids: list(str). Optional
                 misconception ids that are marked as not relevant to the
                 question.
+            proto_size_in_bytes: int. Size of exploration.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -170,6 +171,7 @@ class Question(python_utils.OBJECT):
         self.linked_skill_ids = linked_skill_ids
         self.inapplicable_skill_misconception_ids = (
             inapplicable_skill_misconception_ids)
+        self.proto_size_in_bytes = proto_size_in_bytes
         self.created_on = created_on
         self.last_updated = last_updated
 
@@ -188,7 +190,8 @@ class Question(python_utils.OBJECT):
             'version': self.version,
             'linked_skill_ids': self.linked_skill_ids,
             'inapplicable_skill_misconception_ids': (
-                self.inapplicable_skill_misconception_ids)
+                self.inapplicable_skill_misconception_ids),
+            'proto_size_in_bytes': self.proto_size_in_bytes,
         }
 
     @classmethod
@@ -1096,6 +1099,22 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
+        """Converts from version 45 to 46. Version 46 contains
+        proto_size_in_bytes.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        question_state_dict['proto_size_in_bytes'] = None
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
@@ -1253,7 +1272,8 @@ class Question(python_utils.OBJECT):
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'],
             question_dict['linked_skill_ids'],
-            question_dict['inapplicable_skill_misconception_ids'])
+            question_dict['inapplicable_skill_misconception_ids'],
+            question_dict['proto_size_in_bytes'])
 
         return question
 
@@ -1270,10 +1290,15 @@ class Question(python_utils.OBJECT):
         """
         default_question_state_data = cls.create_default_question_state()
 
-        return cls(
+        question = cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [])
+
+        # Calculate proto_size_in_bytes.
+        proto_size_in_bytes = 0
+        question.update_proto_size_in_bytes(proto_size_in_bytes)
+        return question
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -1304,6 +1329,14 @@ class Question(python_utils.OBJECT):
         """
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))
+
+    def update_proto_size_in_bytes(self, proto_size_in_bytes):
+        """Update question's size in proto.
+
+        Args:
+            proto_size_in_bytes: int. Size of exploration.
+        """
+        self.proto_size_in_bytes = proto_size_in_bytes
 
     def update_question_state_data(self, question_state_data):
         """Updates the question data of the question.

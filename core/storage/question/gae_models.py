@@ -125,6 +125,9 @@ class QuestionModel(base_models.VersionedModel):
     # <skill-id>-<misconceptionid>.
     inapplicable_skill_misconception_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
+    # Proto size of the exploration.
+    proto_size_in_bytes = datastore_services.IntegerProperty(
+        default=0, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -146,7 +149,8 @@ class QuestionModel(base_models.VersionedModel):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'linked_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'inapplicable_skill_misconception_ids':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'proto_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
