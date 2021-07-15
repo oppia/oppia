@@ -151,6 +151,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
+
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
         this.uiConfig &&
@@ -245,7 +246,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
             ckConfig
     );
 
-
     // Hide the editor until it is fully loaded after `instanceReady`
     // is fired. This sets the style for `ck-editor-4-rte`.
     this.elementRef.nativeElement.setAttribute('style', 'display: None');
@@ -259,6 +259,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     var componentRe = (
       /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
     );
+
     /**
        * Before data is loaded into CKEditor, we need to wrap every rte
        * component in a span (inline) or div (block).
@@ -396,7 +397,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     this.ck = ck;
     this.ckEditorCopyContentService.bindPasteHandler(ck);
   }
-
 
   ngOnDestroy(): void {
     this.ck.destroy();
