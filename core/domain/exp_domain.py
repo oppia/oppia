@@ -32,15 +32,12 @@ import string
 
 from constants import constants
 from core.domain import change_domain
-from core.domain import exploration_pb2 as Person
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
 import utils
-
-from google.protobuf.json_format import Parse as Parse # pylint: disable=import-only-modules
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
