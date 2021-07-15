@@ -22,9 +22,9 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
-  '$uibModal', 'UserExplorationPermissionsService',
+  '$uibModal', 'UrlInterpolationService', 'UserExplorationPermissionsService',
   function(
-      $uibModal, UserExplorationPermissionsService) {
+      $uibModal, UrlInterpolationService, UserExplorationPermissionsService) {
     return {
       /**
        * Opens the modal for displaying playthrough actions.
@@ -47,8 +47,8 @@ angular.module('oppia').factory('ImprovementModalService', [
       },
       openLearnerAnswerDetails: function(learnerAnswerDetails) {
         return $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/improvements-tab/templates/' +
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration-editor-page/improvements-tab/templates/' +
             'answer-details-modal.template.html'),
           resolve: {
             isEditable: () => (
