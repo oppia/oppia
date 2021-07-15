@@ -35,6 +35,7 @@ interface RteConfig extends CKEDITOR.config {
   'format_heading'?: CKEDITOR.config.styleObject;
   'format_normal'?: CKEDITOR.config.styleObject;
 }
+
 @Component({
   selector: 'ck-editor-4-rte',
   template: '<div><div></div>' +
