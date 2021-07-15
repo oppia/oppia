@@ -22,20 +22,21 @@ import { PreventPageUnloadEventService }
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe ('Prevent page unload event service', function() {
-  let preventPageUnloadEventService: PreventPageUnloadEventService = null;
-  let windowRef: WindowRef = null;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let windowRef: WindowRef;
 
   var reloadEvt = document.createEvent('Event');
   reloadEvt.initEvent('mockbeforeunload', true, true);
-  reloadEvt.returnValue = null;
+  reloadEvt.returnValue = false;
   reloadEvt.preventDefault = () => {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [PreventPageUnloadEventService]
     });
-    preventPageUnloadEventService = TestBed.get(PreventPageUnloadEventService);
-    windowRef = TestBed.get(WindowRef);
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService);
+    windowRef = TestBed.inject(WindowRef);
   });
 
 

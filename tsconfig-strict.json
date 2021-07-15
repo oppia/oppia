@@ -482,6 +482,8 @@
     "core/templates/services/messenger.service.ts",
     "core/templates/services/platform-feature.service.ts",
     "core/templates/services/platform-feature.service.spec.ts",
+    "core/templates/services/prevent-page-unload-event.service.ts",
+    "core/templates/services/prevent-page-unload-event.service.spec.ts",
     "core/templates/services/promo-bar-backend-api.service.ts",
     "core/templates/services/request-interceptor.service.ts",
     "core/templates/services/request-interceptor.service.spec.ts",
