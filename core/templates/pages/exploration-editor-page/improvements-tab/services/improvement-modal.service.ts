@@ -22,9 +22,9 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('ImprovementModalService', [
-  '$uibModal', 'UrlInterpolationService', 'UserExplorationPermissionsService',
+  '$uibModal', 'UserExplorationPermissionsService',
   function(
-      $uibModal, UrlInterpolationService, UserExplorationPermissionsService) {
+      $uibModal, UserExplorationPermissionsService) {
     return {
       /**
        * Opens the modal for displaying playthrough actions.
@@ -33,8 +33,8 @@ angular.module('oppia').factory('ImprovementModalService', [
        */
       openPlaythroughModal: function(playthrough, playthroughIndex) {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/statistics-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/statistics-tab/templates/' +
             'playthrough-modal.template.html'),
           backdrop: true,
           resolve: {
@@ -47,8 +47,8 @@ angular.module('oppia').factory('ImprovementModalService', [
       },
       openLearnerAnswerDetails: function(learnerAnswerDetails) {
         return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/improvements-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/improvements-tab/templates/' +
             'answer-details-modal.template.html'),
           resolve: {
             isEditable: () => (
@@ -65,8 +65,8 @@ angular.module('oppia').factory('ImprovementModalService', [
        */
       openConfirmationModal: function(message, buttonText, buttonClass) {
         return $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/common-layout-directives/common-elements/' +
+          template: require(
+            'components/common-layout-directives/common-elements/' +
             'confirmation-modal.template.html'),
           backdrop: true,
           resolve: {

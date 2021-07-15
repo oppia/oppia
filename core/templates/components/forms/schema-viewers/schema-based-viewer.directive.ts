@@ -29,10 +29,8 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('schemaBasedViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+angular.module('oppia').directive('schemaBasedViewer',
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -40,9 +38,9 @@ angular.module('oppia').directive('schemaBasedViewer', [
         schema: '&',
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/schema-based-viewer.directive.html'),
+      template: require(
+        'components/forms/schema-viewers/schema-based-viewer.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };
-  }]);
+  });

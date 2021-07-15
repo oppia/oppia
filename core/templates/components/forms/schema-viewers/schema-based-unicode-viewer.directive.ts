@@ -19,14 +19,14 @@
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedUnicodeViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+angular.module('oppia').directive('schemaBasedUnicodeViewer',
+  function() {
     return {
       scope: {
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
+      template: require(
+        'components/forms/schema-viewers/' +
         'schema-based-unicode-viewer.directive.html'),
       restrict: 'E',
       controller: [
@@ -38,4 +38,4 @@ angular.module('oppia').directive('schemaBasedUnicodeViewer', [
           };
         }]
     };
-  }]);
+  });
