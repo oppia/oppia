@@ -327,7 +327,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
         .on('click', () => {
           // Timeout is required to ensure that the format dropdown
           // has been initialized and the iframe has been loaded into DOM.
-          setTimeout(() => changeComboPanel(), 20);
+          setTimeout(() => changeComboPanel(), 25);
         });
 
       // TODO(#12882): Remove the use of jQuery.
