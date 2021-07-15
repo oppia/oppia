@@ -751,7 +751,7 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
-    '--ci-check',
+    '--install-globally',
     help='If true, installs mypy and its requirements globally.'
     ' The default value is false.',
     action='store_true')
@@ -774,18 +774,18 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, ci_check):
+def get_mypy_cmd(files, install_globally):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
-        ci_check: bool. Whether the test is for CI.
+        install_globally: bool. Whether the test is for CI.
 
     Returns:
         list(str). List of command line arguments.
     """
     # TODO(#13113): Change mypy command to mypy path after Python3 migration.
-    if ci_check:
+    if install_globally:
         mypy_cmd = 'mypy'
     else:
         mypy_cmd = os.path.join(
@@ -802,17 +802,19 @@ def get_mypy_cmd(files, ci_check):
     return cmd
 
 
-def install_mypy_prerequisites(ci_check):
+def install_mypy_prerequisites(install_globally):
     """Install mypy and type stubs from mypy_requirements.txt.
 
     Args:
-        ci_check: bool. Whether the test is for CI.
+        install_globally: bool. Whether the test is for CI.
 
     Returns:
         int. The return code from installing prerequisites.
     """
-    # TODO(#13398): Change MyPy installation after Python3 migration.
-    if ci_check:
+    # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
+    # install packages globally for CI as in CI pip installation is not in a way
+    # we expect.
+    if install_globally:
         cmd = [
             PYTHON3_CMD, '-m', 'pip', 'install', '-r',
             MYPY_REQUIREMENTS_FILE_PATH
@@ -849,7 +851,7 @@ def main(args=None):
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
-    return_code = install_mypy_prerequisites(parsed_args.ci_check)
+    return_code = install_mypy_prerequisites(parsed_args.install_globally)
     if return_code != 0:
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
@@ -859,7 +861,7 @@ def main(args=None):
         'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(parsed_args, 'files'), parsed_args.ci_check)
+    cmd = get_mypy_cmd(getattr(parsed_args, 'files'), parsed_args.install_globally)
 
     _paths_to_insert = [
         MYPY_TOOLS_DIR,
