@@ -613,10 +613,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
     def test_update_topic(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
-            self.TOPIC_ID)
-
         # Save a dummy image on filesystem, to be used as thumbnail.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),

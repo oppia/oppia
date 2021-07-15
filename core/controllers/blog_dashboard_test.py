@@ -201,7 +201,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             expected_status_int=401)
         self.logout()
 
-        self.set_topic_managers([self.username])
+        self.set_curriculum_admins([self.username])
         self.login(self.user_email)
         json_response = self.get_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),

@@ -1703,7 +1703,6 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanManageContributorsRoleDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(

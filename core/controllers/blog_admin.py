@@ -171,7 +171,7 @@ class BlogAdminRolesHandler(base.BaseHandler):
                 'User with given username does not exist.')
         user_services.add_user_role(user_id, role)
         role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
+            self.user_id, feconf.ROLE_ACTION_ADD, role=role,
             username=username)
         self.render_json({})
 

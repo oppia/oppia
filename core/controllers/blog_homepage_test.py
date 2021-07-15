@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import blog_services
 from core.domain import config_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -235,7 +236,8 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
                 feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
                 self.BLOG_ADMIN_USERNAME),
             )
-        self.add_user_role(self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_ADMIN)
+        user_services.remove_user_role(
+            self.blog_admin_id, feconf.ROLE_ID_BLOG_ADMIN)
         self.get_json(
             '%s/%s' % (
                 feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,

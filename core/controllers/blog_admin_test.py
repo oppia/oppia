@@ -72,7 +72,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
             {
-                'role': feconf.ROLE_ID_BLOG_ADMIN,
+                'role': feconf.ROLE_ID_BLOG_POST_EDITOR,
                 'username': username
             },
             csrf_token=csrf_token,

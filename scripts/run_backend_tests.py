@@ -235,11 +235,11 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     return result
 
 
-def _get_all_test_targets_from_shard(shard_name):
+def _get_all_test_targets_from_shard(unused_shard_name):
     """Find all test modules in a shard.
 
     Args:
-        shard_name: str. The name of the shard.
+        unused_shard_name: str. The name of the shard.
 
     Returns:
         list(str). The dotted module names that belong to the shard.
@@ -366,7 +366,6 @@ def main(args=None):
             raise Exception(validation_error)
         all_test_targets = _get_all_test_targets_from_shard(
             parsed_args.test_shard)
-        print all_test_targets
     else:
         include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets_from_path(

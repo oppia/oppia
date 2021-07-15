@@ -185,7 +185,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
         expected_validation_results = {
             feconf.EMAIL_INTENT_SIGNUP: (True, False, False, False),
             feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
-            feconf.EMAIL_INTENT_MARKETING: (True, True, False, False),
+            feconf.EMAIL_INTENT_MARKETING: (True, False, False, False),
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
                 True, False, True, False),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
@@ -5263,7 +5263,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     def test_send_user_query_email(self):
         email_subject = 'Bulk Email User Query Subject'
         email_body = 'Bulk Email User Query Body'
-        email_intent = feconf.BULK_EMAIL_INTENT_MARKETING
+        email_intent = feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION
         with self.can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
@@ -5533,7 +5533,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         with self.can_send_emails_ctx:
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids, email_subject,
-                email_html_body, feconf.BULK_EMAIL_INTENT_MARKETING)
+                email_html_body, feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
         messages_a = self._get_sent_email_messages(
             self.RECIPIENT_A_EMAIL)
@@ -5568,7 +5568,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             '%s <%s>' % (self.SENDER_USERNAME, self.SENDER_EMAIL))
         self.assertEqual(
             sent_email_model.intent,
-            feconf.BULK_EMAIL_INTENT_MARKETING)
+            feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
     def test_email_not_sent_if_original_html_not_matches_cleaned_html(self):
         email_subject = 'Dummy Email Subject'
@@ -5578,7 +5578,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             email_manager.send_user_query_email(
                 self.sender_id, self.recipient_ids,
                 email_subject, email_html_body,
-                feconf.BULK_EMAIL_INTENT_MARKETING)
+                feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
         # Check that no email was sent.
         messages_a = self._get_sent_email_messages(
@@ -5613,10 +5613,9 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         email_body = 'Test Body'
         with self.can_send_emails_ctx:
             email_manager.send_test_email_for_bulk_emails(
-                self.sender_id, email_subject, email_body
+                feconf.SYSTEM_COMMITTER_ID, email_subject, email_body
             )
-        messages = self._get_sent_email_messages(
-            self.SENDER_EMAIL)
+        messages = self._get_sent_email_messages(feconf.SYSTEM_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 1)
 
 

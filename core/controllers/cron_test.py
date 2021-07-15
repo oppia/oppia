@@ -381,7 +381,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
     def test_cron_translation_contribution_stats_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)

@@ -86,7 +86,6 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AddContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
@@ -259,7 +258,6 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RemoveContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationAdmen')
@@ -395,7 +393,6 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributorUsersListHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationAdmen')
@@ -453,7 +450,6 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionRightsDataHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATION_ADMIN, 'translationAdmen')
         self.signup(self.QUESTION_ADMIN, 'questionAdmen')
@@ -534,14 +530,14 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslationContributionStatsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.contributor_id = self.get_user_id_from_email(
             self.CONTRIBUTOR_EMAIL)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.set_admins([self.ADMIN_USERNAME])
-        user_services.update_user_role(
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        user_services.add_user_role(
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
     def _publish_topic(self, topic_id, topic_name):

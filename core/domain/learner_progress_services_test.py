@@ -1504,7 +1504,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_and_untracked_topic_ids(self):
         # Add topics to config_domain.
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
@@ -1998,7 +1998,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_activity_progress(self):
         # Add topics to config_domain.
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{
