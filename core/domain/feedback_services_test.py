@@ -350,12 +350,14 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             self.EXPECTED_THREAD_DICT_VIEWER, threads[0].to_dict())
 
-    def test_get_total_open_threads_for_single_exploration(self):
+    def test_get_total_open_thread_for_single_exploration(self):
         feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         thread = feedback_services.get_thread_analytics(self.EXP_ID_1)
-        self.assertEqual(thread.id, 1)
+        self.assertEqual(thread.id, self.EXP_ID_1)
+        self.assertEqual(thread.num_open_threads, 1)
+        self.assertEqual(thread.num_total_threads, 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
         feedback_services.create_thread(
