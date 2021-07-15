@@ -1100,7 +1100,7 @@ class Question(python_utils.OBJECT):
         """Converts from version 45 to 46. Version 46 ensures that the written
         translations in a state containing unicode content do not contain HTML
         tags and the data_format is unicode. This does not affect questions, so
-        no conversion is required.  
+        no conversion is required.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
