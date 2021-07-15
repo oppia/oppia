@@ -49,6 +49,21 @@ def _get_blog_card_summary_dicts_for_dashboard(summaries):
     return summary_dicts
 
 
+class BlogDashboardPage(base.BaseHandler):
+    """Blog Dashboard Page  Handler to render the frontend template."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_template('blog-dashboard-page.mainpage.html')
+
+
 class BlogDashboardDataHandler(base.BaseHandler):
     """Provides user data for the blog dashboard."""
 
