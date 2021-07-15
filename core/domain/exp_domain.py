@@ -650,10 +650,6 @@ class Exploration(python_utils.OBJECT):
 
         # Calculate proto_size_in_bytes.
         proto_size_in_bytes = 0
-        exploration_yaml = exploration.to_dict()
-        exploration_json = json.dumps(exploration_yaml).encode('utf-8')
-        proto_message = Parse(json.dumps(exploration_json), Person.Exploration())
-        print('Size of proto title % is %' % exploration.title % proto_message.ByteSize())
         exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 
