@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid .ts file with wrong lodash import,
- * used by scripts/linters/general_purpose_linter.py.
+ * @fileoverview Root Component for partnerships page.
  */
 
-import _ from 'lodash';
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'oppia-partnerships-page-root',
+  templateUrl: './partnerships-page-root.component.html'
+})
+export class PartnershipsPageRootComponent {}

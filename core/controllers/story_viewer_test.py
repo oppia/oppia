@@ -98,6 +98,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -114,6 +115,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_2.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -130,6 +132,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_3.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -303,6 +306,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -555,6 +559,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],

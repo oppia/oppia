@@ -30,19 +30,17 @@ import apache_beam as beam
     [models.NAMES.base_model, models.NAMES.question])
 
 
-class ValidateQuestionCommitCmdsSchemaTests(
+class ValidateQuestionSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
         invalid_commit_cmd_model = (
-            question_models.QuestionCommitLogEntryModel(
+            question_models.QuestionSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                question_id='123',
-                post_commit_status='private',
+                committer_id='commiter-id',
+                commit_type='delete',
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -51,21 +49,19 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation.ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
 
     def test_change_dict_without_cmd(self):
         invalid_commit_cmd_model = (
-            question_models.QuestionCommitLogEntryModel(
+            question_models.QuestionSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                question_id='123',
-                post_commit_status='private',
+                committer_id='commiter-id',
+                commit_type='delete',
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -73,7 +69,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation.ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -85,14 +81,12 @@ class ValidateQuestionCommitCmdsSchemaTests(
 
     def test_change_dict_with_invalid_cmd(self):
         invalid_commit_cmd_model = (
-            question_models.QuestionCommitLogEntryModel(
+            question_models.QuestionSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                question_id='123',
-                post_commit_status='private',
+                committer_id='commiter-id',
+                commit_type='delete',
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
@@ -100,7 +94,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation.ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -111,38 +105,32 @@ class ValidateQuestionCommitCmdsSchemaTests(
         ])
 
     def test_change_dict_with_missing_attributes_in_cmd(self):
+        commit_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'question_state_data',
+            'old_value': 'old_value'
+        }
         invalid_commit_cmd_model = (
             question_models.QuestionSnapshotMetadataModel(
                 id='model_id-1',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
-                commit_cmds=[{
-                    'cmd': 'update_question_property',
-                    'property_name': 'question_state_data',
-                    'old_value': 'old_value'
-                }])
+                committer_id='commiter-id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
         )
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation.ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'question_state_data',
-                    'old_value': 'old_value'
-                },
+                commit_dict,
                 'The following required attributes are missing: new_value')
         ])
 
@@ -152,11 +140,8 @@ class ValidateQuestionCommitCmdsSchemaTests(
                 id='model_id-1',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
+                committer_id='commiter-id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'create_new', 'invalid': 'invalid'}])
         )
 
@@ -164,7 +149,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation.ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -175,40 +160,85 @@ class ValidateQuestionCommitCmdsSchemaTests(
         ])
 
     def test_update_question_property_with_wrong_property_name(self):
+        commit_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'wrong',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        }
         invalid_commit_cmd_model = (
             question_models.QuestionSnapshotMetadataModel(
                 id='model_id-1',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
-                commit_cmds=[{
-                    'cmd': 'update_question_property',
-                    'property_name': 'wrong',
-                    'new_value': 'new_value',
-                    'old_value': 'old_value'
-                }])
+                committer_id='commiter-id',
+                commit_type='edit',
+                commit_cmds=[commit_dict])
         )
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation.ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                {
-                    'cmd': 'update_question_property',
-                    'property_name': 'wrong',
-                    'new_value': 'new_value',
-                    'old_value': 'old_value'
-                },
+                commit_dict,
                 'Value for property_name in cmd update_question_property: '
                 'wrong is not allowed')
+        ])
+
+
+class ValidateQuestionCommitLogEntryModelTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_validate_question_model(self):
+        invalid_commit_cmd_model = (
+            question_models.QuestionCommitLogEntryModel(
+                id='question_123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                question_id='123',
+                user_id='',
+                commit_type='delete',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                question_validation.ValidateQuestionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_raises_commit_cmd_none_error(self):
+        invalid_commit_cmd_model = (
+            question_models.QuestionCommitLogEntryModel(
+                id='model_123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                question_id='123',
+                user_id='',
+                commit_type='delete',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                question_validation.ValidateQuestionCommitLogEntryModel())
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])
