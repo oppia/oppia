@@ -16,12 +16,6 @@
 </div>
 
 <style>
-  .oppia-stories-list-container .oppia-page-card {
-    margin-top: 10em;
-    padding: 30px 55px 30px 45px;
-    width: 704px;
-  }
-
   .tab-title {
     margin: .83em 0 0.1em 0;
   }
@@ -36,16 +30,23 @@
     padding-bottom: 2vh;
   }
 
-  @media(max-width: 500px) {
-    .oppia-stories-list-container .oppia-page-card {
-      padding: 30px 30px 30px 25px;
-      width: 90vw;
-    }
+  .oppia-stories-list-container .oppia-page-card {
+    border-radius: 0.25em;
+    margin-top: 10em;
+    padding-bottom: 7.5vh;
+    width: 704px;
   }
 
   @media(max-width: 1024px) {
     .oppia-stories-list-container .oppia-page-card {
       width: 80vw;
+    }
+  }
+
+  @media(max-width: 500px) {
+    .oppia-stories-list-container .oppia-page-card {
+      padding: 15px 24px 64px 24px;
+      width: 90vw;
     }
   }
 </style>
