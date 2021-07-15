@@ -54,7 +54,7 @@ export class SearchService {
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
-    new EventEmitter<ExplorationSummaryBackendDict>();
+    new EventEmitter<ExplorationSummarExplorationSummaryBackendDictyBackendDict>();
   public numSearchesInProgress = 0;
 
   constructor(
