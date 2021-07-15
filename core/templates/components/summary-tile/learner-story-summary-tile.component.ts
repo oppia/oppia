@@ -24,6 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-learner-story-summary-tile',
@@ -46,13 +47,31 @@ export class LearnerStorySummaryTileComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
+    private urlService: UrlService,
   ) {}
 
   getStoryLink(): string {
     if (!this.storySummary.getClassroomUrlFragment() ||
       !this.storySummary.getTopicUrlFragment()) {
       return '#';
+    }
+    if (this.isDisplayAreaHome()) {
+      var allNodes = this.storySummary.getAllNodes();
+      var node = allNodes[this.completedNodeCount];
+      let result = '/explore/' + node.getExplorationId();
+      result = this.urlService.addField(
+        result, 'topic_url_fragment',
+        this.storySummary.getTopicUrlFragment());
+      result = this.urlService.addField(
+        result, 'classroom_url_fragment',
+        this.storySummary.getClassroomUrlFragment());
+      result = this.urlService.addField(
+        result, 'story_url_fragment',
+        this.storySummary.getUrlFragment());
+      result = this.urlService.addField(
+        result, 'node_id', node.getId());
+      return result;
     }
     return this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
@@ -88,6 +107,13 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.topicName = this.storySummary.getTopicName();
     }
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
+  }
+
+  isDisplayAreaHome(): boolean {
+    if (this.displayArea === 'homeTab') {
+      return true;
+    }
+    return false;
   }
 
   getStaticImageUrl(imagePath: string): string {

@@ -19,6 +19,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 
  @Component({
    selector: 'oppia-home-tab',
@@ -27,16 +28,22 @@ import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/lear
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   @Input() currentGoals: LearnerTopicSummary[];
-  @Input() untrackedTopics: LearnerTopicSummary[];
+  @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
   @Input() username: string;
   nextIncompleteNodeTitles: string[] = [];
+  widthConst: number = 233;
+  width: number;
+
+  constructor(
+    private deviceInfoService: DeviceInfoService
+  ) {}
 
   ngOnInit(): void {
+    this.width = this.widthConst * (this.currentGoals.length);
   }
 
   getTimeOfDay(): string {
-    let now = new Date();
-    let time = now.getHours();
+    let time = new Date().getHours();
 
     if (time <= 12) {
       return 'morning';
@@ -44,6 +51,25 @@ export class HomeTabComponent {
       return 'afternoon';
     }
     return 'evening';
+  }
+
+  isNonemptyObject(object: Object): boolean {
+    return Object.keys(object).length !== 0;
+  }
+
+  getClassroomLink(classroomUrlFragment: string): string {
+    return `/learn/${classroomUrlFragment}`;
+  }
+
+  checkMobileView(): boolean {
+    return this.deviceInfoService.isMobileDevice();
+  }
+
+  getWidth(length: number): number {
+    if (length >= 3) {
+      return 662;
+    }
+    return (length + 1) * 164;
   }
 
   changeActiveSection(): void {

@@ -1,23 +1,25 @@
 <div class="greeting">
   Good {{getTimeOfDay()}}, {{username}}!
 </div>
-<div class="continue-where-you-left-off" *ngIf="untrackedTopics.length !== 0 || currentGoals.length !== 0">
+<div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
   <p class="continue-where-you-left-off-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate">
   </p>
   <div class="empty-continue-where-you-left-off-section" *ngIf="currentGoals.length === 0">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
     </p>
-    <a class="setting-a-goal-link" (click)="changeActiveSection()">
+    <a id="setting-a-goal-link" (click)="changeActiveSection()">
       setting a goal!
     </a>
   </div>
-  <div class="continue-where-you-left-off-section" *ngIf="currentGoals.length !== 0">
-    <div *ngFor="let topicSummaryTile of currentGoals">
-      <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index" class="story-summary-tile">
-        <oppia-learner-story-summary-tile [storySummary]="storySummaryTile"
-                                          [displayArea]="'homeTab'"
-                                          [topicName]="topicSummaryTile.name">
-        </oppia-learner-story-summary-tile>
+  <div class="continue-where-you-left-off-scroll">
+    <div class="continue-where-you-left-off-section" *ngIf="currentGoals.length !== 0" [ngStyle]="checkMobileView() && {'width': width + 'px'}">
+      <div *ngFor="let topicSummaryTile of currentGoals" class="topic-summary">
+        <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
+          class="story-summary-tile">
+          <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
+            [topicName]="topicSummaryTile.name">
+          </oppia-learner-story-summary-tile>
+        </div>
       </div>
     </div>
   </div>
@@ -26,93 +28,218 @@
   <p class="suggested-for-you-heading"
     [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
   </p>
-  <div class="empty-suggested-for-you-section" *ngIf="untrackedTopics.length === 0">
+  <div class="empty-suggested-for-you-section" *ngIf="!isNonemptyObject(untrackedTopics)">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
     </p>
   </div>
-  <div class="suggested-for-you-section" *ngIf="untrackedTopics.length !== 0">
-    <div *ngFor="let topicSummaryTile of untrackedTopics">
-      <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
-      </oppia-learner-topic-summary-tile>
+  <div class="suggested-for-you-section" *ngIf="isNonemptyObject(untrackedTopics)">
+    <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
+      <div *ngIf="item.value.length !== 0" class="classroom-name">
+        {{item.key}}
+      </div>
+      <div class="topic-summary-tile-scroll">
+        <div class="topic-summary-tile-section" [ngStyle]="checkMobileView() && {'width': getWidth(item.value.length) + 'px'}">
+          <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile">
+            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile">
+            </oppia-learner-topic-summary-tile>
+          </div>
+          <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
+            class="oppia-classroom-link">
+            <div class="classroom-card">
+              <p class="classroom-text">
+                View all {{item.key}} topics
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <style>
-.greeting {
-  color: #00645C;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 32px;
-  margin-left: 137px;
-  text-align: left;
-}
-.continue-where-you-left-off {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 4px #0000001a;
-  margin: 18px 0 25px 137px;
-  min-height: 179px;
-  padding: 32px 0 30px 40px;
-  width: 736px;
-}
-.continue-where-you-left-off-heading,
-.suggested-for-you-heading {
-  color: #00645C;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 24px;
-  margin: 0;
-  text-align: left;
-}
-.empty-continue-where-you-left-off-section {
-  color: #333333;
-  font-size: 18px;
-  padding-top: 32px;
-  text-align: left;
-}
-.next-incomplete-node-title {
-  color: #333333;
-  font-size: 17px;
-  font-weight: 500;
-  margin: 24px 0 12px 6px;
-  text-align: left;
-}
-.classroom-card {
-  background-color: #EEEEEE ;
-  border-radius: 4px;
-  display: inline-block;
-  height: 184px;
-  margin: 0 2px 30px 6px;
-  padding: 0;
-  position: relative;
-  width: 144px;
-  z-index: 5;
-}
-.empty-continue-where-you-left-off-section-text {
-  display: inline-block;
-}
-.setting-a-goal-link {
-  color: #00645C;
-  font-weight: bold;
-}
-.empty-suggested-for-you-section {
-  color: #333333;
-  font-size: 18px;
-  padding: 32px 113px 0 0;
-  text-align: left;
-}
-.suggested-for-you {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 0 4px #0000001a;
-  margin: 18px 0 25px 137px;
-  min-height: 206px;
-  padding: 32px 0 30px 40px;
-  width: 736px;
-}
-.suggested-for-you-section {
-  display: inline-block;
-  padding: 8px 16px 0 0;
-}
-.story-summary-tile {
-  display: inline-block;
-}
+  .greeting {
+    color: #00645C;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 32px;
+    margin-left: 137px;
+    text-align: left;
+  }
+  .continue-where-you-left-off {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin: 18px 0 25px 137px;
+    min-height: 179px;
+    padding: 32px 0 30px 40px;
+    width: 736px;
+  }
+  .classroom-name {
+    text-transform: capitalize;
+    font-size: 19px;
+    font-weight: 500;
+    padding: 24px 0 8px 0;
+    color: #333333;
+  }
+  .oppia-classroom-link {
+    text-decoration: none;
+  }
+  .topic-summary-tile {
+    display: inline-block;
+    padding-right: 20px;
+  }
+  .untracked-topics {
+    width: fit-content;
+  }
+  .continue-where-you-left-off-heading,
+  .suggested-for-you-heading {
+    color: #00645C;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 24px;
+    margin: 0;
+    text-align: left;
+  }
+  .empty-continue-where-you-left-off-section {
+    color: #333333;
+    font-size: 18px;
+    padding-top: 32px;
+    text-align: left;
+  }
+  .next-incomplete-node-title {
+    color: #333333;
+    font-size: 17px;
+    font-weight: 500;
+    margin: 24px 0 12px 6px;
+    text-align: left;
+  }
+  .classroom-card {
+    background-color: #EEEEEE ;
+    border-radius: 4px;
+    float: right;
+    height: 184px;
+    margin: 0 2px 30px 6px;
+    padding: 0;
+    position: relative;
+    width: 144px;
+    z-index: 5;
+  }
+  .classroom-text {
+    color: #333333;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 0.25px;
+    position: relative;
+    top: 70px;
+    text-transform: capitalize;
+  }
+  .empty-continue-where-you-left-off-section-text {
+    display: inline-block;
+  }
+  #setting-a-goal-link {
+    color: #00645C;
+    font-weight: bold;
+  }
+  .empty-suggested-for-you-section {
+    color: #333333;
+    font-size: 18px;
+    padding: 32px 113px 0 0;
+    text-align: left;
+  }
+  .suggested-for-you {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin: 18px 0 25px 137px;
+    min-height: 206px;
+    padding: 32px 0 30px 40px;
+    width: 736px;
+  }
+  .suggested-for-you-section {
+    display: inline-block;
+    padding: 8px 16px 0 0;
+  }
+  .topic-summary {
+    display: inline-block;
+    padding-right: 30px;
+  }
+  @media screen and (max-width: 1200px) {
+    .greeting {
+      margin-left: 0;
+    }
+    .continue-where-you-left-off, .suggested-for-you {
+      margin-left: 0;
+    }
+    .continue-where-you-left-off-scroll {
+      overflow: scroll;
+    }
+    .continue-where-you-left-off-scroll::-webkit-scrollbar {
+    -webkit-appearance: none;
+    }
+    .continue-where-you-left-off-scroll::-webkit-scrollbar:horizontal {
+      height: 5px;
+    }
+    .continue-where-you-left-off-scroll::-webkit-scrollbar-thumb {
+      border-radius: 8px;
+      border: 1px solid white;
+      background-color: #EEEEEE;
+    }
+  }
+  @media screen and (max-width: 767px) {
+    .greeting {
+      font-size: 20px;
+      margin-left: 20px;
+    }
+    .continue-where-you-left-off, .suggested-for-you {
+      margin: 18px 0 25px 20px;
+      width: 365px;
+    }
+    .continue-where-you-left-off-heading, .suggested-for-you-heading {
+      font-size: 16px;
+    }
+    .continue-where-you-left-off-scroll {
+      overflow: scroll;
+    }
+    .topic-summary-tile-section {
+      width: 656px;
+    }
+    .empty-continue-where-you-left-off-section-text {
+      margin-bottom: 0px;
+    }
+    .empty-continue-where-you-left-off-section {
+      font-size: 15px;
+    }
+    .empty-suggested-for-you-section {
+      padding: 32px 32px 0 0;
+    }
+    .topic-summary-tile-scroll {
+      width: 305px;
+      overflow: scroll;
+    }
+  }
+  @media screen and (min-width: 768px) and (max-width: 1000px) {
+    .greeting {
+      font-size: 25px;
+      margin-left: 0;
+    }
+    .continue-where-you-left-off, .suggested-for-you {
+      margin: 18px 0 25px 0;
+      width: 500px;
+    }
+    .continue-where-you-left-off-heading, .suggested-for-you-heading {
+      font-size: 17px;
+    }
+    .topic-summary-tile-scroll {
+      overflow: scroll;
+      width: 440px;
+    }
+    .suggested-for-you, .continue-where-you-left-off {
+      padding: 40px 0 20px 32px;
+    }
+    .continue-where-you-left-off-scroll {
+      overflow: scroll;
+    }
+    .empty-suggested-for-you-section {
+      padding: 17px 32px 0 0;
+    }
+  }
 </style>

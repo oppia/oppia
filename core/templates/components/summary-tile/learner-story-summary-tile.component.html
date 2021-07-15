@@ -1,26 +1,33 @@
-<div class="next-incomplete-chapter" *ngIf="displayArea === 'homeTab'">
+<div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
   {{nextIncompleteNodeTitle}}
 </div>
 <mat-card class="oppia-story-dashboard-card">
   <a [href]="getStoryLink()"
      target="{{ openInNewWindow ? '_blank' : '_self' }}"
      class="oppia-story-link">
-    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-      <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
-      <div class="oppia-story-completion">
-        <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
-        <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
-          {{storyProgress}}% Complete
-        </p>
+    <div class="story-card">
+      <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+        <img class="oppia-thumbnail-image" [src]="thumbnailUrl">
+        <div class="oppia-story-completion">
+          <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
+          <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
+            {{storyProgress}}% Complete
+          </p>
+        </div>
+      </div>
+      <div class="oppia-summary-section">
+        <span class="oppia-story-title">
+          {{storyTitle}}
+        </span>
+        <span class="oppia-topic-title">
+          {{topicName}}
+        </span>
       </div>
     </div>
-    <div class="oppia-summary-section">
-      <span class="oppia-story-title">
-        {{storyTitle}}
-      </span>
-      <span class="oppia-topic-title">
-        {{topicName}}
-      </span>
+    <div class="continue-button" *ngIf="isDisplayAreaHome()">
+      <p class="continue-button-text">
+        Continue
+      </p>
     </div>
   </a>
 </mat-card>
@@ -42,6 +49,27 @@
     margin: 24px 0 12px 6px;
     text-align: left;
   }
+  .continue-button {
+    background: #00645C 0% 0% no-repeat padding-box;
+    box-shadow: 0px 2px 2px #0000003d;
+    display: none;
+    border-radius: 4px;
+    height: 28px;
+    width: 112px;
+    position: relative;
+    bottom: 110px;
+    left: 40px;
+  }
+  .continue-button-text {
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 0px;
+    position: relative;
+    top: 6px;
+    left: 1px;
+    color: #FFFFFF;
+    text-transform: uppercase;
+  }
   .oppia-story-dashboard-card .oppia-story-completion {
     background: #000C 0% 0% no-repeat padding-box;
     border-radius: 2px;
@@ -52,7 +80,10 @@
     position: relative;
     right: 4px;
     text-align: left;
-    width: 80px;
+    width: 90px;
+  }
+  .story-completion {
+    bottom: 52px;
   }
   .oppia-story-dashboard-card .oppia-svg-star-image {
     bottom: 3px;
@@ -118,5 +149,17 @@
   .oppia-story-dashboard-card .oppia-thumbnail-image {
     height: 144px;
     width: 192px;
+  }
+  .story-card:hover + .continue-button {
+    display: block;
+    float: left;
+  }
+  .continue-button:hover {
+    display: block;
+    float: left;
+  }
+  .oppia-story-dashboard-card:hover .oppia-thumbnail-image {
+    filter: blur(2px);
+    -webkit-filter: blur(2px)
   }
 </style>

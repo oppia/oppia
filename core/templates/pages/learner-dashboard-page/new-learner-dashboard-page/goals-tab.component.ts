@@ -38,7 +38,8 @@ export class GoalsTabComponent implements OnInit {
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() editGoals: LearnerTopicSummary[];
   @Input() completedGoals: LearnerTopicSummary[];
-  @Input() untrackedTopics: LearnerTopicSummary[];
+  @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
+  @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics: string[];
   learnerDashboardActivityIds: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH: number;
@@ -50,6 +51,7 @@ export class GoalsTabComponent implements OnInit {
   topicIdsInCompletedGoals: string[] = [];
   topicIdsInCurrentGoals: string[] = [];
   topicIdsInEditGoals: string[] = [];
+  topicIdsInPartiallyLearntTopics: string[] = [];
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
@@ -84,6 +86,9 @@ export class GoalsTabComponent implements OnInit {
         this.getTopicClassification(topic.id));
       this.editGoalsTopicBelongToLearntToPartiallyLearntTopic.push(
         this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name));
+    }
+    for (topic of this.partiallyLearntTopicsList) {
+      this.topicIdsInPartiallyLearntTopics.push(topic.id);
     }
   }
 
@@ -137,13 +142,19 @@ export class GoalsTabComponent implements OnInit {
         this.currentGoalsStoryIsShown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
-        let indexInNewTopics = this.untrackedTopics.findIndex(
-          topic => topic.id === topicId);
-        if (indexInNewTopics !== -1) {
-          this.untrackedTopics.splice(indexInNewTopics, 1);
-        }
         this.editGoalsTopicClassification.splice(
           index, 1, this.getTopicClassification(topic.id));
+        if (this.untrackedTopics[topic.classroom]) {
+          let indexInNewTopics = this.untrackedTopics[
+            topic.classroom].findIndex(
+            topic => topic.id === topicId);
+          if (indexInNewTopics !== -1) {
+            this.untrackedTopics[topic.classroom].splice(indexInNewTopics, 1);
+            if (this.untrackedTopics[topic.classroom].length === 0) {
+              delete this.untrackedTopics[topic.classroom];
+            }
+          }
+        }
       }
     }
   }
@@ -164,13 +175,18 @@ export class GoalsTabComponent implements OnInit {
         this.currentGoalsStoryIsShown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
-        if (!this.topicIdsInCompletedGoals.includes(topicId) &&
-          !this.topicIdsInCurrentGoals.includes(topicId)) {
-          this.untrackedTopics.push(topic);
-        }
         let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
         this.editGoalsTopicClassification.splice(
           indexOfTopic, 1, this.getTopicClassification(topicId));
+        if (!this.topicIdsInCompletedGoals.includes(topicId) &&
+          !this.topicIdsInCurrentGoals.includes(topicId) &&
+          !this.topicIdsInPartiallyLearntTopics.includes(topicId)) {
+          if (this.untrackedTopics[topic.classroom]) {
+            this.untrackedTopics[topic.classroom].push(topic);
+          } else {
+            this.untrackedTopics[topic.classroom] = [topic];
+          }
+        }
       });
   }
 }
