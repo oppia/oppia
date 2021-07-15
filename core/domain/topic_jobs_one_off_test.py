@@ -49,6 +49,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         'skill_ids': ['skill_1'],
         'thumbnail_bg_color': None,
         'thumbnail_filename': None,
+        'thumbnail_size_in_bytes': None,
         'title': 'A subtitle',
         'url_fragment': 'subtitle'
     }
@@ -147,7 +148,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'title': 'A subtitle'
             })
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.subtopic_schema_version, 3)
+        self.assertEqual(topic.subtopic_schema_version, 4)
         self.assertEqual(
             topic.subtopics[0].to_dict(),
             self.MIGRATED_SUBTOPIC_DICT)
@@ -334,3 +335,79 @@ class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+
+class SubtopicThumbnailSizeAuditOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for the SubtopicThumbnailSizeAuditOneOffJob."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(SubtopicThumbnailSizeAuditOneOffJobTest, self).setUp()
+        # Setup user who will own the test topics.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_skips_deleted_topics(self):
+        """Tests that SubtopicThumbnailSizeAuditOneOffJob skips deleted
+        topic.
+        """
+        self.save_new_topic(self.TOPIC_ID, self.albert_id)
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.create_new()
+        )
+        topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected_output = []
+        self.assertEqual(
+            expected_output, [ast.literal_eval(x) for x in actual_output])
+
+    def test_job_logs_thumbnail_filename_and_size_for_subtopics(self):
+        """Test that SubtopicThumbnailSizeAuditOneOffJob logs the
+        thumbnail_filename and thumbnail_size_in_bytes for all the subtopics.
+        """
+        subtopic_schema_v4 = topic_domain.Subtopic.from_dict(
+            {
+                'id': 0,
+                'title': 'subtopic title',
+                'skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color':
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'thumbnail_size_in_bytes': 21131,
+                'url_fragment': 'dummy-subtopic-one'
+            }
+        )
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, subtopics=[subtopic_schema_v4],
+            next_subtopic_id=1)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.create_new()
+        )
+        topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected_output = [[u'topic_id', [u'image.svg 21131']]]
+        self.assertEqual(
+            expected_output, [ast.literal_eval(x) for x in actual_output])

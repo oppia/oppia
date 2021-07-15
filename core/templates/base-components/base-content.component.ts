@@ -22,6 +22,7 @@ import { AppConstants } from 'app.constants';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { OppiaCookieService } from 'services/cookie.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
@@ -37,6 +38,8 @@ export class BaseContentComponent {
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean;
   DEV_MODE = AppConstants.DEV_MODE;
+  COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
+  ONE_YEAR_IN_MSECS = 31536000000;
 
   constructor(
     private windowRef: WindowRef,
@@ -47,6 +50,7 @@ export class BaseContentComponent {
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
+    private oppiaCookieService: OppiaCookieService
   ) {}
 
   ngOnInit(): void {
@@ -116,6 +120,25 @@ export class BaseContentComponent {
     mainContentElement.tabIndex = -1;
     mainContentElement.scrollIntoView();
     mainContentElement.focus();
+  }
+
+  hasAcknowledgedCookies(): boolean {
+    let cookieSetDateMsecs = this.oppiaCookieService.getCookie(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
+    return (
+      !!cookieSetDateMsecs &&
+      Number(cookieSetDateMsecs) > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+    );
+  }
+
+  acknowledgeCookies(): void {
+    let currentDateInUnixTimeMsecs = new Date().valueOf();
+    let cookieOptions = {
+      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
+    };
+    this.oppiaCookieService.putCookie(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),
+      cookieOptions);
   }
 }
 
