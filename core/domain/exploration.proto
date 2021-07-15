@@ -1,5 +1,607 @@
-message Person {
-  required string name = 1;
-  required int32 id = 2;
-  optional string email = 3;
+syntax = "proto3";
+
+package core.domain;
+
+import "google/protobuf/descriptor.proto";
+
+// Custom options. Note that these do not actually enforce semantics--they're
+// just hints. The application needs to manually enforce these since proto lite
+// will not include them during proto generation.
+extend google.protobuf.MessageOptions {
+  bool supports_split_view = 1000;
+  FractionInputInstance.CustomizationArgs default_fraction_customization_args = 1001;
+  ItemSelectionInputInstance.CustomizationArgs default_item_selection_customization_args = 1002;
+  TextInputInstance.CustomizationArgs default_text_input_customization_args = 1003;
+  DragAndDropSortInputInstance.CustomizationArgs default_drag_and_drop_sort_customization_args = 1004;
+  RatioExpressionInputInstance.CustomizationArgs default_ratio_expression_customization_args = 1005;
+}
+
+message Exploration {
+  string id = 1;
+  int32 version = 2;
+  reserved 3; // preferred_audio_language_code
+  reserved 4; // preferred_language_codes
+  reserved 5; // auto_tts_enabled
+  reserved 6; // correctness_feedback_enabled
+  reserved 7; // record_playthrough_probability
+  string init_state_name = 8;
+  reserved 9; // param_changes
+  reserved 10; // param_specs
+  map<string, State> states = 11;
+  string title = 12;
+  reserved 13; // objective
+  reserved 14; // language_code
+}
+
+message State {
+  SubtitledHtml content = 1;
+  reserved 2; // param_changes
+  InteractionInstance interaction = 3;
+  reserved 4; // classifier_model_id
+  RecordedVoiceovers recorded_voiceovers = 5;
+  WrittenTranslations written_translations = 6;
+  reserved 7; // solicit_answer_details
+}
+
+message SubtitledHtml {
+  string content_id = 1;
+  string html = 2;
+}
+
+message RecordedVoiceovers {
+  repeated VoiceoverContentMapping voiceover_language_mapping = 1;
+}
+
+message VoiceoverContentMapping {
+  LanguageCode language_code = 1;
+  map<string, Voiceover> voiceover_content_mapping = 2;
+}
+
+message Voiceover {
+  string filename = 1;
+  int32 file_size_bytes = 2;
+  reserved 3; // needs_update
+  float duration_secs = 4;
+}
+
+message WrittenTranslations {
+  repeated WrittenTranslationContentMapping translation_language_mapping = 1;
+}
+
+message WrittenTranslationContentMapping {
+  LanguageCode language_code = 1;
+  map<string, WrittenTranslation> translation_content_mapping = 2;
+}
+
+message WrittenTranslation {
+  string data_format = 1;
+  string translation = 2;
+  reserved 3; // needs_update
+}
+
+message InteractionInstance {
+  oneof interaction_type {
+    ContinueInstance continue = 1;
+    FractionInputInstance fraction_input = 2;
+    ItemSelectionInputInstance item_selection_input = 3;
+    MultipleChoiceInputInstance multiple_choice_input = 4;
+    NumericInputInstance numeric_input = 5;
+    TextInputInstance text_input = 6;
+    DragAndDropSortInputInstance drag_and_drop_sort_input = 7;
+    ImageClickInputInstance image_click_input = 8;
+    RatioExpressionInputInstance ratio_expression_input = 9;
+    EndExplorationInstance end_exploration = 10;
+  }
+
+  // TODO: consider moving this to be type-specific since end explorations can't have a default outcome. Hints similarly
+  // could be type-specific for those interactions that support interactions.
+  Outcome default_outcome = 11;
+  repeated Hint hints = 12;
+}
+
+message Outcome {
+  string destination_state = 1;
+  SubtitledHtml feedback = 2;
+  bool labelled_as_correct = 3;
+  reserved 4; // param_changes
+  reserved 5; // refresher_exploration_id
+  reserved 6; // missing_prerequisite_skill_id
+}
+
+// Answer type: none (N/A since no answers are submitted for this interaction).
+message ContinueInstance {
+  CustomizationArgs customization_args = 1;
+
+  // Continue interactions cannot have custom answer groups, and do not support
+  // solutions.
+
+  message CustomizationArgs {
+    // Note that while the continue interaction has a default button text
+    // defined, it's not used in the app since the default string needs to come
+    // through the app's strings so that it can be translated.
+    SubtitledHtml button_text = 1;
+  }
+}
+
+// Answer type: Fraction.
+message FractionInputInstance {
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+  Solution solution = 3;
+
+  // The other defaults don't need to be explicitly defined since they match
+  // proto's default values, or the app should reasonably default the absent
+  // value (such as in the case of the placeholder text).
+  option (default_fraction_customization_args).allow_improper_fractions = true;
+
+  message CustomizationArgs {
+    bool requires_simplest_form = 1;
+    bool allow_improper_fractions = 2;
+    bool allow_nonzero_integer_part = 3;
+    SubtitledHtml custom_placeholder = 4;
+  }
+  message Solution {
+    BaseSolution base_solution = 1;
+    Fraction correct_answer = 2;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      IsExactlyEqualToSpec is_exactly_equal_to = 1;
+      IsEquivalentToSpec is_equivalent_to = 2;
+      IsEquivalentToAndInSimplestFormSpec is_equivalent_to_and_in_simplest_form = 3;
+      IsLessThanSpec is_less_than = 4;
+      IsGreaterThanSpec is_greater_than = 5;
+      HasNumeratorEqualToSpec has_numerator_equal_to = 6;
+      HasDenominatorEqualToSpec has_denominator_equal_to = 7;
+      HasIntegerPartEqualToSpec has_integer_part_equal_to = 8;
+      HasNoFractionalPartSpec has_no_fractional_part = 9;
+      HasFractionalPartExactlyEqualToSpec has_fractional_part_exactly_equal_to = 10;
+    }
+    message IsExactlyEqualToSpec {
+      Fraction input = 1;
+    }
+    message IsEquivalentToSpec {
+      Fraction input = 1;
+    }
+    message IsEquivalentToAndInSimplestFormSpec {
+      Fraction input = 1;
+    }
+    message IsLessThanSpec {
+      Fraction input = 1;
+    }
+    message IsGreaterThanSpec {
+      Fraction input = 1;
+    }
+    message HasNumeratorEqualToSpec {
+      int32 input = 1;
+    }
+    message HasDenominatorEqualToSpec {
+      uint32 input = 1;
+    }
+    message HasIntegerPartEqualToSpec {
+      int32 input = 1;
+    }
+    message HasNoFractionalPartSpec {
+      // No inputs for this rule spec.
+    }
+    message HasFractionalPartExactlyEqualToSpec {
+      Fraction input = 1;
+    }
+  }
+}
+
+// Answer type: SetOfTranslatableHtmlContentIds.
+message ItemSelectionInputInstance {
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+
+  // Item selection does not support solutions.
+
+  message CustomizationArgs {
+    int32 min_allowable_selection_count = 1;
+    int32 max_allowable_selection_count = 2;
+    repeated SubtitledHtml choices = 3;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      EqualsSpec equals = 1;
+      ContainsAtLeastOneOfSpec contains_at_least_one_of = 2;
+      DoesNotContainAtLeastOneOfSpec does_not_contain_at_least_one_of = 3;
+      IsProperSubsetOfSpec is_proper_subset_of = 4;
+    }
+    message EqualsSpec {
+      SetOfTranslatableHtmlContentIds input = 1;
+    }
+    message ContainsAtLeastOneOfSpec {
+      SetOfTranslatableHtmlContentIds input = 1;
+    }
+    message DoesNotContainAtLeastOneOfSpec {
+      SetOfTranslatableHtmlContentIds input = 1;
+    }
+    message IsProperSubsetOfSpec {
+      SetOfTranslatableHtmlContentIds input = 1;
+    }
+  }
+}
+
+// Answer type: non-negative int (uint32).
+message MultipleChoiceInputInstance {
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+
+  // Multiple choice does not support solutions.
+
+  message CustomizationArgs {
+    repeated SubtitledHtml choices = 1;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      EqualsSpec equals = 1;
+    }
+    message EqualsSpec {
+      uint32 input = 1;
+    }
+  }
+}
+
+// Answer type: real (double).
+message NumericInputInstance {
+  repeated AnswerGroup answer_groups = 1;
+  Solution solution = 2;
+
+  // Numeric input does not have any customization arguments.
+
+  message Solution {
+    BaseSolution base_solution = 1;
+    double correct_answer = 2;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      EqualsSpec equals = 1;
+      IsLessThanSpec is_less_than = 2;
+      IsGreaterThanSpec is_greater_than = 3;
+      IsLessThanOrEqualToSpec is_less_than_or_equal_to = 4;
+      IsGreaterThanOrEqualToSpec is_greater_than_or_equal_to = 5;
+      IsInclusivelyBetweenSpec is_inclusively_between = 6;
+      IsWithinToleranceSpec is_within_tolerance = 7;
+    }
+    message EqualsSpec {
+      double input = 1;
+    }
+    message IsLessThanSpec {
+      double input = 1;
+    }
+    message IsGreaterThanSpec {
+      double input = 1;
+    }
+    message IsLessThanOrEqualToSpec {
+      double input = 1;
+    }
+    message IsGreaterThanOrEqualToSpec {
+      double input = 1;
+    }
+    message IsInclusivelyBetweenSpec {
+      double inputLowerInclusive = 1;
+      double inputUpperInclusive = 2;
+    }
+    message IsWithinToleranceSpec {
+      double inputTolerance = 1;
+      double inputComparedValue = 2;
+    }
+  }
+}
+
+// Answer type: normalized string (string).
+message TextInputInstance {
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+  Solution solution = 3;
+
+  message CustomizationArgs {
+    SubtitledHtml placeholder = 1;
+    int32 rows = 2;
+  }
+  message Solution {
+    BaseSolution base_solution = 1;
+    string correct_answer = 2;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      EqualsSpec equals = 1;
+      StartsWithSpec starts_with = 2;
+      ContainsSpec contains = 3;
+      FuzzyEqualsSpec fuzzy_equals = 4;
+    }
+    message EqualsSpec {
+      TranslatableSetOfNormalizedString input = 1;
+    }
+    message StartsWithSpec {
+      TranslatableSetOfNormalizedString input = 1;
+    }
+    message ContainsSpec {
+      TranslatableSetOfNormalizedString input = 1;
+    }
+    message FuzzyEqualsSpec {
+      TranslatableSetOfNormalizedString input = 1;
+    }
+  }
+}
+
+// Answer type: ListOfSetsOfTranslatableHtmlContentIds.
+message DragAndDropSortInputInstance {
+  option (supports_split_view) = true;
+
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+  Solution solution = 3;
+
+  message CustomizationArgs {
+    repeated SubtitledHtml choices = 1;
+    bool allowMultipleItemsInSamePosition = 2;
+  }
+  message Solution {
+    BaseSolution base_solution = 1;
+    ListOfSetsOfTranslatableHtmlContentIds correct_answer = 2;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      IsEqualToOrderingSpec is_equal_to_ordering = 1;
+      IsEqualToOrderingWithOneItemAtIncorrectPositionSpec is_equal_to_ordering_with_one_item_at_incorrect_position = 2;
+      HasElementXAtPositionYSpec has_element_x_at_position_y = 3;
+      HasElementXBeforeElementYSpec has_element_x_before_element_y = 4;
+    }
+    message IsEqualToOrderingSpec {
+      ListOfSetsOfTranslatableHtmlContentIds input = 1;
+    }
+    message IsEqualToOrderingWithOneItemAtIncorrectPositionSpec {
+      ListOfSetsOfTranslatableHtmlContentIds input = 1;
+    }
+    message HasElementXAtPositionYSpec {
+      TranslatableHtmlContentId element = 1;
+      uint32 position = 2;
+    }
+    message HasElementXBeforeElementYSpec {
+      TranslatableHtmlContentId considered_element = 1;
+      TranslatableHtmlContentId later_element = 2;
+    }
+  }
+}
+
+// Answer type: ClickOnImage.
+message ImageClickInputInstance {
+  option (supports_split_view) = true;
+
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+
+  // Image click input doesn't yet support solutions.
+
+  message CustomizationArgs {
+    ImageWithRegions image_and_regions = 1;
+    reserved 2; // highlight_regions_on_hover which is not supported on Android.
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      IsInRegionSpec is_in_region = 1;
+    }
+    message IsInRegionSpec {
+      string input_region = 1;
+    }
+  }
+}
+
+// Answer type: RatioExpression.
+message RatioExpressionInputInstance {
+  CustomizationArgs customization_args = 1;
+  repeated AnswerGroup answer_groups = 2;
+  Solution solution = 3;
+
+  message CustomizationArgs {
+    SubtitledHtml placeholder = 1;
+    int32 number_of_terms = 2;
+  }
+  message Solution {
+    BaseSolution base_solution = 1;
+    RatioExpression correct_answer = 2;
+  }
+  message AnswerGroup {
+    BaseAnswerGroup base_answer_group = 1;
+    repeated RuleSpec rule_specs = 2;
+  }
+  message RuleSpec {
+    oneof rule_type {
+      EqualsSpec equals = 1;
+      IsEquivalentSpec is_equivalent = 2;
+      HasNumberOfTermsEqualToSpec has_number_of_terms_equal_to = 3;
+    }
+    message EqualsSpec {
+      RatioExpression input = 1;
+    }
+    message IsEquivalentSpec {
+      RatioExpression input = 1;
+    }
+    message HasNumberOfTermsEqualToSpec {
+      uint32 input_term_count = 1;
+    }
+  }
+}
+
+// Answer type: none (N/A since no answers are submitted for this interaction).
+message EndExplorationInstance {
+  // No answers can be submitted to the end exploration, so there are neither
+  // answer groups nor solutions. The interaction does have customization
+  // arguments, but they aren't supported in the Android app.
+}
+
+message Hint {
+  SubtitledHtml hint_content = 1;
+}
+
+// Common fields for all solutions.
+message BaseSolution {
+  reserved 1; // answer_is_exclusive
+  SubtitledHtml explanation = 2;
+}
+
+// Convenience collection object for all potential types of solutions.
+message Solution {
+  oneof interaction_type {
+    FractionInputInstance.Solution fraction_instance_solution = 1;
+    NumericInputInstance.Solution numeric_input_instance_solution = 2;
+    TextInputInstance.Solution text_input_instance_solution = 3;
+    DragAndDropSortInputInstance.Solution drag_and_drop_sort_input_instance_solution = 4;
+    RatioExpressionInputInstance.Solution ratio_expression_input_instance_solution = 5;
+  }
+}
+
+// Common fields for all answer groups.
+message BaseAnswerGroup {
+  Outcome outcome = 1;
+  reserved 2; // tagged_skill_misconception_id
+}
+
+// Convenience collection object for all potential types of answer groups.
+message AnswerGroup {
+  oneof interaction_type {
+    FractionInputInstance.AnswerGroup fraction_input_instance_answer_group = 1;
+    ItemSelectionInputInstance.AnswerGroup item_selection_input_instance_answer_group = 2;
+    MultipleChoiceInputInstance.AnswerGroup multiple_choice_input_instance_answer_group = 3;
+    NumericInputInstance.AnswerGroup numeric_input_instance_answer_group = 4;
+    TextInputInstance.AnswerGroup text_input_instance_answer_group = 5;
+    DragAndDropSortInputInstance.AnswerGroup drag_and_drop_sort_input_instance_answer_group = 6;
+    ImageClickInputInstance.AnswerGroup image_click_input_instance_answer_group = 7;
+    RatioExpressionInputInstance.AnswerGroup ratio_expression_input_instance_answer_group = 8;
+  }
+}
+
+// Convenience collection object for all potential types of rule specs.
+message RuleSpec {
+  oneof interaction_type {
+    FractionInputInstance.RuleSpec fraction_input_instance_rule_spec = 1;
+    ItemSelectionInputInstance.RuleSpec item_selection_input_instance_rule_spec = 2;
+    MultipleChoiceInputInstance.RuleSpec multiple_choice_input_instance_rule_spec = 3;
+    NumericInputInstance.RuleSpec numeric_input_instance_rule_spec = 4;
+    TextInputInstance.RuleSpec text_input_instance_rule_spec = 5;
+    DragAndDropSortInputInstance.RuleSpec drag_and_drop_sort_input_instance_rule_spec = 6;
+    ImageClickInputInstance.RuleSpec image_click_input_instance_rule_spec = 7;
+    RatioExpressionInputInstance.RuleSpec ratio_expression_input_instance_rule_spec = 8;
+  }
+}
+
+enum LanguageCode {
+  UNKNOWN_LANGUAGE_CODE = 0;
+  ENGLISH = 1;
+}
+
+message Fraction {
+  bool is_negative = 1;
+  uint32 whole_number = 2;
+  uint32 numerator = 3;
+  int32 denominator = 4;
+}
+
+message TranslatableHtmlContentId {
+  string content_id = 1;
+}
+
+message SetOfTranslatableHtmlContentIds {
+  repeated TranslatableHtmlContentId content_ids = 1;
+}
+
+message ListOfSetsOfTranslatableHtmlContentIds {
+  repeated SetOfTranslatableHtmlContentIds content_id_lists = 1;
+}
+
+message Point2d {
+  double x = 1;
+  double y = 2;
+}
+
+message ClickOnImage {
+  Point2d click_position = 1;
+  repeated string clicked_regions = 2;
+}
+
+message RatioExpression {
+  repeated uint32 components = 1;
+}
+
+message TranslatableSetOfNormalizedString {
+  string content_id = 1;
+  repeated string normalized_strings = 2;
+}
+
+message ImageWithRegions {
+  string image_file_path = 1;
+  repeated LabeledRegion labeled_regions = 2;
+
+  message LabeledRegion {
+    string label = 3;
+    oneof region_type {
+      NormalizedRectangle2d normalized_rectangle_2d = 1;
+    }
+    message NormalizedRectangle2d {
+      Point2d upper_left = 1;
+      Point2d lower_right = 2;
+    }
+  }
+}
+
+// Convenience object that supports all potential answer types that can be
+// submitted.
+message UserAnswer {
+  oneof answer_type {
+    Fraction fraction = 1;
+    SetOfTranslatableHtmlContentIds set_of_translatable_html_content_ids = 2;
+    uint32 non_negative_int = 3;
+    double real = 4;
+    string normalized_string = 5;
+    ListOfSetsOfTranslatableHtmlContentIds list_of_sets_of_translatable_html_content_ids = 6;
+    ClickOnImage click_on_image = 7;
+    RatioExpression ratio_expression = 8;
+  }
+}
+
+// Convenience object that supports all potential inputs for rules.
+message RuleInputType {
+  oneof input_type {
+    int32 int = 1;
+    uint32 non_negative_int = 2;
+    double real = 3;
+    string normalized_string = 4;
+    Fraction fraction = 5;
+    SetOfTranslatableHtmlContentIds set_of_translatable_html_content_ids = 6;
+    TranslatableSetOfNormalizedString translatable_set_of_normalized_string = 7;
+    ListOfSetsOfTranslatableHtmlContentIds list_of_sets_of_translatable_html_content_ids = 8;
+    TranslatableHtmlContentId translatable_html_content_id = 9;
+    RatioExpression ratio_expression = 10;
+  }
 }
