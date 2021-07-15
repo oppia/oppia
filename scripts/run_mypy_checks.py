@@ -838,7 +838,7 @@ def main(args=None):
     else:
         python_utils.PRINT(
             'Mypy type checks unsuccessful. Please fix the errors.')
-        sys.exit(1)
+        sys.exit(2)
     return process
 
 

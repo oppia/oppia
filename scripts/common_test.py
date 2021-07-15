@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import errno
 import getpass
 import http.server
 import os
@@ -775,3 +776,30 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertIsNone(old_value)
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
+
+    def test_write_stdout_safe_with_repeat_oserror(self):
+
+        raised_once = False
+
+        def write_raise_oserror(unused_fileno, bytes_to_write):
+            self.assertEqual(bytes_to_write, 'test'.encode('utf-8'))
+
+            nonlocal raised_once
+            if not raised_once:
+                raised_once = True
+                raise OSError(errno.EAGAIN, 'OS error that should be repeated')
+
+            return 4
+
+        write_swap = self.swap_with_checks(os, 'write', write_raise_oserror)
+        with write_swap:
+            common.write_stdout_safe('test')
+
+    def test_write_stdout_safe_with_oserror(self):
+
+        def write_raise_oserror(unused_fileno, unused_bytes):
+            raise OSError('OS error')
+
+        write_swap = self.swap_with_checks(os, 'write', write_raise_oserror)
+        with write_swap, self.assertRaisesRegexp(OSError, 'OS error'):
+            common.write_stdout_safe('test')

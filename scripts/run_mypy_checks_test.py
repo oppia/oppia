@@ -60,6 +60,11 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.popen_swap_failure = self.swap(
             subprocess, 'Popen', mock_popen_failure)
 
+        self.install_mypy_prereq_swap_success = self.swap(
+            run_mypy_checks, 'install_mypy_prerequisites', lambda: 0)
+        self.install_mypy_prereq_swap_failure = self.swap(
+            run_mypy_checks, 'install_mypy_prerequisites', lambda: 1)
+
         self.files_swap = self.swap(
             run_mypy_checks, 'NOT_FULLY_COVERED_FILES',
             ['file1.py', 'file2.py'])
@@ -110,34 +115,36 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_main_with_files_without_mypy_errors(self):
         with self.popen_swap_success:
-            with self.install_swap:
+            with self.install_swap, self.install_mypy_prereq_swap_success:
                 process = run_mypy_checks.main(args=['--files', 'file1.py'])
                 self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self):
         with self.popen_swap_success:
-            with self.install_swap:
+            with self.install_swap, self.install_mypy_prereq_swap_success:
                 process = run_mypy_checks.main(args=[])
                 self.assertEqual(process, 0)
 
     def test_main_with_files_with_mypy_errors(self):
-        with self.popen_swap_failure:
-            with self.install_swap:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+        with self.install_mypy_prereq_swap_success:
+            with self.install_swap, self.popen_swap_failure:
+                with self.assertRaisesRegexp(SystemExit, '2'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self):
         with self.popen_swap_failure:
-            with self.install_swap:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+            with self.install_swap, self.install_mypy_prereq_swap_success:
+                with self.assertRaisesRegexp(SystemExit, '2'):
                     run_mypy_checks.main(args=[])
 
     def test_main_with_install_prerequisites_success(self):
         with self.popen_swap_success, self.install_swap:
-            process = run_mypy_checks.main(args=[])
-            self.assertEqual(process, 0)
+            with self.install_mypy_prereq_swap_success:
+                process = run_mypy_checks.main(args=[])
+                self.assertEqual(process, 0)
 
     def test_main_with_install_prerequisites_failure(self):
         with self.popen_swap_failure, self.install_swap:
-            with self.assertRaisesRegexp(SystemExit, '1'):
-                run_mypy_checks.main(args=[])
+            with self.install_mypy_prereq_swap_failure:
+                with self.assertRaisesRegexp(SystemExit, '1'):
+                    run_mypy_checks.main(args=[])
