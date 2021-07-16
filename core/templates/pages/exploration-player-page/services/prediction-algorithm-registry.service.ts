@@ -45,12 +45,15 @@ export class PredictionAlgorithmRegistryService {
 
   getPredictionService(
       algorithmId: string, dataSchemaVersion: number):
-       PredictionService | null {
-    const predictionServicesByDataSchemaVersion =
-      this.algorithmIdPredictionServiceMapping.get(algorithmId)
-        .get(dataSchemaVersion);
-    if (predictionServicesByDataSchemaVersion) {
-      return predictionServicesByDataSchemaVersion;
+     PredictionService | null {
+    const predictionServicesByAlgorithmId = (
+      this.algorithmIdPredictionServiceMapping.get(algorithmId));
+    if (predictionServicesByAlgorithmId) {
+      const predictionServicesByDataSchemaVersion = (
+        predictionServicesByAlgorithmId).get(dataSchemaVersion);
+      if (predictionServicesByDataSchemaVersion) {
+        return predictionServicesByDataSchemaVersion;
+      }
     }
     return null;
   }
@@ -58,12 +61,11 @@ export class PredictionAlgorithmRegistryService {
   testOnlySetPredictionService(
       algorithmId: string, dataSchemaVersion: number,
       service: PredictionService): void {
-    const predictionServiceByAlgorithmId =
-     this.algorithmIdPredictionServiceMapping.get(algorithmId);
-    if (!predictionServiceByAlgorithmId) {
+    if (!this.algorithmIdPredictionServiceMapping.get(algorithmId)) {
       this.algorithmIdPredictionServiceMapping.set(algorithmId, new Map());
     }
-    predictionServiceByAlgorithmId.set(dataSchemaVersion, service);
+    this.algorithmIdPredictionServiceMapping.get(algorithmId)
+      .set(dataSchemaVersion, service);
   }
 }
 
