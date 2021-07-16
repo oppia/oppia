@@ -864,7 +864,7 @@ def main(args=None):
 
     python_utils.PRINT('Starting Mypy type checks.')
     cmd = get_mypy_cmd(
-        getattr(parsed_args, 'files'), parsed_args.install_globally)
+        parsed_args.files, parsed_args.install_globally)
 
     _paths_to_insert = [
         MYPY_TOOLS_DIR,
