@@ -196,7 +196,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-content-editor.directive.ts',
     'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'state-property.service.ts',
     'state-solution-editor.directive.ts',
     'state-top-answers-stats.service.ts',
     'story-creation.service.ts',
@@ -234,7 +233,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
     'unit-test-utils.ajs.ts', # Please don't try to cover this file.
-    'url-interpolation.service.ts',
     'utils.service.ts',
     'version-diff-visualization.directive.ts',
     'voiceover-recording.service.ts',
