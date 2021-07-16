@@ -747,7 +747,8 @@ _PARSER = argparse.ArgumentParser(
 
 _PARSER.add_argument(
     '--skip-install',
-    help='If passed, skips installing dependencies. The default value is false.',
+    help='If passed, skips installing dependencies.'
+    ' By default, they are installed.',
     action='store_true')
 
 _PARSER.add_argument(
