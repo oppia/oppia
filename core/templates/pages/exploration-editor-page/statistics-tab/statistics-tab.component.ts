@@ -105,10 +105,10 @@ angular.module('oppia').component('statisticsTab', {
           .then(stats => $uibModal.open({
             controller: 'StateStatsModalController',
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              'pages/exploration-editor-page/statistics-tab/templates/' +
+              '/pages/exploration-editor-page/statistics-tab/templates/' +
               'state-stats-modal.template.html'),
             styleUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              'pages/exploration-editor-page/statistics-tab/templates/' +
+              '/pages/exploration-editor-page/statistics-tab/templates/' +
               'state-stats-modal.template.css'),
             backdrop: true,
             resolve: {
