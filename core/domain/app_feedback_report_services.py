@@ -50,7 +50,7 @@ def get_report_models(report_ids):
         app_feedback_report_models.AppFeedbackReportModel.get_multi(report_ids))
 
 
-def create_android_report_from_json(report_json):
+def create_report_from_json(report_json):
     # type: (Dict[str, Any]) -> app_feedback_report_domain.AppFeedbackReport
     """Creates an AppFeedbackReport domain object instance from the incoming
     JSON request.

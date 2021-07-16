@@ -93,6 +93,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     WEB_REPORT_INFO_SCHEMA_VERSION = 1
 
     REPORT_JSON = {
+        'platform': 'android',
         'android_report_info_schema_version': 1,
         'app_context': {
             'entry_point': {
@@ -446,10 +447,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             ticket_obj.reports, self.android_ticket_model.report_ids)
 
-    def test_create_android_report_from_json_is_correct_object(self):
+    def test_create_report_from_json_is_correct_object(self):
         # type: () -> None
         report_obj = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 self.REPORT_JSON))
 
         self.assertTrue(isinstance(
@@ -467,7 +468,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_save_new_android_report_from_json_saves_model_to_storage(self):
         # type: () -> None
         report_obj = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 self.REPORT_JSON))
         app_feedback_report_services.save_feedback_report_to_storage(
             report_obj, new_incoming_report=True)
@@ -489,10 +490,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_new_reports_added_updates_unticketed_stats_model_correctly(self):
         # type: () -> None
         report_obj_1 = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 self.REPORT_JSON))
         report_obj_2 = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 self.REPORT_JSON))
         app_feedback_report_services.store_incoming_report_stats(report_obj_1)
         app_feedback_report_services.store_incoming_report_stats(report_obj_2)
@@ -539,10 +540,10 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_new_report_added_updates_all_reports_stats_model_correctly(self):
         # type: () -> None
         report_obj_1 = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 self.REPORT_JSON))
         report_obj_2 = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 self.REPORT_JSON))
         app_feedback_report_services.store_incoming_report_stats(report_obj_1)
         app_feedback_report_services.store_incoming_report_stats(report_obj_2)

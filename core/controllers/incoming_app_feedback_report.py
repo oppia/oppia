@@ -61,7 +61,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
                 'A report must be sent in the request.')
 
         report_obj = (
-            app_feedback_report_services.create_android_report_from_json(
+            app_feedback_report_services.create_report_from_json(
                 report_dict))
         report_obj.validate()
         app_feedback_report_services.save_feedback_report_to_storage(

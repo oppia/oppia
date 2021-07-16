@@ -234,7 +234,11 @@ class AppFeedbackReport(python_utils.OBJECT):
             AppFeedbackReport. The corresponding AppFeedbackReport domain
             object.
         """
-        return cls.get_android_report_from_dict(report_dict)
+        if report_dict['platform'] == constants.PLATFORM_CHOICE_ANDROID:
+            return cls.get_android_report_from_dict(report_dict)
+        else:
+            raise NotImplementedError(
+                'Domain objects for web reports must be implemented.')
 
     @classmethod
     def get_android_report_from_dict(cls, report_dict):
