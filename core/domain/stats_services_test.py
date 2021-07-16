@@ -824,7 +824,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exp.version += 1
         stats_services.update_exp_issues_for_new_exp_version(
-            exp, exp_domain.ExplorationVersionsDiff([]) , None)
+            exp, exp_domain.ExplorationVersionsDiff([]), None)
 
         exploration_issues_model = (
             stats_models.ExplorationIssuesModel.get('%s.%s' % ('exp_id', 1)))
