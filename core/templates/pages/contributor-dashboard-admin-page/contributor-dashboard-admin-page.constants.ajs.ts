@@ -21,17 +21,14 @@
 import { ContributorDashboardAdminPageConstants as PageConstants } from './contributor-dashboard-admin-page.constants';
 
 angular.module('oppia').constant(
-  'ADD_CONTRIBUTION_RIGHTS_HANDLER_URL',
-  PageConstants.ADD_CONTRIBUTION_RIGHTS_HANDLER_URL);
-angular.module('oppia').constant(
   'CONTRIBUTION_RIGHTS_HANDLER_URL',
   PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL);
 angular.module('oppia').constant(
+  'CONTRIBUTION_RIGHTS_DATA_HANDLER_URL',
+  PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL);
+angular.module('oppia').constant(
   'GET_CONTRIBUTOR_USERS_HANDLER_URL',
   PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL);
-angular.module('oppia').constant(
-  'REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL',
-  PageConstants.REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL);
 angular.module('oppia').constant(
   'TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL',
   PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL);
