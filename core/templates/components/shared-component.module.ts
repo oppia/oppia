@@ -34,6 +34,7 @@ import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
+import { CookieModule } from 'ngx-cookie';
 import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
@@ -164,6 +165,7 @@ const toastrConfig = {
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
+    CookieModule.forRoot(),
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,

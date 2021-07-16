@@ -1834,6 +1834,50 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             exploration_id = self.request.get('exploration_id')
             return self.render_json({'exploration_id': exploration_id})
 
+    class MockHandlerWithDefaultGetSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {
+                'exploration_id': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': 'random_exp_id'
+                }
+            }
+        }
+
+        def get(self):
+            exploration_id = self.normalized_request.get('exploration_id')
+            if exploration_id != 'random_exp_id':
+                raise self.InvalidInputException(
+                    'Expected exploration_id to be random_exp_id received %s'
+                    % exploration_id)
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithDefaultPutSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'PUT': {
+                'exploration_id': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': 'random_exp_id'
+                }
+            }
+        }
+
+        def put(self):
+            exploration_id = self.normalized_payload.get('exploration_id')
+            if exploration_id != 'random_exp_id':
+                raise self.InvalidInputException(
+                    'Expected exploration_id to be random_exp_id received %s'
+                    % exploration_id)
+            return self.render_json({'exploration_id': exploration_id})
+
     def setUp(self):
         super(SchemaValidationRequestArgsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1848,6 +1892,16 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration',
                     self.MockHandlerWithMissingRequestSchema)],
                 debug=feconf.DEBUG))
+
+        self.mock_testapp3 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithDefaultGetSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp4 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithDefaultPutSchema)], debug=feconf.DEBUG))
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
@@ -1874,6 +1928,17 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                     expected_status_int=500)
             self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_can_access_exploration_with_default_value_in_schema(self):
+        self.login(self.OWNER_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp3):
+            self.get_json('/mock_play_exploration')
+
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp4):
+            self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
 
 

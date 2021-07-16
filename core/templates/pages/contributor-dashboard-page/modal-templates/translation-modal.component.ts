@@ -57,7 +57,6 @@ export interface ImageDetails {
 }
 export class TranslationError {
   constructor(
-    private _hasUncopiedImgs: boolean,
     private _hasDuplicateAltTexts: boolean,
     private _hasDuplicateDescriptions: boolean,
     private _hasUntranslatedElements: boolean) {}
@@ -67,9 +66,6 @@ export class TranslationError {
   }
   get hasDuplicateAltTexts(): boolean {
     return this._hasDuplicateAltTexts;
-  }
-  get hasUncopiedImgs(): boolean {
-    return this._hasUncopiedImgs;
   }
   get hasUntranslatedElements(): boolean {
     return this._hasUntranslatedElements;
@@ -97,7 +93,6 @@ export class TranslationModalComponent {
   };
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
-  hasImgCopyError = false;
   hadCopyParagraphError = false;
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
@@ -273,14 +268,6 @@ export class TranslationModalComponent {
     };
   }
 
-  copiedAllElements(
-      originalElements: string[],
-      translatedElements: string[]): boolean {
-    const hasMatchingTranslatedElement = element => (
-      translatedElements.includes(element));
-    return originalElements.every(hasMatchingTranslatedElement);
-  }
-
   hasSomeDuplicateElements(
       originalElements: string[],
       translatedElements: string[]): boolean {
@@ -316,9 +303,6 @@ export class TranslationModalComponent {
     const originalElements: ImageDetails = this.getImageAttributeTexts(
       textToTranslate);
 
-    const hasUncopiedImgs = !this.copiedAllElements(
-      originalElements.filePaths,
-      translatedElements.filePaths);
     const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
       originalElements.alts,
       translatedElements.alts);
@@ -329,7 +313,7 @@ export class TranslationModalComponent {
       textToTranslate, translatedText));
 
     return new TranslationError(
-      hasUncopiedImgs, hasDuplicateAltTexts,
+      hasDuplicateAltTexts,
       hasDuplicateDescriptions, hasUntranslatedElements);
   }
 
@@ -344,13 +328,12 @@ export class TranslationModalComponent {
       originalElements.getElementsByTagName('*'),
       translatedElements.getElementsByTagName('*'));
 
-    this.hasImgCopyError = translationError.hasUncopiedImgs;
     this.hasImgTextError = translationError.hasDuplicateAltTexts ||
       translationError.hasDuplicateDescriptions;
     this.hasIncompleteTranslationError = translationError.
       hasUntranslatedElements;
 
-    if (this.hasImgCopyError || this.hasImgTextError ||
+    if (this.hasImgTextError ||
       this.hasIncompleteTranslationError || this.uploadingTranslation ||
       this.loadingData) {
       return;

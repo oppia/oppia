@@ -13,15 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the contributor dashboard admin page.
+ * @fileoverview Tests for the no-relative-import.js file.
  */
 
-export const ContributorDashboardAdminPageConstants = {
-  CONTRIBUTION_RIGHTS_HANDLER_URL: (
-    '/contributionrightshandler/<category>'),
-  CONTRIBUTION_RIGHTS_DATA_HANDLER_URL: '/contributionrightsdatahandler',
-  GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler/<category>',
-  TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL: (
-    '/translationcontributionstatshandler'
-  )
-} as const;
+'use strict';
+
+var rule = require('./no-relative-import');
+var RuleTester = require('eslint').RuleTester;
+
+var ruleTester = new RuleTester();
+ruleTester.run('no-relative-import', rule, {
+  valid: [
+    {
+      code:
+      "var path = require('path');"
+    }
+  ],
+
+  invalid: [
+    {
+      code:
+      'var forms = require("../protractor_utils/forms.js");',
+      errors: [{
+        message: "Please don't use relative imports in require()."
+      }],
+    },
+  ]
+});

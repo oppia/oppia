@@ -22,14 +22,11 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var CreatorDashboardPage = (
-  require('../protractor_utils/CreatorDashboardPage.js'));
 var ExplorationEditorPage = (
   require('../protractor_utils/ExplorationEditorPage.js'));
 
 describe('Improvements tab', function() {
   let adminPage = new AdminPage.AdminPage();
-  let creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   let explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
 
   let explorationEditorImprovementsTab = (
@@ -59,31 +56,8 @@ describe('Improvements tab', function() {
     await users.logout();
   });
 
-  it('should be present after revisiting a published exploration', async() => {
-    await users.createUser(
-      'publisher@improvementsTab.com', 'improvementsTabPublisher');
-    await users.login('publisher@improvementsTab.com');
-    await workflow.createAndPublishExploration(
-      'Demo Exploration',
-      'Algebra',
-      'Learn how to demo',
-      'English',
-      true
-    );
-
-    // Freshly-published explorations should not show the improvements tab yet.
-    await explorationEditorImprovementsTab.expectToBeHidden();
-
-    await general.goToHomePage();
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.navigateToExplorationEditor();
-
-    // After revisiting the exploration editor, the button should be visible.
-    await explorationEditorPage.navigateToImprovementsTab();
-    await explorationEditorImprovementsTab.expectHealthyExploration();
-    await users.logout();
-  });
-
+  // TODO(#13352): Add back test that verifies that the improvements tab is
+  // present after revisiting a published exploration.
   // TODO(#7327): Add tests for generating and resolving NeedsGuidingResponses
   // tasks once answer stats are generated incrementally. Currently, we need to
   // run a slow continuous job; too slow to outweigh the benefit in test
