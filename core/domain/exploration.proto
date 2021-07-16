@@ -93,7 +93,7 @@ message InteractionInstance {
     EndExplorationInstance end_exploration = 10;
   }
 
-  // TODO: consider moving this to be type-specific since end explorations can't have a default outcome. Hints similarly
+  // TODO(bhenning): consider moving this to be type-specific since end explorations can't have a default outcome. Hints similarly
   // could be type-specific for those interactions that support interactions.
   Outcome default_outcome = 11;
   repeated Hint hints = 12;
