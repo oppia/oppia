@@ -19,7 +19,7 @@
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedUnicodeViewer',
+angular.module('oppia').directive('schemaBasedUnicodeViewer', [
   function() {
     return {
       scope: {
@@ -38,4 +38,4 @@ angular.module('oppia').directive('schemaBasedUnicodeViewer',
           };
         }]
     };
-  });
+  }]);

@@ -18,7 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedPrimitiveViewer',
+angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
   function() {
     return {
       scope: {
@@ -34,4 +34,4 @@ angular.module('oppia').directive('schemaBasedPrimitiveViewer',
         };
       }]
     };
-  });
+  }]);

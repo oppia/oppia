@@ -44,12 +44,14 @@ angular.module('oppia').component('statisticsTab', {
     'ExplorationDataService', 'ExplorationStatsService',
     'ReadOnlyExplorationBackendApiService', 'RouterService',
     'StateInteractionStatsService', 'StatesObjectFactory',
+    'UrlInterpolationService',
     function(
         $q, $rootScope, $scope, $uibModal,
         AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
         ReadOnlyExplorationBackendApiService, RouterService,
-        StateInteractionStatsService, StatesObjectFactory) {
+        StateInteractionStatsService, StatesObjectFactory,
+        UrlInterpolationService) {
       this.directiveSubscriptions = new Subscription();
       const expId = ExplorationDataService.explorationId;
       const refreshExplorationStatistics = () => {
@@ -102,10 +104,10 @@ angular.module('oppia').component('statisticsTab', {
         return StateInteractionStatsService.computeStatsAsync(expId, state)
           .then(stats => $uibModal.open({
             controller: 'StateStatsModalController',
-            template: require(
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               'pages/exploration-editor-page/statistics-tab/templates/' +
               'state-stats-modal.template.html'),
-            style: require(
+            styleUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               'pages/exploration-editor-page/statistics-tab/templates/' +
               'state-stats-modal.template.css'),
             backdrop: true,
