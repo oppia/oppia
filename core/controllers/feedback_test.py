@@ -653,6 +653,42 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FeedbackStatsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.set_admins([self.OWNER_USERNAME])
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp_id = 'exp_id'
+
+    def test_get_num_threads_after_creating_feedback_analytics(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id),
+            expected_status_int=404)
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.owner_id, title='Exploration title',
+            category='Architecture', language_code='en')
+
+        response = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
+        self.assertEqual(response['num_total_threads'], 0)
+        self.assertEqual(response['num_open_threads'], 0)
+
+        feedback_services.create_thread(
+            'exploration', self.exp_id, self.owner_id, 'subject', 'text')
+
+        response = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
+        self.assertEqual(response['num_total_threads'], 1)
+        self.assertEqual(response['num_open_threads'], 1)
+
+        self.logout()
+
+
 class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
