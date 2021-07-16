@@ -203,7 +203,7 @@ describe('Exploration history', function() {
       },
       28: {
         text: '    default_outcome: {}',
-        highlighted: false
+        highlighted: true
       },
       29: {
         text: 'solicit_answer_details: false',
@@ -373,8 +373,8 @@ describe('Exploration history', function() {
         highlighted: false
       },
       36: {
-        text: '  hints:',
-        highlighted: true
+        text: '  hints: []',
+        highlighted: false
       },
       37: {
         text: '  id: NumericInput',
@@ -382,7 +382,7 @@ describe('Exploration history', function() {
       },
       38: {
         text: '  solution: null',
-        highlighted: true
+        highlighted: false
       },
       39: {
         text: 'linked_skill_id: null',
@@ -504,7 +504,6 @@ describe('Exploration history', function() {
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
     await historyGraph.openStateHistory('first (was: Introd...');
-    debugger;
     await historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     await historyGraph.closeStateHistory();
