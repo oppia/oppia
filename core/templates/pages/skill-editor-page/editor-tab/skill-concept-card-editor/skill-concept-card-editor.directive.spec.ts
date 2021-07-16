@@ -20,9 +20,8 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -31,32 +30,28 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { EventEmitter } from '@angular/core';
 // ^^^ This block is to be removed.
 
-fdescribe('Skill editor main tab directive', function() {
+describe('Skill editor main tab directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
   let $q = null;
-  let $timeout = null;
   let directive = null;
-  let UndoRedoService = null;
   let $uibModal = null;
-  let SkillEditorRoutingService = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillUpdateService: SkillUpdateService = null;
   let skillObjectFactory: SkillObjectFactory = null;
   let windowDimensionsService: WindowDimensionsService = null;
-  let focusManagerService = null;
   let urlInterpolationService: UrlInterpolationService;
   let mockEventEmitter = new EventEmitter();
 
   let mockUi = {
     placeholder: {
-      height(){
+      height() {
         return;
       }
     },
     item: {
-      height(){
+      height() {
         return;
       }
     }
@@ -71,23 +66,17 @@ fdescribe('Skill editor main tab directive', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     $q = $injector.get('$q');
-    UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('skillConceptCardEditorDirective')[0];
     skillEditorStateService = $injector.get('SkillEditorStateService');
     skillObjectFactory = $injector.get('SkillObjectFactory');
-    SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
-    
-    focusManagerService = $injector.get('FocusManagerService');
     skillUpdateService = $injector.get('SkillUpdateService');
     windowDimensionsService = $injector.get('WindowDimensionsService');
     urlInterpolationService = $injector.get('UrlInterpolationService');
@@ -140,7 +129,7 @@ fdescribe('Skill editor main tab directive', function() {
       .and.returnValue(null);
 
     ctrl.$onInit();
-    $scope.onSaveExplanation({}); 
+    $scope.onSaveExplanation({});
 
     expect(updateSpy).toHaveBeenCalled();
   });
@@ -272,7 +261,7 @@ fdescribe('Skill editor main tab directive', function() {
 
   it('should format given worked example summary html content' +
     'when calling \'getWorkedExampleSummary\'', () => {
-    let result = $scope.getWorkedExampleSummary('<p>Worked Example</p>'); 
+    let result = $scope.getWorkedExampleSummary('<p>Worked Example</p>');
 
     expect(result).toBe('Worked Example');
   });
