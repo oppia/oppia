@@ -78,10 +78,10 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Iterable, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
-datastore_services = models.Registry.import_datastore_services()
-cache_services = models.Registry.import_cache_services()
+datastore_services = models.Registry.import_datastore_services() # type: ignore[no-untyped-call]
+cache_services = models.Registry.import_cache_services() # type: ignore[no-untyped-call]
 transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
@@ -914,9 +914,11 @@ class NdbWsgiMiddleware:
     """Wraps the WSGI application into the NDB client context."""
 
     def __init__(self, wsgi_app):
+        # type: (webapp2.WSGIApplication) -> None
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
+        # type: (Dict[str, str], Any) -> Any
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)
         with datastore_services.get_ndb_context(global_cache=global_cache):
@@ -925,4 +927,4 @@ class NdbWsgiMiddleware:
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()
+firebase_auth_services.establish_firebase_connection() # type: ignore[no-untyped-call]

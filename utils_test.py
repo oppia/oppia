@@ -239,7 +239,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(len(random_string), 12)
 
     def test_convert_png_data_url_to_binary_with_incorrect_prefix(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG data URL'
         ):
             utils.convert_png_data_url_to_binary('data:image/jpg;base64,')

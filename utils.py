@@ -294,7 +294,7 @@ def get_random_choice(alist):
 
 
 def convert_png_data_url_to_binary(image_data_url):
-    # type: (Text) -> Text
+    # type: (Text) -> bytes
     """Converts a PNG base64 data URL to a PNG binary data.
 
     Args:
@@ -327,9 +327,9 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    # We accept unicode but imghdr.what(file, h) accept 'h' of type str.
-    # So we have casted content to be str.
-    content = python_utils.convert_to_bytes(content)
+    # We accept unicode but imghdr.what(file, h) accept 'h' of type bytes.
+    # So we have casted content to be bytes.
+    content = cast(bytes, python_utils.convert_to_bytes(content)) # type: ignore[no-untyped-call]
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
@@ -417,12 +417,12 @@ class JSONEncoderForHTML(json.JSONEncoder):
 
     # Ignoring error code [override] because JSONEncoder has return type str
     # but we are returning Union[str, unicode].
-    def encode(self, o): # type: ignore[override]
+    def encode(self, o):
         # type: (Text) -> Text
         chunks = self.iterencode(o, True)
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
-    def iterencode(self, o, _one_shot=False): # type: ignore[override]
+    def iterencode(self, o, _one_shot=False):
         # type: (Text, bool) -> Iterator[Text]
         chunks = super(
             JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
@@ -971,7 +971,7 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string)
+    return cast(str, python_utils.urllib_unquote(escaped_string)) # type: ignore[no-untyped-call]
 
 
 def snake_case_to_camel_case(snake_str):
@@ -1035,7 +1035,7 @@ def get_hashable_value(value):
 
 
 def compress_to_zlib(data):
-    # type: (Text) -> Text
+    # type: (bytes) -> bytes
     """Compress the data to zlib format for efficient storage and communication.
 
     Args:
@@ -1044,14 +1044,11 @@ def compress_to_zlib(data):
     Returns:
         str. Compressed data string.
     """
-    # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty. For details, refer to:
-    # https://github.com/oppia/oppia/wiki/Backend-Type-Annotations#1-use-typingtext-instead-of-str-and-unicode
-    return zlib.compress(data) # type: ignore[arg-type]
+    return zlib.compress(data)
 
 
 def decompress_from_zlib(data):
-    # type: (Text) -> Text
+    # type: (bytes) -> bytes
     """Decompress the zlib compressed data.
 
     Args:
@@ -1060,9 +1057,7 @@ def decompress_from_zlib(data):
     Returns:
         str. Decompressed data string.
     """
-    # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty.
-    return zlib.decompress(data) # type: ignore[arg-type]
+    return zlib.decompress(data)
 
 
 def compute_list_difference(list_a, list_b):

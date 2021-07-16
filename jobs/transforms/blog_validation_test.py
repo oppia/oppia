@@ -36,33 +36,33 @@ class RelationshipsOfTests(test_utils.TestBase):
 
     def test_blog_post_model_relationships(self):
         # type: () -> None
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostModel', 'id'),
             ['BlogPostSummaryModel', 'BlogPostRightsModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_summary_model_relationships(self):
         # type: () -> None
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostSummaryModel', 'id'),
             ['BlogPostModel', 'BlogPostRightsModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostSummaryModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_rights_model_relationships(self):
         # type: () -> None
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostRightsModel', 'id'),
             ['BlogPostModel', 'BlogPostSummaryModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual( # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
                 'BlogPostRightsModel', 'editor_ids'),
             ['UserSettingsModel'])
