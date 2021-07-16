@@ -65,6 +65,9 @@ describe ('Prevent page unload event service', function() {
 
   it('should removing listener', () => {
     spyOn(preventPageUnloadEventService, 'removeListener').and.callThrough();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
+    preventPageUnloadEventService.removeListener();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
     preventPageUnloadEventService.addListener();
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
 
@@ -103,7 +106,6 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.ngOnDestroy();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-    preventPageUnloadEventService.removeListener();
   });
 
   it('should test if Alert is displayed when a condition is passed', () => {
