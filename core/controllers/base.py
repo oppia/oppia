@@ -405,7 +405,7 @@ class BaseHandler(webapp2.RequestHandler):
         # default_value provided in the schema.
         keys_that_correspond_to_default_values = list(
             set(normalized_arg_values.keys()) -
-            set(payload_arg_keys + request_arg_keys)
+            set(list(payload_arg_keys) + request_arg_keys)
         )
         # Populate the payload/request with the default args before passing
         # execution onwards to the handler.
