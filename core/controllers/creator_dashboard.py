@@ -91,7 +91,13 @@ class CreatorDashboardHandler(base.BaseHandler):
         'POST': {
             'display_preference': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': [
+                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS[
+                            'CARD'],
+                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS[
+                            'LIST']
+                    ]
                 }
             }
         }

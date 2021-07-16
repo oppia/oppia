@@ -30,7 +30,11 @@ class LearnerPlaylistHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'activity_type': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'choices': [
+                    constants.ACTIVITY_TYPE_EXPLORATION,
+                    constants.ACTIVITY_TYPE_COLLECTION
+                ]
             }
         },
         'activity_id': {
