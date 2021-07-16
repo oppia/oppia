@@ -23,6 +23,7 @@ import ast
 import datetime
 
 from core import jobs
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import html_cleaner
 from core.domain import opportunity_services
@@ -115,8 +116,9 @@ class TranslationSuggestionUnicodeFixOneOffJob(
                 )
             )
         if suggestion.change.content_id in subtitled_unicode_content_ids:
-            suggestion.change.data_format = (
-                schema_utils.SCHEMA_TYPE_UNICODE)
+            if suggestion.change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                suggestion.change.data_format = (
+                    schema_utils.SCHEMA_TYPE_UNICODE)
             suggestion.change.translation_html = html_cleaner.strip_html_tags(
                 suggestion.change.translation_html)
             item.change_cmd = suggestion.change.to_dict()
@@ -167,12 +169,8 @@ class TranslationSuggestionUnicodeAuditOneOffJob(
                 )
             )
         content_id = suggestion.change.content_id
-        data_format = suggestion.change.data_format
-        if (
-                content_id in subtitled_unicode_content_ids and
-                data_format != schema_utils.SCHEMA_TYPE_UNICODE):
-            yield (
-                'FOUND', '%s | %s' % (item.id, content_id))
+        if content_id in subtitled_unicode_content_ids:
+            yield ('FOUND', '%s | %s' % (item.id, content_id))
         yield ('PROCESSED', item.id)
 
     @staticmethod
