@@ -26,12 +26,13 @@ import os
 import re
 
 from core.domain import event_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(stats_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.feedback])
+(stats_models, exp_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.exploration, models.NAMES.feedback])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -298,3 +299,49 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             sorted(all_event_handlers), sorted(expected_event_handlers))
+
+
+class HelperFunctionsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super().setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.exploration = (
+            self.save_new_valid_exploration('exp_id', self.admin_id))
+
+    def test_handle_exploration_rating(self):
+        admin_average_ratings = (
+            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
+        self.assertIsNone(admin_average_ratings)
+
+        event_services.handle_exploration_rating('exp_id', 5, None)
+        admin_average_ratings = (
+            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
+        self.assertEqual(admin_average_ratings, 5)
+
+        event_services.handle_exploration_rating('exp_id', 1, None)
+        admin_average_ratings = (
+            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
+        self.assertEqual(admin_average_ratings, 3)
+
+        event_services.handle_exploration_rating('exp_id', 1, 5)
+        admin_average_ratings = (
+            user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
+        self.assertEqual(admin_average_ratings, 1)
+
+    def test_handle_exploration_start(self):
+        admin_total_plays = (
+            user_services.get_dashboard_stats(self.admin_id)['total_plays'])
+        self.assertEqual(admin_total_plays, 0)
+
+        event_services.handle_exploration_start('exp_id')
+        admin_total_plays = (
+            user_services.get_dashboard_stats(self.admin_id)['total_plays'])
+        self.assertEqual(admin_total_plays, 1)
+
+        event_services.handle_exploration_start('exp_id')
+        admin_total_plays = (
+            user_services.get_dashboard_stats(self.admin_id)['total_plays'])
+        self.assertEqual(admin_total_plays, 2)
+
