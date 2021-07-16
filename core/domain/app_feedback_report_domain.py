@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import re
 
 from core.domain import app_feedback_report_constants as constants
@@ -218,6 +219,187 @@ class AppFeedbackReport(python_utils.OBJECT):
         if not utils.is_user_id_valid(scrubber_id):
             raise utils.ValidationError(
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
+
+    @classmethod
+    def from_dict(cls, report_dict):
+        # type: (Dict) -> AppFeedbackReport
+        """Returns an AppFeedbackReport object from a dict of the report sent in
+        an incoming feedback report request.
+
+        Args:
+            report_dict: dict. A dict representing the incoming feebdack report
+                sent in a request.
+
+        Returns:
+            AppFeedbackReport. The corresponding AppFeedbackReport domain
+            object.
+        """
+        return cls.get_android_report_from_dict(report_dict)
+
+    @classmethod
+    def get_android_report_from_dict(cls, report_dict):
+        # type: (Dict) -> AppFeedbackReport
+        """Returns an AppFeedbackReport object from a dict for an Android
+        report.
+
+        Args:
+            report_dict: dict. A dict representing the Android feedback report.
+
+        Returns:
+            AppFeedbackReport. The corresponding AppFeedbackReport domain
+            object for an Android report.
+        """
+        user_supplied_feedback_json = report_dict['user_supplied_feedback']
+        user_supplied_feedback_obj = (
+            UserSuppliedFeedback(
+                cls.get_report_type_from_string(
+                    user_supplied_feedback_json['report_type']),
+                cls.get_category_from_string(
+                    user_supplied_feedback_json['category']),
+                user_supplied_feedback_json['user_feedback_selected_items'],
+                user_supplied_feedback_json['user_feedback_other_text_input']))
+
+        system_context_json = report_dict['system_context']
+        device_context_json = report_dict['device_context']
+        device_system_context_obj = (
+            AndroidDeviceSystemContext(
+                system_context_json['platform_version'],
+                system_context_json['package_version_code'],
+                system_context_json['android_device_country_locale_code'],
+                system_context_json['android_device_language_locale_code'],
+                device_context_json['android_device_model'],
+                device_context_json['android_sdk_version'],
+                device_context_json['build_fingerprint'],
+                cls.get_android_network_type_from_string(
+                    device_context_json['network_type'])))
+
+        app_context_json = report_dict['app_context']
+        entry_point_obj = cls.get_entry_point_from_json(
+            app_context_json['entry_point'])
+        app_context_obj = AndroidAppContext(
+            entry_point_obj, app_context_json['text_language_code'],
+            app_context_json['audio_language_code'],
+            cls.get_android_text_size_from_string(app_context_json[
+                'text_size']),
+            app_context_json['only_allows_wifi_download_and_update'],
+            app_context_json['automatically_update_topics'],
+            app_context_json['account_is_profile_admin'],
+            app_context_json['event_logs'], app_context_json['logcat_logs'])
+
+        report_datetime = datetime.datetime.fromtimestamp(
+            report_dict['report_submission_timestamp_sec'])
+        report_id = (
+            app_feedback_report_models.AppFeedbackReportModel.generate_id(
+                'android', report_datetime))
+        report_obj = AppFeedbackReport(
+            report_id, report_dict['android_report_info_schema_version'],
+            'android', report_datetime,
+            report_dict['report_submission_utc_offset_hrs'], None, None,
+            user_supplied_feedback_obj, device_system_context_obj,
+            app_context_obj)
+
+        return report_obj
+
+    @classmethod
+    def get_report_type_from_string(cls, report_type_name):
+        # type: (str) -> Type[constants.REPORT_TYPE]
+        """Determines the report type based on the JSON value.
+
+        Args:
+            report_type_name: str. The name of the report type.
+
+        Returns:
+            REPORT_TYPE. The enum representing this report type.
+        """
+        for report_type in constants.ALLOWED_REPORT_TYPES:
+            if report_type_name == report_type.name:
+                return report_type
+        raise utils.InvalidInputException(
+            'The given report type %s is invalid.' % report_type_name)
+
+    @classmethod
+    def get_category_from_string(cls, category_name):
+        # type: (str) -> Type[constants.CATEGORY]
+        """Determines the category based on the JSON value.
+
+        Args:
+            category_name: str. The name of the report type.
+
+        Returns:
+            CATEGORY. The enum representing this category.
+        """
+        for category_type in constants.ALLOWED_CATEGORIES:
+            if category_name == category_type.name:
+                return category_type
+        raise utils.InvalidInputException(
+            'The given category %s is invalid.' % category_name)
+
+    @classmethod
+    def get_android_text_size_from_string(cls, text_size_name):
+        # type: (str) -> Type[constants.ANDOIRD_TEXT_SIZE]
+        """Determines the app text size based on the JSON value.
+
+        Args:
+            text_size_name: str. The name of the app's text size set.
+
+        Returns:
+            ANDROID_TEXT_SIZE. The enum representing the text size.
+        """
+        for text_size_type in constants.ALLOWED_ANDROID_TEXT_SIZES:
+            if text_size_name == text_size_type.name:
+                return text_size_type
+        raise utils.InvalidInputException(
+            'The given Android app text size %s is invalid.' % text_size_name)
+
+    @classmethod
+    def get_entry_point_from_json(cls, entry_point_json):
+        # type: (Dict[str, Any]) -> EntryPoint
+        """Determines the entry point type based on the rececived JSON.
+
+        Args:
+            entry_point_json: dict. The JSON data of the entry point.
+
+        Returns:
+            EntryPoint. The EntryPoint domain object representing the entry
+            point.
+
+        Raises:
+            InvalidInputException. The given entry point is invalid.
+        """
+        entry_point_name = entry_point_json['entry_point_name']
+        if entry_point_name == constants.ENTRY_POINT.navigation_drawer.name:
+            return NavigationDrawerEntryPoint()
+        elif entry_point_name == constants.ENTRY_POINT.lesson_player.name:
+            return LessonPlayerEntryPoint(
+                entry_point_json['entry_point_topic_id'],
+                entry_point_json['entry_point_story_id'],
+                entry_point_json['entry_point_exploration_id'])
+        elif entry_point_name == constants.ENTRY_POINT.revision_card.name:
+            return RevisionCardEntryPoint(
+                entry_point_json['entry_point_topic_id'],
+                entry_point_json['entry_point_subtopic_id'])
+        elif entry_point_name == constants.ENTRY_POINT.crash.name:
+            return CrashEntryPoint()
+        else:
+            raise utils.InvalidInputException(
+                'The given entry point %s is invalid.' % entry_point_name)
+
+    @classmethod
+    def get_android_network_type_from_string(cls, network_type_name):
+        # type: (str) -> Type[constants.ANDROID_NETWORK_TYPE]
+        """Determines the network type based on the JSON value.
+
+        Args:
+            network_type_name: str. The name of the network type.
+
+        Returns:
+            ANDROID_NETWORK_TYPE. The enum representing the network type.
+        """
+        for network_type in constants.ALLOWED_ANDROID_NETWORK_TYPES:
+            if network_type_name == network_type.name:
+                return network_type
+        raise utils.InvalidInputException(
+            'The given Android network type %s is invalid.' % network_type_name)
 
 
 class UserSuppliedFeedback(python_utils.OBJECT):

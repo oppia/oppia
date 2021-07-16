@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 
 import feconf
@@ -29,7 +30,17 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[None, None]
-    HANDLER_ARGS_SCHEMAS = {'POST': {}}  # type: Dict[Text, None]
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'report': {
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': (
+                        app_feedback_report_domain.AppFeedbackReport)
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def post(self):

@@ -33,7 +33,11 @@ REPORT_JSON = {
     'android_report_info_schema_version': 1,
     'app_context': {
         'entry_point': {
-            'entry_point_name': 'navigation_drawer'
+            'entry_point_name': 'navigation_drawer',
+            'entry_point_exploration_id': None,
+            'entry_point_story_id': None,
+            'entry_point_topic_id': None,
+            'entry_point_subtopic_id': None,
         },
         'text_size': 'large_text_size',
         'text_language_code': 'en',
@@ -106,7 +110,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def test_incoming_report_with_no_report_raises_error(self):
         # type: () -> None
-        self._post_json_with_test_headers({}, expected_status=500)
+        self._post_json_with_test_headers({}, expected_status=400)
 
     def test_incoming_report_with_invalid_headers_raises_exception(self):
         # type: () -> None

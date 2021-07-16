@@ -298,6 +298,146 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             NotImplementedError, expected_error_substring):
             report_obj.validate()
 
+    def test_get_report_type_from_string_returns_expected_report_type(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        for report_type in constants.REPORT_TYPE:
+            self.assertEqual(
+                feedback_report.get_report_type_from_string(
+                    report_type.name), report_type)
+
+    def test_get_report_type_from_string_with_invalid_string_raises_error(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        invalid_report_type = 'invalid_report_type'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given report type %s is invalid.' % invalid_report_type):
+            feedback_report.get_report_type_from_string(
+                invalid_report_type)
+
+    def test_get_category_from_string_returns_expected_category(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        for category in constants.ALLOWED_CATEGORIES:
+            self.assertEqual(
+                feedback_report.get_category_from_string(
+                    category.name), category)
+
+    def test_get_category_from_string_with_invalid_string_raises_error(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        invalid_category = 'invalid_category'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given category %s is invalid.' % invalid_category):
+            feedback_report.get_category_from_string(
+                invalid_category)
+
+    def test_get_android_text_size_from_string_returns_expected_text_size(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        for text_size in constants.ALLOWED_ANDROID_TEXT_SIZES:
+            self.assertEqual(
+                feedback_report.get_android_text_size_from_string(
+                    text_size.name), text_size)
+
+    def test_get_android_text_size_from_string_with_invalid_string_raises_error(
+            self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        invalid_text_size = 'invalid_text_size'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given Android app text size %s is invalid.' % (
+                invalid_text_size)):
+            feedback_report.get_android_text_size_from_string(
+                invalid_text_size)
+
+    def test_get_entry_point_from_json_returns_expected_entry_point_obj(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        entry_point_json = {
+            'entry_point_name': '',
+            'entry_point_topic_id': 'topic_id',
+            'entry_point_story_id': 'story_id',
+            'entry_point_exploration_id': 'exploration_id',
+            'entry_point_subtopic_id': 'subtopic_id'
+        }
+
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.navigation_drawer.name)
+        navigation_drawer_obj = (
+            feedback_report.get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                navigation_drawer_obj,
+                app_feedback_report_domain.NavigationDrawerEntryPoint))
+
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.lesson_player.name)
+        lesson_player_obj = (
+            feedback_report.get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                lesson_player_obj,
+                app_feedback_report_domain.LessonPlayerEntryPoint))
+
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.revision_card.name)
+        revision_card_obj = (
+            feedback_report.get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                revision_card_obj,
+                app_feedback_report_domain.RevisionCardEntryPoint))
+
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.crash.name)
+        crash_obj = (
+            feedback_report.get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                crash_obj, app_feedback_report_domain.CrashEntryPoint))
+
+    def test_get_entry_point_from_json_with_invalid_json_raises_error(self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        invalid_json = {
+            'entry_point_name': 'invalid_entry_point_name'
+        }
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given entry point %s is invalid.' % (
+                'invalid_entry_point_name')):
+            feedback_report.get_entry_point_from_json(
+                invalid_json)
+
+    def test_get_android_network_type_from_string_returns_expected_network_type(
+            self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        for network_type in constants.ANDROID_NETWORK_TYPES:
+            self.assertEqual(
+                feedback_report.get_android_network_type_from_string(
+                    network_type.name), network_type)
+
+    def test_get_android_network_type_from_string_invalid_string_raises_error(
+            self):
+        # type: () -> None
+        feedback_report = app_feedback_report_domain.AppFeedbackReport
+        invalid_network_type = 'invalid_text_size'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given Android network type %s is invalid.' % (
+                invalid_network_type)):
+            feedback_report.get_android_network_type_from_string(
+                invalid_network_type)
+
 
 class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
