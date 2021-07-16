@@ -27,8 +27,10 @@ import feconf
 import python_utils
 import utils
 
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
+from typing import Dict, Optional, Type, List, Any # isort:skip # pylint: disable=unused-import
+
+(app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+    [models.NAMES.app_feedback_report])
 transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
@@ -81,18 +83,17 @@ def store_incoming_report_stats(report_obj):
     all_reports_id = constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
 
     stats_date = report_obj.submitted_on_timestamp.date()
-    _update_report_stats_model_in_transaction(
+    _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
         unticketed_id, platform, stats_date, report_obj, 1)
-    _update_report_stats_model_in_transaction(
+    _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
         all_reports_id, platform, stats_date, report_obj, 1)
 
 
 @transaction_services.run_in_transaction_wrapper
-def _update_report_stats_model_in_transaction(
+def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
         ticket_id, platform, date, report_obj, delta):
-    # type: (str, str, datetime.date, app_feedback_report_domain.AppFeedbackReport, int) -> None
     """Adds a new report's stats to the stats model for a specific ticket's
-    stats.
+    stats. Note that this is currently only 
 
     Args:
         ticket_id: str. The id of the ticket that we want to update stats for.
@@ -109,7 +110,10 @@ def _update_report_stats_model_in_transaction(
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
     text_language_code = report_obj.app_context.text_language_code
     audio_language_code = report_obj.app_context.audio_language_code
-    # All the keys in the stats dict must be a string.
+    # All the keys in the stats dict must be a string. Note that this parameter
+    # is only aggregated on Android reports.
+    report_obj.device_system_context.__class__ = (
+        app_feedback_report_domain.AndroidDeviceSystemContext)
     sdk_version = python_utils.UNICODE(
         report_obj.device_system_context.sdk_version)
     version_name = report_obj.device_system_context.version_name
@@ -542,7 +546,7 @@ def reassign_ticket(report, new_ticket):
     # Remove the report from the stats model associated with the old ticket.
     old_ticket_id = report.ticket_id
     if old_ticket_id is None:
-        _update_report_stats_model_in_transaction(
+        _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
             constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
             stats_date, report, -1)
     else:
@@ -568,7 +572,7 @@ def reassign_ticket(report, new_ticket):
                         report_models[index].submitted_on_datetime)
             old_ticket_obj.newest_report_creation_timestamp = latest_timestamp
         _save_ticket(old_ticket_obj)
-        _update_report_stats_model_in_transaction(
+        _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
             old_ticket_id, platform, stats_date, report, -1)
 
     # Add the report to the new ticket.
@@ -589,7 +593,7 @@ def reassign_ticket(report, new_ticket):
     # Update the stats model for the new ticket.
     platform = report.platform
     stats_date = report.submitted_on_timestamp.date()
-    _update_report_stats_model_in_transaction(
+    _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
         new_ticket_id, platform, stats_date, report, 1)
 
     # Update the report model to the new ticket id.

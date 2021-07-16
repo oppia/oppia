@@ -274,6 +274,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, report_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AppFeedbackReport, str) -> None
         """Checks that the feedback report passes validation.
 
         Args:
@@ -560,6 +561,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, feedback_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.UserSuppliedFeedback, str) -> None
         """Checks that the user supplied feeedback passes validation.
 
         Args:
@@ -774,6 +776,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, context_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AndroidDeviceSystemContext, str) -> None
         """Checks that the Android device system context passes validation.
 
         Args:
@@ -933,6 +936,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, entry_point_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.LessonPlayerEntryPoint, str) -> None
         """Checks that the entry point passes validation.
 
         Args:
@@ -1004,6 +1008,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, entry_point_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.RevisionCardEntryPoint, str) -> None
         """Checks that the entry point passes validation.
 
         Args:
@@ -1212,6 +1217,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, app_context_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AndroidAppContext, str) -> None
         """Checks that the app context passes validation.
 
         Args:
@@ -1283,7 +1289,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def test_validation_ticket_id_not_a_string_fails(self):
         # type: () -> None
-        self.ticket_obj.ticket_id = 123
+        self.ticket_obj.ticket_id = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'The ticket id should be a string')
@@ -1297,14 +1303,14 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def test_validation_ticket_name_is_none_fails(self):
         # type: () -> None
-        self.ticket_obj.ticket_name = None
+        self.ticket_obj.ticket_name = None  # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'No ticket name supplied.')
 
     def test_validation_ticket_name_is_not_a_string_fails(self):
         # type: () -> None
-        self.ticket_obj.ticket_name = 123
+        self.ticket_obj.ticket_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'The ticket name should be a string')
@@ -1349,7 +1355,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def test_validation_github_repo_name_not_a_string_fails(self):
         # type: () -> None
-        self.ticket_obj.github_issue_repo_name = 123
+        self.ticket_obj.github_issue_repo_name = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'The Github repo name should be a string')
@@ -1363,13 +1369,14 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def test_validation_archived_is_not_boolean_fails(self):
         # type: () -> None
-        self.ticket_obj.archived = 123
+        self.ticket_obj.archived = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.ticket_obj,
             'The ticket archived status must be a boolean')
 
     def _assert_validation_error(
             self, ticket_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AppFeedbackReportTicket, str) -> None
         """Checks that the ticket passes validation.
 
         Args:
@@ -1377,7 +1384,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             expected_error_substring: str. String that should be a substring
                 of the expected error message.
         """
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             ticket_obj.validate()
 
@@ -1386,7 +1393,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         # type: () -> None
-        super(AppFeedbackReportDailyStatsDomainTests, self).setUp()
+        super(AppFeedbackReportDailyStatsDomainTests, self).setUp() # type: ignore[no-untyped-call]
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1535,6 +1542,7 @@ class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, stats_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AppFeedbackReportStats, str) -> None
         """Checks that the stats object passes validation.
 
         Args:
@@ -1585,6 +1593,7 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, counts_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.ReportStatsParameterValueCounts, str) -> None
         """Checks that the parameter counts passes validation.
 
         Args:
@@ -1633,6 +1642,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self, filter_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AppFeedbackReportFilter, str) -> None
         """Checks that the filter object passes validation.
 
         Args:

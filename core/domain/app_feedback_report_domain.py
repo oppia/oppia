@@ -32,8 +32,10 @@ import feconf
 import python_utils
 import utils
 
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
+from typing import Dict, Optional, Type, List, Any # isort:skip # pylint: disable=unused-import
+
+(app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+    [models.NAMES.app_feedback_report])
 
 
 class AppFeedbackReport(python_utils.OBJECT):
@@ -43,7 +45,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             self, report_id, schema_version, platform, submitted_on_timestamp,
             local_timezone_offset_hrs, ticket_id, scrubbed_by,
             user_supplied_feedback, device_system_context, app_context):
-        # type: (str, int, str, datetime.datetime, int, Optional[str], str, UserSuppliedFeedback, DeviceSystemContext, AppContext) -> None
+        # type: (str, int, str, datetime.datetime, int, Optional[str], Optional[str], UserSuppliedFeedback, DeviceSystemContext, AppContext) -> None
         """Constructs an AppFeedbackReport domain object.
 
         Args:
@@ -57,7 +59,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                 for the user's local time.
             ticket_id: str|None. The unique ID that this ticket is assigned to;
                 None if this report is not yet ticketed.
-            scrubbed_by: str. The unique ID of the user that scrubbed this
+            scrubbed_by: str|None. The unique ID of the user that scrubbed this
                 report, or feconf.REPORT_SCRUBBER_BOT_ID if scrubbed by the
                 cron job.
             user_supplied_feedback: UserSuppliedFeedback. An object representing
@@ -294,10 +296,10 @@ class AppFeedbackReport(python_utils.OBJECT):
             report_dict['report_submission_timestamp_sec'])
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                'android', report_datetime))
+                report_dict['platform'], report_datetime))
         report_obj = AppFeedbackReport(
             report_id, report_dict['android_report_info_schema_version'],
-            'android', report_datetime,
+            report_dict['platform'], report_datetime,
             report_dict['report_submission_utc_offset_hrs'], None, None,
             user_supplied_feedback_obj, device_system_context_obj,
             app_context_obj)
@@ -340,7 +342,7 @@ class AppFeedbackReport(python_utils.OBJECT):
 
     @classmethod
     def get_android_text_size_from_string(cls, text_size_name):
-        # type: (str) -> Type[constants.ANDOIRD_TEXT_SIZE]
+        # type: (str) -> Type[constants.ANDROID_TEXT_SIZE]
         """Determines the app text size based on the JSON value.
 
         Args:
@@ -357,7 +359,7 @@ class AppFeedbackReport(python_utils.OBJECT):
 
     @classmethod
     def get_entry_point_from_json(cls, entry_point_json):
-        # type: (Dict[str, Any]) -> EntryPoint
+        # type: (Dict[str, Dict[str, str]]) -> EntryPoint
         """Determines the entry point type based on the rececived JSON.
 
         Args:
@@ -412,7 +414,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
     def __init__(
             self, report_type, category, user_feedback_selected_items,
             user_feedback_other_text_input):
-            # type: (REPORT_TYPE, CATEGORY, Optional[List[str]], Optional[str]) -> None
+
+            # type: (constants.REPORT_TYPE, constants.CATEGORY, Optional[List[str]], Optional[str]) -> None
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
@@ -464,7 +467,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
 
     @classmethod
     def require_valid_report_type(cls, report_type):
-        # type: (REPORT_TYPE) -> None
+        # type: (constants.REPORT_TYPE) -> None
         """Checks whether the report_type is valid.
 
         Args:
@@ -603,7 +606,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
 
     @classmethod
     def _selected_items_include_other(cls, selected_items):
-        # type: (List[str]) -> None
+        # type: (List[str]) -> bool
         """Checks whether the user_feedback_selected_items include an 'other'
         option. Unless the category is one of ALLOWED_INPUT_TEXT_CATEGORIES, an
         'other' option must be selected for the user to add input text to the
@@ -679,7 +682,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             self, version_name, package_version_code,
             device_country_locale_code, device_language_locale_code,
             device_model, sdk_version, build_fingerprint, network_type):
-        # type: (str, int, str, str, str, int, str, Type[constants.ANDROID_NETWORK_TYPE]) -> None
+        # type: (unicode, int, unicode, unicode, unicode, int, unicode, constants.ANDROID_NETWORK_TYPE) -> None
         """Constructs an AndroidDeviceSystemContext domain object.
 
         Args:
@@ -763,7 +766,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_version_name(cls, version_name):
-        # type: (str) -> None
+        # type: (unicode) -> None
         """Checks whether the version name is a valid string app version for
         Oppia Android.
 
@@ -877,7 +880,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def require_valid_network_type(cls, network_type):
-        # type: (Type[base.ANDOIRD_NETWORK_TYPES]) -> None
+        # type: (Type[constants.ANDROID_NETWORK_TYPES]) -> None
         """Checks that the Android device's network type is valid.
 
         Args:
@@ -918,7 +921,7 @@ class AppContext(python_utils.OBJECT):
         self.audio_language_code = audio_language_code
 
     def to_dict(self):
-        # type: () -> Dict[str, str]
+        # type: () -> Dict[str, Any]
         """Returns a dict representing this AppContext domain object. Subclasses
         should override this to propertly format any additional properties.
 
@@ -954,7 +957,7 @@ class AndroidAppContext(AppContext):
             text_size, only_allows_wifi_download_and_update,
             automatically_update_topics, account_is_profile_admin, event_logs,
             logcat_logs):
-        # type: (EntryPoint, str, str, Type[constants.ANDROID_TEXT_SIZE], bool, bool, bool, List[str], List[str]) -> None
+        # type: (EntryPoint, unicode, unicode, Type[constants.ANDROID_TEXT_SIZE], bool, bool, bool, List[str], List[str]) -> None
         """Constructs a AndroidAppContext domain object.
 
         Args:
@@ -990,7 +993,7 @@ class AndroidAppContext(AppContext):
         self.logcat_logs = logcat_logs
 
     def to_dict(self):
-        # type: () -> Dict[str, str]
+        # type: () -> Dict[str, Any]
         """Returns a dict representing this AndroidAppContext domain object.
 
         Returns:
@@ -1074,7 +1077,7 @@ class AndroidAppContext(AppContext):
 
     @classmethod
     def _match_language_code_string(cls, code):
-        # type: (str) -> None
+        # type: (str) -> bool
         """Helper that checks whether the given language code is a valid code.
 
         Args:
@@ -1117,13 +1120,13 @@ class EntryPoint(python_utils.OBJECT):
     def __init__(
             self, entry_point, topic_id=None, story_id=None,
             exploration_id=None, subtopic_id=None):
-        # type: (Type[constants.ENTRY_POINT], str, Optional[str], Optional[str], Optional[str]) -> None
+        # type: (Type[constants.ENTRY_POINT], Optional[str], Optional[str], Optional[str], Optional[str]) -> None
         """Constructs an EntryPoint domain object.
 
         Args:
             entry_point: ENTRY_POINT. The enum type for entry point used.
-            topic_id: str. The id for the current topic if the report was sent
-                during a topic in a lesson or revision session.
+            topic_id: str|None. The id for the current topic if the report was
+                sent during a topic in a lesson or revision session.
             story_id: str|None. The id for the current story if the report was
                 sent during a lesson.
             exploration_id: str|None. The id for the current exploration if the
@@ -1203,7 +1206,7 @@ class EntryPoint(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
-        expected_story_id = exp_services.get_story_id_linked_to_exploration(
+        expected_story_id = exp_services.get_story_id_linked_to_exploration( # type: ignore[no-untyped-call]
             exploration_id)
         if expected_story_id != story_id:
             raise utils.ValidationError(
@@ -1223,7 +1226,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
             None, None, None)
 
     def to_dict(self):
-        # type: () -> None
+        # type: () -> Dict[str, str]
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1292,8 +1295,8 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name, constants.ENTRY_POINT.lesson_player)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id)
-        story_domain.Story.require_valid_story_id(self.story_id)
+        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
+        story_domain.Story.require_valid_story_id(self.story_id) # type: ignore[no-untyped-call]
         self.require_valid_entry_point_exploration(
             self.exploration_id, self.story_id)
 
@@ -1341,7 +1344,7 @@ class RevisionCardEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             constants.ENTRY_POINT.revision_card)
-        topic_domain.Topic.require_valid_topic_id(self.topic_id)
+        topic_domain.Topic.require_valid_topic_id(self.topic_id) # type: ignore[no-untyped-call]
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % (
@@ -1391,7 +1394,7 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             self, ticket_id, ticket_name, platform, github_issue_repo_name,
             github_issue_number, archived, newest_report_creation_timestamp,
             reports):
-        # type: (str, str, str, str, int, bool, datetime.datetime, List[str]) -> None
+        # type: (unicode, unicode, str, Optional[unicode], Optional[int], bool, datetime.datetime, List[str]) -> None
         """Constructs a AppFeedbackReportTicket domain object.
 
         Args:
@@ -1399,10 +1402,10 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
             ticket_name: str. The user-readable name given to this ticket.
             platform: str. The platform that the reports in this ticket apply
                 to; must be one of PLATFORM_CHOICES.
-            github_issue_repo_name: str. The Github repository that has the
+            github_issue_repo_name: str|None. The Github repository that has the
                 issue addressing this ticket.
-            github_issue_number: int. The Github issue number addressing this
-                ticket.
+            github_issue_number: int|None. The Github issue number addressing
+                this ticket.
             archived: bool. Whether this ticket is archived.
             newest_report_creation_timestamp: datetime.datetime. Timestamp in
                 UTC of the newest submitted report that is in this ticket.
@@ -1571,9 +1574,9 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
 
         Args:
             stats_id: str. The unique ID for ths stats instance.
-            platform: str. The platform these report stats are aggregating for.
             ticket: AppFeedbackReportTicket. The AppFeedbackReportTicket domain
                 object associated with this ticket.
+            platform: str. The platform these report stats are aggregating for.
             stats_tracking_date: datetime.date. The date that this object is
                 aggregating stats on, in UTC.
             total_reports_submitted: int. The total number of reports submitted

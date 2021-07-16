@@ -26,10 +26,13 @@ from core.tests import test_utils
 
 import feconf
 
+from typing import Dict # isort:skip # pylint: disable=unused-import
+
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
 
 REPORT_JSON = {
+    'platform': 'android',
     'android_report_info_schema_version': 1,
     'app_context': {
         'entry_point': {
@@ -116,9 +119,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         # type: () -> None
         # Send a request without headers to act as "incorrect headers".
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
-        self.post_json(
+        self.post_json( # type: ignore[no-untyped-call]
             feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL, self.payload,
-            csrf_token=token, expected_status_int=500) # type: ignore[no-untyped-call]
+            csrf_token=token, expected_status_int=500)
 
     def _post_json_with_test_headers(self, payload, expected_status=200):
         # type: (Dict[str, str], int) -> None
@@ -143,8 +146,8 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                     with self.swap(
                         feconf, 'ANDROID_APP_VERSION_CODE',
                         ANDROID_APP_VERSION_CODE_STRING):
-                        self.post_json(
+                        self.post_json( # type: ignore[no-untyped-call]
                             feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
                             payload, headers=self.headers,
                             csrf_token=token,
-                            expected_status_int=expected_status) # type: ignore[no-untyped-call]
+                            expected_status_int=expected_status)
