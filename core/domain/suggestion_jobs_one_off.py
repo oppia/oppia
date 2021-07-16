@@ -139,7 +139,7 @@ class TranslationSuggestionUnicodeFixOneOffJob(
 class TranslationSuggestionUnicodeAuditOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A one-time job that audits and reports suggestion ids and content ids
-    of suggestions that have invalid unicode content and data_format.
+    of suggestions that have invalid unicode content.
     """
 
     @classmethod
