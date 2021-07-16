@@ -618,7 +618,11 @@
     "extensions/objects/templates/svg-filename-editor.constants.ajs.ts",
     "extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component.ts",
     "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts",
-    "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts"
+    "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts",
+    "core/templates/services/exploration-features-backend-api.service.ts",
+    "core/templates/services/exploration-features-backend-api.service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.ts",
+    "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts"
   ],
   "include": [
     "core/templates/pages/delete-account-page/services/*.ts",

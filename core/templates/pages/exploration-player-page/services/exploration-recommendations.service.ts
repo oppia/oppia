@@ -33,10 +33,10 @@ import { LearnerExplorationSummary } from
   providedIn: 'root'
 })
 export class ExplorationRecommendationsService {
-  isIframed: boolean = null;
-  isInEditorPage: boolean = null;
-  isInEditorPreviewMode: boolean = null;
-  explorationId: string = null;
+  isIframed: boolean = false;
+  isInEditorPage: boolean = false;
+  isInEditorPreviewMode: boolean = false;
+  explorationId: string | undefined;
 
   constructor(
     private contextService: ContextService,
@@ -71,8 +71,9 @@ export class ExplorationRecommendationsService {
     }
 
     this.expRecommendationBackendApiService.getRecommendedSummaryDictsAsync(
-      authorRecommendedExpIds, includeSystemRecommendations, collectionId,
-      storyId, currentNodeId, this.explorationId).then(expSummaries => {
+      authorRecommendedExpIds, includeSystemRecommendations,
+      collectionId, storyId, currentNodeId, this.explorationId
+    ).then(expSummaries => {
       successCallback(expSummaries);
     });
   }
