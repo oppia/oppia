@@ -22,14 +22,14 @@ export interface TranslatableContentBackendDict {
 }
 
 export class TranslatableContent {
-
   constructor(
       public translatableContentText: string,
       public dataFormat: string
   ) {}
 
-  static createFromBackendDict(backendDict: TranslatableContentBackendDict) {
+  static createFromBackendDict(
+      backendDict: TranslatableContentBackendDict): TranslatableContent {
     return new TranslatableContent(
-        backendDict.translatable_content_text, backendDict.data_format);
+      backendDict.translatable_content_text, backendDict.data_format);
   }
 }

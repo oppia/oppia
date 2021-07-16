@@ -16,7 +16,6 @@
  * @fileoverview Tests for TranslatableTexts.
  */
 
-import { WrittenTranslation } from 'domain/exploration/WrittenTranslationObjectFactory';
 import {
   TranslatableTexts,
   TranslatableTextsBackendDict
