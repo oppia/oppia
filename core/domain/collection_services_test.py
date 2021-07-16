@@ -37,6 +37,7 @@ import utils
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -76,6 +77,11 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
+
+
+class MockCollectionModel(collection_models.CollectionModel):
+
+    nodes = datastore_services.JsonProperty(repeated=True)
 
 
 class CollectionQueriesUnitTests(CollectionServicesUnitTests):
@@ -156,6 +162,43 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
         self.assertEqual(collection.version, 1)
+        self.assertEqual(
+            collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+
+    def test_get_collection_from_model_with_schema_version_2_copies_nodes(self):
+        collection_model = MockCollectionModel(
+            id='collection_id',
+            category='category',
+            title='title',
+            schema_version=2,
+            objective='objective',
+            version=1,
+            nodes=[
+                {
+                    'exploration_id': 'exp_id1',
+                    'acquired_skills': ['11'],
+                    'prerequisite_skills': ['22'],
+                }, {
+                    'exploration_id': 'exp_id2',
+                    'acquired_skills': ['33'],
+                    'prerequisite_skills': ['44'],
+                }
+            ]
+        )
+
+        collection = (
+            collection_services.get_collection_from_model(collection_model))
+        self.assertEqual(collection.id, 'collection_id')
+        self.assertEqual(collection.title, 'title')
+        self.assertEqual(collection.category, 'category')
+        self.assertEqual(collection.objective, 'objective')
+        self.assertEqual(
+            collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
+        self.assertEqual(collection.version, 1)
+        self.assertEqual(
+            collection.nodes[0].to_dict(), {'exploration_id': 'exp_id1'})
+        self.assertEqual(
+            collection.nodes[1].to_dict(), {'exploration_id': 'exp_id2'})
         self.assertEqual(
             collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 

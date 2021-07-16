@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.controllers import creator_dashboard
 from core.domain import collection_services
@@ -331,6 +333,74 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
         self.logout()
+
+    def test_get_dashboard_stats(self):
+        user_models.UserStatsModel(
+            id=self.owner_id,
+            total_plays=10,
+            num_ratings=2,
+            average_ratings=3.1111
+        ).put()
+
+        self.set_admins([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+        dashboard_stats = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['dashboard_stats']
+        self.assertEqual(dashboard_stats, {
+            'total_plays': 10,
+            'num_ratings': 2,
+            'average_ratings': 3.11,
+            'total_open_feedback': 0
+        })
+
+    def test_last_week_stats_produce_exception(self):
+        self.set_admins([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {
+                'key_2': {
+                    'num_ratings': 2,
+                    'average_ratings': 3.1111,
+                    'total_plays': 10
+                }
+            }
+        )
+
+        with get_last_week_dashboard_stats_swap:
+            last_week_stats = self.get_json(
+                feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
+
+        self.assertEqual(last_week_stats, {
+            'key_2': {
+                'num_ratings': 2,
+                'average_ratings': 3.11,
+                'total_plays': 10
+            }
+        })
+
+    def test_broken_last_week_stats_produce_exception(self):
+        self.set_admins([self.OWNER_USERNAME])
+        self.login(self.OWNER_EMAIL)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {'key_1': 1, 'key_2': 2}
+        )
+
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with get_last_week_dashboard_stats_swap:
+                last_week_stats = self.get_json(
+                    feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
+            self.assertEqual(logs, [
+                '\'last_week_stats\' should contain only one key-value pair'
+                ' denoting last week dashboard stats of the user keyed by a'
+                ' datetime string.\nNoneType: None'
+            ])
+        self.assertIsNone(last_week_stats)
 
     def test_get_collections_list(self):
         self.set_admins([self.OWNER_USERNAME])

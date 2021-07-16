@@ -461,6 +461,35 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             versioned_collection_contents['collection_contents'], {})
 
+    def test_update_collection_contents_from_model_with_schema_version_5(self):
+        versioned_collection_contents = {
+            'schema_version': 5,
+            'collection_contents': {
+                'nodes': [
+                    {
+                        'prerequisite_skill_ids': ['11', '22'],
+                        'acquired_skill_ids': ['33', '44'],
+                        'other_field': 'value1'
+                    },
+                    {
+                        'prerequisite_skill_ids': ['11', '22'],
+                        'acquired_skill_ids': ['33', '44'],
+                        'other_field': 'value2'
+                    }
+                ]
+            }
+        }
+
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, 5)
+
+        self.assertEqual(versioned_collection_contents['schema_version'], 6)
+        self.assertEqual(
+            versioned_collection_contents['collection_contents']['nodes'], [
+                {'other_field': 'value1'}, {'other_field': 'value2'}
+            ]
+        )
+
     def test_update_collection_contents_from_model_with_invalid_schema_version(
             self):
         versioned_collection_contents = {

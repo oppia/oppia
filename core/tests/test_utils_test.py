@@ -601,6 +601,12 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             self.assertRaisesRegexp(Exception, '', mock_exception_func)
 
+    def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self):
+        with self.assertRaisesRegexp(
+                Exception, 'mocked_now must be datetime, got: 123'):
+            with self.mock_datetime_utcnow(123):
+                pass
+
 
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
