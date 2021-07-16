@@ -31,4 +31,4 @@ jobs:
         run: python -m scripts.install_third_party_libs
       - name: Run Mypy type checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 python -m scripts.run_mypy_checks --skip-install
+        run: PYTHONIOENCODING=utf-8 python -m scripts.run_mypy_checks --skip-install --install-globally
