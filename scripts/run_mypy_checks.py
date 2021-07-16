@@ -753,8 +753,8 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--install-globally',
-    help='If passed, installs mypy and its requirements globally.'
-    ' By default, they are installed to ' + MYPY_TOOLS_DIR,
+    help='optional; if specified, installs mypy and its requirements globally.'
+    ' By default, they are installed to %s' % MYPY_TOOLS_DIR,
     action='store_true')
 
 _PARSER.add_argument(
@@ -775,18 +775,18 @@ def install_third_party_libraries(skip_install):
         install_third_party_libs.main()
 
 
-def get_mypy_cmd(files, install_globally):
+def get_mypy_cmd(files, using_global_mypy):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
-        install_globally: bool. Whether mypy and its requirements are installed
-            globally.
+        using_global_mypy: bool. Whether generated command should run using
+            global mypy.
 
     Returns:
         list(str). List of command line arguments.
     """
-    if install_globally:
+    if using_global_mypy:
         mypy_cmd = 'mypy'
     else:
         mypy_cmd = os.path.join(
@@ -877,9 +877,9 @@ def main(args=None):
 
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
-    output = process.communicate()
-    python_utils.PRINT(output[1])
-    python_utils.PRINT(output[0])
+    stdout, stderr = process.communicate()
+    python_utils.PRINT(stdout)
+    python_utils.PRINT(stderr)
     if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
