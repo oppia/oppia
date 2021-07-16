@@ -26,11 +26,10 @@ import { TranslateTextBackendApiService } from './translate-text-backend-api.ser
 describe('TranslateTextBackendApiService', () => {
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let httpTestingController: HttpTestingController;
-  let getWrittenTranslation = (text) => {
+  const getTranslatableContent = (text) => {
     return {
       data_format: 'html',
-      translation: text,
-      needs_update: false
+      translatable_content_text: text,
     };
   };
 
@@ -56,10 +55,10 @@ describe('TranslateTextBackendApiService', () => {
       const sampleDataResults = {
         state_names_to_content_id_mapping: {
           stateName1: {
-            contentId1: getWrittenTranslation('text1'),
-            contentId2: getWrittenTranslation('text2')
+            contentId1: getTranslatableContent('text1'),
+            contentId2: getTranslatableContent('text2')
           },
-          stateName2: {contentId3: getWrittenTranslation('text3')}
+          stateName2: {contentId3: getTranslatableContent('text3')}
         },
         version: '1'
       };

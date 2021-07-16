@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TranslationBackendDict, WrittenTranslation } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { TranslatableContent, TranslatableContentBackendDict } from './translatable-content.model';
 
 /**
  * @fileoverview Frontend Model for translatable texts
  */
 
 export interface ContentIdToContentBackendDictMapping {
-  [contentId: string]: TranslationBackendDict
+  [contentId: string]: TranslatableContentBackendDict
 }
 
 export interface StateNamesToContentIdBackendDictMapping {
   [state: string]: ContentIdToContentBackendDictMapping
 }
 export interface ContentIdToContentMapping {
-  [contentId: string]: WrittenTranslation
+  [contentId: string]: TranslatableContent
 }
 
 export interface StateNamesToContentIdMapping {
@@ -46,16 +46,15 @@ export class TranslatableTexts {
 
   static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
     TranslatableTexts {
-    let stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
+    const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
     for (let stateName in backendDict.state_names_to_content_id_mapping) {
-      let contentIdToWrittenTranslationMapping = (
+      const contentIdToWrittenTranslationMapping = (
         backendDict.state_names_to_content_id_mapping[stateName]);
-      let contentIdMapping: ContentIdToContentMapping = {};
-      for (let contentId in contentIdToWrittenTranslationMapping) {
-        contentIdMapping[contentId] = new WrittenTranslation(
-          contentIdToWrittenTranslationMapping[contentId].data_format,
-          contentIdToWrittenTranslationMapping[contentId].translation,
-          contentIdToWrittenTranslationMapping[contentId].needs_update);
+      const contentIdMapping: ContentIdToContentMapping = {};
+      for (const contentId in contentIdToWrittenTranslationMapping) {
+        contentIdMapping[contentId] = (
+          TranslatableContent.createFromBackendDict(
+            contentIdToWrittenTranslationMapping[contentId]));
       }
       stateNamesToContentIdMapping[stateName] = contentIdMapping;
     }
