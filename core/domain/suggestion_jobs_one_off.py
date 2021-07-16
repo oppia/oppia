@@ -102,6 +102,9 @@ class TranslationSuggestionUnicodeFixOneOffJob(
         suggestion = suggestion_services.get_suggestion_from_model(item)
 
         exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        if suggestion.change.state_name not in exploration.states:
+            return
+
         state = exploration.states[suggestion.change.state_name]
         subtitled_unicode_content_ids = []
         customisation_args = state.interaction.customization_args
@@ -155,6 +158,9 @@ class TranslationSuggestionUnicodeAuditOneOffJob(
         suggestion = suggestion_services.get_suggestion_from_model(item)
 
         exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        if suggestion.change.state_name not in exploration.states:
+            return
+
         state = exploration.states[suggestion.change.state_name]
         subtitled_unicode_content_ids = []
         customisation_args = state.interaction.customization_args

@@ -277,6 +277,40 @@ class TranslationSuggestionUnicodeAuditOneOffJobTests(
 
         self._run_job_and_verify_output([])
 
+    def test_translation_suggestions_with_invalid_state_names_are_skipped(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'ca_buttonText_0',
+            'language_code': 'bn',
+            'content_html': 'Continue',
+            'translation_html': '<p>চালিয়ে যান</p>',
+            'data_format': 'html'
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Introduction',
+            'new_state_name': 'Renamed state'
+        })]
+        exp_services.update_exploration(
+            self.albert_id, exp_id, change_list, '')
+
+        self._run_job_and_verify_output([])
+
     def test_reports_invalid_unicode_translations(self):
         exp_id = 'EXP_ID'
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -372,6 +406,40 @@ class TranslationSuggestionUnicodeFixOneOffJobTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, self.skill_id, 1,
             self.albert_id, suggestion_change, 'test description')
+
+        self._run_job_and_verify_output([])
+
+    def test_translation_suggestions_with_invalid_state_names_are_skipped(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'ca_buttonText_0',
+            'language_code': 'bn',
+            'content_html': 'Continue',
+            'translation_html': '<p>চালিয়ে যান</p>',
+            'data_format': 'html'
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Introduction',
+            'new_state_name': 'Renamed state'
+        })]
+        exp_services.update_exploration(
+            self.albert_id, exp_id, change_list, '')
 
         self._run_job_and_verify_output([])
 
