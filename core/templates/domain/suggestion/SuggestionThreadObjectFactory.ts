@@ -37,7 +37,7 @@ export class SuggestionThread {
   lastUpdatedMsecs: number;
   messageCount: number;
   threadId: string;
-  // A null suggestion refers that the suggestion is not of type
+  // A null suggestion refers that the suggestion_type is not
   // 'edit_exploration_state_content' It can be any of the two
   // other types i.e. 'translate_content' and 'add_question'.
   suggestion: Suggestion | null;
