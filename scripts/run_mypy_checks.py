@@ -747,12 +747,12 @@ _PARSER = argparse.ArgumentParser(
 
 _PARSER.add_argument(
     '--skip-install',
-    help='If true, skips installing dependencies. The default value is false.',
+    help='If passed, skips installing dependencies. The default value is false.',
     action='store_true')
 
 _PARSER.add_argument(
     '--install-globally',
-    help='If true, installs mypy and its requirements globally.'
+    help='If passed, installs mypy and its requirements globally.'
     ' By default, they are installed to ' + MYPY_TOOLS_DIR,
     action='store_true')
 
@@ -813,7 +813,7 @@ def install_mypy_prerequisites(install_globally):
         int. The return code from installing prerequisites.
     """
     # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
-    # install packages globally for CI as in CI pip installation is not in a way
+    # install packages globally for CI. In CI, pip installation is not in a way
     # we expect.
     if install_globally:
         cmd = [
