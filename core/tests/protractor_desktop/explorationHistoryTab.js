@@ -77,14 +77,6 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setInteraction('NumericInput', false);
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setFeedback(await forms.toRichText('Try again'));
-    await explorationEditorMainTab.addHint('Hint 1');
-    await explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'It is correct'
-    });
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 2'));
@@ -155,7 +147,7 @@ describe('Exploration history', function() {
       },
       14: {
         text: '      html: \'\'',
-        highlighted: true
+        highlighted: false
       },
       15: {
         text: '    labelled_as_correct: false',
@@ -175,7 +167,7 @@ describe('Exploration history', function() {
       },
       19: {
         text: '  hints: []',
-        highlighted: true
+        highlighted: false
       },
       20: {
         text: '  id: null',
@@ -183,7 +175,7 @@ describe('Exploration history', function() {
       },
       21: {
         text: '  solution: null',
-        highlighted: true
+        highlighted: false
       },
       22: {
         text: 'linked_skill_id: null',
@@ -361,8 +353,8 @@ describe('Exploration history', function() {
         highlighted: false
       },
       31: {
-        text: '      html: <p>Try again</p>',
-        highlighted: true
+        text: '      html: \'\'',
+        highlighted: false
       },
       32: {
         text: '    labelled_as_correct: false',
@@ -385,118 +377,70 @@ describe('Exploration history', function() {
         highlighted: true
       },
       37: {
-        text: '  - hint_content:',
-        highlighted: true
-      },
-      38: {
-        text: '      content_id: hint_2',
-        highlighted: true
-      },
-      39: {
-        text: '      html: <p>Hint 1</p>',
-        highlighted: true
-      },
-      40: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      41: {
-        text: '  solution:',
+      38: {
+        text: '  solution: null',
         highlighted: true
       },
-      42: {
-        text: '    answer_is_exclusive: false',
-        highlighted: true
-      },
-      43: {
-        text: '    correct_answer: 6.0',
-        highlighted: true
-      },
-      44: {
-        text: '    explanation:',
-        highlighted: true
-      },
-      45: {
-        text: '      content_id: solution',
-        highlighted: true
-      },
-      46: {
-        text: '      html: <p>It is correct</p>',
-        highlighted: true
-      },
-      47: {
+      39: {
         text: 'linked_skill_id: null',
         highlighted: false
       },
-      48: {
-        text: 'next_content_id_index: 3',
+      40: {
+        text: 'next_content_id_index: 2',
         highlighted: true
       },
-      49: {
+      41: {
         text: 'param_changes: []',
         highlighted: false
       },
-      50: {
+      42: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      51: {
+      43: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      52: {
+      44: {
         text: '    content: {}',
         highlighted: false
       },
-      53: {
+      45: {
         text: '    default_outcome: {}',
         highlighted: false
       },
-      54: {
+      46: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      55: {
-        text: '    hint_2: {}',
-        highlighted: true
-      },
-      56: {
-        text: '    solution: {}',
-        highlighted: true
-      },
-      57: {
+      47: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      58: {
+      48: {
         text: 'written_translations:',
         highlighted: false
       },
-      59: {
+      49: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      60: {
+      50: {
         text: '    content: {}',
         highlighted: false
       },
-      61: {
+      51: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      62: {
+      52: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      63: {
-        text: '    hint_2: {}',
-        highlighted: true
-      },
-      64: {
-        text: '    solution: {}',
-        highlighted: true
-      },
-      65: {
+      53: {
         text: '',
         highlighted: false
       }
@@ -560,6 +504,7 @@ describe('Exploration history', function() {
     await historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
     await historyGraph.openStateHistory('first (was: Introd...');
+    debugger;
     await historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     await historyGraph.closeStateHistory();
