@@ -344,4 +344,3 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
         admin_total_plays = (
             user_services.get_dashboard_stats(self.admin_id)['total_plays'])
         self.assertEqual(admin_total_plays, 2)
-

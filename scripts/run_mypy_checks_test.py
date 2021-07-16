@@ -64,9 +64,9 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_failure)
 
         self.install_mypy_prereq_swap_success = self.swap(
-            run_mypy_checks, 'install_mypy_prerequisites', lambda: 0)
+            run_mypy_checks, 'install_mypy_prerequisites', lambda _: 0)
         self.install_mypy_prereq_swap_failure = self.swap(
-            run_mypy_checks, 'install_mypy_prerequisites', lambda: 1)
+            run_mypy_checks, 'install_mypy_prerequisites', lambda _: 1)
 
         self.files_swap = self.swap(
             run_mypy_checks, 'NOT_FULLY_COVERED_FILES',
@@ -94,7 +94,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                         self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
-                    return '', 'can\'t combine user with prefix'
+                    return b'', b'can\'t combine user with prefix'
             return Ret()
 
         self.popen_swap_user_prefix_error = self.swap(
