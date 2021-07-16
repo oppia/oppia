@@ -31,7 +31,7 @@ import apache_beam as beam
     [models.NAMES.base_model, models.NAMES.config])
 
 
-class ValidateConfigCommitCmdsSchemaTests(
+class ValidateConfigPropertySnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
@@ -42,9 +42,6 @@ class ValidateConfigCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -53,7 +50,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -66,9 +63,6 @@ class ValidateConfigCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -76,7 +70,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -94,9 +88,6 @@ class ValidateConfigCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
@@ -104,7 +95,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -122,9 +113,6 @@ class ValidateConfigCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'change_property_value'}])
         )
 
@@ -132,7 +120,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -144,6 +132,11 @@ class ValidateConfigCommitCmdsSchemaTests(
         ])
 
     def test_config_property_change_object_with_extra_attribute_in_cmd(self):
+        commit_dict = {
+            'cmd': 'change_property_value',
+            'new_value': 'new_value',
+            'invalid': 'invalid'
+        }
         invalid_commit_cmd_model = (
             config_models.ConfigPropertySnapshotMetadataModel(
                 id='model_id-1',
@@ -151,36 +144,25 @@ class ValidateConfigCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
-                commit_cmds=[{
-                    'cmd': 'change_property_value',
-                    'new_value': 'new_value',
-                    'invalid': 'invalid'
-                }])
+                commit_cmds=[commit_dict])
         )
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigPropertySnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                {
-                    'cmd': 'change_property_value',
-                    'new_value': 'new_value',
-                    'invalid': 'invalid'
-                },
+                commit_dict,
                 'The following extra attributes are present: invalid')
         ])
 
 
-class ValidatePlatformParameterCommitCmdsSchemaTests(
+class ValidatePlatformParameterSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     CMD_EDIT_RULES = parameter_domain.PlatformParameterChange.CMD_EDIT_RULES
@@ -193,9 +175,6 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -204,7 +183,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -217,9 +197,6 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -227,7 +204,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -245,9 +223,6 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
@@ -255,7 +230,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -274,9 +250,6 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': self.CMD_EDIT_RULES}])
         )
 
@@ -284,7 +257,8 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -296,6 +270,11 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
 
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
             self):
+        commit_dict = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': [],
+            'invalid': 'invalid'
+        }
         invalid_commit_cmd_model = (
             config_models.PlatformParameterSnapshotMetadataModel(
                 id='model_id-1',
@@ -303,30 +282,20 @@ class ValidatePlatformParameterCommitCmdsSchemaTests(
                 last_updated=self.NOW,
                 committer_id='committer_id',
                 commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
-                commit_cmds=[{
-                    'cmd': self.CMD_EDIT_RULES,
-                    'new_rules': [],
-                    'invalid': 'invalid'
-                }])
+                commit_cmds=[commit_dict])
         )
 
         output = (
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation.ValidatePlatformParameterCommitCmdsSchema())
+                config_validation
+                .ValidatePlatformParameterSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                {
-                    'cmd': self.CMD_EDIT_RULES,
-                    'new_rules': [],
-                    'invalid': 'invalid'
-                },
+                commit_dict,
                 'The following extra attributes are present: invalid')
         ])

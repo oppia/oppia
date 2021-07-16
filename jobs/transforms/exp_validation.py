@@ -26,7 +26,11 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(
+    exp_models, story_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.story
+])
 
 
 @validation_decorators.AuditsExisting(
@@ -46,6 +50,26 @@ class ValidateExplorationSnapshotMetadataModel(
             changes made by commit commands of the model.
         """
         return exp_domain.ExplorationChange
+
+# TODO(#12688): Implement the skipped model.ID relationship checks (listed in
+# 12688). These are skipped at the moment as, Realationshipsof is only capable
+# of handling straigtforward model.ID relations.
+
+
+@validation_decorators.RelationshipsOf(exp_models.ExplorationContextModel)
+def exploration_context_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.story_id, [story_models.StoryModel]
+    yield model.id, [exp_models.ExplorationModel]
+
+
+@validation_decorators.RelationshipsOf(exp_models.ExpSummaryModel)
+def exp_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [exp_models.ExplorationModel]
+    yield model.id, [exp_models.ExplorationRightsModel]
 
 
 @validation_decorators.AuditsExisting(
