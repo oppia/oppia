@@ -622,7 +622,20 @@
     "core/templates/services/exploration-features-backend-api.service.ts",
     "core/templates/services/exploration-features-backend-api.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.ts",
-    "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts"
+    "core/templates/pages/exploration-player-page/services/exploration-recommendations.service.spec.ts",
+    "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.ts",
+    "core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts",
+    "core/templates/services/exploration-stats-backend-api.service.ts",
+    "core/templates/services/exploration-stats-backend-api.service.spec.ts",
+    "core/templates/services/playthrough-issues-backend-api.service.ts",
+    "core/templates/services/playthrough-issues-backend-api.service.spec.ts",
+    "core/templates/services/state-top-answers-stats-backend-api.service.ts",
+    "core/templates/services/state-top-answers-stats-backend-api.service.spec.ts",
+    "extensions/interactions/InteractiveMap/directives/oppia-response-interactive-map.component.ts",
+    "core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.ts",
+    "core/templates/pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service.spec.ts",
+    "core/templates/pages/email-dashboard-pages/email-dashboard-data.service.ts",
+    "core/templates/pages/email-dashboard-pages/email-dashboard-data.service.spec.ts"
   ],
   "include": [
     "core/templates/pages/delete-account-page/services/*.ts",

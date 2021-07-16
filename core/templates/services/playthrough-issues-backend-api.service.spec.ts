@@ -26,10 +26,10 @@ import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('PlaythroughIssuesBackendApiService', () => {
-  let httpTestingController: HttpTestingController = null;
+  let httpTestingController: HttpTestingController;
   let playthroughIssuesBackendApiService:
-    PlaythroughIssuesBackendApiService = null;
-  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
+    PlaythroughIssuesBackendApiService;
+  let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
 
   let backendIssues: PlaythroughIssueBackendDict[] = [{
     issue_type: 'MultipleIncorrectSubmissions',
@@ -44,10 +44,11 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
-    httpTestingController = TestBed.get(HttpTestingController);
-    playthroughIssuesBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    playthroughIssuesBackendApiService = TestBed.inject(
       PlaythroughIssuesBackendApiService);
-    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
+    playthroughIssueObjectFactory = TestBed.inject(
+      PlaythroughIssueObjectFactory);
   });
 
   afterEach(() => {
