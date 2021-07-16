@@ -1210,7 +1210,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return android_ticket_id
 
     def _verify_stats_model(self, stats_json, expected_json):
-        # type: (Dict[str, Dict[str, int]) -> None
+        # type: (Dict[str, Dict[str, int]], Dict[str, Dict[str, int]]) -> None
         """Verify the fields of the feedback report stats model."""
         self.assertEqual(
             stats_json['report_type'],
