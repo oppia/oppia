@@ -814,7 +814,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
     def test_update_exp_issues_for_new_exp_version(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.save_new_valid_exploration('exp_id', admin_id)
+        exp = self.save_new_valid_exploration('exp_id', admin_id)
 
         stats_models.ExplorationIssuesModel.delete_by_id(
             '%s.%s' % ('exp_id', 1))
@@ -822,8 +822,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             stats_models.ExplorationIssuesModel.get(
                 '%s.%s' % ('exp_id', 1), strict=False))
 
+        exp.version += 1
         stats_services.update_exp_issues_for_new_exp_version(
-            'exp_id', None, None)
+            exp, exp_domain.ExplorationVersionsDiff([]) , None)
 
         exploration_issues_model = (
             stats_models.ExplorationIssuesModel.get('%s.%s' % ('exp_id', 1)))
