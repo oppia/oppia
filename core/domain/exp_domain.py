@@ -32,6 +32,7 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import exploration_pb2
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -646,7 +647,38 @@ class Exploration(python_utils.OBJECT):
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
         # Calculate proto_size_in_bytes.
-        proto_size_in_bytes = 0
+        exp_proto = exploration_pb2.Exploration(
+            id=exploration.id,
+            version=exploration.version,
+            init_state_name=exploration.init_state_name,
+            title=exploration.title
+        )
+        state_proto = exploration_pb2.State()
+
+        # InteractionInstance.
+        # A interaction_proto = exploration_pb2.InteractionInstance().
+
+        # RecordedVoiceovers.
+        # B recorderd_voiceovers_proto = exploration_pb2.RecordedVoiceovers().
+        # B voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping().
+        # B voiceover_proto = exploration_pb2.Voiceover().
+
+        # WrittenTranslations.
+        # C written_translation_proto = exploration_pb2.WrittenTranslations().
+        # C written_mapping_proto =
+        # C    exploration_pb2.WrittenTranslationContentMapping().
+        # C written_proto = exploration_pb2.WrittenTranslation().
+
+        # Set state.
+        for (_, state_dict) in exploration.states.items():
+            subtitled_html_proto = exploration_pb2.SubtitledHtml(
+                content_id=state_dict.content.content_id,
+                html=state_dict.content.html
+            )
+            state_proto.content.CopyFrom(subtitled_html_proto)
+
+        # How to set state_proto to exp_proto as states is a map.
+        proto_size_in_bytes = exp_proto.ByteSize()
         exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 
