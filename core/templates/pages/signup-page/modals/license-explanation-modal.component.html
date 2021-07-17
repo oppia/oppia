@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h3 translate="I18N_SIGNUP_WHY_LICENSE"></h3>
+</div>
+
+<div class="modal-body oppia-long-text">
+  <p class="oppia-signup-objective-text"
+     translate="I18N_SIGNUP_SITE_OBJECTIVE"
+     [translateParams]="{sitename: siteName}">
+  </p>
+
+  <p class="oppia-signup-objective-text"
+    innerHTML="{{ 'I18N_SIGNUP_LICENSE_OBJECTIVE' | translate: { licenselink: licenseLink  } }}">
+  </p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" translate="I18N_SIGNUP_CLOSE_BUTTON"></button>
+</div>
+
+<style>
+  .oppia-signup-objective-text {
+    line-height: 1.5;
+  }
+</style>
