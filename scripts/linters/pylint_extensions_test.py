@@ -64,7 +64,6 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
         test(2, 5, test_var_three=6) #@
         test(2) #@
-        test(*(2,)) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
         max(5, 1) #@
 
@@ -110,8 +109,6 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_call(func_call_node_five)
-
-        self.assertFalse(True)
 
     def test_finds_arg_name_for_non_keyword_arg(self):
         node_arg_name_for_non_keyword_arg = astroid.extract_node(
@@ -165,6 +162,16 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
                     pass
 
             TestClass(first=1, second=2) #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_call(
+                node_with_no_error_message)
+
+    def test_skips_calling_not_callable(self):
+        node_with_no_error_message = astroid.extract_node(
+            """
+            1() #@
             """)
 
         with self.checker_test_object.assertNoMessages():

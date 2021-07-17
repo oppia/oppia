@@ -47,7 +47,6 @@ import main
 import python_utils
 import utils
 
-from google.cloud import ndb
 import webapp2
 import webtest
 
@@ -1054,7 +1053,7 @@ class MainTests(test_utils.GenericTestBase):
             self.assertEqual(start_response, 'response')
 
         def get_ndb_context_mock(global_cache):
-            self.assertEqual(type(global_cache), ndb.global_cache.RedisCache)
+            self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()
 
         get_ndb_context_swap = self.swap_with_checks(

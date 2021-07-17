@@ -216,12 +216,9 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         parameters = []
         parameter_name_to_index = {}
         for i, arg in enumerate(called.args.args):
-            if isinstance(arg, astroid.Tuple):
-                name = None
-            else:
-                assert isinstance(arg, astroid.AssignName)
-                name = arg.name
-                parameter_name_to_index[name] = i
+            assert isinstance(arg, astroid.AssignName)
+            name = arg.name
+            parameter_name_to_index[name] = i
             if i >= num_mandatory_parameters:
                 defval = called.args.defaults[i - num_mandatory_parameters]
             else:
