@@ -32,7 +32,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
 
   @Input() value!: number[];
   @Output() valueChanged: EventEmitter<[number, number]> =
-   new EventEmitter<[number, number]>();
+    new EventEmitter<[number, number]>();
 
   // Class Marker is of type Marker<P=any> therefore type
   // cannot be determined.
