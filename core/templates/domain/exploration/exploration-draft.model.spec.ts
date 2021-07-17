@@ -20,9 +20,9 @@ import { ExplorationDraft, ExplorationChange } from 'domain/exploration/explorat
 
 describe('ExplorationDraft model', () => {
   describe('exploration draft model', () => {
-    var draftChangeListId = 2;
-    var changeList: ExplorationChange[] = [];
-    var draftDict = {
+    const draftChangeListId = 2;
+    const changeList: ExplorationChange[] = [];
+    const draftDict = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId
     };

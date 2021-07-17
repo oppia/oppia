@@ -201,7 +201,7 @@ export class Interaction {
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
       } else if (value instanceof Object) {
         type KeyOfValue = keyof typeof value;
-        let keys = <KeyOfValue[]>Object.keys(value);
+        const keys = <KeyOfValue[]>Object.keys(value);
         keys.forEach(key => {
           traverseValueAndRetrieveContentIdsFromSubtitled(value[key]);
         });

@@ -456,7 +456,7 @@ describe('Interaction object factory', () => {
   it('should correctly set the new answer group', () => {
     const testInteraction = iof.createFromBackendDict(interactionDict);
 
-    let newAnswerGroupBackendDict: AnswerGroupBackendDict = {
+    const newAnswerGroupBackendDict: AnswerGroupBackendDict = {
       rule_specs: [],
       outcome: {
         dest: 'dest_3',
@@ -488,7 +488,7 @@ describe('Interaction object factory', () => {
       training_data: ['training_data'],
       tagged_skill_misconception_id: 'skill_id-1'
     }, 'TextInput')]);
-    let newAnswerGroup =
+    const newAnswerGroup =
       agof.createFromBackendDict(newAnswerGroupBackendDict, 'TextInput');
     testInteraction.setAnswerGroups([newAnswerGroup]);
     expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
@@ -694,7 +694,7 @@ describe('Interaction object factory', () => {
 
   it('should correctly convert an Interaction with MultipleChoice to a ' +
      'backend dict', () => {
-    let mcInteractionDict = {
+    const mcInteractionDict = {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -781,7 +781,7 @@ describe('Interaction object factory', () => {
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
     type Keys = keyof typeof INTERACTION_SPECS;
-    let keys = <Keys[]> Object.keys(INTERACTION_SPECS);
+    const keys = <Keys[]> Object.keys(INTERACTION_SPECS);
     keys.forEach(interactionId => {
       expect(() => {
         const defaultCa: Record<string, Object> = {};

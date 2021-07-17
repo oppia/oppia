@@ -91,7 +91,7 @@ export class ExtensionTagAssemblerService {
       this._convertCustomizationArgsToBackendDict(customizationArgs));
     for (const caName in customizationArgs) {
       if ('value' in caBackendDict[caName]) {
-        let caBackendDictValue = caBackendDict[caName].value;
+        const caBackendDictValue = caBackendDict[caName].value;
         element.attr(
           this.camelCaseToHyphens.transform(caName) + '-with-value',
           this.htmlEscaperService.objToEscapedJson(caBackendDictValue));

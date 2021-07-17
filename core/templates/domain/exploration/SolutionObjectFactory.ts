@@ -87,9 +87,9 @@ export class Solution {
   }
 
   getSummary(interactionId: string): string {
-    var solutionType = (
+    const solutionType = (
       this.answerIsExclusive ? 'The only' : 'One');
-    var correctAnswer = null;
+    let correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
     } else if (interactionId === 'CodeRepl' ||
@@ -107,11 +107,11 @@ export class Solution {
         new UnitsObjectFactory())).fromDict(
           <NumberWithUnitsAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
-      let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
+      const formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];
-      for (let arr of <DragAndDropAnswer> this.correctAnswer) {
-        let transformedArray = [];
-        for (let elem of arr) {
+      for (const arr of <DragAndDropAnswer> this.correctAnswer) {
+        const transformedArray = [];
+        for (const elem of arr) {
           transformedArray.push(formatRtePreview.transform(elem));
         }
         correctAnswer.push(transformedArray);
@@ -123,7 +123,7 @@ export class Solution {
         (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
           this.correctAnswer));
     }
-    var explanation = (
+    const explanation = (
       (new ConvertToPlainTextPipe()).transform(this.explanation.html));
     return (
       solutionType + ' solution is "' + correctAnswer +
