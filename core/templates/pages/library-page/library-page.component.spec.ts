@@ -15,3 +15,7 @@
 /**
  * @fileoverview Unit tests for the component of the library page.
  */
+
+describe('Library Page Component', () => {
+
+});
