@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for activityTilesInfinityGrid.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -37,6 +38,7 @@ describe('Activity Tiles Infinity Grid Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         ActivityTilesInfinityGridComponent
       ],
@@ -81,4 +83,20 @@ describe('Activity Tiles Infinity Grid Component', () => {
     expect(componentInstance.endOfPageIsReached).toBeFalse();
     expect(componentInstance.libraryWindowIsNarrow).toBeTrue();
   }));
+
+  it('should show more activities', () => {
+    componentInstance.loadingMessage = '';
+    componentInstance.endOfPageIsReached = false;
+    componentInstance.allActivitiesInOrder = [];
+    spyOn(searchService, 'loadMoreData').and.callFake((
+        successCallback: (SearchResponseData, boolean) => void,
+        failureCallback?: (boolean) => void) => {
+      successCallback({ activity_list: [] }, true);
+      failureCallback(true);
+    });
+
+    componentInstance.showMoreActivities();
+    expect(componentInstance.endOfPageIsReached).toBeTrue();
+    expect(componentInstance.searchResultsAreLoading).toBeFalse();
+  });
 });

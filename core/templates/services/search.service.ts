@@ -230,7 +230,7 @@ export class SearchService {
 
   loadMoreData(
       successCallback: (SearchResponseData, boolean) => void,
-      failureCallback?: (any) => void): void {
+      failureCallback?: (boolean) => void): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
