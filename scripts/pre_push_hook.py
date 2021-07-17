@@ -413,7 +413,7 @@ def does_diff_include_js_or_ts_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.ts') or file_path.endswith('.js'):
+        if file_path.endswith(b'.ts') or file_path.endswith(b'.js'):
             return True
     return False
 
@@ -429,7 +429,7 @@ def does_diff_include_ts_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.ts'):
+        if file_path.endswith(b'.ts'):
             return True
     return False
 
@@ -446,7 +446,7 @@ def does_diff_include_ci_config_or_js_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.js') or re.search(r'e2e_.*\.yml', file_path):
+        if file_path.endswith(b'.js') or re.search(rb'e2e_.*\.yml', file_path):
             return True
     return False
 

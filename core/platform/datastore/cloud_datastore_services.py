@@ -20,10 +20,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
-import datetime
 
 from core.platform import models
-import python_utils
 
 from google.cloud import ndb
 

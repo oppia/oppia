@@ -1882,8 +1882,8 @@ title: Title
 
     @contextlib.contextmanager
     def mock_datetime_utcnow(self, mocked_now):
-        """Mocks parts of the datastore to accept a fake datetime type that always
-        returns the same value for utcnow.
+        """Mocks parts of the datastore to accept a fake datetime type that
+        always returns the same value for utcnow.
 
         Example:
             import datetime
@@ -1904,13 +1904,12 @@ title: Title
 
         old_datetime = datetime.datetime
 
-        class MockDatetime(
-            python_utils.with_metaclass( # pylint: disable=inherit-non-class, invalid-metaclass
-                type(datetime.datetime), old_datetime)):
+        class MockDatetime(old_datetime):
             """Always returns mocked_now as the current time."""
 
             @classmethod
             def utcnow(cls):
+                # type: () -> datetime.datetime
                 """Returns the mocked datetime."""
                 return mocked_now
 
