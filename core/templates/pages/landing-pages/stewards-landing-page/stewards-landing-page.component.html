@@ -18,7 +18,9 @@
                 <span *ngFor="let buttonDefinition of buttonDefinitions; index as idx">
                   <button class="btn oppia-stewards-button"
                           [ngClass]="{'oppia-stewards-button-primary': idx === 0, 'oppia-stewards-button-secondary': idx > 0}"
-                          (click)="onClickButton(buttonDefinition)">{{ buttonDefinition.text }}</button>
+                          (click)="onClickButton(buttonDefinition)">
+                    {{ buttonDefinition.text }}
+                  </button>
                 </span>
               </div>
             </div>
