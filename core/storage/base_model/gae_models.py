@@ -138,7 +138,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @property
     def id(self):
-        # type: () -> Any
+        # type: () -> Text
         """A unique id for this model instance."""
         return self.key.id()
 
@@ -692,7 +692,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_commit(cls, target_entity_id, version):
-        # type: (Text, int) -> BaseCommitLogEntryModel
+        # type: (Text, int) -> Optional[BaseCommitLogEntryModel]
         """Returns the commit corresponding to an instance id and
         version number.
 
