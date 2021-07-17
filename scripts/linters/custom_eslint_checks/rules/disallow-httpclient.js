@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to disallow HttpClient.
+ * @fileoverview Lint check to allow the use of HttpClient only in
+ * *backend-api.services.ts files.
  */
 
 'use strict';
@@ -22,7 +23,9 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Lint check to disallow HttpClient',
+      description: (
+        'Lint check to allow the use of HttpClient only in' +
+        ' *backend-api.services.ts files.'),
       category: 'Best Practices',
       recommended: true,
     },
