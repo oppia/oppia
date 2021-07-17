@@ -924,6 +924,29 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
 
+    def test_update_topic_schema(self):
+        orig_topic_dict = (
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID).to_dict())
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+            'from_version': 2,
+            'to_version': 3,
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist, 'Update schema.')
+
+        new_topic_dict = (
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID).to_dict())
+
+        # Check version is updated.
+        self.assertEqual(new_topic_dict['version'], 3)
+
+        # Delete version and compare of the dict are the same.
+        del orig_topic_dict['version']
+        del new_topic_dict['version']
+        self.assertEqual(orig_topic_dict, new_topic_dict)
+
     def test_add_uncategorized_skill(self):
         topic_services.add_uncategorized_skill(
             self.user_id_admin, self.TOPIC_ID, 'skill_id_3')
@@ -1643,9 +1666,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
 
-# TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class
+# TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.
-# See issue: https://github.com/oppia/oppia/issues/7009.
 class MockTopicObject(topic_domain.Topic):
     """Mocks Topic domain object."""
 
