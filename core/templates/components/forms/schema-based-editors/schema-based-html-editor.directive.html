@@ -4,7 +4,8 @@ focusManager to manage the focus activity automatically. -->
                  ng-if="!$ctrl.isDisabled()"
                  [value]="$ctrl.localValue"
                  (value-change)="$ctrl.updateValue($event)"
-                 [ui-config]="$ctrl.uiConfig()">
+                 [ui-config]="$ctrl.uiConfig()"
+                 [headers-enabled]="$ctrl.headersEnabled()">
 </ck-editor-4-rte>
 
 <span ng-if="$ctrl.isDisabled()"
