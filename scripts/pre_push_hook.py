@@ -525,8 +525,8 @@ def main(args=None):
             mypy_check_status = execute_mypy_checks()
             if mypy_check_status != 0:
                 python_utils.PRINT(
-                   'Push failed, please correct the mypy type annotation '
-                   'issues above.')
+                    'Push failed, please correct the mypy type annotation '
+                    'issues above.')
                 sys.exit(mypy_check_status)
 
             typescript_checks_status = 0
