@@ -35,6 +35,7 @@ EXCLUDED_DIRECTORIES = [
     'proto_files/',
     'scripts/linters/test_files/',
     'third_party/',
+    'core/domain/exploration_pb2.py',
 ]
 
 # List of files who should be type-annotated but are not.
