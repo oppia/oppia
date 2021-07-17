@@ -22,15 +22,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 
-from typing import Any, Dict, Optional, Text
+from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import * # pragma: no cover
-else:
-    base_models, user_models = models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.user])
-    datastore_services = models.Registry.import_datastore_services()
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
+base_models, user_models = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
+datastore_services = models.Registry.import_datastore_services()
 
 ONLY_FIREBASE_SEED_MODEL_ID = '1'
 

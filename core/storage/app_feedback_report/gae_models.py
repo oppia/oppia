@@ -24,16 +24,16 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text
+from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import * # pragma: no cover
-else:
-    (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 
-    datastore_services = models.Registry.import_datastore_services()
-    transaction_services = models.Registry.import_transaction_services()
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'

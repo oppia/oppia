@@ -26,16 +26,17 @@ import functools
 from core.platform import models
 import python_utils
 
-from typing import Any, Callable, Iterator, List, Optional, Text, Tuple
-
 from google.appengine.api import datastore_types
 from google.appengine.datastore import datastore_query
 from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
-MYPY=False
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Callable, Iterator, List, Optional, Text, Tuple)
+
+MYPY = False
 if MYPY:
-    from mypy_imports import *
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 else:
     transaction_services = models.Registry.import_transaction_services()
 
