@@ -501,6 +501,7 @@
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
 /mypy.ini @vojtechjelinek
+/mypy_imports.py @vojtechjelinek
 /mypy_requirements.txt @vojtechjelinek
 /python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep

@@ -26,11 +26,12 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, Iterable, List, Optional, Text, Tuple, Union
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, Iterable, List, Optional, Text, Tuple, Union)
 
 MYPY = False
 if MYPY:
-    from mypy_imports import *
+    from mypy_imports import * # pragma: no cover # pylint: disable=unused-wildcard-import,import-only-modules,wildcard-import
 else:
     transaction_services = models.Registry.import_transaction_services()
     datastore_services = models.Registry.import_datastore_services()
@@ -827,7 +828,7 @@ class VersionedModel(BaseModel):
 
         Args:
             instance_id: str. The given instance id.
-            version_number: str | int. The given version number.
+            version_number: str|int. The given version number.
 
         Returns:
             str. The unique snapshot id corresponding to the given instance and

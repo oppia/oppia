@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Text
 
 MYPY = False
 if MYPY:
-    from mypy_imports import *
+    from mypy_imports import * # pragma: no cover
 else:
     (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
