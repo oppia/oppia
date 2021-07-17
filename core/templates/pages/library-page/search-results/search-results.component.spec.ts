@@ -29,8 +29,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserInfo } from 'domain/user/user-info.model';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Search Results component', () => {
+describe('Search Results component', () => {
   let fixture: ComponentFixture<SearchResultsComponent>;
   let componentInstance: SearchResultsComponent;
   let siteAnalyticsService: SiteAnalyticsService;

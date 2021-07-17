@@ -57,7 +57,9 @@
             <h1 class="oppia-classroom-h1">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_1' | translate }}</h1>
             <p class="oppia-classroom-p">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200"
-               href="/learn/math">{{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}</a>
+               href="/learn/math">
+               {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
+            </a>
           </div>
           <picture class="classroom-promo-image">
             <source type="image/webp"
@@ -95,8 +97,8 @@
           <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
           <div *ngIf="!libraryWindowIsNarrow">
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                       (click)="scroll(idx, true)"
-                       *ngIf="leftmostCardIndices[idx] != 0">
+                    (click)="scroll(idx, true)"
+                    *ngIf="leftmostCardIndices[idx] != 0">
               <i class="material-icons">&#xE314;</i>
             </button>
             <div class="oppia-library-carousel-scroller" *ngIf="leftmostCardIndices[idx] == 0" aria-hidden="true">
@@ -138,9 +140,9 @@
             </div>
 
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                       (click)="scroll(idx, false)"
-                       [hidden]="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]"
-                       aria-hidden="true">
+                    (click)="scroll(idx, false)"
+                    [hidden]="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]"
+                    aria-hidden="true">
               <i class="material-icons">&#xE315;</i>
             </button>
             <div class="oppia-library-carousel-scroller"
@@ -150,9 +152,9 @@
 
           <div *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                       (click)="decrementLeftmostCardIndex(idx)"
-                       [hidden]="leftmostCardIndices[idx] == 0"
-                       aria-hidden="true">
+                    (click)="decrementLeftmostCardIndex(idx)"
+                    [hidden]="leftmostCardIndices[idx] == 0"
+                    aria-hidden="true">
               <i class="material-icons">&#xE314;</i>
             </button>
             <div class="oppia-library-carousel-scroller" *ngIf="leftmostCardIndices[idx] == 0"></div>
@@ -191,8 +193,8 @@
             </div>
 
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
-                       (click)="incrementLeftmostCardIndex(idx)"
-                       [hidden]="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]">
+                    (click)="incrementLeftmostCardIndex(idx)"
+                    [hidden]="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]">
               <i class="material-icons">&#xE315;</i>
             </button>
             <div class="oppia-library-carousel-scroller"
