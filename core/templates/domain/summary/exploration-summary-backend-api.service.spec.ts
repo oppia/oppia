@@ -61,15 +61,10 @@ describe('Exploration Summary Backend Api Service', () => {
 
   it('should not load public exploration summaries from backend when' +
   ' exploration id is not valid', fakeAsync(() => {
-    const explorationIds = ['#', null, '1'];
+    const explorationIds = ['#', '', '1'];
     const alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
     explorationSummaryBackendApiService.loadPublicExplorationSummariesAsync(
-      // This throws "Argument of type '(string | null)[]' is not assignable
-      // to parameter of type 'string[]'." We need to suppress this error
-      // because of the need to test validations when the 'ExplorationId' is
-      // not defined or invalid.
-      // @ts-ignore
       explorationIds).then(successHandler, failHandler);
 
     flushMicrotasks();

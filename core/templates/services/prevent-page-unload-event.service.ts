@@ -39,7 +39,7 @@ export class PreventPageUnloadEventService {
     }
     // A value must be assigned to validationCallback since it cannot be an
     // optional argument. Check _preventPageUnloadEventHandler function.
-    this.validationCallback = callback !== undefined ? callback : () => true;
+    this.validationCallback = callback ? callback : () => true;
     this._preventPageUnloadEventHandlerBind =
       this._preventPageUnloadEventHandler.bind(null, this.validationCallback);
     this.windowRef.nativeWindow.addEventListener(

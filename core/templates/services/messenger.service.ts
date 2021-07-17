@@ -24,6 +24,7 @@ import { Injectable } from '@angular/core';
 
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ServicesConstants } from 'services/services.constants';
 
 interface HeightChangeData {
   height: number;
@@ -46,11 +47,15 @@ interface ExplorationCompletedData {
   explorationVersion: number;
 }
 
+interface ExplorationResetData {
+  stateName: string
+}
+
 interface MessageValidatorsType {
   heightChange(payload: HeightChangeData): boolean;
   explorationLoaded(): boolean;
   stateTransition(payload: StateTransitionData): boolean;
-  explorationReset(payload: {stateName: string}): boolean;
+  explorationReset(payload: ExplorationResetData): boolean;
   explorationCompleted(): boolean;
 }
 
@@ -60,14 +65,14 @@ interface GetPayloadType {
   stateTransition(data: StateTransitionData): StateTransitionData;
   explorationCompleted(
     data: ExplorationCompletedData): ExplorationCompletedData;
-  explorationReset(data: string): {stateName: string};
+  explorationReset(data: string): ExplorationResetData;
 }
 
 type PayloadType = (
   HeightChangeData |
   ExplorationCompletedData |
   StateTransitionData |
-  {stateName: string}
+  ExplorationResetData
 );
 
 type HashDict = {
@@ -82,13 +87,6 @@ type HashDict = {
 export class MessengerService {
   constructor(
     private loggerService: LoggerService, private windowRef: WindowRef) {}
-
-  // TODO(brianrodri): Move these into a .constants.ts file.
-  HEIGHT_CHANGE: string = 'heightChange';
-  EXPLORATION_LOADED: string = 'explorationLoaded';
-  STATE_TRANSITION: string = 'stateTransition';
-  EXPLORATION_RESET: string = 'explorationReset';
-  EXPLORATION_COMPLETED: string = 'explorationCompleted';
 
   SUPPORTED_HASHDICT_VERSIONS: Set<string> = (
     new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
@@ -105,7 +103,7 @@ export class MessengerService {
     stateTransition(payload: StateTransitionData): boolean {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
-    explorationReset(payload: {stateName: string}): boolean {
+    explorationReset(payload: ExplorationResetData): boolean {
       return Boolean(payload.stateName);
     },
     explorationCompleted(): boolean {
@@ -141,7 +139,7 @@ export class MessengerService {
       };
     },
     // ---- DEPRECATED ----
-    explorationReset(data: string): {stateName: string} {
+    explorationReset(data: string): ExplorationResetData {
       return {
         stateName: data
       };
@@ -198,32 +196,33 @@ export class MessengerService {
         this.loggerService.info('Posting message to parent: ' + messageTitle);
         let payload: PayloadType;
         let isValidMessage: boolean;
-        switch (<keyof GetPayloadType> messageTitle) {
-          case 'explorationCompleted':
+        switch (
+          <keyof typeof ServicesConstants.MESSENGER_PAYLOAD> messageTitle) {
+          case 'EXPLORATION_COMPLETED':
             payload = this.getPayload.explorationCompleted(
               <ExplorationCompletedData> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationCompleted());
             break;
-          case 'explorationLoaded':
+          case 'EXPLORATION_LOADED':
             payload = this.getPayload.explorationLoaded(
               <ExplorationLoadedData> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationLoaded());
             break;
-          case 'explorationReset':
+          case 'EXPLORATION_RESET':
             payload = this.getPayload.explorationReset(
               <string> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationReset(payload));
             break;
-          case 'heightChange':
+          case 'HEIGHT_CHANGE':
             payload = this.getPayload.heightChange(
               <HeightChangeData> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.heightChange(payload));
             break;
-          case 'stateTransition':
+          case 'STATE_TRANSITION':
             payload = this.getPayload.stateTransition(
               <StateTransitionData> messageData);
             isValidMessage = (
