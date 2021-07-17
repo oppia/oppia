@@ -321,7 +321,7 @@ export class LibraryPageComponent {
 
           // Initialize the carousel(s) on the library index page.
           // Pause is necessary to ensure all elements have loaded.
-          setTimeout(this.initCarousels, 390);
+          setTimeout(this.initCarousels.bind(this), 390);
           this.keyboardShortcutService.bindLibraryPageShortcuts();
 
           // Check if actual and expected widths are the same.

@@ -141,7 +141,7 @@
 
             <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                     (click)="scroll(idx, false)"
-                    [hidden]="(group.activity_summary_dicts?.length - tileDisplayCount) <= leftmostCardIndices[idx]"
+                    [hidden]="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[idx]"
                     aria-hidden="true">
               <i class="material-icons">&#xE315;</i>
             </button>
