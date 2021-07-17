@@ -452,6 +452,30 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             response.location,
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
+    def test_signup_attempt_on_wrong_page_fails(self):
+        with python_utils.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_return(
+                auth_services,
+                'get_auth_claims_from_request',
+                auth_domain.AuthClaims(
+                    'auth_id', self.NEW_USER_EMAIL, role_is_super_admin=False)
+            ))
+
+            response = self.get_html_response('/', expected_status_int=302)
+
+        self.assert_matches_regexps(
+            logs,
+            [
+                'Cannot find user auth_id with email %s on '
+                'page http://localhost/\nNoneType: None' % self.NEW_USER_EMAIL
+            ]
+        )
+        self.assertEqual(call_counter.times_called, 1)
+
 
 class MaintenanceModeTests(test_utils.GenericTestBase):
     """Tests BaseHandler behavior when maintenance mode is enabled.

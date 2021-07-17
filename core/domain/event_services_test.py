@@ -31,8 +31,13 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(stats_models, exp_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.exploration, models.NAMES.feedback])
+(
+    stats_models, exp_models, feedback_models,
+    user_models
+) = models.Registry.import_models([
+    models.NAMES.statistics, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.user
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -310,7 +315,11 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
         self.exploration = (
             self.save_new_valid_exploration('exp_id', self.admin_id))
 
-    def test_handle_exploration_rating(self):
+    def test_handle_exploration_rating_with_existing_empty_user_stats(self):
+        user_models.UserStatsModel(
+            id=self.admin_id, average_ratings=None, num_ratings=0, total_plays=0
+        ).put()
+
         admin_average_ratings = (
             user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
         self.assertIsNone(admin_average_ratings)

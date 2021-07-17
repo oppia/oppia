@@ -226,7 +226,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         ).put()
 
         response = self.get_html_response(
-            '/emaildashboardresult/', expected_status_int=401)
+            '/emaildashboardresult/%s' % query_id, expected_status_int=401)
         self.assertIn(b'<error-page status_code=', response.body)
 
         self.logout()
