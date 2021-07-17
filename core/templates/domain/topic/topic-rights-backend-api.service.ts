@@ -39,19 +39,20 @@ export class TopicRightsBackendApiService {
     private httpClient: HttpClient
   ) {}
 
-  topicRightsCache = {};
+  topicRightsCache:
+    Record<string, (TopicRightsBackendDict | TopicRightsBackendResponse)> = {};
 
   private _fetchTopicRights(
       topicId: string,
-      successCallback: (value?: TopicRightsBackendDict) => void,
+      successCallback: (value: TopicRightsBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
     let topicRightsUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
         topic_id: topicId
       });
 
-    this.httpClient.get(topicRightsUrl).toPromise().then(
-      (response: TopicRightsBackendDict) => {
+    this.httpClient.get<TopicRightsBackendDict>(topicRightsUrl)
+      .toPromise().then((response) => {
         successCallback(response);
       }, (errorResponse) => {
         errorCallback(errorResponse.error.error);
@@ -61,7 +62,7 @@ export class TopicRightsBackendApiService {
   private _setTopicStatus(
       topicId: string,
       publishStatus: boolean,
-      successCallback: (value?: TopicRightsBackendResponse) => void,
+      successCallback: (value: TopicRightsBackendResponse) => void,
       errorCallback: (reason?: string) => void): void {
     let changeTopicStatusUrl = this.urlInterpolationService.interpolateUrl(
       '/rightshandler/change_topic_status/<topic_id>', {
@@ -72,9 +73,9 @@ export class TopicRightsBackendApiService {
       publish_status: publishStatus
     };
 
-    this.httpClient.put(
+    this.httpClient.put<TopicRightsBackendResponse>(
       changeTopicStatusUrl, putParams).toPromise().then(
-      (response: TopicRightsBackendResponse) => {
+      (response) => {
         this.topicRightsCache[topicId] = response;
         successCallback(response);
       }, (errorResponse) => {
@@ -127,12 +128,12 @@ export class TopicRightsBackendApiService {
       topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(topicId)) {
-        resolve(this.topicRightsCache[topicId]);
+        resolve(<TopicRightsBackendResponse> this.topicRightsCache[topicId]);
       } else {
         this._fetchTopicRights(topicId, (topicRights) => {
           // Save the fetched topic rights to avoid future fetches.
           this.topicRightsCache[topicId] = topicRights;
-          resolve(this.topicRightsCache[topicId]);
+          resolve(<TopicRightsBackendResponse> this.topicRightsCache[topicId]);
         }, reject);
       }
     });

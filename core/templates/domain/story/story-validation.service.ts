@@ -32,14 +32,17 @@ export class StoryValidationService {
    */
   validatePrerequisiteSkillsInStoryContents(
       topicRelevantSkills: string[], storyContents: StoryContents): string[] {
-    let issues = [];
+    let issues: string[] = [];
     let nodeIds = storyContents.getNodeIds();
     let nodes = storyContents.getNodes();
     // Variable nodesQueue stores the pending nodes to visit in a queue form.
     let nodesQueue = [];
     let nodeIsVisited = new Array(nodeIds.length).fill(false);
-    let startingNode = nodes[storyContents.getNodeIndex(
-      storyContents.getInitialNodeId())];
+    const _initialNodeId = storyContents.getInitialNodeId();
+    if (_initialNodeId === null) {
+      throw new Error('Starting Node does not exist');
+    }
+    let startingNode = nodes[storyContents.getNodeIndex(_initialNodeId)];
     nodesQueue.push(startingNode.getId());
 
     // The user is assumed to have all the prerequisite skills of the
@@ -52,7 +55,11 @@ export class StoryValidationService {
     // prerequisite skills required by the destination nodes 'unlocked' by
     // visiting a particular node by the time that node is finished.
     while (nodesQueue.length > 0) {
-      var currentNodeIndex = storyContents.getNodeIndex(nodesQueue.shift());
+      // 'shift()' returns 'undefined' only when NodesQueue array is empty,
+      // the loop terminates before that condition is reached.
+      // non-null assertion (!) is used to make typescript typing happy.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      var currentNodeIndex = storyContents.getNodeIndex(nodesQueue.shift()!);
       nodeIsVisited[currentNodeIndex] = true;
       var currentNode = nodes[currentNodeIndex];
 

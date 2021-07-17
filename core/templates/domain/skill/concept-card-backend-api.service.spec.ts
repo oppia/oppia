@@ -26,15 +26,15 @@ import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 
 describe('Concept card backend API service', () => {
-  let conceptCardBackendApiService: ConceptCardBackendApiService = null;
+  let conceptCardBackendApiService: ConceptCardBackendApiService;
   let httpTestingController: HttpTestingController;
   let conceptCardObjectFactory: ConceptCardObjectFactory;
-  let sampleResponse1 = null;
-  let sampleResponse2 = null;
-  let sampleResponse3 = null;
-  let conceptCardSampleResponse1 = null;
-  let conceptCardSampleResponse2 = null;
-  let conceptCardSampleResponse3 = null;
+  let sampleResponse1;
+  let sampleResponse2;
+  let sampleResponse3;
+  let conceptCardSampleResponse1;
+  let conceptCardSampleResponse2;
+  let conceptCardSampleResponse3;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
