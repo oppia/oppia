@@ -18,7 +18,7 @@
 
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { SearchResultsComponent } from './search-results.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
@@ -28,6 +28,7 @@ import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserInfo } from 'domain/user/user-info.model';
+import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 
 describe('Search Results component', () => {
   let fixture: ComponentFixture<SearchResultsComponent>;
@@ -37,6 +38,8 @@ describe('Search Results component', () => {
   let userService: UserService;
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
+  let mockOnInitialSearchResultsLoaded = (
+    new EventEmitter<ExplorationSummaryDict[]>());
 
   class MockWindowRef {
     nativeWindow = {
@@ -96,11 +99,10 @@ describe('Search Results component', () => {
       Promise.resolve(new UserInfo(
         'admin', true, true,
         true, true, true, 'en', 'test', null, userIsLoggedIn)));
-    spyOn(searchService.onInitialSearchResultsLoaded, 'subscribe')
-      .and.callFake(callb => {
-        callb([]);
-      });
+    spyOnProperty(searchService, 'onInitialSearchResultsLoaded')
+      .and.returnValue(mockOnInitialSearchResultsLoaded);
     componentInstance.ngOnInit();
+    mockOnInitialSearchResultsLoaded.emit([]);
     tick();
     tick();
     expect(componentInstance.someResultsExist).toBeFalse();
