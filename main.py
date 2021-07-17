@@ -78,7 +78,7 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Callable, Dict, Optional, Text, Type, TypeVar  # isort:skip pylint: disable=line-too-long
+from typing import Any, Callable, Dict, Iterable, Optional, Text, Type, TypeVar  # isort:skip pylint: disable=line-too-long
 
 T = TypeVar('T')  # pylint: disable=invalid-name
 
@@ -911,9 +911,7 @@ URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 class NdbWsgiMiddleware:
     """Wraps the WSGI application into the NDB client context."""
 
-    def __init__(
-            self, wsgi_app: Callable[[Dict[str, str], webapp2.Response], T]
-    ) -> None:
+    def __init__(self, wsgi_app: webapp2.WSGIApplication) -> None:
         self.wsgi_app = wsgi_app
 
     def __call__(

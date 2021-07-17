@@ -1541,32 +1541,33 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
     topic_ids = [topic.id for topic in topic_summaries]
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
     for topic in topics:
-        all_skill_ids = topic.get_all_skill_ids()
-        skill_descriptions = (
-            skill_services.get_descriptions_of_skills(
-                all_skill_ids))
-        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
-            user_id, all_skill_ids)
-        summary_dicts.append({
-            'id': topic.id,
-            'name': topic.name,
-            'description': topic.description,
-            'language_code': topic.language_code,
-            'version': topic.version,
-            'story_titles': topic_services.get_story_titles_in_topic(topic),
-            'thumbnail_filename': topic.thumbnail_filename,
-            'thumbnail_bg_color': topic.thumbnail_bg_color,
-            'canonical_story_summary_dict': (
-                topic_fetchers.get_canonical_story_dicts(user_id, topic)),
-            'url_fragment': topic.url_fragment,
-            'classroom': (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id)),
-            'practice_tab_is_displayed': topic.practice_tab_is_displayed,
-            'degrees_of_mastery': degrees_of_mastery,
-            'skill_descriptions': skill_descriptions,
-            'subtopics': topic.get_all_subtopics()
-        })
+        if topic is not None:
+            all_skill_ids = topic.get_all_skill_ids()
+            skill_descriptions = (
+                skill_services.get_descriptions_of_skills(
+                    all_skill_ids))
+            degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
+                user_id, all_skill_ids)
+            summary_dicts.append({
+                'id': topic.id,
+                'name': topic.name,
+                'description': topic.description,
+                'language_code': topic.language_code,
+                'version': topic.version,
+                'story_titles': topic_services.get_story_titles_in_topic(topic),
+                'thumbnail_filename': topic.thumbnail_filename,
+                'thumbnail_bg_color': topic.thumbnail_bg_color,
+                'canonical_story_summary_dict': (
+                    topic_fetchers.get_canonical_story_dicts(user_id, topic)),
+                'url_fragment': topic.url_fragment,
+                'classroom': (
+                    classroom_services.get_classroom_url_fragment_for_topic_id(
+                        topic.id)),
+                'practice_tab_is_displayed': topic.practice_tab_is_displayed,
+                'degrees_of_mastery': degrees_of_mastery,
+                'skill_descriptions': skill_descriptions,
+                'subtopics': topic.get_all_subtopics()
+            })
 
     return summary_dicts
 
