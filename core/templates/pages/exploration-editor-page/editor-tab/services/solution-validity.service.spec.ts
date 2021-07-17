@@ -16,21 +16,20 @@
  * @fileoverview Unit tests for Solution Validity Service.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Solution Validity Service', function() {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Solution Validity Service', () => {
   let svs: SolutionValidityService;
 
   beforeEach(() => {
-    svs = new SolutionValidityService();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    svs = TestBed.inject(SolutionValidityService);
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   it('should store validity of the solution correctly', () => {
     // Initialize SolutionValidityService.
@@ -57,5 +56,12 @@ describe('Solution Validity Service', function() {
     expect(Object.keys(svs.getAllValidities())).toEqual(['State 2']);
 
     expect(svs.isSolutionValid('State 2')).toBe(true);
+  });
+
+  it('should return false if stateName is invalid', () => {
+    svs.solutionValidities = {};
+    svs.isSolutionValid('State 1');
+
+    expect(svs.isSolutionValid('State 2')).toBe(false);
   });
 });

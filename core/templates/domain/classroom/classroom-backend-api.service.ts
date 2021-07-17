@@ -65,7 +65,8 @@ export class ClassroomBackendApiService {
       classroomDataUrl).toPromise().then(response => {
       this.classroomData = (
         ClassroomData.createFromBackendData(
-          response.name, response.topic_summary_dicts,
+          response.name,
+          response.topic_summary_dicts,
           response.course_details,
           response.topic_list_intro));
       if (successCallback) {
