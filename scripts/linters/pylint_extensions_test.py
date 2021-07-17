@@ -66,6 +66,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
         test(2) #@
         test(2, 6, test_var_two=5, test_var_four="test_checker") #@
         max(5, 1) #@
+        test_1(1, 2) #@
 
         TestClass() #@
         """)

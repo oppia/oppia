@@ -78,7 +78,7 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Callable, Dict, Iterable, Optional, Text, Type, TypeVar  # isort:skip pylint: disable=line-too-long
+from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
 
 T = TypeVar('T')  # pylint: disable=invalid-name
 
