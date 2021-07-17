@@ -223,7 +223,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=null&username=validUser');
+      '?filter_criterion=username&role=admin&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -249,7 +249,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=role&role=ADMIN&username=null');
+      '?filter_criterion=role&role=ADMIN&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -272,7 +272,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=null&username=InvalidUser');
+      '?filter_criterion=username&role=admin&username=InvalidUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush({

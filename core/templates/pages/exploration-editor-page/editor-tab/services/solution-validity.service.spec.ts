@@ -20,8 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Solution Validity Service', () => {
+describe('Solution Validity Service', () => {
   let svs: SolutionValidityService;
 
   beforeEach(() => {

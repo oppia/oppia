@@ -179,7 +179,7 @@ describe('Editor state service', () => {
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {
-    expect(ecs.getSolicitAnswerDetails()).toBeNull();
+    expect(ecs.getSolicitAnswerDetails()).toEqual(false);
     ecs.setSolicitAnswerDetails(false);
     expect(ecs.getSolicitAnswerDetails()).toEqual(false);
     ecs.setSolicitAnswerDetails(true);
@@ -187,7 +187,7 @@ describe('Editor state service', () => {
   });
 
   it('should correctly set and get cardIsCheckpoint', () => {
-    expect(ecs.getCardIsCheckpoint()).toBe(null);
+    expect(ecs.getCardIsCheckpoint()).toBe(false);
     expect(ecs.setCardIsCheckpoint(false));
     expect(ecs.getCardIsCheckpoint()).toBe(false);
     expect(ecs.setCardIsCheckpoint(true));
@@ -517,7 +517,7 @@ describe('Editor state service', () => {
   });
 
   it('should set in question mode', () => {
-    expect(ecs.isInQuestionMode()).toBe(null);
+    expect(ecs.isInQuestionMode()).toBe(false);
     ecs.setInQuestionMode(true);
     expect(ecs.isInQuestionMode()).toBe(true);
     ecs.setInQuestionMode(false);
@@ -525,7 +525,7 @@ describe('Editor state service', () => {
   });
 
   it('should set correctness feedback enabled', () => {
-    expect(ecs.getCorrectnessFeedbackEnabled()).toBe(null);
+    expect(ecs.getCorrectnessFeedbackEnabled()).toBe(false);
     ecs.setCorrectnessFeedbackEnabled(true);
     expect(ecs.getCorrectnessFeedbackEnabled()).toBe(true);
     ecs.setCorrectnessFeedbackEnabled(false);
@@ -544,17 +544,17 @@ describe('Editor state service', () => {
     // At present, we are not keeping track of the solution's validity. So, we
     // initialize the Solution Validity Service with the state. Upon,
     // initialization the solution validity is set as true.
-    expect(ecs.isCurrentSolutionValid()).toBe(undefined);
+    expect(ecs.isCurrentSolutionValid()).toBe(false);
     solutionValidityService.init(['Hola']);
     expect(ecs.isCurrentSolutionValid()).toBe(true);
   });
 
   it('should delete current solution validity', () => {
     ecs.activeStateName = 'Hola';
-    expect(ecs.isCurrentSolutionValid()).toBe(undefined);
+    expect(ecs.isCurrentSolutionValid()).toBe(false);
     solutionValidityService.init(['Hola']);
     expect(ecs.isCurrentSolutionValid()).toBe(true);
     ecs.deleteCurrentSolutionValidity();
-    expect(ecs.isCurrentSolutionValid()).toBe(undefined);
+    expect(ecs.isCurrentSolutionValid()).toBe(false);
   });
 });

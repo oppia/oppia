@@ -86,6 +86,9 @@ describe('NoninteractiveLink', () => {
   });
 
   it('should not update url when url or text is not input', () => {
+    component.urlWithValue = '';
+    component.textWithValue = '';
+
     component.ngOnInit();
 
     expect(component.url).toBeUndefined();
