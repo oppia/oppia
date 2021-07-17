@@ -37,8 +37,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 MYPY = False
 if MYPY:
     from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
-else:
-    transaction_services = models.Registry.import_transaction_services()
+
+transaction_services = models.Registry.import_transaction_services()
 
 
 Model = ndb.Model # type: Any

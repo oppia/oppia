@@ -32,9 +32,9 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 MYPY = False
 if MYPY:
     from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
-else:
-    transaction_services = models.Registry.import_transaction_services()
-    datastore_services = models.Registry.import_datastore_services()
+
+transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
@@ -805,9 +805,7 @@ class VersionedModel(BaseModel):
         Returns:
             VersionedModel. Reconstituted instance.
         """
-        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
-        if snapshot_model is None:
-            raise Exception('Invalid snapshot_id.')
+        snapshot_model = self.SNAPSHOT_CONTENT_CLASS[snapshot_id]
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be
