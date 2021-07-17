@@ -522,12 +522,12 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
 
-            # mypy_check_status = execute_mypy_checks()
-            # if mypy_check_status != 0:
-            #    python_utils.PRINT(
-            #        'Push failed, please correct the mypy type annotation '
-            #        'issues above.')
-            #    sys.exit(mypy_check_status)
+            mypy_check_status = execute_mypy_checks()
+            if mypy_check_status != 0:
+                python_utils.PRINT(
+                   'Push failed, please correct the mypy type annotation '
+                   'issues above.')
+                sys.exit(mypy_check_status)
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
