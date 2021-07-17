@@ -114,6 +114,7 @@ RERUN_POLICY_ALWAYS = 'always'
 RERUN_POLICIES = {
     'accessibility': RERUN_POLICY_NEVER,
     'additionaleditorfeatures': RERUN_POLICY_ALWAYS,
+    'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
     'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
     'adminpage': RERUN_POLICY_NEVER,
     'classroompage': RERUN_POLICY_NEVER,
