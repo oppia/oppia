@@ -329,7 +329,7 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     """
     # We accept unicode but imghdr.what(file, h) accept 'h' of type bytes.
     # So we have casted content to be bytes.
-    content = cast(bytes, python_utils.convert_to_bytes(content)) # type: ignore[no-untyped-call]
+    content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
@@ -971,7 +971,7 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return cast(str, python_utils.urllib_unquote(escaped_string)) # type: ignore[no-untyped-call]
+    return python_utils.urllib_unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str):
