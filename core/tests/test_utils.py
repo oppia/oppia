@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import contextlib
 import copy
+import datetime
 import functools
 import inspect
 import itertools
@@ -1880,26 +1881,44 @@ title: Title
         os.environ['USER_IS_ADMIN'] = '0'
 
     @contextlib.contextmanager
-    def mock_datetime_utcnow(self, mocked_datetime):
-        """Mocks response from datetime.datetime.utcnow method.
+    def mock_datetime_utcnow(self, mocked_now):
+        """Mocks parts of the datastore to accept a fake datetime type that always
+        returns the same value for utcnow.
 
-        Example usage:
+        Example:
             import datetime
-            mocked_datetime_utcnow = (
-                datetime.datetime.utcnow() - datetime.timedelta(days=1))
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow() # prints current time.
+            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            with mock_datetime_for_datastore(mocked_now):
+                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+            not_now = datetime.datetime.utcnow() # Returns actual time.
 
         Args:
-            mocked_datetime: datetime.datetime. The datetime which will be used
+            mocked_now: datetime.datetime. The datetime which will be used
                 instead of the current UTC datetime.
 
         Yields:
             None. Empty yield statement.
         """
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+        if not isinstance(mocked_now, datetime.datetime):
+            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+        old_datetime = datetime.datetime
+
+        class MockDatetime(
+            python_utils.with_metaclass( # pylint: disable=inherit-non-class, invalid-metaclass
+                type(datetime.datetime), old_datetime)):
+            """Always returns mocked_now as the current time."""
+
+            @classmethod
+            def utcnow(cls):
+                """Returns the mocked datetime."""
+                return mocked_now
+
+        setattr(datetime, 'datetime', MockDatetime)
+        try:
             yield
+        finally:
+            setattr(datetime, 'datetime', old_datetime)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
