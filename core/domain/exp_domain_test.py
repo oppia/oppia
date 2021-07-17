@@ -2134,6 +2134,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
     def test_validate_exploration_proto_size_in_bytes(self):
+        """Test validating proto_size_in_bytes of explorations."""
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
