@@ -19,8 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import importlib
+import contextlib
 import inspect
 import json
 import logging
@@ -48,10 +47,12 @@ import main
 import python_utils
 import utils
 
+from google.cloud import ndb
 import webapp2
 import webtest
 
 auth_services = models.Registry.import_auth_services()
+datastore_services = models.Registry.import_datastore_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
@@ -1041,6 +1042,30 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         for (name, method, handler_is_decorated) in handlers_checked:
             with self.subTest('%s.%s' % (name, method)):
                 self.assertTrue(handler_is_decorated)
+
+
+class MainTests(test_utils.GenericTestBase):
+    """Tests some things in main.py."""
+
+    def test_ndb_wsgi_middleware(self):
+
+        def wsgi_app_mock(environ, start_response):
+            self.assertEqual(environ, 'env')
+            self.assertEqual(start_response, 'response')
+
+        def get_ndb_context_mock(global_cache):
+            self.assertEqual(type(global_cache), ndb.global_cache.RedisCache)
+            return contextlib.nullcontext()
+
+        get_ndb_context_swap = self.swap_with_checks(
+            datastore_services,
+            'get_ndb_context',
+            get_ndb_context_mock
+        )
+
+        middleware = main.NdbWsgiMiddleware(wsgi_app_mock)
+        with get_ndb_context_swap:
+            middleware('env', 'response')
 
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
