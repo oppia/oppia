@@ -294,7 +294,7 @@ def get_random_choice(alist):
 
 
 def convert_png_data_url_to_binary(image_data_url):
-    # type: (Text) -> Text
+    # type: (Text) -> bytes
     """Converts a PNG base64 data URL to a PNG binary data.
 
     Args:
@@ -309,7 +309,7 @@ def convert_png_data_url_to_binary(image_data_url):
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote( # type: ignore[no-untyped-call]
+            python_utils.urllib_unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
@@ -333,7 +333,7 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -417,12 +417,12 @@ class JSONEncoderForHTML(json.JSONEncoder):
 
     # Ignoring error code [override] because JSONEncoder has return type str
     # but we are returning Union[str, unicode].
-    def encode(self, o): # type: ignore[override]
+    def encode(self, o):
         # type: (Text) -> Text
         chunks = self.iterencode(o, True)
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
-    def iterencode(self, o, _one_shot=False): # type: ignore[override]
+    def iterencode(self, o, _one_shot=False):
         # type: (Text, bool) -> Iterator[Text]
         chunks = super(
             JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
@@ -457,7 +457,7 @@ def convert_to_hash(input_string, max_length):
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(
-            python_utils.convert_to_bytes(input_string)).digest(), # type: ignore[no-untyped-call]
+            python_utils.convert_to_bytes(input_string)).digest(),
         altchars=b'ab'
     ).replace(b'=', b'c')
 
@@ -1035,7 +1035,7 @@ def get_hashable_value(value):
 
 
 def compress_to_zlib(data):
-    # type: (Text) -> Text
+    # type: (Text) -> bytes
     """Compress the data to zlib format for efficient storage and communication.
 
     Args:
@@ -1047,11 +1047,11 @@ def compress_to_zlib(data):
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty. For details, refer to:
     # https://github.com/oppia/oppia/wiki/Backend-Type-Annotations#1-use-typingtext-instead-of-str-and-unicode
-    return zlib.compress(data) # type: ignore[arg-type]
+    return zlib.compress(data)  # type: ignore[arg-type]
 
 
 def decompress_from_zlib(data):
-    # type: (Text) -> Text
+    # type: (Text) -> bytes
     """Decompress the zlib compressed data.
 
     Args:

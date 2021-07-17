@@ -35,7 +35,7 @@ from typing import Any # pylint: disable=unused-import
 (blog_models, user_models) = models.Registry.import_models(  # type: ignore[no-untyped-call]
     [models.NAMES.blog, models.NAMES.user])
 
-datastore_services = models.Registry.import_datastore_services()
+datastore_services = models.Registry.import_datastore_services()  # type: ignore[no-untyped-call]
 
 
 @validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
@@ -54,7 +54,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
         Returns:
             BlogPost. A domain object to validate.
         """
-        return blog_domain.BlogPost( # type: ignore[no-untyped-call]
+        return blog_domain.BlogPost(  # type: ignore[no-untyped-call]
             blog_post_model.id,
             blog_post_model.author_id,
             blog_post_model.title,

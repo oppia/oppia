@@ -308,7 +308,7 @@ def parse_query_string(query_string):
     return urlparse.parse_qs(query_string)  # pylint: disable=disallowed-function-calls
 
 
-def urllib_unquote(content):
+def urllib_unquote(content) -> str:
     """Replace %xx escapes by their single-character equivalent using
     urllib.unquote if run under Python 2 and urllib.parse.unquote if run under
     Python 3.
@@ -489,7 +489,7 @@ def with_metaclass(meta, *bases):
     return future.utils.with_metaclass(meta, *bases)
 
 
-def convert_to_bytes(string_to_convert):
+def convert_to_bytes(string_to_convert) -> bytes:
     """Converts the string to bytes.
 
     Args:

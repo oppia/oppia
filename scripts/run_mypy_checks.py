@@ -881,8 +881,8 @@ def main(args=None):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = process.communicate()
-    python_utils.PRINT(stdout)
-    python_utils.PRINT(stderr)
+    python_utils.PRINT(stdout.decode('utf-8'))
+    python_utils.PRINT(stderr.decode('utf-8'))
     if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:

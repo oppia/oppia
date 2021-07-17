@@ -78,11 +78,13 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
+from typing import Any, Callable, Dict, Optional, Text, Type, TypeVar  # isort:skip pylint: disable=line-too-long
 
-datastore_services = models.Registry.import_datastore_services()
-cache_services = models.Registry.import_cache_services()
-transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
+T = TypeVar('T')  # pylint: disable=invalid-name
+
+datastore_services = models.Registry.import_datastore_services()  # type: ignore[no-untyped-call]
+cache_services = models.Registry.import_cache_services()  # type: ignore[no-untyped-call]
+transaction_services = models.Registry.import_transaction_services()  # type: ignore[no-untyped-call]
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -96,8 +98,7 @@ class FrontendErrorHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.open_access # type: ignore[misc]
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
         self.render_json(self.values) # type: ignore[no-untyped-call]
@@ -107,8 +108,7 @@ class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
@@ -119,8 +119,7 @@ class HomePageRedirectPage(base.BaseHandler):
     """
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
                 self.user_id):
             user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
@@ -137,13 +136,15 @@ class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         self.redirect('/')
 
 
-def get_redirect_route(regex_route, handler, defaults=None):
-    # type: (Text, Type[base.BaseHandler], Optional[Dict[Any, Any]]) -> routes.RedirectRoute
+def get_redirect_route(
+        regex_route: Text,
+        handler: Type[base.BaseHandler],
+        defaults: Optional[Dict[Any, Any]] = None
+) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs
@@ -910,10 +911,16 @@ URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 class NdbWsgiMiddleware:
     """Wraps the WSGI application into the NDB client context."""
 
-    def __init__(self, wsgi_app):
+    def __init__(
+            self, wsgi_app: Callable[[Dict[str, str], webapp2.Response], T]
+    ) -> None:
         self.wsgi_app = wsgi_app
 
-    def __call__(self, environ, start_response):
+    def __call__(
+            self,
+            environ: Dict[str, str],
+            start_response: webapp2.Response
+    ) -> T:
         global_cache = datastore_services.RedisCache(
             cache_services.CLOUD_NDB_REDIS_CLIENT)
         with datastore_services.get_ndb_context(global_cache=global_cache):
@@ -922,4 +929,4 @@ class NdbWsgiMiddleware:
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()
+firebase_auth_services.establish_firebase_connection()  # type: ignore[no-untyped-call]
