@@ -19,13 +19,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { icon, LatLng, latLng, LeafletEvent, LeafletMouseEvent, Marker, marker, TileLayer, tileLayer } from 'leaflet';
-
-interface Options {
-  layers: TileLayer[];
-  zoom: number;
-  center: LatLng;
-}
+import { icon, latLng, LeafletEvent, LeafletMouseEvent, MapOptions, Marker, marker, tileLayer } from 'leaflet';
 
 @Component({
   selector: 'coord-two-dim-editor',
@@ -47,7 +41,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
-  options!: Options;
+  options!: MapOptions;
 
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 
