@@ -1326,25 +1326,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'hint_1'
-            ].translatable_content_text,
+            ].content,
             '<p>hint one</p>'
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'solution'
-            ].translatable_content_text,
+            ].content,
             '<p>hello_world is a string</p>'
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'feedback_1'
-            ].translatable_content_text,
+            ].content,
             '<p>Feedback</p>',
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'default_outcome'
-            ].translatable_content_text,
+            ].content,
             '<p>The default outcome.</p>'
         )
 
@@ -1438,37 +1438,37 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'hint_1'
-            ].translatable_content_text,
+            ].content,
             '<p>hint one</p>'
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'solution'
-            ].translatable_content_text,
+            ].content,
             '<p>hello_world is a string</p>'
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'feedback_1'
-            ].translatable_content_text,
+            ].content,
             '<p>Feedback</p>'
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'default_outcome'
-            ].translatable_content_text,
+            ].content,
             '<p>The default outcome.</p>'
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'content'
-            ].translatable_content_text,
+            ].content,
             '<p>This is content</p>',
         )
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'ca_placeholder_0'
-            ].translatable_content_text,
+            ].content,
             'Placeholder'
         )
 
@@ -1533,19 +1533,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'content'
-            ].translatable_content_text, '<p>This is content</p>')
+            ].content, '<p>This is content</p>')
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'default_outcome'
-            ].translatable_content_text, '<p>The default outcome.</p>')
+            ].content, '<p>The default outcome.</p>')
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'ca_choices_0'
-            ].translatable_content_text, '\u003cp\u003eoption 1\u003c/p\u003e')
+            ].content, '\u003cp\u003eoption 1\u003c/p\u003e')
         self.assertEqual(
             content_id_mapping_needing_translations[
                 'ca_choices_1'
-            ].translatable_content_text, '1,000')
+            ].content, '1,000')
         self.assertFalse(
             'ca_choices_2' in content_id_mapping_needing_translations)
 

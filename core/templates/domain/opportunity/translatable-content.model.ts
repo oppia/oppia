@@ -13,23 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Frontend Model for translatable content
+ * @fileoverview Frontend Model for translatable item.
  */
 
-export interface TranslatableContentBackendDict {
-  'translatable_content_text': string,
+export interface TranslatableItemBackendDict {
+  'content': string,
   'data_format': string
 }
 
-export class TranslatableContent {
+export class TranslatableItem {
   constructor(
-      public translatableContentText: string,
+      public content: string,
       public dataFormat: string
   ) {}
 
   static createFromBackendDict(
-      backendDict: TranslatableContentBackendDict): TranslatableContent {
-    return new TranslatableContent(
-      backendDict.translatable_content_text, backendDict.data_format);
+      backendDict: TranslatableItemBackendDict): TranslatableItem {
+    return new TranslatableItem(backendDict.content, backendDict.data_format);
   }
 }

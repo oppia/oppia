@@ -21,14 +21,14 @@ import {
   TranslatableTextsBackendDict
 } from
   'domain/opportunity/translatable-texts.model';
-import { TranslatableContent } from './translatable-content.model';
+import { TranslatableItem } from './translatable-content.model';
 
 describe('Translatable Texts model', () => {
   let sampleTranslatableTexts: TranslatableTexts;
-  const getTranslatableContent = (text: string) => {
+  const getTranslatableItem = (text: string) => {
     return {
       data_format: 'html',
-      translatable_content_text: text,
+      content: text,
     };
   };
 
@@ -36,11 +36,11 @@ describe('Translatable Texts model', () => {
     const sampleBackendDict: TranslatableTextsBackendDict = {
       state_names_to_content_id_mapping: {
         state1: {
-          1: getTranslatableContent('text1'),
-          2: getTranslatableContent('text2')
+          1: getTranslatableItem('text1'),
+          2: getTranslatableItem('text2')
         },
         state2: {
-          1: getTranslatableContent('text3')
+          1: getTranslatableItem('text3')
         }
       },
       version: '1'
@@ -52,11 +52,11 @@ describe('Translatable Texts model', () => {
   it('should get state name to content id mapping', () => {
     const expectedStatewiseContents = {
       state1: {
-        1: new TranslatableContent('text1', 'html'),
-        2: new TranslatableContent('text2', 'html')
+        1: new TranslatableItem('text1', 'html'),
+        2: new TranslatableItem('text2', 'html')
       },
       state2: {
-        1: new TranslatableContent('text3', 'html')
+        1: new TranslatableItem('text3', 'html')
       }
     };
     expect(sampleTranslatableTexts.stateWiseContents)

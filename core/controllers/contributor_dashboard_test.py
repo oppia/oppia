@@ -475,14 +475,14 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'state_names_to_content_id_mapping': {
                 'Introduction': {
                     'content': {
-                        'translatable_content_text': (
+                        'content': (
                             '<p>A content to translate.</p>'),
                         'data_format': 'html'
                     }
                 },
                 'End State': {
                     'content': {
-                        'translatable_content_text': '',
+                        'content': '',
                         'data_format': 'html'
                     }
                 }
@@ -516,7 +516,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'state_names_to_content_id_mapping': {
                 'End State': {
                     'content': {
-                        'translatable_content_text': '',
+                        'content': '',
                         'data_format': 'html'
                     }
                 }

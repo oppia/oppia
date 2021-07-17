@@ -26,10 +26,10 @@ describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
   let httpTestingController;
-  const getTranslatableContent = (text) => {
+  const getTranslatableItem = (text) => {
     return {
       data_format: 'html',
-      translatable_content_text: text,
+      content: text,
     };
   };
 
@@ -53,10 +53,10 @@ describe('TranslateTextService', () => {
       let textAndAvailability;
       const sampleStateWiseContentMapping = {
         stateName1: {
-          contentId1: getTranslatableContent('text1'),
-          contentId2: getTranslatableContent('text2')
+          contentId1: getTranslatableItem('text1'),
+          contentId2: getTranslatableItem('text2')
         },
-        stateName2: {contentId3: getTranslatableContent('text3')}
+        stateName2: {contentId3: getTranslatableItem('text3')}
       };
       translateTextService.init('1', 'en', () => {});
       const req = httpTestingController.expectOne(
@@ -131,8 +131,8 @@ describe('TranslateTextService', () => {
           dataFormat: 'html'
         };
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: getTranslatableContent('text1')},
-          stateName2: {contentId2: getTranslatableContent('')}
+          stateName1: {contentId1: getTranslatableItem('text1')},
+          stateName2: {contentId2: getTranslatableItem('')}
         };
         translateTextService.init('1', 'en', () => {});
         const req = httpTestingController.expectOne(
@@ -159,8 +159,8 @@ describe('TranslateTextService', () => {
           dataFormat: undefined
         };
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: getTranslatableContent('')},
-          stateName2: {contentId2: getTranslatableContent('')}
+          stateName1: {contentId1: getTranslatableItem('')},
+          stateName2: {contentId2: getTranslatableItem('')}
         };
         translateTextService.init('1', 'en', () => {});
         const req = httpTestingController.expectOne(

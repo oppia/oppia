@@ -275,28 +275,28 @@ class TranslatableTextHandler(base.BaseHandler):
         minus any contents found in suggestions.
 
         Args:
-            state_names_to_content_id_mapping: dict(str, dict(str, TranslatableContent)). A dict # pylint: disable=line-too-long
+            state_names_to_content_id_mapping: dict(str, dict(str, TranslatableItem)). A dict # pylint: disable=line-too-long
                 where state_name is the key and a dict with content_id as
-                the key and TranslatableContent as value.
+                the key and TranslatableItem as value.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            dict(str, dict(str, TranslatableContent)). A dict where state_name
+            dict(str, dict(str, TranslatableItem)). A dict where state_name
             is the key and a dict with content_id as the key and
-            TranslatableContent as value.
+            TranslatableItem as value.
         """
         final_mapping = {}
         for state_name in state_names_to_content_id_mapping:
-            content_id_to_translatable_content = dict(
+            content_id_to_translatable_item = dict(
                 state_names_to_content_id_mapping[state_name])
-            for content_id in content_id_to_translatable_content.keys():
+            for content_id in content_id_to_translatable_item.keys():
                 if self._content_in_review(state_name, content_id, suggestions):
-                    del content_id_to_translatable_content[content_id]
-            if content_id_to_translatable_content:
+                    del content_id_to_translatable_item[content_id]
+            if content_id_to_translatable_item:
                 final_mapping[state_name] = {
-                    cid: translatable_content.to_dict()
-                    for cid, translatable_content in (
-                        content_id_to_translatable_content.items())
+                    cid: translatable_item.to_dict()
+                    for cid, translatable_item in (
+                        content_id_to_translatable_item.items())
                 }
         return final_mapping
 
@@ -407,16 +407,16 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             target_language_code)
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
-        content_id_to_translatable_content_mapping = (
+        content_id_to_translatable_item_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts = {}
         for content_id in content_ids:
-            if content_id not in content_id_to_translatable_content_mapping:
+            if content_id not in content_id_to_translatable_item_mapping:
                 translated_texts[content_id] = None
                 continue
 
-            source_text = content_id_to_translatable_content_mapping[
-                content_id].translatable_content_text
+            source_text = content_id_to_translatable_item_mapping[
+                content_id].content
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
                     exp.language_code, target_language_code, source_text)

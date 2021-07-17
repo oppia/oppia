@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TranslatableContent, TranslatableContentBackendDict } from './translatable-content.model';
-
 /**
  * @fileoverview Frontend Model for translatable texts
  */
 
+import { TranslatableItem, TranslatableItemBackendDict } from './translatable-content.model';
+
 export interface ContentIdToContentBackendDictMapping {
-  [contentId: string]: TranslatableContentBackendDict
+  [contentId: string]: TranslatableItemBackendDict
 }
 
 export interface StateNamesToContentIdBackendDictMapping {
   [state: string]: ContentIdToContentBackendDictMapping
 }
 export interface ContentIdToContentMapping {
-  [contentId: string]: TranslatableContent
+  [contentId: string]: TranslatableItem
 }
 
 export interface StateNamesToContentIdMapping {
@@ -53,7 +53,7 @@ export class TranslatableTexts {
       const contentIdMapping: ContentIdToContentMapping = {};
       for (const contentId in contentIdToWrittenTranslationMapping) {
         contentIdMapping[contentId] = (
-          TranslatableContent.createFromBackendDict(
+          TranslatableItem.createFromBackendDict(
             contentIdToWrittenTranslationMapping[contentId]));
       }
       stateNamesToContentIdMapping[stateName] = contentIdMapping;

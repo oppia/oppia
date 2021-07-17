@@ -172,16 +172,16 @@ export class TranslateTextService {
         const contentIds = [];
         const contentIdToContentMapping = this.stateWiseContents[stateName];
         for (const contentId in contentIdToContentMapping) {
-          let translatableContent = contentIdToContentMapping[contentId];
-          if (translatableContent.translatableContentText !== '') {
+          let translatableItem = contentIdToContentMapping[contentId];
+          if (translatableItem.content !== '') {
             contentIds.push(contentId);
 
             this.stateAndContent.push(
               new StateAndContent(
                 stateName, contentId,
-                translatableContent.translatableContentText,
+                translatableItem.content,
                 this.PENDING as Status, '',
-                translatableContent.dataFormat
+                translatableItem.dataFormat
               )
             );
             stateHasText = true;
@@ -244,7 +244,7 @@ export class TranslateTextService {
       this.activeStateName,
       languageCode,
       this.stateWiseContents[
-        this.activeStateName][this.activeContentId].translatableContentText,
+        this.activeStateName][this.activeContentId].content,
       translation,
       imagesData,
       dataFormat
