@@ -28,7 +28,11 @@ from jobs.transforms import blog_validation
 
 import apache_beam as beam
 
-(blog_models, user_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
+(blog_models, user_models) = models.Registry.import_models(
     [models.NAMES.blog, models.NAMES.user])
 
 

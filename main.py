@@ -80,7 +80,11 @@ from webapp2_extras import routes
 
 from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
-transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
+transaction_services = models.Registry.import_transaction_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
