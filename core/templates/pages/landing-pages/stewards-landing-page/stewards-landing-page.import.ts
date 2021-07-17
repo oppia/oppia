@@ -40,4 +40,3 @@ platformBrowserDynamic().bootstrapModule(StewardsLandingPageModule).catch(
 // TODO(#13080): Remove window.name statement from import.ts files
 // after migration is complete.
 window.name = '';
-
