@@ -22,7 +22,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import topic_validation
 from jobs.types import topic_validation_errors
 
@@ -80,3 +82,12 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
                 topic_validation.ValidateCanonicalNameMatchesNameInLowercase())
         )
         self.assert_pcoll_equal(output, [])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_topic_summary_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'TopicSummaryModel', 'id'),
+            ['TopicModel', 'TopicRightsModel'])
