@@ -139,6 +139,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(AppFeedbackReportModel, self).__init__(*args, **kwargs)
+
     @classmethod
     def create(
             cls, platform, submitted_on, report_type, category,
@@ -381,6 +385,10 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # A list of report IDs associated with this ticket.
     report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(AppFeedbackReportTicketModel, self).__init__(*args, **kwargs)
+
     @classmethod
     def create(
             cls, ticket_name, github_issue_repo_name, github_issue_number,
@@ -524,6 +532,10 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     # The schema version for parameter statistics in this entity.
     daily_param_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
+
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(AppFeedbackReportStatsModel, self).__init__(*args, **kwargs)
 
     @classmethod
     def create(

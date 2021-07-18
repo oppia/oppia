@@ -54,6 +54,10 @@ class RoleQueryAuditModel(base_models.BaseModel):
     # The username in the query.
     username = datastore_services.StringProperty(default=None, indexed=True)
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(RoleQueryAuditModel, self).__init__(*args, **kwargs)
+
     @staticmethod
     def get_deletion_policy():
         # type: () -> Any
@@ -117,6 +121,10 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     # The new username that the old one is being changed to.
     new_username = (
         datastore_services.StringProperty(required=True, indexed=True))
+
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(UsernameChangeAuditModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
