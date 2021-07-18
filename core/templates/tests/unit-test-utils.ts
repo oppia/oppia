@@ -16,6 +16,9 @@
  * @fileoverview Utility functions for unit testing in Angular.
  */
 
+import { Input } from '@angular/core';
+import { ElementRef } from '@angular/core';
+import { Directive } from '@angular/core';
 import { Pipe } from '@angular/core';
 
 @Pipe({name: 'translate'})
@@ -23,4 +26,17 @@ export class MockTranslatePipe {
   transform(value: string): string {
     return value;
   }
+}
+
+@Directive({
+  selector: '[translate],[ngx-translate]'
+})
+export class MockTranslateDirective {
+  key: string;
+
+  @Input() set translate(key: string) {}
+
+  @Input() set translateParams(params: Object) {}
+
+  constructor(private element: ElementRef) {}
 }

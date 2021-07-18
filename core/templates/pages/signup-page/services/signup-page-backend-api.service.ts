@@ -46,6 +46,8 @@ export interface UpdateUsernameRequestParams {
 })
 export class SignupPageBackendApiService {
   SIGNUP_DATA_URL = '/signuphandler/data';
+  USERNAME_HANDLER = '/usernamehandler/data';
+
   constructor(
     private http: HttpClient) {}
 
@@ -57,7 +59,7 @@ export class SignupPageBackendApiService {
   async checkUsernameAvailableAsync(username: string):
    Promise<UsernameAvailabilityResponse> {
     return this.http.post<UsernameAvailabilityResponse>(
-      'usernamehandler/data', {
+      this.USERNAME_HANDLER, {
         username: username
       }).toPromise();
   }
