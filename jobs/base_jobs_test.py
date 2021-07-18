@@ -71,7 +71,8 @@ class JobMetaclassTests(test_utils.TestBase):
             def __init__(self):
                 pass
 
-        del FooJob # NOTE: Deletes the variable, not the class.
+        # NOTE: Deletes the variable, not the class.     
+        del FooJob
 
         with self.assertRaisesRegexp(TypeError, 'name is already used'):
             class FooJob(python_utils.with_metaclass(MockJobMetaclass)): # pylint: disable=function-redefined

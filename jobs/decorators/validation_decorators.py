@@ -114,7 +114,8 @@ class AuditsExisting(python_utils.OBJECT):
         for kind in self._targeted_kinds:
             registered_do_fn_types = self._DO_FN_TYPES_BY_KIND[kind]
             if any(issubclass(r, do_fn_type) for r in registered_do_fn_types):
-                continue # Always keep the most-derived DoFn type.
+                # Always keep the most-derived DoFn type.
+                continue
             registered_do_fn_types -= base_types_of_do_fn_type
             registered_do_fn_types.add(do_fn_type)
 

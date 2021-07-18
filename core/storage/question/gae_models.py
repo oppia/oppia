@@ -590,7 +590,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         question_skill_link_models = cls.query().filter(
             cls.skill_id == skill_id,
-            cls.deleted == False) #pylint: disable=singleton-comparison
+            cls.deleted == False) # pylint: disable=singleton-comparison
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
@@ -626,7 +626,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         return QuestionSkillLinkModel.query().filter(
             cls.question_id == question_id,
-            cls.deleted == False).fetch() #pylint: disable=singleton-comparison
+            cls.deleted == False).fetch() # pylint: disable=singleton-comparison
 
     @classmethod
     def put_multi_question_skill_links(cls, question_skill_links):

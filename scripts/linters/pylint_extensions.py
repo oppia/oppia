@@ -44,7 +44,7 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 # comment or docstring.
 EXCLUDED_PHRASES = [
     'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node',
-    'type:', 'pragma:'
+    'type:', 'pragma:', 'isort:'
 ]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1767,11 +1767,15 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         # Extract comment from line.
         split_line = line.split('#')
         trail_comment = split_line[1]
+        excluded_phrase_at_beginning_of_line = any(
+            trail_comment[1:].startswith(word) 
+            for word in EXCLUDED_PHRASES) or any(
+                trail_comment.startswith(word) for word in EXCLUDED_PHRASES)
         # Check for pylint pragma.
-        if (re.search('pylint:', trail_comment) or
-                re.search('isort:', trail_comment)):
-            if trail_comment.startswith('pylint:'):
+        if excluded_phrase_at_beginning_of_line:
+            if not trail_comment[0].isspace():
                 self.add_message('no-space-before-pylint-pragma', line=line_num)
+            return
         else:
             self.add_message('invalid-trailing-comment', line=line_num)
 

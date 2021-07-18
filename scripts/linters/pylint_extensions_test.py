@@ -2563,7 +2563,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""# coding: utf-8
 
-                    import sys   # pylint: this is fine
+                    import sys   # pragma: this is fine
                 """)
         node_valid_pylint_pragma.file = filename
         node_valid_pylint_pragma.path = filename
