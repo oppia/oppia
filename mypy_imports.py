@@ -22,11 +22,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform.datastore import gae_datastore_services as datastore_services
 from core.platform.transactions import gae_transaction_services as transaction_services # pylint: disable=line-too-long
 
+from core.storage.activity import gae_models as activity_models
 from core.storage.base_model import gae_models as base_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.user import gae_models as user_models
 
 __all__ = [
+    b'activity_models',
     b'base_models',
     b'blog_models',
     b'datastore_services',
