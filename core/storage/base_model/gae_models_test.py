@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Any, Dict, Set, Text, Union
+from typing import Any, Dict, Set, Text, Union # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
