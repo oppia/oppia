@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:
-    from mypy_imports import *
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 
 (base_models, activity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.activity])

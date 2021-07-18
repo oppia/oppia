@@ -393,7 +393,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     def create(
             cls, ticket_name, github_issue_repo_name, github_issue_number,
             newest_report_timestamp, report_ids):
-        # type: (Text, Text, Optional[int], datetime.datetime, List[Text]) -> Text
+        # type: (Text, Optional[Text], Optional[int], datetime.datetime, List[Text]) -> Text
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
@@ -599,7 +599,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_stats_for_ticket(cls, ticket_id):
-        # type: (Text) -> List[Text]
+        # type: (Text) -> List[AppFeedbackReportStatsModel]
         """Fetches the stats for a single ticket.
 
         Args:
