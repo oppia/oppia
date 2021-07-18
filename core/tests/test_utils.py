@@ -1904,8 +1904,15 @@ title: Title
 
         old_datetime = datetime.datetime
 
-        class MockDatetime(old_datetime):
-            """Always returns mocked_now as the current time."""
+        class MockDatetimeType(type(old_datetime)):
+            """Overrides isinstance() behavior."""
+
+            @classmethod
+            def __instancecheck__(cls, instance):
+                return isinstance(instance, old_datetime)
+
+        class MockDatetime(old_datetime, metaclass=MockDatetimeType):
+            """Always returns mocked_now as the current UTC time."""
 
             @classmethod
             def utcnow(cls):
