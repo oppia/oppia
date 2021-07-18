@@ -157,7 +157,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'request-interceptor.service.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
-    'rule-editor.component.ts',
     'rule-type-selector.directive.ts',
     'schema-based-bool-editor.directive.ts',
     'schema-based-choices-editor.directive.ts',

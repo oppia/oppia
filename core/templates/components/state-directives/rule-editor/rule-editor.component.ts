@@ -81,9 +81,6 @@ angular.module('oppia').component('ruleEditor', {
 
         var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
         var finalInputArray = ruleDescription.split(PATTERN);
-        if (finalInputArray.length % 3 !== 1) {
-          $log.error('Could not process rule description.');
-        }
 
         var result = [];
         for (var i = 0; i < finalInputArray.length; i += 3) {
@@ -237,7 +234,7 @@ angular.module('oppia').component('ruleEditor', {
           // take their default values from the DEFAULT_OBJECT_VALUES dict.
           if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
             ctrl.rule.inputs[varName] = [];
-          } else if (answerChoices) {
+          } else if (answerChoices && answerChoices.length > 0) {
             ctrl.rule.inputs[varName] = angular.copy(
               answerChoices[0].val);
           } else {
