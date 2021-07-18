@@ -5615,7 +5615,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             email_manager.send_test_email_for_bulk_emails(
                 self.sender_id, email_subject, email_body
             )
-        messages = self._get_sent_email_messages(feconf.SYSTEM_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(self.SENDER_EMAIL)
         self.assertEqual(len(messages), 1)
 
 

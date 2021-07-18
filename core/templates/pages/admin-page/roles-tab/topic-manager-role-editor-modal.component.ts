@@ -48,6 +48,7 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   addTopic(): void {
     this.managerInTopicsWithId.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
+    this.newTopicId = null;
     this.adminBackendApiService.addUserRoleAsync(
       'TOPIC_MANAGER', this.username, this.topicIdInUpdate).then(()=> {
       this.topicIdInUpdate = null;
