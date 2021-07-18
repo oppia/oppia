@@ -23,7 +23,9 @@ import datetime
 
 from core.domain import topic_domain
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import topic_validation
 from jobs.types import base_validation_errors
 from jobs.types import topic_validation_errors
@@ -533,3 +535,12 @@ class ValidateTopicCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_topic_summary_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'TopicSummaryModel', 'id'),
+            ['TopicModel', 'TopicRightsModel'])

@@ -115,3 +115,11 @@ class ValidateTopicCommitLogEntryModel(
             return topic_domain.TopicChange
         else:
             return None
+
+
+@validation_decorators.RelationshipsOf(topic_models.TopicSummaryModel)
+def topic_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [topic_models.TopicModel]
+    yield model.id, [topic_models.TopicRightsModel]
