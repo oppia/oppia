@@ -355,6 +355,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         'is_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
+    SUGGESTION_LANGUAGE_CODE = 'en'
+    SUBMITTED_TRANSLATIONS_COUNT = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT = 100
+    ACCEPTED_TRANSLATIONS_COUNT = 1
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT = 50
+    REJECTED_TRANSLATIONS_COUNT = 0
+    REJECTED_TRANSLATION_WORD_COUNT = 0
+    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
+    CONTRIBUTION_DATES = [
+        datetime.date.fromtimestamp(1616173836),
+        datetime.date.fromtimestamp(1616173837)
+    ]
 
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
@@ -365,18 +378,20 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         5) Creates an ExplorationUserDataModel.
         6) Simulates completion of some activities.
         7) Simulates incomplete status of some activities.
-        8) Populates ExpUserLastPlaythroughModel of user.
-        9) Creates user LearnerPlaylsts.
-        10) Simulates collection progress of user.
-        11) Simulates story progress of user.
-        12) Creates new collection rights.
-        13) Simulates a general suggestion.
-        14) Creates new exploration rights.
-        15) Populates user settings.
-        16) Creates two reply-to ids for feedback.
-        17) Creates a task closed by the user.
-        18) Simulates user_1 scrubbing a report.
-        19) Creates new BlogPostModel and BlogPostRightsModel.
+        8) Creates user LearnerGoals.
+        9) Populates ExpUserLastPlaythroughModel of user.
+        10) Creates user LearnerPlaylsts.
+        11) Simulates collection progress of user.
+        12) Simulates story progress of user.
+        13) Creates new collection rights.
+        14) Simulates a general suggestion.
+        15) Creates new exploration rights.
+        16) Populates user settings.
+        17) Creates two reply-to ids for feedback.
+        18) Creates a task closed by the user.
+        19) Simulates user_1 scrubbing a report.
+        20) Creates new BlogPostModel and BlogPostRightsModel.
+        21) Creates a TranslationContributionStatsModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -620,7 +635,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.USER_ID_1,
             final_reviewer_id='reviewer_id',
-            language_code='en',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
             filename='application_audio.mp3',
             content='<p>Some content</p>',
             rejection_message=None).put()
@@ -632,10 +647,28 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.USER_ID_1,
             final_reviewer_id=None,
-            language_code='en',
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
             filename='application_audio.mp3',
             content='<p>Some content</p>',
             rejection_message=None).put()
+
+        suggestion_models.TranslationContributionStatsModel.create(
+            language_code=self.SUGGESTION_LANGUAGE_CODE,
+            contributor_user_id=self.USER_ID_1,
+            topic_id=self.TOPIC_ID_1,
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
 
         user_models.UserContributionRightsModel(
             id=self.USER_ID_1,
@@ -915,6 +948,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_subtopic_page_sm = {}
         expected_topic_rights_sm = {}
         expected_topic_sm = {}
+        expected_translation_contribution_stats = {}
         expected_story_sm = {}
         expected_question_sm = {}
         expected_config_property_sm = {}
@@ -968,6 +1002,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,
+            'translation_contribution_stats':
+                expected_translation_contribution_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':
@@ -1539,6 +1575,31 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.BLOG_POST_ID_2
             ],
         }
+        expected_translation_contribution_stats_data = {
+            '%s.%s.%s' % (
+                self.SUGGESTION_LANGUAGE_CODE, self.USER_ID_1,
+                self.TOPIC_ID_1): {
+                    'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                    'topic_id': self.TOPIC_ID_1,
+                    'submitted_translations_count': (
+                        self.SUBMITTED_TRANSLATIONS_COUNT),
+                    'submitted_translation_word_count': (
+                        self.SUBMITTED_TRANSLATION_WORD_COUNT),
+                    'accepted_translations_count': (
+                        self.ACCEPTED_TRANSLATIONS_COUNT),
+                    'accepted_translations_without_reviewer_edits_count': (
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+                    'accepted_translation_word_count': (
+                        self.ACCEPTED_TRANSLATION_WORD_COUNT),
+                    'rejected_translations_count': (
+                        self.REJECTED_TRANSLATIONS_COUNT),
+                    'rejected_translation_word_count': (
+                        self.REJECTED_TRANSLATION_WORD_COUNT),
+                    'contribution_dates': [
+                        date.isoformat() for date in self.CONTRIBUTION_DATES]
+                }
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -1579,6 +1640,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,
+            'translation_contribution_stats':
+                expected_translation_contribution_stats_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
             'config_property_snapshot_metadata':

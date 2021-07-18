@@ -1,4 +1,9 @@
-<div class="oppia-learner-hint-and-solution-modal-title">{{ isHint ? "Hint" : "Solution" }}</div>
+<div *ngIf="isHint" class="oppia-learner-hint-and-solution-modal-title">
+  <span [innerHTML]="'I18N_HINT_TITLE' | translate"></span>
+</div>
+<div *ngIf="!isHint" class="oppia-learner-hint-and-solution-modal-title">
+  <span [innerHTML]="'I18N_SOLUTION_TITLE' | translate"></span>
+</div>
 
 <div class="modal-body">
   <span>
@@ -15,7 +20,7 @@
     </span>
     <br>
     <br>
-    <label>Explanation: </label>
+    <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
     <span>
       <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
                                  [htmlData]="solutionExplanationHtml">

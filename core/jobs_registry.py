@@ -97,6 +97,7 @@ ONE_OFF_JOB_MANAGERS = [
         opportunity_jobs_one_off.
         RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
+    question_jobs_one_off.FixQuestionImagesStorageOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
     question_jobs_one_off.QuestionSnapshotsMigrationAuditJob,
@@ -123,7 +124,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryExplorationsAuditOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.DeleteStoryCommitLogsOneOffJob,
-    suggestion_jobs_one_off.ContentSuggestionFormatUpdateOneOffJob,
+    suggestion_jobs_one_off.PopulateTranslationContributionStatsOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
