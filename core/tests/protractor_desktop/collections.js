@@ -20,7 +20,6 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
@@ -29,7 +28,6 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
 describe('Collections', function() {
-  var adminPage = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
   var collectionId = null;
@@ -40,7 +38,6 @@ describe('Collections', function() {
   var libraryPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();

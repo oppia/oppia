@@ -17,7 +17,6 @@
  */
 
 var action = require('../protractor_utils/action.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
@@ -91,8 +90,7 @@ describe('Basic user journeys', function() {
   });
 });
 
-fdescribe('Site language', function() {
-  var adminPage = null;
+describe('Site language', function() {
   var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
@@ -104,7 +102,6 @@ fdescribe('Site language', function() {
   var preferencesPage = null;
 
   beforeAll(async function() {
-    adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();

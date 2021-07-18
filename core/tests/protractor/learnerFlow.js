@@ -53,11 +53,13 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
   };
 
-  var createDummyExplorationOnDesktopAsAdmin = async function(
-      welcomeModalIsShown) {
+  var createDummyExplorationOnDesktop = async function(
+      welcomeModalIsShown, userIsCollectionEditor) {
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
-    await creatorDashboardPage.clickCreateExplorationButton();
+    if (userIsCollectionEditor) {
+      await creatorDashboardPage.clickCreateExplorationButton();
+    }
     await waitFor.pageToFullyLoad();
     if (welcomeModalIsShown) {
       await explorationEditorMainTab.exitTutorial();
@@ -190,7 +192,7 @@ describe('Learner dashboard functionality', function() {
         'protractor_mobile_test_exploration.yaml');
     } else {
       // Create exploration 'Dummy Exploration'.
-      await createDummyExplorationOnDesktopAsAdmin(true);
+      await createDummyExplorationOnDesktop(true, false);
       // Create a second exploration named 'Test Exploration'.
       await workflow.createAndPublishExploration(
         'Test Exploration',
@@ -300,7 +302,7 @@ describe('Learner dashboard functionality', function() {
       await adminPage.reloadCollection(1);
     } else {
       // Create first exploration named 'Dummy Exploration'.
-      await createDummyExplorationOnDesktopAsAdmin(true);
+      await createDummyExplorationOnDesktop(true, true);
       // Create a second exploration named 'Collection Exploration'.
       await workflow.createAndPublishExploration(
         'Collection Exploration',

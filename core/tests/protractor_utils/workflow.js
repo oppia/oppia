@@ -19,7 +19,6 @@
 
 var forms = require('./forms.js');
 var path = require('path');
-var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
