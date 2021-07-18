@@ -1768,7 +1768,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         split_line = line.split('#')
         trail_comment = split_line[1]
         excluded_phrase_at_beginning_of_line = any(
-            trail_comment[1:].startswith(word) 
+            trail_comment[1:].startswith(word)
             for word in EXCLUDED_PHRASES) or any(
                 trail_comment.startswith(word) for word in EXCLUDED_PHRASES)
         # Check for pylint pragma.
