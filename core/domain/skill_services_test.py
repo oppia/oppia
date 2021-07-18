@@ -1118,8 +1118,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
         skill_services.update_skill(
-            self.USER_ID, self.SKILL_ID, changelist,
-            'Update schema feedback.')
+            self.USER_ID, self.SKILL_ID, changelist, 'Update schema.')
 
         new_skill_dict = skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict()
 
