@@ -1204,8 +1204,9 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 rev_version = int(rev_version)
                 self.assertIn(
                     'Cannot revert to version', response_dict['error'])
-            except:
-                self.assertIn('Schema validation for \'revert_to_version\' '
+            except Exception:
+                self.assertIn(
+                    'Schema validation for \'revert_to_version\' '
                     'failed:', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
@@ -1638,7 +1639,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(exp_id, self.owner_id)
         response = self.delete_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            {'username': 'random_username'}, expected_status_int=400)
+            params={'username': 'random_username'}, expected_status_int=400)
         self.assertEqual(
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
@@ -1913,7 +1914,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             exp_id, self.owner_id, title='Title for emails handler test!',
             category='Category')
 
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exp_fetchers.get_exploration_by_id(exp_id)
 
         csrf_token = self.get_new_csrf_token()
         exp_email_preferences = (
@@ -2240,8 +2241,9 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
                 self.EXP_ID, 'invalid_playthrough_id'), expected_status_int=404)
 
     def test_fetch_issues_handler_with_disabled_exp_id(self):
-        self.get_json('/issuesdatahandler/5', {'exp_version': 2},
-        expected_status_int=404)
+        self.get_json(
+            '/issuesdatahandler/5', params={'exp_version': 2},
+            expected_status_int=404)
 
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""

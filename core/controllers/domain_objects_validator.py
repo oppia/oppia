@@ -117,4 +117,4 @@ def validate_exp_issue_dict(exp_issue_dict):
     Args:
         exp_issue_dict: dict. Data that needs to be validated.
     """
-    assert  isinstance(exp_issue_dict, dict)
+    assert isinstance(exp_issue_dict, dict)
