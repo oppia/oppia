@@ -39,8 +39,7 @@
 /core/templates/domain/ @kevintab95
 /core/templates/pages/ @srijanreddy98
 /core/templates/services/ @nithusha21
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/extensions/ @srijanreddy98
+/extensions/ @vojtechjelinek
 /scripts/ @DubeySandeep
 
 
@@ -69,10 +68,9 @@
 /core/templates/services/question-validation.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/typings/ @srijanreddy98
-/tsconfig.json @srijanreddy98
-/tsconfig-strict.json @srijanreddy98
+/typings/ @vojtechjelinek
+/tsconfig.json @vojtechjelinek
+/tsconfig-strict.json @vojtechjelinek
 
 
 # Answer classification team.
@@ -116,11 +114,9 @@
 # Contributor Dashboard project.
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/domain/translation*.py @seanlip
+/core/domain/translation*.py @vojtechjelinek
 /core/domain/voiceover_services*.py @sagangwee
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/storage/translation/ @seanlip
+/core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 /core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
@@ -134,7 +130,7 @@
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
 /core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
-/core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
+/core/templates/pages/license-page/ @vojtechjelinek
 /core/templates/pages/license-page/license-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
@@ -184,8 +180,7 @@
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/scripts/typescript_checks*.py @DubeySandeep
+/scripts/typescript_checks*.py @vojtechjelinek @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
 /scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
@@ -196,16 +191,14 @@
 # Exploration project.
 /core/controllers/editor*.py @aks681 @rohitkatlaa
 /core/controllers/reader*.py @aks681
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/controllers/resources*.py @aks681
+/core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @aks681
 /core/domain/fs*.py @aks681
 /core/domain/param_domain*.py @aks681
 /core/domain/rating_services*.py @aks681
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/domain/value_generators_domain*.py @aks681
+/core/domain/value_generators_domain*.py @vojtechjelinek
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
@@ -246,8 +239,7 @@
 # Google-app-engine configurations
 /appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/index.yaml @nithusha21
+/index.yaml @vojtechjelinek
 /queue.yaml @nithusha21
 /main_taskqueue.py @nithusha21
 
@@ -327,14 +319,12 @@
 /core/templates/services/guppy-initialization.service.ts @iamprayush
 /core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/extensions/interactions/ @iamprayush
-/extensions/objects/ @iamprayush
+/extensions/interactions/ @iamprayush @vojtechjelinek
+/extensions/objects/ @iamprayush @vojtechjelinek
 /extensions/objects/templates/filepath-editor.component*.ts @kevintab95
 /extensions/objects/templates/filepath-editor.component.html @kevintab95
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/extensions/value_generators/ @iamprayush
-/extensions/__init__.py @iamprayush
+/extensions/value_generators/ @iamprayush @vojtechjelinek
+/extensions/__init__.py @iamprayush @vojtechjelinek
 
 
 # Lesson Analytics team.
@@ -483,8 +473,7 @@
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn
+/core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
@@ -510,12 +499,9 @@
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/extensions/extensions.module.ts @srijanreddy98
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/mypy.ini @sajalasati
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/mypy_requirements.txt @sajalasati
+/extensions/extensions.module.ts @vojtechjelinek
+/mypy.ini @vojtechjelinek
+/mypy_requirements.txt @vojtechjelinek
 /python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
@@ -536,10 +522,9 @@
 
 
 # Release team.
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/core/controllers/release_coordinator*.py @nithusha21
-/core/templates/pages/release-coordinator-page/ @nithusha21
-/scripts/release_scripts/ @nithusha21
+/core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
+/core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
+/scripts/release_scripts/ @nithusha21 @vojtechjelinek
 
 
 # Rich text editor team.
@@ -559,8 +544,7 @@
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/domain/rte_component_registry*.py @aks681
+/core/domain/rte_component_registry*.py @vojtechjelinek
 /extensions/ckeditor_plugins/ @aks681
 /extensions/rich_text_components/ @aks681
 /assets/rich_text_components_definitions.ts @aks681
@@ -586,69 +570,63 @@
 
 
 # Simple pages.
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/core/controllers/pages*.py @jameesjohn
-/core/controllers/custom_landing_pages*.py @jameesjohn
-/core/templates/pages/contact-page/ @jameesjohn
-/core/templates/pages/delete-account-page/ @jameesjohn
-/core/templates/pages/donate-page/ @jameesjohn
-/core/templates/pages/error-pages/ @jameesjohn
-/core/templates/pages/get-started-page/ @jameesjohn
-/core/templates/pages/landing-pages/ @jameesjohn
-/core/templates/pages/maintenance-page/ @jameesjohn
-/core/templates/pages/partnerships-page/ @jameesjohn
-/core/templates/pages/pending-account-deletion-page/ @jameesjohn
-/core/templates/pages/preferences-page/ @jameesjohn
-/core/templates/pages/signup-page/ @jameesjohn
-/core/templates/pages/splash-page/ @jameesjohn
-/core/templates/pages/teach-page/ @jameesjohn
-/core/templates/pages/thanks-page/ @jameesjohn
-/core/templates/pages/participation-playbook/ @jameesjohn
+/core/controllers/pages*.py @vojtechjelinek
+/core/controllers/custom_landing_pages*.py @vojtechjelinek
+/core/templates/pages/contact-page/ @vojtechjelinek
+/core/templates/pages/delete-account-page/ @vojtechjelinek
+/core/templates/pages/donate-page/ @vojtechjelinek
+/core/templates/pages/error-pages/ @vojtechjelinek
+/core/templates/pages/get-started-page/ @vojtechjelinek
+/core/templates/pages/landing-pages/ @vojtechjelinek
+/core/templates/pages/maintenance-page/ @vojtechjelinek
+/core/templates/pages/partnerships-page/ @vojtechjelinek
+/core/templates/pages/pending-account-deletion-page/ @vojtechjelinek
+/core/templates/pages/preferences-page/ @vojtechjelinek
+/core/templates/pages/signup-page/ @vojtechjelinek
+/core/templates/pages/splash-page/ @vojtechjelinek
+/core/templates/pages/teach-page/ @vojtechjelinek
+/core/templates/pages/thanks-page/ @vojtechjelinek
+/core/templates/pages/participation-playbook/ @vojtechjelinek
 
 # Speed Improvement team.
-# TODO(#13119): Set or add @vojtechjelinek as owner after 2021-07-06
-/app_dev.yaml @nithusha21
-/core/templates/google-analytics.initializer.ts @jameesjohn
-/core/templates/base-components/ @jameesjohn
-/core/templates/pages/Base.ts @jameesjohn
-/core/templates/pages/footer_js_libs.html @jameesjohn
-/core/templates/pages/header_css_libs.html @jameesjohn
-/core/templates/pages/header_js_libs.html @jameesjohn
-/core/templates/services/csrf-token.service*.ts @jameesjohn
+/app_dev.yaml @nithusha21 @vojtechjelinek
+/core/templates/google-analytics.initializer.ts @vojtechjelinek
+/core/templates/base-components/ @vojtechjelinek
+/core/templates/pages/Base.ts @vojtechjelinek
+/core/templates/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/pages/header_css_libs.html @vojtechjelinek
+/core/templates/pages/header_js_libs.html @vojtechjelinek
+/core/templates/services/csrf-token.service*.ts @vojtechjelinek
 /core/templates/services/cookie.service*.ts @nithusha21
-/core/templates/third-party-imports/ @nithusha21
-/.lighthouserc.js @jimbyo @jameesjohn
-/.lighthouserc-accessibility.js @jimbyo
-/puppeteer-login-script.js @jimbyo
-/scripts/run_lighthouse_tests.py @jameesjohn
-/webpack.*.ts @nithusha21
+/core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
+/.lighthouserc.js @jimbyo @vojtechjelinek
+/.lighthouserc-accessibility.js @jimbyo @vojtechjelinek
+/puppeteer-login-script.js @jimbyo @vojtechjelinek
+/scripts/run_lighthouse_tests.py @vojtechjelinek
+/webpack.*.ts @nithusha21 @vojtechjelinek
 
 
 # Typings.
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/typings @srijanreddy98
-/typings/tests/ @srijanreddy98
+/typings @vojtechjelinek
+/typings/tests/ @vojtechjelinek
 
 
 # User Data Takeout.
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/core/domain/takeout_*.py @BenHenning
-/core/domain/wipeout_*.py @BenHenning
+/core/domain/takeout_*.py @BenHenning @vojtechjelinek
+/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
 
 
 # User’s profile page.
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/controllers/profile*.py @kevintab95
-/core/templates/domain/user/ @kevintab95
-/core/templates/pages/profile-page/ @kevintab95
-/core/templates/services/user.service*.ts @kevintab95
-/core/templates/services/user-backend-api.service*.ts @kevintab95
+/core/controllers/profile*.py @vojtechjelinek
+/core/templates/domain/user/ @vojtechjelinek
+/core/templates/pages/profile-page/ @vojtechjelinek
+/core/templates/services/user.service*.ts @vojtechjelinek
+/core/templates/services/user-backend-api.service*.ts @vojtechjelinek
 
 
 # Service constants
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/templates/services/services.constants.ajs.ts @srijanreddy98
-/core/templates/services/services.constants.ts @srijanreddy98
+/core/templates/services/services.constants.ajs.ts @vojtechjelinek
+/core/templates/services/services.constants.ts @vojtechjelinek
 
 
 # Dynamic Feature Gating project
@@ -672,9 +650,8 @@
 
 
 # Data stability.
-# TODO(#13119): Add @vojtechjelinek as owner after 2021-07-06
-/core/controllers/domain_objects_validator*.py @rohitkatlaa
-/core/controllers/payload_validator*.py @rohitkatlaa
+/core/controllers/domain_objects_validator*.py @rohitkatlaa @vojtechjelinek
+/core/controllers/payload_validator*.py @rohitkatlaa @vojtechjelinek
 
 
 # QA team.
@@ -682,8 +659,7 @@
 /assets/ @nithusha21
 /data/ @nithusha21
 /core/controllers/android_e2e_config*.py @BenHenning
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/core/templates/karma.module.ts @nithusha21
+/core/templates/karma.module.ts @vojtechjelinek
 # TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
 /core/tests/protractor_utils/ @kevintab95 @krishnarao22
 /core/tests/protractor_desktop/ @kevintab95 @krishnarao22
@@ -725,16 +701,14 @@
 /core/domain/role_services*.py @seanlip @BenHenning
 /core/storage/ @seanlip @BenHenning
 /core/domain/user*.py @seanlip @BenHenning
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06 (up to /scripts/install_third_party_libs.py)
-/requirements.txt @DubeySandeep
-/requirements.in @DubeySandeep
-/manifest.json @DubeySandeep
-/package.json @DubeySandeep
-/yarn.lock @DubeySandeep
+/requirements.txt @vojtechjelinek
+/requirements.in @vojtechjelinek
+/manifest.json @vojtechjelinek
+/package.json @vojtechjelinek
+/yarn.lock @vojtechjelinek
 /scripts/install_third_party_libs.py @DubeySandeep
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
-# TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/.github/stale.yml @seanlip
+/.github/stale.yml @vojtechjelinek
 # TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
 /.github/workflows/ @DubeySandeep @krishnarao22
