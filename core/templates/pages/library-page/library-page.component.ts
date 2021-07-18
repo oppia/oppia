@@ -31,7 +31,9 @@ import { PageTitleService } from 'services/page-title.service';
 import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { LibraryPageConstants } from './library-page.constants';
-import { ActivityDict, LibraryPageBackendApiService, SummaryDict } from './services/library-page-backend-api.service';
+import { ActivityDict,
+  LibraryPageBackendApiService,
+  SummaryDict } from './services/library-page-backend-api.service';
 
 @Component({
   selector: 'oppia-library-page',
