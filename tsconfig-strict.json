@@ -301,7 +301,7 @@
     "core/templates/domain/story_viewer/story-playthrough.model.ts",
     "core/templates/domain/story_viewer/story-playthrough.model.spec.ts",
     "core/templates/domain/story_viewer/story-viewer-backend-api.service.ts",
-    "core/templates/domain/story_viewer/story-viewer-backend-api.service.spec,ts",
+    "core/templates/domain/story_viewer/story-viewer-backend-api.service.spec.ts",
     "core/templates/domain/story_viewer/story-viewer-domain.constants.ts",
     "core/templates/domain/subtopic_viewer/subtopic-viewer-domain.constants.ts",
     "core/templates/domain/suggestion/suggestion.model.ts",
