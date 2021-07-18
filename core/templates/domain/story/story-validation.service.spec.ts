@@ -147,7 +147,7 @@ describe('Story Validation Service', () => {
     let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
     sampleStoryContents.deleteNode('node_1');
-    expect(svs.validatePrerequisiteSkillsInStoryContents(
+    expect(() => svs.validatePrerequisiteSkillsInStoryContents(
       [], sampleStoryContents)).toThrowError('Starting Node does not exist');
   });
 });
