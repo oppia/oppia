@@ -33,7 +33,7 @@ import apache_beam as beam
 class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
+        valid_commit_cmd_model = skill_models.SkillSnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
@@ -44,7 +44,7 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 skill_validation.ValidateSkillSnapshotMetadataModel())
         )
@@ -261,21 +261,19 @@ class ValidateSkillSnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_skill_model(self):
-        invalid_commit_cmd_model = (
-            skill_models.SkillCommitLogEntryModel(
-                id='skill_id123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                skill_id='skill-id',
-                user_id='user-id',
-                commit_type='test-type',
-                post_commit_status='private',
-                commit_cmds=[{'cmd': 'create_new'}])
-        )
+        valid_commit_cmd_model = skill_models.SkillCommitLogEntryModel(
+            id='skill_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            skill_id='skill-id',
+            user_id='user-id',
+            commit_type='test-type',
+            post_commit_status='private',
+            commit_cmds=[{'cmd': 'create_new'}])
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 skill_validation.ValidateSkillCommitLogEntryModel())
         )
@@ -283,17 +281,15 @@ class ValidateSkillCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
     def test_raises_commit_cmd_none_error(self):
-        invalid_commit_cmd_model = (
-            skill_models.SkillCommitLogEntryModel(
-                id='model_id123',
-                created_on=self.YEAR_AGO,
-                last_updated=self.NOW,
-                skill_id='skill-id',
-                user_id='user-id',
-                commit_type='test-type',
-                post_commit_status='private',
-                commit_cmds=[{'cmd': 'create_new'}])
-        )
+        invalid_commit_cmd_model = skill_models.SkillCommitLogEntryModel(
+            id='model_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            skill_id='skill-id',
+            user_id='user-id',
+            commit_type='test-type',
+            post_commit_status='private',
+            commit_cmds=[{'cmd': 'create_new'}])
 
         output = (
             self.pipeline

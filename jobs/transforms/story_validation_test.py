@@ -33,7 +33,7 @@ import apache_beam as beam
 class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
+        valid_commit_cmd_model = story_models.StorySnapshotMetadataModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
@@ -44,7 +44,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
@@ -252,7 +252,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
 class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_story_model(self):
-        invalid_commit_cmd_model = (
+        valid_commit_cmd_model = (
             story_models.StoryCommitLogEntryModel(
                 id='story_id123',
                 created_on=self.YEAR_AGO,
@@ -267,7 +267,7 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
 
         output = (
             self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
+            | beam.Create([valid_commit_cmd_model])
             | beam.ParDo(
                 story_validation.ValidateStoryCommitLogEntryModel())
         )
