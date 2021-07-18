@@ -111,6 +111,42 @@ class ExplorationEmbedPage(base.BaseHandler):
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'parent': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'iframed': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests.
@@ -118,10 +154,10 @@ class ExplorationPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.request.get('v')
+        version_str = self.normalized_request.get('v')
         version = int(version_str) if version_str else None
 
-        if self.request.get('iframed'):
+        if self.normalized_request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
             if version_str:
                 redirect_url += '?v=%s' % version_str
@@ -131,10 +167,10 @@ class ExplorationPage(base.BaseHandler):
         # Note: this is an optional argument and will be None when the
         # exploration is being played outside the context of a collection or if
         # the 'parent' parameter is present.
-        if self.request.get('parent'):
+        if self.normalized_request.get('parent'):
             collection_id = None
         else:
-            collection_id = self.request.get('collection_id')
+            collection_id = self.normalized_request.get('collection_id')
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
             raise self.PageNotFoundException
@@ -146,6 +182,23 @@ class ExplorationHandler(base.BaseHandler):
     """Provides the initial data for a single exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
@@ -154,8 +207,7 @@ class ExplorationHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version = self.request.get('v')
-        version = int(version) if version else None
+        version = self.normalized_request.get('v')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
