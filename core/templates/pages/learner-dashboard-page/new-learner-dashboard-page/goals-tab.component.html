@@ -19,7 +19,8 @@
         </p>
         <div *ngIf="currentGoalsStoryIsShown[i]">
           <div *ngFor="let story of topic.canonicalStorySummaryDicts" class="oppia-story-summary-card">
-            <oppia-learner-story-summary-tile [storySummary]="story">
+            <oppia-learner-story-summary-tile [storySummary]="story"
+                                              [topicName]="topic.name">
             </oppia-learner-story-summary-tile>
           </div>
         </div>
