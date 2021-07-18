@@ -1180,7 +1180,7 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
     _send_email(
-        tester_id, tester_id, feconf.BULK_EMAIL_INTENT_TEST,
+        tester_id, feconf.SYSTEM_COMMITTER_ID, feconf.BULK_EMAIL_INTENT_TEST,
         email_subject, email_body, tester_email, sender_name=tester_name)
 
 

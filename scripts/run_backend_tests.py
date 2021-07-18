@@ -252,6 +252,7 @@ def _get_all_test_targets_from_shard(unused_shard_name):
         ans += shard_spec
     return ans
 
+
 def _check_shards_match_tests(include_load_tests=True):
     """Check whether the test shards match the tests that exist.
 

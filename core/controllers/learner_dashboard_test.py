@@ -290,7 +290,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_all_topics(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['all_topics_list']), 0)
@@ -334,7 +334,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_untracked_topics(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['untracked_topics_list']), 0)

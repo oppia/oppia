@@ -5613,7 +5613,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
         email_body = 'Test Body'
         with self.can_send_emails_ctx:
             email_manager.send_test_email_for_bulk_emails(
-                feconf.SYSTEM_COMMITTER_ID, email_subject, email_body
+                self.sender_id, email_subject, email_body
             )
         messages = self._get_sent_email_messages(feconf.SYSTEM_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 1)

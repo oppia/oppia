@@ -652,7 +652,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         # query result has been used.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             # Send email from email dashboard result page.
-            self.login(self.SUBMITTER_EMAIL)
+            self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
@@ -668,7 +668,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.assertEqual(
             query_models[0].query_status, feconf.USER_QUERY_STATUS_ARCHIVED)
         self.assertTrue(query_models[0].deleted)
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
         with self.assertRaisesRegexp(Exception, '400 Bad Request'):
             self.get_html_response(
                 '/emaildashboardresult/%s' % query_models[0].id)
@@ -813,7 +813,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             test_email_text_body = '[This is a test email.]\n\n %s' % email_body
 
             messages = self._get_sent_email_messages(
-                self.SUBMITTER_EMAIL)
+                feconf.SYSTEM_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
             self.assertEqual(
                 messages[1].html.decode(), test_email_html_body)
@@ -831,7 +831,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.recipient_id, query_models[0].submitter_id)
             self.assertEqual(
-                sent_email_model.sender_id, query_models[0].submitter_id)
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.intent, feconf.BULK_EMAIL_INTENT_TEST)
 
