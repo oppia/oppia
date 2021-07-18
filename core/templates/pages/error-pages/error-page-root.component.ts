@@ -33,9 +33,11 @@ export class ErrorPageRootComponent {
   ) {}
 
   ngOnInit(): void {
+    // Update the default page title.
     this.pageTitleService.setPageTitle('Error 404 | Oppia');
     let bodyTag = (
       this.windowRef.nativeWindow.document.getElementsByTagName('body'));
+    // Read status code from errorCode attribute on body tag.
     this.statusCode = bodyTag[0].getAttribute('errorCode') ?
       bodyTag[0].getAttribute('errorCode') : '404';
   }

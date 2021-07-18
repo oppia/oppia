@@ -21,6 +21,8 @@ import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
 
+// All paths should be defined in constants.ts file.
+// Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
     path: AppConstants.FRONTEND_ROUTES.ABOUT,

@@ -3,6 +3,9 @@
   <head>
     @load('base-components/header.template.html', {"title": "Error - Oppia"})
   </head>
+  <!-- Angular doesnot support passing data into root components like ajs.
+  Here errorCode attribute is used as placeholder to hold the status code provided by underscore
+  template loader. Later it is read using javascript. -->
   <body errorCode="<%=htmlWebpackPlugin.options.statusCode%>">
     <oppia-error-page-root></oppia-error-page-root>
     @load('pages/footer_js_libs.html')
