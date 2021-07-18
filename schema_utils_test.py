@@ -783,6 +783,16 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(obj, normalized_obj)
 
+    def test_is_valid_thread_id(self):
+        # type: () -> None
+        is_valid_thread_id = schema_utils.get_validator('is_valid_thread_id')
+
+        self.assertTrue(is_valid_thread_id(
+            'exploration.EXP_ID_1.WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd'))
+
+        self.assertFalse(is_valid_thread_id(
+            'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd'))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
