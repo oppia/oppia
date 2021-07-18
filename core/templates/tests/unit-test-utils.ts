@@ -32,8 +32,6 @@ export class MockTranslatePipe {
   selector: '[translate],[ngx-translate]'
 })
 export class MockTranslateDirective {
-  key: string;
-
   @Input() set translate(key: string) {}
 
   @Input() set translateParams(params: Object) {}
