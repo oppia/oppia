@@ -88,4 +88,3 @@ describe('ResponseCodeReplComponent', () => {
     expect(focusManagerService.setFocus).toHaveBeenCalledWith('focusLabel');
   });
 });
-
