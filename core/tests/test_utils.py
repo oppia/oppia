@@ -1911,7 +1911,7 @@ title: Title
             def __instancecheck__(cls, instance):
                 return isinstance(instance, old_datetime)
 
-        class MockDatetime(old_datetime, metaclass=MockDatetimeType):
+        class MockDatetime(old_datetime, metaclass=MockDatetimeType): # pylint: disable=invalid-metaclass
             """Always returns mocked_now as the current UTC time."""
 
             @classmethod
