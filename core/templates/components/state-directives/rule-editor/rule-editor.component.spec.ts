@@ -21,7 +21,7 @@ import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('RuleEditor', () => {
+describe('RuleEditorComponent', () => {
   importAllAngularServices();
 
   let ctrl = null;
@@ -152,7 +152,7 @@ describe('RuleEditor', () => {
   });
 
   it('should change rule type when user selects' +
-    ' new rule type when answer choice is present', () => {
+    ' new rule type and answer choice is present', () => {
     spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(
       [
         {
@@ -194,7 +194,7 @@ describe('RuleEditor', () => {
   });
 
   it('should change rule type when user selects' +
-    ' new rule type when answer choice is not present', () => {
+    ' new rule type and answer choice is not present', () => {
     spyOn(ResponsesService, 'getAnswerChoices')
       .and.returnValue(undefined);
     ctrl.rule = {
@@ -222,7 +222,7 @@ describe('RuleEditor', () => {
   });
 
   it('should change rule type when user selects' +
-    ' new rule type when answer choice is not present', () => {
+    ' new rule type and answer choice is not present', () => {
     spyOn(ResponsesService, 'getAnswerChoices')
       .and.returnValue(undefined);
     ctrl.rule = {
@@ -391,7 +391,7 @@ describe('RuleEditor', () => {
   });
 
   it('should set ruleDescriptionFragments as noneditable when answer' +
-    ' choices is empty', () => {
+    ' choices are empty', () => {
     spyOn(ResponsesService, 'getAnswerChoices').and.returnValue([]);
     ctrl.rule = {
       type: 'MatchesExactlyWith'

@@ -197,7 +197,8 @@ describe('VersionDiffVisualizationComponent', () => {
     });
   });
 
-  it('should open state diff modal and return old and new states', () => {
+  it('should open state diff modal and return old and new states when' +
+    ' when user clicks on a state in difference graph', () => {
     let newState, oldStateName, newStateName, oldState, headers;
     spyOn(ctrl, 'getDiffData').and.returnValue(
       {
