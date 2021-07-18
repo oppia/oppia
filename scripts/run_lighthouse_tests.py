@@ -182,6 +182,7 @@ def main(args=None):
             '"ENABLE_ACCOUNT_DELETION": .*',
             '"ENABLE_ACCOUNT_DELETION": true,'))
         stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
