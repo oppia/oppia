@@ -73,16 +73,16 @@ export class SvgSanitizerService {
       if (node.tagName.toLowerCase() === 'svg') {
         let attrHeight = node.getAttribute('height');
         if (attrHeight) {
-          let height = attrHeight.match(/\d+\.*\d*/g);
-          if (height) {
-            dimensions.height = height[0].replace('.', 'd');
+          let heightRegexpMatchResult = attrHeight.match(/\d+\.*\d*/g);
+          if (heightRegexpMatchResult) {
+            dimensions.height = heightRegexpMatchResult[0].replace('.', 'd');
           }
         }
         let attrWidth = node.getAttribute('width');
         if (attrWidth) {
-          let width = attrWidth.match(/\d+\.*\d*/g);
-          if (width) {
-            dimensions.width = width[0].replace('.', 'd');
+          let widthRegexpMatchResult = attrWidth.match(/\d+\.*\d*/g);
+          if (widthRegexpMatchResult) {
+            dimensions.width = widthRegexpMatchResult[0].replace('.', 'd');
           }
         }
         // This attribute is useful for the vertical alignment of the
@@ -114,15 +114,15 @@ export class SvgSanitizerService {
     // mutable type 'string[]'." We need to suppress this error because of
     // stricter type checking.
     // @ts-ignore
-    let SvgAttrsWhitelist: Record<string, string[]> =
-     constants.SVG_ATTRS_WHITELIST;
-    let allowedTags = Object.keys(SvgAttrsWhitelist);
+    const svgAttrsAllowlist: Record<string, string[]> = (
+      constants.SVG_ATTRS_ALLOWLIST);
+    let allowedTags = Object.keys(svgAttrsAllowlist);
     let nodeTagName = null;
     svg.querySelectorAll('*').forEach((node) => {
       nodeTagName = node.tagName.toLowerCase();
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
-          if (SvgAttrsWhitelist[nodeTagName].indexOf(
+          if (svgAttrsAllowlist[nodeTagName].indexOf(
             node.attributes[i].name.toLowerCase()) === -1) {
             invalidAttrs.push(
               node.tagName + ':' + node.attributes[i].name);
