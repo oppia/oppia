@@ -28,6 +28,11 @@ var suites = {
       'protractor_desktop/additionalEditorFeatures.js'
     ],
 
+    additionalEditorFeaturesModals: [
+      'protractor_desktop/additionalEditorFeaturesModals.js'
+    ],
+
+
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
     ],
