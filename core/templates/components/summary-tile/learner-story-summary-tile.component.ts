@@ -41,8 +41,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyLink: string;
   storyTitle: string;
   nextIncompleteNodeTitle: string;
-  thumbnailBgColor: string;
   storyCompleted: boolean = false;
+  thumbnailBgColor: string;
   starImageUrl: string = '';
 
   constructor(
