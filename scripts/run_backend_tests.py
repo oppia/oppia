@@ -235,22 +235,18 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     return result
 
 
-def _get_all_test_targets_from_shard(unused_shard_name):
+def _get_all_test_targets_from_shard(shard_name):
     """Find all test modules in a shard.
 
     Args:
-        unused_shard_name: str. The name of the shard.
+        shard_name: str. The name of the shard.
 
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
     with python_utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
-
-    ans = []
-    for shard_spec in shards_spec.values():
-        ans += shard_spec
-    return ans
+    return shards_spec[shard_name]
 
 
 def _check_shards_match_tests(include_load_tests=True):
