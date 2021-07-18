@@ -98,7 +98,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
 
     await adminPage.get();
-    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     // Add topic to classroom to make it available for question contributions.
     await adminPage.editConfigProperty(
       'The details for each classroom page.',
@@ -291,8 +291,8 @@ describe('Contributor dashboard admin page contribution rights form', () => {
     await users.createAndLoginSuperAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
 
-    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
-    await adminPage.updateRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.addRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {

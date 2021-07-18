@@ -72,11 +72,14 @@ export class AdminRolesTabComponent implements OnInit {
 
   removeRole(roleToRemove: string): void {
     this.roleInUpdate = roleToRemove;
-    let removeFromAllTopics = roleToRemove === 'TOPIC_MANAGER';
+    let removeFromTopicIds = [];
+    if (roleToRemove === 'TOPIC_MANAGER') {
+      removeFromTopicIds = this.managerInTopicsWithId;
+    }
     var roleIndex = this.userRoles.indexOf(roleToRemove);
     this.adminBackendApiService.removeUserRoleAsync(
-      roleToRemove, this.username, null, removeFromAllTopics).then(() => {
-      if (removeFromAllTopics) {
+      roleToRemove, this.username, removeFromTopicIds).then(() => {
+      if (roleToRemove === 'TOPIC_MANAGER') {
         this.managerInTopicsWithId = [];
       }
       this.userRoles.splice(roleIndex, 1);

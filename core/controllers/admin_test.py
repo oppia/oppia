@@ -1046,7 +1046,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'topic_ids': []
+                'managed_topic_ids': []
             })
 
         # Check role correctly gets updated.
@@ -1127,7 +1127,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id]
             })
 
         self.delete_json(
@@ -1135,7 +1135,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={
                 'role': feconf.ROLE_ID_TOPIC_MANAGER,
                 'username': username,
-                'topic_id': topic_id
+                'remove_from_comma_seperated_topic_ids': topic_id
             }, expected_status_int=200)
 
         csrf_token = self.get_new_csrf_token()
@@ -1153,7 +1153,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response_dict, {
             'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
             'banned': False,
-            'topic_ids': []
+            'managed_topic_ids': []
         })
 
         self.logout()
@@ -1183,15 +1183,17 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'topic_ids': []
+                'managed_topic_ids': []
             })
 
         # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_ID_TOPIC_MANAGER, 'username': username,
-             'topic_id': topic_id}, csrf_token=csrf_token)
+            feconf.ADMIN_ROLE_HANDLER_URL, {
+                'role': feconf.ROLE_ID_TOPIC_MANAGER,
+                'username': username,
+                'assign_to_topic_id': topic_id
+            }, csrf_token=csrf_token)
 
         self.assertEqual(response_dict, {})
 
@@ -1203,7 +1205,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id]
             })
         self.logout()
 
@@ -1228,7 +1230,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL, {
                 'role': feconf.ROLE_ID_TOPIC_MANAGER,
                 'username': username,
-                'topic_id': topic_id
+                'assign_to_topic_id': topic_id
             }, csrf_token=csrf_token)
 
         self.assertEqual(response_dict, {})
@@ -1241,7 +1243,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'roles': [
                     feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
                 'banned': False,
-                'topic_ids': [topic_id]
+                'managed_topic_ids': [topic_id]
             })
 
         new_topic_id = topic_fetchers.get_new_topic_id()
@@ -1257,7 +1259,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL, {
                 'role': feconf.ROLE_ID_TOPIC_MANAGER,
                 'username': username,
-                'topic_id': new_topic_id
+                'assign_to_topic_id': new_topic_id
             }, csrf_token=csrf_token)
 
         self.assertEqual(response_dict, {})
@@ -1270,7 +1272,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict['roles'],
             [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER])
         self.assertItemsEqual(
-            response_dict['topic_ids'], [new_topic_id, topic_id])
+            response_dict['managed_topic_ids'], [new_topic_id, topic_id])
 
         self.logout()
 
@@ -1296,7 +1298,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
                 'banned': False,
-                'topic_ids': []
+                'managed_topic_ids': []
             })
 
         self.delete_json(
@@ -1311,7 +1313,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {
                 'roles': [feconf.ROLE_ID_FULL_USER],
                 'banned': False,
-                'topic_ids': []
+                'managed_topic_ids': []
             })
         self.logout()
 

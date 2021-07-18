@@ -710,7 +710,7 @@ class AdminRoleHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'topic_id': {
+            'assign_to_topic_id': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -729,16 +729,9 @@ class AdminRoleHandler(base.BaseHandler):
                     'type': 'basestring'
                 }
             },
-            'topic_id': {
+            'remove_from_comma_seperated_topic_ids': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'remove_from_all_topics': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': ['true', 'false']
                 },
                 'default_value': None
             }
@@ -789,7 +782,7 @@ class AdminRoleHandler(base.BaseHandler):
     def put(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
-        topic_id = self.payload.get('topic_id')
+        assign_to_topic_id = self.payload.get('assign_to_topic_id')
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -803,7 +796,7 @@ class AdminRoleHandler(base.BaseHandler):
             user = user_services.get_user_actions_info(user_settings.user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
-                topic_domain.ROLE_MANAGER, topic_id)
+                topic_domain.ROLE_MANAGER, assign_to_topic_id)
         else:
             user_services.add_user_role(user_settings.user_id, role)
 
@@ -813,8 +806,8 @@ class AdminRoleHandler(base.BaseHandler):
     def delete(self):
         username = self.request.get('username')
         role = self.request.get('role')
-        topic_id = self.request.get('topic_id')
-        remove_from_all_topics = self.request.get('remove_from_all_topics')
+        remove_from_topic_ids = self.request.get(
+            'remove_from_comma_seperated_topic_ids').split(',')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -826,24 +819,21 @@ class AdminRoleHandler(base.BaseHandler):
             self.render_json({})
             return
 
-        if remove_from_all_topics == 'true':
-            topic_services.deassign_user_from_all_topics(
-                user_services.get_system_user(), user_id)
-            user_services.remove_user_role(user_id, role)
-            self.render_json({})
-            return
-
-        topic_ids = [
+        managed_topic_ids = [
             topic_right.id for topic_right in
             topic_fetchers.get_topic_rights_with_user(user_id)]
-        if topic_id not in topic_ids:
+        invalid_topic_ids = set(remove_from_topic_ids) - set(managed_topic_ids)
+
+        if invalid_topic_ids:
             raise self.InvalidInputException(
-                'User does not have rights in the given topic.')
+                'User does not have rights in topic with ids: %s' % (
+                    ', '.join(invalid_topic_ids)))
 
-        topic_services.deassign_manager_role_from_topic(
-            user_services.get_system_user(), user_id, topic_id)
+        for remove_from_topic_id in remove_from_topic_ids:
+            topic_services.deassign_manager_role_from_topic(
+                user_services.get_system_user(), user_id, remove_from_topic_id)
 
-        if len(topic_ids) == 1:
+        if len(managed_topic_ids) == len(remove_from_topic_ids):
             user_services.remove_user_role(user_id, role)
 
         self.render_json({})

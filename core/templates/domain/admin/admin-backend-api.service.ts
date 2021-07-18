@@ -211,14 +211,14 @@ export class AdminBackendApiService {
   }
 
   async addUserRoleAsync(
-      newRole: string, username: string, topicId: string
+      newRole: string, username: string, assignToTopicId: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           role: newRole,
           username: username,
-          topic_id: topicId
+          assign_to_topic_id: assignToTopicId
         }
       ).toPromise().then(response => {
         resolve(response);
@@ -229,8 +229,7 @@ export class AdminBackendApiService {
   }
 
   async removeUserRoleAsync(
-      newRole: string, username: string, topicId: string,
-      removeFromAllTopics: boolean
+      newRole: string, username: string, removeFromTopicId: string[]
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
@@ -238,8 +237,7 @@ export class AdminBackendApiService {
           params: {
             role: newRole,
             username: username,
-            topic_id: topicId,
-            remove_from_all_topics: removeFromAllTopics.toString()
+            remove_from_comma_seperated_topic_ids: removeFromTopicId.join(',')
           }
         }
       ).toPromise().then(resolve, errorResponse => {

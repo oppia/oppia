@@ -41,8 +41,8 @@ class ContributorDashboardAdminPage(base.BaseHandler):
         self.render_template('contributor-dashboard-admin-page.mainpage.html')
 
 
-class AddContributionRightsHandler(base.BaseHandler):
-    """Handles adding contribution rights for contributor dashboard page."""
+class ContributionRightsHandler(base.BaseHandler):
+    """Handles contribution rights of a user on contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -55,6 +55,22 @@ class AddContributionRightsHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        },
+        'DELETE': {
             'username': {
                 'schema': {
                     'type': 'basestring'
@@ -112,47 +128,15 @@ class AddContributionRightsHandler(base.BaseHandler):
                 user_id, category, language_code=language_code)
         self.render_json({})
 
-
-class RemoveContributionRightsHandler(base.BaseHandler):
-    """Handles removing contribution rights for contributor dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'category': {
-            'schema': {
-                'type': 'basestring',
-                'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
-                },
-                'default_value': None
-            }
-        }
-    }
-
     @acl_decorators.can_manage_contributors_role
-    def put(self, category):
-        username = self.normalized_payload.get('username', None)
+    def delete(self, category):
+        username = self.normalized_request.get('username', None)
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = self.normalized_payload.get('language_code', None)
+        language_code = self.normalized_request.get('language_code', None)
 
         if (category ==
                 constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):

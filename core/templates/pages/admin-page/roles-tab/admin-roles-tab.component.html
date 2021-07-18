@@ -30,7 +30,7 @@
     min-height: 100px;
     width: 100%;
   }
-  .oppia-roles-editor-card-container {
+  .oppia-roles-editor-card {
     padding: 70px 70px 40px 70px;
     min-height: 250px;
   }
@@ -98,8 +98,8 @@
         <mat-card *ngIf="startedEditingRole && !rolesFetched" >
           <mat-spinner class="mx-auto" [diameter]="30"></mat-spinner>
         </mat-card>
-        <div *ngIf="startedEditingRole && rolesFetched">
-          <mat-card *ngIf="userIsBanned" class="oppia-roles-editor-card-container">
+        <div *ngIf="startedEditingRole && rolesFetched" class="protractor-test-roles-editor-card-container">
+          <mat-card *ngIf="userIsBanned" class="oppia-roles-editor-card">
             <div class="d-flex flex-column align-items-center">
               <h3>User "{{ username }}" is banned from the application.</h3>
               <button mat-raised-button
@@ -112,7 +112,7 @@
               </button>
             </div>
           </mat-card>
-          <mat-card *ngIf="!userIsBanned" class="oppia-roles-editor-card-container">
+          <mat-card *ngIf="!userIsBanned" class="oppia-roles-editor-card">
             <div class="d-flex justify-content-between">
               <h3>Existing roles of "{{ username }}":</h3>
               <a mat-button
@@ -127,7 +127,9 @@
             <mat-list>
               <mat-list-item  class="oppia-flex"  *ngFor="let role of userRoles">
                 <div class="d-flex align-items-center oppia-user-role">
-                  <span class="oppia-user-role-description"><strong>{{ UPDATABLE_ROLES[role] | titlecase }}</strong></span>
+                  <span class="oppia-user-role-description protractor-test-user-role-description">
+                    <strong>{{ UPDATABLE_ROLES[role] | titlecase }}</strong>
+                  </span>
                   <div class="oppia-progress-spinner protractor-test-progress-spinner" *ngIf="roleInUpdate === role">
                     <mat-spinner [diameter]="24"></mat-spinner>
                   </div>

@@ -42,15 +42,14 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   private updateTopicIdsForSelection(): void {
     this.topicIdsForSelection = Object.keys(this.topicIdToName).filter(
       topicId => !this.managerInTopicsWithId.includes(topicId));
+    this.newTopicId = this.topicIdsForSelection[0];
   }
 
   addTopic(): void {
     this.managerInTopicsWithId.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
-    this.newTopicId = null;
     this.adminBackendApiService.addUserRoleAsync(
       'TOPIC_MANAGER', this.username, this.topicIdInUpdate).then(()=> {
-      this.newTopicId = null;
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     });
@@ -60,7 +59,7 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     let topicIdIndex = this.managerInTopicsWithId.indexOf(topicIdToRemove);
     this.topicIdInUpdate = topicIdToRemove;
     this.adminBackendApiService.removeUserRoleAsync(
-      'TOPIC_MANAGER', this.username, topicIdToRemove, false).then(() => {
+      'TOPIC_MANAGER', this.username, [topicIdToRemove]).then(() => {
       this.managerInTopicsWithId.splice(topicIdIndex, 1);
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();

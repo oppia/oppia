@@ -2043,7 +2043,7 @@ title: Title
             self.put_json('/adminrolehandler', {
                 'username': username,
                 'role': user_role,
-                'topic_id': topic_id
+                'assign_to_topic_id': topic_id
             }, csrf_token=self.get_new_csrf_token())
 
     def set_curriculum_admins(self, curriculum_admin_usernames):
