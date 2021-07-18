@@ -24,6 +24,7 @@ from core.platform.transactions import gae_transaction_services as transaction_s
 
 from core.storage.activity import gae_models as activity_models
 from core.storage.app_feedback_report import gae_models as app_feedback_report_models # pylint: disable=line-too-long
+from core.storage.audit import gae_models as audit_models
 from core.storage.base_model import gae_models as base_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.user import gae_models as user_models
@@ -31,6 +32,7 @@ from core.storage.user import gae_models as user_models
 __all__ = [
     b'activity_models',
     b'app_feedback_report_models',
+    b'audit_models',
     b'base_models',
     b'blog_models',
     b'datastore_services',

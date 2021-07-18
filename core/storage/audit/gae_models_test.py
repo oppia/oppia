@@ -41,8 +41,9 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     ROLE = 'role'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(RoleQueryAuditModelUnitTests, self).setUp()
+        super(RoleQueryAuditModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
 
         audit_models.RoleQueryAuditModel(
             id=self.ID,
@@ -53,11 +54,13 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             audit_models.RoleQueryAuditModel
             .has_reference_to_user_id(self.USER_ID)
@@ -68,7 +71,8 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model(self):
-        audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
+        # type: () -> None
+        audit_model = audit_models.RoleQueryAuditModel.get(self.ID) # type: audit_models.RoleQueryAuditModel # type: ignore[assignment]
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
@@ -87,8 +91,9 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     NEW_USERNAME = 'new_username'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UsernameChangeAuditModelUnitTests, self).setUp()
+        super(UsernameChangeAuditModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
 
         audit_models.UsernameChangeAuditModel(
             id=self.ID,
@@ -98,11 +103,13 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             audit_models.UsernameChangeAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             audit_models.UsernameChangeAuditModel
             .has_reference_to_user_id(self.COMMITTER_ID)
@@ -113,7 +120,8 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model(self):
-        audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
+        # type: () -> None
+        audit_model = audit_models.UsernameChangeAuditModel.get(self.ID) # type: audit_models.RoleQueryAuditModel # type: ignore[assignment]
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)
