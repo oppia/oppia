@@ -28,7 +28,7 @@ import { LoggerService } from 'services/contextual/logger.service';
   providedIn: 'root'
 })
 export class TranslationLanguageService {
-  private activeLanguageCode: string | null = null;
+  private activeLanguageCode!: string;
   private allAudioLanguageCodes: string[] = (
     this.languageUtilService.getAllVoiceoverLanguageCodes());
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
@@ -37,7 +37,7 @@ export class TranslationLanguageService {
     private languageUtilService: LanguageUtilService,
     private loggerService: LoggerService) {}
 
-  getActiveLanguageCode(): string | null {
+  getActiveLanguageCode(): string {
     return this.activeLanguageCode;
   }
 
@@ -47,7 +47,7 @@ export class TranslationLanguageService {
   }
 
   // This function throws an error if 'newActiveLanguageCode' is invalid.
-  setActiveLanguageCode(newActiveLanguageCode: string | null): void {
+  setActiveLanguageCode(newActiveLanguageCode: string): void {
     if (newActiveLanguageCode &&
         this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
       this.loggerService.error(

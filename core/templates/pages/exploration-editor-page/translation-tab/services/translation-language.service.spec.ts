@@ -49,11 +49,11 @@ describe('Translation language service', () => {
     it('should not allow invalid state names to be set', () => {
       translationLanguageService.setActiveLanguageCode('eng');
       expect(
-        translationLanguageService?.getActiveLanguageCode()).toBeNull();
+        translationLanguageService?.getActiveLanguageCode()).toBeUndefined();
 
-      translationLanguageService.setActiveLanguageCode(null);
+      translationLanguageService.setActiveLanguageCode('Invalid language code');
       expect(
-        translationLanguageService.getActiveLanguageCode()).toBeNull();
+        translationLanguageService.getActiveLanguageCode()).toBeUndefined();
     });
 
     it('should show the language direction', () => {
