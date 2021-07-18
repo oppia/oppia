@@ -87,11 +87,13 @@ class StewardsLandingPageTest(test_utils.GenericTestBase):
     def test_teachers_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
-        response.mustcontain('<oppia-stewards-landing-page-root>' +
-        '</oppia-stewards-landing-page-root>')
+        response.mustcontain(
+            '<oppia-stewards-landing-page-root>' +
+            '</oppia-stewards-landing-page-root>')
 
     def test_volunteers_landing_page(self):
         response = self.get_html_response(
             feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
-        response.mustcontain('<oppia-stewards-landing-page-root>' +
-        '</oppia-stewards-landing-page-root>')
+        response.mustcontain(
+            '<oppia-stewards-landing-page-root>' +
+            '</oppia-stewards-landing-page-root>')
