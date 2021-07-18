@@ -23,7 +23,7 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
 
-describe('Delete Topic Modal Component', () => {
+describe('Edit Profile Picture Modal Component', () => {
   let fixture: ComponentFixture<EditProfilePictureModalComponent>;
   let componentInstance: EditProfilePictureModalComponent;
 
@@ -59,7 +59,6 @@ describe('Delete Topic Modal Component', () => {
   });
 
   it('should initialize cropper', () => {
-    fixture.detectChanges();
     componentInstance.croppableImageRef = (
       new ElementRef(document.createElement('img')));
     componentInstance.initializeCropper();
