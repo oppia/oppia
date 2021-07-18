@@ -2,14 +2,20 @@
   "compilerOptions": {
     "allowJs": true,
     "downlevelIteration": true,
-    "lib": ["es2017", "dom", "webworker"],
+    "lib": [
+      "es2017",
+      "dom",
+      "webworker"
+    ],
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es6",
     "sourceMap": true,
     "strict": true,
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
@@ -18,26 +24,52 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "app.constants": ["core/templates/app.constants"],
-      "components/*": ["core/templates/components/*"],
-      "directives/*": ["core/templates/directives/*"],
-      "domain/*": ["core/templates/domain/*"],
-      "expressions/*": ["core/templates/expressions/*"],
-      "app-events/*": ["core/templates/app-events/*"],
-      "pages/*": ["core/templates/pages/*"],
-      "services/*": ["core/templates/services/*"],
-      "classifiers/*": ["extensions/classifiers/*"],
-      "interactions/*": ["extensions/interactions/*"],
-      "filters/*": ["core/templates/filters/*"],
-      "static/*": ["third_party/static/*"],
-      "tests/*": ["core/templates/tests/*"]
+      "app.constants": [
+        "core/templates/app.constants"
+      ],
+      "components/*": [
+        "core/templates/components/*"
+      ],
+      "directives/*": [
+        "core/templates/directives/*"
+      ],
+      "domain/*": [
+        "core/templates/domain/*"
+      ],
+      "expressions/*": [
+        "core/templates/expressions/*"
+      ],
+      "app-events/*": [
+        "core/templates/app-events/*"
+      ],
+      "pages/*": [
+        "core/templates/pages/*"
+      ],
+      "services/*": [
+        "core/templates/services/*"
+      ],
+      "classifiers/*": [
+        "extensions/classifiers/*"
+      ],
+      "interactions/*": [
+        "extensions/interactions/*"
+      ],
+      "filters/*": [
+        "core/templates/filters/*"
+      ],
+      "static/*": [
+        "third_party/static/*"
+      ],
+      "tests/*": [
+        "core/templates/tests/*"
+      ]
     }
   },
   "files": [
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
-    "core/templates/app.constants.ts",
     "core/templates/app-events/app-events.ts",
+    "core/templates/app.constants.ts",
     "core/templates/base-components/loading-message.component.ts",
     "core/templates/base-components/warnings-and-alerts.component.ts",
     "core/templates/base-components/warnings-and-alerts.component.spec.ts",
@@ -247,12 +279,12 @@
     "core/templates/domain/statistics/PlaythroughIssueObjectFactorySpec.ts",
     "core/templates/domain/statistics/PlaythroughObjectFactory.ts",
     "core/templates/domain/statistics/PlaythroughObjectFactorySpec.ts",
-    "core/templates/domain/statistics/playthrough-backend-api.service.ts",
-    "core/templates/domain/statistics/playthrough-backend-api.service.spec.ts",
     "core/templates/domain/statistics/exploration-stats.model.ts",
     "core/templates/domain/statistics/exploration-stats.model.spec.ts",
     "core/templates/domain/statistics/learner-answer-details-backend-api.service.ts",
     "core/templates/domain/statistics/learner-answer-details-backend-api.service.spec.ts",
+    "core/templates/domain/statistics/playthrough-backend-api.service.ts",
+    "core/templates/domain/statistics/playthrough-backend-api.service.spec.ts",
     "core/templates/domain/statistics/state-top-answers-stats-object.factory.ts",
     "core/templates/domain/statistics/state-top-answers-stats-object.factory.spec.ts",
     "core/templates/domain/story/StoryContentsObjectFactory.ts",
