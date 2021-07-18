@@ -51,7 +51,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return ['ref1', 'ref2']
         def mock_collect_files_being_pushed(unused_refs, unused_remote):
             return {
-                'branch1': (['A:file1', 'M:file2'], ['file1', 'file2']),
+                'branch1': ([b'A:file1', b'M:file2'], [b'file1', b'file2']),
                 'branch2': ([], [])}
         def mock_has_uncommitted_files():
             return False
@@ -568,32 +568,32 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_does_diff_include_js_or_ts_files_with_js_file(self):
         self.assertTrue(
             pre_push_hook.does_diff_include_js_or_ts_files(
-                ['file1.js', 'file2.py']))
+                [b'file1.js', b'file2.py']))
 
     def test_does_diff_include_js_or_ts_files_with_no_file(self):
         self.assertFalse(
             pre_push_hook.does_diff_include_js_or_ts_files(
-                ['file1.html', 'file2.py']))
+                [b'file1.html', b'file2.py']))
 
     def test_does_diff_include_ts_files(self):
         self.assertTrue(
             pre_push_hook.does_diff_include_ts_files(
-                ['file1.ts', 'file2.ts', 'file3.js']))
+                [b'file1.ts', b'file2.ts', b'file3.js']))
 
     def test_does_diff_include_ts_files_fail(self):
         self.assertFalse(
             pre_push_hook.does_diff_include_ts_files(
-                ['file1.html', 'file2.yml', 'file3.js']))
+                [b'file1.html', b'file2.yml', b'file3.js']))
 
     def test_does_diff_include_ci_config_or_js_files(self):
         self.assertTrue(
             pre_push_hook.does_diff_include_ci_config_or_js_files(
-                ['file1.js', 'protractor.conf.js', 'e2e_dummy.yml']))
+                [b'file1.js', b'protractor.conf.js', b'e2e_dummy.yml']))
 
     def test_does_diff_include_ci_config_or_js_files_fail(self):
         self.assertFalse(
             pre_push_hook.does_diff_include_ci_config_or_js_files(
-                ['file1.ts', 'file2.ts', 'file3.html']))
+                [b'file1.ts', b'file2.ts', b'file3.html']))
 
     def test_repo_in_dirty_state(self):
         def mock_has_uncommitted_files():
