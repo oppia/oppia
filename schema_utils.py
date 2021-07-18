@@ -627,3 +627,23 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid audio language code.
         """
         return utils.is_valid_language_code(obj)
+
+    @staticmethod
+    def is_valid_thread_id(obj):
+        # type: (Text) -> bool
+        """Checks if the given obj (a string) represents a valid thread id.
+        The id has the form [entity_type].[entity_id].[generated_string]
+
+        Args:
+            obj: str. The thread id to verify.
+
+        Returns:
+            bool. Whether the given object is a valid thread id.
+        """
+        thread_id_must_starts_with = [
+            'exploration.', 'collection.', 'story.', 'learntopic.']
+
+        for starting_chars in thread_id_must_starts_with:
+            if obj.startswith(starting_chars):
+                return True
+        return False

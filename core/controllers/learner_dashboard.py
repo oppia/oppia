@@ -203,7 +203,10 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'thread_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_valid_thread_id'
+                }]
             }
         }
     }
