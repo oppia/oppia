@@ -1112,7 +1112,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             skill_domain.SkillChange({
                 'cmd': (
-                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION),
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
                 'from_version': 1,
                 'to_version': 2,
             })
