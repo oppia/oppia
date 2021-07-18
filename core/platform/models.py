@@ -387,7 +387,7 @@ class Registry(python_utils.OBJECT):
         Returns:
             class. The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING[GAE_PLATFORM]
+        return cls._PLATFORM_MAPPING.get(GAE_PLATFORM) # type: ignore[return-value]
 
     @classmethod
     def import_models(cls, model_names):
