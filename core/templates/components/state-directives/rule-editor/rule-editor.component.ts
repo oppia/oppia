@@ -58,12 +58,12 @@ angular.module('oppia').component('ruleEditor', {
   template: require('./rule-editor.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$log', '$scope', '$timeout', 'EventBusService',
+    '$scope', '$timeout', 'EventBusService',
     'PopulateRuleContentIdsService', 'ResponsesService',
     'StateEditorService', 'StateInteractionIdService',
     'INTERACTION_SPECS',
     function(
-        $log, $scope, $timeout, EventBusService,
+        $scope, $timeout, EventBusService,
         PopulateRuleContentIdsService, ResponsesService,
         StateEditorService, StateInteractionIdService,
         INTERACTION_SPECS) {

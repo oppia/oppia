@@ -21,7 +21,7 @@ import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-fdescribe('RuleEditor', () => {
+describe('RuleEditor', () => {
   importAllAngularServices();
 
   let ctrl = null;
@@ -38,34 +38,45 @@ fdescribe('RuleEditor', () => {
   const INTERACTION_SPECS = {
     TextInput: {
       rule_descriptions: {
-        StartsWith: 'starts with at least one of {{x|TranslatableSetOfNormalizedString}}',
-        Contains: 'contains at least one of {{x|TranslatableSetOfNormalizedString}}',
-        Equals: 'is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, without taking case into account',
-        FuzzyEquals: 'is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, misspelled by at most one character'
+        StartsWith: 'starts with at least one of' +
+          ' {{x|TranslatableSetOfNormalizedString}}',
+        Contains: 'contains at least one of' +
+          ' {{x|TranslatableSetOfNormalizedString}}',
+        Equals: 'is equal to at least one of' +
+          ' {{x|TranslatableSetOfNormalizedString}},' +
+            ' without taking case into account',
+        FuzzyEquals: 'is equal to at least one of {{x|TranslatableSetOf' +
+          'NormalizedString}}, misspelled by at most one character'
       }
     },
     AlgebraicExpressionInput: {
       rule_descriptions: {
         MatchesExactlyWith: 'matches exactly with {{x|AlgebraicExpression}}',
-      IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}',
-      ContainsSomeOf: 'contains at least one of the terms present in {{x|AlgebraicExpression}}',
-      OmitsSomeOf: 'omits at least one of the terms present in {{x|AlgebraicExpression}}',
-      MatchesWithGeneralForm: 'matches the form of {{x|AlgebraicExpression}} with placeholders {{y|SetOfAlgebraicIdentifier}}'
+        IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}',
+        ContainsSomeOf: 'contains at least one of the terms present in' +
+          ' {{x|AlgebraicExpression}}',
+        OmitsSomeOf: 'omits at least one of the terms present in' +
+          ' {{x|AlgebraicExpression}}',
+        MatchesWithGeneralForm: 'matches the form of {{x|Algebraic' +
+          'Expression}} with placeholders {{y|SetOfAlgebraicIdentifier}}'
       }
     },
     DummyInteraction1: {
       rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with {{x|SetOfTranslatableHtmlContentIds}}'
+        MatchesExactlyWith: 'matches exactly with' +
+          ' {{x|SetOfTranslatableHtmlContentIds}}'
       }
     },
     DummyInteraction2: {
       rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with {{x|ListOfSetsOfTranslatableHtmlContentIds}}'
+        MatchesExactlyWith: 'matches exactly with' +
+          ' {{x|ListOfSetsOfTranslatableHtmlContentIds}}'
       }
     },
     DummyInteraction3: {
       rule_descriptions: {
-        MatchesExactlyWith: 'matches exactly with {{x|TranslatableHtmlContentId}}'
+        MatchesExactlyWith: 'matches exactly with' +
+          ' {{x|TranslatableHtmlContentId}}'
       }
     },
     DummyInteraction4: {
@@ -105,7 +116,7 @@ fdescribe('RuleEditor', () => {
   it('should set component properties on initialization', () => {
     ctrl.rule = {
       type: null
-    }
+    };
     StateInteractionIdService.savedMemento = 'TextInput';
 
     expect(ctrl.currentInteractionId).toBe(undefined);
@@ -124,7 +135,7 @@ fdescribe('RuleEditor', () => {
       TestBed.inject(EventBusService));
     ctrl.rule = {
       type: null
-    }
+    };
 
     expect(ctrl.isInvalid).toBe(undefined);
 
@@ -174,7 +185,7 @@ fdescribe('RuleEditor', () => {
     expect(ctrl.rule).toEqual({
       type: 'StartsWith',
       inputTypes: {
-          x: 'TranslatableSetOfNormalizedString'
+        x: 'TranslatableSetOfNormalizedString'
       },
       inputs: {
         x: {contentId: null, normalizedStrSet: []}
@@ -202,7 +213,7 @@ fdescribe('RuleEditor', () => {
     expect(ctrl.rule).toEqual({
       type: 'StartsWith',
       inputTypes: {
-          x: 'TranslatableSetOfNormalizedString'
+        x: 'TranslatableSetOfNormalizedString'
       },
       inputs: {
         x: {contentId: null, normalizedStrSet: []}

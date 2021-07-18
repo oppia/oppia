@@ -179,7 +179,7 @@ describe('VersionDiffVisualizationComponent', () => {
 
       return {
         result: $q.resolve()
-      }
+      };
     });
 
     ctrl.$onInit();
@@ -213,8 +213,8 @@ describe('VersionDiffVisualizationComponent', () => {
           B: {}
         },
         v1States: {
-          A : {},
-          B : {}
+          A: {},
+          B: {}
         }
       }
     );
@@ -227,7 +227,7 @@ describe('VersionDiffVisualizationComponent', () => {
 
       return {
         result: $q.resolve()
-      }
+      };
     });
 
     ctrl.$onInit();
