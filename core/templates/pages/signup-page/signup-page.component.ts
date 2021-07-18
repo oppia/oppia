@@ -19,7 +19,6 @@
 import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -59,7 +58,6 @@ export class SignupPageComponent {
     private loaderService: LoaderService,
     private signupPageBackendApiService: SignupPageBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {}
 
@@ -140,7 +138,7 @@ export class SignupPageComponent {
     }
   }
 
-  onSelectEmailPReference(): void {
+  onSelectEmailPreference(): void {
     this.emailPreferencesWarningText = '';
   }
 
