@@ -91,6 +91,11 @@ def get_matching_activity_dicts(
 class OldLibraryRedirectPage(base.BaseHandler):
     """Redirects the old library URL to the new one."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -102,6 +107,11 @@ class LibraryPage(base.BaseHandler):
     for search results.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -112,6 +122,10 @@ class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the default library index page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -167,6 +181,11 @@ class LibraryGroupPage(base.BaseHandler):
     explorations.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -177,12 +196,22 @@ class LibraryGroupIndexHandler(base.BaseHandler):
     """Provides data for categories such as top rated and recently published."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'group_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests for group pages."""
         # TODO(sll): Support index pages for other language codes.
-        group_name = self.request.get('group_name')
+        group_name = self.normalized_request.get('group_name')
         activity_list = []
         header_i18n_id = ''
 
@@ -223,13 +252,47 @@ class SearchHandler(base.BaseHandler):
     """Provides data for activity search results."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'q': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': ''
+            },
+            'category': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_string_contained_within_parenthesis'
+                    }]
+                },
+                'default_value': ''
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_string_contained_within_parenthesis'
+                    }]
+                },
+                'default_value': ''
+            },
+            'cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         query_string = utils.unescape_encoded_uri_component(
-            self.request.get('q'))
-
+            self.normalized_request.get('q'))
         # Remove all punctuation from the query string, and replace it with
         # spaces. See http://stackoverflow.com/a/266162 and
         # http://stackoverflow.com/a/11693937
@@ -239,11 +302,8 @@ class SearchHandler(base.BaseHandler):
 
         # If there is a category parameter, it should be in the following form:
         #     category=("Algebra" OR "Math")
-        category_string = self.request.get('category', '')
-        if category_string and (
-                not category_string.startswith('("') or
-                not category_string.endswith('")')):
-            raise self.InvalidInputException('Invalid search query.')
+        category_string = self.normalized_request.get('category')
+
         # The 2 and -2 account for the '("" and '")' characters at the
         # beginning and end.
         categories = (
@@ -252,11 +312,8 @@ class SearchHandler(base.BaseHandler):
         # If there is a language code parameter, it should be in the following
         # form:
         #     language_code=("en" OR "hi")
-        language_code_string = self.request.get('language_code', '')
-        if language_code_string and (
-                not language_code_string.startswith('("') or
-                not language_code_string.endswith('")')):
-            raise self.InvalidInputException('Invalid search query.')
+        language_code_string = self.normalized_request.get('language_code')
+
         # The 2 and -2 account for the '("" and '")' characters at the
         # beginning and end.
         language_codes = (
@@ -264,7 +321,7 @@ class SearchHandler(base.BaseHandler):
             if language_code_string else [])
 
         # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
-        search_offset = self.request.get('cursor', None)
+        search_offset = self.normalized_request.get('cursor')
 
         activity_list, new_search_offset = get_matching_activity_dicts(
             query_string, categories, language_codes, search_offset)
@@ -280,6 +337,11 @@ class SearchHandler(base.BaseHandler):
 class LibraryRedirectPage(base.BaseHandler):
     """An old 'gallery' page that should redirect to the library index page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -292,15 +354,33 @@ class ExplorationSummariesHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'stringified_exp_ids': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'include_private_explorations': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         try:
-            exp_ids = json.loads(self.request.get('stringified_exp_ids'))
+            exp_ids = json.loads(self.normalized_request.get(
+                'stringified_exp_ids'))
         except Exception:
             raise self.PageNotFoundException
-        include_private_exps_str = self.request.get(
+        include_private_exps_str = self.normalized_request.get(
             'include_private_explorations')
         include_private_exps = (
             include_private_exps_str.lower() == 'true'
@@ -333,13 +413,24 @@ class CollectionSummariesHandler(base.BaseHandler):
     """Returns collection summaries corresponding to collection ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'stringified_collection_ids': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         try:
             collection_ids = json.loads(
-                self.request.get('stringified_collection_ids'))
+                self.normalized_request.get('stringified_collection_ids'))
         except Exception:
             raise self.PageNotFoundException
         summaries = (

@@ -627,3 +627,18 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid audio language code.
         """
         return utils.is_valid_language_code(obj)
+
+    @staticmethod
+    def is_string_contained_within_parenthesis(obj):
+        # type: (Text) -> bool
+        """Checks if the given obj (a string) is contained within parenthesis.
+
+        Args:
+            obj: str. The string to verify.
+
+        Returns:
+            bool. Whether the given object is contained within parenthesis.
+        """
+        if obj and (not obj.startswith('("') or not obj.endswith('")')):
+            return False
+        return True
