@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid .ts file with wrong lodash import,
- * used by scripts/linters/general_purpose_linter.py.
+ * @fileoverview Constants for the contributor dashboard admin page.
  */
 
-import _ from 'lodash';
+export const ContributorDashboardAdminPageConstants = {
+  CONTRIBUTION_RIGHTS_HANDLER_URL: (
+    '/contributionrightshandler/<category>'),
+  CONTRIBUTION_RIGHTS_DATA_HANDLER_URL: '/contributionrightsdatahandler',
+  GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler/<category>',
+  TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL: (
+    '/translationcontributionstatshandler'
+  )
+} as const;

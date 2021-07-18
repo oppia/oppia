@@ -21,12 +21,11 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { AdminBackendApiService, AdminPageData, ContributionRightsBackendResponse, UserRolesBackendResponse, ViewContributionBackendResponse } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService, AdminPageData, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-import { AddContributionRightsAction, AdminRolesTabComponent, RemoveContributionRightsAction, UpdateRoleAction, ViewContributionReviewersAction, ViewUserRolesAction } from './admin-roles-tab.component';
+import { AdminRolesTabComponent, UpdateRoleAction, ViewUserRolesAction } from './admin-roles-tab.component';
 
 describe('Admin roles tab component ', function() {
   let component: AdminRolesTabComponent;
@@ -35,7 +34,6 @@ describe('Admin roles tab component ', function() {
   let adminBackendApiService: AdminBackendApiService;
   let adminDataService: AdminDataService;
   let adminTaskManagerService: AdminTaskManagerService;
-  let languageUtilService: LanguageUtilService;
 
   let statusMessageSpy: jasmine.Spy;
   const sampleCreatorTopicSummaryBackendDict = {
@@ -100,8 +98,7 @@ describe('Admin roles tab component ', function() {
       providers: [
         AdminBackendApiService,
         AdminDataService,
-        AdminTaskManagerService,
-        LanguageUtilService
+        AdminTaskManagerService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -114,7 +111,6 @@ describe('Admin roles tab component ', function() {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminDataService = TestBed.inject(AdminDataService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
-    languageUtilService = TestBed.inject(LanguageUtilService);
 
     statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
       .and.returnValue(null);
@@ -122,10 +118,6 @@ describe('Admin roles tab component ', function() {
 
   it('should retrieve data from the backend and ' +
     'set properties when initialized', fakeAsync(() => {
-    spyOn(languageUtilService, 'getAllVoiceoverLanguageCodes')
-      .and.returnValue(['en']);
-    spyOn(languageUtilService, 'getAudioLanguageDescription')
-      .and.returnValue('description');
     spyOn(adminDataService, 'getDataAsync').and.resolveTo(adminPageData);
 
     // Prechecks.
@@ -143,30 +135,6 @@ describe('Admin roles tab component ', function() {
     expect(component.VIEWABLE_ROLES).toBe(adminPageData.viewableRoles);
     expect(component.topicSummaries).toBe(adminPageData.topicSummaries);
   }));
-
-  it('should return language description given language codes ' +
-    'when calling \'getLanguageDescriptions\'', () => {
-    spyOn(languageUtilService, 'getAudioLanguageDescription')
-      .and.returnValue('english');
-
-    let languageDesriptions = component.getLanguageDescriptions(['en1', 'en2']);
-
-    expect(languageDesriptions).toEqual(['english', 'english']);
-  });
-
-  it('should check whether a language is in specific review cateogry', () => {
-    // Checks for 'translation'.
-    let result = component.isLanguageSpecificReviewCategory('translation');
-    expect(result).toBe(true);
-
-    // Checks for 'voiceover'.
-    result = component.isLanguageSpecificReviewCategory('voiceover');
-    expect(result).toBe(true);
-
-    // Checks for 'invalidCategory'.
-    result = component.isLanguageSpecificReviewCategory('invalidCategory');
-    expect(result).toBe(false);
-  });
 
   it('should clear results when ever change is detected in ' +
     'the form', fakeAsync(() => {
@@ -349,221 +317,6 @@ describe('Admin roles tab component ', function() {
     }));
   });
 
-  describe('on clicking view contributors button ', () => {
-    it('should successfully show rights of a user given the ' +
-      'username', fakeAsync(() => {
-      // Note that username is filter criterion here.
-      const viewContributionReviewersAction: ViewContributionReviewersAction = {
-        category: 'category',
-        filterCriterion: 'username',
-        isValid: () => true,
-        languageCode: 'en',
-        username: 'user1'
-      };
-
-      const viewContributorsResponse: ContributionRightsBackendResponse = {
-        can_review_questions: true,
-        can_review_translation_for_language_codes: ['en', 'es'],
-        can_review_voiceover_for_language_codes: ['en', 'es'],
-        can_submit_questions: true
-      };
-
-      spyOn(adminBackendApiService, 'contributionReviewerRightsAsync')
-        .and.returnValue(Promise.resolve(viewContributorsResponse));
-
-      expect(component.contributionReviewersDataFetched).toBe(false);
-
-      component.submitViewContributorUsersForm(viewContributionReviewersAction);
-      tick();
-
-      expect(component.contributionReviewersDataFetched).toBe(true);
-      expect(statusMessageSpy).toHaveBeenCalledWith('Success.');
-    }));
-
-    it('should successfully show users given the ' +
-      'contributor rights', fakeAsync(() => {
-      // Note that rights is filter criterion here.
-      const viewContributionReviewersAction: ViewContributionReviewersAction = {
-        category: 'category',
-        filterCriterion: 'role',
-        isValid: () => true,
-        languageCode: 'en',
-        username: 'user1'
-      };
-
-      const viewContributorsResponse: ViewContributionBackendResponse = {
-        usernames: ['user1']
-      };
-
-      spyOn(adminBackendApiService, 'viewContributionReviewersAsync')
-        .and.returnValue(Promise.resolve(viewContributorsResponse));
-
-      expect(component.contributionReviewersResult).toEqual(null);
-      expect(component.contributionReviewersDataFetched).toBe(false);
-
-      component.submitViewContributorUsersForm(viewContributionReviewersAction);
-      tick();
-
-      expect(component.contributionReviewersResult.usernames)
-        .toEqual(viewContributorsResponse.usernames);
-      expect(component.contributionReviewersDataFetched).toBe(true);
-      expect(statusMessageSpy).toHaveBeenCalledWith('Success.');
-    }));
-
-    it('should not show any results if the given rights is unclaimed ' +
-      'by any user', fakeAsync(() => {
-      // Note that rights is filter criterion here.
-      const viewContributionReviewersAction: ViewContributionReviewersAction = {
-        category: 'category',
-        filterCriterion: 'role',
-        isValid: () => true,
-        languageCode: 'en',
-        username: 'user1'
-      };
-
-      const viewContributorsResponse: ViewContributionBackendResponse = {
-        usernames: []
-      };
-
-      // Note that we are returning empty list.
-      spyOn(adminBackendApiService, 'viewContributionReviewersAsync')
-        .and.returnValue(Promise.resolve({usernames: []}));
-
-      expect(component.contributionReviewersDataFetched).toBe(false);
-
-      component.submitViewContributorUsersForm(viewContributionReviewersAction);
-      tick();
-
-      expect(component.contributionReviewersResult.usernames)
-        .toEqual(viewContributorsResponse.usernames);
-
-      expect(statusMessageSpy).toHaveBeenCalledWith('No results.');
-      expect(component.contributionReviewersDataFetched).toBe(false);
-    }));
-
-    it('should not send request to backend if a task ' +
-      'is still running in the queue', fakeAsync(() => {
-      // Setting task running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-      const viewContributorsResponse: ViewContributionBackendResponse = {
-        usernames: ['user1']
-      };
-
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'viewContributionReviewersAsync')
-        .and.resolveTo(viewContributorsResponse);
-
-      const viewContributionReviewersAction: ViewContributionReviewersAction = {
-        category: 'category',
-        filterCriterion: 'username',
-        isValid: () => true,
-        languageCode: 'en',
-        username: 'user1'
-      };
-
-      expect(component.contributionReviewersDataFetched).toBe(false);
-
-      component.submitViewContributorUsersForm(viewContributionReviewersAction);
-      tick();
-
-      expect(adminBackendServiceSpy).not.toHaveBeenCalled();
-      expect(component.contributionReviewersDataFetched).toBe(false);
-    }));
-  });
-
-  describe('on clicking add rights button ', () => {
-    it('should successfully update the rights of the user', fakeAsync(() => {
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'addContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
-
-      const addContributionRightsAction: AddContributionRightsAction = {
-        category: 'translation',
-        isValid: () => true,
-        languageCode: 'en',
-        username: 'user1'
-      };
-
-      component.submitAddContributionRightsForm(addContributionRightsAction);
-      tick();
-
-      expect(adminBackendServiceSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Successfully added "user1" as translation reviewer.');
-    }));
-
-    it('should not send request to backend if a task ' +
-      'is still running in the queue', fakeAsync(() => {
-      // Setting task running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'addContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
-
-      const addContributionRightsAction: AddContributionRightsAction = {
-        category: 'translation',
-        isValid: () => true,
-        languageCode: 'en',
-        username: 'user1'
-      };
-
-      component.submitAddContributionRightsForm(addContributionRightsAction);
-      tick();
-
-      expect(adminBackendServiceSpy).not.toHaveBeenCalled();
-    }));
-  });
-
-  describe('on clicking remove rights button ', () => {
-    it('should successfully remove the rights of the user', fakeAsync(() => {
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'removeContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
-
-      const removeContributionRightsAction: RemoveContributionRightsAction = {
-        category: 'translation',
-        isValid: () => true,
-        languageCode: 'en',
-        method: 'all',
-        username: 'user1'
-      };
-
-      component.submitRemoveContributionRightsForm(
-        removeContributionRightsAction);
-      tick();
-
-      expect(adminBackendServiceSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Success.');
-    }));
-
-    it('should not send request to backend if a task ' +
-      'is still running in the queue', fakeAsync(() => {
-      // Setting task running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-
-      let adminBackendServiceSpy = spyOn(
-        adminBackendApiService, 'removeContributionReviewerAsync')
-        .and.returnValue(Promise.resolve(null));
-
-      const removeContributionRightsAction: RemoveContributionRightsAction = {
-        category: 'translation',
-        isValid: () => true,
-        languageCode: 'en',
-        method: 'all',
-        username: 'user1'
-      };
-
-      component.submitRemoveContributionRightsForm(
-        removeContributionRightsAction);
-      tick();
-
-      expect(adminBackendServiceSpy).not.toHaveBeenCalled();
-    }));
-  });
-
-
   // Note that 'refreshFormData()' is called when
   // ever change is detected in any one of the
   // forms available in admin-roles-tab.
@@ -640,166 +393,6 @@ describe('Admin roles tab component ', function() {
         fixture.detectChanges();
 
         let result = component.formData.updateRole.isValid();
-        expect(result).toBe(false);
-      }));
-    });
-
-    describe('in the view contributor dashboard users section ', () => {
-      it('should return true if there are no validation errors ' +
-        'when fetching user rights with filter criterion as ' +
-        'rights and category as voiceOver', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Note that rights is filter criterion here.
-        component.formData.viewContributionReviewers.filterCriterion = 'role';
-        component.formData.viewContributionReviewers.category = 'voiceOver';
-        component.formData.viewContributionReviewers.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.viewContributionReviewers.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return true if there are no validation errors ' +
-        'when fetching user rights with filter criterion as ' +
-        'rights and category as translation', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Note that rights is filter criterion here.
-        component.formData.viewContributionReviewers.filterCriterion = 'role';
-        component.formData.viewContributionReviewers.category = 'translation';
-        component.formData.viewContributionReviewers.languageCode = 'en';
-        component.formData.viewContributionReviewers.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.viewContributionReviewers.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return true if there are no validation errors ' +
-        'when fetching user rights with filter criterion as ' +
-        'username', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Note that username is filter criterion here.
-        component.formData.viewContributionReviewers.filterCriterion = (
-          'username');
-        component.formData.viewContributionReviewers.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.viewContributionReviewers.isValid();
-        expect(result).toBe(true);
-      }));
-    });
-
-    describe('in the add contribution rights section ', () => {
-      it('should return true if there are no validation errors ' +
-        'when updating user rights for category translation', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting category to be translation.
-        component.formData.addContributionReviewer.category = 'translation';
-        component.formData.addContributionReviewer.languageCode = 'en';
-        component.formData.addContributionReviewer.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.addContributionReviewer.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return true if there are no validation errors ' +
-        'when updating user rights for category voicover', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting category to be voiceover.
-        component.formData.addContributionReviewer.category = 'voiceOver';
-        component.formData.addContributionReviewer.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.addContributionReviewer.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return false if there are validation errors ' +
-        'when updating user rights', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting category to be null.
-        component.formData.addContributionReviewer.category = null;
-        component.formData.addContributionReviewer.username = 'user1';
-        fixture.detectChanges();
-
-        let result = component.formData.addContributionReviewer.isValid();
-        expect(result).toBe(false);
-      }));
-    });
-
-    describe('in the remove contribution rights section ', () => {
-      it('should return true if there are no validation errors ' +
-        'when removing user rights for all categories', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting method to all.
-        component.formData.removeContributionReviewer.category = 'all';
-        component.formData.removeContributionReviewer.languageCode = 'en';
-        component.formData.removeContributionReviewer.username = 'user1';
-        component.formData.removeContributionReviewer.method = 'all';
-        fixture.detectChanges();
-
-        let result = component.formData.removeContributionReviewer.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return true if there are no validation errors ' +
-        'when removing user rights for category translation', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting category to translation.
-        component.formData.removeContributionReviewer.category = 'translation';
-        component.formData.removeContributionReviewer.languageCode = 'en';
-        component.formData.removeContributionReviewer.username = 'user1';
-        component.formData.removeContributionReviewer.method = 'specific';
-        fixture.detectChanges();
-
-        let result = component.formData.removeContributionReviewer.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return true if there are no validation errors ' +
-        'when removing user rights for category voicover', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting category to voiceover.
-        component.formData.removeContributionReviewer.category = 'voiceOver';
-        component.formData.removeContributionReviewer.username = 'user1';
-        component.formData.removeContributionReviewer.method = 'specific';
-        fixture.detectChanges();
-
-        let result = component.formData.removeContributionReviewer.isValid();
-        expect(result).toBe(true);
-      }));
-
-      it('should return false if there are validation errors ' +
-        'when removing user rights', fakeAsync(() => {
-        component.refreshFormData();
-        fixture.detectChanges();
-
-        // Setting category to be null.
-        component.formData.removeContributionReviewer.category = null;
-        component.formData.removeContributionReviewer.username = 'user1';
-        component.formData.removeContributionReviewer.method = 'specific';
-        fixture.detectChanges();
-
-        let result = component.formData.removeContributionReviewer.isValid();
         expect(result).toBe(false);
       }));
     });
