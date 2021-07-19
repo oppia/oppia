@@ -17,17 +17,17 @@ from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='exploration.proto',
-  package='core.domain',
+  package='',
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11\x65xploration.proto\x12\x0b\x63ore.domain\x1a google/protobuf/descriptor.proto\"\x81\x02\n\x0b\x45xploration\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x05\x12\x17\n\x0finit_state_name\x18\x08 \x01(\t\x12\x34\n\x06states\x18\x0b \x03(\x0b\x32$.core.domain.Exploration.StatesEntry\x12\r\n\x05title\x18\x0c \x01(\t\x1a\x41\n\x0bStatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12!\n\x05value\x18\x02 \x01(\x0b\x32\x12.core.domain.State:\x02\x38\x01J\x04\x08\x03\x10\x04J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07J\x04\x08\x07\x10\x08J\x04\x08\t\x10\nJ\x04\x08\n\x10\x0bJ\x04\x08\r\x10\x0eJ\x04\x08\x0e\x10\x0f\"\xfb\x01\n\x05State\x12+\n\x07\x63ontent\x18\x01 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\x12\x35\n\x0binteraction\x18\x03 \x01(\x0b\x32 .core.domain.InteractionInstance\x12<\n\x13recorded_voiceovers\x18\x05 \x01(\x0b\x32\x1f.core.domain.RecordedVoiceovers\x12>\n\x14written_translations\x18\x06 \x01(\x0b\x32 .core.domain.WrittenTranslationsJ\x04\x08\x02\x10\x03J\x04\x08\x04\x10\x05J\x04\x08\x07\x10\x08\"1\n\rSubtitledHtml\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x0c\n\x04html\x18\x02 \x01(\t\"^\n\x12RecordedVoiceovers\x12H\n\x1avoiceover_language_mapping\x18\x01 \x03(\x0b\x32$.core.domain.VoiceoverContentMapping\"\x89\x02\n\x17VoiceoverContentMapping\x12\x30\n\rlanguage_code\x18\x01 \x01(\x0e\x32\x19.core.domain.LanguageCode\x12\x64\n\x19voiceover_content_mapping\x18\x02 \x03(\x0b\x32\x41.core.domain.VoiceoverContentMapping.VoiceoverContentMappingEntry\x1aV\n\x1cVoiceoverContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.core.domain.Voiceover:\x02\x38\x01\"S\n\tVoiceover\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x17\n\x0f\x66ile_size_bytes\x18\x02 \x01(\x05\x12\x15\n\rduration_secs\x18\x04 \x01(\x02J\x04\x08\x03\x10\x04\"j\n\x13WrittenTranslations\x12S\n\x1ctranslation_language_mapping\x18\x01 \x03(\x0b\x32-.core.domain.WrittenTranslationContentMapping\"\xaa\x02\n WrittenTranslationContentMapping\x12\x30\n\rlanguage_code\x18\x01 \x01(\x0e\x32\x19.core.domain.LanguageCode\x12q\n\x1btranslation_content_mapping\x18\x02 \x03(\x0b\x32L.core.domain.WrittenTranslationContentMapping.TranslationContentMappingEntry\x1a\x61\n\x1eTranslationContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12.\n\x05value\x18\x02 \x01(\x0b\x32\x1f.core.domain.WrittenTranslation:\x02\x38\x01\"D\n\x12WrittenTranslation\x12\x13\n\x0b\x64\x61ta_format\x18\x01 \x01(\t\x12\x13\n\x0btranslation\x18\x02 \x01(\tJ\x04\x08\x03\x10\x04\"\x90\x06\n\x13InteractionInstance\x12\x31\n\x08\x63ontinue\x18\x01 \x01(\x0b\x32\x1d.core.domain.ContinueInstanceH\x00\x12<\n\x0e\x66raction_input\x18\x02 \x01(\x0b\x32\".core.domain.FractionInputInstanceH\x00\x12G\n\x14item_selection_input\x18\x03 \x01(\x0b\x32\'.core.domain.ItemSelectionInputInstanceH\x00\x12I\n\x15multiple_choice_input\x18\x04 \x01(\x0b\x32(.core.domain.MultipleChoiceInputInstanceH\x00\x12:\n\rnumeric_input\x18\x05 \x01(\x0b\x32!.core.domain.NumericInputInstanceH\x00\x12\x34\n\ntext_input\x18\x06 \x01(\x0b\x32\x1e.core.domain.TextInputInstanceH\x00\x12M\n\x18\x64rag_and_drop_sort_input\x18\x07 \x01(\x0b\x32).core.domain.DragAndDropSortInputInstanceH\x00\x12\x41\n\x11image_click_input\x18\x08 \x01(\x0b\x32$.core.domain.ImageClickInputInstanceH\x00\x12K\n\x16ratio_expression_input\x18\t \x01(\x0b\x32).core.domain.RatioExpressionInputInstanceH\x00\x12>\n\x0f\x65nd_exploration\x18\n \x01(\x0b\x32#.core.domain.EndExplorationInstanceH\x00\x12-\n\x0f\x64\x65\x66\x61ult_outcome\x18\x0b \x01(\x0b\x32\x14.core.domain.Outcome\x12 \n\x05hints\x18\x0c \x03(\x0b\x32\x11.core.domain.HintB\x12\n\x10interaction_type\"\x81\x01\n\x07Outcome\x12\x19\n\x11\x64\x65stination_state\x18\x01 \x01(\t\x12,\n\x08\x66\x65\x65\x64\x62\x61\x63k\x18\x02 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\x12\x1b\n\x13labelled_as_correct\x18\x03 \x01(\x08J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07\"\xa5\x01\n\x10\x43ontinueInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.core.domain.ContinueInstance.CustomizationArgs\x1a\x44\n\x11\x43ustomizationArgs\x12/\n\x0b\x62utton_text\x18\x01 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\"\xf3\x11\n\x15\x46ractionInputInstance\x12P\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32\x34.core.domain.FractionInputInstance.CustomizationArgs\x12\x45\n\ranswer_groups\x18\x02 \x03(\x0b\x32..core.domain.FractionInputInstance.AnswerGroup\x12=\n\x08solution\x18\x03 \x01(\x0b\x32+.core.domain.FractionInputInstance.Solution\x1a\xb1\x01\n\x11\x43ustomizationArgs\x12\x1e\n\x16requires_simplest_form\x18\x01 \x01(\x08\x12 \n\x18\x61llow_improper_fractions\x18\x02 \x01(\x08\x12\"\n\x1a\x61llow_nonzero_integer_part\x18\x03 \x01(\x08\x12\x36\n\x12\x63ustom_placeholder\x18\x04 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\x1ak\n\x08Solution\x12\x30\n\rbase_solution\x18\x01 \x01(\x0b\x32\x19.core.domain.BaseSolution\x12-\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\x15.core.domain.Fraction\x1a\x87\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12?\n\nrule_specs\x18\x02 \x03(\x0b\x32+.core.domain.FractionInputInstance.RuleSpec\x1a\xcf\x0c\n\x08RuleSpec\x12_\n\x13is_exactly_equal_to\x18\x01 \x01(\x0b\x32@.core.domain.FractionInputInstance.RuleSpec.IsExactlyEqualToSpecH\x00\x12Z\n\x10is_equivalent_to\x18\x02 \x01(\x0b\x32>.core.domain.FractionInputInstance.RuleSpec.IsEquivalentToSpecH\x00\x12\x80\x01\n%is_equivalent_to_and_in_simplest_form\x18\x03 \x01(\x0b\x32O.core.domain.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpecH\x00\x12R\n\x0cis_less_than\x18\x04 \x01(\x0b\x32:.core.domain.FractionInputInstance.RuleSpec.IsLessThanSpecH\x00\x12X\n\x0fis_greater_than\x18\x05 \x01(\x0b\x32=.core.domain.FractionInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12\x65\n\x16has_numerator_equal_to\x18\x06 \x01(\x0b\x32\x43.core.domain.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpecH\x00\x12i\n\x18has_denominator_equal_to\x18\x07 \x01(\x0b\x32\x45.core.domain.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpecH\x00\x12j\n\x19has_integer_part_equal_to\x18\x08 \x01(\x0b\x32\x45.core.domain.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpecH\x00\x12\x65\n\x16has_no_fractional_part\x18\t \x01(\x0b\x32\x43.core.domain.FractionInputInstance.RuleSpec.HasNoFractionalPartSpecH\x00\x12\x7f\n$has_fractional_part_exactly_equal_to\x18\n \x01(\x0b\x32O.core.domain.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpecH\x00\x1a<\n\x14IsExactlyEqualToSpec\x12$\n\x05input\x18\x01 \x01(\x0b\x32\x15.core.domain.Fraction\x1a:\n\x12IsEquivalentToSpec\x12$\n\x05input\x18\x01 \x01(\x0b\x32\x15.core.domain.Fraction\x1aK\n#IsEquivalentToAndInSimplestFormSpec\x12$\n\x05input\x18\x01 \x01(\x0b\x32\x15.core.domain.Fraction\x1a\x36\n\x0eIsLessThanSpec\x12$\n\x05input\x18\x01 \x01(\x0b\x32\x15.core.domain.Fraction\x1a\x39\n\x11IsGreaterThanSpec\x12$\n\x05input\x18\x01 \x01(\x0b\x32\x15.core.domain.Fraction\x1a(\n\x17HasNumeratorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a*\n\x19HasDenominatorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\r\x1a*\n\x19HasIntegerPartEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a\x19\n\x17HasNoFractionalPartSpec\x1aK\n#HasFractionalPartExactlyEqualToSpec\x12$\n\x05input\x18\x01 \x01(\x0b\x32\x15.core.domain.FractionB\x0b\n\trule_type:\x05\xca>\x02\x10\x01\"\xf2\t\n\x1aItemSelectionInputInstance\x12U\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32\x39.core.domain.ItemSelectionInputInstance.CustomizationArgs\x12J\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x33.core.domain.ItemSelectionInputInstance.AnswerGroup\x1a\x8e\x01\n\x11\x43ustomizationArgs\x12%\n\x1dmin_allowable_selection_count\x18\x01 \x01(\x05\x12%\n\x1dmax_allowable_selection_count\x18\x02 \x01(\x05\x12+\n\x07\x63hoices\x18\x03 \x03(\x0b\x32\x1a.core.domain.SubtitledHtml\x1a\x8c\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12\x44\n\nrule_specs\x18\x02 \x03(\x0b\x32\x30.core.domain.ItemSelectionInputInstance.RuleSpec\x1a\x90\x06\n\x08RuleSpec\x12M\n\x06\x65quals\x18\x01 \x01(\x0b\x32;.core.domain.ItemSelectionInputInstance.RuleSpec.EqualsSpecH\x00\x12m\n\x18\x63ontains_at_least_one_of\x18\x02 \x01(\x0b\x32I.core.domain.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpecH\x00\x12{\n does_not_contain_at_least_one_of\x18\x03 \x01(\x0b\x32O.core.domain.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpecH\x00\x12\x64\n\x13is_proper_subset_of\x18\x04 \x01(\x0b\x32\x45.core.domain.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpecH\x00\x1aI\n\nEqualsSpec\x12;\n\x05input\x18\x01 \x01(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIds\x1aW\n\x18\x43ontainsAtLeastOneOfSpec\x12;\n\x05input\x18\x01 \x01(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIds\x1a]\n\x1e\x44oesNotContainAtLeastOneOfSpec\x12;\n\x05input\x18\x01 \x01(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIds\x1aS\n\x14IsProperSubsetOfSpec\x12;\n\x05input\x18\x01 \x01(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIdsB\x0b\n\trule_type\"\x9b\x04\n\x1bMultipleChoiceInputInstance\x12V\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32:.core.domain.MultipleChoiceInputInstance.CustomizationArgs\x12K\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x34.core.domain.MultipleChoiceInputInstance.AnswerGroup\x1a@\n\x11\x43ustomizationArgs\x12+\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x1a.core.domain.SubtitledHtml\x1a\x8d\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12\x45\n\nrule_specs\x18\x02 \x03(\x0b\x32\x31.core.domain.MultipleChoiceInputInstance.RuleSpec\x1a\x84\x01\n\x08RuleSpec\x12N\n\x06\x65quals\x18\x01 \x01(\x0b\x32<.core.domain.MultipleChoiceInputInstance.RuleSpec.EqualsSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\rB\x0b\n\trule_type\"\x82\x0b\n\x14NumericInputInstance\x12\x44\n\ranswer_groups\x18\x01 \x03(\x0b\x32-.core.domain.NumericInputInstance.AnswerGroup\x12<\n\x08solution\x18\x02 \x01(\x0b\x32*.core.domain.NumericInputInstance.Solution\x1aT\n\x08Solution\x12\x30\n\rbase_solution\x18\x01 \x01(\x0b\x32\x19.core.domain.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\x01\x1a\x86\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12>\n\nrule_specs\x18\x02 \x03(\x0b\x32*.core.domain.NumericInputInstance.RuleSpec\x1a\x86\x08\n\x08RuleSpec\x12G\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x35.core.domain.NumericInputInstance.RuleSpec.EqualsSpecH\x00\x12Q\n\x0cis_less_than\x18\x02 \x01(\x0b\x32\x39.core.domain.NumericInputInstance.RuleSpec.IsLessThanSpecH\x00\x12W\n\x0fis_greater_than\x18\x03 \x01(\x0b\x32<.core.domain.NumericInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12\x66\n\x18is_less_than_or_equal_to\x18\x04 \x01(\x0b\x32\x42.core.domain.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpecH\x00\x12l\n\x1bis_greater_than_or_equal_to\x18\x05 \x01(\x0b\x32\x45.core.domain.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpecH\x00\x12\x65\n\x16is_inclusively_between\x18\x06 \x01(\x0b\x32\x43.core.domain.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpecH\x00\x12_\n\x13is_within_tolerance\x18\x07 \x01(\x0b\x32@.core.domain.NumericInputInstance.RuleSpec.IsWithinToleranceSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\x1f\n\x0eIsLessThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\"\n\x11IsGreaterThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a(\n\x17IsLessThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a+\n\x1aIsGreaterThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1aT\n\x18IsInclusivelyBetweenSpec\x12\x1b\n\x13inputLowerInclusive\x18\x01 \x01(\x01\x12\x1b\n\x13inputUpperInclusive\x18\x02 \x01(\x01\x1aK\n\x15IsWithinToleranceSpec\x12\x16\n\x0einputTolerance\x18\x01 \x01(\x01\x12\x1a\n\x12inputComparedValue\x18\x02 \x01(\x01\x42\x0b\n\trule_type\"\x98\t\n\x11TextInputInstance\x12L\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32\x30.core.domain.TextInputInstance.CustomizationArgs\x12\x41\n\ranswer_groups\x18\x02 \x03(\x0b\x32*.core.domain.TextInputInstance.AnswerGroup\x12\x39\n\x08solution\x18\x03 \x01(\x0b\x32\'.core.domain.TextInputInstance.Solution\x1aR\n\x11\x43ustomizationArgs\x12/\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x1aT\n\x08Solution\x12\x30\n\rbase_solution\x18\x01 \x01(\x0b\x32\x19.core.domain.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\t\x1a\x83\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12;\n\nrule_specs\x18\x02 \x03(\x0b\x32\'.core.domain.TextInputInstance.RuleSpec\x1a\x86\x05\n\x08RuleSpec\x12\x44\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x32.core.domain.TextInputInstance.RuleSpec.EqualsSpecH\x00\x12M\n\x0bstarts_with\x18\x02 \x01(\x0b\x32\x36.core.domain.TextInputInstance.RuleSpec.StartsWithSpecH\x00\x12H\n\x08\x63ontains\x18\x03 \x01(\x0b\x32\x34.core.domain.TextInputInstance.RuleSpec.ContainsSpecH\x00\x12O\n\x0c\x66uzzy_equals\x18\x04 \x01(\x0b\x32\x37.core.domain.TextInputInstance.RuleSpec.FuzzyEqualsSpecH\x00\x1aK\n\nEqualsSpec\x12=\n\x05input\x18\x01 \x01(\x0b\x32..core.domain.TranslatableSetOfNormalizedString\x1aO\n\x0eStartsWithSpec\x12=\n\x05input\x18\x01 \x01(\x0b\x32..core.domain.TranslatableSetOfNormalizedString\x1aM\n\x0c\x43ontainsSpec\x12=\n\x05input\x18\x01 \x01(\x0b\x32..core.domain.TranslatableSetOfNormalizedString\x1aP\n\x0f\x46uzzyEqualsSpec\x12=\n\x05input\x18\x01 \x01(\x0b\x32..core.domain.TranslatableSetOfNormalizedStringB\x0b\n\trule_type\"\xa2\r\n\x1c\x44ragAndDropSortInputInstance\x12W\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32;.core.domain.DragAndDropSortInputInstance.CustomizationArgs\x12L\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x35.core.domain.DragAndDropSortInputInstance.AnswerGroup\x12\x44\n\x08solution\x18\x03 \x01(\x0b\x32\x32.core.domain.DragAndDropSortInputInstance.Solution\x1aj\n\x11\x43ustomizationArgs\x12+\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x1a.core.domain.SubtitledHtml\x12(\n allowMultipleItemsInSamePosition\x18\x02 \x01(\x08\x1a\x89\x01\n\x08Solution\x12\x30\n\rbase_solution\x18\x01 \x01(\x0b\x32\x19.core.domain.BaseSolution\x12K\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\x33.core.domain.ListOfSetsOfTranslatableHtmlContentIds\x1a\x8e\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12\x46\n\nrule_specs\x18\x02 \x03(\x0b\x32\x32.core.domain.DragAndDropSortInputInstance.RuleSpec\x1a\x86\x08\n\x08RuleSpec\x12h\n\x14is_equal_to_ordering\x18\x01 \x01(\x0b\x32H.core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpecH\x00\x12\xaa\x01\n8is_equal_to_ordering_with_one_item_at_incorrect_position\x18\x02 \x01(\x0b\x32\x66.core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecH\x00\x12t\n\x1bhas_element_x_at_position_y\x18\x03 \x01(\x0b\x32M.core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpecH\x00\x12z\n\x1ehas_element_x_before_element_y\x18\x04 \x01(\x0b\x32P.core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpecH\x00\x1a[\n\x15IsEqualToOrderingSpec\x12\x42\n\x05input\x18\x01 \x01(\x0b\x32\x33.core.domain.ListOfSetsOfTranslatableHtmlContentIds\x1ay\n3IsEqualToOrderingWithOneItemAtIncorrectPositionSpec\x12\x42\n\x05input\x18\x01 \x01(\x0b\x32\x33.core.domain.ListOfSetsOfTranslatableHtmlContentIds\x1ag\n\x1aHasElementXAtPositionYSpec\x12\x37\n\x07\x65lement\x18\x01 \x01(\x0b\x32&.core.domain.TranslatableHtmlContentId\x12\x10\n\x08position\x18\x02 \x01(\r\x1a\xa2\x01\n\x1dHasElementXBeforeElementYSpec\x12\x42\n\x12\x63onsidered_element\x18\x01 \x01(\x0b\x32&.core.domain.TranslatableHtmlContentId\x12=\n\rlater_element\x18\x02 \x01(\x0b\x32&.core.domain.TranslatableHtmlContentIdB\x0b\n\trule_type:\x03\xc0>\x01\"\xb4\x04\n\x17ImageClickInputInstance\x12R\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32\x36.core.domain.ImageClickInputInstance.CustomizationArgs\x12G\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x30.core.domain.ImageClickInputInstance.AnswerGroup\x1aS\n\x11\x43ustomizationArgs\x12\x38\n\x11image_and_regions\x18\x01 \x01(\x0b\x32\x1d.core.domain.ImageWithRegionsJ\x04\x08\x02\x10\x03\x1a\x89\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12\x41\n\nrule_specs\x18\x02 \x03(\x0b\x32-.core.domain.ImageClickInputInstance.RuleSpec\x1a\x95\x01\n\x08RuleSpec\x12T\n\x0cis_in_region\x18\x01 \x01(\x0b\x32<.core.domain.ImageClickInputInstance.RuleSpec.IsInRegionSpecH\x00\x1a&\n\x0eIsInRegionSpec\x12\x14\n\x0cinput_region\x18\x01 \x01(\tB\x0b\n\trule_type:\x03\xc0>\x01\"\xe5\x08\n\x1cRatioExpressionInputInstance\x12W\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32;.core.domain.RatioExpressionInputInstance.CustomizationArgs\x12L\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x35.core.domain.RatioExpressionInputInstance.AnswerGroup\x12\x44\n\x08solution\x18\x03 \x01(\x0b\x32\x32.core.domain.RatioExpressionInputInstance.Solution\x1a]\n\x11\x43ustomizationArgs\x12/\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\x12\x17\n\x0fnumber_of_terms\x18\x02 \x01(\x05\x1ar\n\x08Solution\x12\x30\n\rbase_solution\x18\x01 \x01(\x0b\x32\x19.core.domain.BaseSolution\x12\x34\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\x1c.core.domain.RatioExpression\x1a\x8e\x01\n\x0b\x41nswerGroup\x12\x37\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x1c.core.domain.BaseAnswerGroup\x12\x46\n\nrule_specs\x18\x02 \x03(\x0b\x32\x32.core.domain.RatioExpressionInputInstance.RuleSpec\x1a\xf3\x03\n\x08RuleSpec\x12O\n\x06\x65quals\x18\x01 \x01(\x0b\x32=.core.domain.RatioExpressionInputInstance.RuleSpec.EqualsSpecH\x00\x12\\\n\ris_equivalent\x18\x02 \x01(\x0b\x32\x43.core.domain.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpecH\x00\x12v\n\x1chas_number_of_terms_equal_to\x18\x03 \x01(\x0b\x32N.core.domain.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpecH\x00\x1a\x39\n\nEqualsSpec\x12+\n\x05input\x18\x01 \x01(\x0b\x32\x1c.core.domain.RatioExpression\x1a?\n\x10IsEquivalentSpec\x12+\n\x05input\x18\x01 \x01(\x0b\x32\x1c.core.domain.RatioExpression\x1a\x37\n\x1bHasNumberOfTermsEqualToSpec\x12\x18\n\x10input_term_count\x18\x01 \x01(\rB\x0b\n\trule_type\"\x18\n\x16\x45ndExplorationInstance\"8\n\x04Hint\x12\x30\n\x0chint_content\x18\x01 \x01(\x0b\x32\x1a.core.domain.SubtitledHtml\"E\n\x0c\x42\x61seSolution\x12/\n\x0b\x65xplanation\x18\x02 \x01(\x0b\x32\x1a.core.domain.SubtitledHtmlJ\x04\x08\x01\x10\x02\"\xeb\x03\n\x08Solution\x12Q\n\x1a\x66raction_instance_solution\x18\x01 \x01(\x0b\x32+.core.domain.FractionInputInstance.SolutionH\x00\x12U\n\x1fnumeric_input_instance_solution\x18\x02 \x01(\x0b\x32*.core.domain.NumericInputInstance.SolutionH\x00\x12O\n\x1ctext_input_instance_solution\x18\x03 \x01(\x0b\x32\'.core.domain.TextInputInstance.SolutionH\x00\x12h\n*drag_and_drop_sort_input_instance_solution\x18\x04 \x01(\x0b\x32\x32.core.domain.DragAndDropSortInputInstance.SolutionH\x00\x12\x66\n(ratio_expression_input_instance_solution\x18\x05 \x01(\x0b\x32\x32.core.domain.RatioExpressionInputInstance.SolutionH\x00\x42\x12\n\x10interaction_type\">\n\x0f\x42\x61seAnswerGroup\x12%\n\x07outcome\x18\x01 \x01(\x0b\x32\x14.core.domain.OutcomeJ\x04\x08\x02\x10\x03\"\xd4\x06\n\x0b\x41nswerGroup\x12^\n$fraction_input_instance_answer_group\x18\x01 \x01(\x0b\x32..core.domain.FractionInputInstance.AnswerGroupH\x00\x12i\n*item_selection_input_instance_answer_group\x18\x02 \x01(\x0b\x32\x33.core.domain.ItemSelectionInputInstance.AnswerGroupH\x00\x12k\n+multiple_choice_input_instance_answer_group\x18\x03 \x01(\x0b\x32\x34.core.domain.MultipleChoiceInputInstance.AnswerGroupH\x00\x12\\\n#numeric_input_instance_answer_group\x18\x04 \x01(\x0b\x32-.core.domain.NumericInputInstance.AnswerGroupH\x00\x12V\n text_input_instance_answer_group\x18\x05 \x01(\x0b\x32*.core.domain.TextInputInstance.AnswerGroupH\x00\x12o\n.drag_and_drop_sort_input_instance_answer_group\x18\x06 \x01(\x0b\x32\x35.core.domain.DragAndDropSortInputInstance.AnswerGroupH\x00\x12\x63\n\'image_click_input_instance_answer_group\x18\x07 \x01(\x0b\x32\x30.core.domain.ImageClickInputInstance.AnswerGroupH\x00\x12m\n,ratio_expression_input_instance_answer_group\x18\x08 \x01(\x0b\x32\x35.core.domain.RatioExpressionInputInstance.AnswerGroupH\x00\x42\x12\n\x10interaction_type\"\xa1\x06\n\x08RuleSpec\x12X\n!fraction_input_instance_rule_spec\x18\x01 \x01(\x0b\x32+.core.domain.FractionInputInstance.RuleSpecH\x00\x12\x63\n\'item_selection_input_instance_rule_spec\x18\x02 \x01(\x0b\x32\x30.core.domain.ItemSelectionInputInstance.RuleSpecH\x00\x12\x65\n(multiple_choice_input_instance_rule_spec\x18\x03 \x01(\x0b\x32\x31.core.domain.MultipleChoiceInputInstance.RuleSpecH\x00\x12V\n numeric_input_instance_rule_spec\x18\x04 \x01(\x0b\x32*.core.domain.NumericInputInstance.RuleSpecH\x00\x12P\n\x1dtext_input_instance_rule_spec\x18\x05 \x01(\x0b\x32\'.core.domain.TextInputInstance.RuleSpecH\x00\x12i\n+drag_and_drop_sort_input_instance_rule_spec\x18\x06 \x01(\x0b\x32\x32.core.domain.DragAndDropSortInputInstance.RuleSpecH\x00\x12]\n$image_click_input_instance_rule_spec\x18\x07 \x01(\x0b\x32-.core.domain.ImageClickInputInstance.RuleSpecH\x00\x12g\n)ratio_expression_input_instance_rule_spec\x18\x08 \x01(\x0b\x32\x32.core.domain.RatioExpressionInputInstance.RuleSpecH\x00\x42\x12\n\x10interaction_type\"]\n\x08\x46raction\x12\x13\n\x0bis_negative\x18\x01 \x01(\x08\x12\x14\n\x0cwhole_number\x18\x02 \x01(\r\x12\x11\n\tnumerator\x18\x03 \x01(\r\x12\x13\n\x0b\x64\x65nominator\x18\x04 \x01(\x05\"/\n\x19TranslatableHtmlContentId\x12\x12\n\ncontent_id\x18\x01 \x01(\t\"^\n\x1fSetOfTranslatableHtmlContentIds\x12;\n\x0b\x63ontent_ids\x18\x01 \x03(\x0b\x32&.core.domain.TranslatableHtmlContentId\"p\n&ListOfSetsOfTranslatableHtmlContentIds\x12\x46\n\x10\x63ontent_id_lists\x18\x01 \x03(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIds\"\x1f\n\x07Point2d\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"U\n\x0c\x43lickOnImage\x12,\n\x0e\x63lick_position\x18\x01 \x01(\x0b\x32\x14.core.domain.Point2d\x12\x17\n\x0f\x63licked_regions\x18\x02 \x03(\t\"%\n\x0fRatioExpression\x12\x12\n\ncomponents\x18\x01 \x03(\r\"S\n!TranslatableSetOfNormalizedString\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x1a\n\x12normalized_strings\x18\x02 \x03(\t\"\xf5\x02\n\x10ImageWithRegions\x12\x17\n\x0fimage_file_path\x18\x01 \x01(\t\x12\x44\n\x0flabeled_regions\x18\x02 \x03(\x0b\x32+.core.domain.ImageWithRegions.LabeledRegion\x1a\x81\x02\n\rLabeledRegion\x12\r\n\x05label\x18\x03 \x01(\t\x12\x64\n\x17normalized_rectangle_2d\x18\x01 \x01(\x0b\x32\x41.core.domain.ImageWithRegions.LabeledRegion.NormalizedRectangle2dH\x00\x1al\n\x15NormalizedRectangle2d\x12(\n\nupper_left\x18\x01 \x01(\x0b\x32\x14.core.domain.Point2d\x12)\n\x0blower_right\x18\x02 \x01(\x0b\x32\x14.core.domain.Point2dB\r\n\x0bregion_type\"\xca\x03\n\nUserAnswer\x12)\n\x08\x66raction\x18\x01 \x01(\x0b\x32\x15.core.domain.FractionH\x00\x12\\\n$set_of_translatable_html_content_ids\x18\x02 \x01(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIdsH\x00\x12\x1a\n\x10non_negative_int\x18\x03 \x01(\rH\x00\x12\x0e\n\x04real\x18\x04 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x05 \x01(\tH\x00\x12l\n-list_of_sets_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32\x33.core.domain.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\x33\n\x0e\x63lick_on_image\x18\x07 \x01(\x0b\x32\x19.core.domain.ClickOnImageH\x00\x12\x38\n\x10ratio_expression\x18\x08 \x01(\x0b\x32\x1c.core.domain.RatioExpressionH\x00\x42\r\n\x0b\x61nswer_type\"\xd7\x04\n\rRuleInputType\x12\r\n\x03int\x18\x01 \x01(\x05H\x00\x12\x1a\n\x10non_negative_int\x18\x02 \x01(\rH\x00\x12\x0e\n\x04real\x18\x03 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x04 \x01(\tH\x00\x12)\n\x08\x66raction\x18\x05 \x01(\x0b\x32\x15.core.domain.FractionH\x00\x12\\\n$set_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32,.core.domain.SetOfTranslatableHtmlContentIdsH\x00\x12_\n%translatable_set_of_normalized_string\x18\x07 \x01(\x0b\x32..core.domain.TranslatableSetOfNormalizedStringH\x00\x12l\n-list_of_sets_of_translatable_html_content_ids\x18\x08 \x01(\x0b\x32\x33.core.domain.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12N\n\x1ctranslatable_html_content_id\x18\t \x01(\x0b\x32&.core.domain.TranslatableHtmlContentIdH\x00\x12\x38\n\x10ratio_expression\x18\n \x01(\x0b\x32\x1c.core.domain.RatioExpressionH\x00\x42\x0c\n\ninput_type*6\n\x0cLanguageCode\x12\x19\n\x15UNKNOWN_LANGUAGE_CODE\x10\x00\x12\x0b\n\x07\x45NGLISH\x10\x01:=\n\x13supports_split_view\x12\x1f.google.protobuf.MessageOptions\x18\xe8\x07 \x01(\x08:\x83\x01\n#default_fraction_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xe9\x07 \x01(\x0b\x32\x34.core.domain.FractionInputInstance.CustomizationArgs:\x8e\x01\n)default_item_selection_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xea\x07 \x01(\x0b\x32\x39.core.domain.ItemSelectionInputInstance.CustomizationArgs:\x81\x01\n%default_text_input_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xeb\x07 \x01(\x0b\x32\x30.core.domain.TextInputInstance.CustomizationArgs:\x94\x01\n-default_drag_and_drop_sort_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xec\x07 \x01(\x0b\x32;.core.domain.DragAndDropSortInputInstance.CustomizationArgs:\x92\x01\n+default_ratio_expression_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xed\x07 \x01(\x0b\x32;.core.domain.RatioExpressionInputInstance.CustomizationArgsb\x06proto3'
+  serialized_pb=b'\n\x11\x65xploration.proto\x1a google/protobuf/descriptor.proto\"\xe9\x01\n\x0b\x45xploration\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x05\x12\x17\n\x0finit_state_name\x18\x08 \x01(\t\x12(\n\x06states\x18\x0b \x03(\x0b\x32\x18.Exploration.StatesEntry\x12\r\n\x05title\x18\x0c \x01(\t\x1a\x35\n\x0bStatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x15\n\x05value\x18\x02 \x01(\x0b\x32\x06.State:\x02\x38\x01J\x04\x08\x03\x10\x04J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07J\x04\x08\x07\x10\x08J\x04\x08\t\x10\nJ\x04\x08\n\x10\x0bJ\x04\x08\r\x10\x0eJ\x04\x08\x0e\x10\x0f\"\xcb\x01\n\x05State\x12\x1f\n\x07\x63ontent\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12)\n\x0binteraction\x18\x03 \x01(\x0b\x32\x14.InteractionInstance\x12\x30\n\x13recorded_voiceovers\x18\x05 \x01(\x0b\x32\x13.RecordedVoiceovers\x12\x32\n\x14written_translations\x18\x06 \x01(\x0b\x32\x14.WrittenTranslationsJ\x04\x08\x02\x10\x03J\x04\x08\x04\x10\x05J\x04\x08\x07\x10\x08\"1\n\rSubtitledHtml\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x0c\n\x04html\x18\x02 \x01(\t\"R\n\x12RecordedVoiceovers\x12<\n\x1avoiceover_language_mapping\x18\x01 \x03(\x0b\x32\x18.VoiceoverContentMapping\"\xe5\x01\n\x17VoiceoverContentMapping\x12$\n\rlanguage_code\x18\x01 \x01(\x0e\x32\r.LanguageCode\x12X\n\x19voiceover_content_mapping\x18\x02 \x03(\x0b\x32\x35.VoiceoverContentMapping.VoiceoverContentMappingEntry\x1aJ\n\x1cVoiceoverContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x19\n\x05value\x18\x02 \x01(\x0b\x32\n.Voiceover:\x02\x38\x01\"S\n\tVoiceover\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x17\n\x0f\x66ile_size_bytes\x18\x02 \x01(\x05\x12\x15\n\rduration_secs\x18\x04 \x01(\x02J\x04\x08\x03\x10\x04\"^\n\x13WrittenTranslations\x12G\n\x1ctranslation_language_mapping\x18\x01 \x03(\x0b\x32!.WrittenTranslationContentMapping\"\x86\x02\n WrittenTranslationContentMapping\x12$\n\rlanguage_code\x18\x01 \x01(\x0e\x32\r.LanguageCode\x12\x65\n\x1btranslation_content_mapping\x18\x02 \x03(\x0b\x32@.WrittenTranslationContentMapping.TranslationContentMappingEntry\x1aU\n\x1eTranslationContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\"\n\x05value\x18\x02 \x01(\x0b\x32\x13.WrittenTranslation:\x02\x38\x01\"D\n\x12WrittenTranslation\x12\x13\n\x0b\x64\x61ta_format\x18\x01 \x01(\t\x12\x13\n\x0btranslation\x18\x02 \x01(\tJ\x04\x08\x03\x10\x04\"\x80\x05\n\x13InteractionInstance\x12%\n\x08\x63ontinue\x18\x01 \x01(\x0b\x32\x11.ContinueInstanceH\x00\x12\x30\n\x0e\x66raction_input\x18\x02 \x01(\x0b\x32\x16.FractionInputInstanceH\x00\x12;\n\x14item_selection_input\x18\x03 \x01(\x0b\x32\x1b.ItemSelectionInputInstanceH\x00\x12=\n\x15multiple_choice_input\x18\x04 \x01(\x0b\x32\x1c.MultipleChoiceInputInstanceH\x00\x12.\n\rnumeric_input\x18\x05 \x01(\x0b\x32\x15.NumericInputInstanceH\x00\x12(\n\ntext_input\x18\x06 \x01(\x0b\x32\x12.TextInputInstanceH\x00\x12\x41\n\x18\x64rag_and_drop_sort_input\x18\x07 \x01(\x0b\x32\x1d.DragAndDropSortInputInstanceH\x00\x12\x35\n\x11image_click_input\x18\x08 \x01(\x0b\x32\x18.ImageClickInputInstanceH\x00\x12?\n\x16ratio_expression_input\x18\t \x01(\x0b\x32\x1d.RatioExpressionInputInstanceH\x00\x12\x32\n\x0f\x65nd_exploration\x18\n \x01(\x0b\x32\x17.EndExplorationInstanceH\x00\x12!\n\x0f\x64\x65\x66\x61ult_outcome\x18\x0b \x01(\x0b\x32\x08.Outcome\x12\x14\n\x05hints\x18\x0c \x03(\x0b\x32\x05.HintB\x12\n\x10interaction_type\"u\n\x07Outcome\x12\x19\n\x11\x64\x65stination_state\x18\x01 \x01(\t\x12 \n\x08\x66\x65\x65\x64\x62\x61\x63k\x18\x02 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x1b\n\x13labelled_as_correct\x18\x03 \x01(\x08J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07\"\x8d\x01\n\x10\x43ontinueInstance\x12?\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32#.ContinueInstance.CustomizationArgs\x1a\x38\n\x11\x43ustomizationArgs\x12#\n\x0b\x62utton_text\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\"\xd1\x0f\n\x15\x46ractionInputInstance\x12\x44\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32(.FractionInputInstance.CustomizationArgs\x12\x39\n\ranswer_groups\x18\x02 \x03(\x0b\x32\".FractionInputInstance.AnswerGroup\x12\x31\n\x08solution\x18\x03 \x01(\x0b\x32\x1f.FractionInputInstance.Solution\x1a\xa5\x01\n\x11\x43ustomizationArgs\x12\x1e\n\x16requires_simplest_form\x18\x01 \x01(\x08\x12 \n\x18\x61llow_improper_fractions\x18\x02 \x01(\x08\x12\"\n\x1a\x61llow_nonzero_integer_part\x18\x03 \x01(\x08\x12*\n\x12\x63ustom_placeholder\x18\x04 \x01(\x0b\x32\x0e.SubtitledHtml\x1aS\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12!\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\t.Fraction\x1ao\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x33\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1f.FractionInputInstance.RuleSpec\x1a\x8e\x0b\n\x08RuleSpec\x12S\n\x13is_exactly_equal_to\x18\x01 \x01(\x0b\x32\x34.FractionInputInstance.RuleSpec.IsExactlyEqualToSpecH\x00\x12N\n\x10is_equivalent_to\x18\x02 \x01(\x0b\x32\x32.FractionInputInstance.RuleSpec.IsEquivalentToSpecH\x00\x12t\n%is_equivalent_to_and_in_simplest_form\x18\x03 \x01(\x0b\x32\x43.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpecH\x00\x12\x46\n\x0cis_less_than\x18\x04 \x01(\x0b\x32..FractionInputInstance.RuleSpec.IsLessThanSpecH\x00\x12L\n\x0fis_greater_than\x18\x05 \x01(\x0b\x32\x31.FractionInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12Y\n\x16has_numerator_equal_to\x18\x06 \x01(\x0b\x32\x37.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpecH\x00\x12]\n\x18has_denominator_equal_to\x18\x07 \x01(\x0b\x32\x39.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpecH\x00\x12^\n\x19has_integer_part_equal_to\x18\x08 \x01(\x0b\x32\x39.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpecH\x00\x12Y\n\x16has_no_fractional_part\x18\t \x01(\x0b\x32\x37.FractionInputInstance.RuleSpec.HasNoFractionalPartSpecH\x00\x12s\n$has_fractional_part_exactly_equal_to\x18\n \x01(\x0b\x32\x43.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpecH\x00\x1a\x30\n\x14IsExactlyEqualToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a.\n\x12IsEquivalentToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a?\n#IsEquivalentToAndInSimplestFormSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a*\n\x0eIsLessThanSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a-\n\x11IsGreaterThanSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a(\n\x17HasNumeratorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a*\n\x19HasDenominatorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\r\x1a*\n\x19HasIntegerPartEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a\x19\n\x17HasNoFractionalPartSpec\x1a?\n#HasFractionalPartExactlyEqualToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.FractionB\x0b\n\trule_type:\x05\xca>\x02\x10\x01\"\xd5\x08\n\x1aItemSelectionInputInstance\x12I\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32-.ItemSelectionInputInstance.CustomizationArgs\x12>\n\ranswer_groups\x18\x02 \x03(\x0b\x32\'.ItemSelectionInputInstance.AnswerGroup\x1a\x82\x01\n\x11\x43ustomizationArgs\x12%\n\x1dmin_allowable_selection_count\x18\x01 \x01(\x05\x12%\n\x1dmax_allowable_selection_count\x18\x02 \x01(\x05\x12\x1f\n\x07\x63hoices\x18\x03 \x03(\x0b\x32\x0e.SubtitledHtml\x1at\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x38\n\nrule_specs\x18\x02 \x03(\x0b\x32$.ItemSelectionInputInstance.RuleSpec\x1a\xb0\x05\n\x08RuleSpec\x12\x41\n\x06\x65quals\x18\x01 \x01(\x0b\x32/.ItemSelectionInputInstance.RuleSpec.EqualsSpecH\x00\x12\x61\n\x18\x63ontains_at_least_one_of\x18\x02 \x01(\x0b\x32=.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpecH\x00\x12o\n does_not_contain_at_least_one_of\x18\x03 \x01(\x0b\x32\x43.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpecH\x00\x12X\n\x13is_proper_subset_of\x18\x04 \x01(\x0b\x32\x39.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpecH\x00\x1a=\n\nEqualsSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aK\n\x18\x43ontainsAtLeastOneOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aQ\n\x1e\x44oesNotContainAtLeastOneOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aG\n\x14IsProperSubsetOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsB\x0b\n\trule_type\"\xd1\x03\n\x1bMultipleChoiceInputInstance\x12J\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32..MultipleChoiceInputInstance.CustomizationArgs\x12?\n\ranswer_groups\x18\x02 \x03(\x0b\x32(.MultipleChoiceInputInstance.AnswerGroup\x1a\x34\n\x11\x43ustomizationArgs\x12\x1f\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x0e.SubtitledHtml\x1au\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x39\n\nrule_specs\x18\x02 \x03(\x0b\x32%.MultipleChoiceInputInstance.RuleSpec\x1ax\n\x08RuleSpec\x12\x42\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x30.MultipleChoiceInputInstance.RuleSpec.EqualsSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\rB\x0b\n\trule_type\"\xf1\t\n\x14NumericInputInstance\x12\x38\n\ranswer_groups\x18\x01 \x03(\x0b\x32!.NumericInputInstance.AnswerGroup\x12\x30\n\x08solution\x18\x02 \x01(\x0b\x32\x1e.NumericInputInstance.Solution\x1aH\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\x01\x1an\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x32\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1e.NumericInputInstance.RuleSpec\x1a\xb2\x07\n\x08RuleSpec\x12;\n\x06\x65quals\x18\x01 \x01(\x0b\x32).NumericInputInstance.RuleSpec.EqualsSpecH\x00\x12\x45\n\x0cis_less_than\x18\x02 \x01(\x0b\x32-.NumericInputInstance.RuleSpec.IsLessThanSpecH\x00\x12K\n\x0fis_greater_than\x18\x03 \x01(\x0b\x32\x30.NumericInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12Z\n\x18is_less_than_or_equal_to\x18\x04 \x01(\x0b\x32\x36.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpecH\x00\x12`\n\x1bis_greater_than_or_equal_to\x18\x05 \x01(\x0b\x32\x39.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpecH\x00\x12Y\n\x16is_inclusively_between\x18\x06 \x01(\x0b\x32\x37.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpecH\x00\x12S\n\x13is_within_tolerance\x18\x07 \x01(\x0b\x32\x34.NumericInputInstance.RuleSpec.IsWithinToleranceSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\x1f\n\x0eIsLessThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\"\n\x11IsGreaterThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a(\n\x17IsLessThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a+\n\x1aIsGreaterThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1aT\n\x18IsInclusivelyBetweenSpec\x12\x1b\n\x13inputLowerInclusive\x18\x01 \x01(\x01\x12\x1b\n\x13inputUpperInclusive\x18\x02 \x01(\x01\x1aK\n\x15IsWithinToleranceSpec\x12\x16\n\x0einputTolerance\x18\x01 \x01(\x01\x12\x1a\n\x12inputComparedValue\x18\x02 \x01(\x01\x42\x0b\n\trule_type\"\xe3\x07\n\x11TextInputInstance\x12@\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32$.TextInputInstance.CustomizationArgs\x12\x35\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x1e.TextInputInstance.AnswerGroup\x12-\n\x08solution\x18\x03 \x01(\x0b\x32\x1b.TextInputInstance.Solution\x1a\x46\n\x11\x43ustomizationArgs\x12#\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x1aH\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\t\x1ak\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12/\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1b.TextInputInstance.RuleSpec\x1a\xa6\x04\n\x08RuleSpec\x12\x38\n\x06\x65quals\x18\x01 \x01(\x0b\x32&.TextInputInstance.RuleSpec.EqualsSpecH\x00\x12\x41\n\x0bstarts_with\x18\x02 \x01(\x0b\x32*.TextInputInstance.RuleSpec.StartsWithSpecH\x00\x12<\n\x08\x63ontains\x18\x03 \x01(\x0b\x32(.TextInputInstance.RuleSpec.ContainsSpecH\x00\x12\x43\n\x0c\x66uzzy_equals\x18\x04 \x01(\x0b\x32+.TextInputInstance.RuleSpec.FuzzyEqualsSpecH\x00\x1a?\n\nEqualsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x43\n\x0eStartsWithSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x41\n\x0c\x43ontainsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x44\n\x0f\x46uzzyEqualsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedStringB\x0b\n\trule_type\"\xd4\x0b\n\x1c\x44ragAndDropSortInputInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.DragAndDropSortInputInstance.CustomizationArgs\x12@\n\ranswer_groups\x18\x02 \x03(\x0b\x32).DragAndDropSortInputInstance.AnswerGroup\x12\x38\n\x08solution\x18\x03 \x01(\x0b\x32&.DragAndDropSortInputInstance.Solution\x1a^\n\x11\x43ustomizationArgs\x12\x1f\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x0e.SubtitledHtml\x12(\n allowMultipleItemsInSamePosition\x18\x02 \x01(\x08\x1aq\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12?\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1av\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12:\n\nrule_specs\x18\x02 \x03(\x0b\x32&.DragAndDropSortInputInstance.RuleSpec\x1a\x9a\x07\n\x08RuleSpec\x12\\\n\x14is_equal_to_ordering\x18\x01 \x01(\x0b\x32<.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpecH\x00\x12\x9e\x01\n8is_equal_to_ordering_with_one_item_at_incorrect_position\x18\x02 \x01(\x0b\x32Z.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecH\x00\x12h\n\x1bhas_element_x_at_position_y\x18\x03 \x01(\x0b\x32\x41.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpecH\x00\x12n\n\x1ehas_element_x_before_element_y\x18\x04 \x01(\x0b\x32\x44.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpecH\x00\x1aO\n\x15IsEqualToOrderingSpec\x12\x36\n\x05input\x18\x01 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1am\n3IsEqualToOrderingWithOneItemAtIncorrectPositionSpec\x12\x36\n\x05input\x18\x01 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1a[\n\x1aHasElementXAtPositionYSpec\x12+\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1a.TranslatableHtmlContentId\x12\x10\n\x08position\x18\x02 \x01(\r\x1a\x8a\x01\n\x1dHasElementXBeforeElementYSpec\x12\x36\n\x12\x63onsidered_element\x18\x01 \x01(\x0b\x32\x1a.TranslatableHtmlContentId\x12\x31\n\rlater_element\x18\x02 \x01(\x0b\x32\x1a.TranslatableHtmlContentIdB\x0b\n\trule_type:\x03\xc0>\x01\"\xeb\x03\n\x17ImageClickInputInstance\x12\x46\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32*.ImageClickInputInstance.CustomizationArgs\x12;\n\ranswer_groups\x18\x02 \x03(\x0b\x32$.ImageClickInputInstance.AnswerGroup\x1aG\n\x11\x43ustomizationArgs\x12,\n\x11image_and_regions\x18\x01 \x01(\x0b\x32\x11.ImageWithRegionsJ\x04\x08\x02\x10\x03\x1aq\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x35\n\nrule_specs\x18\x02 \x03(\x0b\x32!.ImageClickInputInstance.RuleSpec\x1a\x89\x01\n\x08RuleSpec\x12H\n\x0cis_in_region\x18\x01 \x01(\x0b\x32\x30.ImageClickInputInstance.RuleSpec.IsInRegionSpecH\x00\x1a&\n\x0eIsInRegionSpec\x12\x14\n\x0cinput_region\x18\x01 \x01(\tB\x0b\n\trule_type:\x03\xc0>\x01\"\xc8\x07\n\x1cRatioExpressionInputInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.RatioExpressionInputInstance.CustomizationArgs\x12@\n\ranswer_groups\x18\x02 \x03(\x0b\x32).RatioExpressionInputInstance.AnswerGroup\x12\x38\n\x08solution\x18\x03 \x01(\x0b\x32&.RatioExpressionInputInstance.Solution\x1aQ\n\x11\x43ustomizationArgs\x12#\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x17\n\x0fnumber_of_terms\x18\x02 \x01(\x05\x1aZ\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12(\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\x10.RatioExpression\x1av\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12:\n\nrule_specs\x18\x02 \x03(\x0b\x32&.RatioExpressionInputInstance.RuleSpec\x1a\xb7\x03\n\x08RuleSpec\x12\x43\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x31.RatioExpressionInputInstance.RuleSpec.EqualsSpecH\x00\x12P\n\ris_equivalent\x18\x02 \x01(\x0b\x32\x37.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpecH\x00\x12j\n\x1chas_number_of_terms_equal_to\x18\x03 \x01(\x0b\x32\x42.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpecH\x00\x1a-\n\nEqualsSpec\x12\x1f\n\x05input\x18\x01 \x01(\x0b\x32\x10.RatioExpression\x1a\x33\n\x10IsEquivalentSpec\x12\x1f\n\x05input\x18\x01 \x01(\x0b\x32\x10.RatioExpression\x1a\x37\n\x1bHasNumberOfTermsEqualToSpec\x12\x18\n\x10input_term_count\x18\x01 \x01(\rB\x0b\n\trule_type\"\x18\n\x16\x45ndExplorationInstance\",\n\x04Hint\x12$\n\x0chint_content\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\"9\n\x0c\x42\x61seSolution\x12#\n\x0b\x65xplanation\x18\x02 \x01(\x0b\x32\x0e.SubtitledHtmlJ\x04\x08\x01\x10\x02\"\xaf\x03\n\x08Solution\x12\x45\n\x1a\x66raction_instance_solution\x18\x01 \x01(\x0b\x32\x1f.FractionInputInstance.SolutionH\x00\x12I\n\x1fnumeric_input_instance_solution\x18\x02 \x01(\x0b\x32\x1e.NumericInputInstance.SolutionH\x00\x12\x43\n\x1ctext_input_instance_solution\x18\x03 \x01(\x0b\x32\x1b.TextInputInstance.SolutionH\x00\x12\\\n*drag_and_drop_sort_input_instance_solution\x18\x04 \x01(\x0b\x32&.DragAndDropSortInputInstance.SolutionH\x00\x12Z\n(ratio_expression_input_instance_solution\x18\x05 \x01(\x0b\x32&.RatioExpressionInputInstance.SolutionH\x00\x42\x12\n\x10interaction_type\"2\n\x0f\x42\x61seAnswerGroup\x12\x19\n\x07outcome\x18\x01 \x01(\x0b\x32\x08.OutcomeJ\x04\x08\x02\x10\x03\"\xf4\x05\n\x0b\x41nswerGroup\x12R\n$fraction_input_instance_answer_group\x18\x01 \x01(\x0b\x32\".FractionInputInstance.AnswerGroupH\x00\x12]\n*item_selection_input_instance_answer_group\x18\x02 \x01(\x0b\x32\'.ItemSelectionInputInstance.AnswerGroupH\x00\x12_\n+multiple_choice_input_instance_answer_group\x18\x03 \x01(\x0b\x32(.MultipleChoiceInputInstance.AnswerGroupH\x00\x12P\n#numeric_input_instance_answer_group\x18\x04 \x01(\x0b\x32!.NumericInputInstance.AnswerGroupH\x00\x12J\n text_input_instance_answer_group\x18\x05 \x01(\x0b\x32\x1e.TextInputInstance.AnswerGroupH\x00\x12\x63\n.drag_and_drop_sort_input_instance_answer_group\x18\x06 \x01(\x0b\x32).DragAndDropSortInputInstance.AnswerGroupH\x00\x12W\n\'image_click_input_instance_answer_group\x18\x07 \x01(\x0b\x32$.ImageClickInputInstance.AnswerGroupH\x00\x12\x61\n,ratio_expression_input_instance_answer_group\x18\x08 \x01(\x0b\x32).RatioExpressionInputInstance.AnswerGroupH\x00\x42\x12\n\x10interaction_type\"\xc1\x05\n\x08RuleSpec\x12L\n!fraction_input_instance_rule_spec\x18\x01 \x01(\x0b\x32\x1f.FractionInputInstance.RuleSpecH\x00\x12W\n\'item_selection_input_instance_rule_spec\x18\x02 \x01(\x0b\x32$.ItemSelectionInputInstance.RuleSpecH\x00\x12Y\n(multiple_choice_input_instance_rule_spec\x18\x03 \x01(\x0b\x32%.MultipleChoiceInputInstance.RuleSpecH\x00\x12J\n numeric_input_instance_rule_spec\x18\x04 \x01(\x0b\x32\x1e.NumericInputInstance.RuleSpecH\x00\x12\x44\n\x1dtext_input_instance_rule_spec\x18\x05 \x01(\x0b\x32\x1b.TextInputInstance.RuleSpecH\x00\x12]\n+drag_and_drop_sort_input_instance_rule_spec\x18\x06 \x01(\x0b\x32&.DragAndDropSortInputInstance.RuleSpecH\x00\x12Q\n$image_click_input_instance_rule_spec\x18\x07 \x01(\x0b\x32!.ImageClickInputInstance.RuleSpecH\x00\x12[\n)ratio_expression_input_instance_rule_spec\x18\x08 \x01(\x0b\x32&.RatioExpressionInputInstance.RuleSpecH\x00\x42\x12\n\x10interaction_type\"]\n\x08\x46raction\x12\x13\n\x0bis_negative\x18\x01 \x01(\x08\x12\x14\n\x0cwhole_number\x18\x02 \x01(\r\x12\x11\n\tnumerator\x18\x03 \x01(\r\x12\x13\n\x0b\x64\x65nominator\x18\x04 \x01(\x05\"/\n\x19TranslatableHtmlContentId\x12\x12\n\ncontent_id\x18\x01 \x01(\t\"R\n\x1fSetOfTranslatableHtmlContentIds\x12/\n\x0b\x63ontent_ids\x18\x01 \x03(\x0b\x32\x1a.TranslatableHtmlContentId\"d\n&ListOfSetsOfTranslatableHtmlContentIds\x12:\n\x10\x63ontent_id_lists\x18\x01 \x03(\x0b\x32 .SetOfTranslatableHtmlContentIds\"\x1f\n\x07Point2d\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"I\n\x0c\x43lickOnImage\x12 \n\x0e\x63lick_position\x18\x01 \x01(\x0b\x32\x08.Point2d\x12\x17\n\x0f\x63licked_regions\x18\x02 \x03(\t\"%\n\x0fRatioExpression\x12\x12\n\ncomponents\x18\x01 \x03(\r\"S\n!TranslatableSetOfNormalizedString\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x1a\n\x12normalized_strings\x18\x02 \x03(\t\"\xc5\x02\n\x10ImageWithRegions\x12\x17\n\x0fimage_file_path\x18\x01 \x01(\t\x12\x38\n\x0flabeled_regions\x18\x02 \x03(\x0b\x32\x1f.ImageWithRegions.LabeledRegion\x1a\xdd\x01\n\rLabeledRegion\x12\r\n\x05label\x18\x03 \x01(\t\x12X\n\x17normalized_rectangle_2d\x18\x01 \x01(\x0b\x32\x35.ImageWithRegions.LabeledRegion.NormalizedRectangle2dH\x00\x1aT\n\x15NormalizedRectangle2d\x12\x1c\n\nupper_left\x18\x01 \x01(\x0b\x32\x08.Point2d\x12\x1d\n\x0blower_right\x18\x02 \x01(\x0b\x32\x08.Point2dB\r\n\x0bregion_type\"\x8e\x03\n\nUserAnswer\x12\x1d\n\x08\x66raction\x18\x01 \x01(\x0b\x32\t.FractionH\x00\x12P\n$set_of_translatable_html_content_ids\x18\x02 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsH\x00\x12\x1a\n\x10non_negative_int\x18\x03 \x01(\rH\x00\x12\x0e\n\x04real\x18\x04 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x05 \x01(\tH\x00\x12`\n-list_of_sets_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\'\n\x0e\x63lick_on_image\x18\x07 \x01(\x0b\x32\r.ClickOnImageH\x00\x12,\n\x10ratio_expression\x18\x08 \x01(\x0b\x32\x10.RatioExpressionH\x00\x42\r\n\x0b\x61nswer_type\"\x8f\x04\n\rRuleInputType\x12\r\n\x03int\x18\x01 \x01(\x05H\x00\x12\x1a\n\x10non_negative_int\x18\x02 \x01(\rH\x00\x12\x0e\n\x04real\x18\x03 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x04 \x01(\tH\x00\x12\x1d\n\x08\x66raction\x18\x05 \x01(\x0b\x32\t.FractionH\x00\x12P\n$set_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsH\x00\x12S\n%translatable_set_of_normalized_string\x18\x07 \x01(\x0b\x32\".TranslatableSetOfNormalizedStringH\x00\x12`\n-list_of_sets_of_translatable_html_content_ids\x18\x08 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\x42\n\x1ctranslatable_html_content_id\x18\t \x01(\x0b\x32\x1a.TranslatableHtmlContentIdH\x00\x12,\n\x10ratio_expression\x18\n \x01(\x0b\x32\x10.RatioExpressionH\x00\x42\x0c\n\ninput_type*6\n\x0cLanguageCode\x12\x19\n\x15UNKNOWN_LANGUAGE_CODE\x10\x00\x12\x0b\n\x07\x45NGLISH\x10\x01:=\n\x13supports_split_view\x12\x1f.google.protobuf.MessageOptions\x18\xe8\x07 \x01(\x08:w\n#default_fraction_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xe9\x07 \x01(\x0b\x32(.FractionInputInstance.CustomizationArgs:\x82\x01\n)default_item_selection_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xea\x07 \x01(\x0b\x32-.ItemSelectionInputInstance.CustomizationArgs:u\n%default_text_input_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xeb\x07 \x01(\x0b\x32$.TextInputInstance.CustomizationArgs:\x88\x01\n-default_drag_and_drop_sort_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xec\x07 \x01(\x0b\x32/.DragAndDropSortInputInstance.CustomizationArgs:\x86\x01\n+default_ratio_expression_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xed\x07 \x01(\x0b\x32/.RatioExpressionInputInstance.CustomizationArgsb\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_descriptor__pb2.DESCRIPTOR,])
 
 _LANGUAGECODE = _descriptor.EnumDescriptor(
   name='LanguageCode',
-  full_name='core.domain.LanguageCode',
+  full_name='LanguageCode',
   filename=None,
   file=DESCRIPTOR,
   create_key=_descriptor._internal_create_key,
@@ -45,8 +45,8 @@ _LANGUAGECODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=17150,
-  serialized_end=17204,
+  serialized_start=15001,
+  serialized_end=15055,
 )
 _sym_db.RegisterEnumDescriptor(_LANGUAGECODE)
 
@@ -56,7 +56,7 @@ ENGLISH = 1
 
 SUPPORTS_SPLIT_VIEW_FIELD_NUMBER = 1000
 supports_split_view = _descriptor.FieldDescriptor(
-  name='supports_split_view', full_name='core.domain.supports_split_view', index=0,
+  name='supports_split_view', full_name='supports_split_view', index=0,
   number=1000, type=8, cpp_type=7, label=1,
   has_default_value=False, default_value=False,
   message_type=None, enum_type=None, containing_type=None,
@@ -64,7 +64,7 @@ supports_split_view = _descriptor.FieldDescriptor(
   serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key)
 DEFAULT_FRACTION_CUSTOMIZATION_ARGS_FIELD_NUMBER = 1001
 default_fraction_customization_args = _descriptor.FieldDescriptor(
-  name='default_fraction_customization_args', full_name='core.domain.default_fraction_customization_args', index=1,
+  name='default_fraction_customization_args', full_name='default_fraction_customization_args', index=1,
   number=1001, type=11, cpp_type=10, label=1,
   has_default_value=False, default_value=None,
   message_type=None, enum_type=None, containing_type=None,
@@ -72,7 +72,7 @@ default_fraction_customization_args = _descriptor.FieldDescriptor(
   serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key)
 DEFAULT_ITEM_SELECTION_CUSTOMIZATION_ARGS_FIELD_NUMBER = 1002
 default_item_selection_customization_args = _descriptor.FieldDescriptor(
-  name='default_item_selection_customization_args', full_name='core.domain.default_item_selection_customization_args', index=2,
+  name='default_item_selection_customization_args', full_name='default_item_selection_customization_args', index=2,
   number=1002, type=11, cpp_type=10, label=1,
   has_default_value=False, default_value=None,
   message_type=None, enum_type=None, containing_type=None,
@@ -80,7 +80,7 @@ default_item_selection_customization_args = _descriptor.FieldDescriptor(
   serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key)
 DEFAULT_TEXT_INPUT_CUSTOMIZATION_ARGS_FIELD_NUMBER = 1003
 default_text_input_customization_args = _descriptor.FieldDescriptor(
-  name='default_text_input_customization_args', full_name='core.domain.default_text_input_customization_args', index=3,
+  name='default_text_input_customization_args', full_name='default_text_input_customization_args', index=3,
   number=1003, type=11, cpp_type=10, label=1,
   has_default_value=False, default_value=None,
   message_type=None, enum_type=None, containing_type=None,
@@ -88,7 +88,7 @@ default_text_input_customization_args = _descriptor.FieldDescriptor(
   serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key)
 DEFAULT_DRAG_AND_DROP_SORT_CUSTOMIZATION_ARGS_FIELD_NUMBER = 1004
 default_drag_and_drop_sort_customization_args = _descriptor.FieldDescriptor(
-  name='default_drag_and_drop_sort_customization_args', full_name='core.domain.default_drag_and_drop_sort_customization_args', index=4,
+  name='default_drag_and_drop_sort_customization_args', full_name='default_drag_and_drop_sort_customization_args', index=4,
   number=1004, type=11, cpp_type=10, label=1,
   has_default_value=False, default_value=None,
   message_type=None, enum_type=None, containing_type=None,
@@ -96,7 +96,7 @@ default_drag_and_drop_sort_customization_args = _descriptor.FieldDescriptor(
   serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key)
 DEFAULT_RATIO_EXPRESSION_CUSTOMIZATION_ARGS_FIELD_NUMBER = 1005
 default_ratio_expression_customization_args = _descriptor.FieldDescriptor(
-  name='default_ratio_expression_customization_args', full_name='core.domain.default_ratio_expression_customization_args', index=5,
+  name='default_ratio_expression_customization_args', full_name='default_ratio_expression_customization_args', index=5,
   number=1005, type=11, cpp_type=10, label=1,
   has_default_value=False, default_value=None,
   message_type=None, enum_type=None, containing_type=None,
@@ -106,21 +106,21 @@ default_ratio_expression_customization_args = _descriptor.FieldDescriptor(
 
 _EXPLORATION_STATESENTRY = _descriptor.Descriptor(
   name='StatesEntry',
-  full_name='core.domain.Exploration.StatesEntry',
+  full_name='Exploration.StatesEntry',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key', full_name='core.domain.Exploration.StatesEntry.key', index=0,
+      name='key', full_name='Exploration.StatesEntry.key', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='value', full_name='core.domain.Exploration.StatesEntry.value', index=1,
+      name='value', full_name='Exploration.StatesEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -138,48 +138,48 @@ _EXPLORATION_STATESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=207,
-  serialized_end=272,
+  serialized_start=182,
+  serialized_end=235,
 )
 
 _EXPLORATION = _descriptor.Descriptor(
   name='Exploration',
-  full_name='core.domain.Exploration',
+  full_name='Exploration',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='core.domain.Exploration.id', index=0,
+      name='id', full_name='Exploration.id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='version', full_name='core.domain.Exploration.version', index=1,
+      name='version', full_name='Exploration.version', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='init_state_name', full_name='core.domain.Exploration.init_state_name', index=2,
+      name='init_state_name', full_name='Exploration.init_state_name', index=2,
       number=8, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='states', full_name='core.domain.Exploration.states', index=3,
+      name='states', full_name='Exploration.states', index=3,
       number=11, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='title', full_name='core.domain.Exploration.title', index=4,
+      name='title', full_name='Exploration.title', index=4,
       number=12, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -197,42 +197,42 @@ _EXPLORATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=69,
-  serialized_end=326,
+  serialized_start=56,
+  serialized_end=289,
 )
 
 
 _STATE = _descriptor.Descriptor(
   name='State',
-  full_name='core.domain.State',
+  full_name='State',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='content', full_name='core.domain.State.content', index=0,
+      name='content', full_name='State.content', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='interaction', full_name='core.domain.State.interaction', index=1,
+      name='interaction', full_name='State.interaction', index=1,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='recorded_voiceovers', full_name='core.domain.State.recorded_voiceovers', index=2,
+      name='recorded_voiceovers', full_name='State.recorded_voiceovers', index=2,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='written_translations', full_name='core.domain.State.written_translations', index=3,
+      name='written_translations', full_name='State.written_translations', index=3,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -250,28 +250,28 @@ _STATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=329,
-  serialized_end=580,
+  serialized_start=292,
+  serialized_end=495,
 )
 
 
 _SUBTITLEDHTML = _descriptor.Descriptor(
   name='SubtitledHtml',
-  full_name='core.domain.SubtitledHtml',
+  full_name='SubtitledHtml',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='content_id', full_name='core.domain.SubtitledHtml.content_id', index=0,
+      name='content_id', full_name='SubtitledHtml.content_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='html', full_name='core.domain.SubtitledHtml.html', index=1,
+      name='html', full_name='SubtitledHtml.html', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -289,21 +289,21 @@ _SUBTITLEDHTML = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=582,
-  serialized_end=631,
+  serialized_start=497,
+  serialized_end=546,
 )
 
 
 _RECORDEDVOICEOVERS = _descriptor.Descriptor(
   name='RecordedVoiceovers',
-  full_name='core.domain.RecordedVoiceovers',
+  full_name='RecordedVoiceovers',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='voiceover_language_mapping', full_name='core.domain.RecordedVoiceovers.voiceover_language_mapping', index=0,
+      name='voiceover_language_mapping', full_name='RecordedVoiceovers.voiceover_language_mapping', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -321,28 +321,28 @@ _RECORDEDVOICEOVERS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=633,
-  serialized_end=727,
+  serialized_start=548,
+  serialized_end=630,
 )
 
 
 _VOICEOVERCONTENTMAPPING_VOICEOVERCONTENTMAPPINGENTRY = _descriptor.Descriptor(
   name='VoiceoverContentMappingEntry',
-  full_name='core.domain.VoiceoverContentMapping.VoiceoverContentMappingEntry',
+  full_name='VoiceoverContentMapping.VoiceoverContentMappingEntry',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key', full_name='core.domain.VoiceoverContentMapping.VoiceoverContentMappingEntry.key', index=0,
+      name='key', full_name='VoiceoverContentMapping.VoiceoverContentMappingEntry.key', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='value', full_name='core.domain.VoiceoverContentMapping.VoiceoverContentMappingEntry.value', index=1,
+      name='value', full_name='VoiceoverContentMapping.VoiceoverContentMappingEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -360,27 +360,27 @@ _VOICEOVERCONTENTMAPPING_VOICEOVERCONTENTMAPPINGENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=909,
-  serialized_end=995,
+  serialized_start=788,
+  serialized_end=862,
 )
 
 _VOICEOVERCONTENTMAPPING = _descriptor.Descriptor(
   name='VoiceoverContentMapping',
-  full_name='core.domain.VoiceoverContentMapping',
+  full_name='VoiceoverContentMapping',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='language_code', full_name='core.domain.VoiceoverContentMapping.language_code', index=0,
+      name='language_code', full_name='VoiceoverContentMapping.language_code', index=0,
       number=1, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='voiceover_content_mapping', full_name='core.domain.VoiceoverContentMapping.voiceover_content_mapping', index=1,
+      name='voiceover_content_mapping', full_name='VoiceoverContentMapping.voiceover_content_mapping', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -398,35 +398,35 @@ _VOICEOVERCONTENTMAPPING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=730,
-  serialized_end=995,
+  serialized_start=633,
+  serialized_end=862,
 )
 
 
 _VOICEOVER = _descriptor.Descriptor(
   name='Voiceover',
-  full_name='core.domain.Voiceover',
+  full_name='Voiceover',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='filename', full_name='core.domain.Voiceover.filename', index=0,
+      name='filename', full_name='Voiceover.filename', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='file_size_bytes', full_name='core.domain.Voiceover.file_size_bytes', index=1,
+      name='file_size_bytes', full_name='Voiceover.file_size_bytes', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='duration_secs', full_name='core.domain.Voiceover.duration_secs', index=2,
+      name='duration_secs', full_name='Voiceover.duration_secs', index=2,
       number=4, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -444,21 +444,21 @@ _VOICEOVER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=997,
-  serialized_end=1080,
+  serialized_start=864,
+  serialized_end=947,
 )
 
 
 _WRITTENTRANSLATIONS = _descriptor.Descriptor(
   name='WrittenTranslations',
-  full_name='core.domain.WrittenTranslations',
+  full_name='WrittenTranslations',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='translation_language_mapping', full_name='core.domain.WrittenTranslations.translation_language_mapping', index=0,
+      name='translation_language_mapping', full_name='WrittenTranslations.translation_language_mapping', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -476,28 +476,28 @@ _WRITTENTRANSLATIONS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1082,
-  serialized_end=1188,
+  serialized_start=949,
+  serialized_end=1043,
 )
 
 
 _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY = _descriptor.Descriptor(
   name='TranslationContentMappingEntry',
-  full_name='core.domain.WrittenTranslationContentMapping.TranslationContentMappingEntry',
+  full_name='WrittenTranslationContentMapping.TranslationContentMappingEntry',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key', full_name='core.domain.WrittenTranslationContentMapping.TranslationContentMappingEntry.key', index=0,
+      name='key', full_name='WrittenTranslationContentMapping.TranslationContentMappingEntry.key', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='value', full_name='core.domain.WrittenTranslationContentMapping.TranslationContentMappingEntry.value', index=1,
+      name='value', full_name='WrittenTranslationContentMapping.TranslationContentMappingEntry.value', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -515,27 +515,27 @@ _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY = _descriptor.D
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1392,
-  serialized_end=1489,
+  serialized_start=1223,
+  serialized_end=1308,
 )
 
 _WRITTENTRANSLATIONCONTENTMAPPING = _descriptor.Descriptor(
   name='WrittenTranslationContentMapping',
-  full_name='core.domain.WrittenTranslationContentMapping',
+  full_name='WrittenTranslationContentMapping',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='language_code', full_name='core.domain.WrittenTranslationContentMapping.language_code', index=0,
+      name='language_code', full_name='WrittenTranslationContentMapping.language_code', index=0,
       number=1, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='translation_content_mapping', full_name='core.domain.WrittenTranslationContentMapping.translation_content_mapping', index=1,
+      name='translation_content_mapping', full_name='WrittenTranslationContentMapping.translation_content_mapping', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -553,28 +553,28 @@ _WRITTENTRANSLATIONCONTENTMAPPING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1191,
-  serialized_end=1489,
+  serialized_start=1046,
+  serialized_end=1308,
 )
 
 
 _WRITTENTRANSLATION = _descriptor.Descriptor(
   name='WrittenTranslation',
-  full_name='core.domain.WrittenTranslation',
+  full_name='WrittenTranslation',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='data_format', full_name='core.domain.WrittenTranslation.data_format', index=0,
+      name='data_format', full_name='WrittenTranslation.data_format', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='translation', full_name='core.domain.WrittenTranslation.translation', index=1,
+      name='translation', full_name='WrittenTranslation.translation', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -592,98 +592,98 @@ _WRITTENTRANSLATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1491,
-  serialized_end=1559,
+  serialized_start=1310,
+  serialized_end=1378,
 )
 
 
 _INTERACTIONINSTANCE = _descriptor.Descriptor(
   name='InteractionInstance',
-  full_name='core.domain.InteractionInstance',
+  full_name='InteractionInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='continue', full_name='core.domain.InteractionInstance.continue', index=0,
+      name='continue', full_name='InteractionInstance.continue', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='fraction_input', full_name='core.domain.InteractionInstance.fraction_input', index=1,
+      name='fraction_input', full_name='InteractionInstance.fraction_input', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='item_selection_input', full_name='core.domain.InteractionInstance.item_selection_input', index=2,
+      name='item_selection_input', full_name='InteractionInstance.item_selection_input', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='multiple_choice_input', full_name='core.domain.InteractionInstance.multiple_choice_input', index=3,
+      name='multiple_choice_input', full_name='InteractionInstance.multiple_choice_input', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='numeric_input', full_name='core.domain.InteractionInstance.numeric_input', index=4,
+      name='numeric_input', full_name='InteractionInstance.numeric_input', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='text_input', full_name='core.domain.InteractionInstance.text_input', index=5,
+      name='text_input', full_name='InteractionInstance.text_input', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='drag_and_drop_sort_input', full_name='core.domain.InteractionInstance.drag_and_drop_sort_input', index=6,
+      name='drag_and_drop_sort_input', full_name='InteractionInstance.drag_and_drop_sort_input', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='image_click_input', full_name='core.domain.InteractionInstance.image_click_input', index=7,
+      name='image_click_input', full_name='InteractionInstance.image_click_input', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='ratio_expression_input', full_name='core.domain.InteractionInstance.ratio_expression_input', index=8,
+      name='ratio_expression_input', full_name='InteractionInstance.ratio_expression_input', index=8,
       number=9, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='end_exploration', full_name='core.domain.InteractionInstance.end_exploration', index=9,
+      name='end_exploration', full_name='InteractionInstance.end_exploration', index=9,
       number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='default_outcome', full_name='core.domain.InteractionInstance.default_outcome', index=10,
+      name='default_outcome', full_name='InteractionInstance.default_outcome', index=10,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='hints', full_name='core.domain.InteractionInstance.hints', index=11,
+      name='hints', full_name='InteractionInstance.hints', index=11,
       number=12, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -701,40 +701,40 @@ _INTERACTIONINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='interaction_type', full_name='core.domain.InteractionInstance.interaction_type',
+      name='interaction_type', full_name='InteractionInstance.interaction_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1562,
-  serialized_end=2346,
+  serialized_start=1381,
+  serialized_end=2021,
 )
 
 
 _OUTCOME = _descriptor.Descriptor(
   name='Outcome',
-  full_name='core.domain.Outcome',
+  full_name='Outcome',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='destination_state', full_name='core.domain.Outcome.destination_state', index=0,
+      name='destination_state', full_name='Outcome.destination_state', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='feedback', full_name='core.domain.Outcome.feedback', index=1,
+      name='feedback', full_name='Outcome.feedback', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='labelled_as_correct', full_name='core.domain.Outcome.labelled_as_correct', index=2,
+      name='labelled_as_correct', full_name='Outcome.labelled_as_correct', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -752,21 +752,21 @@ _OUTCOME = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2349,
-  serialized_end=2478,
+  serialized_start=2023,
+  serialized_end=2140,
 )
 
 
 _CONTINUEINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.ContinueInstance.CustomizationArgs',
+  full_name='ContinueInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='button_text', full_name='core.domain.ContinueInstance.CustomizationArgs.button_text', index=0,
+      name='button_text', full_name='ContinueInstance.CustomizationArgs.button_text', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -784,20 +784,20 @@ _CONTINUEINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2578,
-  serialized_end=2646,
+  serialized_start=2228,
+  serialized_end=2284,
 )
 
 _CONTINUEINSTANCE = _descriptor.Descriptor(
   name='ContinueInstance',
-  full_name='core.domain.ContinueInstance',
+  full_name='ContinueInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.ContinueInstance.customization_args', index=0,
+      name='customization_args', full_name='ContinueInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -815,42 +815,42 @@ _CONTINUEINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2481,
-  serialized_end=2646,
+  serialized_start=2143,
+  serialized_end=2284,
 )
 
 
 _FRACTIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.FractionInputInstance.CustomizationArgs',
+  full_name='FractionInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='requires_simplest_form', full_name='core.domain.FractionInputInstance.CustomizationArgs.requires_simplest_form', index=0,
+      name='requires_simplest_form', full_name='FractionInputInstance.CustomizationArgs.requires_simplest_form', index=0,
       number=1, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='allow_improper_fractions', full_name='core.domain.FractionInputInstance.CustomizationArgs.allow_improper_fractions', index=1,
+      name='allow_improper_fractions', full_name='FractionInputInstance.CustomizationArgs.allow_improper_fractions', index=1,
       number=2, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='allow_nonzero_integer_part', full_name='core.domain.FractionInputInstance.CustomizationArgs.allow_nonzero_integer_part', index=2,
+      name='allow_nonzero_integer_part', full_name='FractionInputInstance.CustomizationArgs.allow_nonzero_integer_part', index=2,
       number=3, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='custom_placeholder', full_name='core.domain.FractionInputInstance.CustomizationArgs.custom_placeholder', index=3,
+      name='custom_placeholder', full_name='FractionInputInstance.CustomizationArgs.custom_placeholder', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -868,27 +868,27 @@ _FRACTIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2891,
-  serialized_end=3068,
+  serialized_start=2493,
+  serialized_end=2658,
 )
 
 _FRACTIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   name='Solution',
-  full_name='core.domain.FractionInputInstance.Solution',
+  full_name='FractionInputInstance.Solution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_solution', full_name='core.domain.FractionInputInstance.Solution.base_solution', index=0,
+      name='base_solution', full_name='FractionInputInstance.Solution.base_solution', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='correct_answer', full_name='core.domain.FractionInputInstance.Solution.correct_answer', index=1,
+      name='correct_answer', full_name='FractionInputInstance.Solution.correct_answer', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -906,27 +906,27 @@ _FRACTIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3070,
-  serialized_end=3177,
+  serialized_start=2660,
+  serialized_end=2743,
 )
 
 _FRACTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.FractionInputInstance.AnswerGroup',
+  full_name='FractionInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.FractionInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='FractionInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.FractionInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='FractionInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -944,20 +944,20 @@ _FRACTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3180,
-  serialized_end=3315,
+  serialized_start=2745,
+  serialized_end=2856,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISEXACTLYEQUALTOSPEC = _descriptor.Descriptor(
   name='IsExactlyEqualToSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.IsExactlyEqualToSpec',
+  full_name='FractionInputInstance.RuleSpec.IsExactlyEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.IsExactlyEqualToSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.IsExactlyEqualToSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -975,20 +975,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISEXACTLYEQUALTOSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4374,
-  serialized_end=4434,
+  serialized_start=3794,
+  serialized_end=3842,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOSPEC = _descriptor.Descriptor(
   name='IsEquivalentToSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.IsEquivalentToSpec',
+  full_name='FractionInputInstance.RuleSpec.IsEquivalentToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.IsEquivalentToSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.IsEquivalentToSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1006,20 +1006,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4436,
-  serialized_end=4494,
+  serialized_start=3844,
+  serialized_end=3890,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOANDINSIMPLESTFORMSPEC = _descriptor.Descriptor(
   name='IsEquivalentToAndInSimplestFormSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec',
+  full_name='FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1037,20 +1037,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOANDINSIMPLESTFORMSPEC = _descripto
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4496,
-  serialized_end=4571,
+  serialized_start=3892,
+  serialized_end=3955,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
   name='IsLessThanSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.IsLessThanSpec',
+  full_name='FractionInputInstance.RuleSpec.IsLessThanSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.IsLessThanSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.IsLessThanSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1068,20 +1068,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4573,
-  serialized_end=4627,
+  serialized_start=3957,
+  serialized_end=3999,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
   name='IsGreaterThanSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.IsGreaterThanSpec',
+  full_name='FractionInputInstance.RuleSpec.IsGreaterThanSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.IsGreaterThanSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.IsGreaterThanSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1099,20 +1099,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4629,
-  serialized_end=4686,
+  serialized_start=4001,
+  serialized_end=4046,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASNUMERATOREQUALTOSPEC = _descriptor.Descriptor(
   name='HasNumeratorEqualToSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec',
+  full_name='FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec.input', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1130,20 +1130,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASNUMERATOREQUALTOSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4688,
-  serialized_end=4728,
+  serialized_start=4048,
+  serialized_end=4088,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASDENOMINATOREQUALTOSPEC = _descriptor.Descriptor(
   name='HasDenominatorEqualToSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec',
+  full_name='FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec.input', index=0,
       number=1, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1161,20 +1161,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASDENOMINATOREQUALTOSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4730,
-  serialized_end=4772,
+  serialized_start=4090,
+  serialized_end=4132,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASINTEGERPARTEQUALTOSPEC = _descriptor.Descriptor(
   name='HasIntegerPartEqualToSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec',
+  full_name='FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec.input', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1192,13 +1192,13 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASINTEGERPARTEQUALTOSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4774,
-  serialized_end=4816,
+  serialized_start=4134,
+  serialized_end=4176,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASNOFRACTIONALPARTSPEC = _descriptor.Descriptor(
   name='HasNoFractionalPartSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.HasNoFractionalPartSpec',
+  full_name='FractionInputInstance.RuleSpec.HasNoFractionalPartSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -1216,20 +1216,20 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASNOFRACTIONALPARTSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4818,
-  serialized_end=4843,
+  serialized_start=4178,
+  serialized_end=4203,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASFRACTIONALPARTEXACTLYEQUALTOSPEC = _descriptor.Descriptor(
   name='HasFractionalPartExactlyEqualToSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec',
+  full_name='FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec.input', index=0,
+      name='input', full_name='FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1247,83 +1247,83 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASFRACTIONALPARTEXACTLYEQUALTOSPEC = _descripto
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4845,
-  serialized_end=4920,
+  serialized_start=4205,
+  serialized_end=4268,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.FractionInputInstance.RuleSpec',
+  full_name='FractionInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='is_exactly_equal_to', full_name='core.domain.FractionInputInstance.RuleSpec.is_exactly_equal_to', index=0,
+      name='is_exactly_equal_to', full_name='FractionInputInstance.RuleSpec.is_exactly_equal_to', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_equivalent_to', full_name='core.domain.FractionInputInstance.RuleSpec.is_equivalent_to', index=1,
+      name='is_equivalent_to', full_name='FractionInputInstance.RuleSpec.is_equivalent_to', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_equivalent_to_and_in_simplest_form', full_name='core.domain.FractionInputInstance.RuleSpec.is_equivalent_to_and_in_simplest_form', index=2,
+      name='is_equivalent_to_and_in_simplest_form', full_name='FractionInputInstance.RuleSpec.is_equivalent_to_and_in_simplest_form', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_less_than', full_name='core.domain.FractionInputInstance.RuleSpec.is_less_than', index=3,
+      name='is_less_than', full_name='FractionInputInstance.RuleSpec.is_less_than', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_greater_than', full_name='core.domain.FractionInputInstance.RuleSpec.is_greater_than', index=4,
+      name='is_greater_than', full_name='FractionInputInstance.RuleSpec.is_greater_than', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_numerator_equal_to', full_name='core.domain.FractionInputInstance.RuleSpec.has_numerator_equal_to', index=5,
+      name='has_numerator_equal_to', full_name='FractionInputInstance.RuleSpec.has_numerator_equal_to', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_denominator_equal_to', full_name='core.domain.FractionInputInstance.RuleSpec.has_denominator_equal_to', index=6,
+      name='has_denominator_equal_to', full_name='FractionInputInstance.RuleSpec.has_denominator_equal_to', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_integer_part_equal_to', full_name='core.domain.FractionInputInstance.RuleSpec.has_integer_part_equal_to', index=7,
+      name='has_integer_part_equal_to', full_name='FractionInputInstance.RuleSpec.has_integer_part_equal_to', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_no_fractional_part', full_name='core.domain.FractionInputInstance.RuleSpec.has_no_fractional_part', index=8,
+      name='has_no_fractional_part', full_name='FractionInputInstance.RuleSpec.has_no_fractional_part', index=8,
       number=9, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_fractional_part_exactly_equal_to', full_name='core.domain.FractionInputInstance.RuleSpec.has_fractional_part_exactly_equal_to', index=9,
+      name='has_fractional_part_exactly_equal_to', full_name='FractionInputInstance.RuleSpec.has_fractional_part_exactly_equal_to', index=9,
       number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1341,39 +1341,39 @@ _FRACTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.FractionInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='FractionInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=3318,
-  serialized_end=4933,
+  serialized_start=2859,
+  serialized_end=4281,
 )
 
 _FRACTIONINPUTINSTANCE = _descriptor.Descriptor(
   name='FractionInputInstance',
-  full_name='core.domain.FractionInputInstance',
+  full_name='FractionInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.FractionInputInstance.customization_args', index=0,
+      name='customization_args', full_name='FractionInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.FractionInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='FractionInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='solution', full_name='core.domain.FractionInputInstance.solution', index=2,
+      name='solution', full_name='FractionInputInstance.solution', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1391,35 +1391,35 @@ _FRACTIONINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2649,
-  serialized_end=4940,
+  serialized_start=2287,
+  serialized_end=4288,
 )
 
 
 _ITEMSELECTIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.ItemSelectionInputInstance.CustomizationArgs',
+  full_name='ItemSelectionInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='min_allowable_selection_count', full_name='core.domain.ItemSelectionInputInstance.CustomizationArgs.min_allowable_selection_count', index=0,
+      name='min_allowable_selection_count', full_name='ItemSelectionInputInstance.CustomizationArgs.min_allowable_selection_count', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='max_allowable_selection_count', full_name='core.domain.ItemSelectionInputInstance.CustomizationArgs.max_allowable_selection_count', index=1,
+      name='max_allowable_selection_count', full_name='ItemSelectionInputInstance.CustomizationArgs.max_allowable_selection_count', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='choices', full_name='core.domain.ItemSelectionInputInstance.CustomizationArgs.choices', index=2,
+      name='choices', full_name='ItemSelectionInputInstance.CustomizationArgs.choices', index=2,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1437,27 +1437,27 @@ _ITEMSELECTIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5137,
-  serialized_end=5279,
+  serialized_start=4461,
+  serialized_end=4591,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.ItemSelectionInputInstance.AnswerGroup',
+  full_name='ItemSelectionInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.ItemSelectionInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='ItemSelectionInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.ItemSelectionInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='ItemSelectionInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1475,20 +1475,20 @@ _ITEMSELECTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5282,
-  serialized_end=5422,
+  serialized_start=4593,
+  serialized_end=4709,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   name='EqualsSpec',
-  full_name='core.domain.ItemSelectionInputInstance.RuleSpec.EqualsSpec',
+  full_name='ItemSelectionInputInstance.RuleSpec.EqualsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.EqualsSpec.input', index=0,
+      name='input', full_name='ItemSelectionInputInstance.RuleSpec.EqualsSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1506,20 +1506,20 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5854,
-  serialized_end=5927,
+  serialized_start=5093,
+  serialized_end=5154,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_CONTAINSATLEASTONEOFSPEC = _descriptor.Descriptor(
   name='ContainsAtLeastOneOfSpec',
-  full_name='core.domain.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec',
+  full_name='ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec.input', index=0,
+      name='input', full_name='ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1537,20 +1537,20 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_CONTAINSATLEASTONEOFSPEC = _descriptor.Desc
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5929,
-  serialized_end=6016,
+  serialized_start=5156,
+  serialized_end=5231,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_DOESNOTCONTAINATLEASTONEOFSPEC = _descriptor.Descriptor(
   name='DoesNotContainAtLeastOneOfSpec',
-  full_name='core.domain.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec',
+  full_name='ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec.input', index=0,
+      name='input', full_name='ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1568,20 +1568,20 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_DOESNOTCONTAINATLEASTONEOFSPEC = _descripto
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6018,
-  serialized_end=6111,
+  serialized_start=5233,
+  serialized_end=5314,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_ISPROPERSUBSETOFSPEC = _descriptor.Descriptor(
   name='IsProperSubsetOfSpec',
-  full_name='core.domain.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec',
+  full_name='ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec.input', index=0,
+      name='input', full_name='ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1599,41 +1599,41 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_ISPROPERSUBSETOFSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6113,
-  serialized_end=6196,
+  serialized_start=5316,
+  serialized_end=5387,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.ItemSelectionInputInstance.RuleSpec',
+  full_name='ItemSelectionInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='equals', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.equals', index=0,
+      name='equals', full_name='ItemSelectionInputInstance.RuleSpec.equals', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='contains_at_least_one_of', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.contains_at_least_one_of', index=1,
+      name='contains_at_least_one_of', full_name='ItemSelectionInputInstance.RuleSpec.contains_at_least_one_of', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='does_not_contain_at_least_one_of', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.does_not_contain_at_least_one_of', index=2,
+      name='does_not_contain_at_least_one_of', full_name='ItemSelectionInputInstance.RuleSpec.does_not_contain_at_least_one_of', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_proper_subset_of', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.is_proper_subset_of', index=3,
+      name='is_proper_subset_of', full_name='ItemSelectionInputInstance.RuleSpec.is_proper_subset_of', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1651,32 +1651,32 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.ItemSelectionInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='ItemSelectionInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=5425,
-  serialized_end=6209,
+  serialized_start=4712,
+  serialized_end=5400,
 )
 
 _ITEMSELECTIONINPUTINSTANCE = _descriptor.Descriptor(
   name='ItemSelectionInputInstance',
-  full_name='core.domain.ItemSelectionInputInstance',
+  full_name='ItemSelectionInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.ItemSelectionInputInstance.customization_args', index=0,
+      name='customization_args', full_name='ItemSelectionInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.ItemSelectionInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='ItemSelectionInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1694,21 +1694,21 @@ _ITEMSELECTIONINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4943,
-  serialized_end=6209,
+  serialized_start=4291,
+  serialized_end=5400,
 )
 
 
 _MULTIPLECHOICEINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.MultipleChoiceInputInstance.CustomizationArgs',
+  full_name='MultipleChoiceInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='choices', full_name='core.domain.MultipleChoiceInputInstance.CustomizationArgs.choices', index=0,
+      name='choices', full_name='MultipleChoiceInputInstance.CustomizationArgs.choices', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1726,27 +1726,27 @@ _MULTIPLECHOICEINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6408,
-  serialized_end=6472,
+  serialized_start=5575,
+  serialized_end=5627,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.MultipleChoiceInputInstance.AnswerGroup',
+  full_name='MultipleChoiceInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.MultipleChoiceInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='MultipleChoiceInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.MultipleChoiceInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='MultipleChoiceInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1764,20 +1764,20 @@ _MULTIPLECHOICEINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6475,
-  serialized_end=6616,
+  serialized_start=5629,
+  serialized_end=5746,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   name='EqualsSpec',
-  full_name='core.domain.MultipleChoiceInputInstance.RuleSpec.EqualsSpec',
+  full_name='MultipleChoiceInputInstance.RuleSpec.EqualsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.MultipleChoiceInputInstance.RuleSpec.EqualsSpec.input', index=0,
+      name='input', full_name='MultipleChoiceInputInstance.RuleSpec.EqualsSpec.input', index=0,
       number=1, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -1795,20 +1795,20 @@ _MULTIPLECHOICEINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6711,
-  serialized_end=6738,
+  serialized_start=5828,
+  serialized_end=5855,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.MultipleChoiceInputInstance.RuleSpec',
+  full_name='MultipleChoiceInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='equals', full_name='core.domain.MultipleChoiceInputInstance.RuleSpec.equals', index=0,
+      name='equals', full_name='MultipleChoiceInputInstance.RuleSpec.equals', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -1826,32 +1826,32 @@ _MULTIPLECHOICEINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.MultipleChoiceInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='MultipleChoiceInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=6619,
-  serialized_end=6751,
+  serialized_start=5748,
+  serialized_end=5868,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE = _descriptor.Descriptor(
   name='MultipleChoiceInputInstance',
-  full_name='core.domain.MultipleChoiceInputInstance',
+  full_name='MultipleChoiceInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.MultipleChoiceInputInstance.customization_args', index=0,
+      name='customization_args', full_name='MultipleChoiceInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.MultipleChoiceInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='MultipleChoiceInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1869,28 +1869,28 @@ _MULTIPLECHOICEINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6212,
-  serialized_end=6751,
+  serialized_start=5403,
+  serialized_end=5868,
 )
 
 
 _NUMERICINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   name='Solution',
-  full_name='core.domain.NumericInputInstance.Solution',
+  full_name='NumericInputInstance.Solution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_solution', full_name='core.domain.NumericInputInstance.Solution.base_solution', index=0,
+      name='base_solution', full_name='NumericInputInstance.Solution.base_solution', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='correct_answer', full_name='core.domain.NumericInputInstance.Solution.correct_answer', index=1,
+      name='correct_answer', full_name='NumericInputInstance.Solution.correct_answer', index=1,
       number=2, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -1908,27 +1908,27 @@ _NUMERICINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6910,
-  serialized_end=6994,
+  serialized_start=6003,
+  serialized_end=6075,
 )
 
 _NUMERICINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.NumericInputInstance.AnswerGroup',
+  full_name='NumericInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.NumericInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='NumericInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.NumericInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='NumericInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -1946,20 +1946,20 @@ _NUMERICINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6997,
-  serialized_end=7131,
+  serialized_start=6077,
+  serialized_end=6187,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   name='EqualsSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.EqualsSpec',
+  full_name='NumericInputInstance.RuleSpec.EqualsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.NumericInputInstance.RuleSpec.EqualsSpec.input', index=0,
+      name='input', full_name='NumericInputInstance.RuleSpec.EqualsSpec.input', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -1977,20 +1977,20 @@ _NUMERICINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7805,
-  serialized_end=7832,
+  serialized_start=6777,
+  serialized_end=6804,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
   name='IsLessThanSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.IsLessThanSpec',
+  full_name='NumericInputInstance.RuleSpec.IsLessThanSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.NumericInputInstance.RuleSpec.IsLessThanSpec.input', index=0,
+      name='input', full_name='NumericInputInstance.RuleSpec.IsLessThanSpec.input', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -2008,20 +2008,20 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7834,
-  serialized_end=7865,
+  serialized_start=6806,
+  serialized_end=6837,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
   name='IsGreaterThanSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.IsGreaterThanSpec',
+  full_name='NumericInputInstance.RuleSpec.IsGreaterThanSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.NumericInputInstance.RuleSpec.IsGreaterThanSpec.input', index=0,
+      name='input', full_name='NumericInputInstance.RuleSpec.IsGreaterThanSpec.input', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -2039,20 +2039,20 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7867,
-  serialized_end=7901,
+  serialized_start=6839,
+  serialized_end=6873,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANOREQUALTOSPEC = _descriptor.Descriptor(
   name='IsLessThanOrEqualToSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec',
+  full_name='NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec.input', index=0,
+      name='input', full_name='NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec.input', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -2070,20 +2070,20 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANOREQUALTOSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7903,
-  serialized_end=7943,
+  serialized_start=6875,
+  serialized_end=6915,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANOREQUALTOSPEC = _descriptor.Descriptor(
   name='IsGreaterThanOrEqualToSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec',
+  full_name='NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec.input', index=0,
+      name='input', full_name='NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec.input', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -2101,27 +2101,27 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANOREQUALTOSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7945,
-  serialized_end=7988,
+  serialized_start=6917,
+  serialized_end=6960,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISINCLUSIVELYBETWEENSPEC = _descriptor.Descriptor(
   name='IsInclusivelyBetweenSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec',
+  full_name='NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='inputLowerInclusive', full_name='core.domain.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec.inputLowerInclusive', index=0,
+      name='inputLowerInclusive', full_name='NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec.inputLowerInclusive', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='inputUpperInclusive', full_name='core.domain.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec.inputUpperInclusive', index=1,
+      name='inputUpperInclusive', full_name='NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec.inputUpperInclusive', index=1,
       number=2, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -2139,27 +2139,27 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISINCLUSIVELYBETWEENSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7990,
-  serialized_end=8074,
+  serialized_start=6962,
+  serialized_end=7046,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISWITHINTOLERANCESPEC = _descriptor.Descriptor(
   name='IsWithinToleranceSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec.IsWithinToleranceSpec',
+  full_name='NumericInputInstance.RuleSpec.IsWithinToleranceSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='inputTolerance', full_name='core.domain.NumericInputInstance.RuleSpec.IsWithinToleranceSpec.inputTolerance', index=0,
+      name='inputTolerance', full_name='NumericInputInstance.RuleSpec.IsWithinToleranceSpec.inputTolerance', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='inputComparedValue', full_name='core.domain.NumericInputInstance.RuleSpec.IsWithinToleranceSpec.inputComparedValue', index=1,
+      name='inputComparedValue', full_name='NumericInputInstance.RuleSpec.IsWithinToleranceSpec.inputComparedValue', index=1,
       number=2, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -2177,62 +2177,62 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISWITHINTOLERANCESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8076,
-  serialized_end=8151,
+  serialized_start=7048,
+  serialized_end=7123,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.NumericInputInstance.RuleSpec',
+  full_name='NumericInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='equals', full_name='core.domain.NumericInputInstance.RuleSpec.equals', index=0,
+      name='equals', full_name='NumericInputInstance.RuleSpec.equals', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_less_than', full_name='core.domain.NumericInputInstance.RuleSpec.is_less_than', index=1,
+      name='is_less_than', full_name='NumericInputInstance.RuleSpec.is_less_than', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_greater_than', full_name='core.domain.NumericInputInstance.RuleSpec.is_greater_than', index=2,
+      name='is_greater_than', full_name='NumericInputInstance.RuleSpec.is_greater_than', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_less_than_or_equal_to', full_name='core.domain.NumericInputInstance.RuleSpec.is_less_than_or_equal_to', index=3,
+      name='is_less_than_or_equal_to', full_name='NumericInputInstance.RuleSpec.is_less_than_or_equal_to', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_greater_than_or_equal_to', full_name='core.domain.NumericInputInstance.RuleSpec.is_greater_than_or_equal_to', index=4,
+      name='is_greater_than_or_equal_to', full_name='NumericInputInstance.RuleSpec.is_greater_than_or_equal_to', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_inclusively_between', full_name='core.domain.NumericInputInstance.RuleSpec.is_inclusively_between', index=5,
+      name='is_inclusively_between', full_name='NumericInputInstance.RuleSpec.is_inclusively_between', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_within_tolerance', full_name='core.domain.NumericInputInstance.RuleSpec.is_within_tolerance', index=6,
+      name='is_within_tolerance', full_name='NumericInputInstance.RuleSpec.is_within_tolerance', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2250,32 +2250,32 @@ _NUMERICINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.NumericInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='NumericInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=7134,
-  serialized_end=8164,
+  serialized_start=6190,
+  serialized_end=7136,
 )
 
 _NUMERICINPUTINSTANCE = _descriptor.Descriptor(
   name='NumericInputInstance',
-  full_name='core.domain.NumericInputInstance',
+  full_name='NumericInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.NumericInputInstance.answer_groups', index=0,
+      name='answer_groups', full_name='NumericInputInstance.answer_groups', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='solution', full_name='core.domain.NumericInputInstance.solution', index=1,
+      name='solution', full_name='NumericInputInstance.solution', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2293,28 +2293,28 @@ _NUMERICINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6754,
-  serialized_end=8164,
+  serialized_start=5871,
+  serialized_end=7136,
 )
 
 
 _TEXTINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.TextInputInstance.CustomizationArgs',
+  full_name='TextInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='placeholder', full_name='core.domain.TextInputInstance.CustomizationArgs.placeholder', index=0,
+      name='placeholder', full_name='TextInputInstance.CustomizationArgs.placeholder', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rows', full_name='core.domain.TextInputInstance.CustomizationArgs.rows', index=1,
+      name='rows', full_name='TextInputInstance.CustomizationArgs.rows', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -2332,27 +2332,27 @@ _TEXTINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8392,
-  serialized_end=8474,
+  serialized_start=7328,
+  serialized_end=7398,
 )
 
 _TEXTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   name='Solution',
-  full_name='core.domain.TextInputInstance.Solution',
+  full_name='TextInputInstance.Solution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_solution', full_name='core.domain.TextInputInstance.Solution.base_solution', index=0,
+      name='base_solution', full_name='TextInputInstance.Solution.base_solution', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='correct_answer', full_name='core.domain.TextInputInstance.Solution.correct_answer', index=1,
+      name='correct_answer', full_name='TextInputInstance.Solution.correct_answer', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -2370,27 +2370,27 @@ _TEXTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8476,
-  serialized_end=8560,
+  serialized_start=7400,
+  serialized_end=7472,
 )
 
 _TEXTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.TextInputInstance.AnswerGroup',
+  full_name='TextInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.TextInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='TextInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.TextInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='TextInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -2408,20 +2408,20 @@ _TEXTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8563,
-  serialized_end=8694,
+  serialized_start=7474,
+  serialized_end=7581,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   name='EqualsSpec',
-  full_name='core.domain.TextInputInstance.RuleSpec.EqualsSpec',
+  full_name='TextInputInstance.RuleSpec.EqualsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.TextInputInstance.RuleSpec.EqualsSpec.input', index=0,
+      name='input', full_name='TextInputInstance.RuleSpec.EqualsSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2439,20 +2439,20 @@ _TEXTINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9013,
-  serialized_end=9088,
+  serialized_start=7852,
+  serialized_end=7915,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_STARTSWITHSPEC = _descriptor.Descriptor(
   name='StartsWithSpec',
-  full_name='core.domain.TextInputInstance.RuleSpec.StartsWithSpec',
+  full_name='TextInputInstance.RuleSpec.StartsWithSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.TextInputInstance.RuleSpec.StartsWithSpec.input', index=0,
+      name='input', full_name='TextInputInstance.RuleSpec.StartsWithSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2470,20 +2470,20 @@ _TEXTINPUTINSTANCE_RULESPEC_STARTSWITHSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9090,
-  serialized_end=9169,
+  serialized_start=7917,
+  serialized_end=7984,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_CONTAINSSPEC = _descriptor.Descriptor(
   name='ContainsSpec',
-  full_name='core.domain.TextInputInstance.RuleSpec.ContainsSpec',
+  full_name='TextInputInstance.RuleSpec.ContainsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.TextInputInstance.RuleSpec.ContainsSpec.input', index=0,
+      name='input', full_name='TextInputInstance.RuleSpec.ContainsSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2501,20 +2501,20 @@ _TEXTINPUTINSTANCE_RULESPEC_CONTAINSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9171,
-  serialized_end=9248,
+  serialized_start=7986,
+  serialized_end=8051,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_FUZZYEQUALSSPEC = _descriptor.Descriptor(
   name='FuzzyEqualsSpec',
-  full_name='core.domain.TextInputInstance.RuleSpec.FuzzyEqualsSpec',
+  full_name='TextInputInstance.RuleSpec.FuzzyEqualsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.TextInputInstance.RuleSpec.FuzzyEqualsSpec.input', index=0,
+      name='input', full_name='TextInputInstance.RuleSpec.FuzzyEqualsSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2532,41 +2532,41 @@ _TEXTINPUTINSTANCE_RULESPEC_FUZZYEQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9250,
-  serialized_end=9330,
+  serialized_start=8053,
+  serialized_end=8121,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.TextInputInstance.RuleSpec',
+  full_name='TextInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='equals', full_name='core.domain.TextInputInstance.RuleSpec.equals', index=0,
+      name='equals', full_name='TextInputInstance.RuleSpec.equals', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='starts_with', full_name='core.domain.TextInputInstance.RuleSpec.starts_with', index=1,
+      name='starts_with', full_name='TextInputInstance.RuleSpec.starts_with', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='contains', full_name='core.domain.TextInputInstance.RuleSpec.contains', index=2,
+      name='contains', full_name='TextInputInstance.RuleSpec.contains', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='fuzzy_equals', full_name='core.domain.TextInputInstance.RuleSpec.fuzzy_equals', index=3,
+      name='fuzzy_equals', full_name='TextInputInstance.RuleSpec.fuzzy_equals', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2584,39 +2584,39 @@ _TEXTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.TextInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='TextInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=8697,
-  serialized_end=9343,
+  serialized_start=7584,
+  serialized_end=8134,
 )
 
 _TEXTINPUTINSTANCE = _descriptor.Descriptor(
   name='TextInputInstance',
-  full_name='core.domain.TextInputInstance',
+  full_name='TextInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.TextInputInstance.customization_args', index=0,
+      name='customization_args', full_name='TextInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.TextInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='TextInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='solution', full_name='core.domain.TextInputInstance.solution', index=2,
+      name='solution', full_name='TextInputInstance.solution', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2634,28 +2634,28 @@ _TEXTINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8167,
-  serialized_end=9343,
+  serialized_start=7139,
+  serialized_end=8134,
 )
 
 
 _DRAGANDDROPSORTINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.DragAndDropSortInputInstance.CustomizationArgs',
+  full_name='DragAndDropSortInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='choices', full_name='core.domain.DragAndDropSortInputInstance.CustomizationArgs.choices', index=0,
+      name='choices', full_name='DragAndDropSortInputInstance.CustomizationArgs.choices', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='allowMultipleItemsInSamePosition', full_name='core.domain.DragAndDropSortInputInstance.CustomizationArgs.allowMultipleItemsInSamePosition', index=1,
+      name='allowMultipleItemsInSamePosition', full_name='DragAndDropSortInputInstance.CustomizationArgs.allowMultipleItemsInSamePosition', index=1,
       number=2, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -2673,27 +2673,27 @@ _DRAGANDDROPSORTINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9615,
-  serialized_end=9721,
+  serialized_start=8370,
+  serialized_end=8464,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   name='Solution',
-  full_name='core.domain.DragAndDropSortInputInstance.Solution',
+  full_name='DragAndDropSortInputInstance.Solution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_solution', full_name='core.domain.DragAndDropSortInputInstance.Solution.base_solution', index=0,
+      name='base_solution', full_name='DragAndDropSortInputInstance.Solution.base_solution', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='correct_answer', full_name='core.domain.DragAndDropSortInputInstance.Solution.correct_answer', index=1,
+      name='correct_answer', full_name='DragAndDropSortInputInstance.Solution.correct_answer', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2711,27 +2711,27 @@ _DRAGANDDROPSORTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9724,
-  serialized_end=9861,
+  serialized_start=8466,
+  serialized_end=8579,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.DragAndDropSortInputInstance.AnswerGroup',
+  full_name='DragAndDropSortInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.DragAndDropSortInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='DragAndDropSortInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.DragAndDropSortInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='DragAndDropSortInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -2749,20 +2749,20 @@ _DRAGANDDROPSORTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9864,
-  serialized_end=10006,
+  serialized_start=8581,
+  serialized_end=8699,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGSPEC = _descriptor.Descriptor(
   name='IsEqualToOrderingSpec',
-  full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec',
+  full_name='DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec.input', index=0,
+      name='input', full_name='DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2780,20 +2780,20 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGSPEC = _descriptor.Descr
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10542,
-  serialized_end=10633,
+  serialized_start=9187,
+  serialized_end=9266,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGWITHONEITEMATINCORRECTPOSITIONSPEC = _descriptor.Descriptor(
   name='IsEqualToOrderingWithOneItemAtIncorrectPositionSpec',
-  full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec',
+  full_name='DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec.input', index=0,
+      name='input', full_name='DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2811,27 +2811,27 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGWITHONEITEMATINCORRECTPO
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10635,
-  serialized_end=10756,
+  serialized_start=9268,
+  serialized_end=9377,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXATPOSITIONYSPEC = _descriptor.Descriptor(
   name='HasElementXAtPositionYSpec',
-  full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec',
+  full_name='DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='element', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec.element', index=0,
+      name='element', full_name='DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec.element', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='position', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec.position', index=1,
+      name='position', full_name='DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec.position', index=1,
       number=2, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -2849,27 +2849,27 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXATPOSITIONYSPEC = _descriptor.
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10758,
-  serialized_end=10861,
+  serialized_start=9379,
+  serialized_end=9470,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXBEFOREELEMENTYSPEC = _descriptor.Descriptor(
   name='HasElementXBeforeElementYSpec',
-  full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec',
+  full_name='DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='considered_element', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec.considered_element', index=0,
+      name='considered_element', full_name='DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec.considered_element', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='later_element', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec.later_element', index=1,
+      name='later_element', full_name='DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec.later_element', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2887,41 +2887,41 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXBEFOREELEMENTYSPEC = _descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10864,
-  serialized_end=11026,
+  serialized_start=9473,
+  serialized_end=9611,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.DragAndDropSortInputInstance.RuleSpec',
+  full_name='DragAndDropSortInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='is_equal_to_ordering', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.is_equal_to_ordering', index=0,
+      name='is_equal_to_ordering', full_name='DragAndDropSortInputInstance.RuleSpec.is_equal_to_ordering', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_equal_to_ordering_with_one_item_at_incorrect_position', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.is_equal_to_ordering_with_one_item_at_incorrect_position', index=1,
+      name='is_equal_to_ordering_with_one_item_at_incorrect_position', full_name='DragAndDropSortInputInstance.RuleSpec.is_equal_to_ordering_with_one_item_at_incorrect_position', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_element_x_at_position_y', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.has_element_x_at_position_y', index=2,
+      name='has_element_x_at_position_y', full_name='DragAndDropSortInputInstance.RuleSpec.has_element_x_at_position_y', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_element_x_before_element_y', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.has_element_x_before_element_y', index=3,
+      name='has_element_x_before_element_y', full_name='DragAndDropSortInputInstance.RuleSpec.has_element_x_before_element_y', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2939,39 +2939,39 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.DragAndDropSortInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='DragAndDropSortInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=10009,
-  serialized_end=11039,
+  serialized_start=8702,
+  serialized_end=9624,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE = _descriptor.Descriptor(
   name='DragAndDropSortInputInstance',
-  full_name='core.domain.DragAndDropSortInputInstance',
+  full_name='DragAndDropSortInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.DragAndDropSortInputInstance.customization_args', index=0,
+      name='customization_args', full_name='DragAndDropSortInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.DragAndDropSortInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='DragAndDropSortInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='solution', full_name='core.domain.DragAndDropSortInputInstance.solution', index=2,
+      name='solution', full_name='DragAndDropSortInputInstance.solution', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -2989,21 +2989,21 @@ _DRAGANDDROPSORTINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9346,
-  serialized_end=11044,
+  serialized_start=8137,
+  serialized_end=9629,
 )
 
 
 _IMAGECLICKINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.ImageClickInputInstance.CustomizationArgs',
+  full_name='ImageClickInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='image_and_regions', full_name='core.domain.ImageClickInputInstance.CustomizationArgs.image_and_regions', index=0,
+      name='image_and_regions', full_name='ImageClickInputInstance.CustomizationArgs.image_and_regions', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3021,27 +3021,27 @@ _IMAGECLICKINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11231,
-  serialized_end=11314,
+  serialized_start=9792,
+  serialized_end=9863,
 )
 
 _IMAGECLICKINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.ImageClickInputInstance.AnswerGroup',
+  full_name='ImageClickInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.ImageClickInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='ImageClickInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.ImageClickInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='ImageClickInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -3059,20 +3059,20 @@ _IMAGECLICKINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11317,
-  serialized_end=11454,
+  serialized_start=9865,
+  serialized_end=9978,
 )
 
 _IMAGECLICKINPUTINSTANCE_RULESPEC_ISINREGIONSPEC = _descriptor.Descriptor(
   name='IsInRegionSpec',
-  full_name='core.domain.ImageClickInputInstance.RuleSpec.IsInRegionSpec',
+  full_name='ImageClickInputInstance.RuleSpec.IsInRegionSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input_region', full_name='core.domain.ImageClickInputInstance.RuleSpec.IsInRegionSpec.input_region', index=0,
+      name='input_region', full_name='ImageClickInputInstance.RuleSpec.IsInRegionSpec.input_region', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -3090,20 +3090,20 @@ _IMAGECLICKINPUTINSTANCE_RULESPEC_ISINREGIONSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11555,
-  serialized_end=11593,
+  serialized_start=10067,
+  serialized_end=10105,
 )
 
 _IMAGECLICKINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.ImageClickInputInstance.RuleSpec',
+  full_name='ImageClickInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='is_in_region', full_name='core.domain.ImageClickInputInstance.RuleSpec.is_in_region', index=0,
+      name='is_in_region', full_name='ImageClickInputInstance.RuleSpec.is_in_region', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3121,32 +3121,32 @@ _IMAGECLICKINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.ImageClickInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='ImageClickInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=11457,
-  serialized_end=11606,
+  serialized_start=9981,
+  serialized_end=10118,
 )
 
 _IMAGECLICKINPUTINSTANCE = _descriptor.Descriptor(
   name='ImageClickInputInstance',
-  full_name='core.domain.ImageClickInputInstance',
+  full_name='ImageClickInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.ImageClickInputInstance.customization_args', index=0,
+      name='customization_args', full_name='ImageClickInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.ImageClickInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='ImageClickInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -3164,28 +3164,28 @@ _IMAGECLICKINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11047,
-  serialized_end=11611,
+  serialized_start=9632,
+  serialized_end=10123,
 )
 
 
 _RATIOEXPRESSIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   name='CustomizationArgs',
-  full_name='core.domain.RatioExpressionInputInstance.CustomizationArgs',
+  full_name='RatioExpressionInputInstance.CustomizationArgs',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='placeholder', full_name='core.domain.RatioExpressionInputInstance.CustomizationArgs.placeholder', index=0,
+      name='placeholder', full_name='RatioExpressionInputInstance.CustomizationArgs.placeholder', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='number_of_terms', full_name='core.domain.RatioExpressionInputInstance.CustomizationArgs.number_of_terms', index=1,
+      name='number_of_terms', full_name='RatioExpressionInputInstance.CustomizationArgs.number_of_terms', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -3203,27 +3203,27 @@ _RATIOEXPRESSIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11883,
-  serialized_end=11976,
+  serialized_start=10359,
+  serialized_end=10440,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   name='Solution',
-  full_name='core.domain.RatioExpressionInputInstance.Solution',
+  full_name='RatioExpressionInputInstance.Solution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_solution', full_name='core.domain.RatioExpressionInputInstance.Solution.base_solution', index=0,
+      name='base_solution', full_name='RatioExpressionInputInstance.Solution.base_solution', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='correct_answer', full_name='core.domain.RatioExpressionInputInstance.Solution.correct_answer', index=1,
+      name='correct_answer', full_name='RatioExpressionInputInstance.Solution.correct_answer', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3241,27 +3241,27 @@ _RATIOEXPRESSIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11978,
-  serialized_end=12092,
+  serialized_start=10442,
+  serialized_end=10532,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.RatioExpressionInputInstance.AnswerGroup',
+  full_name='RatioExpressionInputInstance.AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_answer_group', full_name='core.domain.RatioExpressionInputInstance.AnswerGroup.base_answer_group', index=0,
+      name='base_answer_group', full_name='RatioExpressionInputInstance.AnswerGroup.base_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='rule_specs', full_name='core.domain.RatioExpressionInputInstance.AnswerGroup.rule_specs', index=1,
+      name='rule_specs', full_name='RatioExpressionInputInstance.AnswerGroup.rule_specs', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -3279,20 +3279,20 @@ _RATIOEXPRESSIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12095,
-  serialized_end=12237,
+  serialized_start=10534,
+  serialized_end=10652,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   name='EqualsSpec',
-  full_name='core.domain.RatioExpressionInputInstance.RuleSpec.EqualsSpec',
+  full_name='RatioExpressionInputInstance.RuleSpec.EqualsSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.EqualsSpec.input', index=0,
+      name='input', full_name='RatioExpressionInputInstance.RuleSpec.EqualsSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3310,20 +3310,20 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12547,
-  serialized_end=12604,
+  serialized_start=10926,
+  serialized_end=10971,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTSPEC = _descriptor.Descriptor(
   name='IsEquivalentSpec',
-  full_name='core.domain.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec',
+  full_name='RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec.input', index=0,
+      name='input', full_name='RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec.input', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3341,20 +3341,20 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12606,
-  serialized_end=12669,
+  serialized_start=10973,
+  serialized_end=11024,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_HASNUMBEROFTERMSEQUALTOSPEC = _descriptor.Descriptor(
   name='HasNumberOfTermsEqualToSpec',
-  full_name='core.domain.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec',
+  full_name='RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='input_term_count', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec.input_term_count', index=0,
+      name='input_term_count', full_name='RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec.input_term_count', index=0,
       number=1, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -3372,34 +3372,34 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_HASNUMBEROFTERMSEQUALTOSPEC = _descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12671,
-  serialized_end=12726,
+  serialized_start=11026,
+  serialized_end=11081,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.RatioExpressionInputInstance.RuleSpec',
+  full_name='RatioExpressionInputInstance.RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='equals', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.equals', index=0,
+      name='equals', full_name='RatioExpressionInputInstance.RuleSpec.equals', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='is_equivalent', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.is_equivalent', index=1,
+      name='is_equivalent', full_name='RatioExpressionInputInstance.RuleSpec.is_equivalent', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='has_number_of_terms_equal_to', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.has_number_of_terms_equal_to', index=2,
+      name='has_number_of_terms_equal_to', full_name='RatioExpressionInputInstance.RuleSpec.has_number_of_terms_equal_to', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3417,39 +3417,39 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='rule_type', full_name='core.domain.RatioExpressionInputInstance.RuleSpec.rule_type',
+      name='rule_type', full_name='RatioExpressionInputInstance.RuleSpec.rule_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=12240,
-  serialized_end=12739,
+  serialized_start=10655,
+  serialized_end=11094,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE = _descriptor.Descriptor(
   name='RatioExpressionInputInstance',
-  full_name='core.domain.RatioExpressionInputInstance',
+  full_name='RatioExpressionInputInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='customization_args', full_name='core.domain.RatioExpressionInputInstance.customization_args', index=0,
+      name='customization_args', full_name='RatioExpressionInputInstance.customization_args', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='answer_groups', full_name='core.domain.RatioExpressionInputInstance.answer_groups', index=1,
+      name='answer_groups', full_name='RatioExpressionInputInstance.answer_groups', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='solution', full_name='core.domain.RatioExpressionInputInstance.solution', index=2,
+      name='solution', full_name='RatioExpressionInputInstance.solution', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3467,14 +3467,14 @@ _RATIOEXPRESSIONINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11614,
-  serialized_end=12739,
+  serialized_start=10126,
+  serialized_end=11094,
 )
 
 
 _ENDEXPLORATIONINSTANCE = _descriptor.Descriptor(
   name='EndExplorationInstance',
-  full_name='core.domain.EndExplorationInstance',
+  full_name='EndExplorationInstance',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -3492,21 +3492,21 @@ _ENDEXPLORATIONINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12741,
-  serialized_end=12765,
+  serialized_start=11096,
+  serialized_end=11120,
 )
 
 
 _HINT = _descriptor.Descriptor(
   name='Hint',
-  full_name='core.domain.Hint',
+  full_name='Hint',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='hint_content', full_name='core.domain.Hint.hint_content', index=0,
+      name='hint_content', full_name='Hint.hint_content', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3524,21 +3524,21 @@ _HINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12767,
-  serialized_end=12823,
+  serialized_start=11122,
+  serialized_end=11166,
 )
 
 
 _BASESOLUTION = _descriptor.Descriptor(
   name='BaseSolution',
-  full_name='core.domain.BaseSolution',
+  full_name='BaseSolution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='explanation', full_name='core.domain.BaseSolution.explanation', index=0,
+      name='explanation', full_name='BaseSolution.explanation', index=0,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3556,49 +3556,49 @@ _BASESOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=12825,
-  serialized_end=12894,
+  serialized_start=11168,
+  serialized_end=11225,
 )
 
 
 _SOLUTION = _descriptor.Descriptor(
   name='Solution',
-  full_name='core.domain.Solution',
+  full_name='Solution',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='fraction_instance_solution', full_name='core.domain.Solution.fraction_instance_solution', index=0,
+      name='fraction_instance_solution', full_name='Solution.fraction_instance_solution', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='numeric_input_instance_solution', full_name='core.domain.Solution.numeric_input_instance_solution', index=1,
+      name='numeric_input_instance_solution', full_name='Solution.numeric_input_instance_solution', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='text_input_instance_solution', full_name='core.domain.Solution.text_input_instance_solution', index=2,
+      name='text_input_instance_solution', full_name='Solution.text_input_instance_solution', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='drag_and_drop_sort_input_instance_solution', full_name='core.domain.Solution.drag_and_drop_sort_input_instance_solution', index=3,
+      name='drag_and_drop_sort_input_instance_solution', full_name='Solution.drag_and_drop_sort_input_instance_solution', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='ratio_expression_input_instance_solution', full_name='core.domain.Solution.ratio_expression_input_instance_solution', index=4,
+      name='ratio_expression_input_instance_solution', full_name='Solution.ratio_expression_input_instance_solution', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3616,26 +3616,26 @@ _SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='interaction_type', full_name='core.domain.Solution.interaction_type',
+      name='interaction_type', full_name='Solution.interaction_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=12897,
-  serialized_end=13388,
+  serialized_start=11228,
+  serialized_end=11659,
 )
 
 
 _BASEANSWERGROUP = _descriptor.Descriptor(
   name='BaseAnswerGroup',
-  full_name='core.domain.BaseAnswerGroup',
+  full_name='BaseAnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='outcome', full_name='core.domain.BaseAnswerGroup.outcome', index=0,
+      name='outcome', full_name='BaseAnswerGroup.outcome', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3653,70 +3653,70 @@ _BASEANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13390,
-  serialized_end=13452,
+  serialized_start=11661,
+  serialized_end=11711,
 )
 
 
 _ANSWERGROUP = _descriptor.Descriptor(
   name='AnswerGroup',
-  full_name='core.domain.AnswerGroup',
+  full_name='AnswerGroup',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='fraction_input_instance_answer_group', full_name='core.domain.AnswerGroup.fraction_input_instance_answer_group', index=0,
+      name='fraction_input_instance_answer_group', full_name='AnswerGroup.fraction_input_instance_answer_group', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='item_selection_input_instance_answer_group', full_name='core.domain.AnswerGroup.item_selection_input_instance_answer_group', index=1,
+      name='item_selection_input_instance_answer_group', full_name='AnswerGroup.item_selection_input_instance_answer_group', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='multiple_choice_input_instance_answer_group', full_name='core.domain.AnswerGroup.multiple_choice_input_instance_answer_group', index=2,
+      name='multiple_choice_input_instance_answer_group', full_name='AnswerGroup.multiple_choice_input_instance_answer_group', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='numeric_input_instance_answer_group', full_name='core.domain.AnswerGroup.numeric_input_instance_answer_group', index=3,
+      name='numeric_input_instance_answer_group', full_name='AnswerGroup.numeric_input_instance_answer_group', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='text_input_instance_answer_group', full_name='core.domain.AnswerGroup.text_input_instance_answer_group', index=4,
+      name='text_input_instance_answer_group', full_name='AnswerGroup.text_input_instance_answer_group', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='drag_and_drop_sort_input_instance_answer_group', full_name='core.domain.AnswerGroup.drag_and_drop_sort_input_instance_answer_group', index=5,
+      name='drag_and_drop_sort_input_instance_answer_group', full_name='AnswerGroup.drag_and_drop_sort_input_instance_answer_group', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='image_click_input_instance_answer_group', full_name='core.domain.AnswerGroup.image_click_input_instance_answer_group', index=6,
+      name='image_click_input_instance_answer_group', full_name='AnswerGroup.image_click_input_instance_answer_group', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='ratio_expression_input_instance_answer_group', full_name='core.domain.AnswerGroup.ratio_expression_input_instance_answer_group', index=7,
+      name='ratio_expression_input_instance_answer_group', full_name='AnswerGroup.ratio_expression_input_instance_answer_group', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3734,75 +3734,75 @@ _ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='interaction_type', full_name='core.domain.AnswerGroup.interaction_type',
+      name='interaction_type', full_name='AnswerGroup.interaction_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=13455,
-  serialized_end=14307,
+  serialized_start=11714,
+  serialized_end=12470,
 )
 
 
 _RULESPEC = _descriptor.Descriptor(
   name='RuleSpec',
-  full_name='core.domain.RuleSpec',
+  full_name='RuleSpec',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='fraction_input_instance_rule_spec', full_name='core.domain.RuleSpec.fraction_input_instance_rule_spec', index=0,
+      name='fraction_input_instance_rule_spec', full_name='RuleSpec.fraction_input_instance_rule_spec', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='item_selection_input_instance_rule_spec', full_name='core.domain.RuleSpec.item_selection_input_instance_rule_spec', index=1,
+      name='item_selection_input_instance_rule_spec', full_name='RuleSpec.item_selection_input_instance_rule_spec', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='multiple_choice_input_instance_rule_spec', full_name='core.domain.RuleSpec.multiple_choice_input_instance_rule_spec', index=2,
+      name='multiple_choice_input_instance_rule_spec', full_name='RuleSpec.multiple_choice_input_instance_rule_spec', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='numeric_input_instance_rule_spec', full_name='core.domain.RuleSpec.numeric_input_instance_rule_spec', index=3,
+      name='numeric_input_instance_rule_spec', full_name='RuleSpec.numeric_input_instance_rule_spec', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='text_input_instance_rule_spec', full_name='core.domain.RuleSpec.text_input_instance_rule_spec', index=4,
+      name='text_input_instance_rule_spec', full_name='RuleSpec.text_input_instance_rule_spec', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='drag_and_drop_sort_input_instance_rule_spec', full_name='core.domain.RuleSpec.drag_and_drop_sort_input_instance_rule_spec', index=5,
+      name='drag_and_drop_sort_input_instance_rule_spec', full_name='RuleSpec.drag_and_drop_sort_input_instance_rule_spec', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='image_click_input_instance_rule_spec', full_name='core.domain.RuleSpec.image_click_input_instance_rule_spec', index=6,
+      name='image_click_input_instance_rule_spec', full_name='RuleSpec.image_click_input_instance_rule_spec', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='ratio_expression_input_instance_rule_spec', full_name='core.domain.RuleSpec.ratio_expression_input_instance_rule_spec', index=7,
+      name='ratio_expression_input_instance_rule_spec', full_name='RuleSpec.ratio_expression_input_instance_rule_spec', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -3820,47 +3820,47 @@ _RULESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='interaction_type', full_name='core.domain.RuleSpec.interaction_type',
+      name='interaction_type', full_name='RuleSpec.interaction_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=14310,
-  serialized_end=15111,
+  serialized_start=12473,
+  serialized_end=13178,
 )
 
 
 _FRACTION = _descriptor.Descriptor(
   name='Fraction',
-  full_name='core.domain.Fraction',
+  full_name='Fraction',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='is_negative', full_name='core.domain.Fraction.is_negative', index=0,
+      name='is_negative', full_name='Fraction.is_negative', index=0,
       number=1, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='whole_number', full_name='core.domain.Fraction.whole_number', index=1,
+      name='whole_number', full_name='Fraction.whole_number', index=1,
       number=2, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='numerator', full_name='core.domain.Fraction.numerator', index=2,
+      name='numerator', full_name='Fraction.numerator', index=2,
       number=3, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='denominator', full_name='core.domain.Fraction.denominator', index=3,
+      name='denominator', full_name='Fraction.denominator', index=3,
       number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -3878,21 +3878,21 @@ _FRACTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15113,
-  serialized_end=15206,
+  serialized_start=13180,
+  serialized_end=13273,
 )
 
 
 _TRANSLATABLEHTMLCONTENTID = _descriptor.Descriptor(
   name='TranslatableHtmlContentId',
-  full_name='core.domain.TranslatableHtmlContentId',
+  full_name='TranslatableHtmlContentId',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='content_id', full_name='core.domain.TranslatableHtmlContentId.content_id', index=0,
+      name='content_id', full_name='TranslatableHtmlContentId.content_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -3910,21 +3910,21 @@ _TRANSLATABLEHTMLCONTENTID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15208,
-  serialized_end=15255,
+  serialized_start=13275,
+  serialized_end=13322,
 )
 
 
 _SETOFTRANSLATABLEHTMLCONTENTIDS = _descriptor.Descriptor(
   name='SetOfTranslatableHtmlContentIds',
-  full_name='core.domain.SetOfTranslatableHtmlContentIds',
+  full_name='SetOfTranslatableHtmlContentIds',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='content_ids', full_name='core.domain.SetOfTranslatableHtmlContentIds.content_ids', index=0,
+      name='content_ids', full_name='SetOfTranslatableHtmlContentIds.content_ids', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -3942,21 +3942,21 @@ _SETOFTRANSLATABLEHTMLCONTENTIDS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15257,
-  serialized_end=15351,
+  serialized_start=13324,
+  serialized_end=13406,
 )
 
 
 _LISTOFSETSOFTRANSLATABLEHTMLCONTENTIDS = _descriptor.Descriptor(
   name='ListOfSetsOfTranslatableHtmlContentIds',
-  full_name='core.domain.ListOfSetsOfTranslatableHtmlContentIds',
+  full_name='ListOfSetsOfTranslatableHtmlContentIds',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='content_id_lists', full_name='core.domain.ListOfSetsOfTranslatableHtmlContentIds.content_id_lists', index=0,
+      name='content_id_lists', full_name='ListOfSetsOfTranslatableHtmlContentIds.content_id_lists', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -3974,28 +3974,28 @@ _LISTOFSETSOFTRANSLATABLEHTMLCONTENTIDS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15353,
-  serialized_end=15465,
+  serialized_start=13408,
+  serialized_end=13508,
 )
 
 
 _POINT2D = _descriptor.Descriptor(
   name='Point2d',
-  full_name='core.domain.Point2d',
+  full_name='Point2d',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='x', full_name='core.domain.Point2d.x', index=0,
+      name='x', full_name='Point2d.x', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='y', full_name='core.domain.Point2d.y', index=1,
+      name='y', full_name='Point2d.y', index=1,
       number=2, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -4013,28 +4013,28 @@ _POINT2D = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15467,
-  serialized_end=15498,
+  serialized_start=13510,
+  serialized_end=13541,
 )
 
 
 _CLICKONIMAGE = _descriptor.Descriptor(
   name='ClickOnImage',
-  full_name='core.domain.ClickOnImage',
+  full_name='ClickOnImage',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='click_position', full_name='core.domain.ClickOnImage.click_position', index=0,
+      name='click_position', full_name='ClickOnImage.click_position', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='clicked_regions', full_name='core.domain.ClickOnImage.clicked_regions', index=1,
+      name='clicked_regions', full_name='ClickOnImage.clicked_regions', index=1,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -4052,21 +4052,21 @@ _CLICKONIMAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15500,
-  serialized_end=15585,
+  serialized_start=13543,
+  serialized_end=13616,
 )
 
 
 _RATIOEXPRESSION = _descriptor.Descriptor(
   name='RatioExpression',
-  full_name='core.domain.RatioExpression',
+  full_name='RatioExpression',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='components', full_name='core.domain.RatioExpression.components', index=0,
+      name='components', full_name='RatioExpression.components', index=0,
       number=1, type=13, cpp_type=3, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -4084,28 +4084,28 @@ _RATIOEXPRESSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15587,
-  serialized_end=15624,
+  serialized_start=13618,
+  serialized_end=13655,
 )
 
 
 _TRANSLATABLESETOFNORMALIZEDSTRING = _descriptor.Descriptor(
   name='TranslatableSetOfNormalizedString',
-  full_name='core.domain.TranslatableSetOfNormalizedString',
+  full_name='TranslatableSetOfNormalizedString',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='content_id', full_name='core.domain.TranslatableSetOfNormalizedString.content_id', index=0,
+      name='content_id', full_name='TranslatableSetOfNormalizedString.content_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='normalized_strings', full_name='core.domain.TranslatableSetOfNormalizedString.normalized_strings', index=1,
+      name='normalized_strings', full_name='TranslatableSetOfNormalizedString.normalized_strings', index=1,
       number=2, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -4123,28 +4123,28 @@ _TRANSLATABLESETOFNORMALIZEDSTRING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15626,
-  serialized_end=15709,
+  serialized_start=13657,
+  serialized_end=13740,
 )
 
 
 _IMAGEWITHREGIONS_LABELEDREGION_NORMALIZEDRECTANGLE2D = _descriptor.Descriptor(
   name='NormalizedRectangle2d',
-  full_name='core.domain.ImageWithRegions.LabeledRegion.NormalizedRectangle2d',
+  full_name='ImageWithRegions.LabeledRegion.NormalizedRectangle2d',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='upper_left', full_name='core.domain.ImageWithRegions.LabeledRegion.NormalizedRectangle2d.upper_left', index=0,
+      name='upper_left', full_name='ImageWithRegions.LabeledRegion.NormalizedRectangle2d.upper_left', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='lower_right', full_name='core.domain.ImageWithRegions.LabeledRegion.NormalizedRectangle2d.lower_right', index=1,
+      name='lower_right', full_name='ImageWithRegions.LabeledRegion.NormalizedRectangle2d.lower_right', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -4162,27 +4162,27 @@ _IMAGEWITHREGIONS_LABELEDREGION_NORMALIZEDRECTANGLE2D = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15962,
-  serialized_end=16070,
+  serialized_start=13969,
+  serialized_end=14053,
 )
 
 _IMAGEWITHREGIONS_LABELEDREGION = _descriptor.Descriptor(
   name='LabeledRegion',
-  full_name='core.domain.ImageWithRegions.LabeledRegion',
+  full_name='ImageWithRegions.LabeledRegion',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='label', full_name='core.domain.ImageWithRegions.LabeledRegion.label', index=0,
+      name='label', full_name='ImageWithRegions.LabeledRegion.label', index=0,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='normalized_rectangle_2d', full_name='core.domain.ImageWithRegions.LabeledRegion.normalized_rectangle_2d', index=1,
+      name='normalized_rectangle_2d', full_name='ImageWithRegions.LabeledRegion.normalized_rectangle_2d', index=1,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -4200,32 +4200,32 @@ _IMAGEWITHREGIONS_LABELEDREGION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='region_type', full_name='core.domain.ImageWithRegions.LabeledRegion.region_type',
+      name='region_type', full_name='ImageWithRegions.LabeledRegion.region_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=15828,
-  serialized_end=16085,
+  serialized_start=13847,
+  serialized_end=14068,
 )
 
 _IMAGEWITHREGIONS = _descriptor.Descriptor(
   name='ImageWithRegions',
-  full_name='core.domain.ImageWithRegions',
+  full_name='ImageWithRegions',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='image_file_path', full_name='core.domain.ImageWithRegions.image_file_path', index=0,
+      name='image_file_path', full_name='ImageWithRegions.image_file_path', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='labeled_regions', full_name='core.domain.ImageWithRegions.labeled_regions', index=1,
+      name='labeled_regions', full_name='ImageWithRegions.labeled_regions', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -4243,70 +4243,70 @@ _IMAGEWITHREGIONS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=15712,
-  serialized_end=16085,
+  serialized_start=13743,
+  serialized_end=14068,
 )
 
 
 _USERANSWER = _descriptor.Descriptor(
   name='UserAnswer',
-  full_name='core.domain.UserAnswer',
+  full_name='UserAnswer',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='fraction', full_name='core.domain.UserAnswer.fraction', index=0,
+      name='fraction', full_name='UserAnswer.fraction', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='set_of_translatable_html_content_ids', full_name='core.domain.UserAnswer.set_of_translatable_html_content_ids', index=1,
+      name='set_of_translatable_html_content_ids', full_name='UserAnswer.set_of_translatable_html_content_ids', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='non_negative_int', full_name='core.domain.UserAnswer.non_negative_int', index=2,
+      name='non_negative_int', full_name='UserAnswer.non_negative_int', index=2,
       number=3, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='real', full_name='core.domain.UserAnswer.real', index=3,
+      name='real', full_name='UserAnswer.real', index=3,
       number=4, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='normalized_string', full_name='core.domain.UserAnswer.normalized_string', index=4,
+      name='normalized_string', full_name='UserAnswer.normalized_string', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='list_of_sets_of_translatable_html_content_ids', full_name='core.domain.UserAnswer.list_of_sets_of_translatable_html_content_ids', index=5,
+      name='list_of_sets_of_translatable_html_content_ids', full_name='UserAnswer.list_of_sets_of_translatable_html_content_ids', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='click_on_image', full_name='core.domain.UserAnswer.click_on_image', index=6,
+      name='click_on_image', full_name='UserAnswer.click_on_image', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='ratio_expression', full_name='core.domain.UserAnswer.ratio_expression', index=7,
+      name='ratio_expression', full_name='UserAnswer.ratio_expression', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -4324,89 +4324,89 @@ _USERANSWER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='answer_type', full_name='core.domain.UserAnswer.answer_type',
+      name='answer_type', full_name='UserAnswer.answer_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=16088,
-  serialized_end=16546,
+  serialized_start=14071,
+  serialized_end=14469,
 )
 
 
 _RULEINPUTTYPE = _descriptor.Descriptor(
   name='RuleInputType',
-  full_name='core.domain.RuleInputType',
+  full_name='RuleInputType',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='int', full_name='core.domain.RuleInputType.int', index=0,
+      name='int', full_name='RuleInputType.int', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='non_negative_int', full_name='core.domain.RuleInputType.non_negative_int', index=1,
+      name='non_negative_int', full_name='RuleInputType.non_negative_int', index=1,
       number=2, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='real', full_name='core.domain.RuleInputType.real', index=2,
+      name='real', full_name='RuleInputType.real', index=2,
       number=3, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='normalized_string', full_name='core.domain.RuleInputType.normalized_string', index=3,
+      name='normalized_string', full_name='RuleInputType.normalized_string', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='fraction', full_name='core.domain.RuleInputType.fraction', index=4,
+      name='fraction', full_name='RuleInputType.fraction', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='set_of_translatable_html_content_ids', full_name='core.domain.RuleInputType.set_of_translatable_html_content_ids', index=5,
+      name='set_of_translatable_html_content_ids', full_name='RuleInputType.set_of_translatable_html_content_ids', index=5,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='translatable_set_of_normalized_string', full_name='core.domain.RuleInputType.translatable_set_of_normalized_string', index=6,
+      name='translatable_set_of_normalized_string', full_name='RuleInputType.translatable_set_of_normalized_string', index=6,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='list_of_sets_of_translatable_html_content_ids', full_name='core.domain.RuleInputType.list_of_sets_of_translatable_html_content_ids', index=7,
+      name='list_of_sets_of_translatable_html_content_ids', full_name='RuleInputType.list_of_sets_of_translatable_html_content_ids', index=7,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='translatable_html_content_id', full_name='core.domain.RuleInputType.translatable_html_content_id', index=8,
+      name='translatable_html_content_id', full_name='RuleInputType.translatable_html_content_id', index=8,
       number=9, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='ratio_expression', full_name='core.domain.RuleInputType.ratio_expression', index=9,
+      name='ratio_expression', full_name='RuleInputType.ratio_expression', index=9,
       number=10, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -4424,13 +4424,13 @@ _RULEINPUTTYPE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='input_type', full_name='core.domain.RuleInputType.input_type',
+      name='input_type', full_name='RuleInputType.input_type',
       index=0, containing_type=None,
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=16549,
-  serialized_end=17148,
+  serialized_start=14472,
+  serialized_end=14999,
 )
 
 _EXPLORATION_STATESENTRY.fields_by_name['value'].message_type = _STATE
@@ -4982,12 +4982,12 @@ Exploration = _reflection.GeneratedProtocolMessageType('Exploration', (_message.
   'StatesEntry' : _reflection.GeneratedProtocolMessageType('StatesEntry', (_message.Message,), {
     'DESCRIPTOR' : _EXPLORATION_STATESENTRY,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.Exploration.StatesEntry)
+    # @@protoc_insertion_point(class_scope:Exploration.StatesEntry)
     })
   ,
   'DESCRIPTOR' : _EXPLORATION,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Exploration)
+  # @@protoc_insertion_point(class_scope:Exploration)
   })
 _sym_db.RegisterMessage(Exploration)
 _sym_db.RegisterMessage(Exploration.StatesEntry)
@@ -4995,21 +4995,21 @@ _sym_db.RegisterMessage(Exploration.StatesEntry)
 State = _reflection.GeneratedProtocolMessageType('State', (_message.Message,), {
   'DESCRIPTOR' : _STATE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.State)
+  # @@protoc_insertion_point(class_scope:State)
   })
 _sym_db.RegisterMessage(State)
 
 SubtitledHtml = _reflection.GeneratedProtocolMessageType('SubtitledHtml', (_message.Message,), {
   'DESCRIPTOR' : _SUBTITLEDHTML,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.SubtitledHtml)
+  # @@protoc_insertion_point(class_scope:SubtitledHtml)
   })
 _sym_db.RegisterMessage(SubtitledHtml)
 
 RecordedVoiceovers = _reflection.GeneratedProtocolMessageType('RecordedVoiceovers', (_message.Message,), {
   'DESCRIPTOR' : _RECORDEDVOICEOVERS,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.RecordedVoiceovers)
+  # @@protoc_insertion_point(class_scope:RecordedVoiceovers)
   })
 _sym_db.RegisterMessage(RecordedVoiceovers)
 
@@ -5018,12 +5018,12 @@ VoiceoverContentMapping = _reflection.GeneratedProtocolMessageType('VoiceoverCon
   'VoiceoverContentMappingEntry' : _reflection.GeneratedProtocolMessageType('VoiceoverContentMappingEntry', (_message.Message,), {
     'DESCRIPTOR' : _VOICEOVERCONTENTMAPPING_VOICEOVERCONTENTMAPPINGENTRY,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.VoiceoverContentMapping.VoiceoverContentMappingEntry)
+    # @@protoc_insertion_point(class_scope:VoiceoverContentMapping.VoiceoverContentMappingEntry)
     })
   ,
   'DESCRIPTOR' : _VOICEOVERCONTENTMAPPING,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.VoiceoverContentMapping)
+  # @@protoc_insertion_point(class_scope:VoiceoverContentMapping)
   })
 _sym_db.RegisterMessage(VoiceoverContentMapping)
 _sym_db.RegisterMessage(VoiceoverContentMapping.VoiceoverContentMappingEntry)
@@ -5031,14 +5031,14 @@ _sym_db.RegisterMessage(VoiceoverContentMapping.VoiceoverContentMappingEntry)
 Voiceover = _reflection.GeneratedProtocolMessageType('Voiceover', (_message.Message,), {
   'DESCRIPTOR' : _VOICEOVER,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Voiceover)
+  # @@protoc_insertion_point(class_scope:Voiceover)
   })
 _sym_db.RegisterMessage(Voiceover)
 
 WrittenTranslations = _reflection.GeneratedProtocolMessageType('WrittenTranslations', (_message.Message,), {
   'DESCRIPTOR' : _WRITTENTRANSLATIONS,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.WrittenTranslations)
+  # @@protoc_insertion_point(class_scope:WrittenTranslations)
   })
 _sym_db.RegisterMessage(WrittenTranslations)
 
@@ -5047,12 +5047,12 @@ WrittenTranslationContentMapping = _reflection.GeneratedProtocolMessageType('Wri
   'TranslationContentMappingEntry' : _reflection.GeneratedProtocolMessageType('TranslationContentMappingEntry', (_message.Message,), {
     'DESCRIPTOR' : _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.WrittenTranslationContentMapping.TranslationContentMappingEntry)
+    # @@protoc_insertion_point(class_scope:WrittenTranslationContentMapping.TranslationContentMappingEntry)
     })
   ,
   'DESCRIPTOR' : _WRITTENTRANSLATIONCONTENTMAPPING,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.WrittenTranslationContentMapping)
+  # @@protoc_insertion_point(class_scope:WrittenTranslationContentMapping)
   })
 _sym_db.RegisterMessage(WrittenTranslationContentMapping)
 _sym_db.RegisterMessage(WrittenTranslationContentMapping.TranslationContentMappingEntry)
@@ -5060,21 +5060,21 @@ _sym_db.RegisterMessage(WrittenTranslationContentMapping.TranslationContentMappi
 WrittenTranslation = _reflection.GeneratedProtocolMessageType('WrittenTranslation', (_message.Message,), {
   'DESCRIPTOR' : _WRITTENTRANSLATION,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.WrittenTranslation)
+  # @@protoc_insertion_point(class_scope:WrittenTranslation)
   })
 _sym_db.RegisterMessage(WrittenTranslation)
 
 InteractionInstance = _reflection.GeneratedProtocolMessageType('InteractionInstance', (_message.Message,), {
   'DESCRIPTOR' : _INTERACTIONINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.InteractionInstance)
+  # @@protoc_insertion_point(class_scope:InteractionInstance)
   })
 _sym_db.RegisterMessage(InteractionInstance)
 
 Outcome = _reflection.GeneratedProtocolMessageType('Outcome', (_message.Message,), {
   'DESCRIPTOR' : _OUTCOME,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Outcome)
+  # @@protoc_insertion_point(class_scope:Outcome)
   })
 _sym_db.RegisterMessage(Outcome)
 
@@ -5083,12 +5083,12 @@ ContinueInstance = _reflection.GeneratedProtocolMessageType('ContinueInstance', 
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _CONTINUEINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ContinueInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:ContinueInstance.CustomizationArgs)
     })
   ,
   'DESCRIPTOR' : _CONTINUEINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.ContinueInstance)
+  # @@protoc_insertion_point(class_scope:ContinueInstance)
   })
 _sym_db.RegisterMessage(ContinueInstance)
 _sym_db.RegisterMessage(ContinueInstance.CustomizationArgs)
@@ -5098,21 +5098,21 @@ FractionInputInstance = _reflection.GeneratedProtocolMessageType('FractionInputI
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:FractionInputInstance.CustomizationArgs)
     })
   ,
 
   'Solution' : _reflection.GeneratedProtocolMessageType('Solution', (_message.Message,), {
     'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_SOLUTION,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.Solution)
+    # @@protoc_insertion_point(class_scope:FractionInputInstance.Solution)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:FractionInputInstance.AnswerGroup)
     })
   ,
 
@@ -5121,80 +5121,80 @@ FractionInputInstance = _reflection.GeneratedProtocolMessageType('FractionInputI
     'IsExactlyEqualToSpec' : _reflection.GeneratedProtocolMessageType('IsExactlyEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_ISEXACTLYEQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.IsExactlyEqualToSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.IsExactlyEqualToSpec)
       })
     ,
 
     'IsEquivalentToSpec' : _reflection.GeneratedProtocolMessageType('IsEquivalentToSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.IsEquivalentToSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.IsEquivalentToSpec)
       })
     ,
 
     'IsEquivalentToAndInSimplestFormSpec' : _reflection.GeneratedProtocolMessageType('IsEquivalentToAndInSimplestFormSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOANDINSIMPLESTFORMSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpec)
       })
     ,
 
     'IsLessThanSpec' : _reflection.GeneratedProtocolMessageType('IsLessThanSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.IsLessThanSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.IsLessThanSpec)
       })
     ,
 
     'IsGreaterThanSpec' : _reflection.GeneratedProtocolMessageType('IsGreaterThanSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.IsGreaterThanSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.IsGreaterThanSpec)
       })
     ,
 
     'HasNumeratorEqualToSpec' : _reflection.GeneratedProtocolMessageType('HasNumeratorEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_HASNUMERATOREQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.HasNumeratorEqualToSpec)
       })
     ,
 
     'HasDenominatorEqualToSpec' : _reflection.GeneratedProtocolMessageType('HasDenominatorEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_HASDENOMINATOREQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.HasDenominatorEqualToSpec)
       })
     ,
 
     'HasIntegerPartEqualToSpec' : _reflection.GeneratedProtocolMessageType('HasIntegerPartEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_HASINTEGERPARTEQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpec)
       })
     ,
 
     'HasNoFractionalPartSpec' : _reflection.GeneratedProtocolMessageType('HasNoFractionalPartSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_HASNOFRACTIONALPARTSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.HasNoFractionalPartSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.HasNoFractionalPartSpec)
       })
     ,
 
     'HasFractionalPartExactlyEqualToSpec' : _reflection.GeneratedProtocolMessageType('HasFractionalPartExactlyEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC_HASFRACTIONALPARTEXACTLYEQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec)
+      # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpec)
       })
     ,
     'DESCRIPTOR' : _FRACTIONINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:FractionInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _FRACTIONINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.FractionInputInstance)
+  # @@protoc_insertion_point(class_scope:FractionInputInstance)
   })
 _sym_db.RegisterMessage(FractionInputInstance)
 _sym_db.RegisterMessage(FractionInputInstance.CustomizationArgs)
@@ -5217,14 +5217,14 @@ ItemSelectionInputInstance = _reflection.GeneratedProtocolMessageType('ItemSelec
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.CustomizationArgs)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.AnswerGroup)
     })
   ,
 
@@ -5233,38 +5233,38 @@ ItemSelectionInputInstance = _reflection.GeneratedProtocolMessageType('ItemSelec
     'EqualsSpec' : _reflection.GeneratedProtocolMessageType('EqualsSpec', (_message.Message,), {
       'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_RULESPEC_EQUALSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.RuleSpec.EqualsSpec)
+      # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.RuleSpec.EqualsSpec)
       })
     ,
 
     'ContainsAtLeastOneOfSpec' : _reflection.GeneratedProtocolMessageType('ContainsAtLeastOneOfSpec', (_message.Message,), {
       'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_RULESPEC_CONTAINSATLEASTONEOFSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec)
+      # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpec)
       })
     ,
 
     'DoesNotContainAtLeastOneOfSpec' : _reflection.GeneratedProtocolMessageType('DoesNotContainAtLeastOneOfSpec', (_message.Message,), {
       'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_RULESPEC_DOESNOTCONTAINATLEASTONEOFSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec)
+      # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpec)
       })
     ,
 
     'IsProperSubsetOfSpec' : _reflection.GeneratedProtocolMessageType('IsProperSubsetOfSpec', (_message.Message,), {
       'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_RULESPEC_ISPROPERSUBSETOFSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec)
+      # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpec)
       })
     ,
     'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _ITEMSELECTIONINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.ItemSelectionInputInstance)
+  # @@protoc_insertion_point(class_scope:ItemSelectionInputInstance)
   })
 _sym_db.RegisterMessage(ItemSelectionInputInstance)
 _sym_db.RegisterMessage(ItemSelectionInputInstance.CustomizationArgs)
@@ -5280,14 +5280,14 @@ MultipleChoiceInputInstance = _reflection.GeneratedProtocolMessageType('Multiple
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _MULTIPLECHOICEINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.MultipleChoiceInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:MultipleChoiceInputInstance.CustomizationArgs)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _MULTIPLECHOICEINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.MultipleChoiceInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:MultipleChoiceInputInstance.AnswerGroup)
     })
   ,
 
@@ -5296,17 +5296,17 @@ MultipleChoiceInputInstance = _reflection.GeneratedProtocolMessageType('Multiple
     'EqualsSpec' : _reflection.GeneratedProtocolMessageType('EqualsSpec', (_message.Message,), {
       'DESCRIPTOR' : _MULTIPLECHOICEINPUTINSTANCE_RULESPEC_EQUALSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.MultipleChoiceInputInstance.RuleSpec.EqualsSpec)
+      # @@protoc_insertion_point(class_scope:MultipleChoiceInputInstance.RuleSpec.EqualsSpec)
       })
     ,
     'DESCRIPTOR' : _MULTIPLECHOICEINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.MultipleChoiceInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:MultipleChoiceInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _MULTIPLECHOICEINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.MultipleChoiceInputInstance)
+  # @@protoc_insertion_point(class_scope:MultipleChoiceInputInstance)
   })
 _sym_db.RegisterMessage(MultipleChoiceInputInstance)
 _sym_db.RegisterMessage(MultipleChoiceInputInstance.CustomizationArgs)
@@ -5319,14 +5319,14 @@ NumericInputInstance = _reflection.GeneratedProtocolMessageType('NumericInputIns
   'Solution' : _reflection.GeneratedProtocolMessageType('Solution', (_message.Message,), {
     'DESCRIPTOR' : _NUMERICINPUTINSTANCE_SOLUTION,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.Solution)
+    # @@protoc_insertion_point(class_scope:NumericInputInstance.Solution)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _NUMERICINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:NumericInputInstance.AnswerGroup)
     })
   ,
 
@@ -5335,59 +5335,59 @@ NumericInputInstance = _reflection.GeneratedProtocolMessageType('NumericInputIns
     'EqualsSpec' : _reflection.GeneratedProtocolMessageType('EqualsSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_EQUALSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.EqualsSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.EqualsSpec)
       })
     ,
 
     'IsLessThanSpec' : _reflection.GeneratedProtocolMessageType('IsLessThanSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.IsLessThanSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.IsLessThanSpec)
       })
     ,
 
     'IsGreaterThanSpec' : _reflection.GeneratedProtocolMessageType('IsGreaterThanSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.IsGreaterThanSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.IsGreaterThanSpec)
       })
     ,
 
     'IsLessThanOrEqualToSpec' : _reflection.GeneratedProtocolMessageType('IsLessThanOrEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANOREQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpec)
       })
     ,
 
     'IsGreaterThanOrEqualToSpec' : _reflection.GeneratedProtocolMessageType('IsGreaterThanOrEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANOREQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpec)
       })
     ,
 
     'IsInclusivelyBetweenSpec' : _reflection.GeneratedProtocolMessageType('IsInclusivelyBetweenSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_ISINCLUSIVELYBETWEENSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpec)
       })
     ,
 
     'IsWithinToleranceSpec' : _reflection.GeneratedProtocolMessageType('IsWithinToleranceSpec', (_message.Message,), {
       'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC_ISWITHINTOLERANCESPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec.IsWithinToleranceSpec)
+      # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec.IsWithinToleranceSpec)
       })
     ,
     'DESCRIPTOR' : _NUMERICINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:NumericInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _NUMERICINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.NumericInputInstance)
+  # @@protoc_insertion_point(class_scope:NumericInputInstance)
   })
 _sym_db.RegisterMessage(NumericInputInstance)
 _sym_db.RegisterMessage(NumericInputInstance.Solution)
@@ -5406,21 +5406,21 @@ TextInputInstance = _reflection.GeneratedProtocolMessageType('TextInputInstance'
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _TEXTINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:TextInputInstance.CustomizationArgs)
     })
   ,
 
   'Solution' : _reflection.GeneratedProtocolMessageType('Solution', (_message.Message,), {
     'DESCRIPTOR' : _TEXTINPUTINSTANCE_SOLUTION,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.Solution)
+    # @@protoc_insertion_point(class_scope:TextInputInstance.Solution)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _TEXTINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:TextInputInstance.AnswerGroup)
     })
   ,
 
@@ -5429,38 +5429,38 @@ TextInputInstance = _reflection.GeneratedProtocolMessageType('TextInputInstance'
     'EqualsSpec' : _reflection.GeneratedProtocolMessageType('EqualsSpec', (_message.Message,), {
       'DESCRIPTOR' : _TEXTINPUTINSTANCE_RULESPEC_EQUALSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.RuleSpec.EqualsSpec)
+      # @@protoc_insertion_point(class_scope:TextInputInstance.RuleSpec.EqualsSpec)
       })
     ,
 
     'StartsWithSpec' : _reflection.GeneratedProtocolMessageType('StartsWithSpec', (_message.Message,), {
       'DESCRIPTOR' : _TEXTINPUTINSTANCE_RULESPEC_STARTSWITHSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.RuleSpec.StartsWithSpec)
+      # @@protoc_insertion_point(class_scope:TextInputInstance.RuleSpec.StartsWithSpec)
       })
     ,
 
     'ContainsSpec' : _reflection.GeneratedProtocolMessageType('ContainsSpec', (_message.Message,), {
       'DESCRIPTOR' : _TEXTINPUTINSTANCE_RULESPEC_CONTAINSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.RuleSpec.ContainsSpec)
+      # @@protoc_insertion_point(class_scope:TextInputInstance.RuleSpec.ContainsSpec)
       })
     ,
 
     'FuzzyEqualsSpec' : _reflection.GeneratedProtocolMessageType('FuzzyEqualsSpec', (_message.Message,), {
       'DESCRIPTOR' : _TEXTINPUTINSTANCE_RULESPEC_FUZZYEQUALSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.RuleSpec.FuzzyEqualsSpec)
+      # @@protoc_insertion_point(class_scope:TextInputInstance.RuleSpec.FuzzyEqualsSpec)
       })
     ,
     'DESCRIPTOR' : _TEXTINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:TextInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _TEXTINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.TextInputInstance)
+  # @@protoc_insertion_point(class_scope:TextInputInstance)
   })
 _sym_db.RegisterMessage(TextInputInstance)
 _sym_db.RegisterMessage(TextInputInstance.CustomizationArgs)
@@ -5477,21 +5477,21 @@ DragAndDropSortInputInstance = _reflection.GeneratedProtocolMessageType('DragAnd
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.CustomizationArgs)
     })
   ,
 
   'Solution' : _reflection.GeneratedProtocolMessageType('Solution', (_message.Message,), {
     'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_SOLUTION,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.Solution)
+    # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.Solution)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.AnswerGroup)
     })
   ,
 
@@ -5500,38 +5500,38 @@ DragAndDropSortInputInstance = _reflection.GeneratedProtocolMessageType('DragAnd
     'IsEqualToOrderingSpec' : _reflection.GeneratedProtocolMessageType('IsEqualToOrderingSpec', (_message.Message,), {
       'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec)
+      # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpec)
       })
     ,
 
     'IsEqualToOrderingWithOneItemAtIncorrectPositionSpec' : _reflection.GeneratedProtocolMessageType('IsEqualToOrderingWithOneItemAtIncorrectPositionSpec', (_message.Message,), {
       'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGWITHONEITEMATINCORRECTPOSITIONSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec)
+      # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpec)
       })
     ,
 
     'HasElementXAtPositionYSpec' : _reflection.GeneratedProtocolMessageType('HasElementXAtPositionYSpec', (_message.Message,), {
       'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXATPOSITIONYSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec)
+      # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpec)
       })
     ,
 
     'HasElementXBeforeElementYSpec' : _reflection.GeneratedProtocolMessageType('HasElementXBeforeElementYSpec', (_message.Message,), {
       'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXBEFOREELEMENTYSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec)
+      # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpec)
       })
     ,
     'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _DRAGANDDROPSORTINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.DragAndDropSortInputInstance)
+  # @@protoc_insertion_point(class_scope:DragAndDropSortInputInstance)
   })
 _sym_db.RegisterMessage(DragAndDropSortInputInstance)
 _sym_db.RegisterMessage(DragAndDropSortInputInstance.CustomizationArgs)
@@ -5548,14 +5548,14 @@ ImageClickInputInstance = _reflection.GeneratedProtocolMessageType('ImageClickIn
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _IMAGECLICKINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ImageClickInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:ImageClickInputInstance.CustomizationArgs)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _IMAGECLICKINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ImageClickInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:ImageClickInputInstance.AnswerGroup)
     })
   ,
 
@@ -5564,17 +5564,17 @@ ImageClickInputInstance = _reflection.GeneratedProtocolMessageType('ImageClickIn
     'IsInRegionSpec' : _reflection.GeneratedProtocolMessageType('IsInRegionSpec', (_message.Message,), {
       'DESCRIPTOR' : _IMAGECLICKINPUTINSTANCE_RULESPEC_ISINREGIONSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.ImageClickInputInstance.RuleSpec.IsInRegionSpec)
+      # @@protoc_insertion_point(class_scope:ImageClickInputInstance.RuleSpec.IsInRegionSpec)
       })
     ,
     'DESCRIPTOR' : _IMAGECLICKINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ImageClickInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:ImageClickInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _IMAGECLICKINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.ImageClickInputInstance)
+  # @@protoc_insertion_point(class_scope:ImageClickInputInstance)
   })
 _sym_db.RegisterMessage(ImageClickInputInstance)
 _sym_db.RegisterMessage(ImageClickInputInstance.CustomizationArgs)
@@ -5587,21 +5587,21 @@ RatioExpressionInputInstance = _reflection.GeneratedProtocolMessageType('RatioEx
   'CustomizationArgs' : _reflection.GeneratedProtocolMessageType('CustomizationArgs', (_message.Message,), {
     'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_CUSTOMIZATIONARGS,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.CustomizationArgs)
+    # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.CustomizationArgs)
     })
   ,
 
   'Solution' : _reflection.GeneratedProtocolMessageType('Solution', (_message.Message,), {
     'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_SOLUTION,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.Solution)
+    # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.Solution)
     })
   ,
 
   'AnswerGroup' : _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
     'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_ANSWERGROUP,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.AnswerGroup)
+    # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.AnswerGroup)
     })
   ,
 
@@ -5610,31 +5610,31 @@ RatioExpressionInputInstance = _reflection.GeneratedProtocolMessageType('RatioEx
     'EqualsSpec' : _reflection.GeneratedProtocolMessageType('EqualsSpec', (_message.Message,), {
       'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_EQUALSSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.RuleSpec.EqualsSpec)
+      # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.RuleSpec.EqualsSpec)
       })
     ,
 
     'IsEquivalentSpec' : _reflection.GeneratedProtocolMessageType('IsEquivalentSpec', (_message.Message,), {
       'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec)
+      # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.RuleSpec.IsEquivalentSpec)
       })
     ,
 
     'HasNumberOfTermsEqualToSpec' : _reflection.GeneratedProtocolMessageType('HasNumberOfTermsEqualToSpec', (_message.Message,), {
       'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_HASNUMBEROFTERMSEQUALTOSPEC,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec)
+      # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpec)
       })
     ,
     'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance.RuleSpec)
+    # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance.RuleSpec)
     })
   ,
   'DESCRIPTOR' : _RATIOEXPRESSIONINPUTINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.RatioExpressionInputInstance)
+  # @@protoc_insertion_point(class_scope:RatioExpressionInputInstance)
   })
 _sym_db.RegisterMessage(RatioExpressionInputInstance)
 _sym_db.RegisterMessage(RatioExpressionInputInstance.CustomizationArgs)
@@ -5648,105 +5648,105 @@ _sym_db.RegisterMessage(RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEq
 EndExplorationInstance = _reflection.GeneratedProtocolMessageType('EndExplorationInstance', (_message.Message,), {
   'DESCRIPTOR' : _ENDEXPLORATIONINSTANCE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.EndExplorationInstance)
+  # @@protoc_insertion_point(class_scope:EndExplorationInstance)
   })
 _sym_db.RegisterMessage(EndExplorationInstance)
 
 Hint = _reflection.GeneratedProtocolMessageType('Hint', (_message.Message,), {
   'DESCRIPTOR' : _HINT,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Hint)
+  # @@protoc_insertion_point(class_scope:Hint)
   })
 _sym_db.RegisterMessage(Hint)
 
 BaseSolution = _reflection.GeneratedProtocolMessageType('BaseSolution', (_message.Message,), {
   'DESCRIPTOR' : _BASESOLUTION,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.BaseSolution)
+  # @@protoc_insertion_point(class_scope:BaseSolution)
   })
 _sym_db.RegisterMessage(BaseSolution)
 
 Solution = _reflection.GeneratedProtocolMessageType('Solution', (_message.Message,), {
   'DESCRIPTOR' : _SOLUTION,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Solution)
+  # @@protoc_insertion_point(class_scope:Solution)
   })
 _sym_db.RegisterMessage(Solution)
 
 BaseAnswerGroup = _reflection.GeneratedProtocolMessageType('BaseAnswerGroup', (_message.Message,), {
   'DESCRIPTOR' : _BASEANSWERGROUP,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.BaseAnswerGroup)
+  # @@protoc_insertion_point(class_scope:BaseAnswerGroup)
   })
 _sym_db.RegisterMessage(BaseAnswerGroup)
 
 AnswerGroup = _reflection.GeneratedProtocolMessageType('AnswerGroup', (_message.Message,), {
   'DESCRIPTOR' : _ANSWERGROUP,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.AnswerGroup)
+  # @@protoc_insertion_point(class_scope:AnswerGroup)
   })
 _sym_db.RegisterMessage(AnswerGroup)
 
 RuleSpec = _reflection.GeneratedProtocolMessageType('RuleSpec', (_message.Message,), {
   'DESCRIPTOR' : _RULESPEC,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.RuleSpec)
+  # @@protoc_insertion_point(class_scope:RuleSpec)
   })
 _sym_db.RegisterMessage(RuleSpec)
 
 Fraction = _reflection.GeneratedProtocolMessageType('Fraction', (_message.Message,), {
   'DESCRIPTOR' : _FRACTION,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Fraction)
+  # @@protoc_insertion_point(class_scope:Fraction)
   })
 _sym_db.RegisterMessage(Fraction)
 
 TranslatableHtmlContentId = _reflection.GeneratedProtocolMessageType('TranslatableHtmlContentId', (_message.Message,), {
   'DESCRIPTOR' : _TRANSLATABLEHTMLCONTENTID,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.TranslatableHtmlContentId)
+  # @@protoc_insertion_point(class_scope:TranslatableHtmlContentId)
   })
 _sym_db.RegisterMessage(TranslatableHtmlContentId)
 
 SetOfTranslatableHtmlContentIds = _reflection.GeneratedProtocolMessageType('SetOfTranslatableHtmlContentIds', (_message.Message,), {
   'DESCRIPTOR' : _SETOFTRANSLATABLEHTMLCONTENTIDS,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.SetOfTranslatableHtmlContentIds)
+  # @@protoc_insertion_point(class_scope:SetOfTranslatableHtmlContentIds)
   })
 _sym_db.RegisterMessage(SetOfTranslatableHtmlContentIds)
 
 ListOfSetsOfTranslatableHtmlContentIds = _reflection.GeneratedProtocolMessageType('ListOfSetsOfTranslatableHtmlContentIds', (_message.Message,), {
   'DESCRIPTOR' : _LISTOFSETSOFTRANSLATABLEHTMLCONTENTIDS,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.ListOfSetsOfTranslatableHtmlContentIds)
+  # @@protoc_insertion_point(class_scope:ListOfSetsOfTranslatableHtmlContentIds)
   })
 _sym_db.RegisterMessage(ListOfSetsOfTranslatableHtmlContentIds)
 
 Point2d = _reflection.GeneratedProtocolMessageType('Point2d', (_message.Message,), {
   'DESCRIPTOR' : _POINT2D,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.Point2d)
+  # @@protoc_insertion_point(class_scope:Point2d)
   })
 _sym_db.RegisterMessage(Point2d)
 
 ClickOnImage = _reflection.GeneratedProtocolMessageType('ClickOnImage', (_message.Message,), {
   'DESCRIPTOR' : _CLICKONIMAGE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.ClickOnImage)
+  # @@protoc_insertion_point(class_scope:ClickOnImage)
   })
 _sym_db.RegisterMessage(ClickOnImage)
 
 RatioExpression = _reflection.GeneratedProtocolMessageType('RatioExpression', (_message.Message,), {
   'DESCRIPTOR' : _RATIOEXPRESSION,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.RatioExpression)
+  # @@protoc_insertion_point(class_scope:RatioExpression)
   })
 _sym_db.RegisterMessage(RatioExpression)
 
 TranslatableSetOfNormalizedString = _reflection.GeneratedProtocolMessageType('TranslatableSetOfNormalizedString', (_message.Message,), {
   'DESCRIPTOR' : _TRANSLATABLESETOFNORMALIZEDSTRING,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.TranslatableSetOfNormalizedString)
+  # @@protoc_insertion_point(class_scope:TranslatableSetOfNormalizedString)
   })
 _sym_db.RegisterMessage(TranslatableSetOfNormalizedString)
 
@@ -5757,17 +5757,17 @@ ImageWithRegions = _reflection.GeneratedProtocolMessageType('ImageWithRegions', 
     'NormalizedRectangle2d' : _reflection.GeneratedProtocolMessageType('NormalizedRectangle2d', (_message.Message,), {
       'DESCRIPTOR' : _IMAGEWITHREGIONS_LABELEDREGION_NORMALIZEDRECTANGLE2D,
       '__module__' : 'exploration_pb2'
-      # @@protoc_insertion_point(class_scope:core.domain.ImageWithRegions.LabeledRegion.NormalizedRectangle2d)
+      # @@protoc_insertion_point(class_scope:ImageWithRegions.LabeledRegion.NormalizedRectangle2d)
       })
     ,
     'DESCRIPTOR' : _IMAGEWITHREGIONS_LABELEDREGION,
     '__module__' : 'exploration_pb2'
-    # @@protoc_insertion_point(class_scope:core.domain.ImageWithRegions.LabeledRegion)
+    # @@protoc_insertion_point(class_scope:ImageWithRegions.LabeledRegion)
     })
   ,
   'DESCRIPTOR' : _IMAGEWITHREGIONS,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.ImageWithRegions)
+  # @@protoc_insertion_point(class_scope:ImageWithRegions)
   })
 _sym_db.RegisterMessage(ImageWithRegions)
 _sym_db.RegisterMessage(ImageWithRegions.LabeledRegion)
@@ -5776,14 +5776,14 @@ _sym_db.RegisterMessage(ImageWithRegions.LabeledRegion.NormalizedRectangle2d)
 UserAnswer = _reflection.GeneratedProtocolMessageType('UserAnswer', (_message.Message,), {
   'DESCRIPTOR' : _USERANSWER,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.UserAnswer)
+  # @@protoc_insertion_point(class_scope:UserAnswer)
   })
 _sym_db.RegisterMessage(UserAnswer)
 
 RuleInputType = _reflection.GeneratedProtocolMessageType('RuleInputType', (_message.Message,), {
   'DESCRIPTOR' : _RULEINPUTTYPE,
   '__module__' : 'exploration_pb2'
-  # @@protoc_insertion_point(class_scope:core.domain.RuleInputType)
+  # @@protoc_insertion_point(class_scope:RuleInputType)
   })
 _sym_db.RegisterMessage(RuleInputType)
 

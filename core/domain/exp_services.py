@@ -43,6 +43,7 @@ from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import exploration_pb2
 from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import html_cleaner
@@ -556,7 +557,42 @@ def apply_change_list(exploration_id, change_list):
                             change.to_version))
 
         # Calculate the size of exp.
-        proto_size_in_bytes = 0
+        state_proto = exploration_pb2.State()
+        recorderd_voiceovers_proto = exploration_pb2.RecordedVoiceovers()
+        voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping()
+        voiceover_proto = exploration_pb2.Voiceover()
+
+        for (state_name, state_dict) in exploration.states.items():
+            subtitled_html_proto = exploration_pb2.SubtitledHtml(
+                content_id=state_dict.content.content_id,
+                html=state_dict.content.html
+            )
+            state_prot.content.CopyFrom(subtitled_html_proto)
+            for (content_id, language_code_to_voiceover) in (
+                state_dict.recorded_voiceovers.voiceovers_mapping.items()):
+                for (language_code, voiceover) in language_code_to_voiceover.items():
+                    voiceover_proto = exploration_pb2.Voiceover(
+                        filename=voiceover.filename,
+                        file_size_bytes=voiceover.file_size_bytes,
+                        duration_secs=voiceover.duration_secs
+                    )
+                    voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping(
+                        voiceover_content_mapping={
+                            language_code: voiceover_proto
+                        }
+                    )
+            state_proto.recorded_voiceovers.CopyFrom(recorderd_voiceovers_proto)
+
+        exp_proto = exploration_pb2.Exploration(
+            id=exploration.id,
+            version=exploration.version,
+            init_state_name=exploration.init_state_name,
+            title=exploration.title,
+            states={
+                init_state_name: state_proto
+            }
+        )
+        proto_size_in_bytes = 0 
         exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 

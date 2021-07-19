@@ -647,21 +647,15 @@ class Exploration(python_utils.OBJECT):
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
         # Calculate proto_size_in_bytes.
-        exp_proto = exploration_pb2.Exploration(
-            id=exploration.id,
-            version=exploration.version,
-            init_state_name=exploration.init_state_name,
-            title=exploration.title
-        )
         state_proto = exploration_pb2.State()
 
         # InteractionInstance.
         # A interaction_proto = exploration_pb2.InteractionInstance().
 
         # RecordedVoiceovers.
-        # B recorderd_voiceovers_proto = exploration_pb2.RecordedVoiceovers().
-        # B voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping().
-        # B voiceover_proto = exploration_pb2.Voiceover().
+        recorderd_voiceovers_proto = exploration_pb2.RecordedVoiceovers()
+        voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping()
+        voiceover_proto = exploration_pb2.Voiceover()
 
         # WrittenTranslations.
         # C written_translation_proto = exploration_pb2.WrittenTranslations().
@@ -675,7 +669,38 @@ class Exploration(python_utils.OBJECT):
                 content_id=state_dict.content.content_id,
                 html=state_dict.content.html
             )
+            for (content_id, language_code_to_voiceover) in (
+                    state_dict.recorded_voiceovers.voiceovers_mapping.items()):
+                for (language_code_, voiceover) in (
+                        language_code_to_voiceover.items()):
+                    voiceover_proto = exploration_pb2.Voiceover(
+                        filename=voiceover.filename,
+                        file_size_bytes=voiceover.file_size_bytes,
+                        duration_secs=voiceover.duration_secs
+                    )
+                    voiceover_mapping_proto = (
+                        exploration_pb2.VoiceoverContentMapping(
+                            language_code=language_code_,
+                            voiceover_content_mapping={
+                                language_code_: voiceover_proto
+                            }
+                        )
+                    )
             state_proto.content.CopyFrom(subtitled_html_proto)
+            recorderd_voiceovers_proto = exploration_pb2.RecordedVoiceovers(
+                voiceover_language_mapping=voiceover_mapping_proto
+            )
+            state_proto.recorded_voiceovers.CopyFrom(recorderd_voiceovers_proto)
+
+        exp_proto = exploration_pb2.Exploration(
+            id=exploration.id,
+            version=exploration.version,
+            init_state_name=exploration.init_state_name,
+            title=exploration.title,
+            states={
+                init_state_name: state_proto
+            }
+        )
 
         # How to set state_proto to exp_proto as states is a map.
         proto_size_in_bytes = exp_proto.ByteSize()

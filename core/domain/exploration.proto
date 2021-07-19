@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package core.domain;
-
 import "google/protobuf/descriptor.proto";
 
 // Custom options. Note that these do not actually enforce semantics--they're
