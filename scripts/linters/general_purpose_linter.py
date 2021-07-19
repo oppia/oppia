@@ -558,6 +558,36 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_disallowed_flags(self):
+        """This function is used to disallow flags."""
+        name = 'Disallow flags'
+        disallow_flag = (
+            'eslint-disable-next-line oppia/no-bypass-security-phrase')
+        error_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+        excluded_files = (
+            warranted_angular_security_bypasses
+            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES)
+        allowed_files = ''
+        for filepath in files_to_lint:
+            for excluded_file in excluded_files:
+                if excluded_file in filepath:
+                    allowed_files = filepath
+            if not filepath.endswith('.ts') or filepath == allowed_files:
+                continue
+            file_content = self.file_cache.read(filepath)
+
+            if disallow_flag in file_content:
+                error_message = (
+                    '%s --> The no-bypass-security-phrase flag is only '
+                    'expected to be use in the file mentioned in '
+                    'warranted_angular_security_bypasses.py' % filepath)
+                error_messages.append(error_message)
+                failed = True
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
@@ -606,7 +636,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     ['There are no files to be checked.'])]
         task_results = [
             self.check_mandatory_patterns(), self.check_bad_patterns(),
-            self.check_newline_at_eof(), self.check_extra_js_files()]
+            self.check_newline_at_eof(), self.check_extra_js_files(),
+            self.check_disallowed_flags()]
         return task_results
 
 
