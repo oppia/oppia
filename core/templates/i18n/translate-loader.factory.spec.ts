@@ -17,6 +17,7 @@
  * @fileoverview Unit tests for the Translate Loader Factory.
  */
 
+// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
