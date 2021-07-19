@@ -1904,14 +1904,14 @@ title: Title
 
         old_datetime = datetime.datetime
 
-        class MockDatetimeType(type(old_datetime)):
+        class MockDatetimeType(type):
             """Overrides isinstance() behavior."""
 
             @classmethod
             def __instancecheck__(cls, instance):
                 return isinstance(instance, old_datetime)
 
-        class MockDatetime(old_datetime, metaclass=MockDatetimeType): # pylint: disable=invalid-metaclass
+        class MockDatetime(old_datetime, metaclass=MockDatetimeType):
             """Always returns mocked_now as the current UTC time."""
 
             @classmethod
