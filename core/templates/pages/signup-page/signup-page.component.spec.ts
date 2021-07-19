@@ -134,21 +134,36 @@ describe('Sign up page component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve()
     } as NgbModalRef);
-    componentInstance.showLicenseExplanationModal();
+    componentInstance.showLicenseExplanationModal(
+      { target: { innerText: 'here' } });
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should cancel license explanation modal', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
-    componentInstance.showLicenseExplanationModal();
+    componentInstance.showLicenseExplanationModal(
+      { target: { innerText: 'here' } });
+    expect(ngbModal.open).toHaveBeenCalled();
   });
+
+  it('should not trigger license explanation modal if click elsewhere',
+    () => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
+      componentInstance.showLicenseExplanationModal(
+        { target: { innerText: '' } });
+      expect(ngbModal.open).not.toHaveBeenCalled();
+    });
 
   it('should confirm registration session expired modal', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve()
     } as NgbModalRef);
     componentInstance.showRegistrationSessionExpiredModal();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should cancel registration session expired modal', () => {
@@ -156,6 +171,7 @@ describe('Sign up page component', () => {
       result: Promise.reject()
     } as NgbModalRef);
     componentInstance.showRegistrationSessionExpiredModal();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should handle username input blur event', fakeAsync(() => {
@@ -175,8 +191,10 @@ describe('Sign up page component', () => {
   }));
 
   it('should not perform checks for empty username', () => {
+    spyOn(alertsService, 'clearWarnings');
     componentInstance.hasUsername = true;
     componentInstance.onUsernameInputFormBlur('');
+    expect(alertsService.clearWarnings).not.toHaveBeenCalled();
   });
 
   it('should update warning text', () => {
@@ -216,8 +234,10 @@ describe('Sign up page component', () => {
   });
 
   it('should not submit if username is not valid', () => {
+    spyOn(urlService, 'getUrlParams');
     componentInstance.warningI18nCode = 'not_empty';
     componentInstance.submitPrerequisitesForm(true, '', 'yes');
+    expect(urlService.getUrlParams).not.toHaveBeenCalled();
   });
 
   it('should submit prerequisites form', fakeAsync(() => {

@@ -83,7 +83,10 @@ export class SignupPageComponent {
     );
   }
 
-  showLicenseExplanationModal(): void {
+  showLicenseExplanationModal(evt: { target: {innerText: string} }): void {
+    if (evt.target.innerText !== 'here') {
+      return;
+    }
     let modalRef = this.ngbModal.open(LicenseExplanationModalComponent, {
       backdrop: true
     });

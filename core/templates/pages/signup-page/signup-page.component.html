@@ -84,7 +84,7 @@ link before completing the signup process, they will be logged out.
       <div>
         <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
         <br>
-        <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}"></span>
+        <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}" (click)="showLicenseExplanationModal($event)"></span>
       </div>
 
       <hr>
