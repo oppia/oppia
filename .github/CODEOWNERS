@@ -597,7 +597,6 @@
 /core/templates/pages/header_css_libs.html @vojtechjelinek
 /core/templates/pages/header_js_libs.html @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @vojtechjelinek
-/core/templates/services/cookie.service*.ts @nithusha21
 /core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
 /.lighthouserc.js @jimbyo @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo @vojtechjelinek

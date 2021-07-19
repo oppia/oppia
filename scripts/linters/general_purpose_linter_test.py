@@ -56,8 +56,6 @@ INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_templateurl.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
-INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
 # PY filepaths.
 INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
@@ -145,17 +143,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 24: The directives must be directly referenced.'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_http_client_used_with_error_message(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 22: An instance of HttpClient is found in this file. You are '
-            'not allowed to create http requests from files that are not '
-            'backend api services.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
