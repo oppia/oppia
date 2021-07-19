@@ -149,8 +149,6 @@ export class StewardsLandingPageComponent {
     }, 150);
   }
 
-  // Note: This should be kept in sync with the CSS media query on
-  // stewards-landing-page.mainpage.html.
   isWindowNarrow(windowWidthPx: number): boolean {
     return windowWidthPx <= 890;
   }

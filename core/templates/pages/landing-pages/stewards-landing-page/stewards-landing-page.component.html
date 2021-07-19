@@ -133,10 +133,18 @@
       <main class="row d-flex">
         <div class="column oppia-stewards-sidebar" *ngIf="!windowIsNarrow">
           <ul class="primary">
-            <li [ngClass]="{active: isActiveTab(TAB_NAME_PARENTS)}"><a (click)="setActiveTabName(TAB_NAME_PARENTS)">Parents</a></li>
-            <li [ngClass]="{active: isActiveTab(TAB_NAME_TEACHERS)}"><a (click)="setActiveTabName(TAB_NAME_TEACHERS)">Teachers</a></li>
-            <li [ngClass]="{active: isActiveTab(TAB_NAME_NONPROFITS)}"><a (click)="setActiveTabName(TAB_NAME_NONPROFITS)">NGOs</a></li>
-            <li [ngClass]="{active: isActiveTab(TAB_NAME_VOLUNTEERS)}"><a (click)="setActiveTabName(TAB_NAME_VOLUNTEERS)">Volunteers</a></li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_PARENTS)}">
+              <a (click)="setActiveTabName(TAB_NAME_PARENTS)">Parents</a>
+            </li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_TEACHERS)}">
+              <a (click)="setActiveTabName(TAB_NAME_TEACHERS)">Teachers</a>
+            </li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_NONPROFITS)}">
+              <a (click)="setActiveTabName(TAB_NAME_NONPROFITS)">NGOs</a>
+            </li>
+            <li [ngClass]="{active: isActiveTab(TAB_NAME_VOLUNTEERS)}">
+              <a (click)="setActiveTabName(TAB_NAME_VOLUNTEERS)">Volunteers</a>
+            </li>
           </ul>
         </div>
 
