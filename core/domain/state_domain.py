@@ -2345,7 +2345,7 @@ class TranslatableItem(python_utils.OBJECT):
     DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
 
     def __init__(self, content, data_format):
-        """Initializes a SubtitledUnicode domain object.
+        """Initializes a TranslatableItem domain object.
 
         Args:
             content: str. The translatable content text.
