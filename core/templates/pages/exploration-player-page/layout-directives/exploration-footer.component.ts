@@ -51,7 +51,7 @@ export class ExplorationFooterComponent {
   }
 
   ngOnInit(): void {
-    if (this.contextService.getExplorationId()) {
+    try {
       this.explorationId = this.contextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
@@ -81,7 +81,7 @@ export class ExplorationFooterComponent {
             }
           });
       }
-    }
+    } catch (err) { }
   }
 
   ngOnDestroy(): void {
