@@ -167,7 +167,7 @@ describe('Embedding', function() {
       await driver.get(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         TEST_PAGES[i].filename);
-
+    
       await (await driver.findElement(by.css(
         '.protractor-test-exploration-id-input-field')
       )).sendKeys(explorationId);
@@ -239,7 +239,20 @@ describe('Embedding', function() {
     expect(embeddingLogs).toEqual(expectedLogs);
 
     await users.logout();
-    await general.checkForConsoleErrors([]);
+    
+    // This error is to be ignored as 'idToBeReplaced' is not a valid
+      // exploration id. It appears just after the page loads.
+    var errorToIgnore = [
+      'http:\/\/localhost:9001\/assets\/' +
+      'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
+      'locale=en#version=0.0.1&secret=',
+      'http:\/\/localhost:9001\/assets\/' +
+      'scripts\/embedding_tests_dev_i18n_0.0.2.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
+      'locale=en#version=0.0.1&secret='
+    ];
+    await general.checkForConsoleErrors([errorToIgnore]);
   });
 
   it('should use the exploration language as site language.',
@@ -334,10 +347,16 @@ describe('Embedding', function() {
 
       // This error is to be ignored as 'idToBeReplaced' is not a valid
       // exploration id. It appears just after the page loads.
-      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
+      var errorToIgnore = [
+        'http:\/\/localhost:9001\/assets\/' +
         'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
         '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-        'locale=en#version=0.0.1&secret=';
+        'locale=en#version=0.0.1&secret=',
+        'http:\/\/localhost:9001\/assets\/' +
+        'scripts\/embedding_tests_dev_i18n_0.0.2.html - Refused to display ' +
+        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
+        'locale=en#version=0.0.1&secret='
+      ];
       await general.checkForConsoleErrors([errorToIgnore]);
     });
 });
