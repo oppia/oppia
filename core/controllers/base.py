@@ -575,9 +575,9 @@ class BaseHandler(webapp2.RequestHandler):
             elif values['status_code'] == 404:
                 # Routes for pages are handled at the frontend using angular
                 # router. As they are not registered at the backend,
-                # the backend tries to return error page with 404 status code.
-                # This scenario is handled here, so that pages are served with
-                # appropriate status code.
+                # the backend tries to respond with 404 status code.
+                # This scenario is handled here, so that routes registered
+                # with angular router have appropriate status code.
 
                 route_is_registered_with_angular_router = any(
                     self.request.path == '/%s' % route for route in
