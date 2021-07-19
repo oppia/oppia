@@ -19,10 +19,10 @@
 import { Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { CookieService } from 'ngx-cookie';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { OppiaCookieService } from 'services/cookie.service';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
@@ -50,7 +50,7 @@ export class BaseContentComponent {
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
-    private oppiaCookieService: OppiaCookieService
+    private cookieService: CookieService
   ) {}
 
   ngOnInit(): void {
@@ -123,7 +123,7 @@ export class BaseContentComponent {
   }
 
   hasAcknowledgedCookies(): boolean {
-    let cookieSetDateMsecs = this.oppiaCookieService.getCookie(
+    let cookieSetDateMsecs = this.cookieService.get(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
     return (
       !!cookieSetDateMsecs &&
@@ -136,7 +136,7 @@ export class BaseContentComponent {
     let cookieOptions = {
       expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
     };
-    this.oppiaCookieService.putCookie(
+    this.cookieService.put(
       this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),
       cookieOptions);
   }

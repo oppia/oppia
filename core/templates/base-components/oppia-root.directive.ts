@@ -75,7 +75,7 @@ angular.module('oppia').directive('oppiaRoot', [
               'LostChangeObjectFactory', 'MessengerService',
               'MetaTagCustomizationService', 'NormalizeWhitespacePipe',
               'NormalizeWhitespacePunctuationAndCasePipe',
-              'NumberAttemptsService', 'OppiaCookieService',
+              'NumberAttemptsService',
               'PageTitleService', 'ParamChangesObjectFactory',
               'ParamSpecsObjectFactory',
               'PencilCodeEditorRulesService',
