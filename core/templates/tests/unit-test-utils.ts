@@ -44,6 +44,10 @@ export class MockTranslateDirective {
   declarations: [
     MockTranslateDirective,
     MockTranslatePipe
+  ],
+  exports: [
+    MockTranslateDirective,
+    MockTranslatePipe
   ]
 })
 export class MockTranslateModule {}
