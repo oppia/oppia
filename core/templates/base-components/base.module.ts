@@ -38,9 +38,11 @@ import { OppiaFooterComponent } from './oppia-footer.component';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
 // Directives.
-import { BaseContentComponent,
+import {
+  BaseContentComponent,
   BaseContentNavBarBreadCrumbDirective,
-  BaseContentPageFooterDirective } from './base-content.component';
+  BaseContentPageFooterDirective
+} from './base-content.component';
 
 // Miscenellous.
 import * as hammer from 'hammerjs';
