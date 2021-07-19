@@ -139,20 +139,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'extensions/value_generators/',
             'extensions/visualizations/')
     },
-    {
-        'regexp': re.compile(r':\n? *HttpClient'),
-        'message': (
-            'An instance of HttpClient is found in this file. You are not '
-            'allowed to create http requests from files that are not backend '
-            'api services.'),
-        'excluded_files': (
-            'backend-api.service.ts',
-            'core/templates/pages/translate-loader.factory.ts',
-            'translate-loader.factory.spec.ts',
-            'core/templates/services/auth-interceptor.service.spec.ts',
-            'core/templates/services/request-interceptor.service.spec.ts',),
-        'excluded_dirs': ()
-    }
 ]
 
 MANDATORY_PATTERNS_REGEXP = [

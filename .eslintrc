@@ -156,6 +156,7 @@
     "oppia/constant-declaration": "error",
     "oppia/comment-style": "error",
     "oppia/disallow-flags": "error",
+    "oppia/disallow-httpclient": "error",
     "oppia/disallow-angularjs-properties": "error",
     "oppia/import-lodash": "error",
     "oppia/no-multiple-component": "error",
