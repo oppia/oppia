@@ -36,7 +36,7 @@ export class RemoveActivityModalComponent implements OnInit {
   @Input() subsectionName!: string;
   @Input() activityId!: string;
   @Input() activityTitle!: string;
-  removeActivityUrl!: string | null;
+  removeActivityUrl!: string;
 
   constructor(
     private activeModal: NgbActiveModal,
