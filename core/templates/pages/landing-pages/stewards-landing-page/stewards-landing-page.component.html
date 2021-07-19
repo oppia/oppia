@@ -143,17 +143,23 @@
         <div class="column tab-content view-content oppia-stewards-main-content" autoscroll="true">
           <div *ngIf="windowIsNarrow">
             <strong>I AM A ...</strong>
-            <!-- <div uib-dropdown class="oppia-stewards-dropdown">
-              <button uib-dropdown-toggle class="btn btn-secondary selection dropdown-toggle" type="button" aria-expanded="false" data-toggle="dropdown">
-                <[getActiveTabNameInSingularForm()]>
+            <div ngbDropdown
+                 class="oppia-stewards-dropdown dropdown"
+                 [ngClass]="{'open': dropdownToggle}">
+              <button ngbDropdownToggle
+                      class="btn btn-secondary selection dropdown-toggle"
+                      type="button"
+                      aria-expanded="false"
+                      (click)="dropdownToggle = !dropdownToggle">
+                {{ getActiveTabNameInSingularForm() }}
               </button>
-              <ul uib-dropdown-menu class="oppia-dropdown-menu">
+              <ul ngbDropdownMenu class="oppia-dropdown-menu dropdown-menu">
                 <li><a (click)="setActiveTabName(TAB_NAME_PARENTS)">Parent</a></li>
                 <li><a (click)="setActiveTabName(TAB_NAME_TEACHERS)">Teacher</a></li>
                 <li><a (click)="setActiveTabName(TAB_NAME_NONPROFITS)">Nonprofit</a></li>
                 <li><a (click)="setActiveTabName(TAB_NAME_VOLUNTEERS)">Volunteer</a></li>
               </ul>
-            </div> -->
+            </div>
           </div>
 
           <div *ngIf="activeTabName === TAB_NAME_PARENTS">

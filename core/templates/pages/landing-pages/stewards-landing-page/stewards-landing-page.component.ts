@@ -49,6 +49,7 @@ export class StewardsLandingPageComponent {
   };
   windowIsNarrow: boolean;
   resizeSubscription = new Subscription();
+  dropdownToggle: boolean = false;
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
