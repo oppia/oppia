@@ -70,7 +70,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'No filename supplied')
+        self.assertEqual(
+            response_dict['error'], 'Missing key in handler args: filename.')
 
         self.logout()
 

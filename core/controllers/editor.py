@@ -1098,7 +1098,11 @@ class EditorAutosaveHandler(ExplorationHandler):
                 }
             }
         },
-        'POST': {}
+        'POST': {},
+        # Below two methods are not defined in handler class but they must be
+        # present in schema since these two are inherited from its parent class.
+        'GET': {},
+        'DELETE': {}
     }
 
     @acl_decorators.can_save_exploration
