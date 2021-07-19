@@ -21,7 +21,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
-import { MockTranslateDirective, MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockTranslateModule } from 'tests/unit-test-utils';
 import { RegistrationSessionExpiredModalComponent } from './registration-session-expired-modal.component';
 
 class MockWindowRef {
@@ -42,13 +42,12 @@ describe('Registration Session Expired Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        MockTranslateModule,
         NgbModalModule,
         HttpClientTestingModule
       ],
       declarations: [
-        RegistrationSessionExpiredModalComponent,
-        MockTranslatePipe,
-        MockTranslateDirective
+        RegistrationSessionExpiredModalComponent
       ],
       providers: [
         NgbActiveModal,

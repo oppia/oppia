@@ -17,6 +17,7 @@
  */
 
 import { Input } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Pipe } from '@angular/core';
@@ -38,3 +39,11 @@ export class MockTranslateDirective {
 
   constructor(private element: ElementRef) {}
 }
+
+@NgModule({
+  declarations: [
+    MockTranslateDirective,
+    MockTranslatePipe
+  ]
+})
+export class MockTranslateModule {}

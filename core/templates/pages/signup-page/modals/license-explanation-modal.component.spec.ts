@@ -18,7 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslateDirective, MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LicenseExplanationModalComponent } from './license-explanation-modal.component';
 
 describe('License Explanation Modal Component', () => {
@@ -28,12 +28,11 @@ describe('License Explanation Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        MockTranslateModule,
         NgbModalModule
       ],
       declarations: [
-        LicenseExplanationModalComponent,
-        MockTranslatePipe,
-        MockTranslateDirective
+        LicenseExplanationModalComponent
       ],
       providers: [
         NgbActiveModal

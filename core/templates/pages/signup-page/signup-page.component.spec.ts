@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { MockTranslateDirective, MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockTranslateModule } from 'tests/unit-test-utils';
 import { SignupPageBackendApiService } from './services/signup-page-backend-api.service';
 import { SignupPageComponent } from './signup-page.component';
 
@@ -54,13 +54,12 @@ describe('Sign up page component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+        MockTranslateModule,
         NgbModalModule,
         FormsModule
       ],
       declarations: [
         SignupPageComponent,
-        MockTranslatePipe,
-        MockTranslateDirective
       ],
       providers: [
         {
