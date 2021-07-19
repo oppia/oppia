@@ -62,7 +62,7 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
     customizationArguments = {
       buttonText: {
         value: new SubtitledUnicode('Some Button Text', 'ca_buttonText')
@@ -111,6 +111,10 @@ describe('ContinueValidationService', () => {
   it('should expect a non-confusing and non-null default outcome',
     () => {
       var warnings = validatorService.getAllWarnings(
+        // This throws "Type 'null' is not assignable to type 'Outcome'
+        // ." We need to suppress this error because of the need to test
+        // validations if the outcome is not defined.
+        // @ts-ignore
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,

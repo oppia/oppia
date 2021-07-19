@@ -43,9 +43,9 @@ describe('Assets Backend API Service', () => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule]
       });
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      csrfTokenService = TestBed.get(CsrfTokenService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
@@ -385,8 +385,8 @@ describe('Assets Backend API Service', () => {
   });
 
   describe('on emulator mode', () => {
-    let assetsBackendApiService: AssetsBackendApiService = null;
-    let httpTestingController: HttpTestingController = null;
+    let assetsBackendApiService: AssetsBackendApiService;
+    let httpTestingController: HttpTestingController;
     const gcsPrefix: string =
       'https://storage.googleapis.com/app_default_bucket';
 
@@ -397,8 +397,8 @@ describe('Assets Backend API Service', () => {
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
-      httpTestingController = TestBed.get(HttpTestingController);
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+      httpTestingController = TestBed.inject(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     });
 
     it('should correctly formulate the download URL for audios', () => {

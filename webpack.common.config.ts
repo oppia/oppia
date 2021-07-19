@@ -59,6 +59,8 @@ module.exports = {
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
+    blog_admin:
+      commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.import.ts',
     collection_editor:
@@ -75,6 +77,9 @@ module.exports = {
     contributor_dashboard:
       commonPrefix + '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
+    contributor_dashboard_admin:
+      commonPrefix + '/pages/contributor-dashboard-admin-page/' +
+      'contributor-dashboard-admin-page.import.ts',
     delete_account:
       commonPrefix + '/pages/delete-account-page/' +
         'delete-account-page.import.ts',
@@ -108,6 +113,8 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
+    partnerships:
+      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -152,9 +159,9 @@ module.exports = {
   },
 
   /**
-   * TODO(#13079): Remove the hybrid field from the html webpack plugin options
-   * once angularjs is removed from corresponding pages.
-   */
+  * TODO(#13079): Remove the hybrid field from the html webpack plugin options
+  * once angularjs is removed from corresponding pages.
+  */
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
@@ -184,6 +191,23 @@ module.exports = {
           'education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['blog_admin'],
+      filename: 'blog-admin-page.mainpage.html',
+      hybrid: true,
+      meta: {
+        name: defaultMeta.name,
+        description: 'With Oppia, you can access free lessons on ' +
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
+      },
+      template:
+        commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -248,7 +272,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['contact'],
       filename: 'contact-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Contact the Oppia team, submit feedback, and learn ' +
@@ -270,6 +293,17 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['contributor_dashboard_admin'],
+      filename: 'contributor-dashboard-admin-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
+        'contributor-dashboard-admin-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['contributor_dashboard'],
       filename: 'contributor-dashboard-page.mainpage.html',
       hybrid: true,
@@ -283,7 +317,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['delete_account'],
       filename: 'delete-account-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/delete-account-page/' +
@@ -294,7 +327,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['donate'],
       filename: 'donate-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Donate to The Oppia Foundation to enable more ' +
@@ -413,7 +445,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['get_started'],
       filename: 'get-started-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Learn how to get started using Oppia.'
@@ -426,7 +457,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['landing'],
       filename: 'topic-landing-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/landing-pages/topic-landing-page/' +
@@ -476,7 +506,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['login'],
       filename: 'login-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/login-page/login-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -512,9 +541,18 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['partnerships'],
+      filename: 'partnerships-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/partnerships-page/' +
+          'partnerships-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['pending_account_deletion'],
       filename: 'pending-account-deletion-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
           commonPrefix + '/pages/pending-account-deletion-page/' +
@@ -564,7 +602,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['privacy'],
       filename: 'privacy-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -634,7 +671,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on math, ' +
@@ -694,7 +730,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['teach'],
       filename: 'teach-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'The Oppia library is full of user-created lessons ' +
@@ -708,7 +743,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['terms'],
       filename: 'terms-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
@@ -722,7 +756,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['thanks'],
       filename: 'thanks-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Thank you for donating to The Oppia Foundation!'
