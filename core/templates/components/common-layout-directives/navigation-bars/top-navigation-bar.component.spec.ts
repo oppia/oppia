@@ -33,6 +33,7 @@ import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 class MockWindowRef {
   _window = {
@@ -100,7 +101,7 @@ describe('TopNavigationBarComponent', () => {
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true
-  };
+  } as UserInfo;
 
   beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
