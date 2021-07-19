@@ -695,7 +695,6 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     expectTextToBe: async function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
-      console.log('aaaa');
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
         lineNumber++) {
         console.log(expectedTextArray[lineNumber - 1]);

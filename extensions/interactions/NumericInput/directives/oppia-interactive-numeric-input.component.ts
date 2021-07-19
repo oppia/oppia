@@ -98,9 +98,7 @@ export class InteractiveNumericInput implements OnInit {
       'NumericInput',
       this.getAttributesObject()
     ) as NumericInputCustomizationArgs;
-    this.inputGreaterThanZero = inputGreaterThanZero.value;
-    window.localStorage.setItem(
-      'checkInputGreaterThanZero', this.inputGreaterThanZeroWithValue);
+    //this.inputGreaterThanZero = inputGreaterThanZero.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
@@ -109,7 +107,9 @@ export class InteractiveNumericInput implements OnInit {
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
-      ui_config: {}
+      ui_config: {
+        checkInputGreaterThanZero: inputGreaterThanZero.value
+      }
     };
 
     this.currentInteractionService.registerCurrentInteraction(

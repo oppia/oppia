@@ -1114,7 +1114,7 @@ class Question(python_utils.OBJECT):
                 'interaction']['customization_args']
             customization_args.update({
                 'inputGreaterThanZero': {
-                    'value': True
+                    'value': False
                 }
             })
         return question_state_dict

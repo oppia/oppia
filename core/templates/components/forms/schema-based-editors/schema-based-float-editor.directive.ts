@@ -39,7 +39,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         validators: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        uiConfig: '&'
       },
       template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
@@ -112,17 +113,6 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.onDownKeyPress = function(event) {
-            var inputGreaterThanZeroWithValue = localStorage.getItem(
-              'checkInputGreaterThanZero');
-            if (inputGreaterThanZeroWithValue === 'true' &&
-             ctrl.localValue < 1) {
-              if (event.keyCode === 40) {
-                event.preventDefault();
-              }
-            }
-          };
-
           ctrl.$onInit = function() {
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
@@ -133,6 +123,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
+            //ctrl.minValue = (
+              //ctrl.uiConfig().checkInputGreaterThanZero ? 0 : null);
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {
