@@ -52,6 +52,8 @@ export class ExplorationRecommendationsBackendApiService {
   async getRecommendedSummaryDictsAsync(
       authorRecommendedExpIds: string[],
       includeSystemRecommendations: string,
+      // 'collectionId', 'storyId' and 'currentNodeId' are optional
+      // since they may not be present in the URL.
       collectionId: string | null, storyId: string | null,
       currentNodeId: string | null, explorationId: string):
       Promise<LearnerExplorationSummary[]> {
