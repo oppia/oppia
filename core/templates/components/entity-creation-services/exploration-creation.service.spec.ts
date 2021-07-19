@@ -113,7 +113,7 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(ecs.explorationCreationInProgress).toBe(false);
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
@@ -135,7 +135,7 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(ecs.explorationCreationInProgress).toBe(false);
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
