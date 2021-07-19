@@ -2348,7 +2348,7 @@ class TranslatableItem(python_utils.OBJECT):
         """Initializes a TranslatableItem domain object.
 
         Args:
-            content: str. The translatable content text.
+            content: str|list(str). The translatable content text.
             data_format: str. The data format of the translatable content.
         """
         self.content = content
