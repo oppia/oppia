@@ -1,4 +1,4 @@
-<div class="oppia-goals-box">
+<div class="oppia-goals-box" [ngStyle]="{'margin-top': checkMobileView()? '35px': '64px'}">
   <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
   </p>
   <div *ngIf="currentGoals.length > 0">

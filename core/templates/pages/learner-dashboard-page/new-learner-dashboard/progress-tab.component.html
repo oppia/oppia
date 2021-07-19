@@ -1,4 +1,4 @@
-<div class="completed-stories" *ngIf="completedStoriesList.length !== 0">
+<div class="completed-stories" *ngIf="(!checkMobileView() && completedStoriesList.length !== 0) || (checkMobileView() && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
   <div class="completed-stories-heading">
     <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
     </p>
@@ -62,6 +62,7 @@
   }
   @media screen and (min-width: 768px) and (max-width: 950px) {
     .completed-stories {
+      margin-top: 35px;
       padding: 0 0 30px 25px;
       position: relative;
       right: 20px;
@@ -76,6 +77,7 @@
   }
   @media screen and (max-width: 767px) {
     .completed-stories {
+      margin-top: 35px;
       padding: 0 0 30px 25px;
       width: 360px;
     }

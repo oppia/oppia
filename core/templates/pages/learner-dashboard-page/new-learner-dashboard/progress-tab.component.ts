@@ -22,6 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { LearnerDashboardPageConstants } from '../learner-dashboard-page.constants';
 
 
  @Component({
@@ -31,8 +32,11 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 export class ProgressTabComponent implements OnInit {
   @Input() completedStoriesList: StorySummary[];
   @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
+  @Input() activeSubsection?: string;
   widthConst: number = 233;
   width: number;
+  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
+    LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 
   constructor(
     private deviceInfoService: DeviceInfoService,

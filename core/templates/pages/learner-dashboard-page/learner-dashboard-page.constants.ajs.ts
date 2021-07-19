@@ -30,13 +30,5 @@ angular.module('oppia').constant(
   LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
 
 angular.module('oppia').constant(
-  'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-  LearnerDashboardPageConstants.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
-
-angular.module('oppia').constant(
-  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
-  LearnerDashboardPageConstants.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS);
-
-angular.module('oppia').constant(
   'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   LearnerDashboardPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);

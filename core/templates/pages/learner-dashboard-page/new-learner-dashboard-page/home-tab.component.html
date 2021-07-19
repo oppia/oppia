@@ -1,4 +1,4 @@
-<div class="greeting">
+<div class="greeting" [ngStyle]="!checkMobileView() && {'margin-top': '64px'}">
   Good {{getTimeOfDay()}}, {{username}}!
 </div>
 <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
@@ -61,14 +61,14 @@
     color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
-    margin-left: 137px;
+    margin-left: 108px;
     text-align: left;
   }
   .continue-where-you-left-off {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px 137px;
+    margin: 18px 0 25px 108px;
     min-height: 179px;
     padding: 32px 0 30px 40px;
     width: 736px;
@@ -142,7 +142,7 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px 137px;
+    margin: 18px 0 25px 108px;
     min-height: 206px;
     padding: 32px 0 30px 40px;
     width: 736px;
@@ -154,10 +154,12 @@
   .continue-where-you-left-off .topic-summary {
     display: inline-block;
     padding-right: 30px;
+    width: 228px;
   }
   @media screen and (max-width: 1200px) {
     .greeting {
       margin-left: 0;
+      padding-top: 30px;
     }
     .continue-where-you-left-off, .suggested-for-you {
       margin-left: 0;
@@ -179,8 +181,8 @@
   }
   @media screen and (max-width: 767px) {
     .greeting {
-      font-size: 20px;
-      margin-left: 20px;
+      font-size: 23px;
+      margin: 24px 0 0 20px;
     }
     .continue-where-you-left-off, .suggested-for-you {
       margin: 18px 0 25px 20px;
