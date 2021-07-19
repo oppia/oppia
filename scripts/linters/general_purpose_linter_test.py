@@ -54,8 +54,6 @@ FILE_IN_EXCLUDED_PATH = os.path.join(
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
-INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
 # PY filepaths.
 INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
@@ -129,21 +127,6 @@ class HTMLLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 2: Please do not use inline styling.'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-
-class JsTsLintTests(test_utils.LinterTestBase):
-    """Test the JsTs lint functions."""
-
-    def test_http_client_used_with_error_message(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_HTTP_CLIENT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 22: An instance of HttpClient is found in this file. You are '
-            'not allowed to create http requests from files that are not '
-            'backend api services.'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
