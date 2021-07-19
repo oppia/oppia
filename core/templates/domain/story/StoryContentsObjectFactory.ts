@@ -102,7 +102,10 @@ export class StoryContents {
     });
   }
 
-  // If the node id is null, empty or undefined the function returns -1.
+  // A nodeId will be null if the initial node does not exist.
+  // A nodeId can be undefined if the nodesQueue(pending nodes to visit)
+  // are not present.
+  // If the nodeId is null, empty or undefined then the function returns -1.
   getNodeIndex(nodeId: string | null | undefined): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
