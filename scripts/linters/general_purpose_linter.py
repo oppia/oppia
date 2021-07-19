@@ -546,9 +546,9 @@ class GeneralPurposeLinter(python_utils.OBJECT):
 
             if disallow_flag in file_content:
                 error_message = (
-                    '%s --> The no-bypass-security-phrase flag is only '
-                    'expected to be use in the file mentioned in '
-                    'warranted_angular_security_bypasses.py' % filepath)
+                    '%s --> Please do not use "no-bypass-security-phrase" flag.'
+                    ' It is only expected to be used in files listed in'
+                    ' warranted_angular_security_bypasses.py' % filepath)
                 error_messages.append(error_message)
                 failed = True
         return concurrent_task_utils.TaskResult(

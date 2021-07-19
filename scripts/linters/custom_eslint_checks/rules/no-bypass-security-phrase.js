@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Lint check to disallow the use of bypassSecurity
- * identifier phrase
+ * identifier phrase.
  */
 
 'use strict';
@@ -24,7 +24,7 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to disallow the use of bypassSecurity identifier phrase'),
+        'Lint check to disallow the use of bypassSecurity identifier phrase.'),
       category: 'Best Practices',
       recommended: true,
     },

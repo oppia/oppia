@@ -398,8 +398,9 @@ class GeneralLintTests(test_utils.LinterTestBase):
             [INVALID_BYPASS_FLAG], FILE_CACHE)
         lint_task_report = linter.check_disallowed_flags()
         self.assert_same_list_elements(
-            ['The no-bypass-security-phrase flag is only expected to be use in '
-             'the file mentioned in warranted_angular_security_bypasses.py'],
+            ['Please do not use "no-bypass-security-phrase" flag. It is only '
+             'expected to be used in files listed in '
+             'warranted_angular_security_bypasses.py'],
             lint_task_report.trimmed_messages)
         self.assertEqual(lint_task_report.name, 'Disallow flags')
         self.assertTrue(lint_task_report.failed)
