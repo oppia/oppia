@@ -22,6 +22,24 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
 
+type nodeAttr = (
+  'style' |
+  'about' |
+  'class' |
+  'content' |
+  'datatype' |
+  'id' |
+  'lang' |
+  'property' |
+  'rel' |
+  'resource' |
+  'rev' |
+  'tabindex' |
+  'typeof'
+);
+
+type keyOfSvgAttrsAllowlist = keyof typeof constants.SVG_ATTRS_ALLOWLIST;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -109,27 +127,12 @@ export class SvgSanitizerService {
     let invalidTags: string[] = [];
     let invalidAttrs: string[] = [];
 
-    type keyOfSvgAttrsAllowlist = keyof typeof constants.SVG_ATTRS_ALLOWLIST;
     let allowedTags = Object.keys(constants.SVG_ATTRS_ALLOWLIST);
     let nodeTagName: keyOfSvgAttrsAllowlist;
     svg.querySelectorAll('*').forEach((node) => {
       nodeTagName = <keyOfSvgAttrsAllowlist> node.tagName.toLowerCase();
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
-          type nodeAttr = (
-            'style' |
-            'about' |
-            'class' |
-            'content' |
-            'datatype' |
-            'id' |
-            'lang' |
-            'property' |
-            'rel' |
-            'resource' |
-            'rev' |
-            'tabindex' |
-            'typeof');
           let nodeAttrName: string = node.attributes[i].name.toLowerCase();
           if (constants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
             <nodeAttr> nodeAttrName) === -1) {
