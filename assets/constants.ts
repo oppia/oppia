@@ -5952,8 +5952,8 @@ export default {
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
-  // Routes handled using angular router.
-  "FRONTEND_ROUTES": {
+  // Routes registered with angular router.
+  "ROUTES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": "about"
   },
 

@@ -579,11 +579,11 @@ class BaseHandler(webapp2.RequestHandler):
                 # This scenario is handled here, so that pages are served with
                 # appropriate status code.
 
-                route_is_handled_using_angular_router = any(
+                route_is_registered_with_angular_router = any(
                     self.request.path == '/%s' %
-                    route for route in constants.FRONTEND_ROUTES.values())
+                    route for route in constants.ROUTES_REGISTERED_WITH_FRONTEND.values())
 
-                if route_is_handled_using_angular_router:
+                if route_is_registered_with_angular_router:
                     self.response.set_status(200)
 
                 self.render_template('oppia-root.mainpage.html')
