@@ -319,6 +319,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        # The query is encoded into base64 in the frontend.
         q = self.normalized_request.get('q').encode('utf-8')
         query_string = base64.b64decode(q).decode('utf-8')
 

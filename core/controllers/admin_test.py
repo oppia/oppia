@@ -724,19 +724,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'new_rules\' failed: \'int\' '
-            'object has no attribute \'__getitem__\'')
-        with self.assertRaisesRegexp(Exception, error_msg):
-            response = self.post_json(
-                '/adminhandler', {
-                    'action': 'update_feature_flag_rules',
-                    'feature_name': 'feature_name',
-                    'new_rules': [1, 2],
-                    'commit_message': 'test update feature',
-                },
-                csrf_token=csrf_token,
-                expected_status_int=400
-            )
-            self.assertEqual(response['error'], error_msg)
+            'object is not subscriptable')
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'update_feature_flag_rules',
+                'feature_name': 'feature_name',
+                'new_rules': [1, 2],
+                'commit_message': 'test update feature',
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -1243,13 +1242,12 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Schema validation for \'exp_version\' failed: '
-            'Could not convert unicode to int: a')
-        with self.assertRaisesRegexp(Exception, error_msg):
-            response = self.get_json(
-                '/explorationdataextractionhandler',
-                params=payload,
-                expected_status_int=400)
-            self.assertEqual(response['error'], error_msg)
+            'Could not convert str to int: a')
+        response = self.get_json(
+            '/explorationdataextractionhandler',
+            params=payload,
+            expected_status_int=400)
+        self.assertEqual(response['error'], error_msg)
 
     def test_that_handler_raises_exception(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)

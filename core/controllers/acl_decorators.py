@@ -2027,6 +2027,7 @@ def can_perform_tasks_in_taskqueue(handler):
         # The X-AppEngine-QueueName header is set inside AppEngine and if
         # a request from outside comes with this header AppEngine will get
         # rid of it.
+        # https://cloud.google.com/tasks/docs/creating-appengine-handlers#reading_app_engine_task_request_headers
         if (self.request.headers.get('X-AppEngine-QueueName') is None and
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
@@ -2067,6 +2068,7 @@ def can_perform_cron_tasks(handler):
         """
         # The X-AppEngine-Cron header is set inside AppEngine and if a request
         # from outside comes with this header AppEngine will get rid of it.
+        # https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#validating_cron_requests
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(

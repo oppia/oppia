@@ -456,7 +456,7 @@
 /core/templates/domain/jobs/ @brianrodri @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
-/main.py @DubeySandeep @nithusha21
+/main*.py @DubeySandeep @nithusha21
 /feconf.py @DubeySandeep @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21

@@ -273,7 +273,7 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
-            elif self.payload.get('action') == 'update_feature_flag_rules':
+            elif action == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rule_dicts = self.normalized_payload.get('new_rules')
                 commit_message = self.normalized_payload.get('commit_message')

@@ -93,17 +93,27 @@ class UserFacingExceptions(python_utils.OBJECT):
     class NotLoggedInException(Exception):
         """Error class for users that are not logged in (error code 401)."""
 
+        pass
+
     class InvalidInputException(Exception):
         """Error class for invalid input on the user side (error code 400)."""
+
+        pass
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""
 
+        pass
+
     class PageNotFoundException(Exception):
         """Error class for a page not found error (error code 404)."""
 
+        pass
+
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+        pass
 
     class TemporaryMaintenanceException(Exception):
         """Error class for when the server is currently down for temporary
@@ -502,7 +512,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         self.response.headers['Content-Type'] = content_type
         self.response.headers['Content-Disposition'] = (
-            python_utils.UNICODE('attachment; filename=%s' % filename))
+            'attachment; filename=%s' % filename)
         self.response.charset = 'utf-8'
         # We use this super in order to bypass the write method
         # in webapp2.Response, since webapp2.Response doesn't support writing

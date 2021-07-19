@@ -215,7 +215,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['opportunities'], [])
-        self.assertTrue(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -282,11 +281,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
-            next_cursor = response['next_cursor']
             next_response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi', 'cursor': next_cursor})
-
+                params={
+                    'language_code': 'hi',
+                    'cursor': response['next_cursor']
+                }
+            )
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
