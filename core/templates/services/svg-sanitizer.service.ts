@@ -109,21 +109,30 @@ export class SvgSanitizerService {
     let invalidTags: string[] = [];
     let invalidAttrs: string[] = [];
 
-    // This throws "The type 'readonly ["about", "alignment-baseline, ... 86
-    // more ..., "writing-mode"]' is 'readonly' and cannot be assigned to the
-    // mutable type 'string[]'." We need to suppress this error because of
-    // stricter type checking.
-    // @ts-ignore
-    const svgAttrsAllowlist: Record<string, string[]> = (
-      constants.SVG_ATTRS_ALLOWLIST);
-    let allowedTags = Object.keys(svgAttrsAllowlist);
-    let nodeTagName = null;
+    type keyOfSvgAttrsAllowlist = keyof typeof constants.SVG_ATTRS_ALLOWLIST;
+    let allowedTags = Object.keys(constants.SVG_ATTRS_ALLOWLIST);
+    let nodeTagName: keyOfSvgAttrsAllowlist;
     svg.querySelectorAll('*').forEach((node) => {
-      nodeTagName = node.tagName.toLowerCase();
+      nodeTagName = <keyOfSvgAttrsAllowlist> node.tagName.toLowerCase();
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
-          if (svgAttrsAllowlist[nodeTagName].indexOf(
-            node.attributes[i].name.toLowerCase()) === -1) {
+          type nodeAttr = (
+            'style' |
+            'about' |
+            'class' |
+            'content' |
+            'datatype' |
+            'id' |
+            'lang' |
+            'property' |
+            'rel' |
+            'resource' |
+            'rev' |
+            'tabindex' |
+            'typeof');
+          let nodeAttrName: string = node.attributes[i].name.toLowerCase();
+          if (constants.SVG_ATTRS_ALLOWLIST[nodeTagName].indexOf(
+            <nodeAttr> nodeAttrName) === -1) {
             invalidAttrs.push(
               node.tagName + ':' + node.attributes[i].name);
           }
