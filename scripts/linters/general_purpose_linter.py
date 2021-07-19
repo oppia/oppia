@@ -124,21 +124,6 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             warranted_angular_security_bypasses
             .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
     },
-    {
-        'regexp': re.compile(r'templateUrl: \''),
-        'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/pages/exploration-player-page/'
-            'FeedbackPopupDirective.js',
-            '.component.ts'
-        ),
-        'excluded_dirs': (
-            'extensions/answer_summarizers/',
-            'extensions/classifiers/',
-            'extensions/dependencies/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
-    },
 ]
 
 MANDATORY_PATTERNS_REGEXP = [
