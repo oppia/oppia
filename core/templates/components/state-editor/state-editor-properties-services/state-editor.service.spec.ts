@@ -179,9 +179,9 @@ describe('Editor state service', () => {
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {
-    expect(ecs.getSolicitAnswerDetails()).toEqual(false);
+    expect(ecs.getSolicitAnswerDetails()).toBeFalse();
     ecs.setSolicitAnswerDetails(false);
-    expect(ecs.getSolicitAnswerDetails()).toEqual(false);
+    expect(ecs.getSolicitAnswerDetails()).toBeFalse();
     ecs.setSolicitAnswerDetails(true);
     expect(ecs.getSolicitAnswerDetails()).toEqual(true);
   });

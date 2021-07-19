@@ -171,7 +171,7 @@ describe('NoninteractiveVideo', () => {
   });
 
   it('should not update video view if atleast one video parameters' +
-    ' is undefined', () => {
+    ' is empty', () => {
     component.videoIdWithValue = '';
     spyOn(htmlEscaperService, 'escapedJsonToObj');
 

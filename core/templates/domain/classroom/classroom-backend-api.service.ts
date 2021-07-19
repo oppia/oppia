@@ -45,7 +45,12 @@ interface ClassroomDataBackendDict {
   providedIn: 'root'
 })
 export class ClassroomBackendApiService {
+  // This property is initialized using ClassroomData model and can be undefined
+  // but not null so we need to do non-undefined assertion, for more
+  // information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   classroomData!: ClassroomData;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient

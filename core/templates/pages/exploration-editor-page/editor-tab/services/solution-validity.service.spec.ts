@@ -61,6 +61,6 @@ describe('Solution Validity Service', () => {
     svs.solutionValidities = {};
     svs.isSolutionValid('State 1');
 
-    expect(svs.isSolutionValid('State 2')).toBe(false);
+    expect(svs.isSolutionValid('State 2')).toBeFalse();
   });
 });
