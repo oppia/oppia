@@ -54,6 +54,12 @@ describe('Translation Modal Component', () => {
     progressPercentage: '20',
     actionButtonTitle: 'Action Button'
   };
+  const getTranslatableItem = (text) => {
+    return {
+      data_format: 'html',
+      content: text,
+    };
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -167,8 +173,8 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: {contentId1: getTranslatableItem('text1')},
+        stateName2: {contentId2: getTranslatableItem('text2')}
       };
 
       const req = httpTestingController.expectOne(
@@ -205,6 +211,10 @@ describe('Translation Modal Component', () => {
         expect(component.getHtmlSchema().ui_config.language)
           .toBe('ar');
       }));
+
+    it('should get the unicode schema', () => {
+      expect(component.getUnicodeSchema()).toEqual({type: 'unicode'});
+    });
   });
 
   describe('when clicking on the translatable content', () => {
@@ -273,8 +283,8 @@ describe('Translation Modal Component', () => {
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: 'text1'},
-          stateName2: {contentId2: 'text2'}
+          stateName1: {contentId1: getTranslatableItem('text1')},
+          stateName2: {contentId2: getTranslatableItem('text2')}
         };
 
         const req = httpTestingController.expectOne(
@@ -318,8 +328,8 @@ describe('Translation Modal Component', () => {
       component.ngOnInit();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: {contentId1: getTranslatableItem('text1')},
+        stateName2: {contentId2: getTranslatableItem('text2')}
       };
 
       const req = httpTestingController.expectOne(
@@ -368,7 +378,8 @@ describe('Translation Modal Component', () => {
         text: 'abc',
         more: true,
         status: 'submitted',
-        translationHtml: 'cba'
+        translation: 'cba',
+        dataFormat: 'html'
       });
       expect(component.isSubmitted()).toBeFalse();
 

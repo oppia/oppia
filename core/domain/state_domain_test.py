@@ -1321,13 +1321,32 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_written_translations(written_translations)
 
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'hint_1': '<p>hint one</p>',
-                'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>'
-            })
+            content_id_mapping_needing_translations[
+                'hint_1'
+            ].content,
+            '<p>hint one</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'solution'
+            ].content,
+            '<p>hello_world is a string</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'feedback_1'
+            ].content,
+            '<p>Feedback</p>',
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content,
+            '<p>The default outcome.</p>'
+        )
 
     def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1414,15 +1433,44 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         init_state.update_written_translations(written_translations)
 
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'hint_1': '<p>hint one</p>',
-                'solution': '<p>hello_world is a string</p>',
-                'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>',
-                'content': '<p>This is content</p>',
-                'ca_placeholder_0': 'Placeholder'
-            })
+            content_id_mapping_needing_translations[
+                'hint_1'
+            ].content,
+            '<p>hint one</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'solution'
+            ].content,
+            '<p>hello_world is a string</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'feedback_1'
+            ].content,
+            '<p>Feedback</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content,
+            '<p>The default outcome.</p>'
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'content'
+            ].content,
+            '<p>This is content</p>',
+        )
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_placeholder_0'
+            ].content,
+            'Placeholder'
+        )
 
     def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
@@ -1480,13 +1528,26 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_written_translations(written_translations)
 
         # Choice 2 should not be returned as its value is numeric.
+        content_id_mapping_needing_translations = (
+            init_state.get_content_id_mapping_needing_translations('hi'))
         self.assertEqual(
-            init_state.get_content_id_mapping_needing_translations('hi'), {
-                'content': '<p>This is content</p>',
-                'default_outcome': '<p>The default outcome.</p>',
-                'ca_choices_0': '\u003cp\u003eoption 1\u003c/p\u003e',
-                'ca_choices_1': '1,000',
-            })
+            content_id_mapping_needing_translations[
+                'content'
+            ].content, '<p>This is content</p>')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'default_outcome'
+            ].content, '<p>The default outcome.</p>')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_0'
+            ].content, '\u003cp\u003eoption 1\u003c/p\u003e')
+        self.assertEqual(
+            content_id_mapping_needing_translations[
+                'ca_choices_1'
+            ].content, '1,000')
+        self.assertFalse(
+            'ca_choices_2' in content_id_mapping_needing_translations)
 
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')

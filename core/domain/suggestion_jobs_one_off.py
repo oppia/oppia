@@ -23,11 +23,15 @@ import ast
 import datetime
 
 from core import jobs
+from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import html_cleaner
 from core.domain import opportunity_services
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+import schema_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -77,6 +81,110 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         if key == 'SUCCESS':
             value = len(value)
         yield (key, value)
+
+
+class TranslationSuggestionUnicodeFixOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-time job to update translation suggestions that contain unicode
+    translations to have unicode data_format and non-html text.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.suggestion_type != (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            return
+
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+
+        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        if suggestion.change.state_name not in exploration.states:
+            return
+
+        state = exploration.states[suggestion.change.state_name]
+        subtitled_unicode_content_ids = []
+        customisation_args = state.interaction.customization_args
+        for ca_name in customisation_args:
+            subtitled_unicode_content_ids.extend(
+                state_domain.InteractionCustomizationArg
+                .traverse_by_schema_and_get(
+                    customisation_args[ca_name].schema,
+                    customisation_args[ca_name].value,
+                    [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                    lambda subtitled_unicode: subtitled_unicode.content_id
+                )
+            )
+        if suggestion.change.content_id in subtitled_unicode_content_ids:
+            if suggestion.change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                suggestion.change.data_format = (
+                    schema_utils.SCHEMA_TYPE_UNICODE)
+            suggestion.change.translation_html = html_cleaner.strip_html_tags(
+                suggestion.change.translation_html)
+            item.change_cmd = suggestion.change.to_dict()
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
+            yield (
+                'UPDATED', '%s | %s' % (item.id, suggestion.change.content_id))
+        yield ('PROCESSED', item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        if key == 'PROCESSED':
+            yield (key, len(value))
+        else:
+            yield (key, value)
+
+
+class TranslationSuggestionUnicodeAuditOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-time job that audits and reports suggestion ids and content ids
+    of suggestions that have invalid unicode content.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.suggestion_type != (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            return
+
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+
+        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
+        if suggestion.change.state_name not in exploration.states:
+            return
+
+        state = exploration.states[suggestion.change.state_name]
+        subtitled_unicode_content_ids = []
+        customisation_args = state.interaction.customization_args
+        for ca_name in customisation_args:
+            subtitled_unicode_content_ids.extend(
+                state_domain.InteractionCustomizationArg
+                .traverse_by_schema_and_get(
+                    customisation_args[ca_name].schema,
+                    customisation_args[ca_name].value,
+                    [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                    lambda subtitled_unicode: subtitled_unicode.content_id
+                )
+            )
+        content_id = suggestion.change.content_id
+        if content_id in subtitled_unicode_content_ids:
+            yield ('FOUND', '%s | %s' % (item.id, content_id))
+        yield ('PROCESSED', item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        if key == 'PROCESSED':
+            yield (key, len(value))
+        else:
+            yield (key, value)
 
 
 class PopulateTranslationContributionStatsOneOffJob(

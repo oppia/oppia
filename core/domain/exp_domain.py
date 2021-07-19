@@ -32,11 +32,13 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -1858,6 +1860,52 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
+        """Converts from version 45 to 46. Version 46 ensures that the written
+        translations in a state containing unicode content do not contain HTML
+        tags and the data_format is unicode.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            list_of_subtitled_unicode_content_ids = []
+            customisation_args = (
+                state_domain.InteractionInstance
+                .convert_customization_args_dict_to_customization_args(
+                    state_dict['interaction']['id'],
+                    state_dict['interaction']['customization_args']))
+            for ca_name in customisation_args:
+                list_of_subtitled_unicode_content_ids.extend(
+                    state_domain.InteractionCustomizationArg
+                    .traverse_by_schema_and_get(
+                        customisation_args[ca_name].schema,
+                        customisation_args[ca_name].value,
+                        [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                        lambda subtitled_unicode: subtitled_unicode.content_id
+                    )
+                )
+            translations_mapping = (
+                state_dict['written_translations']['translations_mapping'])
+            for content_id in translations_mapping:
+                if content_id in list_of_subtitled_unicode_content_ids:
+                    for language_code in translations_mapping[content_id]:
+                        written_translation = (
+                            translations_mapping[content_id][language_code])
+                        written_translation['data_format'] = (
+                            schema_utils.SCHEMA_TYPE_UNICODE)
+                        written_translation['translation'] = (
+                            html_cleaner.strip_html_tags(
+                                written_translation['translation']))
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -1894,7 +1942,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 50
+    CURRENT_EXP_SCHEMA_VERSION = 51
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1988,6 +2036,29 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
+        """Converts a v50 exploration dict into a v51 exploration dict.
+        Version 51 ensures that unicode written_translations are stripped of
+        HTML tags and have data_format field set to unicode.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v50.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v51.
+        """
+
+        exploration_dict['schema_version'] = 51
+
+        exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 46
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2042,6 +2113,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v49_dict_to_v50_dict(
                 exploration_dict)
             exploration_schema_version = 50
+
+        if exploration_schema_version == 50:
+            exploration_dict = cls._convert_v50_dict_to_v51_dict(
+                exploration_dict)
+            exploration_schema_version = 51
 
         return exploration_dict
 

@@ -211,6 +211,280 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
             self._run_job_and_verify_output(expected_output)
 
 
+class TranslationSuggestionUnicodeAuditOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(TranslationSuggestionUnicodeAuditOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the QuestionSuggestionMigrationJobManager and
+        verifies that the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off
+            .TranslationSuggestionUnicodeAuditOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off
+            .TranslationSuggestionUnicodeAuditOneOffJob.enqueue(job_id)
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off
+            .TranslationSuggestionUnicodeAuditOneOffJob.get_output(job_id))
+
+        self.assertItemsEqual(actual_output, expected_output)
+
+    def test_non_translation_suggestions_are_skipped(self):
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': [self.skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.skill_id, 1,
+            self.albert_id, suggestion_change, 'test description')
+
+        self._run_job_and_verify_output([])
+
+    def test_translation_suggestions_with_invalid_state_names_are_skipped(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'ca_buttonText_0',
+            'language_code': 'bn',
+            'content_html': 'Continue',
+            'translation_html': '<p>চালিয়ে যান</p>',
+            'data_format': 'html'
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Introduction',
+            'new_state_name': 'Renamed state'
+        })]
+        exp_services.update_exploration(
+            self.albert_id, exp_id, change_list, '')
+
+        self._run_job_and_verify_output([])
+
+    def test_reports_invalid_unicode_translations(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'ca_buttonText_0',
+            'language_code': 'bn',
+            'content_html': 'Continue',
+            'translation_html': '<p>চালিয়ে যান</p>',
+            'data_format': 'html'
+        }
+
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        expected_output = [
+            u'[u\'FOUND\', [u\'%s | ca_buttonText_0\']]'
+            % suggestion.suggestion_id,
+            u'[u\'PROCESSED\', 1]'
+        ]
+        self._run_job_and_verify_output(expected_output)
+
+
+class TranslationSuggestionUnicodeFixOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(TranslationSuggestionUnicodeFixOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the QuestionSuggestionMigrationJobManager and
+        verifies that the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off
+            .TranslationSuggestionUnicodeFixOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off
+            .TranslationSuggestionUnicodeFixOneOffJob.enqueue(job_id)
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off
+            .TranslationSuggestionUnicodeFixOneOffJob.get_output(job_id))
+
+        self.assertItemsEqual(actual_output, expected_output)
+
+    def test_non_translation_suggestions_are_skipped(self):
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': [self.skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.skill_id, 1,
+            self.albert_id, suggestion_change, 'test description')
+
+        self._run_job_and_verify_output([])
+
+    def test_translation_suggestions_with_invalid_state_names_are_skipped(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'ca_buttonText_0',
+            'language_code': 'bn',
+            'content_html': 'Continue',
+            'translation_html': '<p>চালিয়ে যান</p>',
+            'data_format': 'html'
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'Introduction',
+            'new_state_name': 'Renamed state'
+        })]
+        exp_services.update_exploration(
+            self.albert_id, exp_id, change_list, '')
+
+        self._run_job_and_verify_output([])
+
+    def test_fixes_invalid_unicode_translations(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'ca_buttonText_0',
+            'language_code': 'bn',
+            'content_html': 'Continue',
+            'translation_html': '<p>চালিয়ে যান</p>',
+            'data_format': 'html'
+        }
+
+        invalid_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        self.assertEqual(invalid_suggestion.change.data_format, 'html')
+        self.assertEqual(
+            invalid_suggestion.change.translation_html, '<p>চালিয়ে যান</p>')
+
+        expected_output = [
+            u'[u\'UPDATED\', [u\'%s | ca_buttonText_0\']]'
+            % invalid_suggestion.suggestion_id,
+            u'[u\'PROCESSED\', 1]'
+        ]
+        self._run_job_and_verify_output(expected_output)
+
+        valid_suggestion = suggestion_services.get_suggestion_by_id(
+            invalid_suggestion.suggestion_id)
+        self.assertEqual(valid_suggestion.change.data_format, 'unicode')
+        self.assertEqual(
+            valid_suggestion.change.translation_html, 'চালিয়ে যান')
+
+
 class PopulateTranslationContributionStatsOneOffJobTests(
         test_utils.GenericTestBase):
 
