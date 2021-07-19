@@ -122,7 +122,6 @@ export class StewardsLandingPageComponent {
         href: '/community-library'
       }];
     } else if (tabName === this.TAB_NAME_VOLUNTEERS) {
-      // TODO(sll): Add "Get in Touch" link that points to contact form.
       return [{
         text: 'Browse Volunteer Opportunities',
         href: 'https://www.oppiafoundation.org/volunteer'
