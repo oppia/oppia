@@ -48,6 +48,7 @@ export class GoalsTabComponent implements OnInit {
   topicBelongToCurrentGoals: boolean[] = [];
   topicIdsInCompletedGoals: string[] = [];
   topicIdsInCurrentGoals: string[] = [];
+  topicIdsInEditGoals: string[] = [];
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
@@ -75,6 +76,7 @@ export class GoalsTabComponent implements OnInit {
         topic.urlFragment, topic.classroom));
     }
     for (topic of this.editGoals) {
+      this.topicIdsInEditGoals.push(topic.id);
       this.editGoalsTopicPageUrl.push(this.getTopicPageUrl(
         topic.urlFragment, topic.classroom));
       this.editGoalsTopicClassification.push(
@@ -155,8 +157,9 @@ export class GoalsTabComponent implements OnInit {
         this.currentGoalsStoryIsShown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
+        let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
         this.editGoalsTopicClassification.splice(
-          index, 1, this.getTopicClassification(topicId));
+          indexOfTopic, 1, this.getTopicClassification(topicId));
       });
   }
 }
