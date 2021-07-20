@@ -36,6 +36,7 @@ from core.domain import html_cleaner
 import feconf
 import python_utils
 import utils
+import re
 
 from typing import Any, Callable, Dict, List, Optional, Text, Union # isort:skip # pylint: disable=unused-import
 
@@ -641,9 +642,13 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid thread id.
         """
         thread_id_must_starts_with = [
-            'exploration.', 'collection.', 'story.', 'learntopic.']
+            'exploration', 'collection', 'story', 'learntopic']
+        regex_pattern = r'[.]\w+[.]\w+'
 
         for starting_chars in thread_id_must_starts_with:
-            if obj.startswith(starting_chars):
+            regex_pattern_to_check = starting_chars + regex_pattern
+            regex_match = re.findall(regex_pattern_to_check, obj)
+
+            if regex_match:
                 return True
         return False
