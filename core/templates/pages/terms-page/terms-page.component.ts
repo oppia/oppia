@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'terms-page',
@@ -25,6 +26,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class TermsPageComponent {
+  ROUTES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.ROUTES_REGISTERED_WITH_FRONTEND);
   scrollTo(el: HTMLElement): void {
     el.scrollIntoView({behavior: 'smooth'});
   }

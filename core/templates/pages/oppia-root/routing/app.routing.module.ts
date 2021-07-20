@@ -45,6 +45,11 @@ const routes: Route[] = [
       .then(m => m.GetStartedPageModule)
   },
   {
+    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.PRIVACY,
+    loadChildren: () => import('pages/privacy-page/privacy-page.module')
+      .then(m => m.PrivacyPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import(
       'pages/error-pages/error-404/error-404-page.module').then(

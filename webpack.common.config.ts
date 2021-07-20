@@ -121,7 +121,6 @@ module.exports = {
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
-    privacy: commonPrefix + '/pages/privacy-page/privacy-page.import.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.import.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.import.ts',
@@ -531,14 +530,6 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['privacy'],
-      filename: 'privacy-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

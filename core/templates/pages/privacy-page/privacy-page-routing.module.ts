@@ -13,23 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Privacy Page.
+ * @fileoverview Routing module for privacy page.
  */
 
-import { Component } from '@angular/core';
-import { PageTitleService } from 'services/page-title.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { PrivacyPageRootComponent } from './privacy-page-root.component';
 
-@Component({
-  selector: 'oppia-privacy-page-root',
-  templateUrl: './privacy-page-root.component.html'
-})
-export class PrivacyPageRootComponent {
-  constructor(
-    private pageTitleService: PageTitleService
-  ) {}
-
-  ngOnInit(): void {
-    // Update default title and meta tags.
-    this.pageTitleService.setPageTitle('Privacy Policy | Oppia');
+const routes: Route[] = [
+  {
+    path: '',
+    component: PrivacyPageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class PrivacyPageRoutingModule {}

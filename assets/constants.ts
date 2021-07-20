@@ -5957,7 +5957,8 @@ export default {
     "ABOUT": "about",
     "CONTACT": "contact",
     "DONATE": "donate",
-    "GET_STARTED": "get-started"
+    "GET_STARTED": "get-started",
+    "PRIVACY": "privacy-policy"
   },
 
   "DEV_MODE": true,

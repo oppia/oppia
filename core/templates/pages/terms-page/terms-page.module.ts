@@ -28,12 +28,15 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TermsPageRootComponent } from './terms-page-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MockRouterModule } from '../../hybrid-router-module-provider';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // Remove mock router module once terms page is migrated to router.
+    MockRouterModule,
     SharedComponentsModule
   ],
   declarations: [
