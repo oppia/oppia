@@ -80,10 +80,7 @@ import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
-
-
-// Directives.
-import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 
 
 // Pipes.
@@ -160,7 +157,7 @@ import { AuthService } from 'services/auth.service';
     SkillMasteryViewerComponent,
     StateSkillEditorComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
@@ -213,6 +210,7 @@ import { AuthService } from 'services/auth.service';
     RubricsEditorComponent,
     SearchBarComponent,
     StorySummaryTileComponent,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
@@ -269,7 +267,7 @@ import { AuthService } from 'services/auth.service';
     SharingLinksComponent,
     SkillSelectorComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
