@@ -47,7 +47,7 @@ describe('Blog Dashboard backend api service', () => {
     url_fragment: 'sample#url',
     last_updated: 3232323,
     published_on: 1212121,
-  }
+  };
   let blogDashboardDataObject = {
     username: blogDashboardBackendResponse.username,
     profilePictureDataUrl: (
@@ -59,7 +59,7 @@ describe('Blog Dashboard backend api service', () => {
     draftBlogPostSummaryDicts: [],
   };
   let blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
-    blogPostSummary)
+    blogPostSummary);
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -80,7 +80,7 @@ describe('Blog Dashboard backend api service', () => {
     httpTestingController.verify();
   });
 
-  it('it should successfully fetch the blog dashboard data.', fakeAsync(() => {
+  it('should successfully fetch the blog dashboard data.', fakeAsync(() => {
     bdbas.fetchBlogDashboardDataAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -93,11 +93,12 @@ describe('Blog Dashboard backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('it should fetch the blog dashboard data with blog post summary data',
+  it('should fetch the blog dashboard data with blog post summary data',
     fakeAsync(() => {
       blogDashboardBackendResponse.published_blog_post_summary_dicts = [
         blogPostSummary];
-      blogDashboardBackendResponse.draft_blog_post_summary_dicts = [blogPostSummary];
+      blogDashboardBackendResponse.draft_blog_post_summary_dicts = [
+        blogPostSummary];
       blogDashboardDataObject.publishedBlogPostSummaryDicts = [
         blogPostSummaryObject];
       blogDashboardDataObject.draftBlogPostSummaryDicts = [
@@ -141,7 +142,7 @@ describe('Blog Dashboard backend api service', () => {
     let req = httpTestingController.expectOne(
       BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
     expect(req.request.method).toEqual('POST');
-    req.flush({'blog_post_id': 'newBlogId'});
+    req.flush({blog_post_id: 'newBlogId'});
 
     flushMicrotasks();
 
@@ -149,7 +150,7 @@ describe('Blog Dashboard backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use the rejection handler if the backend request for new blog failed.',
+  it('should use the rejection handler if the request for new blog failed.',
     fakeAsync(() => {
       bdbas.createBlogPostAsync().then(successHandler, failHandler);
 
