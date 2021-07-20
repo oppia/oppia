@@ -187,6 +187,8 @@ importlib-metadata==3.10.1
     #   pytest
 iniconfig==1.1.1
     # via pytest
+mailchimp3==3.0.14
+    # via -r requirements.in
 mock==2.0.0
     # via apache-beam
 msgpack==1.0.2
@@ -279,6 +281,7 @@ requests==2.24.0
     #   google-api-core
     #   google-cloud-storage
     #   hdfs
+    #   mailchimp3
     #   requests-mock
     #   requests-toolbelt
 rsa==4.5

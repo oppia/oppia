@@ -148,9 +148,9 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         self.assertTrue(lint_task_report.failed)
 
     def test_get_linters_with_success(self):
-        _, third_party_linter = python_linter.get_linters(
-            [VALID_PY_FILEPATH], FILE_CACHE)
-        self.assertTrue(
-            isinstance(
-                third_party_linter,
-                python_linter.ThirdPartyPythonLintChecksManager))
+        custom_linter, third_party_linter = python_linter.get_linters(
+            [VALID_PY_FILEPATH])
+        self.assertIsNone(custom_linter)
+        self.assertIsInstance(
+            third_party_linter,
+            python_linter.ThirdPartyPythonLintChecksManager)

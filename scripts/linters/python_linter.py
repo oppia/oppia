@@ -225,9 +225,7 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         with linter_utils.redirect_stdout(stdout):
             for filepath in files_to_check:
                 # This line prints the error message along with file path
-                # and returns True if it finds an error else returns False
-                # If check is set to True, isort simply checks the file and
-                # if check is set to False, it autocorrects import-order errors.
+                # and returns True if it finds an error else returns False.
                 if not isort.api.check_file(filepath, show_diff=True):
                     failed = True
 
@@ -262,13 +260,11 @@ class ThirdPartyPythonLintChecksManager(python_utils.OBJECT):
         return linter_stdout
 
 
-def get_linters(files_to_lint, unused_file_cache):
+def get_linters(files_to_lint):
     """Creates ThirdPartyPythonLintChecksManager and returns it.
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
-        unused_file_cache: object(FileCache). Provides thread-safe access to
-            cached file content.
 
     Returns:
         tuple(None, ThirdPartyPythonLintChecksManager). A 2-tuple of None and

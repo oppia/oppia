@@ -244,29 +244,6 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
 
 class EventHandlerNameTests(test_utils.GenericTestBase):
 
-    def _get_all_python_files(self):
-        """Recursively collects all Python files in the core/ and extensions/
-        directory.
-
-        Returns:
-            list(str). A list of Python files.
-        """
-        files_in_directory = []
-        for directory, _, files in os.walk('.'):
-            if not (directory.startswith('./core/') or
-                    directory.startswith('./extensions/')):
-                continue
-            for file_name in files:
-                if not file_name.endswith('.py'):
-                    continue
-                filepath = os.path.join(directory, file_name)
-                # 'filepath' is in the form of './YYY/XXX.py', so we need to
-                # extract YYY.XXX from the filepath so that it can be imported
-                # as a module.
-                module = filepath[2:-3].replace('/', '.')
-                files_in_directory.append(module)
-        return files_in_directory
-
     def test_event_handler_names(self):
         """This function checks for duplicate event handlers."""
 

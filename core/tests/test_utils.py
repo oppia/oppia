@@ -2101,13 +2101,9 @@ title: Title
         # because those are always valid auth IDs.
         return python_utils.UNICODE(abs(hash(email)))
 
-    def get_all_python_files(self, skip_prefix=None):
+    def get_all_python_files(self):
         """Recursively collects all Python files in the core/ and extensions/
         directory.
-
-        Args:
-            skip_prefix: str. Path prefix that should be skipped when collecting
-                the files.
 
         Returns:
             list(str). A list of Python files.
@@ -2122,9 +2118,6 @@ title: Title
                         filepath.endswith('.py') and (
                             filepath.startswith('core/') or
                             filepath.startswith('extensions/')
-                        ) and (
-                            skip_prefix is None or
-                            not filepath.startswith(skip_prefix)
                         )
                 ):
                     module = filepath[:-3].replace('/', '.')
