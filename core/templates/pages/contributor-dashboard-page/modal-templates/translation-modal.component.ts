@@ -32,6 +32,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { UnicodeSchema } from 'services/schema-default-value.service';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -57,7 +58,6 @@ export interface ImageDetails {
 }
 export class TranslationError {
   constructor(
-    private _hasUncopiedImgs: boolean,
     private _hasDuplicateAltTexts: boolean,
     private _hasDuplicateDescriptions: boolean,
     private _hasUntranslatedElements: boolean) {}
@@ -67,9 +67,6 @@ export class TranslationError {
   }
   get hasDuplicateAltTexts(): boolean {
     return this._hasDuplicateAltTexts;
-  }
-  get hasUncopiedImgs(): boolean {
-    return this._hasUncopiedImgs;
   }
   get hasUntranslatedElements(): boolean {
     return this._hasUntranslatedElements;
@@ -82,6 +79,7 @@ export class TranslationError {
 })
 export class TranslationModalComponent {
   @Input() opportunity: TranslationOpportunity;
+  activeDataFormat: string;
   activeWrittenTranslation: {html: string} = {html: ''};
   uploadingTranslation = false;
   subheading: string;
@@ -95,9 +93,9 @@ export class TranslationModalComponent {
     'type': string;
     'ui_config': UiConfig;
   };
+  UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
-  hasImgCopyError = false;
   hadCopyParagraphError = false;
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
@@ -146,7 +144,8 @@ export class TranslationModalComponent {
         this.moreAvailable = textAndAvailability.more;
         this.activeStatus = textAndAvailability.status;
         this.activeWrittenTranslation.html = (
-          textAndAvailability.translationHtml);
+          textAndAvailability.translation);
+        this.activeDataFormat = textAndAvailability.dataFormat;
         this.loadingData = false;
       });
     this.HTML_SCHEMA = {
@@ -178,6 +177,10 @@ export class TranslationModalComponent {
 
   getHtmlSchema(): HTMLSchema {
     return this.HTML_SCHEMA;
+  }
+
+  getUnicodeSchema(): UnicodeSchema {
+    return this.UNICODE_SCHEMA;
   }
 
   onContentClick(event: MouseEvent): boolean | void {
@@ -225,7 +228,8 @@ export class TranslationModalComponent {
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = textAndAvailability.more;
     this.activeStatus = textAndAvailability.status;
-    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+    this.activeWrittenTranslation.html = textAndAvailability.translation;
+    this.activeDataFormat = textAndAvailability.dataFormat;
     this.resetEditor();
   }
 
@@ -239,7 +243,8 @@ export class TranslationModalComponent {
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = true;
     this.activeStatus = textAndAvailability.status;
-    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+    this.activeWrittenTranslation.html = textAndAvailability.translation;
+    this.activeDataFormat = textAndAvailability.dataFormat;
     this.resetEditor();
   }
 
@@ -271,14 +276,6 @@ export class TranslationModalComponent {
       descriptions: this.getElementAttributeTexts(
         htmlElements, 'caption-with-value')
     };
-  }
-
-  copiedAllElements(
-      originalElements: string[],
-      translatedElements: string[]): boolean {
-    const hasMatchingTranslatedElement = element => (
-      translatedElements.includes(element));
-    return originalElements.every(hasMatchingTranslatedElement);
   }
 
   hasSomeDuplicateElements(
@@ -316,9 +313,6 @@ export class TranslationModalComponent {
     const originalElements: ImageDetails = this.getImageAttributeTexts(
       textToTranslate);
 
-    const hasUncopiedImgs = !this.copiedAllElements(
-      originalElements.filePaths,
-      translatedElements.filePaths);
     const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
       originalElements.alts,
       translatedElements.alts);
@@ -329,7 +323,7 @@ export class TranslationModalComponent {
       textToTranslate, translatedText));
 
     return new TranslationError(
-      hasUncopiedImgs, hasDuplicateAltTexts,
+      hasDuplicateAltTexts,
       hasDuplicateDescriptions, hasUntranslatedElements);
   }
 
@@ -344,13 +338,12 @@ export class TranslationModalComponent {
       originalElements.getElementsByTagName('*'),
       translatedElements.getElementsByTagName('*'));
 
-    this.hasImgCopyError = translationError.hasUncopiedImgs;
     this.hasImgTextError = translationError.hasDuplicateAltTexts ||
       translationError.hasDuplicateDescriptions;
     this.hasIncompleteTranslationError = translationError.
       hasUntranslatedElements;
 
-    if (this.hasImgCopyError || this.hasImgTextError ||
+    if (this.hasImgTextError ||
       this.hasIncompleteTranslationError || this.uploadingTranslation ||
       this.loadingData) {
       return;
@@ -369,7 +362,7 @@ export class TranslationModalComponent {
       this.translateTextService.suggestTranslatedText(
         this.activeWrittenTranslation.html,
         this.translationLanguageService.getActiveLanguageCode(),
-        imagesData, () => {
+        imagesData, this.activeDataFormat, () => {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.');
           this.uploadingTranslation = false;
@@ -380,7 +373,8 @@ export class TranslationModalComponent {
             this.moreAvailable = textAndAvailability.more;
             this.activeStatus = textAndAvailability.status;
             this.activeWrittenTranslation.html = (
-              textAndAvailability.translationHtml);
+              textAndAvailability.translation);
+            this.activeDataFormat = textAndAvailability.dataFormat;
             this.resetEditor();
           } else {
             this.activeWrittenTranslation.html = '';
