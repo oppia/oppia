@@ -220,6 +220,13 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Volunteer page', async function() {
+    await browser.get('/volunteer');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-volunteer-page')).isPresent()).toBe(true);
+  });
+
   it('should show the error page when an incorrect url is given',
     async function() {
       await browser.get('/splashes');

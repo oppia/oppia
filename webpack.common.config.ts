@@ -156,6 +156,8 @@ module.exports = {
     ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
+    volunteer:
+      commonPrefix + '/pages/volunteer-page/volunteer-page.import.ts',
   },
 
   /**
@@ -796,6 +798,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/topic-viewer-page/' +
         'topic-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['volunteer'],
+      filename: 'volunteer-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/volunteer-page/' +
+          'volunteer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
