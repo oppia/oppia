@@ -31,8 +31,10 @@ import feconf
 import python_utils
 import utils
 
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
+from typing import Dict, Text, Optional, Type, List, Any # isort:skip # pylint: disable=unused-import
+
+(app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+    [models.NAMES.app_feedback_report])
 
 
 class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
@@ -147,9 +149,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         # type: () -> None
-        super(AppFeedbackReportServicesUnitTests, self).setUp()
-        self.signup(self.USER_EMAIL, self.USER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        super(AppFeedbackReportServicesUnitTests, self).setUp() # type: ignore[no-untyped-call]
+        self.signup(self.USER_EMAIL, self.USER_USERNAME) # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL) # type: ignore[no-untyped-call]
 
         self.android_report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -249,7 +251,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_model = self.android_report_obj
         mock_web_report_model.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Web app feedback report domain objects must be defined.'):
             app_feedback_report_services.get_report_from_model(
@@ -275,6 +277,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_get_report_from_model_has_same_device_system_info(self):
         # type: () -> None
         device_system_context = self.android_report_obj.device_system_context
+        device_system_context.__class__ = (
+            app_feedback_report_domain.AndroidDeviceSystemContext)
 
         self.assertTrue(isinstance(
             device_system_context,
@@ -307,6 +311,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_get_report_from_model_has_same_app_info(self):
         # type: () -> None
         app_context = self.android_report_obj.app_context
+        app_context.__class__ = app_feedback_report_domain.AndroidAppContext
 
         self.assertTrue(isinstance(
             app_context, app_feedback_report_domain.AndroidAppContext))
@@ -363,7 +368,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'Web report domain objects have not been defined.'):
             app_feedback_report_services.save_feedback_report_to_storage(
@@ -902,7 +907,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = self.PLATFORM_WEB
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Assigning web reports to tickets has not been implemented yet.'):
             app_feedback_report_services.reassign_ticket(
@@ -913,7 +918,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         # Set an invalid ticket_id so that the stats model calculates an invalid
         # id for this ticket's stats model.
         self.android_report_obj.ticket_id = 'invalid_id'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'The report is being removed from an invalid ticket id'):
             app_feedback_report_services.reassign_ticket(
@@ -1050,7 +1055,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = constants.PLATFORM_CHOICE_WEB
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             NotImplementedError,
             'Stats aggregation for incoming web reports have not been '
             'implemented yet.'):
@@ -1061,9 +1066,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self):
         # type: () -> None
         stats_map = {
-            'parameter_name': {
-                'value_1': 1
-            }
+            'value_1': 1
         }
         delta = 1
 
@@ -1076,13 +1079,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_calculate_new_stats_count_with_invalid_delta_raises_error(self):
         # type: () -> None
         stats_map = {
-            'parameter_name': {
-                'current_value': 1
-            }
+            'current_value': 1
         }
         delta = -1
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'Cannot decrement a count for a parameter value that does '
             'not exist'):
@@ -1090,20 +1091,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 stats_map, 'value_2', delta)
 
     def _verify_report_is_scrubbed(self, model_entity, scrubber):
-        # type: (app_feedback_report_models.AppFeedbackReportModel, str) -> None
+        # type: (AppFeedbackReportModel, Text) -> None
         """Verifies the report model is scrubbed."""
         self.assertIsNotNone(model_entity)
         self.assertEqual(
             model_entity.scrubbed_by, scrubber)
 
     def _verify_report_is_not_scrubbed(self, model_entity):
-        # type: (app_feedback_report_models.AppFeedbackReportModel) -> None
+        # type: (AppFeedbackReportModel) -> None
         """Verifies the report model is not scrubbed."""
         self.assertIsNotNone(model_entity)
         self.assertIsNone(model_entity.scrubbed_by)
 
     def _add_current_report(self):
-        # type: () -> None
+        # type: () -> Text
         """Adds reports to the model that should not be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1135,7 +1136,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return report_id
 
     def _add_expiring_android_report_with_no_scrubber(self):
-        # type: () -> None
+        # type: () -> Text
         """Adds reports to the model that should be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1167,7 +1168,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return report_id
 
     def _add_scrubbed_report(self, scrubber_user):
-        # type: (str) -> None
+        # type: (str) -> Text
         """Add an already-scrubbed report to the model."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
@@ -1200,7 +1201,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return report_id
 
     def _add_new_android_ticket(self, ticket_name, report_ids):
-        # type: (str, List[str]) -> None
+        # type: (Text, List[Text]) -> Text
         """Create an Android report ticket."""
         android_ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1211,7 +1212,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         return android_ticket_id
 
     def _verify_stats_model(self, stats_json, expected_json):
-        # type: (Dict[str, Dict[str, int]], Dict[str, Dict[str, int]]) -> None
+        # type: (Dict[Text, Dict[Text, int]], Dict[Text, Dict[Text, int]]) -> None
         """Verify the fields of the feedback report stats model."""
         self.assertEqual(
             stats_json['report_type'],

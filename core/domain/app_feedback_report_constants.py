@@ -66,7 +66,7 @@ STATS_PARAMETER_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call
 ANDROID_TEXT_SIZE = python_utils.create_enum( # type: ignore[no-untyped-call]
     'text_size_unspecified', 'small_text_size', 'medium_text_size',
     'large_text_size', 'extra_large_text_size')
-ANDROID_NETWORK_TYPES = python_utils.create_enum('wifi', 'cellular', 'none') # type: ignore[no-untyped-call]
+ANDROID_NETWORK_TYPE = python_utils.create_enum('wifi', 'cellular', 'none') # type: ignore[no-untyped-call]
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [
@@ -109,8 +109,8 @@ ALLOWED_FILTERS = [
     FILTER_FIELD_NAMES.audio_language_code, FILTER_FIELD_NAMES.platform_version,
     FILTER_FIELD_NAMES.android_device_country_locale_code]
 ALLOWED_ANDROID_NETWORK_TYPES = [
-    ANDROID_NETWORK_TYPES.wifi, ANDROID_NETWORK_TYPES.cellular,
-    ANDROID_NETWORK_TYPES.none]
+    ANDROID_NETWORK_TYPE.wifi, ANDROID_NETWORK_TYPE.cellular,
+    ANDROID_NETWORK_TYPE.none]
 ALLOWED_ANDROID_TEXT_SIZES = [
     ANDROID_TEXT_SIZE.text_size_unspecified, ANDROID_TEXT_SIZE.small_text_size,
     ANDROID_TEXT_SIZE.medium_text_size, ANDROID_TEXT_SIZE.large_text_size,

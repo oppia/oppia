@@ -25,12 +25,14 @@ from core.domain import app_feedback_report_services
 import feconf
 import utils
 
+from typing import Dict, List # isort:skip # pylint: disable=unused-import
+
 
 class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[None, None]
-    HANDLER_ARGS_SCHEMAS = {
+    HANDLER_ARGS_SCHEMAS = { # type: ignore[assignment]
         'POST': {
             'report': {
                 'schema': {
@@ -44,7 +46,6 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def post(self):
-         # type: () -> None
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the
