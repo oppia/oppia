@@ -106,8 +106,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v45_dict_to_v46_dict(cls, draft_change_list):
         """Converts draft change list from state version 45 to 46. State
-        version 46 adds inputGreatertThanZero customization_arg to
-        NumericInput interaction.
+        version 46 ensures that written translations corresponding to
+        unicode text have data_format field set to 'unicode' and that they
+        do not contain any HTML tags. This should not affect drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
