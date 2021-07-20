@@ -851,12 +851,12 @@ class TopicManagerRoleHandler(base.BaseHandler):
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
         else:
+            topic_services.deassign_manager_role_from_topic(
+                user_services.get_system_user(), user_id, topic_id)
+
             if not topic_fetchers.get_topic_rights_with_user(user_id):
                 user_services.remove_user_role(
                     user_id, feconf.ROLE_ID_TOPIC_MANAGER)
-
-            topic_services.deassign_manager_role_from_topic(
-                user_services.get_system_user(), user_id, topic_id)
 
         self.render_json({})
 

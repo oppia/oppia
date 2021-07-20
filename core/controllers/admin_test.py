@@ -1130,13 +1130,13 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'managed_topic_ids': [topic_id]
             })
 
-        self.delete_json(
-            feconf.ADMIN_ROLE_HANDLER_URL,
-            params={
-                'role': feconf.ROLE_ID_TOPIC_MANAGER,
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/topicmanagerrolehandler', {
+                'action': 'deassign',
                 'username': username,
-                'remove_from_comma_seperated_topic_ids': topic_id
-            }, expected_status_int=200)
+                'topic_id': topic_id
+            }, csrf_token=csrf_token)
 
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
@@ -1189,10 +1189,10 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            feconf.ADMIN_ROLE_HANDLER_URL, {
-                'role': feconf.ROLE_ID_TOPIC_MANAGER,
+            '/topicmanagerrolehandler', {
+                'action': 'assign',
                 'username': username,
-                'assign_to_topic_id': topic_id
+                'topic_id': topic_id
             }, csrf_token=csrf_token)
 
         self.assertEqual(response_dict, {})
@@ -1227,10 +1227,10 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            feconf.ADMIN_ROLE_HANDLER_URL, {
-                'role': feconf.ROLE_ID_TOPIC_MANAGER,
+            '/topicmanagerrolehandler', {
+                'action': 'assign',
                 'username': username,
-                'assign_to_topic_id': topic_id
+                'topic_id': topic_id
             }, csrf_token=csrf_token)
 
         self.assertEqual(response_dict, {})
@@ -1256,10 +1256,10 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
-            feconf.ADMIN_ROLE_HANDLER_URL, {
-                'role': feconf.ROLE_ID_TOPIC_MANAGER,
+            '/topicmanagerrolehandler', {
+                'action': 'assign',
                 'username': username,
-                'assign_to_topic_id': new_topic_id
+                'topic_id': new_topic_id
             }, csrf_token=csrf_token)
 
         self.assertEqual(response_dict, {})
