@@ -29,6 +29,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 
 import { AppConstants } from 'app.constants';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -89,7 +90,7 @@ export class DragAndDropSortInputValidationService {
       stateName: string,
       customizationArgs: DragAndDropSortInputCustomizationArgs,
       answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
-    var warningsList = [];
+    var warningsList: Warning[] = [];
     var seenItems = [];
     var ranges = [];
     var areAnyItemsEmpty = false;
@@ -98,10 +99,10 @@ export class DragAndDropSortInputValidationService {
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
 
-    var checkRedundancy = function(earlierRule, laterRule) {
+    var checkRedundancy = (earlierRule: Rule, laterRule: Rule) => {
       var noOfMismatches = 0;
-      var inputs = earlierRule.inputs.x;
-      var answer = laterRule.inputs.x;
+      var inputs = <string[][]> earlierRule.inputs.x;
+      var answer = <string[][]> laterRule.inputs.x;
       for (var i = 0; i < Math.min(inputs.length, answer.length); i++) {
         for (var j = 0; j < Math.max(answer[i].length, inputs[i].length);
           j++) {
@@ -146,10 +147,15 @@ export class DragAndDropSortInputValidationService {
 
         let choiceValues = (
           customizationArgs.choices.value.map(x => x.html));
-        const choiceContentIdToHtml = {};
+        const choiceContentIdToHtml: Record<string, string> = {};
         customizationArgs.choices.value.forEach(
-          choice => choiceContentIdToHtml[
-            choice.contentId] = choice.html);
+          choice => {
+            const contentId = choice.contentId;
+            if (contentId === null) {
+              throw new Error ('ContentId of choice does not exist');
+            }
+            choiceContentIdToHtml[contentId] = choice.html;
+          });
 
         switch (rule.type) {
           case 'HasElementXAtPositionY':

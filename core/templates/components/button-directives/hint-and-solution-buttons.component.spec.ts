@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for HintAndSolutionButtonsComponent
+ */
+
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
@@ -19,7 +23,8 @@ import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
@@ -27,29 +32,27 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
-
-/**
- * @fileoverview Unit tests for HintAndSolutionButtonsComponent
- */
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
   let playerPositionService: PlayerPositionService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
-  let stateCardObjectFactory: StateCardObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let interactionObjectFactory: InteractionObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let statsReportingService: StatsReportingService;
+
   let newCard: StateCard;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [HintAndSolutionButtonsComponent]
+      declarations: [HintAndSolutionButtonsComponent, MockTranslatePipe]
     }).compileComponents();
   }));
 
@@ -59,7 +62,6 @@ describe('HintAndSolutionButtonsComponent', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     hintsAndSolutionManagerService = TestBed
       .inject(HintsAndSolutionManagerService);
-    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
     writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
@@ -68,6 +70,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    audioTranslationLanguageService = (
+      TestBed.inject(AudioTranslationLanguageService));
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>());
@@ -79,7 +83,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       .and.returnValue(new EventEmitter<void>());
 
     // A StateCard which supports hints.
-    newCard = stateCardObjectFactory.createNewCard(
+    newCard = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
         id: 'TextInput',
@@ -129,11 +133,11 @@ describe('HintAndSolutionButtonsComponent', () => {
             content_id: '2',
             html: 'test_explanation1',
           },
-        },
+        }
       }),
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
-      'content');
+      'content', audioTranslationLanguageService);
   });
 
   it('should subscribe to events on initialization', () => {
@@ -157,10 +161,11 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it('should reset hints and solutions when new' +
     ' card is opened', fakeAsync(() => {
-    let oldCard: StateCard = stateCardObjectFactory.createNewCard(
+    let oldCard: StateCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       null, RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content');
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
     component.displayedCard = oldCard;
@@ -236,7 +241,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     expect(component.isHintButtonVisible(0)).toBe(false);
 
     // StateCard with EndExploration interaction, which does not supports hints.
-    component.displayedCard = stateCardObjectFactory.createNewCard(
+    component.displayedCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
         id: 'EndExploration',
@@ -247,7 +252,8 @@ describe('HintAndSolutionButtonsComponent', () => {
         hints: [],
         solution: null,
       }), RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(), 'content');
+      writtenTranslationsObjectFactory.createEmpty(), 'content',
+      audioTranslationLanguageService);
 
     expect(component.isHintButtonVisible(0)).toBe(false);
 

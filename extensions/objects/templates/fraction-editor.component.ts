@@ -51,6 +51,7 @@ export class FractionEditorComponent implements OnInit {
     if (newFraction.length === 0) {
       this.errorMessage = 'Please enter a non-empty fraction value.';
       this.currentFractionValueIsValid = false;
+      return;
     }
     try {
       const INTERMEDIATE_REGEX = /^\s*-?\s*$/;

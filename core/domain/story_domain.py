@@ -18,12 +18,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import functools
 import json
 import re
 
 import android_validation_constants
 from constants import constants
 from core.domain import change_domain
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
 import feconf
@@ -176,7 +179,7 @@ class StoryNode(python_utils.OBJECT):
 
     def __init__(
             self, node_id, title, description, thumbnail_filename,
-            thumbnail_bg_color, destination_node_ids,
+            thumbnail_bg_color, thumbnail_size_in_bytes, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
             outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
@@ -189,6 +192,7 @@ class StoryNode(python_utils.OBJECT):
                 node.
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story node.
+            thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
@@ -211,6 +215,7 @@ class StoryNode(python_utils.OBJECT):
         self.description = description
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
@@ -298,6 +303,7 @@ class StoryNode(python_utils.OBJECT):
             'description': self.description,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
@@ -320,6 +326,7 @@ class StoryNode(python_utils.OBJECT):
             node_dict['id'], node_dict['title'], node_dict['description'],
             node_dict['thumbnail_filename'],
             node_dict['thumbnail_bg_color'],
+            node_dict['thumbnail_size_in_bytes'],
             node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
@@ -340,7 +347,7 @@ class StoryNode(python_utils.OBJECT):
             value.
         """
         return cls(
-            node_id, title, '', None, None,
+            node_id, title, '', None, None, None,
             [], [], [], '', False, None)
 
     def validate(self):
@@ -367,6 +374,10 @@ class StoryNode(python_utils.OBJECT):
         if self.thumbnail_filename and self.thumbnail_bg_color is None:
             raise utils.ValidationError(
                 'Chapter thumbnail background color is not specified.')
+        if self.thumbnail_filename is not None and (
+                self.thumbnail_size_in_bytes == 0):
+            raise utils.ValidationError(
+                'Story node thumbnail size in bytes cannot be zero.')
         if self.exploration_id == '':
             raise utils.ValidationError(
                 'Expected exploration ID to not be an empty string, '
@@ -630,7 +641,7 @@ class Story(python_utils.OBJECT):
 
     def __init__(
             self, story_id, title, thumbnail_filename,
-            thumbnail_bg_color, description, notes,
+            thumbnail_bg_color, thumbnail_size_in_bytes, description, notes,
             story_contents, story_contents_schema_version, language_code,
             corresponding_topic_id, version, url_fragment, meta_tag_content,
             created_on=None, last_updated=None):
@@ -659,6 +670,7 @@ class Story(python_utils.OBJECT):
             thumbnail_filename: str|None. The thumbnail filename of the story.
             thumbnail_bg_color: str|None. The thumbnail background color of
                 the story.
+            thumbnail_size_in_bytes: int|None. The size of thumbnail in bytes.
             url_fragment: str. The url fragment for the story.
             meta_tag_content: str. The meta tag content in the topic viewer
                 page.
@@ -667,6 +679,7 @@ class Story(python_utils.OBJECT):
         self.title = title
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
+        self.thumbnail_size_in_bytes = thumbnail_size_in_bytes
         self.description = description
         self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
@@ -869,6 +882,7 @@ class Story(python_utils.OBJECT):
             'story_contents': self.story_contents.to_dict(),
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'url_fragment': self.url_fragment,
             'meta_tag_content': self.meta_tag_content
         }
@@ -952,6 +966,7 @@ class Story(python_utils.OBJECT):
         story = cls(
             story_dict['id'], story_dict['title'],
             story_dict['thumbnail_filename'], story_dict['thumbnail_bg_color'],
+            story_dict['thumbnail_size_in_bytes'],
             story_dict['description'], story_dict['notes'],
             StoryContents.from_dict(story_dict['story_contents']),
             story_dict['story_contents_schema_version'],
@@ -985,7 +1000,7 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title, None, None, description,
+            story_id, title, None, None, None, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
@@ -1044,8 +1059,33 @@ class Story(python_utils.OBJECT):
         return story_contents_dict
 
     @classmethod
+    def _convert_story_contents_v4_dict_to_v5_dict(
+            cls, story_id, story_contents_dict):
+        """Converts v4 Story Contents schema to the modern v5 schema.
+        v5 schema introduces the thumbnail_size_in_bytes for Story Nodes.
+
+        Args:
+            story_id: str. The unique ID of the story.
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_STORY, story_id))
+        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
+            filepath = '%s/%s' % (
+                constants.ASSET_TYPE_THUMBNAIL,
+                story_contents_dict['nodes'][index]['thumbnail_filename'])
+            story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = (
+                len(fs.get(filepath)) if fs.isfile(filepath) else None)
+        return story_contents_dict
+
+    @classmethod
     def update_story_contents_from_model(
-            cls, versioned_story_contents, current_version):
+            cls, versioned_story_contents, current_version, story_id):
         """Converts the story_contents blob contained in the given
         versioned_story_contents dict from current_version to
         current_version + 1. Note that the versioned_story_contents being
@@ -1058,12 +1098,17 @@ class Story(python_utils.OBJECT):
                 - story_contents: dict. The dict comprising the story
                     contents.
             current_version: int. The current schema version of story_contents.
+            story_id: str. The unique ID of the story.
         """
         versioned_story_contents['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
             cls, '_convert_story_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
+
+        if current_version == 4:
+            conversion_fn = functools.partial(conversion_fn, story_id)
+
         versioned_story_contents['story_contents'] = conversion_fn(
             versioned_story_contents['story_contents'])
 
@@ -1075,14 +1120,26 @@ class Story(python_utils.OBJECT):
         """
         self.title = title
 
-    def update_thumbnail_filename(self, thumbnail_filename):
-        """Updates the thumbnail filename of the story.
+    def update_thumbnail_filename(self, new_thumbnail_filename):
+        """Updates the thumbnail filename and file size of the story.
 
         Args:
-            thumbnail_filename: str|None. The new thumbnail filename of the
+            new_thumbnail_filename: str|None. The new thumbnail filename of the
                 story.
         """
-        self.thumbnail_filename = thumbnail_filename
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_STORY, self.id))
+
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.thumbnail_filename = new_thumbnail_filename
+            self.thumbnail_size_in_bytes = len(fs.get(filepath))
+        else:
+            raise Exception(
+                'The thumbnail %s for story with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_thumbnail_bg_color(self, thumbnail_bg_color):
         """Updates the thumbnail background color of the story.
@@ -1248,7 +1305,7 @@ class Story(python_utils.OBJECT):
         self.story_contents.nodes[node_index].description = new_description
 
     def update_node_thumbnail_filename(self, node_id, new_thumbnail_filename):
-        """Updates the thumbnail filename field of a given node.
+        """Updates the thumbnail filename and file size field of a given node.
 
         Args:
             node_id: str. The id of the node.
@@ -1262,8 +1319,21 @@ class Story(python_utils.OBJECT):
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        self.story_contents.nodes[node_index].thumbnail_filename = (
-            new_thumbnail_filename)
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_STORY, self.id))
+
+        filepath = '%s/%s' % (
+            constants.ASSET_TYPE_THUMBNAIL, new_thumbnail_filename)
+        if fs.isfile(filepath):
+            self.story_contents.nodes[node_index].thumbnail_filename = (
+                new_thumbnail_filename)
+            self.story_contents.nodes[node_index].thumbnail_size_in_bytes = (
+                len(fs.get(filepath)))
+        else:
+            raise Exception(
+                'The thumbnail %s for story node with id %s does not exist'
+                ' in the filesystem.' % (new_thumbnail_filename, self.id))
 
     def update_node_thumbnail_bg_color(self, node_id, new_thumbnail_bg_color):
         """Updates the thumbnail background color field of a given node.

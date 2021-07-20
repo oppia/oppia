@@ -19,7 +19,9 @@
 import { DOCUMENT } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { LimitToPipe } from 'filters/limit-to.pipe';
+import { CookieModule, CookieService } from 'ngx-cookie';
 import { Observable, of } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -33,6 +35,9 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
 
 describe('Base Content Component', () => {
+  // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+  const NOW_MILLIS = 1416563100000;
+  const ONE_YEAR_FROM_NOW_MILLIS = 1448099100000;
   let fixture: ComponentFixture<BaseContentComponent>;
   let componentInstance: BaseContentComponent;
   let isIframed: boolean = false;
@@ -47,6 +52,8 @@ describe('Base Content Component', () => {
   let loaderService: LoaderService;
   let keyboardShortcutService: KeyboardShortcutService;
   let sidebarStatusService: SidebarStatusService;
+  let cookieService: CookieService;
+  let oldDate = Date;
 
   class MockUrlService {
     isIframed(): boolean {
@@ -62,6 +69,11 @@ describe('Base Content Component', () => {
         pathname: pathname,
         search: search,
         hash: hash
+      },
+      document: {
+        addEventListener(event: string, callback: () => void) {
+          callback();
+        }
       }
     };
   }
@@ -82,6 +94,9 @@ describe('Base Content Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        CookieModule.forRoot()
+      ],
       declarations: [
         BaseContentComponent,
         MockTranslatePipe,
@@ -132,6 +147,7 @@ describe('Base Content Component', () => {
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
     backgroundMaskService = (backgroundMaskService as unknown) as
      jasmine.SpyObj<BackgroundMaskService>;
+    cookieService = TestBed.inject(CookieService);
   });
 
   it('should create', () => {
@@ -198,5 +214,42 @@ describe('Base Content Component', () => {
     spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError(
       'Variable mainContentElement is undefined.');
+  });
+
+  it('should show the cookie banner if there is no cookie set', () => {
+    spyOn(cookieService, 'get').and.returnValue(null);
+    expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+  });
+
+  it('should show the cookie banner if a cookie exists but the policy has ' +
+     'been updated', () => {
+    spyOn(cookieService, 'get').and.returnValue(
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000));
+    expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+  });
+
+  it('should not show the cookie banner if a valid cookie exists', () => {
+    spyOn(cookieService, 'get').and.returnValue(
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000));
+    expect(componentInstance.hasAcknowledgedCookies()).toBeTrue();
+  });
+
+  it('should be able to acknowledge cookies', () => {
+    spyOn(window, 'Date')
+      // This throws "Argument of type 'Date' is not assignable to parameter of
+      // type 'string'.". We need to suppress this error because DateConstructor
+      // cannot be mocked without it.
+      // @ts-expect-error
+      .withArgs().and.returnValue(new oldDate(NOW_MILLIS))
+      // This throws "Expected 0 arguments, but got 1.". We need to suppress
+      // this error because we pass an argument to the Date constructor in the
+      // component code.
+      // @ts-expect-error
+      .withArgs(ONE_YEAR_FROM_NOW_MILLIS).and.callThrough();
+    spyOn(cookieService, 'put');
+    componentInstance.acknowledgeCookies();
+    expect(cookieService.put).toHaveBeenCalledWith(
+      'OPPIA_COOKIES_ACKNOWLEDGED', String(NOW_MILLIS),
+      { expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS) });
   });
 });

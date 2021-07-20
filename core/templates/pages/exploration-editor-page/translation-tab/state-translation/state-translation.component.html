@@ -4,42 +4,42 @@
 <div class="oppia-page-card oppia-state-translation-page">
   <div class="translation-nav">
     <ul id="tutorialTranslationState" class="oppia-translation-tabs">
-      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="protractor-test-accessibility-translation-content" aria-label="Content of the card" role="button">
+      <li ng-class="{'oppia-active-translation-tab protractor-test-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="protractor-test-accessibility-translation-content" aria-label="Content of the card" role="button">
         <a ng-click="onTabClick(TAB_ID_CONTENT)" href="" ng-style="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text protractor-test-translation-content-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_CONTENT)" class="oppia-tab-needs-update"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Content
         </a>
       </li>
-      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" aria-label="Interaction content" role="button">
+      <li ng-class="{'oppia-active-translation-tab protractor-test-active-translation-tab': isActive(TAB_ID_CUSTOMIZATION_ARGS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_CUSTOMIZATION_ARGS)}" aria-label="Interaction content" role="button">
         <a ng-click="onTabClick(TAB_ID_CUSTOMIZATION_ARGS)" ng-style="tabStatusColorStyle(TAB_ID_CUSTOMIZATION_ARGS)" href="" class="oppia-translation-tabs-text">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_CUSTOMIZATION_ARGS)" class="oppia-tab-needs-update"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Interaction
         </a>
       </li>
-      <li ng-if="!isVoiceoverModeActive()" ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_RULE_INPUTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULE_INPUTS)}" aria-label="Rule Inputs" role="button">
+      <li ng-if="!isVoiceoverModeActive()" ng-class="{'oppia-active-translation-tab protractor-test-active-translation-tab': isActive(TAB_ID_RULE_INPUTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_RULE_INPUTS)}" aria-label="Rule Inputs" role="button">
         <a ng-click="onTabClick(TAB_ID_RULE_INPUTS)" ng-style="tabStatusColorStyle(TAB_ID_RULE_INPUTS)" href="" class="oppia-translation-tabs-text">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_RULE_INPUTS)" class="oppia-tab-needs-update"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Rules
         </a>
       </li>
-      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="protractor-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
+      <li ng-class="{'oppia-active-translation-tab protractor-test-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="protractor-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
         <a ng-click="onTabClick(TAB_ID_FEEDBACK)" ng-style="tabStatusColorStyle(TAB_ID_FEEDBACK)" href="" class="oppia-translation-tabs-text protractor-test-translation-feedback-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" class="oppia-tab-needs-update"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Feedback
         </a>
       </li>
-      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}" class="protractor-test-accessibility-translation-hint" aria-label="Hints for the state" role="button">
+      <li ng-class="{'oppia-active-translation-tab protractor-test-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}" class="protractor-test-accessibility-translation-hint" aria-label="Hints for the state" role="button">
         <a ng-click="onTabClick(TAB_ID_HINTS)" href="" ng-style="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text protractor-test-translation-hints-tab">
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_HINTS)" class="oppia-tab-needs-update"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠
           </span>Hints
         </a>
       </li>
-      <li ng-class="{'oppia-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}" class="protractor-test-accessibility-translation-solution" aria-label="Solutions for the state" role="button">
+      <li ng-class="{'oppia-active-translation-tab protractor-test-active-translation-tab': isActive(TAB_ID_SOLUTION), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_SOLUTION)}" class="protractor-test-accessibility-translation-solution" aria-label="Solutions for the state" role="button">
         <a ng-click="onTabClick(TAB_ID_SOLUTION)" href="" ng-style="tabStatusColorStyle(TAB_ID_SOLUTION)" class="oppia-translation-tabs-text protractor-test-translation-solution-tab" >
           <span ng-show="tabNeedUpdatesStatus(TAB_ID_SOLUTION)" class="oppia-tab-needs-update"
                 uib-tooltip="<[needsUpdateTooltipMessage]>" tooltip-placement="top">⚠

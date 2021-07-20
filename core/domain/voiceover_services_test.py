@@ -82,7 +82,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -108,6 +108,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 'old_value': None,
                 'new_value': '0'
             })], 'Changes.')
+
+        self.set_user_role(self.ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_voiceover_application_creation(self):
 

@@ -49,7 +49,7 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { ChangeListService } from '../services/change-list.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 

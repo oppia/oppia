@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
@@ -34,6 +34,7 @@ import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
+import { CookieModule } from 'ngx-cookie';
 import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
@@ -84,21 +85,18 @@ import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edi
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective, BaseContentPageFooterDirective } from '../base-components/base-content.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
-import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
-import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
 import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
-
-
-// Directives.
-import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
+import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 
 
 // Pipes.
@@ -113,6 +111,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
+// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -164,9 +163,11 @@ const toastrConfig = {
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
+    CookieModule.forRoot(),
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
+    NgbDropdownModule,
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
@@ -231,10 +232,11 @@ const toastrConfig = {
     AlertMessageComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    BaseContentNavBarBreadCrumbDirective,
+    BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -249,7 +251,6 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -264,6 +265,7 @@ const toastrConfig = {
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
@@ -271,7 +273,7 @@ const toastrConfig = {
     StateSkillEditorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
@@ -296,7 +298,6 @@ const toastrConfig = {
     AlertMessageComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
@@ -326,14 +327,15 @@ const toastrConfig = {
     HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
-    I18nLanguageSelectorComponent,
     OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
@@ -369,9 +371,10 @@ const toastrConfig = {
     AttributionGuideComponent,
     AudioBarComponent,
     AudioFileUploaderComponent,
-    AlertMessageComponent,
     BackgroundBannerComponent,
     BaseContentComponent,
+    BaseContentNavBarBreadCrumbDirective,
+    BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -384,7 +387,6 @@ const toastrConfig = {
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     HintAndSolutionButtonsComponent,
-    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
@@ -397,6 +399,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
+    SearchBarComponent,
     QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
@@ -405,7 +408,7 @@ const toastrConfig = {
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,

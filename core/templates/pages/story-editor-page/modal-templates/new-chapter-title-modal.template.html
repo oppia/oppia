@@ -33,11 +33,11 @@
         <span>Exploration ID*</span>
       </div>
       <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control protractor-test-chapter-exploration-input">
-      <span class="new-chapter-error-msg protractor-test-invalid-exp-id" ng-if="invalidExpId">
+      <span class="new-chapter-error-msg protractor-test-invalid-exp-id" ng-if="invalidExpId || explorationId && !validateExplorationId()">
         <span><[invalidExpErrorString]></span>
       </span>
     </div>
-    <div class="chapter-input chapter-input-thumbnail">
+    <div class="chapter-input chapter-input-thumbnail protractor-test-chapter-input-thumbnail">
       <div class="chapter-input-header">
         <span>Thumbnail Image*</span>
       </div>
@@ -46,7 +46,7 @@
                                 [bg-color]="editableThumbnailBgColor"
                                 (update-bg-color)="updateThumbnailBgColor($event)"
                                 [allowed-bg-colors]="allowedBgColors"
-                                [aspect-ratio]="'4:3'"
+                                [aspect-ratio]="'16:9'"
                                 [preview-title]="title"
                                 preview-description-bg-color="#BE563C">
       </oppia-thumbnail-uploader>

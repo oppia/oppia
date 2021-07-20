@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
+from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import story_domain
@@ -97,6 +98,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -113,6 +115,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_2.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -129,6 +132,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_3.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -302,6 +306,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -503,6 +508,11 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_mark_story_and_topic_as_completed_and_learnt(self):
         csrf_token = self.get_new_csrf_token()
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
+            self.viewer_id, self.TOPIC_ID)
+        self.assertEqual(len(
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 1)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
@@ -518,6 +528,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertEqual(len(
             learner_progress_services.get_all_learnt_topic_ids(
                 self.viewer_id)), 1)
+        self.assertEqual(len(
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 0)
         self.assertEqual(len(
             learner_progress_services.get_all_completed_story_ids(
                 self.viewer_id)), 1)
@@ -546,6 +559,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -606,3 +620,26 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     captured_logs,
                     ['Could not find a story corresponding to %s '
                      'id.' % self.STORY_ID])
+
+    def test_remove_topic_from_learn(self):
+        learner_progress_services.validate_and_add_topic_to_learn_goal(
+            self.viewer_id, self.TOPIC_ID)
+        self.assertEqual(
+            len(learner_goals_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 1)
+        csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
+
+        self.assertEqual(
+            len(learner_goals_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 0)
