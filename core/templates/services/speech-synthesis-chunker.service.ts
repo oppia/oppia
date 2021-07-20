@@ -198,7 +198,6 @@ export class SpeechSynthesisChunkerService {
           newTextContent && newTextContent !== '"' ?
           newTextContent + ' ' : ''
         );
-            newTextContent + ' ' : '';
       });
 
     var _this = this;
