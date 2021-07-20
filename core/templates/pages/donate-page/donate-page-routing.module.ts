@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,29 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the donate page.
+ * @fileoverview Routing module for donate page.
  */
 
 import { NgModule } from '@angular/core';
-import { DonatePageComponent } from './donate-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { Route, RouterModule } from '@angular/router';
 import { DonatePageRootComponent } from './donate-page-root.component';
-import { CommonModule } from '@angular/common';
-import { DonatePageRoutingModule } from './donate-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: DonatePageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    DonatePageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    DonatePageComponent,
-    DonatePageRootComponent,
-  ],
-  entryComponents: [
-    DonatePageComponent,
-    DonatePageRootComponent,
+  exports: [
+    RouterModule
   ]
 })
-export class DonatePageModule {}
+
+export class DonatePageRoutingModule {}

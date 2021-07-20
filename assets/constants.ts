@@ -5956,6 +5956,7 @@ export default {
   "ROUTES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": "about",
     "CONTACT": "contact",
+    "DONATE": "donate",
     "GET_STARTED": "get-started"
   },
 

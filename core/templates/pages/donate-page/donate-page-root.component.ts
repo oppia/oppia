@@ -17,9 +17,29 @@
  */
 
 import { Component } from '@angular/core';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-donate-page-root',
   templateUrl: './donate-page-root.component.html'
 })
-export class DonatePageRootComponent {}
+export class DonatePageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    // Update default title and meta tags.
+    this.pageTitleService.setPageTitle('Donate | Oppia');
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'description',
+        content: 'Donate to The Oppia Foundation to enable more ' +
+          'students to receive the quality education they deserve.'
+      }
+    ]);
+  }
+}

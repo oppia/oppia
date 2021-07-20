@@ -81,7 +81,6 @@ module.exports = {
     delete_account:
       commonPrefix + '/pages/delete-account-page/' +
         'delete-account-page.import.ts',
-    donate: commonPrefix + '/pages/donate-page/donate-page.import.ts',
     email_dashboard:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-page.import.ts',
@@ -294,18 +293,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/delete-account-page/' +
           'delete-account-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['donate'],
-      filename: 'donate-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Donate to The Oppia Foundation to enable more ' +
-        'students to receive the quality education they deserve.'
-      },
-      template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

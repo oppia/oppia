@@ -179,7 +179,9 @@
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/donate'}">
-      <a href="/donate" class="protractor-mobile-test-donate-link">
+      <a href="/donate"
+         [routerLink]="'/' + ROUTES_REGISTERED_WITH_FRONTEND.DONATE"
+         class="protractor-mobile-test-donate-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
       </a>

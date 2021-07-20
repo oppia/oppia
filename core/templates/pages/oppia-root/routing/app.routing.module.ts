@@ -35,6 +35,11 @@ const routes: Route[] = [
       .then(m => m.ContactPageModule)
   },
   {
+    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.DONATE,
+    loadChildren: () => import('pages/donate-page/donate-page.module')
+      .then(m => m.DonatePageModule)
+  },
+  {
     path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.GET_STARTED,
     loadChildren: () => import('pages/get-started-page/get-started-page.module')
       .then(m => m.GetStartedPageModule)
