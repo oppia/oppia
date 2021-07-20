@@ -23,7 +23,7 @@
    selector: 'oppia-blog-dashboard-navbar-breadcrumb',
    templateUrl: './blog-dashboard-navbar-breadcrumb.component.html'
  })
- export class BlogDashboardNavbarBreadcrumbComponent { }
+ export class BlogDashboardNavbarBreadcrumbComponent {}
  
  angular.module('oppia')
    .directive(

@@ -15,3 +15,44 @@
 /**
  * @fileoverview Unit tests for blog-post-summary-model.
  */
+
+import { TestBed } from '@angular/core/testing';
+
+import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+
+describe('Blog post summary object factory', () => {
+  let sampleSummary: BlogPostSummary;
+  let sampleSummaryBackendObject = {
+    id: 'sampleId',
+    author_username: 'test_user',
+    title: 'Title',
+    summary: 'Hello World',
+    tags: ['news'],
+    thumbnail_filename: 'image.png',
+    url_fragment: 'title',
+    last_updated: 3232323,
+    published_on: 3232323,
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [BlogPostSummary]
+    });
+  });
+
+  it('should create correct BlogPostSummary object from' +
+  ' backend dict', () => {
+    sampleSummary = BlogPostSummary.createFromBackendDict(
+      sampleSummaryBackendObject);
+
+    expect(sampleSummary.getId()).toEqual('sampleId');
+    expect(sampleSummary.getAuthorUsername()).toEqual('test_user');
+    expect(sampleSummary.getTitle()).toEqual('Title');
+    expect(sampleSummary.getTags()).toEqual(['news']);
+    expect(sampleSummary.getSummary()).toEqual('Hello World');
+    expect(sampleSummary.getUrlFragment()).toEqual('title');
+    expect(sampleSummary.getLastUpdated()).toEqual(3232323);
+    expect(sampleSummary.getPublishedOn()).toEqual(3232323);
+    expect(sampleSummary.getThumbnailFilename()).toEqual('image.png');
+  })
+})

@@ -17,6 +17,9 @@
  * blog post domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 export interface BlogPostBackendDict {
   'id': string;
   'author_username': string;
@@ -28,10 +31,6 @@ export interface BlogPostBackendDict {
   'last_updated'?: number;
   'published_on'?: number;
 }
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
 export class BlogPostData {
   _id: string;
   _author_username: string;
@@ -95,6 +94,11 @@ export class BlogPostData {
     this._tags.push(tag);
   }
 
+  removeTag(tag: string): void {
+    let index = this._tags.indexOf(tag);
+    this._tags.splice(index, 1)
+  }
+
   getUrlFragment(): string {
     return this._urlFragment;
   }
@@ -145,25 +149,13 @@ export class BlogPostData {
     if (this._tags.length > maxTags) {
       issues.push(
       'Blog Post should atmost have ' + String(maxTags) +
-      ' linked to it.');
+      ' tag linked to it.');
     }
     if (this._content === '') {
       issues.push(
         'Blog Post content should not be empty');
     }
     return issues;
-  }
-
-  toBackendDict(): BlogPostBackendDict {
-    return {
-      id: this._id,
-      author_username: this._author_username,
-      title: this._title,
-      url_fragment: this._urlFragment,
-      content: this._content,
-      thumbnail_filename: this._thumbnailFilename,
-      tags: this._tags
-    };
   }
 }
 
@@ -187,9 +179,9 @@ export class BlogPostObjectFactory {
 
   // Create an interstitial blog post that would be displayed in the editor until
   // the actual blog post is fetched from the backend.
-  createInterstitialTopic(): BlogPostData {
+  createInterstitialBlogPost(): BlogPostData {
     return new BlogPostData (
-      null, null, 'Blog Post Title loading', '', [],
+      null, 'loading', 'Blog Post Title loading', '', [],
       null, 'Url Fragment loading'
     );
   }

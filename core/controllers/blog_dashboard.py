@@ -81,9 +81,9 @@ class BlogDashboardDataHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
 
         no_of_published_blog_posts = 0
-        published_post_summary_dicts = None
+        published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
-        draft_blog_post_summary_dicts = None
+        draft_blog_post_summary_dicts = []
         published_post_summaries = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id, True))

@@ -17,7 +17,7 @@
  */
 import { Injectable } from '@angular/core';
 import { BlogPostData } from 'domain/blog/BlogPostObjectFactory';
-
+import { downgradeInjectable } from '@angular/upgrade/static';
 export interface BlogPostChangeDict {
   'title'?: string,
   'thumbnail_filename'?: string,
@@ -35,15 +35,15 @@ interface ImageData {
 })
 export class BlogPostUpdateService {
 
-  changeDict: BlogPostChangeDict;
+  changeDict: BlogPostChangeDict = {};
   constructor() {}
 
   setBlogPostTitle(blogPost: BlogPostData, title: string): void{
     blogPost.setTitle(title);
-    this.changeDict.title = title
+    this.changeDict.title = title;
   }
 
-  setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData): void {
+  setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
     let filename = image[0].filename
     blogPost.setThumbnailFilename(filename);
     this.changeDict.thumbnail_filename = filename
@@ -54,12 +54,20 @@ export class BlogPostUpdateService {
     this.changeDict.tags = blogPost.getTags();
   }
 
+  removeBlogPostTag(blogPost: BlogPostData, tag: string): void {
+    blogPost.removeTag(tag);
+    this.changeDict.tags = blogPost.getTags();
+  }
+
   setBlogPostContent(blogPost: BlogPostData, content: string): void {
     blogPost.setContent(content);
-    this.changeDict.content = content
+    this.changeDict.content= content
   }
 
   getBlogPostChangeDict(): BlogPostChangeDict {
     return this.changeDict
   }
 }
+angular.module('oppia').factory(
+  'BlogPostUpdateService',
+  downgradeInjectable(BlogPostUpdateService));

@@ -19,6 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 interface BlogDashboardBackendResponse {
@@ -30,7 +31,7 @@ interface BlogDashboardBackendResponse {
   'draft_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
 }
 
-interface BlogDashboardData {
+export interface BlogDashboardData {
   username: string;
   profilePictureDataUrl: string;
   numOfPublishedBlogPosts: number;
@@ -39,7 +40,9 @@ interface BlogDashboardData {
   draftBlogPostSummaryDicts: BlogPostSummary[]
 }
 
-
+@Injectable({
+  providedIn: 'root'
+})
 export class BlogDashboardBackendApiService {
   constructor(
     private http: HttpClient) {}
@@ -55,9 +58,13 @@ export class BlogDashboardBackendApiService {
             numOfDraftBlogPosts: response.no_of_draft_blog_posts,
             numOfPublishedBlogPosts: response.no_of_published_blog_posts,
             publishedBlogPostSummaryDicts: response.published_blog_post_summary_dicts.map(
-              blogPostSummary => BlogPostSummary.createFromBackendDict(blogPostSummary)),
+              blogPostSummary => {
+                return BlogPostSummary.createFromBackendDict(blogPostSummary);
+              }),
             draftBlogPostSummaryDicts: response.draft_blog_post_summary_dicts.map(
-              blogPostSummary => BlogPostSummary.createFromBackendDict(blogPostSummary)),
+              blogPostSummary => {
+                return BlogPostSummary.createFromBackendDict(blogPostSummary);
+              }),
           });
         }, errorResponse => {
           reject(errorResponse.error.error);

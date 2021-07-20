@@ -15,6 +15,9 @@
 /**
  * @fileoverview Service to send changes to a blog post to the backend.
  */
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 import { BlogPostBackendDict, BlogPostData, BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClient } from '@angular/common/http';
@@ -27,11 +30,15 @@ interface ImageData {
 }
 
 interface BlogPostUpdateBackendDict {
-  'blog_post_dict': BlogPostBackendDict;
+  'blog_post': BlogPostBackendDict;
 }
 
 interface BlogPostUpdatedData {
   blogPostDict: BlogPostData
+}
+
+interface DeleteBlogPostBackendResponse {
+  status: number;
 }
 
 interface BlogPostEditorBackendResponse {
@@ -42,7 +49,7 @@ interface BlogPostEditorBackendResponse {
   'list_of_default_tags': string[];
 }
 
-interface BlogPostEditorData {
+export interface BlogPostEditorData {
   blogPostDict: BlogPostData;
   username: string;
   profilePictureDataUrl: string;
@@ -50,7 +57,9 @@ interface BlogPostEditorData {
   listOfDefaulTags: string[];
 }
 
-
+@Injectable({
+  providedIn: 'root'
+})
 export class BlogPostEditorBackendApiService {
   constructor(
     private http: HttpClient,
@@ -58,17 +67,21 @@ export class BlogPostEditorBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  async fetchBlogPostEditorData(blogPostId: string): Promise<BlogPostUpdatedData> {
+  async fetchBlogPostEditorData(blogPostId: string): Promise<BlogPostEditorData> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {
+        BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
           blog_post_id: blogPostId
         });
       this.http.get<BlogPostEditorBackendResponse>(blogPostDataUrl).toPromise().then(
         (response) => {
           resolve({
+            username: response.username,
             blogPostDict: this.blogPostObjectFactory.createFromBackendDict(
-              response.blog_post_dict)      
+              response.blog_post_dict),
+            maxNumOfTags: response.max_no_of_tags,
+            profilePictureDataUrl: response.profile_picture_data_url,
+            listOfDefaulTags: response.list_of_default_tags   
           })
       }, (errorResponse) => {
         reject(errorResponse.error.error);
@@ -76,18 +89,19 @@ export class BlogPostEditorBackendApiService {
     });
   }
   
-  async deleteBlogPostAsync(blogPostId: string): Promise<void> {
+  async deleteBlogPostAsync(blogPostId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {
+        BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
           blog_post_id: blogPostId
         });
 
-      this.http.delete<void>(blogPostDataUrl).toPromise().then(() => {
-        resolve();
-      }, (errorResponse) => {
-        reject(errorResponse.error.error);
-      });
+      this.http.delete<DeleteBlogPostBackendResponse>(blogPostDataUrl).toPromise().then(
+        (response) => {
+          resolve(response.status);
+        }, (errorResponse) => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
@@ -97,7 +111,7 @@ export class BlogPostEditorBackendApiService {
       changeDict: BlogPostChangeDict): Promise<BlogPostUpdatedData> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {
+        BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
           blog_post_id: blogPostId
         });
 
@@ -109,7 +123,8 @@ export class BlogPostEditorBackendApiService {
       this.http.put<BlogPostUpdateBackendDict>(
         blogPostDataUrl, putData).toPromise().then(response => {
           resolve({
-            blogPostDict : this.blogPostObjectFactory.createFromBackendDict(response.blog_post_dict)
+            blogPostDict : this.blogPostObjectFactory.createFromBackendDict(
+              response.blog_post)
           })
         }, errorResponse => {
           reject(errorResponse.error.error);
@@ -120,7 +135,7 @@ export class BlogPostEditorBackendApiService {
   async postThumbnailDataAsync(blogPostId: string, imagesData: ImageData[]): Promise<void> {
     return new Promise((resolve, reject) => {
       const blogPostDataUrl = this.urlInterpolationService.interpolateUrl(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {
+        BlogDashboardPageConstants.BLOG_EDITOR_DATA_URL_TEMPLATE, {
           blog_post_id: blogPostId
         });
       let body = new FormData();
@@ -139,3 +154,6 @@ export class BlogPostEditorBackendApiService {
     }
   )}
 }
+
+angular.module('oppia').factory('BlogPostEditorBackendApiService',
+  downgradeInjectable(BlogPostEditorBackendApiService));

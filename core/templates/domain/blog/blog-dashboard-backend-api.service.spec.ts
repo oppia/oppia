@@ -1,0 +1,101 @@
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for BlogDashboardBackendApiService.
+ */
+
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { BlogDashboardData, BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
+import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
+import { CsrfTokenService } from 'services/csrf-token.service';
+
+describe('Blog Dashboard backend api service', () => {
+    let bdbas: BlogDashboardBackendApiService;
+    let httpTestingController: HttpTestingController;
+    let csrfService: CsrfTokenService = null;
+    let successHandler = null;
+    let failHandler = null;
+    let blogDashboardDataObject: BlogDashboardData;
+    let blogDashboardBackendResponse = {
+      username: 'testUsername',
+      profile_picture_data_url: 'image',
+      no_of_published_blog_posts: 0,
+      no_of_draft_blog_posts: 0,
+      published_blog_post_summary_dicts: [],
+      draft_blog_post_summary_dicts: []
+    }
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
+    bdbas = TestBed.inject(BlogDashboardBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+    blogDashboardDataObject = {
+      username: blogDashboardBackendResponse.username,
+      profilePictureDataUrl: blogDashboardBackendResponse.profile_picture_data_url,
+      numOfDraftBlogPosts: blogDashboardBackendResponse.no_of_draft_blog_posts,
+      numOfPublishedBlogPosts: blogDashboardBackendResponse.no_of_published_blog_posts,
+      publishedBlogPostSummaryDicts: [],
+      draftBlogPostSummaryDicts: []
+    }
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+      return Promise.resolve('sample-csrf-token');
+    });
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should fetch the blog dashboard data.', fakeAsync(() => {
+    bdbas.fetchBlogDashboardDataAsync().then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+    expect(req.request.method).toEqual('GET');
+    req.flush(blogDashboardBackendResponse);
+
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalledWith(blogDashboardDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use the rejection handler if the backend request failed.',
+    fakeAsync(() => {
+      bdbas.fetchBlogDashboardDataAsync().then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
+      expect(req.request.method).toEqual('GET');
+
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    })
+  );
+})

@@ -92,6 +92,10 @@ export class BlogPostSummary {
     return this._summary
   }
 
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
   static createFromBackendDict(
       blogPostSummaryBackendDict: BlogPostSummaryBackendDict
   ): BlogPostSummary {
@@ -104,6 +108,7 @@ export class BlogPostSummary {
       blogPostSummaryBackendDict.thumbnail_filename,
       blogPostSummaryBackendDict.url_fragment,
       blogPostSummaryBackendDict.last_updated,
-      blogPostSummaryBackendDict.published_on);
+      blogPostSummaryBackendDict.published_on
+    );
   }
 }
