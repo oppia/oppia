@@ -437,7 +437,7 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     if report.platform == PLATFORM_ANDROID:
         report.app_context.__class__ = (
             app_feedback_report_domain.AndroidAppContext)
-        app_feedback_report_domain.AndroidAppContext(report.app_context).event_logs = None
+        report.app_context.event_logs = None
         report.app_context.logcat_logs = None
     save_feedback_report_to_storage(report)
 
