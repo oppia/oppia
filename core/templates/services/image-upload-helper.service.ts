@@ -40,7 +40,7 @@ export class ImageUploadHelperService {
       Math.random().toString(36).substr(2, 10);
   }
 
-  convertImageDataToImageFile(dataURI: string): Blob {
+  convertImageDataToImageFile(dataURI: string): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     let byteString = atob(dataURI.split(',')[1]);
