@@ -36,7 +36,6 @@ from core.domain import html_cleaner
 import feconf
 import python_utils
 import utils
-import re
 
 from typing import Any, Callable, Dict, List, Optional, Text, Union # isort:skip # pylint: disable=unused-import
 
