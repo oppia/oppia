@@ -942,7 +942,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Check version is updated.
         self.assertEqual(new_topic_dict['version'], 3)
 
-        # Delete version and compare of the dict are the same.
+        # Delete version and check that the two dicts are the same.
         del orig_topic_dict['version']
         del new_topic_dict['version']
         self.assertEqual(orig_topic_dict, new_topic_dict)

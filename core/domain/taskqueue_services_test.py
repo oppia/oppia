@@ -100,7 +100,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
         # Get all attributes of taskqueue_services using the dir function.
         attributes = dir(taskqueue_services)
-        # Check if the queue names in the queue.yaml file exist in as a queue
+        # Check if the queue names in the queue.yaml file exist as a queue
         # name in taskqueue_services.
         for attribute in attributes:
             if attribute.startswith('QUEUE_NAME_'):

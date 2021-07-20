@@ -1125,7 +1125,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         # Check version is updated.
         self.assertEqual(new_skill_dict['version'], 2)
 
-        # Delete version and compare of the dict are the same.
+        # Delete version and check that the two dicts are the same.
         del orig_skill_dict['version']
         del new_skill_dict['version']
         self.assertEqual(orig_skill_dict, new_skill_dict)

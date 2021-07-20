@@ -544,7 +544,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         # Check version is updated.
         self.assertEqual(new_story_dict['version'], 2)
 
-        # Delete version and compare of the dict are the same.
+        # Delete version and check that the two dicts are the same.
         del orig_story_dict['version']
         del new_story_dict['version']
         self.assertEqual(orig_story_dict, new_story_dict)

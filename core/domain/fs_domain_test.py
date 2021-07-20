@@ -72,7 +72,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             self.fs.get('abc.png')
 
         with self.assertRaisesRegexp(
-            IOError, 'Image does not exist: fake_file.png'):
+            IOError, 'File does not exist: fake_file.png'
+        ):
             self.fs.delete('fake_file.png')
 
     def test_listdir(self):

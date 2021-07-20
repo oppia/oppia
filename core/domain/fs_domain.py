@@ -197,7 +197,7 @@ class GcsFileSystem(GeneralFileSystem):
             storage_services.delete(
                 self._bucket_name, self._get_gcs_file_url(filepath))
         else:
-            raise IOError('Image does not exist: %s' % filepath)
+            raise IOError('File does not exist: %s' % filepath)
 
     def copy(self, source_assets_path, filepath):
         """Copy images from source_path.
@@ -232,7 +232,8 @@ class GcsFileSystem(GeneralFileSystem):
             )
 
         # The trailing slash is necessary to prevent non-identical directory
-        # names with the same prefix from matching.
+        # names with the same prefix from matching, e.g. /abcd/123.png should
+        # not match a query for files under /abc/.
         if dir_name and not dir_name.endswith('/'):
             dir_name += '/'
 
