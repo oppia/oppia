@@ -172,7 +172,10 @@
     </li>
 
     <li>
-      <a href="https://www.oppiafoundation.org/partnerships" target="_blank" rel="noopener">
+      <a href="/partnerships"
+         [routerLink]="'/' + ROUTES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS"
+         target="_blank"
+         rel="noopener">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0Af;</i>
         <span>{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
       </a>

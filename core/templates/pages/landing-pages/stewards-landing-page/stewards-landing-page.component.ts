@@ -66,7 +66,7 @@ angular.module('oppia').component('stewardsLandingPage', {
           return [{
             text: 'Get Involved',
             href: (
-              'https://www.oppiafoundation.org/partnerships#get-in-touch')
+              '/partnerships#get-in-touch')
           }, {
             text: 'Browse Lessons',
             href: '/community-library'

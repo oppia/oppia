@@ -112,8 +112,6 @@ module.exports = {
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
     oppia_root:
       commonPrefix + '/pages/oppia-root/index.ts',
-    partnerships:
-      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -468,16 +466,6 @@ module.exports = {
       meta: defaultMeta,
       template:
           commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['partnerships'],
-      filename: 'partnerships-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-          commonPrefix + '/pages/partnerships-page/' +
-          'partnerships-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

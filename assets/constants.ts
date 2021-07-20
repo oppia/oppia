@@ -5958,6 +5958,7 @@ export default {
     "CONTACT": "contact",
     "DONATE": "donate",
     "GET_STARTED": "get-started",
+    "PARTNERSHIPS": "partnerships",
     "PRIVACY": "privacy-policy",
     "TEACH": "teach",
     "TERMS": "terms",

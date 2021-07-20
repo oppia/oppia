@@ -13,23 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root Component for partnerships page.
+ * @fileoverview Routing module for partnerships page.
  */
 
-import { Component } from '@angular/core';
-import { PageTitleService } from 'services/page-title.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { PartnershipsPageRootComponent } from './partnerships-page-root.component';
 
-@Component({
-  selector: 'oppia-partnerships-page-root',
-  templateUrl: './partnerships-page-root.component.html'
-})
-export class PartnershipsPageRootComponent {
-  constructor(
-    private pageTitleService: PageTitleService
-  ) {}
-
-  ngOnInit(): void {
-    // Update default title and meta tags.
-    this.pageTitleService.setPageTitle('Partnerships | Oppia');
+const routes: Route[] = [
+  {
+    path: '',
+    component: PartnershipsPageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class PartnershipsPageRoutingModule {}
