@@ -96,10 +96,7 @@ import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-pl
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
-
-
-// Directives.
-import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 
 
 // Pipes.
@@ -276,7 +273,7 @@ const toastrConfig = {
     StateSkillEditorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
@@ -338,6 +335,7 @@ const toastrConfig = {
     SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
@@ -410,7 +408,7 @@ const toastrConfig = {
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
