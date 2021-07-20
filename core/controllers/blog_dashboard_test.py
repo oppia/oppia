@@ -26,8 +26,8 @@ import python_utils
 import utils
 
 
-class BlogAdminPageTests(test_utils.GenericTestBase):
-    """Checks the access to the blog admin page and its rendering."""
+class BlogDashboardPageTests(test_utils.GenericTestBase):
+    """Checks the access to the blog dashboard page and its rendering."""
 
     def test_blog_dashboard_page_access_without_logging_in(self):
         """Tests access to the Blog Dashboard page."""
