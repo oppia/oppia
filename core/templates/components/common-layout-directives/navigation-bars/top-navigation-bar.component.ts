@@ -105,6 +105,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg');
   navElementsVisibilityStatus ={};
+  ROUTES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.ROUTES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,

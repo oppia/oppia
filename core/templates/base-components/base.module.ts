@@ -47,6 +47,7 @@ import {
 // Miscenellous.
 import * as hammer from 'hammerjs';
 import { HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
 
 // Configurations.
 
@@ -87,6 +88,7 @@ const toastrConfig = {
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
+    HybridRouterModuleProvider.provide(),
     SharedPipesModule,
     ToastrModule.forRoot(toastrConfig),
   ],
