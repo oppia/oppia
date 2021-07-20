@@ -175,7 +175,7 @@ describe('BannerComponent', () => {
         '"sourceTagId":"1","secret":"secret1"}', '*');
     });
 
-  it('should 1', () => {
+  it('should post message when height of exploration window changes', () => {
     spyOn(loggerService, 'error').and.stub();
     mockWindowRef.nativeWindow.location.hash =
       '/version0.0.0';
@@ -189,7 +189,8 @@ describe('BannerComponent', () => {
       .toHaveBeenCalledWith('Invalid hash for embedding: version0.0.0');
   });
 
-  it('should 2', () => {
+  it('should throw error when an invalid version or secret is' +
+  ' presenti in the url', () => {
     spyOn(loggerService, 'error').and.stub();
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.0';
@@ -203,7 +204,7 @@ describe('BannerComponent', () => {
       .toHaveBeenCalledWith('Invalid hash for embedding: version=0.0.0');
   });
 
-  it('should 3', () => {
+  it('should thow error when hasdict version is not supported', () => {
     spyOn(loggerService, 'error').and.stub();
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.0&secret=secret1&tagid=1';
@@ -217,7 +218,7 @@ describe('BannerComponent', () => {
       .toHaveBeenCalledWith('Error validating payload: [object Object]');
   });
 
-  it('should 3', () => {
+  it('should throw error when version of embedding is unknown', () => {
     spyOn(loggerService, 'error').and.stub();
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.10&secret=secret1&tagid=1';
