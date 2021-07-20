@@ -33,5 +33,6 @@ class OppiaRootPage(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
+        # type: () -> None
         """Handles GET requests."""
         self.render_template('oppia-root.mainpage.html')
