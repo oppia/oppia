@@ -46,6 +46,7 @@ from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
+from core.controllers import oppia_root
 from core.controllers import pages
 from core.controllers import platform_feature
 from core.controllers import practice_sessions
@@ -922,6 +923,12 @@ if constants.DEV_MODE:
         get_redirect_route(
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
+
+for route in constants.ROUTES_REGISTERED_WITH_FRONTEND.values():
+    URLS.append(
+        get_redirect_route(
+            r'/%s' % route,
+            oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))

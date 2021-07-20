@@ -573,19 +573,6 @@ class BaseHandler(webapp2.RequestHandler):
             elif values['status_code'] == 503:
                 self.render_template('maintenance-page.mainpage.html')
             elif values['status_code'] == 404:
-                # Routes for pages are handled at the frontend using angular
-                # router. As they are not registered at the backend,
-                # the backend tries to respond with 404 status code.
-                # This scenario is handled here, so that routes registered
-                # with angular router have appropriate status code.
-
-                route_is_registered_with_angular_router = any(
-                    self.request.path == '/%s' % route for route in
-                    constants.ROUTES_REGISTERED_WITH_FRONTEND.values())
-
-                if route_is_registered_with_angular_router:
-                    self.response.set_status(200)
-
                 self.render_template('oppia-root.mainpage.html')
             else:
                 self.render_template(
