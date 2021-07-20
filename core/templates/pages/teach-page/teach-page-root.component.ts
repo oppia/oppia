@@ -17,9 +17,31 @@
  */
 
 import { Component } from '@angular/core';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-teach-page-root',
   templateUrl: './teach-page-root.component.html'
 })
-export class TeachPageRootComponent {}
+export class TeachPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    // Update default title and meta tags.
+    this.pageTitleService.setPageTitle(
+      'Guide to Oppia for Parents and Teachers | Oppia');
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'description',
+        content: 'The Oppia library is full of user-created lessons ' +
+        'called \'explorations\'. Read about how to participate in the ' +
+        'community and begin creating explorations.'
+      }
+    ]);
+  }
+}

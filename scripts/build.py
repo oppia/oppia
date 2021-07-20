@@ -124,7 +124,6 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/partnerships-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
     'webpack_bundles/playbook.mainpage.html',
-    'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/thanks-page.mainpage.html'
 )
 

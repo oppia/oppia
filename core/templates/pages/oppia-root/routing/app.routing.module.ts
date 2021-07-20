@@ -50,6 +50,11 @@ const routes: Route[] = [
       .then(m => m.PrivacyPageModule)
   },
   {
+    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.TEACH,
+    loadChildren: () => import('pages/teach-page/teach-page.module')
+      .then(m => m.TeachPageModule)
+  },
+  {
     path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.TERMS,
     loadChildren: () => import('pages/terms-page/terms-page.module')
       .then(m => m.TermsPageModule)

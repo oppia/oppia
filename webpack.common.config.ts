@@ -142,7 +142,6 @@ module.exports = {
     subtopic_viewer:
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-    teach: commonPrefix + '/pages/teach-page/teach-page.import.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
@@ -649,19 +648,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/subtopic-viewer-page/' +
         'subtopic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['teach'],
-      filename: 'teach-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'The Oppia library is full of user-created lessons ' +
-        'called \'explorations\'. Read about how to participate in the ' +
-        'community and begin creating explorations.'
-      },
-      template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

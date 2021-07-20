@@ -5959,6 +5959,7 @@ export default {
     "DONATE": "donate",
     "GET_STARTED": "get-started",
     "PRIVACY": "privacy-policy",
+    "TEACH": "teach",
     "TERMS": "terms"
   },
 

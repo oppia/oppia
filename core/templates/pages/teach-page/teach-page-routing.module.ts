@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,29 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the teach page.
+ * @fileoverview Routing module for teach page.
  */
 
 import { NgModule } from '@angular/core';
-import { TeachPageComponent } from './teach-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { Route, RouterModule } from '@angular/router';
 import { TeachPageRootComponent } from './teach-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TeachPageRoutingModule } from './teach-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: TeachPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    TeachPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    TeachPageComponent,
-    TeachPageRootComponent,
-  ],
-  entryComponents: [
-    TeachPageComponent,
-    TeachPageRootComponent,
+  exports: [
+    RouterModule
   ]
 })
-export class TeachPageModule {}
+
+export class TeachPageRoutingModule {}
