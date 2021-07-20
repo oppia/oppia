@@ -30,6 +30,11 @@ const routes: Route[] = [
       .then(m => m.AboutPageModule)
   },
   {
+    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.CONTACT,
+    loadChildren: () => import('pages/contact-page/contact-page.module')
+      .then(m => m.ContactPageModule)
+  },
+  {
     path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.GET_STARTED,
     loadChildren: () => import('pages/get-started-page/get-started-page.module')
       .then(m => m.GetStartedPageModule)

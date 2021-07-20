@@ -17,9 +17,29 @@
  */
 
 import { Component } from '@angular/core';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-contact-page-root',
   templateUrl: './contact-page-root.component.html'
 })
-export class ContactPageRootComponent {}
+export class ContactPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    // Update default title and meta tags.
+    this.pageTitleService.setPageTitle('Contact | Oppia');
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'description',
+        content: 'Contact the Oppia team, submit feedback, and learn ' +
+          'how to get involved with the Oppia project.'
+      }
+    ]);
+  }
+}

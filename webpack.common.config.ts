@@ -68,7 +68,6 @@ module.exports = {
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.import.ts',
-    contact: commonPrefix + '/pages/contact-page/contact-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
@@ -252,18 +251,6 @@ module.exports = {
           'how to get involved with the Oppia project.'
       },
       template: commonPrefix + '/tests/console_errors.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['contact'],
-      filename: 'contact-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.'
-      },
-      template: commonPrefix + '/pages/contact-page/contact-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -118,7 +118,6 @@ FILEPATHS_NOT_TO_RENAME = (
 )
 
 PAGES_IN_APP_YAML = (
-    'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/license.mainpage.html',
     'webpack_bundles/login-page.mainpage.html',
