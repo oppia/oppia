@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file contain HttpClient which is not allowed.
+ * @fileoverview Frontend Model for translatable item.
  */
 
-describe('Request Interceptor Service', () => {
-  let mcts: MockCsrfTokenService = null;
-  let httpClient: HttpClient = null; // This line is using httpClient.
-  let httpTestingController: HttpTestingController = null;
-});
+export interface TranslatableItemBackendDict {
+  'content': string,
+  'data_format': string
+}
+
+export class TranslatableItem {
+  constructor(
+      public content: string,
+      public dataFormat: string
+  ) {}
+
+  static createFromBackendDict(
+      backendDict: TranslatableItemBackendDict): TranslatableItem {
+    return new TranslatableItem(backendDict.content, backendDict.data_format);
+  }
+}

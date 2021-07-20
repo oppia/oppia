@@ -16,6 +16,7 @@
  * @fileoverview Factory for creating http loader for translations.
  */
 
+// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
