@@ -60,6 +60,11 @@ const routes: Route[] = [
       .then(m => m.TermsPageModule)
   },
   {
+    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.THANKS,
+    loadChildren: () => import('pages/thanks-page/thanks-page.module')
+      .then(m => m.ThanksPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import(
       'pages/error-pages/error-404/error-404-page.module').then(

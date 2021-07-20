@@ -142,7 +142,6 @@ module.exports = {
     subtopic_viewer:
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-    thanks: commonPrefix + '/pages/thanks-page/thanks-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
     topics_and_skills_dashboard: (
@@ -648,17 +647,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/subtopic-viewer-page/' +
         'subtopic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['thanks'],
-      filename: 'thanks-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Thank you for donating to The Oppia Foundation!'
-      },
-      template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

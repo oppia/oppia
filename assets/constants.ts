@@ -5960,7 +5960,8 @@ export default {
     "GET_STARTED": "get-started",
     "PRIVACY": "privacy-policy",
     "TEACH": "teach",
-    "TERMS": "terms"
+    "TERMS": "terms",
+    "THANKS": "thanks"
   },
 
   "DEV_MODE": true,

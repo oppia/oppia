@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the thanks page.
+ * @fileoverview Routing module for thanks page.
  */
 
 import { NgModule } from '@angular/core';
-
-import { ThanksPageComponent } from './thanks-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { Route, RouterModule } from '@angular/router';
 import { ThanksPageRootComponent } from './thanks-page-root.component';
-import { CommonModule } from '@angular/common';
-import { ThanksPageRoutingModule } from './thanks-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: ThanksPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    ThanksPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    ThanksPageComponent,
-    ThanksPageRootComponent
-  ],
-  entryComponents: [
-    ThanksPageComponent,
-    ThanksPageRootComponent
+  exports: [
+    RouterModule
   ]
 })
-export class ThanksPageModule {}
+
+export class ThanksPageRoutingModule {}
