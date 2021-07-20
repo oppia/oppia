@@ -73,6 +73,10 @@ angular.module('oppia').directive('conceptCard', [function() {
             }
             // TODO(#8521): Remove when this directive is migrated to Angular.
             $rootScope.$apply();
+          }, function(errorResponse) {
+            ctrl.loadingMessage = '';
+            ctrl.skillDeletedMessage = 'Oops, it looks like this skill has' +
+              ' been deleted.';
           });
         };
       }

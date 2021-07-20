@@ -4,6 +4,9 @@
       <angular-html-bind class="protractor-test-concept-card-explanation"
                          html-data="$ctrl.currentConceptCard.getExplanation().html">
       </angular-html-bind>
+      <div ng-if="$ctrl.skillDeletedMessage">
+        <div class="oppia-align-center"><[$ctrl.skillDeletedMessage]></div>
+      </div>
     </div>
   </div>
   <div class="concept-card-worked-examples" ng-if="$ctrl.numberOfWorkedExamplesShown > 0">
