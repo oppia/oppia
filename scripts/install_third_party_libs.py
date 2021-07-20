@@ -64,13 +64,6 @@ _PARSER = argparse.ArgumentParser(
 Installation script for Oppia third-party libraries.
 """)
 
-PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
-    'configparser.py')
-PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
-    'configparser.py')
-
 # Download locations for buf binary.
 BUF_BASE_URL = (
     'https://github.com/bufbuild/buf/releases/download/v0.29.0/')

@@ -398,8 +398,8 @@ def url_retrieve(source_url, filename=None):
     except ImportError:
         import urllib as urlrequest
 
-        # Change the User-Agent to prevent servers from blocking requests.
-        # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
+    # Change the User-Agent to prevent servers from blocking requests.
+    # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
     urlrequest.URLopener.version = (
         'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
         'Gecko/20100101 Firefox/47.0'
@@ -418,7 +418,7 @@ def url_open(source_url):
     Returns:
         urlopen. The 'urlopen' object.
     """
-    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
+    context = ssl.create_default_context(certifi.where())
     try:
         import urllib.request as urlrequest
     except ImportError:
@@ -503,7 +503,11 @@ def convert_to_bytes(string_to_convert) -> bytes:
         return string_to_convert.encode('utf-8')
     elif isinstance(string_to_convert, int):
         raise Exception(
-            'Passing int is not allowed, since it leads to dangerous issues.')
+            'Passing int is not allowed, since it is insecure, because when '
+            'big number is passed to the bytes function it can spent some time '
+            'generating array with empty bytes.'
+            'See: https://beginnersbook.com/2019/05/python-bytes/#h-example-2-array-of-bytes-from-an-integer'
+        )
     return bytes(string_to_convert)
 
 

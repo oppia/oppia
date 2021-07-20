@@ -133,9 +133,9 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/thanks-page.mainpage.html'
 )
 
-# These are the env vars that need to be removed from the app.yaml when we are
+# These are the env vars that need to be removed from app.yaml when we are
 # deploying to production.
-ENV_VARS_TO_REMOVE_FROM_DEPLOY_APP_YAML = (
+ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML = (
     'FIREBASE_AUTH_EMULATOR_HOST',
     'DATASTORE_DATASET',
     'DATASTORE_EMULATOR_HOST',
@@ -233,7 +233,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         content = content.replace('version: default', '')
         # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
         # test locally, and MUST NOT be included in the deployed file.
-        for env_variable in ENV_VARS_TO_REMOVE_FROM_DEPLOY_APP_YAML:
+        for env_variable in ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML:
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)

@@ -251,7 +251,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--project', feconf.OPPIA_PROJECT_ID,
         '--data-dir', common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
         '--host-port', emulator_hostport,
-        '--consistency=1.0', '--quiet',
+        '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
     with python_utils.ExitStack() as stack:
