@@ -19,9 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import functools
+
 from google.cloud import storage
 
-CLIENT = storage.Client()
+
+@functools.lru_cache(maxsize=1)
+def get_client():
+    return storage.Client()
 
 
 def isfile(bucket_name, filepath):
@@ -35,7 +40,7 @@ def isfile(bucket_name, filepath):
     Returns:
         bool. Whether the file exists in GCS.
     """
-    return CLIENT.get_bucket(bucket_name).get_blob(filepath) is not None
+    return get_client().get_bucket(bucket_name).get_blob(filepath) is not None
 
 
 def get(bucket_name, filepath):
@@ -50,7 +55,7 @@ def get(bucket_name, filepath):
         FileStream or None. It returns FileStream domain object if the file
         exists. Otherwise, it returns None.
     """
-    blob = CLIENT.get_bucket(bucket_name).get_blob(filepath)
+    blob = get_client().get_bucket(bucket_name).get_blob(filepath)
     data = blob.download_as_bytes()
     return data
 
@@ -65,7 +70,7 @@ def commit(bucket_name, filepath, raw_bytes, mimetype):
         raw_bytes: str. The content to be stored in the file.
         mimetype: str. The content-type of the cloud file.
     """
-    blob = CLIENT.get_bucket(bucket_name).blob(filepath)
+    blob = get_client().get_bucket(bucket_name).blob(filepath)
     blob.upload_from_string(raw_bytes, content_type=mimetype)
 
 
@@ -77,7 +82,7 @@ def delete(bucket_name, filepath):
         filepath: str. The path to the relevant file within the entity's
             assets folder.
     """
-    blob = CLIENT.get_bucket(bucket_name).get_blob(filepath)
+    blob = get_client().get_bucket(bucket_name).get_blob(filepath)
     blob.delete()
 
 
@@ -91,9 +96,12 @@ def copy(bucket_name, source_assets_path, dest_assets_path):
         dest_assets_path: str. The path to the relevant file within the entity's
             assets folder.
     """
-    src_blob = CLIENT.get_bucket(bucket_name).get_blob(source_assets_path)
-    CLIENT.get_bucket(bucket_name).copy_blob(
-        src_blob, CLIENT.get_bucket(bucket_name), new_name=dest_assets_path)
+    src_blob = get_client().get_bucket(bucket_name).get_blob(source_assets_path)
+    get_client().get_bucket(bucket_name).copy_blob(
+        src_blob,
+        get_client().get_bucket(bucket_name),
+        new_name=dest_assets_path
+    )
 
 
 def listdir(bucket_name, dir_name):
@@ -108,4 +116,5 @@ def listdir(bucket_name, dir_name):
         list(str). A lexicographically-sorted list of filenames.
     """
     return list(
-        CLIENT.list_blobs(CLIENT.get_bucket(bucket_name), prefix=dir_name))
+        get_client().list_blobs(
+            get_client().get_bucket(bucket_name), prefix=dir_name))

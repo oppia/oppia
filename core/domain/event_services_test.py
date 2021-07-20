@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import importlib
 import inspect
 import logging
-import os
 import re
 
 from core.domain import event_services

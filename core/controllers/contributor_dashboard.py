@@ -288,14 +288,17 @@ class TranslatableTextHandler(base.BaseHandler):
         for state_name in state_names_to_content_id_mapping:
             content_id_to_translatable_item = dict(
                 state_names_to_content_id_mapping[state_name])
-            for content_id in content_id_to_translatable_item.keys():
-                if self._content_in_review(state_name, content_id, suggestions):
-                    del content_id_to_translatable_item[content_id]
-            if content_id_to_translatable_item:
+            content_id_to_not_reviewed_translatable_item = {}
+            for content_id, item in content_id_to_translatable_item.items():
+                if not self._content_in_review(
+                        state_name, content_id, suggestions):
+                    content_id_to_not_reviewed_translatable_item[content_id] = (
+                        item)
+            if content_id_to_not_reviewed_translatable_item:
                 final_mapping[state_name] = {
                     cid: translatable_item.to_dict()
                     for cid, translatable_item in (
-                        content_id_to_translatable_item.items())
+                        content_id_to_not_reviewed_translatable_item.items())
                 }
         return final_mapping
 
