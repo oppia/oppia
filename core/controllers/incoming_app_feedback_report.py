@@ -25,12 +25,14 @@ from core.domain import app_feedback_report_services
 import feconf
 import utils
 
+from typing import Dict # isort:skip # pylint: disable=unused-import
+
 
 class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[None, None]
-    HANDLER_ARGS_SCHEMAS = {
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = { # type: ignore[assignment]
         'POST': {
             'report': {
                 'schema': {
@@ -43,8 +45,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     }
 
     @acl_decorators.open_access
-    def post(self):
-         # type: () -> None
+    def post(self): # type: ignore[no-untyped-def]
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the
@@ -68,23 +69,23 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
             report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
-        return self.render_json({})
+        return self.render_json({}) # type: ignore[no-untyped-call]
 
     def _has_valid_android_request_headers(self, headers):
-         # type: (List[str]) -> bool
+         # type: (Dict[Text]) -> bool
         """Verifies the headers from the incoming request.
 
         Args:
-            headers: list(str). The headers to validate from the request.
+            headers: dict. The headers to validate from the request.
 
         Returns:
             bool. Whether the request headers are valid and correspond to the
             expected header values for Android requests.
         """
-        api_key = headers.get('api_key')
-        app_package_name = headers.get('app_package_name')
-        app_version_name = headers.get('app_version_name')
-        app_version_code = headers.get('app_version_code')
+        api_key = headers['api_key']
+        app_package_name = headers['app_package_name']
+        app_version_name = headers['app_version_name']
+        app_version_code = headers['app_version_code']
         if (
                 api_key != feconf.ANDROID_API_KEY or
                 app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or

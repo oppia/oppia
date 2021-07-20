@@ -27,7 +27,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, Optional, Type, List, Any # isort:skip # pylint: disable=unused-import
+from typing import Dict, Text, Optional, Type, List, Any # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
     [models.NAMES.app_feedback_report])
@@ -38,7 +38,7 @@ PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
 
 
 def get_report_models(report_ids):
-    # type: (List[str]) -> List[app_feedback_report_models.AppFeedbackReportModel]
+    # type: (List[Text]) -> app_feedback_report_models.AppFeedbackReportModel
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
@@ -53,7 +53,7 @@ def get_report_models(report_ids):
 
 
 def create_report_from_json(report_json):
-    # type: (Dict[str, Any]) -> app_feedback_report_domain.AppFeedbackReport
+    # type: (Dict[Text, Any]) -> app_feedback_report_domain.AppFeedbackReport
     """Creates an AppFeedbackReport domain object instance from the incoming
     JSON request.
 
@@ -83,17 +83,17 @@ def store_incoming_report_stats(report_obj):
     all_reports_id = constants.ALL_ANDROID_REPORTS_STATS_TICKET_ID
 
     stats_date = report_obj.submitted_on_timestamp.date()
-    _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
+    _update_report_stats_model_in_transaction(
         unticketed_id, platform, stats_date, report_obj, 1)
-    _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
+    _update_report_stats_model_in_transaction(
         all_reports_id, platform, stats_date, report_obj, 1)
 
 
 @transaction_services.run_in_transaction_wrapper
-def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
+def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         ticket_id, platform, date, report_obj, delta):
     """Adds a new report's stats to the stats model for a specific ticket's
-    stats. Note that this is currently only 
+    stats. Note that this currently only works for Android reports.
 
     Args:
         ticket_id: str. The id of the ticket that we want to update stats for.
@@ -204,20 +204,20 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
 
 def calculate_new_stats_count_for_parameter(
         current_stats_map, current_value, delta):
-    # type: (Dict[str, app_feedback_report_domain.ReportStatsParameterValueCounts], str, int) -> int
+    # type: (Dict[Text, int], Text, int) -> Dict[Any, int]
     """Helper to increment or initialize the stats count for a parameter.
 
     Args:
         current_stats_map: dict. The current stats map for the parameter we are
-            updating.
+            updating; keys correspond to the possible value for a single
+            parameter.
         current_value: str. The value for the parameter that we are updating
             the stats of.
         delta: int. The amount to increment the current count by, either -1 or
             +1.
 
     Returns:
-        int. The new report count to put into the stats dict for a single
-        parameter value.
+        dict. The new stats values for the given parameter.
     """
     if current_stats_map.has_key(current_value):
         current_stats_map[current_value] += delta
@@ -293,14 +293,14 @@ def get_stats_from_model(stats_model):
         stats_model.ticket_id)
     param_stats = create_app_daily_stats_from_model_json(
         stats_model.daily_param_stats)
-    app_feedback_report_domain.AppFeedbackReportDailyStats(
+    return app_feedback_report_domain.AppFeedbackReportDailyStats(
         stats_model.id, ticket, stats_model.platform,
         stats_model.stats_tracking_date, stats_model.total_reports_submitted,
         param_stats)
 
 
 def create_app_daily_stats_from_model_json(daily_param_stats):
-    # type: (Dict[str, Dict[str, int]]) -> Dict[str, app_feedback_report_domain.ReportStatsParameterValueCounts]
+    # type: (Dict[Text, Dict[Text, int]]) -> Dict[Text, app_feedback_report_domain.ReportStatsParameterValueCounts]
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
@@ -328,7 +328,7 @@ def create_app_daily_stats_from_model_json(daily_param_stats):
 
 
 def get_android_report_from_model(android_report_model):
-    # type: (app_feedback_report_model.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
+    # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Creates a domain object that represents an android feedback report from
     the given model.
 
@@ -393,7 +393,7 @@ def get_android_report_from_model(android_report_model):
 
 
 def scrub_all_unscrubbed_expiring_reports(scrubbed_by):
-    # type: (str) -> None
+    # type: (Text) -> None
     """Fetches the reports that are expiring and must be scrubbed.
 
     Args:
@@ -421,7 +421,7 @@ def get_all_expiring_reports_to_scrub():
 
 
 def scrub_single_app_feedback_report(report, scrubbed_by):
-    # type: (app_feedback_report_domain.AppFeedbackReport, str) -> None
+    # type: (app_feedback_report_domain.AppFeedbackReport, Text) -> None
     """Scrubs the instance of AppFeedbackReportModel with given ID, removing
     any user-entered input in the entity.
 
@@ -435,7 +435,9 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     report.scrubbed_by = scrubbed_by
     report.user_supplied_feedback.user_feedback_other_text_input = None
     if report.platform == PLATFORM_ANDROID:
-        report.app_context.event_logs = None
+        report.app_context.__class__ = (
+            app_feedback_report_domain.AndroidAppContext)
+        app_feedback_report_domain.AndroidAppContext(report.app_context).event_logs = None
         report.app_context.logcat_logs = None
     save_feedback_report_to_storage(report)
 
@@ -449,6 +451,10 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
         new_incoming_report: bool. Whether the report is a new incoming report
             that does not have a corresponding model entity.
     """
+    if report.platform == PLATFORM_WEB:
+        raise utils.InvalidInputException(
+            'Web report domain objects have not been defined.')
+
     user_supplied_feedback = report.user_supplied_feedback
     device_system_context = report.device_system_context
     app_context = report.app_context
@@ -460,26 +466,30 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
         'user_feedback_other_text_input': (
             user_supplied_feedback.user_feedback_other_text_input)
     }
-    if report.platform == PLATFORM_ANDROID:
-        report_info_json = {
-            'user_feedback_selected_items': (
-                user_supplied_feedback.user_feedback_selected_items),
-            'user_feedback_other_text_input': (
-                user_supplied_feedback.user_feedback_other_text_input),
-            'event_logs': app_context.event_logs,
-            'logcat_logs': app_context.logcat_logs,
-            'package_version_code': device_system_context.package_version_code,
-            'android_device_language_locale_code': (
-                device_system_context.device_language_locale_code),
-            'build_fingerprint': device_system_context.build_fingerprint,
-            'network_type': device_system_context.network_type.name,
-            'text_size': app_context.text_size.name,
-            'only_allows_wifi_download_and_update': (
-                app_context.only_allows_wifi_download_and_update),
-            'automatically_update_topics': (
-                app_context.automatically_update_topics),
-            'account_is_profile_admin': app_context.account_is_profile_admin
-        }
+    app_context.__class__ = (
+        app_feedback_report_domain.AndroidAppContext)
+    device_system_context.__class__ = (
+        app_feedback_report_domain.AndroidDeviceSystemContext)
+
+    report_info_json = {
+        'user_feedback_selected_items': (
+            user_supplied_feedback.user_feedback_selected_items),
+        'user_feedback_other_text_input': (
+            user_supplied_feedback.user_feedback_other_text_input),
+        'event_logs': app_context.event_logs,
+        'logcat_logs': app_context.logcat_logs,
+        'package_version_code': device_system_context.package_version_code,
+        'android_device_language_locale_code': (
+            device_system_context.device_language_locale_code),
+        'build_fingerprint': device_system_context.build_fingerprint,
+        'network_type': device_system_context.network_type.name,
+        'text_size': app_context.text_size.name,
+        'only_allows_wifi_download_and_update': (
+            app_context.only_allows_wifi_download_and_update),
+        'automatically_update_topics': (
+            app_context.automatically_update_topics),
+        'account_is_profile_admin': app_context.account_is_profile_admin
+    }
 
     if new_incoming_report:
         app_feedback_report_models.AppFeedbackReportModel.create(
@@ -498,11 +508,7 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
             app_context.audio_language_code, None, None)
     model_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
         report.report_id)
-    if report.platform == PLATFORM_ANDROID:
-        model_entity.android_report_info = report_info_json
-    else:
-        raise utils.InvalidInputException(
-            'Web report domain objects have not been defined.')
+    model_entity.android_report_info = report_info_json
 
     model_entity.scrubbed_by = report.scrubbed_by
     model_entity.update_timestamps()
@@ -546,7 +552,7 @@ def reassign_ticket(report, new_ticket):
     # Remove the report from the stats model associated with the old ticket.
     old_ticket_id = report.ticket_id
     if old_ticket_id is None:
-        _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
+        _update_report_stats_model_in_transaction(
             constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
             stats_date, report, -1)
     else:
@@ -560,7 +566,7 @@ def reassign_ticket(report, new_ticket):
                 'The report is being removed from an invalid ticket id: %s.'
                 % old_ticket_id)
         old_ticket_obj = get_ticket_from_model(old_ticket_model)
-        old_ticket_obj.reports.remove(report)
+        old_ticket_obj.reports.remove(report.report_id)
         if old_ticket_obj.newest_report_creation_timestamp == (
                 report.submitted_on_timestamp):
             report_models = get_report_models(old_ticket_obj.reports)
@@ -572,7 +578,7 @@ def reassign_ticket(report, new_ticket):
                         report_models[index].submitted_on_datetime)
             old_ticket_obj.newest_report_creation_timestamp = latest_timestamp
         _save_ticket(old_ticket_obj)
-        _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
+        _update_report_stats_model_in_transaction(
             old_ticket_id, platform, stats_date, report, -1)
 
     # Add the report to the new ticket.
@@ -593,16 +599,16 @@ def reassign_ticket(report, new_ticket):
     # Update the stats model for the new ticket.
     platform = report.platform
     stats_date = report.submitted_on_timestamp.date()
-    _update_report_stats_model_in_transaction( # type: ignore[no-untyped-call]
+    _update_report_stats_model_in_transaction(
         new_ticket_id, platform, stats_date, report, 1)
 
     # Update the report model to the new ticket id.
-    report.ticket_id = new_ticket.ticket_id
+    report.ticket_id = new_ticket_id
     save_feedback_report_to_storage(report)
 
 
 def edit_ticket_name(ticket, new_name):
-    # type: (app_feedback_report_domain.AppFeedbackReportTicket, str) -> None
+    # type: (app_feedback_report_domain.AppFeedbackReportTicket, Text) -> None
     """Updates the ticket name.
 
     Returns:
@@ -614,7 +620,7 @@ def edit_ticket_name(ticket, new_name):
 
 
 def _save_ticket(ticket):
-    # type: (app_feedback_report_domain.AppFeedbackReportTicket) -> app_feedback_report_domain.AppFeedbackReportTicket
+    # type: (app_feedback_report_domain.AppFeedbackReportTicket) -> None
     """Saves the ticket to persistent storage.
 
     Returns:

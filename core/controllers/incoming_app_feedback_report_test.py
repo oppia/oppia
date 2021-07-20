@@ -26,10 +26,10 @@ from core.tests import test_utils
 
 import feconf
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict, Any, Text # isort:skip # pylint: disable=unused-import
 
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report]) # type: ignore[no-untyped-call]
+(app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+    [models.NAMES.app_feedback_report])
 
 REPORT_JSON = {
     'platform': 'android',
@@ -84,7 +84,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         # type: () -> None
-        super(IncomingAndroidFeedbackReportHandlerTests, self).setUp()
+        super(IncomingAndroidFeedbackReportHandlerTests, self).setUp() # type: ignore[no-untyped-call]
         self.payload = {
             'report': REPORT_JSON
         }
@@ -124,7 +124,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             csrf_token=token, expected_status_int=500)
 
     def _post_json_with_test_headers(self, payload, expected_status=200):
-        # type: (Dict[str, str], int) -> None
+        # type: (Dict[Text, Any], int) -> None
         """Sends a post request usint str-type representations of the header
         values so that header validation is successful.
 
