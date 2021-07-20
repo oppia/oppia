@@ -93,8 +93,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/library_test.py',
     'core/controllers/moderator.py',
     'core/controllers/moderator_test.py',
-    'core/controllers/oppia_root.py',
-    'core/controllers/oppia_root_test.py',
     'core/controllers/pages.py',
     'core/controllers/pages_test.py',
     'core/controllers/platform_feature.py',
