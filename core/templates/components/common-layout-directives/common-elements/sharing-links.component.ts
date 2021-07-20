@@ -98,7 +98,7 @@ export class SharingLinksComponent implements OnInit {
     return classes;
   }
 
-getUrl(network: SharingPlatform): string {
+  getUrl(network: SharingPlatform): string {
     let queryString: string;
     switch (network) {
       case 'facebook':
