@@ -110,6 +110,7 @@ ignore-imports=yes
 disable=abstract-method,
         arguments-differ,
         broad-except,
+        consider-using-items,
         consider-using-ternary,
         duplicate-code,
         fixme,
