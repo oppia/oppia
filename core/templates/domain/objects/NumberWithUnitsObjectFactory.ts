@@ -68,12 +68,12 @@ export class NumberWithUnits {
   }
 
   toString(): string {
-    let numberWithUnitsString: string = '';
+    let numberWithUnitsString = '';
     // The NumberWithUnits class is allowed to have 4 properties namely
     // type, real, fraction and units. Hence, we cannot inject
     // UnitsObjectFactory, since that'll lead to creation of 5th property
     // which isn't allowed. Refer objects.py L#956.
-    let unitsString: string = (new UnitsObjectFactory()).fromList(
+    let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
@@ -99,8 +99,8 @@ export class NumberWithUnits {
   }
 
   toMathjsCompatibleString(): string {
-    let numberWithUnitsString: string = '';
-    let unitsString: string = (new UnitsObjectFactory()).fromList(
+    let numberWithUnitsString = '';
+    let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
     unitsString = (new UnitsObjectFactory()).toMathjsCompatibleString(
       unitsString);
