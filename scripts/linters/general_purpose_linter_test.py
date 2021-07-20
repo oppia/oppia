@@ -52,8 +52,6 @@ INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
 FILE_IN_EXCLUDED_PATH = os.path.join(
     'core', 'tests', 'build_sources', 'assets', 'constants.js')
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
-INVALID_TEMPLATE_URL_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_templateurl.ts')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
 
@@ -128,20 +126,6 @@ class HTMLLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements([
             'Line 2: Please do not use inline styling.'
-            ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-
-class JsTsLintTests(test_utils.LinterTestBase):
-    """Test the JsTs lint functions."""
-
-    def test_invalid_use_of_template_url(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_TEMPLATE_URL_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 24: The directives must be directly referenced.'
             ], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
