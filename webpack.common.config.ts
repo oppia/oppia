@@ -143,7 +143,6 @@ module.exports = {
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.import.ts',
-    terms: commonPrefix + '/pages/terms-page/terms-page.import.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
@@ -663,19 +662,6 @@ module.exports = {
         'community and begin creating explorations.'
       },
       template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['terms'],
-      filename: 'terms-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
-        ' e-learning platform. Learn about our terms and conditions for ' +
-        'creating and distributing learning material.'
-      },
-      template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

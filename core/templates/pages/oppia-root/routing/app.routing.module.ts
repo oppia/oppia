@@ -50,6 +50,11 @@ const routes: Route[] = [
       .then(m => m.PrivacyPageModule)
   },
   {
+    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.TERMS,
+    loadChildren: () => import('pages/terms-page/terms-page.module')
+      .then(m => m.TermsPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import(
       'pages/error-pages/error-404/error-404-page.module').then(

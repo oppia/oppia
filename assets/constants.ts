@@ -5958,7 +5958,8 @@ export default {
     "CONTACT": "contact",
     "DONATE": "donate",
     "GET_STARTED": "get-started",
-    "PRIVACY": "privacy-policy"
+    "PRIVACY": "privacy-policy",
+    "TERMS": "terms"
   },
 
   "DEV_MODE": true,

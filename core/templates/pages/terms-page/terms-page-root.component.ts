@@ -17,9 +17,30 @@
  */
 
 import { Component } from '@angular/core';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-terms-page-root',
   templateUrl: './terms-page-root.component.html'
 })
-export class TermsPageRootComponent {}
+export class TermsPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    // Update default title and meta tags.
+    this.pageTitleService.setPageTitle('Terms of Use | Oppia');
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
+      {
+        propertyType: 'name',
+        propertyValue: 'description',
+        content: 'Oppia is a 501(c)(3) registered non-profit open-source' +
+          ' e-learning platform. Learn about our terms and conditions for ' +
+          'creating and distributing learning material.'
+      }
+    ]);
+  }
+}

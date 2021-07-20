@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the terms page.
+ * @fileoverview Routing module for terms page.
  */
 
 import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TermsPageComponent } from
-  'pages/terms-page/terms-page.component';
+import { Route, RouterModule } from '@angular/router';
 import { TermsPageRootComponent } from './terms-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TermsPageRoutingModule } from './terms-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: TermsPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    TermsPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    TermsPageComponent,
-    TermsPageRootComponent
-  ],
-  entryComponents: [
-    TermsPageComponent,
-    TermsPageRootComponent
+  exports: [
+    RouterModule
   ]
 })
-export class TermsPageModule {}
+
+export class TermsPageRoutingModule {}
