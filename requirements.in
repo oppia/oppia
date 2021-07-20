@@ -15,6 +15,7 @@ google-cloud-storage==1.37.1
 GoogleAppEnginePipeline==1.9.22.1
 Graphy==1.0.0
 html5lib==1.0.1
+mailchimp3==3.0.14
 mutagen==1.43.0
 packaging==20.4
 pylatexenc==2.6
