@@ -26,7 +26,6 @@ import os
 import re
 import time
 
-from constants import constants
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services

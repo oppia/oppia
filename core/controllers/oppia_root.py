@@ -14,6 +14,9 @@
 
 """Controllers for the unified entry to frontend."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.controllers import acl_decorators
 from core.controllers import base
 
@@ -24,7 +27,7 @@ class OppiaRootPage(base.BaseHandler):
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
-      'GET': {}
+        'GET': {}
     }
 
     @acl_decorators.open_access
