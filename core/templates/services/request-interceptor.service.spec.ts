@@ -16,9 +16,17 @@
  * @fileoverview Unit tests for RequestInterceptorService.
  */
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import {HTTP_INTERCEPTORS, HttpClient, HttpRequest, HttpHandler} from '@angular/common/http';
-import { RequestInterceptor, MockCsrfTokenService } from 'services/request-interceptor.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController
+} from '@angular/common/http/testing';
+// eslint-disable-next-line oppia/disallow-httpclient
+import {HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest} from '@angular/common/http';
+
+import {
+  MockCsrfTokenService,
+  RequestInterceptor
+} from 'services/request-interceptor.service';
 import { CsrfTokenService } from './csrf-token.service';
 
 describe('Request Interceptor Service', () => {

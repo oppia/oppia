@@ -96,10 +96,7 @@ import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-pl
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
-
-
-// Directives.
-import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
+import { SubtopicSummaryTileComponent } from './summary-tile/subtopic-summary-tile.component';
 
 
 // Pipes.
@@ -114,6 +111,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
+// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -275,7 +273,7 @@ const toastrConfig = {
     StateSkillEditorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
@@ -337,6 +335,7 @@ const toastrConfig = {
     SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
@@ -409,7 +408,7 @@ const toastrConfig = {
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
-    SubtopicSummaryTileDirective,
+    SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
