@@ -46,9 +46,6 @@ import utils
 
 def _require_valid_version(version_from_payload, exploration_version):
     """Check that the payload version matches the given exploration version."""
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
 
     if version_from_payload != exploration_version:
         raise base.BaseHandler.InvalidInputException(
@@ -300,8 +297,7 @@ class ExplorationRightsHandler(EditorHandler):
             'version': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_value': None
+                }
             },
             'make_community_owned': {
                 'schema': {
@@ -476,8 +472,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
             'email_body': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             },
             'version': {
                 'schema': {
@@ -500,10 +495,6 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         # If moderator emails can be sent, check that all the prerequisites are
         # satisfied, otherwise do nothing.
         if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            if not email_body:
-                raise self.InvalidInputException(
-                    'Moderator actions should include an email to the '
-                    'recipient.')
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.
@@ -610,7 +601,7 @@ class ExplorationFileDownloader(EditorHandler):
             'output_format': {
                 'schema': {
                     'type': 'basestring',
-                    'choice': [
+                    'choices': [
                         feconf.OUTPUT_FORMAT_ZIP,
                         feconf.OUTPUT_FORMAT_JSON
                     ]
@@ -649,9 +640,6 @@ class ExplorationFileDownloader(EditorHandler):
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
                 exploration_id, version=version))
-        else:
-            raise self.InvalidInputException(
-                'Unrecognized output format %s' % output_format)
 
 
 class StateYamlHandler(EditorHandler):
@@ -1221,8 +1209,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
             'state_name': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             },
             'learner_answer_info_id': {
                 'schema': {
@@ -1293,8 +1280,6 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')
-            if not state_name:
-                raise self.InvalidInputException
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))

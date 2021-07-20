@@ -122,7 +122,7 @@ class ExplorationPage(base.BaseHandler):
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'basestring'
                 },
                 'default_value': None
             },

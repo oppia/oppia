@@ -631,7 +631,8 @@ class _Validators(python_utils.OBJECT):
     @staticmethod
     def is_string_contained_within_parenthesis(obj):
         # type: (Text) -> bool
-        """Checks if the given obj (a string) is contained within parenthesis.
+        """Checks if the given obj (a string) is contained within double quotes
+        followed by parenthesis.
 
         Args:
             obj: str. The string to verify.
