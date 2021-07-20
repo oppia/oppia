@@ -217,12 +217,10 @@ module.exports = {
       chunks: ['blog_dashboard'],
       filename: 'blog-dashboard-page.mainpage.html',
       hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'Blog Dashboard page'
-      },
+      meta: defaultMeta,
       template:
-        commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.mainpage.html',
+        commonPrefix + '/pages/blog-dashboard-page/' +
+        'blog-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

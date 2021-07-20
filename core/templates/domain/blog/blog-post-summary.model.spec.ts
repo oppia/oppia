@@ -54,5 +54,5 @@ describe('Blog post summary object factory', () => {
     expect(sampleSummary.getLastUpdated()).toEqual(3232323);
     expect(sampleSummary.getPublishedOn()).toEqual(3232323);
     expect(sampleSummary.getThumbnailFilename()).toEqual('image.png');
-  })
-})
+  });
+});

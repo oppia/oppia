@@ -16,19 +16,16 @@
  * @fileoverview Component for the navbar breadcrumb of the blog dashboard.
  */
 
- import { Component } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- 
- @Component({
-   selector: 'oppia-blog-dashboard-navbar-breadcrumb',
-   templateUrl: './blog-dashboard-navbar-breadcrumb.component.html'
- })
- export class BlogDashboardNavbarBreadcrumbComponent {}
- 
- angular.module('oppia')
-   .directive(
-     'oppiaBlogDashboardNavbarBreadcrumb',
-     downgradeComponent({
-       component: BlogDashboardNavbarBreadcrumbComponent
-     }));
- 
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+@Component({
+  selector: 'oppia-blog-dashboard-navbar-breadcrumb',
+  templateUrl: './blog-dashboard-navbar-breadcrumb.component.html'
+})
+export class BlogDashboardNavbarBreadcrumbComponent {}
+
+angular.module('oppia').directive('oppiaBlogDashboardNavbarBreadcrumb',
+  downgradeComponent({
+    component: BlogDashboardNavbarBreadcrumbComponent
+  }));

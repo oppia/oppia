@@ -33,17 +33,17 @@ export interface BlogPostBackendDict {
 }
 export class BlogPostData {
   _id: string;
-  _author_username: string;
+  _authorUsername: string;
   _title: string;
   _content: string;
   _tags: string[];
   _thumbnailFilename: string;
   _urlFragment: string;
   _lastUpdated: number;
-  _publishedOn: number
+  _publishedOn: number;
   constructor(
       id: string,
-      author_username: string,
+      authorUsername: string,
       title: string,
       content: string,
       tags: string[],
@@ -52,14 +52,14 @@ export class BlogPostData {
       lastUpdated?: number,
       publishedOn?: number) {
     this._id = id;
-    this._author_username = author_username;
+    this._authorUsername = authorUsername;
     this._title = title;
     this._content = content;
     this._tags = tags;
     this._thumbnailFilename = thumbnailFilename;
     this._urlFragment = urlFragment;
     this._lastUpdated = lastUpdated;
-    this._publishedOn = publishedOn
+    this._publishedOn = publishedOn;
   }
 
   getId(): string {
@@ -67,7 +67,7 @@ export class BlogPostData {
   }
 
   getAuthorUsername(): string {
-    return this._author_username;
+    return this._authorUsername;
   }
 
   getLastUpdated(): number {
@@ -96,7 +96,7 @@ export class BlogPostData {
 
   removeTag(tag: string): void {
     let index = this._tags.indexOf(tag);
-    this._tags.splice(index, 1)
+    this._tags.splice(index, 1);
   }
 
   getUrlFragment(): string {
@@ -148,8 +148,8 @@ export class BlogPostData {
     }
     if (this._tags.length > maxTags) {
       issues.push(
-      'Blog Post should atmost have ' + String(maxTags) +
-      ' tag linked to it.');
+        'Blog Post should atmost have ' + String(maxTags) +
+        ' tag linked to it.');
     }
     if (this._content === '') {
       issues.push(
@@ -164,7 +164,9 @@ export class BlogPostData {
 })
 export class BlogPostObjectFactory {
   constructor() {}
-  createFromBackendDict(blogPostBackendDict: BlogPostBackendDict): BlogPostData {
+
+  createFromBackendDict(
+      blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
       blogPostBackendDict.author_username,
@@ -177,8 +179,8 @@ export class BlogPostObjectFactory {
       blogPostBackendDict.published_on);
   }
 
-  // Create an interstitial blog post that would be displayed in the editor until
-  // the actual blog post is fetched from the backend.
+  // Create an interstitial blog post that would be displayed in the editor
+  // until the actual blog post is fetched from the backend.
   createInterstitialBlogPost(): BlogPostData {
     return new BlogPostData (
       null, 'loading', 'Blog Post Title loading', '', [],

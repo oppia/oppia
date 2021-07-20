@@ -16,33 +16,29 @@
  * @fileoverview Directive scripts for the blog dashboard.
  */
 
- import 'core-js/es7/reflect';
- import 'zone.js';
- 
- import 'angular-ui-sortable';
- import uiValidate from 'angular-ui-validate';
- 
- angular.module('oppia', [
-   require('angular-cookies'), 'ngAnimate',
-   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-   'ui.bootstrap', 'ui.sortable', uiValidate
- ]);
- 
- require('Polyfills.ts');
- 
- // The module needs to be loaded directly after jquery since it defines the
- // main module the elements are attached to.
- require(
-   'pages/blog-dashboard-page/' +
-   'blog-dashboard-page.module.ts');
- require('App.ts');
- require('base-components/oppia-root.directive.ts');
- 
- require(
-   'pages/blog-dashboard-page/navbar/' +
-   'blog-dashboard-navbar-breadcrumb.component.ts'
- );
- require(
-   'pages/blog-dashboard-page/' +
-   'blog-dashboard-page.component.ts');
- 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'ui.bootstrap', 'ui.sortable', uiValidate
+]);
+
+require('Polyfills.ts');
+
+// The module needs to be loaded directly after jquery since it defines the
+// main module the elements are attached to.
+require(
+  'pages/blog-dashboard-page/blog-dashboard-page.module.ts');
+require('App.ts');
+require('base-components/oppia-root.directive.ts');
+require(
+  'pages/blog-dashboard-page/navbar/' +
+  'blog-dashboard-navbar-breadcrumb.component.ts'
+);
+require(
+  'pages/blog-dashboard-page/blog-dashboard-page.component.ts');

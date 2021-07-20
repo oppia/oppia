@@ -34,19 +34,18 @@ interface ImageData {
   providedIn: 'root',
 })
 export class BlogPostUpdateService {
-
   changeDict: BlogPostChangeDict = {};
   constructor() {}
 
-  setBlogPostTitle(blogPost: BlogPostData, title: string): void{
+  setBlogPostTitle(blogPost: BlogPostData, title: string): void {
     blogPost.setTitle(title);
     this.changeDict.title = title;
   }
 
   setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
-    let filename = image[0].filename
+    let filename = image[0].filename;
     blogPost.setThumbnailFilename(filename);
-    this.changeDict.thumbnail_filename = filename
+    this.changeDict.thumbnail_filename = filename;
   }
 
   addBlogPostTag(blogPost: BlogPostData, tag: string): void {
@@ -61,13 +60,14 @@ export class BlogPostUpdateService {
 
   setBlogPostContent(blogPost: BlogPostData, content: string): void {
     blogPost.setContent(content);
-    this.changeDict.content= content
+    this.changeDict.content = content;
   }
 
   getBlogPostChangeDict(): BlogPostChangeDict {
-    return this.changeDict
+    return this.changeDict;
   }
 }
+
 angular.module('oppia').factory(
   'BlogPostUpdateService',
   downgradeInjectable(BlogPostUpdateService));

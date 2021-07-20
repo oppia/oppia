@@ -31,6 +31,9 @@ interface BlogDashboardBackendResponse {
   'draft_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
 }
 
+interface NewBlogPostBackendResponse {
+  'blog_post_id': string
+}
 export interface BlogDashboardData {
   username: string;
   profilePictureDataUrl: string;
@@ -57,14 +60,16 @@ export class BlogDashboardBackendApiService {
             profilePictureDataUrl: response.profile_picture_data_url,
             numOfDraftBlogPosts: response.no_of_draft_blog_posts,
             numOfPublishedBlogPosts: response.no_of_published_blog_posts,
-            publishedBlogPostSummaryDicts: response.published_blog_post_summary_dicts.map(
-              blogPostSummary => {
-                return BlogPostSummary.createFromBackendDict(blogPostSummary);
-              }),
-            draftBlogPostSummaryDicts: response.draft_blog_post_summary_dicts.map(
-              blogPostSummary => {
-                return BlogPostSummary.createFromBackendDict(blogPostSummary);
-              }),
+            publishedBlogPostSummaryDicts: (
+              response.published_blog_post_summary_dicts.map(
+                blogPostSummary => {
+                  return BlogPostSummary.createFromBackendDict(blogPostSummary);
+                })),
+            draftBlogPostSummaryDicts: (
+              response.draft_blog_post_summary_dicts.map(
+                blogPostSummary => {
+                  return BlogPostSummary.createFromBackendDict(blogPostSummary);
+                })),
           });
         }, errorResponse => {
           reject(errorResponse.error.error);
@@ -74,12 +79,12 @@ export class BlogDashboardBackendApiService {
 
   async createBlogPostAsync(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.http.post<string>(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}).toPromise()
-      .then(response => {
-        resolve(response);
+      this.http.post<NewBlogPostBackendResponse>(
+        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}
+      ).toPromise().then(response => {
+        resolve(response.blog_post_id);
       }, errorResponse => {
-          reject(errorResponse.error.error);
+        reject(errorResponse.error.error);
       });
     });
   }

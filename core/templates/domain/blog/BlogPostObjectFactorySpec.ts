@@ -19,7 +19,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { BlogPostData, BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
 
-describe( 'Blog Post Object Factory', () => {
+describe('Blog Post Object Factory', () => {
   let blogPostObjectFactory: BlogPostObjectFactory;
   let _sampleBlogPostData: BlogPostData = null;
 
@@ -59,7 +59,7 @@ describe( 'Blog Post Object Factory', () => {
     expect(_sampleBlogPostData.prepublishValidate(maxTags)).toEqual([]);
   });
 
-  it('should raise correct validation issues for pre publish' + 
+  it('should raise correct validation issues for pre publish' +
   'validation', () => {
     _sampleBlogPostData.setTitle('');
     _sampleBlogPostData.setContent('');
@@ -98,6 +98,6 @@ describe( 'Blog Post Object Factory', () => {
 
   it('should return correct property values', () => {
     expect(_sampleBlogPostData.getLastUpdated()).toEqual(3454354354);
-    expect(_sampleBlogPostData.getPublishedOn()).toEqual(3454354354)
-  })
-})
+    expect(_sampleBlogPostData.getPublishedOn()).toEqual(3454354354);
+  });
+});

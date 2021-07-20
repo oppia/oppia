@@ -26,4 +26,3 @@ export const BlogDashboardPageConstants = {
     DRAFTS: '#/drafts',
   },
 } as const;
-  

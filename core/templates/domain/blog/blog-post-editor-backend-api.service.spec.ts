@@ -19,11 +19,10 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from './blog-post-editor-backend-api.service';
-import { BlogPostData, BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
+import { BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Blog Post Editor backend api service', () => {
-
   let bpebas: BlogPostEditorBackendApiService;
   let blogPostObjectFactory: BlogPostObjectFactory;
   let httpTestingController: HttpTestingController;
@@ -50,8 +49,8 @@ describe('Blog Post Editor backend api service', () => {
     username: 'test_user',
     profile_picture_data_url: 'image',
     max_no_of_tags: 2,
-    list_of_default_tags: ['learners', 'news']
-  }
+    list_of_default_tags: ['learners', 'news'],
+  };
 
 
   beforeEach(() => {
@@ -66,12 +65,13 @@ describe('Blog Post Editor backend api service', () => {
     failHandler = jasmine.createSpy('fail');
     blogPostEditorDataObject = {
       username: blogPostEditorBackendResponse.username,
-      profilePictureDataUrl: blogPostEditorBackendResponse.profile_picture_data_url,
+      profilePictureDataUrl: (
+        blogPostEditorBackendResponse.profile_picture_data_url),
       maxNumOfTags: blogPostEditorBackendResponse.max_no_of_tags,
       listOfDefaulTags: blogPostEditorBackendResponse.list_of_default_tags,
       blogPostDict: blogPostObjectFactory.createFromBackendDict(
         blogPostEditorBackendResponse.blog_post_dict)
-    }
+    };
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
@@ -82,41 +82,44 @@ describe('Blog Post Editor backend api service', () => {
   });
 
   it('should fetch the blog post editor data.', fakeAsync(() => {
-    bpebas.fetchBlogPostEditorData('sampleBlogId').then((blogPostEditorData) => {
-      expect(blogPostEditorData).toEqual(blogPostEditorDataObject);
-    });
+    bpebas.fetchBlogPostEditorData('sampleBlogId').then(
+      successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/blogeditorhandler/data/sampleBlogId');
+    let req = httpTestingController.expectOne(
+      '/blogeditorhandler/data/sampleBlogId');
     expect(req.request.method).toEqual('GET');
     req.flush(blogPostEditorBackendResponse);
 
     flushMicrotasks();
+    expect(successHandler).toHaveBeenCalledWith(blogPostEditorDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use the rejection handler if the backend request for fetchng data fails',
-    fakeAsync(() => {
+  it('should use the rejection handler if the backend request for fetching' +
+      'data fails', fakeAsync(() => {
+    bpebas.fetchBlogPostEditorData('sampleBlogId').then(
+      successHandler, failHandler);
 
-      bpebas.fetchBlogPostEditorData('sampleBlogId').then(
-        successHandler, failHandler);
-      let req = httpTestingController.expectOne('/blogeditorhandler/data/sampleBlogId');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error:'Error loading blog post.'
-      }, {
-        status: 500,
-        statusText: 'Error loading blog post.'
-      });
+    let req = httpTestingController.expectOne(
+      '/blogeditorhandler/data/sampleBlogId');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Error loading blog post.'
+    }, {
+      status: 500,
+      statusText: 'Error loading blog post.'
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading blog post.');
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error loading blog post.');
+  }));
 
   it('should successfully delete a blog post', fakeAsync(() => {
-
     bpebas.deleteBlogPostAsync('sampleBlogId').then(
       successHandler, failHandler);
+
     let req = httpTestingController.expectOne(
       '/blogeditorhandler/data/sampleBlogId');
     expect(req.request.method).toEqual('DELETE');
@@ -133,7 +136,6 @@ describe('Blog Post Editor backend api service', () => {
 
   it('should use the rejection handler when deleting a blog post fails.',
     fakeAsync(() => {
-
       bpebas.deleteBlogPostAsync('sampleBlogId').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(
@@ -153,31 +155,32 @@ describe('Blog Post Editor backend api service', () => {
     }));
 
   it('should update a blog post successfully',
-  fakeAsync(() => {
-    let changeDict = {
-      title: 'title_sample',
-      content: '<p>Hello Blog<P>',
-    };
-    blogPostEditorBackendResponse.blog_post_dict.title = changeDict.title;
-    blogPostEditorBackendResponse.blog_post_dict.content = changeDict.content;
-    let updatedBlogPost =  blogPostObjectFactory.createFromBackendDict(
-      blogPostEditorBackendResponse.blog_post_dict)
-    // Send a request to update blog post.
-    bpebas.updateBlogPostDataAsync(
-      'sampleBlogId', false, changeDict).then(successHandler, failHandler);
-    let req = httpTestingController.expectOne('/blogeditorhandler/data/sampleBlogId');
-    expect(req.request.method).toEqual('PUT');
-    req.flush({ blog_post: blogPostEditorBackendResponse.blog_post_dict });
+    fakeAsync(() => {
+      let changeDict = {
+        title: 'title_sample',
+        content: '<p>Hello Blog<P>',
+      };
+      blogPostEditorBackendResponse.blog_post_dict.title = changeDict.title;
+      blogPostEditorBackendResponse.blog_post_dict.content = changeDict.content;
+      let updatedBlogPost = blogPostObjectFactory.createFromBackendDict(
+        blogPostEditorBackendResponse.blog_post_dict);
 
-    flushMicrotasks();
+      bpebas.updateBlogPostDataAsync(
+        'sampleBlogId', false, changeDict).then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/blogeditorhandler/data/sampleBlogId');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({ blog_post: blogPostEditorBackendResponse.blog_post_dict });
 
-    expect(successHandler).toHaveBeenCalledWith(
-      { blogPostDict: updatedBlogPost });
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      flushMicrotasks();
 
-  it('should use the rejection handler if the blog post to update doesn\'t exist',
-  fakeAsync(() => {
+      expect(successHandler).toHaveBeenCalledWith(
+        { blogPostDict: updatedBlogPost });
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should use the rejection handler if the blog post to update doesn\'t' +
+      'exist', fakeAsync(() => {
     let changeDict = {
       title: 'title_sample',
       content: '<p>Hello Blog<P>',
@@ -185,10 +188,11 @@ describe('Blog Post Editor backend api service', () => {
 
     bpebas.updateBlogPostDataAsync(
       'invalidBlog', false, changeDict).then(successHandler, failHandler);
-    let req = httpTestingController.expectOne('/blogeditorhandler/data/invalidBlog');
+    let req = httpTestingController.expectOne(
+      '/blogeditorhandler/data/invalidBlog');
     expect(req.request.method).toEqual('PUT');
     req.flush({
-      error: 'Blog Post with given id doesn\'t exist.' 
+      error: 'Blog Post with given id doesn\'t exist.'
     }, {
       status: 404,
       statusText: 'Blog Post with given id doesn\'t exist.'
@@ -204,11 +208,12 @@ describe('Blog Post Editor backend api service', () => {
   it('should post image data successfully to the backend', fakeAsync(() => {
     bpebas.postThumbnailDataAsync(
       'sampleBlogId', [{
-      filename: 'image',
-      imageBlob: fakeImage()
-    }]).then(successHandler, failHandler);
+        filename: 'image',
+        imageBlob: fakeImage()
+      }]).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/blogeditorhandler/data/sampleBlogId');
+    let req = httpTestingController.expectOne(
+      '/blogeditorhandler/data/sampleBlogId');
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -223,11 +228,12 @@ describe('Blog Post Editor backend api service', () => {
     fakeAsync(() => {
       bpebas.postThumbnailDataAsync(
         'sampleBlogId', [{
-        filename: 'image',
-        imageBlob: fakeImage()
-      }]).then(successHandler, failHandler);
-  
-      let req = httpTestingController.expectOne('/blogeditorhandler/data/sampleBlogId');
+          filename: 'image',
+          imageBlob: fakeImage()
+        }]).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/blogeditorhandler/data/sampleBlogId');
       expect(req.request.method).toEqual('POST');
       req.flush({
         error: 'Error updating blog post thumbnail.'
@@ -239,7 +245,7 @@ describe('Blog Post Editor backend api service', () => {
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error updating blog post thumbnail.');
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error updating blog post thumbnail.');
     }));
-})
-
+});

@@ -31,17 +31,17 @@ export interface BlogPostSummaryBackendDict {
 
 export class BlogPostSummary {
   _id: string;
-  _author_username: string;
+  _authorUsername: string;
   _title: string;
   _summary: string;
   _tags: string[];
   _thumbnailFilename: string;
   _urlFragment: string;
   _lastUpdated: number;
-  _publishedOn: number
+  _publishedOn: number;
   constructor(
       id: string,
-      author_username: string,
+      authorUsername: string,
       title: string,
       summary: string,
       tags: string[],
@@ -50,14 +50,14 @@ export class BlogPostSummary {
       lastUpdated?: number,
       publishedOn?: number) {
     this._id = id;
-    this._author_username = author_username;
+    this._authorUsername = authorUsername;
     this._title = title;
     this._summary = summary;
     this._tags = tags;
     this._thumbnailFilename = thumbnailFilename;
     this._urlFragment = urlFragment;
     this._lastUpdated = lastUpdated;
-    this._publishedOn = publishedOn
+    this._publishedOn = publishedOn;
   }
 
   getId(): string {
@@ -65,7 +65,7 @@ export class BlogPostSummary {
   }
 
   getAuthorUsername(): string {
-    return this._author_username;
+    return this._authorUsername;
   }
 
   getLastUpdated(): number {
@@ -89,7 +89,7 @@ export class BlogPostSummary {
   }
 
   getSummary(): string {
-    return this._summary
+    return this._summary;
   }
 
   getThumbnailFilename(): string {
