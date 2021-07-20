@@ -170,7 +170,7 @@ export class SpeechSynthesisChunkerService {
   }
 
   _convertToSpeakableText(html: string): string {
-    const rteCompSpecsKeys = <(RTEComponentSpecsKey)[]> Object.keys(
+    const rteCompSpecsKeys = <RTEComponentSpecsKey[]> Object.keys(
       ServicesConstants.RTE_COMPONENT_SPECS);
     rteCompSpecsKeys.forEach(
       (componentSpec) => {
@@ -187,14 +187,17 @@ export class SpeechSynthesisChunkerService {
       .replaceWith(function() {
         var element = <HTMLElement> this;
         const _newTextAttr = element.attributes[
-            <keyof NamedNodeMap> 'text-with-value'] as Attr;
-          // 'Node.textContent' only returns 'null' if the Node is a
-          // 'document' or a 'DocType'. '_newTextAttr' is neither.
+          <keyof NamedNodeMap> 'text-with-value'] as Attr;
+        // 'Node.textContent' only returns 'null' if the Node is a
+        // 'document' or a 'DocType'. '_newTextAttr' is neither.
         const newTextContent = _newTextAttr.textContent?.replace(
           /&quot;/g, '');
-          // Variable newTextContent ends with a " character, so this is being
-          // ignored in the condition below.
-        return newTextContent && newTextContent !== '"' ?
+        // Variable newTextContent ends with a " character, so this is being
+        // ignored in the condition below.
+        return (
+          newTextContent && newTextContent !== '"' ?
+          newTextContent + ' ' : ''
+        );
             newTextContent + ' ' : '';
       });
 
@@ -206,10 +209,10 @@ export class SpeechSynthesisChunkerService {
         const _mathContentAttr = element.attributes[
           <keyof NamedNodeMap> 'math_content-with-value'] as Attr;
         var mathContent = (
-            <MathExpressionContent>(_this.htmlEscaper.escapedJsonToObj(
-              // 'Node.textContent' only returns 'null' if the Node is a
-              // 'document' or a 'DocType'. '_mathContentAttr' is neither.
-              <string> _mathContentAttr.textContent)));
+          <MathExpressionContent>(_this.htmlEscaper.escapedJsonToObj(
+            // 'Node.textContent' only returns 'null' if the Node is a
+            // 'document' or a 'DocType'. '_mathContentAttr' is neither.
+            <string> _mathContentAttr.textContent)));
         const latexSpeakableText = _this._formatLatexToSpeakableText(
           mathContent.raw_latex);
         return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
