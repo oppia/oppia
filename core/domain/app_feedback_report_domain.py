@@ -606,7 +606,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
 
     @classmethod
     def _selected_items_include_other(cls, selected_items):
-        # type: (List[Text]) -> bool
+        # type: (Optional[List[Text]]) -> bool
         """Checks whether the user_feedback_selected_items include an 'other'
         option. Unless the category is one of ALLOWED_INPUT_TEXT_CATEGORIES, an
         'other' option must be selected for the user to add input text to the
@@ -844,7 +844,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
     @classmethod
     def _match_locale_code_string(cls, code):
-        # type: (Text) -> Optional[Match[str]]
+        # type: (Text) -> Optional[Match[Text]]
         """Helper that checks whether the given locale code is a valid code.
 
         Args:
@@ -1319,7 +1319,7 @@ class RevisionCardEntryPoint(EntryPoint):
             topic_id, None, None, subtopic_id)
 
     def to_dict(self):
-        # type: () -> Dict[Text, Text]
+        # type: () -> Dict[Text, Any]
         """Returns a dict representing this RevisionCardEntryPoint domain
         object.
 

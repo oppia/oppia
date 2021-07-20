@@ -25,13 +25,13 @@ from core.domain import app_feedback_report_services
 import feconf
 import utils
 
-from typing import Dict # isort:skip # pylint: disable=unused-import
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 
 class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
     """Handles incoming android feedback reports from the app."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS = {} # type: ignore[assignment]
     HANDLER_ARGS_SCHEMAS = { # type: ignore[assignment]
         'POST': {
             'report': {
@@ -72,7 +72,7 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         return self.render_json({}) # type: ignore[no-untyped-call]
 
     def _has_valid_android_request_headers(self, headers):
-         # type: (Dict[Text]) -> bool
+         # type: (Dict[Text, Text]) -> bool
         """Verifies the headers from the incoming request.
 
         Args:

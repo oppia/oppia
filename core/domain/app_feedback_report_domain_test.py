@@ -767,7 +767,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def test_validation_network_type_is_none_fails(self):
         # type: () -> None
-        self.device_system_context.network_type = None # type: ignore[assignment]
+        self.device_system_context.network_type = None
         self._assert_validation_error(
             self.device_system_context, 'No network type supplied.')
 
@@ -1623,8 +1623,7 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
         constants.PLATFORM_CHOICES.sort()
         expected_dict = {
             'filter_field': 'platform',
-            'filter_options': (
-                [choice.name for choice in constants.PLATFORM_CHOICES])
+            'filter_options': constants.PLATFORM_CHOICES
         }
         self.assertDictEqual(
             expected_dict, self.filter.to_dict())

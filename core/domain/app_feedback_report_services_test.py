@@ -1098,7 +1098,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             model_entity.scrubbed_by, scrubber)
 
     def _verify_report_is_not_scrubbed(self, model_entity):
-        # type: (AppFeedbackReportModel) -> None
+        # type: (app_feedback_report_models.AppFeedbackReportModel) -> None
         """Verifies the report model is not scrubbed."""
         self.assertIsNotNone(model_entity)
         self.assertIsNone(model_entity.scrubbed_by)
