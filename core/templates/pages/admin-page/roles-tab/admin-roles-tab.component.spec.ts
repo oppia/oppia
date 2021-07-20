@@ -133,36 +133,72 @@ describe('Admin roles tab component ', function() {
     expect(component.topicSummaries).toBe(adminPageData.topicSummaries);
   }));
 
-  it('should clear results when ever change is detected in ' +
-    'the form', fakeAsync(() => {
-    const viewUserRolesAction: ViewUserRolesAction = {
-      filterCriterion: 'username',
-      role: 'admin',
-      username: 'user1',
-      isValid: () => true
-    };
+  describe('on startEditing', function() {
+    it('should enable startedEditingRole', function() {
+      expect(component.startedEditingRole).toBeFalse();
 
-    const userRolesResult: UserRolesBackendResponse = {
-      admin: 'admin'
-    };
+      component.startEditing();
 
-    spyOn(adminBackendApiService, 'viewUsersRoleAsync')
-      .and.returnValue(Promise.resolve({admin: 'admin'}));
+      expect(component.startedEditingRole).toBeTrue();
+    });
 
-    // Prechecks.
-    expect(component.userRolesResult).toBe(null);
+    it('should fetch user roles and intialize properties', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync')
+        .and.returnValue(Promise.resolve({
+          roles: ['TOPIC_MANAGER'],
+          managed_topic_ids: ['topic_id_1'],
+          banned: false
+        }));
 
-    // Clicking on view roles button to fill form with user data.
-    component.submitRoleViewForm(viewUserRolesAction);
-    tick();
+      // Prechecks.
+      expect(component.rolesFetched).toBeFalse();
+      expect(component.userRoles).toBe([]);
+      expect(component.managerInTopicsWithId).toBe([]);
+      expect(component.userIsBanned).toBeFalse();
 
-    expect(Object.keys(component.userRolesResult))
-      .toContain(userRolesResult.admin);
+      component.startEditing();
+      tick();
 
-    // Clearing results.
-    component.clearResults();
-    expect(component.userRolesResult).toEqual({});
-  }));
+      expect(component.rolesFetched).toBeTrue();
+      expect(component.userRoles).toBe(['TOPIC_MANAGER']);
+      expect(component.managerInTopicsWithId).toBe(['topic_id_1']);
+      expect(component.userIsBanned).toBeFalse();
+    }));
+  });
+
+  describe('on unmarkUserBanned', function() {
+    it('should enable changingBannedVlaue', function() {
+      expect(component.startedEditingRole).toBeFalse();
+
+      component.startEditing();
+
+      expect(component.startedEditingRole).toBeTrue();
+    });
+
+    it('should fetch user roles and intialize properties', fakeAsync(() => {
+      spyOn(adminBackendApiService, 'viewUsersRoleAsync')
+        .and.returnValue(Promise.resolve({
+          roles: ['TOPIC_MANAGER'],
+          managed_topic_ids: ['topic_id_1'],
+          banned: false
+        }));
+
+      // Prechecks.
+      expect(component.rolesFetched).toBeFalse();
+      expect(component.userRoles).toBe([]);
+      expect(component.managerInTopicsWithId).toBe([]);
+      expect(component.userIsBanned).toBeFalse();
+
+      component.startEditing();
+      tick();
+
+      expect(component.rolesFetched).toBeTrue();
+      expect(component.userRoles).toBe(['TOPIC_MANAGER']);
+      expect(component.managerInTopicsWithId).toBe(['topic_id_1']);
+      expect(component.userIsBanned).toBeFalse();
+    }));
+  });
+
 
   it('should handle error responses sent from the backend', () => {
     component.handleErrorResponse('User name does not exist.');

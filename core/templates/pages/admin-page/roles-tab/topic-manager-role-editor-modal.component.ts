@@ -20,6 +20,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+
 
 @Component({
   selector: 'oppia-topic-manager-role-editor-modal',
@@ -36,7 +38,8 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private adminBackendApiService: AdminBackendApiService
+    private adminBackendApiService: AdminBackendApiService,
+    private alertsService: AlertsService
   ) {}
 
   private updateTopicIdsForSelection(): void {
@@ -49,21 +52,33 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     this.managerInTopicsWithId.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
-    this.adminBackendApiService.addUserRoleAsync(
-      'TOPIC_MANAGER', this.username, this.topicIdInUpdate).then(()=> {
+    this.adminBackendApiService.assignManagerToTopicAsync(
+      this.username, this.topicIdInUpdate).then(()=> {
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
+    }, data => {
+      let topicIdIndex = this.managerInTopicsWithId.indexOf(this.newTopicId);
+      this.managerInTopicsWithId.splice(topicIdIndex, 1);
+      var transformedData = data.responseText.substring(5);
+      var parsedResponse = JSON.parse(transformedData);
+      this.alertsService.addWarning(
+        parsedResponse.error || 'Error communicating with server.');
     });
   }
 
   removeTopicId(topicIdToRemove: string): void {
     let topicIdIndex = this.managerInTopicsWithId.indexOf(topicIdToRemove);
     this.topicIdInUpdate = topicIdToRemove;
-    this.adminBackendApiService.removeUserRoleAsync(
-      'TOPIC_MANAGER', this.username, [topicIdToRemove]).then(() => {
+    this.adminBackendApiService.deassignManagerFromTopicAsync(
+      this.username, topicIdToRemove).then(() => {
       this.managerInTopicsWithId.splice(topicIdIndex, 1);
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
+    }, data => {
+      var transformedData = data.responseText.substring(5);
+      var parsedResponse = JSON.parse(transformedData);
+      this.alertsService.addWarning(
+        parsedResponse.error || 'Error communicating with server.');
     });
   }
 

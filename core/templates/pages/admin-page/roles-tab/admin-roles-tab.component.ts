@@ -72,13 +72,10 @@ export class AdminRolesTabComponent implements OnInit {
 
   removeRole(roleToRemove: string): void {
     this.roleInUpdate = roleToRemove;
-    let removeFromTopicIds = [];
-    if (roleToRemove === 'TOPIC_MANAGER') {
-      removeFromTopicIds = this.managerInTopicsWithId;
-    }
+
     var roleIndex = this.userRoles.indexOf(roleToRemove);
     this.adminBackendApiService.removeUserRoleAsync(
-      roleToRemove, this.username, removeFromTopicIds).then(() => {
+      roleToRemove, this.username).then(() => {
       if (roleToRemove === 'TOPIC_MANAGER') {
         this.managerInTopicsWithId = [];
       }
@@ -118,7 +115,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.selectingNewRole = false;
 
     this.adminBackendApiService.addUserRoleAsync(
-      role, this.username, null).then(() => {
+      role, this.username).then(() => {
       this.roleInUpdate = null;
     }, data => {
       var transformedData = data.responseText.substring(5);
@@ -145,7 +142,7 @@ export class AdminRolesTabComponent implements OnInit {
   unmarkUserBanned(): void {
     this.changingBannedVlaue = true;
     this.adminBackendApiService.unmarkUserBannedAsync(
-      this.username).then((response) => {
+      this.username).then(() => {
       this.changingBannedVlaue = false;
       this.userIsBanned = false;
       this.startEditing();
@@ -158,7 +155,6 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   clearEditor(): void {
-    this.topicSummaries = null;
     this.rolesFetched = false;
     this.selectingNewRole = false;
     this.username = '';

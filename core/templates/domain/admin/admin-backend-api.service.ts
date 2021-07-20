@@ -211,14 +211,12 @@ export class AdminBackendApiService {
   }
 
   async addUserRoleAsync(
-      newRole: string, username: string, assignToTopicId: string
-  ): Promise<void> {
+      newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           role: newRole,
-          username: username,
-          assign_to_topic_id: assignToTopicId
+          username: username
         }
       ).toPromise().then(response => {
         resolve(response);
@@ -228,17 +226,44 @@ export class AdminBackendApiService {
     });
   }
 
-  async removeUserRoleAsync(
-      newRole: string, username: string, removeFromTopicId: string[]
-  ): Promise<void> {
+  async removeUserRoleAsync(newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
             role: newRole,
-            username: username,
-            remove_from_comma_seperated_topic_ids: removeFromTopicId.join(',')
+            username: username
           }
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async assignManagerToTopicAsync(
+      username: string, topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+          username: username,
+          topic_id: topicId,
+          action: 'assign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deassignManagerFromTopicAsync(
+      username: string, topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+          username: username,
+          topic_id: topicId,
+          action: 'deassign'
         }
       ).toPromise().then(resolve, errorResponse => {
         reject(errorResponse.error.error);

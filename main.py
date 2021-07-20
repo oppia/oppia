@@ -236,6 +236,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
     get_redirect_route(
+        r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler),
+    get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',

@@ -151,14 +151,14 @@ var createUserWithRole = async function(email, username, role) {
   await adminPage.get();
   await adminPage.addRole(username, role);
   await logout();
-}
+};
 
 var createModerator = async function(email, username) {
   await createUserWithRole(email, username, 'moderator');
 };
 
 var createCollectionEditor = async function(email, username) {
-  await createUserWithRole(email, username, 'collection editor')
+  await createUserWithRole(email, username, 'collection editor');
 };
 
 var createAdmin = async function(email, username) {

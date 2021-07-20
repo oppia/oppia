@@ -709,12 +709,6 @@ class AdminRoleHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 }
-            },
-            'assign_to_topic_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
             }
         },
         'DELETE': {
@@ -728,12 +722,6 @@ class AdminRoleHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 }
-            },
-            'remove_from_comma_seperated_topic_ids': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
             }
         }
     }
@@ -782,7 +770,6 @@ class AdminRoleHandler(base.BaseHandler):
     def put(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
-        assign_to_topic_id = self.payload.get('assign_to_topic_id')
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
@@ -790,15 +777,10 @@ class AdminRoleHandler(base.BaseHandler):
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
-            if feconf.ROLE_ID_TOPIC_MANAGER not in user_settings.roles:
-                user_services.add_user_role(user_settings.user_id, role)
+            raise self.InvalidInputException(
+                'Unsupported role for the handler.')
 
-            user = user_services.get_user_actions_info(user_settings.user_id)
-            topic_services.assign_role(
-                user_services.get_system_user(), user,
-                topic_domain.ROLE_MANAGER, assign_to_topic_id)
-        else:
-            user_services.add_user_role(user_settings.user_id, role)
+        user_services.add_user_role(user_settings.user_id, role)
 
         self.render_json({})
 
@@ -806,35 +788,75 @@ class AdminRoleHandler(base.BaseHandler):
     def delete(self):
         username = self.request.get('username')
         role = self.request.get('role')
-        remove_from_topic_ids = self.request.get(
-            'remove_from_comma_seperated_topic_ids').split(',')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
 
-        if role != feconf.ROLE_ID_TOPIC_MANAGER:
-            user_services.remove_user_role(user_id, role)
-            self.render_json({})
-            return
+        if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            topic_services.deassign_user_from_all_topics(self.user, user_id)
 
-        managed_topic_ids = [
-            topic_right.id for topic_right in
-            topic_fetchers.get_topic_rights_with_user(user_id)]
-        invalid_topic_ids = set(remove_from_topic_ids) - set(managed_topic_ids)
+        user_services.remove_user_role(user_id, role)
 
-        if invalid_topic_ids:
+        self.render_json({})
+
+
+class TopicManagerRoleHandler(base.BaseHandler):
+    """Handler to assign or deassigning manager to a topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign']
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.normalized_payload.get('username')
+        action = self.normalized_payload.get('action')
+        topic_id = self.normalized_payload.get('topic_id')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
             raise self.InvalidInputException(
-                'User does not have rights in topic with ids: %s' % (
-                    ', '.join(invalid_topic_ids)))
+                'User with given username does not exist.')
 
-        for remove_from_topic_id in remove_from_topic_ids:
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_TOPIC_MANAGER in user_settings.roles:
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
+            topic_manager = user_services.get_user_actions_info(user_id)
+            topic_services.assign_role(
+                user_services.get_system_user(),
+                topic_manager, topic_domain.ROLE_MANAGER, topic_id)
+        else:
+            if not topic_fetchers.get_topic_rights_with_user(user_id):
+                user_services.remove_user_role(
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
             topic_services.deassign_manager_role_from_topic(
-                user_services.get_system_user(), user_id, remove_from_topic_id)
-
-        if len(managed_topic_ids) == len(remove_from_topic_ids):
-            user_services.remove_user_role(user_id, role)
+                user_services.get_system_user(), user_id, topic_id)
 
         self.render_json({})
 
@@ -863,7 +885,7 @@ class BannedUsersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def put(self):
-        username = self.payload.get('username')
+        username = self.normalized_payload.get('username')
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
@@ -875,12 +897,13 @@ class BannedUsersHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self):
-        username = self.request.get('username')
+        username = self.normalized_request.get('username')
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
+        topic_services.deassign_user_from_all_topics(self.user, user_id)
         user_services.unmark_user_banned(user_id)
 
         self.render_json({})

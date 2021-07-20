@@ -95,7 +95,7 @@
       <div *ngIf="!username">Please fillout the username above to edit the user role.</div>
 
       <div class="oppia-roles-editor-form-container">
-        <mat-card *ngIf="startedEditingRole && !rolesFetched" >
+        <mat-card *ngIf="startedEditingRole && !rolesFetched" class="oppia-roles-editor-card">
           <mat-spinner class="mx-auto" [diameter]="30"></mat-spinner>
         </mat-card>
         <div *ngIf="startedEditingRole && rolesFetched" class="protractor-test-roles-editor-card-container">
