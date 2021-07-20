@@ -233,7 +233,7 @@ def calculate_new_stats_count_for_parameter(
 
 
 def get_report_from_model(report_model):
-    # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
+    # type: (AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the data.
 
@@ -257,7 +257,7 @@ def get_report_from_model(report_model):
 
 
 def get_ticket_from_model(ticket_model):
-    # type: (app_feedback_report_models.AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
+    # type: (AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
     """Create and return a domain object AppFeedbackReportTicket given a model
     loaded from the the data.
 
@@ -277,7 +277,7 @@ def get_ticket_from_model(ticket_model):
 
 
 def get_stats_from_model(stats_model):
-    # type: (app_feedback_report_models.AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
+    # type: (AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the data.
 

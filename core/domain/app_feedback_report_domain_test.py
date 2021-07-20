@@ -767,7 +767,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def test_validation_network_type_is_none_fails(self):
         # type: () -> None
-        self.device_system_context.network_type = None
+        self.device_system_context.network_type = None # type: ignore[assignment]
         self._assert_validation_error(
             self.device_system_context, 'No network type supplied.')
 
@@ -1579,7 +1579,7 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
         counts_obj = app_feedback_report_domain.ReportStatsParameterValueCounts(
             {
                 1: 1, # type: ignore[dict-item]
-                2: 1 # type: ignore[dict-tiem]
+                2: 1 # type: ignore[dict-item]
             })
         self._assert_validation_error(
             counts_obj, 'The parameter value should be a string')
