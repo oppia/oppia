@@ -22,19 +22,25 @@ import datetime
 from constants import constants
 from core.platform import models
 import feconf
-
 import python_utils
 import utils
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, Iterable, List, Optional, Sequence, Text, Tuple, Type, Union, TypeVar)
+    Any, Dict, Iterable, List, Optional, Sequence, Text, Tuple, Type, Union,
+    TypeVar)
 
-SelfBaseModel = TypeVar('SelfBaseModel', bound='BaseModel')
-SelfBaseHumanMaintainedModel = TypeVar('SelfBaseHumanMaintainedModel', bound='BaseHumanMaintainedModel')
-SelfBaseCommitLogEntryModel = TypeVar('SelfBaseCommitLogEntryModel', bound='BaseCommitLogEntryModel')
-SelfVersionedModel = TypeVar('SelfVersionedModel', bound='VersionedModel')
-SelfBaseSnapshotMetadataModel = TypeVar('SelfBaseSnapshotMetadataModel', bound='BaseSnapshotMetadataModel')
-SelfBaseSnapshotContentModel = TypeVar('SelfBaseSnapshotContentModel', bound='BaseSnapshotContentModel')
+SELF_BASE_MODEL = TypeVar(
+    'SELF_BASE_MODEL', bound='BaseModel')
+SELF_BASE_HUMAN_MAINTAINED_MODEL = TypeVar(
+    'SELF_BASE_HUMAN_MAINTAINED_MODEL', bound='BaseHumanMaintainedModel')
+SELF_BASE_COMMIT_LOG_ENTRY_MODEL = TypeVar(
+    'SELF_BASE_COMMIT_LOG_ENTRY_MODEL', bound='BaseCommitLogEntryModel')
+SELF_VERSIONED_MODEL = TypeVar(
+    'SELF_VERSIONED_MODEL', bound='VersionedModel')
+SELF_BASE_SNAPSHOT_METADATA_MODEL = TypeVar(
+    'SELF_BASE_SNAPSHOT_METADATA_MODEL', bound='BaseSnapshotMetadataModel')
+SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
+    'SELF_BASE_SNAPSHOT_CONTENT_MODEL', bound='BaseSnapshotContentModel')
 
 MYPY = False
 if MYPY:
@@ -233,7 +239,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @classmethod
     def get(cls, entity_id, strict=True):
-        # type: (Type[SelfBaseModel], Text, bool) -> Optional[SelfBaseModel]
+        # type: (Type[SELF_BASE_MODEL], Text, bool) -> Optional[SELF_BASE_MODEL]
         """Gets an entity by id.
 
         Args:
@@ -263,7 +269,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @classmethod
     def get_multi(cls, entity_ids, include_deleted=False):
-        # type: (Type[SelfBaseModel], Sequence[Optional[Text]], bool) -> List[Optional[SelfBaseModel]]
+        # type: (Type[SELF_BASE_MODEL], Sequence[Optional[Text]], bool) -> List[Optional[SELF_BASE_MODEL]]
         """Gets list of entities by list of ids.
 
         Args:
@@ -313,7 +319,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @classmethod
     def update_timestamps_multi(cls, entities, update_last_updated_time=True):
-        # type: (Type[SelfBaseModel], List[SelfBaseModel], bool) -> None
+        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL], bool) -> None
         """Update the created_on and last_updated fields of all given entities.
 
         Args:
@@ -328,7 +334,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def put_multi_transactional(cls, entities):
-        # type: (Type[SelfBaseModel], List[SelfBaseModel]) -> None
+        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL]) -> None
         """Stores the given datastore_services.Model instances and runs it
         through a transaction. Either all models are stored, or none of them
         in the case when the transaction fails.
@@ -341,7 +347,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @classmethod
     def put_multi(cls, entities):
-        # type: (Type[SelfBaseModel], List[SelfBaseModel]) -> None
+        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL]) -> None
         """Stores the given datastore_services.Model instances.
 
         Args:
@@ -352,7 +358,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @classmethod
     def delete_multi(cls, entities):
-        # type: (Type[SelfBaseModel], List[SelfBaseModel]) -> None
+        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL]) -> None
         """Deletes the given datastore_services.Model instances.
 
         Args:
@@ -423,7 +429,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
     @classmethod
     def _fetch_page_sorted_by_last_updated(
             cls, query, page_size, urlsafe_start_cursor):
-        # type: (Type[SelfBaseModel], datastore_services.Query, int, Optional[Text]) -> Tuple[List[SelfBaseModel], Optional[Text], bool]
+        # type: (Type[SELF_BASE_MODEL], datastore_services.Query, int, Optional[Text]) -> Tuple[List[SELF_BASE_MODEL], Optional[Text], bool]
         """Fetches a page of entities sorted by their last_updated attribute in
         descending order (newly updated first).
 
@@ -477,7 +483,7 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(BaseHumanMaintainedModel, self).__init__(*args, **kwargs)
 
@@ -499,14 +505,14 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi(cls, unused_instances):
-        # type: (Type[SelfBaseHumanMaintainedModel], List[SelfBaseHumanMaintainedModel]) -> None
+        # type: (Type[SELF_BASE_HUMAN_MAINTAINED_MODEL], List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError(
             'Use put_multi_for_human or put_multi_for_bot instead')
 
     @classmethod
     def put_multi_for_human(cls, instances):
-        # type: (Type[SelfBaseHumanMaintainedModel], List[SelfBaseHumanMaintainedModel]) -> None
+        # type: (Type[SELF_BASE_HUMAN_MAINTAINED_MODEL], List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
         """Stores the given model instances on behalf of a human.
 
         Args:
@@ -522,7 +528,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi_for_bot(cls, instances):
-        # type: (Type[SelfBaseHumanMaintainedModel], List[SelfBaseHumanMaintainedModel]) -> None
+        # type: (Type[SELF_BASE_HUMAN_MAINTAINED_MODEL], List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
         """Stores the given model instances on behalf of a non-human.
 
         Args:
@@ -561,7 +567,7 @@ class BaseCommitLogEntryModel(BaseModel):
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(BaseCommitLogEntryModel, self).__init__(*args, **kwargs)
 
@@ -618,7 +624,7 @@ class BaseCommitLogEntryModel(BaseModel):
     def create(
             cls, entity_id, version, committer_id, commit_type, commit_message,
             commit_cmds, status, community_owned):
-        # type: (Type[SelfBaseCommitLogEntryModel], Text, int, Text, Text, Text, Union[Dict[Text, Any], List[Dict[Text, Any]], None], Text, bool) -> SelfBaseCommitLogEntryModel
+        # type: (Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Text, int, Text, Text, Text, Union[Dict[Text, Any], List[Dict[Text, Any]], None], Text, bool) -> SELF_BASE_COMMIT_LOG_ENTRY_MODEL
         """This method returns an instance of the CommitLogEntryModel for a
         construct with the common fields filled.
 
@@ -679,7 +685,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        # type: (Type[SelfBaseCommitLogEntryModel], int, Optional[Text]) -> Tuple[List[SelfBaseCommitLogEntryModel], Optional[Text], bool]
+        # type: (Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], int, Optional[Text]) -> Tuple[List[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[Text], bool]
         """Fetches a list of all the commits sorted by their last updated
         attribute.
 
@@ -707,7 +713,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_commit(cls, target_entity_id, version):
-        # type: (Type[SelfBaseCommitLogEntryModel], Text, int) -> Optional[SelfBaseCommitLogEntryModel]
+        # type: (Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Text, int) -> Optional[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]
         """Returns the commit corresponding to an instance id and
         version number.
 
@@ -783,7 +789,7 @@ class VersionedModel(BaseModel):
     # previous versions is stored in the snapshot models.
     version = datastore_services.IntegerProperty(default=0)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(VersionedModel, self).__init__(*args, **kwargs)
 
@@ -799,7 +805,7 @@ class VersionedModel(BaseModel):
         return self.to_dict(exclude=['created_on', 'last_updated']) # type: ignore[no-any-return]
 
     def _reconstitute(self, snapshot_dict):
-        # type: (SelfVersionedModel, Dict[Text, Any]) -> SelfVersionedModel
+        # type: (SELF_VERSIONED_MODEL, Dict[Text, Any]) -> SELF_VERSIONED_MODEL
         """Populates the model instance with the snapshot.
 
         Args:
@@ -814,7 +820,7 @@ class VersionedModel(BaseModel):
         return self
 
     def _reconstitute_from_snapshot_id(self, snapshot_id):
-        # type: (SelfVersionedModel, Text) -> SelfVersionedModel
+        # type: (SELF_VERSIONED_MODEL, Text) -> SELF_VERSIONED_MODEL
         """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
 
@@ -1112,7 +1118,7 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def revert(cls, model, committer_id, commit_message, version_number):
-        # type: (Type[SelfVersionedModel], SelfVersionedModel, Text, Text, int) -> None
+        # type: (Type[SELF_VERSIONED_MODEL], SELF_VERSIONED_MODEL, Text, Text, int) -> None
         """Reverts model to previous version.
 
         Args:
@@ -1160,7 +1166,7 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_version(cls, entity_id, version_number, strict=True): # type: ignore[return]
-        # type: (Type[SelfVersionedModel], Text, int, bool) -> Optional[SelfVersionedModel]
+        # type: (Type[SELF_VERSIONED_MODEL], Text, int, bool) -> Optional[SELF_VERSIONED_MODEL]
         """Gets model instance representing the given version.
 
         The snapshot content is used to populate this model instance. The
@@ -1199,7 +1205,7 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):
-        # type: (Type[SelfVersionedModel], Text, List[int]) -> List[SelfVersionedModel]
+        # type: (Type[SELF_VERSIONED_MODEL], Text, List[int]) -> List[SELF_VERSIONED_MODEL]
         """Gets model instances for each version specified in version_numbers.
 
         Args:
@@ -1249,7 +1255,7 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get(cls, entity_id, strict=True, version=None):
-        # type: (Type[SelfVersionedModel], Text, bool, Optional[int]) -> Optional[SelfVersionedModel]
+        # type: (Type[SELF_VERSIONED_MODEL], Text, bool, Optional[int]) -> Optional[SELF_VERSIONED_MODEL]
         """Gets model instance.
 
         Args:
@@ -1383,7 +1389,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     content_user_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(BaseSnapshotMetadataModel, self).__init__(*args, **kwargs)
 
@@ -1435,7 +1441,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     def create(
             cls, snapshot_id, committer_id, commit_type, commit_message,
             commit_cmds):
-        # type: (Type[SelfBaseSnapshotMetadataModel], Text, Text, Text, Optional[Text], Union[Dict[Text, Any], List[Dict[Text, Any]], None]) -> SelfBaseSnapshotMetadataModel
+        # type: (Type[SELF_BASE_SNAPSHOT_METADATA_MODEL], Text, Text, Text, Optional[Text], Union[Dict[Text, Any], List[Dict[Text, Any]], None]) -> SELF_BASE_SNAPSHOT_METADATA_MODEL
         """This method returns an instance of the BaseSnapshotMetadataModel for
         a construct with the common fields filled.
 
@@ -1506,7 +1512,7 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = datastore_services.JsonProperty(indexed=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(BaseSnapshotContentModel, self).__init__(*args, **kwargs)
 
@@ -1531,7 +1537,7 @@ class BaseSnapshotContentModel(BaseModel):
 
     @classmethod
     def create(cls, snapshot_id, content):
-        # type: (Type[SelfBaseSnapshotContentModel], Text, Dict[Text, Any]) -> SelfBaseSnapshotContentModel
+        # type: (Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL], Text, Dict[Text, Any]) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL
         """This method returns an instance of the BaseSnapshotContentModel for
         a construct with the common fields filled.
 

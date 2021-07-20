@@ -62,16 +62,14 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
             id='config_model1', value='c')
         config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model1 = config_models.ConfigPropertyModel.get_version(
-            'config_model1', 1)
+            'config_model1', 1) # type: config_models.ConfigPropertyModel # type: ignore[assignment]
 
-        assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.value, 'c')
         retrieved_model1.value = 'd'
         retrieved_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model2 = config_models.ConfigPropertyModel.get_version(
-            'config_model1', 2)
+            'config_model1', 2) # type: config_models.ConfigPropertyModel # type: ignore[assignment]
 
-        assert retrieved_model2 is not None
         self.assertEqual(retrieved_model2.value, 'd')
 
 
@@ -125,9 +123,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 1)
+            parameter_name, 1) # type: config_models.PlatformParameterModel # type: ignore[assignment]
 
-        assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
         new_rules = [
@@ -144,9 +141,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         retrieved_model1.commit(
             feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model2 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 2)
+            parameter_name, 2) # type: config_models.PlatformParameterModel # type: ignore[assignment]
 
-        assert retrieved_model2 is not None
         self.assertEqual(retrieved_model2.rules, new_rules)
 
     def test_commit_is_persistent_in_storage(self):
@@ -164,8 +160,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 1)
-        assert retrieved_model1 is not None
+            parameter_name, 1) # type: config_models.PlatformParameterModel # type: ignore[assignment]
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
     def test_commit_with_updated_rules(self):
@@ -194,7 +189,6 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model.rules = new_rules
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model = config_models.PlatformParameterModel.get_version(
-            parameter_name, 2)
+            parameter_name, 2) # type: config_models.PlatformParameterModel # type: ignore[assignment]
 
-        assert retrieved_model is not None
         self.assertEqual(retrieved_model.rules, new_rules)

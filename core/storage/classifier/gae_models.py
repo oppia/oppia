@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Text, Tuple, Union # isort:skip # 
 
 MYPY = False
 if MYPY:
-    from mypy_imports import *
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 else:
     (base_models,) = models.Registry.import_models([models.NAMES.base_model])
     datastore_services = models.Registry.import_datastore_services()
@@ -75,7 +75,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     algorithm_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(ClassifierTrainingJobModel, self).__init__(*args, **kwargs)
 
@@ -266,7 +266,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     algorithm_ids_to_job_ids = datastore_services.JsonProperty(
         required=True, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(StateTrainingJobsMappingModel, self).__init__(*args, **kwargs)
 

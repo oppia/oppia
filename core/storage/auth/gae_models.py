@@ -53,7 +53,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
     parent_user_id = (
         datastore_services.StringProperty(indexed=True, default=None))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(UserAuthDetailsModel, self).__init__(*args, **kwargs)
 
@@ -165,7 +165,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     user_id = datastore_services.StringProperty(required=True, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(UserIdentifiersModel, self).__init__(*args, **kwargs)
 
@@ -258,7 +258,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     user_id = datastore_services.StringProperty(required=True, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(UserIdByFirebaseAuthIdModel, self).__init__(*args, **kwargs)
 
@@ -331,7 +331,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 class FirebaseSeedModel(base_models.BaseModel):
     """Dummy model used to kick-off the DestroyFirebaseAccountsOneOffJob."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(FirebaseSeedModel, self).__init__(*args, **kwargs)
 

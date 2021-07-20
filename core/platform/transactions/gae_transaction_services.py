@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
 
-
 from google.appengine.ext import ndb
 
 from typing import Any, Callable # isort:skip # pylint: disable=unused-import

@@ -139,7 +139,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(AppFeedbackReportModel, self).__init__(*args, **kwargs)
 
@@ -385,7 +385,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # A list of report IDs associated with this ticket.
     report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(AppFeedbackReportTicketModel, self).__init__(*args, **kwargs)
 
@@ -533,7 +533,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     daily_param_stats_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(AppFeedbackReportStatsModel, self).__init__(*args, **kwargs)
 

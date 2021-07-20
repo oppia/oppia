@@ -54,7 +54,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
     # The username in the query.
     username = datastore_services.StringProperty(default=None, indexed=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(RoleQueryAuditModel, self).__init__(*args, **kwargs)
 
@@ -122,7 +122,7 @@ class UsernameChangeAuditModel(base_models.BaseModel):
     new_username = (
         datastore_services.StringProperty(required=True, indexed=True))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
         # type: (*Any, **Any) -> None
         super(UsernameChangeAuditModel, self).__init__(*args, **kwargs)
 
