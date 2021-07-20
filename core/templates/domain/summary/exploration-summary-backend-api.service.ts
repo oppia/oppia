@@ -62,7 +62,7 @@ export class ExplorationSummaryBackendApiService {
       successCallback: (
         value: ExplorationSummaryBackendDict |
         Promise<ExplorationSummaryBackendDict>) => void,
-      errorCallback: (reason?: string | string[] | null[]) => void): void {
+      errorCallback: (reason: string | null[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
