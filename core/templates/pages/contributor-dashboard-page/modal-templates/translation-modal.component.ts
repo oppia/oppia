@@ -32,6 +32,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { UnicodeSchema } from 'services/schema-default-value.service';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -78,6 +79,7 @@ export class TranslationError {
 })
 export class TranslationModalComponent {
   @Input() opportunity: TranslationOpportunity;
+  activeDataFormat: string;
   activeWrittenTranslation: {html: string} = {html: ''};
   uploadingTranslation = false;
   subheading: string;
@@ -91,6 +93,7 @@ export class TranslationModalComponent {
     'type': string;
     'ui_config': UiConfig;
   };
+  UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
   hadCopyParagraphError = false;
@@ -141,7 +144,8 @@ export class TranslationModalComponent {
         this.moreAvailable = textAndAvailability.more;
         this.activeStatus = textAndAvailability.status;
         this.activeWrittenTranslation.html = (
-          textAndAvailability.translationHtml);
+          textAndAvailability.translation);
+        this.activeDataFormat = textAndAvailability.dataFormat;
         this.loadingData = false;
       });
     this.HTML_SCHEMA = {
@@ -173,6 +177,10 @@ export class TranslationModalComponent {
 
   getHtmlSchema(): HTMLSchema {
     return this.HTML_SCHEMA;
+  }
+
+  getUnicodeSchema(): UnicodeSchema {
+    return this.UNICODE_SCHEMA;
   }
 
   onContentClick(event: MouseEvent): boolean | void {
@@ -220,7 +228,8 @@ export class TranslationModalComponent {
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = textAndAvailability.more;
     this.activeStatus = textAndAvailability.status;
-    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+    this.activeWrittenTranslation.html = textAndAvailability.translation;
+    this.activeDataFormat = textAndAvailability.dataFormat;
     this.resetEditor();
   }
 
@@ -234,7 +243,8 @@ export class TranslationModalComponent {
     this.textToTranslate = textAndAvailability.text;
     this.moreAvailable = true;
     this.activeStatus = textAndAvailability.status;
-    this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
+    this.activeWrittenTranslation.html = textAndAvailability.translation;
+    this.activeDataFormat = textAndAvailability.dataFormat;
     this.resetEditor();
   }
 
@@ -352,7 +362,7 @@ export class TranslationModalComponent {
       this.translateTextService.suggestTranslatedText(
         this.activeWrittenTranslation.html,
         this.translationLanguageService.getActiveLanguageCode(),
-        imagesData, () => {
+        imagesData, this.activeDataFormat, () => {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.');
           this.uploadingTranslation = false;
@@ -363,7 +373,8 @@ export class TranslationModalComponent {
             this.moreAvailable = textAndAvailability.more;
             this.activeStatus = textAndAvailability.status;
             this.activeWrittenTranslation.html = (
-              textAndAvailability.translationHtml);
+              textAndAvailability.translation);
+            this.activeDataFormat = textAndAvailability.dataFormat;
             this.resetEditor();
           } else {
             this.activeWrittenTranslation.html = '';
