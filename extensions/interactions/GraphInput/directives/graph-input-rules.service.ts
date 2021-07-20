@@ -197,7 +197,7 @@ export class GraphInputRulesService {
 
     // Check against every permutation of vectices.
     var numVertices = graph2.vertices.length;
-    // The permutation will be 'null' when there are no more 
+    // The permutation will be 'null' when there are no more
     // lexicographical permutation of vertices.
     var permutation: number[] | null = [];
     for (var i = 0; i < numVertices; i++) {
