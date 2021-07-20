@@ -100,7 +100,12 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             self.assertEqual(stanzas[2].covered_lines, 5)
 
     def test_get_stanzas_from_lcov_file_file_name_exception(self):
-        self.lcov_items_list = 'SF:\nLF:10\nLH:5\nend_of_record\n'
+        self.lcov_items_list = (
+            'SF:\n'
+            'LF:10\n'
+            'LH:5\n'
+            'end_of_record\n'
+        )
         with self.open_file_swap:
             with self.assertRaisesRegexp(
                 Exception,
@@ -111,7 +116,10 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
 
     def test_get_stanzas_from_lcov_file_total_lines_exception(self):
         self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\nLF:\nLH:5\nend_of_record\n'
+            'SF:/opensource/oppia/file.ts\n'
+            'LF:\n'
+            'LH:5\n'
+            'end_of_record\n'
         )
         with self.open_file_swap:
             with self.assertRaisesRegexp(
@@ -123,7 +131,10 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
 
     def test_get_stanzas_from_lcov_file_covered_lines_exception(self):
         self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\nLF:10\nLH:\nend_of_record\n'
+            'SF:/opensource/oppia/file.ts\n'
+            'LF:10\n'
+            'LH:\n'
+            'end_of_record\n'
         )
         with self.open_file_swap:
             with self.assertRaisesRegexp(

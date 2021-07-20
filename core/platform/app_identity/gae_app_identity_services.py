@@ -27,6 +27,8 @@ _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 def get_application_id():
     """Returns the application's App Engine ID.
 
+    Locally we set the GOOGLE_CLOUD_PROJECT when starting the dev server.
+
     Returns:
         str. The application ID.
     """
@@ -39,7 +41,7 @@ def get_gcs_resource_bucket_name():
     development mode.
 
     This needs to be in sync with deploy.py which adds the bucket name to
-    constants.js
+    constants.ts
 
     Also, note that app_identity.get_default_gcs_bucket_name() returns None
     if we try to use it in production mode but the default bucket hasn't been

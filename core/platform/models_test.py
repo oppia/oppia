@@ -368,7 +368,7 @@ class RegistryUnitTest(test_utils.TestBase):
             elastic_search_services)
 
     def test_import_storage_services(self):
-        """Tests import taskqueue services function."""
+        """Tests import storage services function."""
 
         class MockCloudStorage():
             pass
@@ -381,6 +381,7 @@ class RegistryUnitTest(test_utils.TestBase):
             self.assertEqual(
                 self.registry_instance.import_storage_services(),
                 MockCloudStorage)
+
         from core.platform.storage import dev_mode_storage_services
         self.assertEqual(
             self.registry_instance.import_storage_services(),

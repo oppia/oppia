@@ -509,9 +509,9 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def import_storage_services(cls):
-        """Imports and returns search_services module.
+        """Imports and returns storage_services module.
 
         Returns:
-            module. The search_services module.
+            module. The storage_services module.
         """
         return cls._get().import_storage_services()

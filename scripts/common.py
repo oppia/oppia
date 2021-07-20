@@ -795,10 +795,11 @@ def write_stdout_safe(string):
     """
     string_bytes = string.encode('utf-8') if isinstance(string, str) else string
 
-    written = 0
-    while written < len(string_bytes):
+    num_bytes_written = 0
+    while num_bytes_written < len(string_bytes):
         try:
-            written += os.write(sys.stdout.fileno(), string_bytes[written:])
+            num_bytes_written += os.write(
+                sys.stdout.fileno(), string_bytes[num_bytes_written:])
         except io.UnsupportedOperation:
             sys.stdout.write(string_bytes.decode('utf-8'))
             return

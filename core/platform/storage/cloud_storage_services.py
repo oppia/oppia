@@ -26,6 +26,11 @@ from google.cloud import storage
 
 @functools.lru_cache(maxsize=1)
 def get_client():
+    """Gets Cloud Storage client.
+
+    Returns:
+        storage.Client. Cloud Storage client.
+    """
     return storage.Client()
 
 

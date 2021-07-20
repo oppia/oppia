@@ -29,14 +29,14 @@ import redis
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.OPPIA_REDIS_DB
+    db=feconf.OPPIA_REDIS_DB_NUMBER
 )
 
 # Redis client for the Cloud NDB cache.
 CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.CLOUD_NDB_REDIS_DB
+    db=feconf.CLOUD_NDB_REDIS_DB_NUMBER
 )
 
 

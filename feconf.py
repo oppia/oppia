@@ -479,9 +479,9 @@ REDISPORT = 6379
 
 # The DB numbers for various Redis instances that Oppia uses, do not reuse these
 # if you're creating new Redis client.
-OPPIA_REDIS_DB = 0
-CLOUD_NDB_REDIS_DB = 1
-STORAGE_EMULATOR_REDIS_DB = 2
+OPPIA_REDIS_DB_NUMBER = 0
+CLOUD_NDB_REDIS_DB_NUMBER = 1
+STORAGE_EMULATOR_REDIS_DB_NUMBER = 2
 
 
 # NOTE TO RELEASE COORDINATORS: Replace this project id with the correct oppia
