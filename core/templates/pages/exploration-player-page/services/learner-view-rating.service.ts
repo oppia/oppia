@@ -14,6 +14,8 @@
 
 /**
  * @fileoverview Service for the rating functionality in the learner view.
+ Includes class with subsequent functions that intialize, submit (update),
+ and get learner view ratings.
  */
 
 import { EventEmitter } from '@angular/core';
@@ -26,6 +28,7 @@ import { LearnerViewRatingBackendApiService } from './learner-view-rating-backen
 @Injectable({
   providedIn: 'root'
 })
+
 export class LearnerViewRatingService {
   userRating: number;
   private _ratingUpdatedEventEmitter: EventEmitter<void> = new EventEmitter();
@@ -36,6 +39,11 @@ export class LearnerViewRatingService {
     LearnerViewRatingBackendApiService
   ) {}
 
+  // Updates the view rating value of this particlaur instance of the
+  // LearnerViewRatingService class by using the controller scope object.
+  /**
+   * @params successCallback - function that recieves value from controller
+   */
   init(successCallback: (usrRating) => void): void {
     this.learnerViewRatingBackendApiService.getUserRatingAsync()
       .then((response) => {
@@ -44,6 +52,13 @@ export class LearnerViewRatingService {
       });
   }
 
+  // Submits an updated value of the the userRating for the specifc instance
+  // of the LearnerViewRatingService class and submits an event to
+  // the EventEmitter.
+  /**
+   * @params ratingValue - variable input number that is assigned the
+   userRating.
+   */
   submitUserRating(ratingValue: number): void {
     this.learnerViewRatingBackendApiService.submitUserRatingAsync(ratingValue)
       .then(() => {
@@ -52,10 +67,23 @@ export class LearnerViewRatingService {
       });
   }
 
+  // Gets/returns the user rating value of that specific instance of the
+  // LearnerViewRatingService class.
+  /**
+   * @return the current value of the userRating instance variable of the
+   specific instance of the LearnerViewRatingService class.
+   */
   getUserRating(): number {
     return this.userRating;
   }
 
+  // This function gets and then returns the _ratingUpdatedEventEmitter
+  // associated with the specific instance of the LearnerViewRatingService
+  // class called upon.
+  /**
+   * @returns the event log of the specific LearnerViewRatingService
+   instance being called upon.
+   */
   get onRatingUpdated(): EventEmitter<void> {
     return this._ratingUpdatedEventEmitter;
   }
