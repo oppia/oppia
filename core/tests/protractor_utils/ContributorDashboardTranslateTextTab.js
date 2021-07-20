@@ -70,6 +70,10 @@ var ContributorDashboardTranslateTextTab = function() {
       featuredLanguageContainer,
       'Featured languages took too long to display'
     );
+    await waitFor.visibilityOf(
+      featuredLanguageElements.first(),
+      'Featured language elements taking too long to appear'
+    );
     var displayedFeaturedLanguages = await featuredLanguageElements
       .map(async function(featuredLanguageElement) {
         return (await featuredLanguageElement.getText()).replace('info\n', '');
