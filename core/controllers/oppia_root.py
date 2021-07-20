@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 
+
 class OppiaRootPage(base.BaseHandler):
     """Renders unified entry point for all routes registered
        with angular router.
