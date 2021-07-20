@@ -98,14 +98,34 @@ export class SharingLinksComponent implements OnInit {
     return classes;
   }
 
-  getUrl(network: SharingPlatform): string {
+getUrl(network: SharingPlatform): string {
+    let queryString: string;
     switch (network) {
       case 'facebook':
-        return `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=${this.serverName}/${this.activityUrlFragment}/${this.activityId}&display=popup&ref=plugin&src=share_button`;
+        queryString = (
+          'sdk=joey&' +
+          `u=${this.serverName}/${this.activityUrlFragment}/` +
+          `${this.activityId}&` +
+          'display=popup&' +
+          'ref=plugin&' +
+          'src=share_button'
+        );
+        return `https://www.facebook.com/sharer/sharer.php?${queryString}`;
+
       case 'twitter':
-        return `https://twitter.com/share?text=${this.escapedTwitterText}&url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
+        queryString = (
+          `text=${this.escapedTwitterText}&` +
+          `url=${this.serverName}/${this.activityUrlFragment}/` +
+          `${this.activityId}`
+        );
+        return `https://twitter.com/share?${queryString}`;
+
       case 'classroom':
-        return `https://classroom.google.com/share?url=${this.serverName}/${this.activityUrlFragment}/${this.activityId}`;
+        queryString = (
+          `url=${this.serverName}/${this.activityUrlFragment}/` +
+          `${this.activityId}`
+        );
+        return `https://classroom.google.com/share?${queryString}`;
     }
   }
 
