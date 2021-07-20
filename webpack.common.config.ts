@@ -98,8 +98,6 @@ module.exports = {
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
       'exploration-player-page.import.ts',
-    get_started:
-      commonPrefix + '/pages/get-started-page/get-started-page.import.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
       'topic-landing-page.import.ts',
@@ -405,18 +403,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/exploration-player-page/' +
         'exploration-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['get_started'],
-      filename: 'get-started-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Learn how to get started using Oppia.'
-      },
-      template:
-        commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

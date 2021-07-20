@@ -5954,7 +5954,8 @@ export default {
 
   // Routes registered with angular router.
   "ROUTES_REGISTERED_WITH_FRONTEND": {
-    "ABOUT": "about"
+    "ABOUT": "about",
+    "GET_STARTED": "get-started"
   },
 
   "DEV_MODE": true,

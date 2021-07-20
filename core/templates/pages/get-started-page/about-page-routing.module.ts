@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,23 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the get started page.
+ * @fileoverview Routing module for get started page.
  */
 
 import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import { Route, RouterModule } from '@angular/router';
 import { GetStartedPageRootComponent } from './get-started-page-root.component';
-import { CommonModule } from '@angular/common';
-import { GetStartedPageRoutingModule } from './about-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: GetStartedPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    GetStartedPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    GetStartedPageRootComponent
+  exports: [
+    RouterModule
   ]
 })
-export class GetStartedPageModule {}
+
+export class GetStartedPageRoutingModule {}
