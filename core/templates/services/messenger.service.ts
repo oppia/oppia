@@ -75,8 +75,10 @@ type PayloadType = (
   ExplorationResetData
 );
 
+// The 'secret' and 'tagId' sent to the parent will be 'null' if the supported
+// hash version is not '0.0.0'. They are used to ensure backwards-compatibility.
 type HashDict = {
-  version: string | null,
+  version: string,
   secret: string | null,
   tagid: string | null
 };
@@ -170,7 +172,7 @@ export class MessengerService {
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
       let hashParts = hash.split('&');
       let hashDict: HashDict = {
-        version: null,
+        version: '',
         secret: null,
         tagid: null
       };
