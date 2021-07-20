@@ -44,7 +44,7 @@ export class RatioExpressionInputValidationService {
   getCustomizationArgsWarnings(
       customizationArgs: RatioExpressionInputCustomizationArgs): Warning[] {
     var isNonNegativeInt = function(number: number) {
-      return (typeof number === 'number') && number % 1 === 0 && number >= 0;
+      return number % 1 === 0 && number >= 0;
     };
     var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
     // 0 is allowed as an input, as that corresponds to having no limit.
