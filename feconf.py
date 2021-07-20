@@ -25,7 +25,7 @@ import os
 
 from constants import constants
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -1314,10 +1314,10 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
-}]
+}] # type: List[Dict[Text, Any]]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS)
+    COMMON_RIGHTS_ALLOWED_COMMANDS) # type: List[Dict[Text, Any]]
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],

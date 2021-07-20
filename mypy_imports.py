@@ -23,11 +23,15 @@ from core.platform.datastore import gae_datastore_services as datastore_services
 from core.platform.transactions import gae_transaction_services as transaction_services # pylint: disable=line-too-long
 
 from core.storage.activity import gae_models as activity_models
-from core.storage.app_feedback_report import gae_models as app_feedback_report_models # pylint: disable=line-too-long
+from core.storage.app_feedback_report import (
+    gae_models as app_feedback_report_models)
 from core.storage.audit import gae_models as audit_models
 from core.storage.auth import gae_models as auth_models
 from core.storage.base_model import gae_models as base_models
 from core.storage.blog import gae_models as blog_models
+from core.storage.classifier import gae_models as classifier_models
+from core.storage.collection import gae_models as collection_models
+from core.storage.config import gae_models as config_models
 from core.storage.user import gae_models as user_models
 
 __all__ = [
@@ -37,6 +41,9 @@ __all__ = [
     b'auth_models',
     b'base_models',
     b'blog_models',
+    b'classifier_models',
+    b'collection_models',
+    b'config_models',
     b'datastore_services',
     b'transaction_services',
     b'user_models'

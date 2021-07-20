@@ -310,7 +310,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
         user_data = dict()
-        report_models = cls.get_all().filter( # type: ignore[attr-defined]
+        report_models = cls.get_all().filter(
             cls.scrubbed_by == user_id).fetch()
 
         for report_model in report_models:

@@ -22,6 +22,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
+from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -29,14 +35,21 @@ class ConfigPropertySnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a config property snapshot."""
 
-    pass
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(ConfigPropertySnapshotMetadataModel, self).__init__(*args, **kwargs)
 
 
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(ConfigPropertySnapshotContentModel, self).__init__(*args, **kwargs)
+
     @staticmethod
     def get_deletion_policy():
+        # type: () -> Any
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -53,24 +66,32 @@ class ConfigPropertyModel(base_models.VersionedModel):
     # The property value.
     value = datastore_services.JsonProperty(indexed=False)
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(ConfigPropertyModel, self).__init__(*args, **kwargs)
+
     @staticmethod
     def get_deletion_policy():
+        # type: () -> Any
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> Any
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, Any]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    def commit(self, committer_id, commit_cmds):
+    def commit(self, committer_id, commit_cmds): # type: ignore[override]
+        # type: (Text, List[Dict[Text, Any]]) -> None
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
 
 
@@ -78,15 +99,22 @@ class PlatformParameterSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a platform parameter snapshot."""
 
-    pass
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(PlatformParameterSnapshotMetadataModel, self).__init__(*args, **kwargs)
 
 
 class PlatformParameterSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content for a platform parameter snapshot."""
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(PlatformParameterSnapshotContentModel, self).__init__(*args, **kwargs)
+
     @staticmethod
     def get_deletion_policy():
+        # type: () -> Any
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -105,18 +133,25 @@ class PlatformParameterModel(base_models.VersionedModel):
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
 
+    def __init__(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
+        super(PlatformParameterModel, self).__init__(*args, **kwargs)
+
     @staticmethod
     def get_deletion_policy():
+        # type: () -> Any
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> Any
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, Any]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -125,6 +160,7 @@ class PlatformParameterModel(base_models.VersionedModel):
 
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):
+        # type: (Text, List[Dict[Text, Any]], int) -> PlatformParameterModel
         """Creates a PlatformParameterModel instance.
 
         Args:
