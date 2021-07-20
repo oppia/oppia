@@ -1093,8 +1093,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
 
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)
 
@@ -1153,8 +1153,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'inputs': {'x': '{{ExampleParam}}'}
         }
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         old_answer_groups[0]['rule_specs'][0] = temp_rule
@@ -1264,8 +1264,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.set_interaction_for_state(init_state, 'TextInput')
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
@@ -1306,8 +1306,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer groups to be a list')
 
         new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in old_answer_groups
         ]
         init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
