@@ -924,6 +924,7 @@ if constants.DEV_MODE:
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
 
+# Redirect all routes handled using angular router to the oppia root page.
 for route in constants.ROUTES_REGISTERED_WITH_FRONTEND.values():
     URLS.append(
         get_redirect_route(
