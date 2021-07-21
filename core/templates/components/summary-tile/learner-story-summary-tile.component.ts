@@ -59,19 +59,21 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     if (this.isDisplayAreaHome()) {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
-      let result = '/explore/' + node.getExplorationId();
-      result = this.urlService.addField(
-        result, 'topic_url_fragment',
-        this.storySummary.getTopicUrlFragment());
-      result = this.urlService.addField(
-        result, 'classroom_url_fragment',
-        this.storySummary.getClassroomUrlFragment());
-      result = this.urlService.addField(
-        result, 'story_url_fragment',
-        this.storySummary.getUrlFragment());
-      result = this.urlService.addField(
-        result, 'node_id', node.getId());
-      return result;
+      if (node) {
+        let result = '/explore/' + node.getExplorationId();
+        result = this.urlService.addField(
+          result, 'topic_url_fragment',
+          this.storySummary.getTopicUrlFragment());
+        result = this.urlService.addField(
+          result, 'classroom_url_fragment',
+          this.storySummary.getClassroomUrlFragment());
+        result = this.urlService.addField(
+          result, 'story_url_fragment',
+          this.storySummary.getUrlFragment());
+        result = this.urlService.addField(
+          result, 'node_id', node.getId());
+        return result;
+      }
     }
     return this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
