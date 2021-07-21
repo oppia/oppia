@@ -660,7 +660,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['stewards'],
       filename: 'stewards-landing-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix +
