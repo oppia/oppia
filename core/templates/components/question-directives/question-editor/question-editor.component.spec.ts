@@ -212,7 +212,7 @@ describe('QuestionEditorComponent', () => {
     let onStateEditorDirectiveInitializedEmitter = new EventEmitter();
     spyOnProperty(
       StateEditorService, 'onStateEditorDirectiveInitialized')
-        .and.returnValue(onStateEditorDirectiveInitializedEmitter);
+      .and.returnValue(onStateEditorDirectiveInitializedEmitter);
 
     ctrl.$onInit();
 
@@ -231,7 +231,7 @@ describe('QuestionEditorComponent', () => {
     let onInteractionEditorInitializedEmitter = new EventEmitter();
     spyOnProperty(
       StateEditorService, 'onInteractionEditorInitialized')
-        .and.returnValue(onInteractionEditorInitializedEmitter);
+      .and.returnValue(onInteractionEditorInitializedEmitter);
 
     ctrl.$onInit();
 
@@ -250,7 +250,7 @@ describe('QuestionEditorComponent', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
     spyOnProperty(
       StateInteractionIdService, 'onInteractionIdChanged')
-        .and.returnValue(onInteractionIdChangedEmitter);
+      .and.returnValue(onInteractionIdChangedEmitter);
 
     ctrl.$onInit();
 
