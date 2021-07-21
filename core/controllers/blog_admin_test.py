@@ -229,3 +229,29 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
             'property_values\' failed: Could not convert list to int: [20]')
+
+    def test_raise_error_for_updating_value_to_zero_for_max_tags(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        new_config_value = 0
+
+        response_dict = self.get_json('/blogadminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': 10,
+        }, response_config_properties[
+            config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name])
+
+        payload = {
+            'action': 'save_config_properties',
+            'new_config_property_values': {
+                config_domain.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.name: (
+                    new_config_value),
+            }
+        }
+        response_dict = self.post_json(
+            '/blogadminhandler', payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response_dict['error'], 'Value for max tags cannot be 0.'
+        )

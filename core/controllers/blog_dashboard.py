@@ -50,7 +50,7 @@ def _get_blog_card_summary_dicts_for_dashboard(summaries):
 
 
 class BlogDashboardPage(base.BaseHandler):
-    """Blog Dashboard Page  Handler to render the frontend template."""
+    """Blog Dashboard Page Handler to render the frontend template."""
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {
