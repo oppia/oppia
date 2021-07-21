@@ -18,16 +18,15 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { BlogPostEditorBackendApiService } from './blog-post-editor-backend-api.service';
+import { BlogPostEditorData, BlogPostEditorBackendApiService } from './blog-post-editor-backend-api.service';
 import { BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { Blog } from 'typings/blog-typings';
 
 describe('Blog Post Editor backend api service', () => {
   let bpebas: BlogPostEditorBackendApiService;
   let blogPostObjectFactory: BlogPostObjectFactory;
   let httpTestingController: HttpTestingController;
-  let blogPostEditorDataObject: Blog.BlogPostEditorData;
+  let blogPostEditorDataObject: BlogPostEditorData;
   let csrfService: CsrfTokenService = null;
   let successHandler = null;
   let failHandler = null;

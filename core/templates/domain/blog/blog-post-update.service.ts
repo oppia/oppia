@@ -19,12 +19,23 @@ import { Injectable } from '@angular/core';
 import { BlogPostData } from 'domain/blog/BlogPostObjectFactory';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Blog } from 'typings/blog-typings';
+export interface BlogPostChangeDict {
+  'title'?: string,
+  'thumbnail_filename'?: string,
+  'content'?: string,
+  'tags'?: string[],
+}
+
+interface ImageData {
+  filename: string,
+  imageBlob: Blob
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class BlogPostUpdateService {
-  changeDict: Blog.BlogPostChangeDict = {};
+  changeDict: BlogPostChangeDict = {};
   constructor() {}
 
   setBlogPostTitle(blogPost: BlogPostData, title: string): void {
@@ -32,7 +43,7 @@ export class BlogPostUpdateService {
     this.changeDict.title = title;
   }
 
-  setBlogPostThumbnail(blogPost: BlogPostData, image: Blog.ImageData[]): void {
+  setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
     let filename = image[0].filename;
     blogPost.setThumbnailFilename(filename);
     this.changeDict.thumbnail_filename = filename;
@@ -53,7 +64,7 @@ export class BlogPostUpdateService {
     this.changeDict.content = content;
   }
 
-  getBlogPostChangeDict(): Blog.BlogPostChangeDict {
+  getBlogPostChangeDict(): BlogPostChangeDict {
     return this.changeDict;
   }
 }
