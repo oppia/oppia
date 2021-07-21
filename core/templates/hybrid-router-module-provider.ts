@@ -20,6 +20,10 @@
 import { Directive, Input, ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+
+/** Mock routerLink directive will be used in pages which are yet to be migrated
+ *  to angular router.
+ */
 @Directive({
   selector: '[routerLink]'
 })
