@@ -26,6 +26,8 @@ from core.tests import test_utils
 
 from . import general_purpose_linter
 from . import pre_commit_linter
+from . import warranted_angular_security_bypasses
+
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = pre_commit_linter.FileCache()
@@ -54,6 +56,8 @@ FILE_IN_EXCLUDED_PATH = os.path.join(
 EXTRA_JS_FILEPATH = os.path.join('core', 'templates', 'demo.js')
 INVALID_FILEOVERVIEW_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_fileoverview.ts')
+INVALID_BYPASS_FLAG = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_bypass_flag.ts')
 
 # PY filepaths.
 INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
@@ -388,6 +392,32 @@ class GeneralLintTests(test_utils.LinterTestBase):
             lint_task_report.trimmed_messages)
         self.assertEqual('Newline at EOF', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+
+    def test_file_with_disallow_flags_raise_messsage(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_BYPASS_FLAG], FILE_CACHE)
+        lint_task_report = linter.check_disallowed_flags()
+        self.assert_same_list_elements(
+            ['Please do not use "no-bypass-security-phrase" flag. It is only '
+             'expected to be used in files listed in '
+             'warranted_angular_security_bypasses.py'],
+            lint_task_report.trimmed_messages)
+        self.assertEqual(lint_task_report.name, 'Disallow flags')
+        self.assertTrue(lint_task_report.failed)
+
+    def test_excluded_file_with_disallow_flags_raise_no_message(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_BYPASS_FLAG], FILE_CACHE)
+        excluded_files_swap = self.swap(
+            warranted_angular_security_bypasses,
+            'EXCLUDED_BYPASS_SECURITY_TRUST_FILES',
+            [INVALID_BYPASS_FLAG])
+        with excluded_files_swap:
+            lint_task_report = linter.check_disallowed_flags()
+        self.assertEqual(
+            lint_task_report.trimmed_messages, [])
+        self.assertEqual(lint_task_report.name, 'Disallow flags')
+        self.assertFalse(lint_task_report.failed)
 
     def test_check_extra_js_file_found(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
