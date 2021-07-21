@@ -59,7 +59,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id, gae_id,
         firebase_auth_id, and parent_user_id fields.
         """
@@ -67,7 +67,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Currently, the model holds authentication details relevant only for
         backend. Currently the only relevant user data is the username of the
         parent.
@@ -86,7 +86,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in the
@@ -171,7 +171,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id, and
         user_id fields.
         """
@@ -179,7 +179,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Currently, the model holds identifiers relevant only for backend that
         should not be exported.
         """
@@ -187,7 +187,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in the
@@ -264,13 +264,13 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model has data to delete corresponding to users: id and user_id."""
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Currently, the model holds IDs relevant only for backend that should
         not be exported.
         """
@@ -278,7 +278,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in the
@@ -337,13 +337,13 @@ class FirebaseSeedModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model should never be erased."""
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not correspond to any users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

@@ -55,7 +55,7 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -79,7 +79,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to pseudonymize or delete corresponding
         to a user: user_id field.
         """
@@ -89,7 +89,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -97,7 +97,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
@@ -205,19 +205,19 @@ class CollectionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -383,7 +383,7 @@ class CollectionRightsSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to pseudonymize or delete corresponding
         to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
@@ -461,7 +461,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
@@ -472,7 +472,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance shared across users since multiple
         users contribute to collections and have varying rights.
         """
@@ -496,7 +496,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export/delete corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -790,7 +790,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, editor_ids, owner_ids, contributor_ids,
         and contributors_summary fields.
@@ -801,7 +801,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model data has already been exported as a part of the
         CollectionRightsModel, and thus does not need an export_data
         function.
@@ -810,7 +810,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because noteworthy details that belong to this model have already been
         exported as a part of the CollectionRightsModel.

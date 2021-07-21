@@ -257,7 +257,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model stores the user ID of who has scrubbed this report for auditing
         purposes but otherwise does not contain data directly corresponding to
         the user themselves.
@@ -266,7 +266,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data referencing user and will be exported."""
         return dict(super(cls, cls).get_export_policy(), **{
             'platform': base_models.EXPORT_POLICY.EXPORTED,
@@ -330,7 +330,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since there
         are multiple reports relevant to a user.
         """
@@ -459,7 +459,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any information directly corresponding to a
         user.
         """
@@ -467,7 +467,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -480,7 +480,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -614,7 +614,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any information directly corresponding to a
         user.
         """
@@ -622,7 +622,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -636,7 +636,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

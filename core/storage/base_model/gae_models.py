@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import enum
 
 from constants import constants
 from core.platform import models
@@ -54,47 +55,6 @@ datastore_services = models.Registry.import_datastore_services()
 # method to find the location of this delimiter.
 VERSION_DELIMITER = '-'
 
-# Types of deletion policies. The pragma comment is needed because Enums are
-# evaluated as classes in Python and they should use PascalCase, but using
-# UPPER_CASE seems more appropriate here.
-DELETION_POLICY = python_utils.create_enum( # type: ignore[no-untyped-call]  # pylint: disable=invalid-name
-    # Models that should be kept.
-    'KEEP',
-    # Models that should be deleted.
-    'DELETE',
-    # Models that should be deleted after all the other models are deleted and
-    # verified to be deleted.
-    'DELETE_AT_END',
-    # Models that should be pseudonymized in their local context.
-    'LOCALLY_PSEUDONYMIZE',
-    # Models that should be pseudonymized if they are published and otherwise
-    # (when private) deleted.
-    'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE',
-    # Models that are not directly or indirectly related to users.
-    'NOT_APPLICABLE'
-) # type: Any
-
-EXPORT_POLICY = python_utils.create_enum( # type: ignore[no-untyped-call]  # pylint: disable=invalid-name
-    # Indicates that a model's field is to be exported.
-    'EXPORTED',
-    # Indicates that the value of the field is exported as the key in the
-    # Takeout dict.
-    'EXPORTED_AS_KEY_FOR_TAKEOUT_DICT',
-    # Indicates that a model's field should not be exported.
-    'NOT_APPLICABLE'
-) # type: Any
-
-MODEL_ASSOCIATION_TO_USER = python_utils.create_enum( # type: ignore[no-untyped-call]  # pylint: disable=invalid-name
-    # Indicates that a model has a single instance per user.
-    'ONE_INSTANCE_PER_USER',
-    # Indicates that a model can be shared by multiple users.
-    'ONE_INSTANCE_SHARED_ACROSS_USERS',
-    # Indicates that a model has multiple instances, specific to a user.
-    'MULTIPLE_INSTANCES_PER_USER',
-    # Indicates that a model should not be exported.
-    'NOT_CORRESPONDING_TO_USER'
-) # type: Any
-
 # Constant used when retrieving big number of models.
 FETCH_BATCH_SIZE = 1000
 
@@ -102,6 +62,47 @@ FETCH_BATCH_SIZE = 1000
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
+
+
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+class DELETION_POLICY(enum.Enum):
+    # Models that should be kept.
+    KEEP = 1
+    # Models that should be deleted.
+    DELETE = 2
+    # Models that should be deleted after all the other models are deleted and
+    # verified to be deleted.
+    DELETE_AT_END = 3
+    # Models that should be pseudonymized in their local context.
+    LOCALLY_PSEUDONYMIZE = 4
+    # Models that should be pseudonymized if they are published and otherwise
+    # (when private) deleted.
+    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = 5
+    # Models that are not directly or indirectly related to users.
+    NOT_APPLICABLE = 6
+
+
+class EXPORT_POLICY(enum.Enum):
+    # Indicates that a model's field is to be exported.
+    EXPORTED = 1
+    # Indicates that the value of the field is exported as the key in the
+    # Takeout dict.
+    EXPORTED_AS_KEY_FOR_TAKEOUT_DICT = 2
+    # Indicates that a model's field should not be exported.
+    NOT_APPLICABLE = 3
+
+
+class MODEL_ASSOCIATION_TO_USER(enum.Enum):
+    # Indicates that a model has a single instance per user.
+    ONE_INSTANCE_PER_USER = 1
+    # Indicates that a model can be shared by multiple users.
+    ONE_INSTANCE_SHARED_ACROSS_USERS = 2
+    # Indicates that a model has multiple instances, specific to a user.
+    MULTIPLE_INSTANCES_PER_USER = 3
+    # Indicates that a model should not be exported.
+    NOT_CORRESPONDING_TO_USER = 4
 
 
 class BaseModel(datastore_services.Model): # type: ignore[misc]
@@ -162,7 +163,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> DELETION_POLICY
         """This method should be implemented by subclasses.
 
         Raises:
@@ -207,7 +208,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> None
+        # type: () -> MODEL_ASSOCIATION_TO_USER
         """This method should be implemented by subclasses.
 
         Raises:
@@ -220,7 +221,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return {
             'created_on': EXPORT_POLICY.NOT_APPLICABLE,
@@ -573,7 +574,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> MODEL_ASSOCIATION_TO_USER
         """The history of commits is not relevant for the purposes of
         Takeout, since commits do not contain any personal data of the user.
         """
@@ -581,7 +582,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> DELETION_POLICY
         """Model contains data corresponding to a user that
         requires pseudonymization: user_id field.
         """
@@ -589,7 +590,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, EXPORT_POLICY]
         """Model contains data corresponding to a user,
         but this isn't exported because the history of commits is not
         relevant to a user for the purposes of Takeout, since commits do not
@@ -1395,7 +1396,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        # type: () -> Any
+        # type: () -> DELETION_POLICY
         """Model contains data corresponding to a user that requires
         pseudonymization: committer_id field.
         """
@@ -1403,13 +1404,13 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> MODEL_ASSOCIATION_TO_USER
         """There are multiple SnapshotMetadataModels per user."""
         return MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, EXPORT_POLICY]
         """Model contains data to export/delete corresponding to a user."""
         return dict(BaseModel.get_export_policy(), **{
             'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
@@ -1518,7 +1519,7 @@ class BaseSnapshotContentModel(BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> MODEL_ASSOCIATION_TO_USER
         """The contents of snapshots are not relevant to the user for
         Takeout.
         """
@@ -1526,7 +1527,7 @@ class BaseSnapshotContentModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because the contents of snapshots are note relevant to the user for
         Takeout.
