@@ -147,7 +147,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'player-transcript.service.ts',
     'promo-bar-backend-api.service.ts',
     'python-program.tokenizer.ts',
-    'question-editor.directive.ts',
+    'question-editor.component.ts',
     'question-update.service.ts',
     'random-selector.directive.ts',
     'real-editor.component.ts',
