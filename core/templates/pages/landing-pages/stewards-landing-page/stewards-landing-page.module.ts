@@ -38,12 +38,10 @@ import { StewardsLandingPageRootComponent } from './stewards-landing-page-root.c
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StewardsLandingPageComponent,
     StewardsLandingPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StewardsLandingPageComponent,
     StewardsLandingPageRootComponent
   ],
