@@ -102,7 +102,7 @@ export class StoryContents {
     });
   }
 
-  getNodeIndex(nodeId: string): number {
+  getNodeIndex(nodeId: string | null | undefined): number {
     for (var i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].getId() === nodeId) {
         return i;

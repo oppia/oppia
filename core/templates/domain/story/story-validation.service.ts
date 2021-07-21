@@ -55,11 +55,7 @@ export class StoryValidationService {
     // prerequisite skills required by the destination nodes 'unlocked' by
     // visiting a particular node by the time that node is finished.
     while (nodesQueue.length > 0) {
-      // 'shift()' returns 'undefined' only when NodesQueue array is empty,
-      // the loop terminates before that condition is reached.
-      // non-null assertion (!) is used to make typescript typing happy.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      var currentNodeIndex = storyContents.getNodeIndex(nodesQueue.shift()!);
+      var currentNodeIndex = storyContents.getNodeIndex(nodesQueue.shift());
       nodeIsVisited[currentNodeIndex] = true;
       var currentNode = nodes[currentNodeIndex];
 

@@ -36,7 +36,9 @@ export class ExplorationRecommendationsService {
   isIframed: boolean = false;
   isInEditorPage: boolean = false;
   isInEditorPreviewMode: boolean = false;
-  explorationId: string | undefined;
+  // 'explorationId' is only used in 'getRecommendedSummaryDicts()' and is
+  // assigned a value before it is used, hence we need to do non-null assertion.
+  explorationId!: string;
 
   constructor(
     private contextService: ContextService,

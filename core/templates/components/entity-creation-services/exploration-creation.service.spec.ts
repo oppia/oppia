@@ -113,13 +113,13 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(false);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
       tick(150);
 
-      expect(ecs.explorationCreationInProgress).toBe(true);
+      expect(ecs.explorationCreationInProgress).toBeTrue();
       expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
     }));
 
@@ -135,13 +135,13 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(false);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
       tick(150);
 
-      expect(ecs.explorationCreationInProgress).toBe(false);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
       expect(siteAnalyticsService.registerCreateNewExplorationEvent)
         .not.toHaveBeenCalled();
