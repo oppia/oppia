@@ -16,9 +16,8 @@
  * @fileoverview Module for the classroom page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -30,6 +29,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { ClassroomPageComponent } from './classroom-page.component';
 import { TopicSummaryTileComponent } from
   'components/summary-tile/topic-summary-tile.component';
+import { ClassroomPageRootComponent } from './classroom-page-root.component';
 
 @NgModule({
   imports: [
@@ -39,11 +39,13 @@ import { TopicSummaryTileComponent } from
   ],
   declarations: [
     ClassroomPageComponent,
+    ClassroomPageRootComponent,
     OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
   entryComponents: [
     ClassroomPageComponent,
+    ClassroomPageRootComponent,
     OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
@@ -59,30 +61,7 @@ import { TopicSummaryTileComponent } from
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
+  bootstrap: [ClassroomPageRootComponent]
 })
-class ClassroomPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ClassroomPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ClassroomPageModule {}

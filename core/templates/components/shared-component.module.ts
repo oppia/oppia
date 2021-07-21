@@ -85,7 +85,7 @@ import { EditThumbnailModalComponent } from './forms/custom-forms-directives/edi
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective, BaseContentPageFooterDirective } from '../base-components/base-content.component';
+import { BaseContentComponent, BaseContentNavBarBreadCrumbDirective, BaseContentNavBarPreLogoActionDirective, BaseContentPageFooterDirective } from '../base-components/base-content.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
@@ -236,6 +236,7 @@ const toastrConfig = {
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentNavBarPreLogoActionDirective,
     BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
@@ -374,6 +375,7 @@ const toastrConfig = {
     BackgroundBannerComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentNavBarPreLogoActionDirective,
     BaseContentPageFooterDirective,
     CorrectnessFooterComponent,
     ContinueButtonComponent,

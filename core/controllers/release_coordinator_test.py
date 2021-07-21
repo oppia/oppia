@@ -72,7 +72,8 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
 
         response = self.get_html_response('/release-coordinator')
         response.mustcontain(
-            '<oppia-release-coordinator-page></oppia-release-coordinator-page>')
+            '<oppia-release-coordinator-page-root>' +
+            '</oppia-release-coordinator-page-root>')
         self.logout()
 
 
