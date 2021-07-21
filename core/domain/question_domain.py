@@ -1097,7 +1097,25 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
-        """Converts from version 45 to 46. Version 46 adds inputGreaterThanzero
+        """Converts from version 45 to 46. Version 46 ensures that the written
+        translations in a state containing unicode content do not contain HTML
+        tags and the data_format is unicode. This does not affect questions, so
+        no conversion is required.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v46_dict_to_v47_dict(cls, question_state_dict):
+        """Converts from version 46 to 47. Version 47 adds inputGreaterThanzero
         customization arg to NumericInput interaction which allows
         creators to set input range greater than or equal to zero.
 

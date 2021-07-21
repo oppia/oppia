@@ -40,11 +40,15 @@ describe('NumericInputValidationService', () => {
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome,
     customizationArgs: NumericInputCustomizationArgs;
-  let equalsZeroRule: Rule, betweenNegativeOneAndOneRule: Rule,
+  let equalsZeroRule: Rule, equalsZeroRuleLessThanZero: Rule,
+    betweenNegativeOneAndOneRule: Rule,
     betweenFourAndTwoRule: Rule, lessThanOneRule: Rule,
+    lessThanOneRuleLessThanZero: Rule,
     greaterThanNegativeOneRule: Rule, lessThanOrEqualToOneRule: Rule,
+    lessThanOrEqualToOneRuleLessThanZero: Rule,
     greaterThanOrEqualToNegativeOneRule: Rule,
-    zeroWithinToleranceOfOneRule: Rule;
+    zeroWithinToleranceOfOneRule: Rule,
+    zeroWithinToleranceOfOneRuleLessThanZero: Rule;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory,
     rof: RuleObjectFactory;
 
@@ -126,6 +130,32 @@ describe('NumericInputValidationService', () => {
       inputs: {
         x: 0,
         tol: 1
+      },
+    }, 'NumericInput');
+    zeroWithinToleranceOfOneRuleLessThanZero =
+      rof.createFromBackendDict({
+        rule_type: 'IsWithinTolerance',
+        inputs: {
+          x: -2,
+          tol: 1
+        }
+      }, 'NumericInput');
+    lessThanOneRuleLessThanZero = rof.createFromBackendDict({
+      rule_type: 'IsLessThan',
+      inputs: {
+        x: -1
+      }
+    }, 'NumericInput');
+    equalsZeroRuleLessThanZero = rof.createFromBackendDict({
+      rule_type: 'Equals',
+      inputs: {
+        x: -1
+      }
+    }, 'NumericInput');
+    lessThanOrEqualToOneRuleLessThanZero = rof.createFromBackendDict({
+      rule_type: 'IsLessThanOrEqualTo',
+      inputs: {
+        x: -1
       }
     }, 'NumericInput');
     answerGroups = [agof.createNew(
@@ -148,14 +178,7 @@ describe('NumericInputValidationService', () => {
 
   it('should show warning if input less than zero for IsWithinTolerance',
     () => {
-      zeroWithinToleranceOfOneRule = rof.createFromBackendDict({
-        rule_type: 'IsWithinTolerance',
-        inputs: {
-          x: -2,
-          tol: 1
-        }
-      }, 'NumericInput');
-      answerGroups[0].rules = [zeroWithinToleranceOfOneRule];
+      answerGroups[0].rules = [zeroWithinToleranceOfOneRuleLessThanZero];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
@@ -167,13 +190,7 @@ describe('NumericInputValidationService', () => {
     });
 
   it('should show warning if input less than zero for IsLessThan', () => {
-    lessThanOneRule = rof.createFromBackendDict({
-      rule_type: 'IsLessThan',
-      inputs: {
-        x: -1
-      }
-    }, 'NumericInput');
-    answerGroups[0].rules = [lessThanOneRule];
+    answerGroups[0].rules = [lessThanOneRuleLessThanZero];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
@@ -184,13 +201,7 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should show warning if input less than zero for Equals', () => {
-    equalsZeroRule = rof.createFromBackendDict({
-      rule_type: 'Equals',
-      inputs: {
-        x: -1
-      }
-    }, 'NumericInput');
-    answerGroups[0].rules = [equalsZeroRule];
+    answerGroups[0].rules = [equalsZeroRuleLessThanZero];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
@@ -202,13 +213,7 @@ describe('NumericInputValidationService', () => {
 
   it('should show warning if input less than zero for IsLessThanOrEqualTo',
     () => {
-      lessThanOrEqualToOneRule = rof.createFromBackendDict({
-        rule_type: 'IsLessThanOrEqualTo',
-        inputs: {
-          x: -1
-        }
-      }, 'NumericInput');
-      answerGroups[0].rules = [lessThanOrEqualToOneRule];
+      answerGroups[0].rules = [lessThanOrEqualToOneRuleLessThanZero];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
       expect(customizationArgs.inputGreaterThanZero.value).toBe(true);

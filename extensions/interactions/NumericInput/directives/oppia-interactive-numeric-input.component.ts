@@ -98,7 +98,6 @@ export class InteractiveNumericInput implements OnInit {
       'NumericInput',
       this.getAttributesObject()
     ) as NumericInputCustomizationArgs;
-    //this.inputGreaterThanZero = inputGreaterThanZero.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''

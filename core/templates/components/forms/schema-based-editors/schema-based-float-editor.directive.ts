@@ -123,8 +123,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
-            ctrl.minValue = (
-              ctrl.uiConfig().checkInputGreaterThanZero ? 0 : null);
+            let { checkInputGreaterThanZero } = ctrl.uiConfig() || {};
+            ctrl.minValue = checkInputGreaterThanZero && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {
