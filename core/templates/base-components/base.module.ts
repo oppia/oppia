@@ -88,6 +88,8 @@ const toastrConfig = {
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     SharedPipesModule,
     ToastrModule.forRoot(toastrConfig),

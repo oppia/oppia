@@ -20,6 +20,8 @@
 import { Directive, Input, ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+// TODO(#13443): Remove hybrid router module provider once all pages are
+// migrated to angular router.
 
 /** Mock routerLink directive will be used in pages which are yet to be migrated
  *  to angular router.
