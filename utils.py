@@ -327,7 +327,7 @@ def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    # We accept unicode but imghdr.what(file, h) accept 'h' of type bytes.
+    # We accept unicode but imghdr.what(file, h) accepts 'h' of type bytes.
     # So we have casted content to be bytes.
     content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':

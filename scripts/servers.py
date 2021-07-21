@@ -403,7 +403,7 @@ def managed_webpack_compiler(
                 if b'Built at: ' in line:
                     break
             else:
-                # If the none of the lines contained the string 'Built at',
+                # If none of the lines contained the string 'Built at',
                 # raise an error because a build hasn't finished successfully.
                 raise IOError('First build never completed')
 

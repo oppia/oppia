@@ -313,6 +313,19 @@ def main(args=None):
     common.fix_third_party_imports()
 
     if parsed_args.generate_coverage_report:
+        python_utils.PRINT(
+            'Checking whether coverage is installed in %s'
+            % common.OPPIA_TOOLS_DIR
+        )
+        if not os.path.exists(
+                os.path.join(
+                    common.OPPIA_TOOLS_DIR,
+                    'coverage-%s' % common.COVERAGE_VERSION
+                )
+        ):
+            raise Exception(
+                'Coverage is not installed, please run the start script.')
+
         pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
             pythonpath_components.append(os.environ.get('PYTHONPATH'))

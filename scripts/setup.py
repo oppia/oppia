@@ -52,7 +52,7 @@ def create_directory(directory_path):
 def test_python_version():
     running_python_version = '{0[0]}.{0[1]}'.format(sys.version_info)
     if running_python_version != '3.7':
-        python_utils.PRINT('Please use Python 3.7 exiting...')
+        python_utils.PRINT('Please use Python 3.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
         if common.is_windows_os():
