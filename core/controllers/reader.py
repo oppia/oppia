@@ -159,7 +159,7 @@ class ExplorationPage(base.BaseHandler):
         if self.normalized_request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
             if version:
-                redirect_url += '?v=%s' % str(version)
+                redirect_url += '?v=%s' % version
             self.redirect(redirect_url)
             return
 

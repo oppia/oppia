@@ -170,10 +170,10 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                         'content_id': 'default_outcome',
                         'html': ''
                     },
-                'dest': 'State A',
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'labelled_as_correct': False
+                    'dest': 'State A',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
                 },
                 'customization_args': {
                     'rows': {
