@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
 import constants from 'assets/constants';
 export interface BlogPostBackendDict {
   'id': string ;
