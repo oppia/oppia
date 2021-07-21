@@ -28,7 +28,8 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&',
-        uiConfig: '&'
+        uiConfig: '&',
+        headersEnabled: '&',
       },
       template: require('./schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',

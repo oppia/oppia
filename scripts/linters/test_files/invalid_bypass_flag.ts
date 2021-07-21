@@ -13,15 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating http loader for translations.
+ * @fileoverview Invalid syntax .ts file, used by scripts/linters/
+ * js_ts_linter_test.py. This file is using eslint-disable-next-line oppia/
+ * no-bypass-security-phrase which is not allowed.
  */
 
-// eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient } from '@angular/common/http';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { DomSanitizer } from '@angular/platform-browser';
+import { SvgSanitizerService } from './svg-sanitizer.service';
 
-export class TranslateLoaderFactory {
-  static createHttpLoader(httpClient: HttpClient): TranslateHttpLoader {
-    return new TranslateHttpLoader(httpClient);
-  }
+
+let svgSanitizerService: SvgSanitizerService;
+let domParser: DOMParser = new DOMParser();
+class MockDomSanitizer {
+    // eslint-disable-next-line oppia/no-bypass-security-phrase
+    bypassSecurityTrustResourceUrl(str: string): string {
+        return str;
+    }
 }

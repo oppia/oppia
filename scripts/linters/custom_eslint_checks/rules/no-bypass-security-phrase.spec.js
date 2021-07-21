@@ -13,15 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating http loader for translations.
+ * @fileoverview Tests for the no-bypass-security-phrase.js file.
  */
 
-// eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient } from '@angular/common/http';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+'use strict';
 
-export class TranslateLoaderFactory {
-  static createHttpLoader(httpClient: HttpClient): TranslateHttpLoader {
-    return new TranslateHttpLoader(httpClient);
-  }
-}
+var rule = require('./no-bypass-security-phrase');
+var RuleTester = require('eslint').RuleTester;
+
+var ruleTester = new RuleTester();
+ruleTester.run('no-bypass-security-phrase', rule, {
+  valid: [
+    {
+      code:
+      'SecurityTrustResourceUrl()'
+    }
+  ],
+
+  invalid: [
+    {
+      code:
+      'this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData)',
+      errors: [{
+        message: 'Please do not use phrase "bypassSecurity"'
+      }],
+    }
+  ]
+});
