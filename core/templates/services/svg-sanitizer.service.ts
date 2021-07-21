@@ -95,6 +95,8 @@ export class SvgSanitizerService {
           if (heightRegexpMatchResult) {
             dimensions.height = heightRegexpMatchResult[0].replace('.', 'd');
           }
+        } else {
+          throw new Error('SVG height attribute is missing.');
         }
         let attrWidth = node.getAttribute('width');
         if (attrWidth) {
@@ -102,6 +104,8 @@ export class SvgSanitizerService {
           if (widthRegexpMatchResult) {
             dimensions.width = widthRegexpMatchResult[0].replace('.', 'd');
           }
+        } else {
+          throw new Error('SVG width attribute is missing.');
         }
         // This attribute is useful for the vertical alignment of the
         // Math SVG while displaying inline with other text.

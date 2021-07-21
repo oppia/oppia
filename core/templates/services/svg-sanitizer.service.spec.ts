@@ -122,7 +122,7 @@ describe('SvgSanitizerService', () => {
     expect(cleanedSvgString).toEqual(expectedCleanSvgString);
   });
 
-  it('should remove custom data attribute from the SVG string', function() {
+  it('should remove custom data attribute from the SVG string', () => {
     var svgString = (
       '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
       'focusable="false" role= "img" style="vertical-align: -0.241ex;" xmln' +
@@ -193,27 +193,7 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
-  it('should assign empty dimensions if no dimensions are not present', () => {
-    let svgString = (
-      '<svg viewBox="0 -511.5 572.5 615.4" focusable="false" xmlns="http://ww' +
-      'w.w3.org/2000/svg"><g stroke="currentColor" fill="currentColor" stro' +
-      'ke-width="0" transform="matrix(1 0 0 -1 0 0)"><path stroke-width="1"' +
-      ' d="M52 289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402Q368 ' +
-      '386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T463 14' +
-      '0Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z"/></g></svg>'
-    );
-    let dimensions = (
-      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
-        svgString));
-    let expectedDimension = {
-      height: '',
-      width: '',
-      verticalPadding: ''
-    };
-    expect(dimensions).toEqual(expectedDimension);
-  });
-
-  it('should extract dimensions from SVG string without style', function() {
+  it('should extract dimensions from SVG string without style', () => {
     var svgString = (
       '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
       'focusable="false" style="" xmlns="http://www.w3.org/2000/svg"><g str' +
@@ -234,8 +214,40 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
+  it('should throw error if height attribute is missing from SVG', () => {
+    var svgString = (
+      '<svg width="1.33ex" viewBox="0 -511.5 572.5 615.4" ' +
+      'focusable="false" style="" xmlns="http://www.w3.org/2000/svg"><g str' +
+      'oke="currentColor" fill="currentColor" stroke-width="0" transform="m' +
+      'atrix(1 0 0 -1 0 0)"><path stroke-width="1" d="M52 289Q59 331 106 38' +
+      '6T222 442Q257 442 2864Q412 404 406 402Q368 386 350 336Q290 115 290 7' +
+      '8Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153' +
+      'H489Q504 153 504 145284 52 289Z"/></g></svg>'
+    );
+    expect(() => {
+      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+        svgString);
+    }).toThrowError('SVG height attribute is missing.');
+  });
+
+  it('should throw error if width attribute is missing from SVG', () => {
+    var svgString = (
+      '<svg height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
+      'focusable="false" style="" xmlns="http://www.w3.org/2000/svg"><g str' +
+      'oke="currentColor" fill="currentColor" stroke-width="0" transform="m' +
+      'atrix(1 0 0 -1 0 0)"><path stroke-width="1" d="M52 289Q59 331 106 38' +
+      '6T222 442Q257 442 2864Q412 404 406 402Q368 386 350 336Q290 115 290 7' +
+      '8Q290 50 306 38T341 26Q378 26 414 59T463 140Q466 150 469 151T485 153' +
+      'H489Q504 153 504 145284 52 289Z"/></g></svg>'
+    );
+    expect(() => {
+      svgSanitizerService.extractDimensionsFromMathExpressionSvgString(
+        svgString);
+    }).toThrowError('SVG width attribute is missing.');
+  });
+
   it('should expect dimensions.verticalPadding to be zero if attribute style' +
-  'is invalid', function() {
+  'is invalid', () => {
     var svgString = (
       '<svg width="1.33ex" height="1.429ex" viewBox="0 -511.5 572.5 615.4" ' +
       'focusable="false" style="invalid" xmlns="http://www.w3.org/2000/svg"><g str' +
@@ -256,7 +268,7 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
-  it('should get invalid svg tags and attributes', function() {
+  it('should get invalid svg tags and attributes', () => {
     var dataURI = (
       'data:image/svg+xml;base64,' +
       btoa(unescape(encodeURIComponent(
