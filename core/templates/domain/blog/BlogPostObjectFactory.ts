@@ -19,35 +19,25 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
-export interface BlogPostBackendDict {
-  'id': string;
-  'author_username': string;
-  'title': string;
-  'content': string;
-  'thumbnail_filename': string;
-  'tags': string[];
-  'url_fragment': string;
-  'last_updated'?: number;
-  'published_on'?: number;
-}
+import { Blog } from 'typings/blog-typings';
+import constants from 'assets/constants';
 export class BlogPostData {
-  _id: string;
+  _id: string | null;
   _authorUsername: string;
   _title: string;
   _content: string;
   _tags: string[];
-  _thumbnailFilename: string;
+  _thumbnailFilename: string | null;
   _urlFragment: string;
-  _lastUpdated: number;
-  _publishedOn: number;
+  _lastUpdated?: number;
+  _publishedOn?: number;
   constructor(
-      id: string,
+      id: string | null,
       authorUsername: string,
       title: string,
       content: string,
       tags: string[],
-      thumbnailFilename: string,
+      thumbnailFilename: string | null,
       urlFragment: string,
       lastUpdated?: number,
       publishedOn?: number) {
@@ -62,7 +52,7 @@ export class BlogPostData {
     this._publishedOn = publishedOn;
   }
 
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -70,11 +60,11 @@ export class BlogPostData {
     return this._authorUsername;
   }
 
-  getLastUpdated(): number {
+  getLastUpdated(): number | undefined {
     return this._lastUpdated;
   }
 
-  getPublishedOn(): number {
+  getPublishedOn(): number | undefined {
     return this._publishedOn;
   }
 
@@ -107,7 +97,7 @@ export class BlogPostData {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
@@ -127,7 +117,7 @@ export class BlogPostData {
     }
     if (this._content === '') {
       issues.push(
-        'Blog Post content should not be empty');
+        'Blog Post content should not be empty.');
     }
     return issues;
   }
@@ -138,22 +128,27 @@ export class BlogPostData {
       issues.push(
         'Blog Post title should not be empty.');
     }
+    if (this._title.length > constants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+      issues.push(
+        'Blog Post title should not exceed ' +
+        `${constants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+      );
+    }
     if (!this._thumbnailFilename) {
       issues.push(
-        'Blog Post should have a thumbnail');
+        'Blog Post should have a thumbnail.');
     }
-    if (!this._tags.length) {
+    if (this._tags.length === 0) {
       issues.push(
         'Blog Post should have atleast one tag linked to it.');
     }
     if (this._tags.length > maxTags) {
       issues.push(
-        'Blog Post should atmost have ' + String(maxTags) +
-        ' tag linked to it.');
+        `Blog Post should atmost have ${maxTags} tag(s) linked to it.`);
     }
     if (this._content === '') {
       issues.push(
-        'Blog Post content should not be empty');
+        'Blog Post content should not be empty.');
     }
     return issues;
   }
@@ -166,7 +161,7 @@ export class BlogPostObjectFactory {
   constructor() {}
 
   createFromBackendDict(
-      blogPostBackendDict: BlogPostBackendDict): BlogPostData {
+      blogPostBackendDict: Blog.BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
       blogPostBackendDict.author_username,

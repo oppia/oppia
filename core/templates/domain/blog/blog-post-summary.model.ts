@@ -17,35 +17,24 @@
  * blog post summary.
  */
 
-export interface BlogPostSummaryBackendDict {
-  'id': string;
-  'title': string;
-  'summary': string;
-  'author_username': string;
-  'tags': string[];
-  'url_fragment': string;
-  'thumbnail_filename': string;
-  'published_on'?: number;
-  'last_updated': number;
-}
-
+import { Blog } from 'typings/blog-typings';
 export class BlogPostSummary {
   _id: string;
   _authorUsername: string;
   _title: string;
   _summary: string;
   _tags: string[];
-  _thumbnailFilename: string;
+  _thumbnailFilename: string | null;
   _urlFragment: string;
-  _lastUpdated: number;
-  _publishedOn: number;
+  _lastUpdated?: number;
+  _publishedOn?: number;
   constructor(
       id: string,
       authorUsername: string,
       title: string,
       summary: string,
       tags: string[],
-      thumbnailFilename: string,
+      thumbnailFilename: string | null,
       urlFragment: string,
       lastUpdated?: number,
       publishedOn?: number) {
@@ -68,11 +57,11 @@ export class BlogPostSummary {
     return this._authorUsername;
   }
 
-  getLastUpdated(): number {
+  getLastUpdated(): number | undefined {
     return this._lastUpdated;
   }
 
-  getPublishedOn(): number {
+  getPublishedOn(): number | undefined {
     return this._publishedOn;
   }
 
@@ -92,12 +81,12 @@ export class BlogPostSummary {
     return this._summary;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
   static createFromBackendDict(
-      blogPostSummaryBackendDict: BlogPostSummaryBackendDict
+      blogPostSummaryBackendDict: Blog.BlogPostSummaryBackendDict
   ): BlogPostSummary {
     return new BlogPostSummary (
       blogPostSummaryBackendDict.id,

@@ -20,29 +20,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
-interface BlogDashboardBackendResponse {
-  'username': string;
-  'profile_picture_data_url': string;
-  'no_of_published_blog_posts': number;
-  'no_of_draft_blog_posts': number;
-  'published_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
-  'draft_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
-}
-
-interface NewBlogPostBackendResponse {
-  'blog_post_id': string
-}
-export interface BlogDashboardData {
-  username: string;
-  profilePictureDataUrl: string;
-  numOfPublishedBlogPosts: number;
-  numOfDraftBlogPosts: number;
-  publishedBlogPostSummaryDicts: BlogPostSummary[];
-  draftBlogPostSummaryDicts: BlogPostSummary[]
-}
-
+import { Blog } from 'typings/blog-typings';
 @Injectable({
   providedIn: 'root'
 })
@@ -50,9 +30,9 @@ export class BlogDashboardBackendApiService {
   constructor(
     private http: HttpClient) {}
 
-  async fetchBlogDashboardDataAsync(): Promise<BlogDashboardData> {
+  async fetchBlogDashboardDataAsync(): Promise<Blog.BlogDashboardData> {
     return new Promise((resolve, reject) => {
-      this.http.get<BlogDashboardBackendResponse>(
+      this.http.get<Blog.BlogDashboardBackendResponse>(
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE).toPromise()
         .then(response => {
           resolve({
@@ -79,7 +59,7 @@ export class BlogDashboardBackendApiService {
 
   async createBlogPostAsync(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.http.post<NewBlogPostBackendResponse>(
+      this.http.post<Blog.NewBlogPostBackendResponse>(
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}
       ).toPromise().then(response => {
         resolve(response.blog_post_id);

@@ -50,7 +50,7 @@ describe('Blog Post Object Factory', () => {
 
     expect(_sampleBlogPostData.validate()).toEqual([
       'Blog Post title should not be empty.',
-      'Blog Post content should not be empty'
+      'Blog Post content should not be empty.'
     ]);
   });
 
@@ -69,19 +69,23 @@ describe('Blog Post Object Factory', () => {
 
     expect(_sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
       'Blog Post title should not be empty.',
-      'Blog Post should have a thumbnail',
+      'Blog Post should have a thumbnail.',
       'Blog Post should have atleast one tag linked to it.',
-      'Blog Post content should not be empty',
+      'Blog Post content should not be empty.',
     ]);
   });
 
   it('should raise correct validation issues for' +
   'exceeding property limits', () => {
     _sampleBlogPostData.addTag('Learner');
+    _sampleBlogPostData.setTitle(
+      'Title exceeding character limit of 40 characters should' +
+      'raise error.');
     let maxTags = 1;
 
     expect(_sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
-      'Blog Post should atmost have 1 tag linked to it.'
+      'Blog Post title should not exceed 40 characters.',
+      'Blog Post should atmost have 1 tag(s) linked to it.'
     ]);
   });
 
