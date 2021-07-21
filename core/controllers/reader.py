@@ -122,7 +122,7 @@ class ExplorationPage(base.BaseHandler):
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 },
                 'default_value': None
             },
@@ -154,13 +154,12 @@ class ExplorationPage(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        version_str = self.normalized_request.get('v')
-        version = int(version_str) if version_str else None
+        version = self.normalized_request.get('v')
 
         if self.normalized_request.get('iframed'):
             redirect_url = '/embed/exploration/%s' % exploration_id
-            if version_str:
-                redirect_url += '?v=%s' % version_str
+            if version:
+                redirect_url += '?v=%s' % str(version)
             self.redirect(redirect_url)
             return
 

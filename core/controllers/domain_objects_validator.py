@@ -26,6 +26,7 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
+from core.domain import stats_domain
 import python_utils
 
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
@@ -117,4 +118,4 @@ def validate_exp_issue_dict(exp_issue_dict):
     Args:
         exp_issue_dict: dict. Data that needs to be validated.
     """
-    assert isinstance(exp_issue_dict, dict)
+    stats_domain.ExplorationIssue.from_dict(exp_issue_dict)

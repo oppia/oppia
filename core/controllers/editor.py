@@ -471,7 +471,10 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         'PUT': {
             'email_body': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
                 }
             },
             'version': {
@@ -662,14 +665,12 @@ class StateYamlHandler(EditorHandler):
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': objects_validator.validate_state_dict
-                },
-                'default_value': None
+                }
             },
             'width': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -679,9 +680,6 @@ class StateYamlHandler(EditorHandler):
         """Handles POST requests."""
         state_dict = self.normalized_payload.get('state_dict')
         width = self.normalized_payload.get('width')
-
-        if not width or not state_dict:
-            raise self.PageNotFoundException
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
@@ -930,11 +928,6 @@ class ResolveIssueHandler(EditorHandler):
     def post(self, exp_id):
         """Handles POST requests."""
         exp_issue_dict = self.normalized_payload.get('exp_issue_dict')
-        try:
-            stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
-        except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
-
         exp_version = self.normalized_payload.get('exp_version')
 
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
@@ -1089,7 +1082,20 @@ class EditorAutosaveHandler(ExplorationHandler):
         'POST': {},
         # Below two methods are not defined in handler class but they must be
         # present in schema since these two are inherited from its parent class.
-        'GET': {},
+        'GET': {
+            'v': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'apply_draft': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        },
         'DELETE': {}
     }
 
@@ -1209,13 +1215,13 @@ class LearnerAnswerInfoHandler(EditorHandler):
             'state_name': {
                 'schema': {
                     'type': 'basestring'
-                }
+                },
+                'default_value': None
             },
             'learner_answer_info_id': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -1280,6 +1286,8 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')
+            if not state_name:
+                raise self.InvalidInputException
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
                     entity_id, state_name))
@@ -1289,8 +1297,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
                     entity_id))
         learner_answer_info_id = self.normalized_request.get(
             'learner_answer_info_id')
-        if not learner_answer_info_id:
-            raise self.PageNotFoundException
+
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json({})

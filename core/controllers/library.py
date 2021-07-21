@@ -201,7 +201,11 @@ class LibraryGroupIndexHandler(base.BaseHandler):
         'GET': {
             'group_name': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': [
+                        feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED,
+                        feconf.LIBRARY_GROUP_TOP_RATED
+                    ]
                 }
             }
         }
@@ -231,9 +235,6 @@ class LibraryGroupIndexHandler(base.BaseHandler):
             if top_rated_activity_summary_dicts:
                 activity_list = top_rated_activity_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
-
-        else:
-            raise self.PageNotFoundException
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:

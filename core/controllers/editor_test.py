@@ -744,7 +744,7 @@ written_translations:
 
         self.post_json(
             '/createhandler/state_yaml/%s' % exp_id, {},
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 
@@ -772,9 +772,12 @@ written_translations:
             '/createhandler/download/%s?output_format=invalid_output_format'
             % (exp_id), expected_status_int=400)
 
+        error_msg = (
+            'Schema validation for \'output_format\' failed: Received '
+            'invalid_output_format which is not in the allowed range of '
+            'choices: [u\'zip\', u\'json\']')
         self.assertEqual(
-            response['error'],
-            'Unrecognized output format invalid_output_format')
+            response['error'], error_msg)
 
         self.logout()
 
@@ -1882,7 +1885,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
-            'Invalid POST request: a version must be specified.')
+            'Missing key in handler args: version.')
 
         # Raises error as version from payload does not match the exploration
         # version.
@@ -2022,7 +2025,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                     'version': 1,
                 }, csrf_token=csrf_token, expected_status_int=400)
             self.assertIn(
-                'Moderator actions should include an email',
+                'Missing key in handler args: email_body.',
                 response_dict['error'])
 
             response_dict = self.put_json(
@@ -2030,9 +2033,11 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                     'email_body': '',
                     'version': 1,
                 }, csrf_token=csrf_token, expected_status_int=400)
-            self.assertIn(
-                'Moderator actions should include an email',
-                response_dict['error'])
+
+            error_msg = (
+                'Schema validation for \'email_body\' failed: Validation '
+                'failed: is_nonempty ({}) for object ')
+            self.assertIn(error_msg, response_dict['error'])
 
             # Try to unpublish the exploration even if the relevant feconf
             # flags are not set. This should cause a system error.
@@ -2427,7 +2432,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                     'exp_issue_dict': self.exp_issue_dict,
                     'exp_version': 1
                 }, csrf_token=csrf_token,
-                expected_status_int=404)
+                expected_status_int=400)
 
     def test_error_on_passing_non_matching_exp_issue_dict(self):
         """Test that error is raised on passing an exploration issue dict that
@@ -2892,7 +2897,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 '%s/%s/%s?state_name=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
-                    self.state_name), expected_status_int=404)
+                    self.state_name), expected_status_int=400)
         self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
