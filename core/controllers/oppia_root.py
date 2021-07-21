@@ -31,8 +31,9 @@ class OppiaRootPage(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        self.render_template('oppia-root.mainpage.html')
+        self.render_template( # type: ignore[no-untyped-call]
+            'oppia-root.mainpage.html')
