@@ -35,16 +35,16 @@ export class AdminRolesTabComponent implements OnInit {
   roleToActions = null;
   rolesFetched = false;
 
-  selectingNewRole = false;
+  roleSelectorIsShown = false;
   username = '';
   userRoles = [];
   possibleRolesToAdd = [];
-  managerInTopicsWithId = [];
+  managedTopicIds = [];
   roleInUpdate = null;
   errorMessage = null;
-  changingBannedVlaue = false;
+  changingBannedValue = false;
   userIsBanned = false;
-  startedEditingRole = false;
+  roleIsCurrentlyBeingEdited = false;
 
   constructor(
     private adminDataService: AdminDataService,
@@ -54,12 +54,12 @@ export class AdminRolesTabComponent implements OnInit {
   ) {}
 
   startEditing(): void {
-    this.startedEditingRole = true;
+    this.roleIsCurrentlyBeingEdited = true;
     this.adminBackendApiService.viewUsersRoleAsync(
       'username', null, this.username).then((userRoles) => {
       this.rolesFetched = true;
       this.userRoles = userRoles.roles;
-      this.managerInTopicsWithId = userRoles.managed_topic_ids;
+      this.managedTopicIds = userRoles.managed_topic_ids;
       this.userIsBanned = userRoles.banned;
     });
   }
@@ -67,7 +67,7 @@ export class AdminRolesTabComponent implements OnInit {
   showNewRoleSelector(): void {
     this.possibleRolesToAdd = Object.keys(this.UPDATABLE_ROLES).filter(
       role => !this.userRoles.includes(role)).sort();
-    this.selectingNewRole = true;
+    this.roleSelectorIsShown = true;
   }
 
   removeRole(roleToRemove: string): void {
@@ -77,7 +77,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.adminBackendApiService.removeUserRoleAsync(
       roleToRemove, this.username).then(() => {
       if (roleToRemove === 'TOPIC_MANAGER') {
-        this.managerInTopicsWithId = [];
+        this.managedTopicIds = [];
       }
       this.userRoles.splice(roleIndex, 1);
       this.roleInUpdate = null;
@@ -87,21 +87,21 @@ export class AdminRolesTabComponent implements OnInit {
   openTopicManagerRoleEditor(): void {
     const modalRef = this.modalService.open(
       TopicManagerRoleEditorModalComponent);
-    modalRef.componentInstance.managerInTopicsWithId = (
-      this.managerInTopicsWithId);
+    modalRef.componentInstance.managedTopicIds = (
+      this.managedTopicIds);
     modalRef.componentInstance.username = this.username;
     let topicIdToName = {};
     this.topicSummaries.forEach(
       topicSummary => topicIdToName[topicSummary.id] = topicSummary.name);
     modalRef.componentInstance.topicIdToName = topicIdToName;
-    modalRef.result.then(managerInTopicsWithId => {
-      this.managerInTopicsWithId = managerInTopicsWithId;
+    modalRef.result.then(managedTopicIds => {
+      this.managedTopicIds = managedTopicIds;
       if (
         !this.userRoles.includes('TOPIC_MANAGER') &&
-        managerInTopicsWithId.length) {
+        managedTopicIds.length) {
         this.userRoles.push('TOPIC_MANAGER');
       }
-      this.selectingNewRole = false;
+      this.roleSelectorIsShown = false;
     });
   }
 
@@ -112,7 +112,7 @@ export class AdminRolesTabComponent implements OnInit {
     }
     this.roleInUpdate = role;
     this.userRoles.push(role);
-    this.selectingNewRole = false;
+    this.roleSelectorIsShown = false;
 
     this.adminBackendApiService.addUserRoleAsync(
       role, this.username).then(() => {
@@ -126,9 +126,9 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   markUserBanned(): void {
-    this.changingBannedVlaue = true;
+    this.changingBannedValue = true;
     this.adminBackendApiService.markUserBannedAsync(this.username).then(() => {
-      this.changingBannedVlaue = false;
+      this.changingBannedValue = false;
       this.userIsBanned = true;
       this.userRoles = [];
     }, data => {
@@ -140,10 +140,10 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   unmarkUserBanned(): void {
-    this.changingBannedVlaue = true;
+    this.changingBannedValue = true;
     this.adminBackendApiService.unmarkUserBannedAsync(
       this.username).then(() => {
-      this.changingBannedVlaue = false;
+      this.changingBannedValue = false;
       this.userIsBanned = false;
       this.startEditing();
     }, data => {
@@ -156,15 +156,15 @@ export class AdminRolesTabComponent implements OnInit {
 
   clearEditor(): void {
     this.rolesFetched = false;
-    this.selectingNewRole = false;
+    this.roleSelectorIsShown = false;
     this.username = '';
     this.userRoles = [];
     this.possibleRolesToAdd = [];
-    this.managerInTopicsWithId = [];
+    this.managedTopicIds = [];
     this.roleInUpdate = null;
-    this.changingBannedVlaue = false;
+    this.changingBannedValue = false;
     this.userIsBanned = false;
-    this.startedEditingRole = false;
+    this.roleIsCurrentlyBeingEdited = false;
   }
 
   ngOnInit(): void {

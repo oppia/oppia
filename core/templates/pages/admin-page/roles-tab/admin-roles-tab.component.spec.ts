@@ -134,12 +134,12 @@ describe('Admin roles tab component ', function() {
   }));
 
   describe('on startEditing', function() {
-    it('should enable startedEditingRole', function() {
-      expect(component.startedEditingRole).toBeFalse();
+    it('should enable roleIsCurrentlyBeingEdited', function() {
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();
 
-      expect(component.startedEditingRole).toBeTrue();
+      expect(component.roleIsCurrentlyBeingEdited).toBeTrue();
     });
 
     it('should fetch user roles and intialize properties', fakeAsync(() => {
@@ -153,7 +153,7 @@ describe('Admin roles tab component ', function() {
       // Prechecks.
       expect(component.rolesFetched).toBeFalse();
       expect(component.userRoles).toBe([]);
-      expect(component.managerInTopicsWithId).toBe([]);
+      expect(component.managedTopicIds).toBe([]);
       expect(component.userIsBanned).toBeFalse();
 
       component.startEditing();
@@ -161,21 +161,21 @@ describe('Admin roles tab component ', function() {
 
       expect(component.rolesFetched).toBeTrue();
       expect(component.userRoles).toBe(['TOPIC_MANAGER']);
-      expect(component.managerInTopicsWithId).toBe(['topic_id_1']);
+      expect(component.managedTopicIds).toBe(['topic_id_1']);
       expect(component.userIsBanned).toBeFalse();
     }));
   });
 
   describe('on unmarkUserBanned', function() {
-    it('should enable changingBannedVlaue', function() {
-      expect(component.startedEditingRole).toBeFalse();
+    it('should enable changingBannedValue', function() {
+      expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();
 
-      expect(component.startedEditingRole).toBeTrue();
+      expect(component.roleIsCurrentlyBeingEdited).toBeTrue();
     });
 
-    it('should fetch user roles and intialize properties', fakeAsync(() => {
+    it('should fetch user roles and initialize properties', fakeAsync(() => {
       spyOn(adminBackendApiService, 'viewUsersRoleAsync')
         .and.returnValue(Promise.resolve({
           roles: ['TOPIC_MANAGER'],
@@ -186,7 +186,7 @@ describe('Admin roles tab component ', function() {
       // Prechecks.
       expect(component.rolesFetched).toBeFalse();
       expect(component.userRoles).toBe([]);
-      expect(component.managerInTopicsWithId).toBe([]);
+      expect(component.managedTopicIds).toBe([]);
       expect(component.userIsBanned).toBeFalse();
 
       component.startEditing();
@@ -194,7 +194,7 @@ describe('Admin roles tab component ', function() {
 
       expect(component.rolesFetched).toBeTrue();
       expect(component.userRoles).toBe(['TOPIC_MANAGER']);
-      expect(component.managerInTopicsWithId).toBe(['topic_id_1']);
+      expect(component.managedTopicIds).toBe(['topic_id_1']);
       expect(component.userIsBanned).toBeFalse();
     }));
   });

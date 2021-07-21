@@ -28,7 +28,7 @@ import { AlertsService } from 'services/alerts.service';
   templateUrl: './topic-manager-role-editor-modal.component.html',
 })
 export class TopicManagerRoleEditorModalComponent implements OnInit {
-  @Input() managerInTopicsWithId;
+  @Input() managedTopicIds;
   @Input() topicIdToName;
   @Input() username;
 
@@ -44,12 +44,12 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
 
   private updateTopicIdsForSelection(): void {
     this.topicIdsForSelection = Object.keys(this.topicIdToName).filter(
-      topicId => !this.managerInTopicsWithId.includes(topicId));
+      topicId => !this.managedTopicIds.includes(topicId));
     this.newTopicId = this.topicIdsForSelection[0];
   }
 
   addTopic(): void {
-    this.managerInTopicsWithId.push(this.newTopicId);
+    this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
     this.adminBackendApiService.assignManagerToTopicAsync(
@@ -57,8 +57,8 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, data => {
-      let topicIdIndex = this.managerInTopicsWithId.indexOf(this.newTopicId);
-      this.managerInTopicsWithId.splice(topicIdIndex, 1);
+      let topicIdIndex = this.managedTopicIds.indexOf(this.newTopicId);
+      this.managedTopicIds.splice(topicIdIndex, 1);
       var transformedData = data.responseText.substring(5);
       var parsedResponse = JSON.parse(transformedData);
       this.alertsService.addWarning(
@@ -67,11 +67,11 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   removeTopicId(topicIdToRemove: string): void {
-    let topicIdIndex = this.managerInTopicsWithId.indexOf(topicIdToRemove);
+    let topicIdIndex = this.managedTopicIds.indexOf(topicIdToRemove);
     this.topicIdInUpdate = topicIdToRemove;
     this.adminBackendApiService.deassignManagerFromTopicAsync(
       this.username, topicIdToRemove).then(() => {
-      this.managerInTopicsWithId.splice(topicIdIndex, 1);
+      this.managedTopicIds.splice(topicIdIndex, 1);
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
     }, data => {
@@ -83,7 +83,7 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
   }
 
   close(): void {
-    this.activeModal.close(this.managerInTopicsWithId);
+    this.activeModal.close(this.managedTopicIds);
   }
 
   ngOnInit(): void {

@@ -5,17 +5,17 @@
   </button>
 </div>
 <div class="modal-body">
-  <p *ngIf="managerInTopicsWithId.length">User has rights in the following topics:</p>
-  <p *ngIf="!managerInTopicsWithId.length">Please assign users to required topics:</p>
+  <p *ngIf="managedTopicIds.length">User has rights in the following topics:</p>
+  <p *ngIf="!managedTopicIds.length">Please assign users to required topics:</p>
   <ul>
-    <li *ngFor="let topicId of managerInTopicsWithId">
+    <li *ngFor="let topicId of managedTopicIds">
       <div class="d-flex justify-content-between">
         <span>{{ topicIdToName[topicId] }}</span>
         <div class="mat-icon-button oppia-progress-spinner" *ngIf="topicIdInUpdate === topicId">
           <mat-spinner [diameter]="24"></mat-spinner>
         </div>
         <button mat-button matSuffix mat-icon-button
-                *ngIf="topicIdInUpdate !== topicId && managerInTopicsWithId.length > 1"
+                *ngIf="topicIdInUpdate !== topicId && managedTopicIds.length > 1"
                 aria-label="Clear"
                 (click)="removeTopicId(topicId)">
           <mat-icon matListIcon>close</mat-icon>
@@ -24,7 +24,7 @@
     </li>
     <li *ngIf="topicIdsForSelection.length">
       <div class="d-inline-flex mt-3 w-100">
-        <select class="w-50" placeholder="Select new topic to add" label="Topic selector" [(ngModel)]="newTopicId">
+        <select class="w-50" placeholder="Select new topic to add" label="Topic selector" ngbAutofocus [(ngModel)]="newTopicId">
           <option *ngFor="let topicId of topicIdsForSelection" [value]="topicId">{{ topicIdToName[topicId] }}</option>
         </select>
         <button mat-icon-button color="primary" (click)="addTopic()">
@@ -33,8 +33,8 @@
       </div>
     </li>
     <li *ngIf="!topicIdsForSelection.length">
-      <i *ngIf="managerInTopicsWithId.length">There are no topics remaining, looks like user is assigned to all the topics.</i>
-      <i *ngIf="!managerInTopicsWithId.length">There are no topics for which you can assign a manger.</i>
+      <i *ngIf="managedTopicIds.length">There are no topics remaining, looks like user is assigned to all the topics.</i>
+      <i *ngIf="!managedTopicIds.length">There are no topics for which you can assign a manger.</i>
     </li>
   </ul>
 </div>

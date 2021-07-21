@@ -757,7 +757,7 @@ class AdminRoleHandler(base.BaseHandler):
             managed_topic_ids = []
             if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
                 managed_topic_ids = [
-                    topic_right.id for topic_right in
+                    rights.id for rights in
                     topic_fetchers.get_topic_rights_with_user(user_id)]
             user_roles_dict = {
                 'roles': user_roles,
@@ -777,8 +777,10 @@ class AdminRoleHandler(base.BaseHandler):
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            # The Topic manager role assignment is handled via
+            # TopicManagerRoleHandler.
             raise self.InvalidInputException(
-                'Unsupported role for the handler.')
+                'Unsupported role for this handler.')
 
         user_services.add_user_role(user_settings.user_id, role)
 
@@ -850,7 +852,7 @@ class TopicManagerRoleHandler(base.BaseHandler):
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager, topic_domain.ROLE_MANAGER, topic_id)
-        else:
+        elif action == 'deassign':
             topic_services.deassign_manager_role_from_topic(
                 user_services.get_system_user(), user_id, topic_id)
 

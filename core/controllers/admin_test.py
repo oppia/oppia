@@ -1209,7 +1209,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             })
         self.logout()
 
-    def test_adding_new_topic_to_a_topic_manager(self):
+    def test_adding_new_topic_manager_to_a_topic(self):
         user_email = 'usernew@example.com'
         username = 'usernew'
 

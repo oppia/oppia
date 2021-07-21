@@ -92,13 +92,13 @@
           <mat-icon aria-label="Example icon-button with a heart icon">edit</mat-icon>
         </button>
       </div>
-      <div *ngIf="!username">Please fillout the username above to edit the user role.</div>
+      <div *ngIf="!username">Please fill in the username above to edit the user role.</div>
 
       <div class="oppia-roles-editor-form-container">
-        <mat-card *ngIf="startedEditingRole && !rolesFetched" class="oppia-roles-editor-card">
+        <mat-card *ngIf="roleIsCurrentlyBeingEdited && !rolesFetched" class="oppia-roles-editor-card">
           <mat-spinner class="mx-auto" [diameter]="30"></mat-spinner>
         </mat-card>
-        <div *ngIf="startedEditingRole && rolesFetched" class="protractor-test-roles-editor-card-container">
+        <div *ngIf="roleIsCurrentlyBeingEdited && rolesFetched" class="protractor-test-roles-editor-card-container">
           <mat-card *ngIf="userIsBanned" class="oppia-roles-editor-card">
             <div class="d-flex flex-column align-items-center">
               <h3>User "{{ username }}" is banned from the application.</h3>
@@ -107,7 +107,7 @@
                       (click)="unmarkUserBanned()">
                 <div class="d-flex align-items-center">
                   <span class="mr-3">Unban this user</span>
-                  <mat-spinner *ngIf="changingBannedVlaue" [diameter]="20"></mat-spinner>
+                  <mat-spinner *ngIf="changingBannedValue" [diameter]="20"></mat-spinner>
                 </div>
               </button>
             </div>
@@ -120,7 +120,7 @@
                  (click)="markUserBanned()">
                 <div class="d-flex align-items-center">
                   <span class="mr-3">Ban this user</span>
-                  <mat-spinner *ngIf="changingBannedVlaue" [diameter]="20"></mat-spinner>
+                  <mat-spinner *ngIf="changingBannedValue" [diameter]="20"></mat-spinner>
                 </div>
               </a>
             </div>
@@ -148,7 +148,7 @@
                   </div>
                 </div>
               </mat-list-item>
-              <mat-list-item *ngIf="selectingNewRole">
+              <mat-list-item *ngIf="roleSelectorIsShown">
                 <span class="oppia-user-role-description">
                   <mat-form-field>
                     <mat-select (selectionChange)="addNewRole($event.value)" class="protractor-test-new-role-selector">
@@ -164,7 +164,7 @@
                     class="oppia-add-role-button protractor-test-add-new-role-button"
                     color="primary"
                     (click)="showNewRoleSelector()"
-                    *ngIf="!selectingNewRole">
+                    *ngIf="!roleSelectorIsShown">
               <div class="oppia-flex">
                 <mat-icon color="primary" aria-label="Example icon-button with a heart icon">add_circle</mat-icon>
                 <h4>Add role</h4>
