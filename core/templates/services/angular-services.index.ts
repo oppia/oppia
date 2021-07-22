@@ -286,7 +286,6 @@ import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
-import { OppiaCookieService } from 'services/cookie.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -588,7 +587,6 @@ export const angularServices: [string, Type<{}>][] = [
     NumericExpressionInputValidationService],
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
-  ['OppiaCookieService', OppiaCookieService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
