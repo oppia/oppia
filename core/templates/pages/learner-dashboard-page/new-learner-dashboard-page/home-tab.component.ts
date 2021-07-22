@@ -19,6 +19,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 
  @Component({
@@ -30,12 +31,15 @@ export class HomeTabComponent {
   @Input() currentGoals: LearnerTopicSummary[];
   @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
   @Input() username: string;
+  CLASSROOM_LINK_URL_TEMPLATE = '/learn/<classroom_url_fragment>';
+  classroomUrlFragment: string;
   nextIncompleteNodeTitles: string[] = [];
   widthConst: number = 233;
   width: number;
 
   constructor(
-    private deviceInfoService: DeviceInfoService
+    private deviceInfoService: DeviceInfoService,
+    private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   ngOnInit(): void {
@@ -58,7 +62,12 @@ export class HomeTabComponent {
   }
 
   getClassroomLink(classroomUrlFragment: string): string {
-    return `/learn/${classroomUrlFragment}`;
+    this.classroomUrlFragment = classroomUrlFragment;
+    return this.urlInterpolationService.interpolateUrl(
+      this.CLASSROOM_LINK_URL_TEMPLATE, {
+        classroom_url_fragment: this.classroomUrlFragment
+      }
+    );
   }
 
   checkMobileView(): boolean {
@@ -66,9 +75,19 @@ export class HomeTabComponent {
   }
 
   getWidth(length: number): number {
+    /**
+     * If there are 3 or more topics for each untrackedTopic, the total
+     * width of the section will be 662px in mobile view to enable scrolling.
+    */
     if (length >= 3) {
       return 662;
     }
+    /**
+     * If there less than 3 topics for each untrackedTopic, the total
+     * width of the section will be caluclated by multiplying the addition of
+     * number of topics and one classroom card with 164px in mobile view to
+     * enable scrolling.
+    */
     return (length + 1) * 164;
   }
 

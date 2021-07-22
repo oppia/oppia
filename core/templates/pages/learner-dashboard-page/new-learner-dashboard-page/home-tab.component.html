@@ -1,4 +1,4 @@
-<div class="greeting">
+<div class="oppia-greeting">
   Good {{getTimeOfDay()}}, {{username}}!
 </div>
 <div class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || currentGoals.length !== 0">
@@ -57,7 +57,7 @@
   </div>
 </div>
 <style>
-  .greeting {
+  .oppia-greeting {
     color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
@@ -156,7 +156,7 @@
     padding-right: 30px;
   }
   @media screen and (max-width: 1200px) {
-    .greeting {
+    .oppia-greeting {
       margin-left: 0;
     }
     .continue-where-you-left-off, .suggested-for-you {
@@ -178,7 +178,7 @@
     }
   }
   @media screen and (max-width: 767px) {
-    .greeting {
+    .oppia-greeting {
       font-size: 20px;
       margin-left: 20px;
     }
@@ -211,7 +211,7 @@
     }
   }
   @media screen and (min-width: 768px) and (max-width: 1000px) {
-    .greeting {
+    .oppia-greeting {
       font-size: 25px;
       margin-left: 0;
     }

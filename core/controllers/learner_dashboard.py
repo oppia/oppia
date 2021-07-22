@@ -102,7 +102,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             learner_progress_services.get_displayable_topic_summary_dicts(
                 self.user_id, learner_progress.all_topic_summaries))
         untracked_topic_summary_dicts = (
-            learner_progress_services.get_displayable_untracked_topic_dicts(
+            learner_progress_services
+            .get_displayable_untracked_topic_summary_dicts(
                 self.user_id, learner_progress.untracked_topic_summaries))
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(

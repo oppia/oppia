@@ -1526,7 +1526,8 @@ def get_displayable_story_summary_dicts(user_id, story_summaries):
     return summary_dicts
 
 
-def get_displayable_untracked_topic_dicts(user_id, untracked_topic_summaries):
+def get_displayable_untracked_topic_summary_dicts(
+        user_id, untracked_topic_summaries):
     """Returns a displayable dict of the the topic summaries
     given to it.
 

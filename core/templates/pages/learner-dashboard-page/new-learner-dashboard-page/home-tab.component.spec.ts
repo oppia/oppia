@@ -30,6 +30,7 @@ import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -52,6 +53,7 @@ describe('Home tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HomeTabComponent);
     component = fixture.componentInstance;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -168,9 +170,13 @@ describe('Home tab Component', () => {
   });
 
   it('should get the classroom link', () => {
-    let classroomUrlFragment = 'math';
-    expect(component.getClassroomLink(classroomUrlFragment)).toEqual(
+    component.classroomUrlFragment = 'math';
+    const urlSpy = spyOn(
+      urlInterpolationService, 'interpolateUrl')
+      .and.returnValue('/learn/math');
+    expect(component.getClassroomLink('math')).toEqual(
       '/learn/math');
+    expect(urlSpy).toHaveBeenCalled();
   });
 
   it('should get the correct width', () => {

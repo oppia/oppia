@@ -40,6 +40,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   thumbnailUrl: string = null;
   storyLink: string;
   storyTitle: string;
+  isStoryIncomplete: boolean = false;
   nextIncompleteNodeTitle: string;
   storyCompleted: boolean = false;
   thumbnailBgColor: string;
@@ -60,6 +61,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
       if (node) {
+        this.isStoryIncomplete = true;
         let result = '/explore/' + node.getExplorationId();
         result = this.urlService.addField(
           result, 'topic_url_fragment',
@@ -101,10 +103,12 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
-    let nextIncompleteNode = this.storySummary.getNodeTitles()[
-      this.completedNodeCount];
-    this.nextIncompleteNodeTitle = (
-      `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
+    if (this.nodeCount !== this.completedNodeCount) {
+      let nextIncompleteNode = this.storySummary.getNodeTitles()[
+        this.completedNodeCount];
+      this.nextIncompleteNodeTitle = (
+        `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
+    }
     if (!this.topicName) {
       this.topicName = this.storySummary.getTopicName();
     }
