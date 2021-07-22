@@ -226,6 +226,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'solicit_answer_details': False
         }
+        # The error is representing the keyerror.
         with self.assertRaisesRegexp(Exception, 'content'):
             domain_objects_validator.validate_state_dict(invalid_state_dict)
 

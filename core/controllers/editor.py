@@ -596,7 +596,7 @@ class ExplorationFileDownloader(EditorHandler):
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'int'
                 },
                 'default_value': None
             },
@@ -620,11 +620,6 @@ class ExplorationFileDownloader(EditorHandler):
 
         version_str = self.normalized_request.get('v', exploration.version)
         output_format = self.normalized_request.get('output_format')
-
-        try:
-            version = int(version_str)
-        except ValueError:
-            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         if not exploration.title:
@@ -1294,8 +1289,8 @@ class LearnerAnswerInfoHandler(EditorHandler):
             state_reference = (
                 stats_services.get_state_reference_for_question(
                     entity_id))
-        learner_answer_info_id = self.normalized_request.get(
-            'learner_answer_info_id')
+        learner_answer_info_id = (
+            self.normalized_request.get('learner_answer_info_id'))
 
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
