@@ -43,7 +43,7 @@ var CreatorDashboardPage = function() {
   var createNewExplorationButton =
     element(by.css('.protractor-test-create-new-exploration-button'));
   var listViewButton = element(by.css('.protractor-test-oppia-list-view-btn'));
-  var titleMaskCssSelector = by.css('.protractor-test-title-mask');
+  var titleMaskLocator = by.css('.protractor-test-title-mask');
   var expSummaryTileTitleElements = element.all(
     by.css('.protractor-test-exp-summary-tile-title'));
   var expSummaryTileRatingElements = element.all(
@@ -134,7 +134,7 @@ var CreatorDashboardPage = function() {
       throw new Error(
         'Could not find exploration tile with name ' + explorationTitle);
     }
-    var explorationElement = elems[0].element(titleMaskCssSelector);
+    var explorationElement = elems[0].element(titleMaskLocator);
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };

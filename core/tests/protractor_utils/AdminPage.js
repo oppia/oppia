@@ -52,30 +52,30 @@ var AdminPage = function() {
     '.protractor-test-reload-exploration-row'));
   var reloadCollectionButtons = element.all(by.css(
     '.protractor-test-reload-collection-button'));
-  var explorationTitleCssSelector = by.css(
+  var explorationTitleLocator = by.css(
     '.protractor-test-reload-exploration-title');
-  var explorationButtonCssSelector = by.css(
+  var explorationButtonLocator = by.css(
     '.protractor-test-reload-exploration-button');
-  var configTitleCssSelector = by.css('.protractor-test-config-title');
+  var configTitleLocator = by.css('.protractor-test-config-title');
   var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
   var featureFlagElements = element.all(by.css(
     '.protractor-test-feature-flag'));
-  var featureNameCssSelector = by.css('.protractor-test-feature-name');
-  var ruleIndicatorCssSelector = by.css('.protractor-test-no-rule-indicator');
-  var removeRuleButtonCssSelector = by.css(
+  var featureNameLocator = by.css('.protractor-test-feature-name');
+  var ruleIndicatorLocator = by.css('.protractor-test-no-rule-indicator');
+  var removeRuleButtonLocator = by.css(
     '.protractor-test-remove-rule-button');
-  var saveButtonCssSelector = by.css('.protractor-test-save-button');
-  var addFeatureRuleButtonCssSelector = by.css(
+  var saveButtonLocator = by.css('.protractor-test-save-button');
+  var addFeatureRuleButtonLocator = by.css(
     '.protractor-test-feature-add-rule-button');
-  var valueSelectorCssSelector = by.css('.protractor-test-value-selector');
-  var addConditionButtonCssSelector = by.css(
+  var valueSelectorLocator = by.css('.protractor-test-value-selector');
+  var addConditionButtonLocator = by.css(
     '.protractor-test-add-condition-button');
-  var rolesResultRowsCssSelector = by.css('.protractor-test-roles-result-rows');
-  var oneOffjobsStartBtnCssSelector = by.css(
+  var rolesResultRowsLocator = by.css('.protractor-test-roles-result-rows');
+  var oneOffjobsStartBtnLocator = by.css(
     '.protractor-test-one-off-jobs-start-btn');
-  var oneOffjobsStopBtnCssSelector = by.css(
+  var oneOffjobsStopBtnLocator = by.css(
     '.protractor-test-one-off-jobs-stop-btn');
-  var unfinishedJobsCardCssSelector = by.css(
+  var unfinishedJobsCardLocator = by.css(
     '.protractor-test-unfinished-jobs-card');
 
   // The reload functions are used for mobile testing
@@ -83,11 +83,11 @@ var AdminPage = function() {
   // a problem when used to run tests directly on Travis.
   if (general.isInDevMode()) {
     var getExplorationTitleElement = function(explorationElement) {
-      return explorationElement.element(explorationTitleCssSelector);
+      return explorationElement.element(explorationTitleLocator);
     };
 
     var getExplorationElementReloadButton = function(explorationElement) {
-      return explorationElement.element(explorationButtonCssSelector);
+      return explorationElement.element(explorationButtonLocator);
     };
 
     this.reloadCollection = async function(collectionId) {
@@ -144,9 +144,9 @@ var AdminPage = function() {
   var saveConfigProperty = async function(
       configProperty, propertyName, objectType, editingInstructions) {
     await waitFor.visibilityOf(
-      configProperty.element(configTitleCssSelector),
+      configProperty.element(configTitleLocator),
       'Config Title taking too long too appear');
-    var title = await configProperty.element(configTitleCssSelector).getText();
+    var title = await configProperty.element(configTitleLocator).getText();
     if (title.match(propertyName)) {
       await editingInstructions(
         await forms.getEditor(objectType)(configProperty));
@@ -181,7 +181,7 @@ var AdminPage = function() {
     var count = await featureFlagElements.count();
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements.get(i);
-      if ((await elem.element(featureNameCssSelector).getText()) ===
+      if ((await elem.element(featureNameLocator).getText()) ===
           'dummy_feature') {
         return elem;
       }
@@ -191,11 +191,11 @@ var AdminPage = function() {
   };
 
   this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.isElementPresent(ruleIndicatorCssSelector)) {
+    while (!await featureElement.isElementPresent(ruleIndicatorLocator)) {
       await action.click(
         'Remove feature rule button',
         featureElement
-          .element(removeRuleButtonCssSelector)
+          .element(removeRuleButtonLocator)
       );
     }
   };
@@ -204,7 +204,7 @@ var AdminPage = function() {
     await action.click(
       'Save feature button',
       featureElement
-        .element(saveButtonCssSelector)
+        .element(saveButtonLocator)
     );
 
     await general.acceptAlert();
@@ -217,19 +217,19 @@ var AdminPage = function() {
     await action.click(
       'Add feature rule button',
       featureElement
-        .element(addFeatureRuleButtonCssSelector)
+        .element(addFeatureRuleButtonLocator)
     );
 
     await action.sendKeys(
       'Rule value selector',
       featureElement
-        .element(valueSelectorCssSelector),
+        .element(valueSelectorLocator),
       'Enabled');
 
     await action.click(
       'Add condition button',
       featureElement
-        .element(addConditionButtonCssSelector)
+        .element(addConditionButtonLocator)
     );
 
     await this.saveChangeOfFeature(featureElement);
@@ -270,7 +270,7 @@ var AdminPage = function() {
     var text = await oneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
-        oneOffjobsStartBtnCssSelector);
+        oneOffjobsStartBtnLocator);
       await action.click('One Off Job Rows Button', oneOffJobRowsButton);
     } else {
       await this._startOneOffJob(jobName, ++i);
@@ -289,7 +289,7 @@ var AdminPage = function() {
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = (
         unfinishedOneOffJobRows.get(i)
-      ).element(oneOffjobsStopBtnCssSelector);
+      ).element(oneOffjobsStopBtnLocator);
       await action.click(
         'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
       await browser.refresh();
@@ -308,7 +308,7 @@ var AdminPage = function() {
     await browser.refresh();
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(element(
-      unfinishedJobsCardCssSelector),
+      unfinishedJobsCardLocator),
     'Unfinished Jobs taking too long to appear');
     let regex = new RegExp(`^${jobName.toLowerCase()}.*`, 'i');
     let unfinishedJob = element(
@@ -358,9 +358,9 @@ var AdminPage = function() {
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
     if (expectedUsernamesArray.length !== 0) {
-      await waitFor.visibilityOf(element(rolesResultRowsCssSelector));
+      await waitFor.visibilityOf(element(rolesResultRowsLocator));
     }
-    var usernames = await element.all(rolesResultRowsCssSelector)
+    var usernames = await element.all(rolesResultRowsLocator)
       .map(async function(elm) {
         var text = await action.getText(
           'Username in roles list on admin page', elm);
