@@ -41,6 +41,7 @@ import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 import {
   BaseContentComponent,
   BaseContentNavBarBreadCrumbDirective,
+  BaseContentNavBarPreLogoActionDirective,
   BaseContentPageFooterDirective
 } from './base-content.component';
 
@@ -106,6 +107,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentNavBarPreLogoActionDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
@@ -141,6 +143,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentNavBarPreLogoActionDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
@@ -151,4 +154,4 @@ const toastrConfig = {
     WarningsAndAlertsComponent,
   ],
 })
-export class BaseModule { }
+export class BaseModule {}
