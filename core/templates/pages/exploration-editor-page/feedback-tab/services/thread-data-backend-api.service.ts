@@ -34,13 +34,13 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
 
-type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
+export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
 interface NumberOfOpenThreads {
   'num_open_threads': number;
 }
 
-interface SuggestionAndFeedbackThreads {
+export interface SuggestionAndFeedbackThreads {
   feedbackThreads: FeedbackThread[];
   suggestionThreads: SuggestionThread[];
 }

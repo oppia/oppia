@@ -29,9 +29,9 @@ import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions.model';
 
 describe('User Exploration Permissions Service', () => {
-  let ueps: UserExplorationPermissionsService = null;
-  let contextService: ContextService = null;
-  let httpTestingController: HttpTestingController = null;
+  let ueps: UserExplorationPermissionsService;
+  let contextService: ContextService;
+  let httpTestingController: HttpTestingController;
 
   let sampleExplorationId = 'sample-exploration';
   let samplePermissionsData = {
@@ -59,7 +59,6 @@ describe('User Exploration Permissions Service', () => {
       ExplorationPermissions.createFromBackendDict(samplePermissionsData);
     spyOn(contextService, 'getExplorationId').and.returnValue(
       sampleExplorationId);
-    UserExplorationPermissionsService.permissionsPromise = null;
   });
 
   afterEach(()=> {

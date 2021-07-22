@@ -74,7 +74,7 @@ interface CreatorDashboardDataBackendDict {
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  lastWeekStats: CreatorDashboardStats;
+  lastWeekStats: CreatorDashboardStats | null;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
   threadsForCreatedSuggestionsList: FeedbackThread[];
@@ -169,11 +169,9 @@ export class CreatorDashboardBackendApiService {
         collectionsList: dashboardData.collections_list.map(
           collectionSummary => CollectionSummary
             .createFromBackendDict(collectionSummary)),
-        topicSummaries: (
-          dashboardData.topic_summary_dicts ? (
-            dashboardData.topic_summary_dicts.map(
-              topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
-                topicSummaryDict))) : null)
+        topicSummaries: dashboardData.topic_summary_dicts.map(
+          topicSummaryDict => CreatorTopicSummary.createFromBackendDict(
+            topicSummaryDict))
       };
     }, errorResponse => {
       throw new Error(errorResponse.error.error);

@@ -28,7 +28,7 @@ import {
   providedIn: 'root'
 })
 export class AdminDataService {
-  dataPromise: Promise<AdminPageData>;
+  dataPromise: Promise<AdminPageData> | null;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService) {

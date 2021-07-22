@@ -91,10 +91,13 @@ export class ReadOnlyCollectionBackendApiService {
 
   private _cacheCollectionDetails(
       details: ReadOnlyCollectionBackendResponse): void {
-    this._collectionDetailsCache[details.collection.id] = {
-      canEdit: details.can_edit,
-      title: details.collection.title,
-    };
+    if (details.collection.id && details.collection.title) {
+      this._collectionDetailsCache[details.collection.id] = {
+        canEdit: details.can_edit,
+        title: details.collection.title,
+      };
+    }
+    throw new Error('Id and title are possibly null!');
   }
 
   private _isCached(collectionId: string): boolean {

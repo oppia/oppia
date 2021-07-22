@@ -55,8 +55,8 @@ export class GuestCollectionProgressService {
 
   recordCompletedExploration(
       collectionId: string, explorationId: string): void {
-    var guestCollectionProgress = this.loadGuestCollectionProgress();
-    var completedExplorationIdHasBeenAdded = (
+    let guestCollectionProgress = this.loadGuestCollectionProgress();
+    const completedExplorationIdHasBeenAdded = (
       guestCollectionProgress.addCompletedExplorationId(
         collectionId, explorationId));
     if (completedExplorationIdHasBeenAdded) {
@@ -65,10 +65,15 @@ export class GuestCollectionProgressService {
   }
 
   getValidCompletedExplorationIds(collection: Collection): string[] {
-    var collectionId = collection.getId();
-    var guestCollectionProgress = this.loadGuestCollectionProgress();
-    var completedExplorationIds = (
-      guestCollectionProgress.getCompletedExplorationIds(collectionId));
+    const collectionId = collection.getId();
+    const guestCollectionProgress = this.loadGuestCollectionProgress();
+    let completedExplorationIds: string[];
+    if (collectionId) {
+      completedExplorationIds = (
+        guestCollectionProgress.getCompletedExplorationIds(collectionId));
+    } else {
+      throw new Error('Collection does not exist!');
+    }
     // Filter the exploration IDs by whether they are contained within the
     // specified collection structure.
     return completedExplorationIds.filter((expId) => {
@@ -77,8 +82,9 @@ export class GuestCollectionProgressService {
   }
 
   // This method corresponds to collection_domain.get_next_exploration_id.
+  // A null value will be returned if no explorationIds exist.
   _getNextExplorationId(
-      collection: Collection, completedIds: string[]): string {
+      collection: Collection, completedIds: string[]): string | null {
     var explorationIds = collection.getExplorationIds();
 
     for (var i = 0; i < explorationIds.length; i++) {
@@ -127,7 +133,9 @@ export class GuestCollectionProgressService {
    * guest has completed the collection.
    */
   getNextExplorationId(
-      collection: Collection, completedExplorationIds: string[]): string {
+      collection: Collection,
+      completedExplorationIds: string[]
+  ): string | null {
     return this._getNextExplorationId(collection, completedExplorationIds);
   }
 }
