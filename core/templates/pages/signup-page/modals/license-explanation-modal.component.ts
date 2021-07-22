@@ -29,9 +29,7 @@ export class LicenseExplanationModalComponent extends ConfirmOrCancelModal {
   SITE_NAME = AppConstants.SITE_NAME;
   LICENSE_LINK = '<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0</a>';
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }
