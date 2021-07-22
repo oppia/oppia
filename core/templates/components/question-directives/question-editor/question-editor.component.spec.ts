@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for Question Editor Component.
+ */
+
 import { EventEmitter } from '@angular/core';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
-/**
- * @fileoverview Unit tests for Question Editor Component.
- */
 
 describe('QuestionEditorComponent', () => {
   let ctrl = null;

@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+  'components/state-directives/outcome-editor/outcome-editor.component.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require(
   'components/question-directives/question-misconception-editor/' +
