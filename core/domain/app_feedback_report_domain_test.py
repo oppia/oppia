@@ -274,34 +274,6 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.android_report_obj, 'No platform supplied.')
 
-    def _assert_validation_error(
-            self, report_obj, expected_error_substring):
-        # type: (app_feedback_report_domain.AppFeedbackReport, Text) -> None
-        """Checks that the feedback report passes validation.
-
-        Args:
-            report_obj: AppFeedbackReport. The domain object to validate.
-            expected_error_substring: str. String that should be a substring
-                of the expected error message.
-        """
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            utils.ValidationError, expected_error_substring):
-            report_obj.validate()
-
-    def _assert_not_implemented_error(
-            self, report_obj, expected_error_substring):
-        # type: (app_feedback_report_domain.AppFeedbackReport, Text) -> None
-        """Checks that the feedback report passes validation.
-
-        Args:
-            report_obj: AppFeedbackReport. The domain object to validate.
-            expected_error_substring: str. String that should be a substring
-                of the expected error message.
-        """
-        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
-            NotImplementedError, expected_error_substring):
-            report_obj.validate()
-
     def test_get_report_type_from_string_returns_expected_report_type(self):
         # type: () -> None
         feedback_report = app_feedback_report_domain.AppFeedbackReport
@@ -441,6 +413,34 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 invalid_network_type)):
             feedback_report.get_android_network_type_from_string(
                 invalid_network_type)
+
+    def _assert_validation_error(
+            self, report_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AppFeedbackReport, Text) -> None
+        """Checks that the feedback report passes validation.
+
+        Args:
+            report_obj: AppFeedbackReport. The domain object to validate.
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            utils.ValidationError, expected_error_substring):
+            report_obj.validate()
+
+    def _assert_not_implemented_error(
+            self, report_obj, expected_error_substring):
+        # type: (app_feedback_report_domain.AppFeedbackReport, Text) -> None
+        """Checks that the feedback report passes validation.
+
+        Args:
+            report_obj: AppFeedbackReport. The domain object to validate.
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            NotImplementedError, expected_error_substring):
+            report_obj.validate()
 
 
 class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):

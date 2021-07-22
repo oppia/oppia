@@ -236,7 +236,7 @@ class AppFeedbackReport(python_utils.OBJECT):
             AppFeedbackReport. The corresponding AppFeedbackReport domain
             object.
         """
-        if report_dict['platform'] == constants.PLATFORM_CHOICE_ANDROID:
+        if report_dict['platform_type'] == constants.PLATFORM_CHOICE_ANDROID:
             return cls.get_android_report_from_dict(report_dict)
         else:
             raise NotImplementedError(
@@ -296,10 +296,10 @@ class AppFeedbackReport(python_utils.OBJECT):
             report_dict['report_submission_timestamp_sec'])
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
-                report_dict['platform'], report_datetime))
+                report_dict['platform_type'], report_datetime))
         report_obj = AppFeedbackReport(
             report_id, report_dict['android_report_info_schema_version'],
-            report_dict['platform'], report_datetime,
+            report_dict['platform_type'], report_datetime,
             report_dict['report_submission_utc_offset_hrs'], None, None,
             user_supplied_feedback_obj, device_system_context_obj,
             app_context_obj)
@@ -562,7 +562,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
     @classmethod
     def require_valid_selected_items_for_category(
             cls, category, selected_items):
-        # type: (Text, Optional[List[Text]]) -> None
+        # type: (Text, List[Text]) -> None
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
@@ -984,6 +984,9 @@ class AndroidAppContext(AppContext):
         """
         super(AndroidAppContext, self).__init__(
             entry_point, text_language_code, audio_language_code)
+        self.entry_point = entry_point
+        self.text_language_code = text_language_code
+        self.audio_language_code = audio_language_code
         self.text_size = text_size
         self.only_allows_wifi_download_and_update = (
             only_allows_wifi_download_and_update)

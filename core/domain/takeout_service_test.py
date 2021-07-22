@@ -1575,7 +1575,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP.second,
                 'randomInteger123'): {
                     'scrubbed_by': self.USER_ID_1,
-                    'platform': self.PLATFORM_ANDROID,
                     'ticket_id': self.TICKET_ID,
                     'submitted_on': self.REPORT_SUBMITTED_TIMESTAMP.isoformat(),
                     'local_timezone_offset_hrs': 0,

@@ -95,7 +95,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     WEB_REPORT_INFO_SCHEMA_VERSION = 1
 
     REPORT_JSON = {
-        'platform': 'android',
+        'platform_type': 'android',
         'android_report_info_schema_version': 1,
         'app_context': {
             'entry_point': {
@@ -276,8 +276,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_report_from_model_has_same_device_system_info(self):
         # type: () -> None
-        device_system_context = self.android_report_obj.device_system_context
-        device_system_context.__class__ = (
+        device_system_context = cast(
+            self.android_report_obj.device_system_context,
             app_feedback_report_domain.AndroidDeviceSystemContext)
 
         self.assertTrue(isinstance(
@@ -310,8 +310,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_report_from_model_has_same_app_info(self):
         # type: () -> None
-        app_context = self.android_report_obj.app_context
-        app_context.__class__ = app_feedback_report_domain.AndroidAppContext
+        app_context = cast(
+            self.android_report_obj.app_context,
+            app_feedback_report_domain.AndroidAppContext)
 
         self.assertTrue(isinstance(
             app_context, app_feedback_report_domain.AndroidAppContext))
@@ -469,6 +470,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(report_obj.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
             report_obj.submitted_on_timestamp, self.REPORT_SUBMITTED_TIMESTAMP)
+
+    def test_create_report_from_json_web_report_throws_error(self):
+        # type: () -> None
+        web_dict = {
+            'platform_type': 'web'
+        }
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            NotImplementedError,
+            'Domain objects for web reports must be implemented.'):
+            app_feedback_report_services.create_report_from_json(web_dict)
 
     def test_save_new_android_report_from_json_saves_model_to_storage(self):
         # type: () -> None

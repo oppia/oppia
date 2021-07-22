@@ -27,7 +27,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, Text, Optional, Type, List, Any # isort:skip # pylint: disable=unused-import
+from typing import Dict, Text, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
     [models.NAMES.app_feedback_report])
@@ -233,7 +233,7 @@ def calculate_new_stats_count_for_parameter(
 
 
 def get_report_from_model(report_model):
-    # type: (AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
+    # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the data.
 
@@ -257,7 +257,7 @@ def get_report_from_model(report_model):
 
 
 def get_ticket_from_model(ticket_model):
-    # type: (AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
+    # type: (app_feedback_report_models.AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
     """Create and return a domain object AppFeedbackReportTicket given a model
     loaded from the the data.
 
@@ -277,7 +277,7 @@ def get_ticket_from_model(ticket_model):
 
 
 def get_stats_from_model(stats_model):
-    # type: (AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
+    # type: (app_feedback_report_models.AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the data.
 
@@ -435,8 +435,8 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     report.scrubbed_by = scrubbed_by
     report.user_supplied_feedback.user_feedback_other_text_input = None
     if report.platform == PLATFORM_ANDROID:
-        report.app_context.__class__ = (
-            app_feedback_report_domain.AndroidAppContext)
+        report.app_context = cast(
+            report.app_context, app_feedback_report_domain.AndroidAppContext)
         report.app_context.event_logs = None
         report.app_context.logcat_logs = None
     save_feedback_report_to_storage(report)
@@ -456,8 +456,11 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
             'Web report domain objects have not been defined.')
 
     user_supplied_feedback = report.user_supplied_feedback
-    device_system_context = report.device_system_context
-    app_context = report.app_context
+    device_system_context = cast(
+        report.device_system_context,
+        app_feedback_report_domain.AndroidDeviceSystemContext)
+    app_context = cast(
+        report.app_context, app_feedback_report_domain.AndroidAppContext)
     entry_point = app_context.entry_point
 
     report_info_json = {
@@ -466,10 +469,6 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
         'user_feedback_other_text_input': (
             user_supplied_feedback.user_feedback_other_text_input)
     }
-    app_context.__class__ = (
-        app_feedback_report_domain.AndroidAppContext)
-    device_system_context.__class__ = (
-        app_feedback_report_domain.AndroidDeviceSystemContext)
 
     report_info_json = {
         'user_feedback_selected_items': (

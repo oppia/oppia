@@ -32,7 +32,7 @@ from typing import Dict, Any, Text # isort:skip # pylint: disable=unused-import
     [models.NAMES.app_feedback_report])
 
 REPORT_JSON = {
-    'platform': 'android',
+    'platform_type': 'android',
     'android_report_info_schema_version': 1,
     'app_context': {
         'entry_point': {
