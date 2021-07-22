@@ -384,7 +384,7 @@
 	"I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "Oups, il semblerait que votre recherche ne corresponde à aucune exploration.",
 	"I18N_LIBRARY_NO_EXPLORATION_GROUPS": "Il n’y a aucun groupe d’exploration disponible à afficher.",
 	"I18N_LIBRARY_NO_OBJECTIVE": "Aucun objectif spécifié.",
-	"I18N_LIBRARY_N_CATEGORIES": "{categoriesCount, plural, =1{1 catégorie} other{# catégories}}",
+	"I18N_LIBRARY_N_CATEGORIES": "{categoriesCount, plural, =1{1 Catégorie} other{# Catégories}}",
 	"I18N_LIBRARY_N_LANGUAGES": "{languagesCount, plural, =1{1 langue} other{# langues}}",
 	"I18N_LIBRARY_PAGE_TITLE": "Leçons de la bibliothèque communautaire | Oppia",
 	"I18N_LIBRARY_RATINGS_TOOLTIP": "Évaluations",

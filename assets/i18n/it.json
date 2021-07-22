@@ -225,6 +225,7 @@
 	"I18N_LIBRARY_N/A": "N/D",
 	"I18N_LIBRARY_NO_EXPLORATIONS": "Ops, non ci sono esplorazioni da mostrare.",
 	"I18N_LIBRARY_NO_EXPLORATION_GROUPS": "Non ci sono gruppi di esplorazioni disponibili da mostrare.",
+	"I18N_LIBRARY_N_CATEGORIES": "{categoriesCount, plural, =1{1 Categoria} other{# Categorie}}",
 	"I18N_LIBRARY_N_LANGUAGES": "{languagesCount, plural, =1{1 lingua} other{# lingue}}",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Visualizzazioni",
 	"I18N_LIBRARY_VIEW_ALL": "Mostra tutto",
