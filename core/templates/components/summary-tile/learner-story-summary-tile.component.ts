@@ -40,7 +40,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   thumbnailUrl: string = null;
   storyLink: string;
   storyTitle: string;
-  isStoryIncomplete: boolean = false;
   nextIncompleteNodeTitle: string;
   storyCompleted: boolean = false;
   thumbnailBgColor: string;
@@ -61,7 +60,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
       if (node) {
-        this.isStoryIncomplete = true;
         let result = '/explore/' + node.getExplorationId();
         result = this.urlService.addField(
           result, 'topic_url_fragment',

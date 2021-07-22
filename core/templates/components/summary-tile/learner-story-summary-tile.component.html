@@ -1,4 +1,4 @@
-<div class="oppia-next-incomplete-chapter" *ngIf="isDisplayAreaHome() && isStoryIncomplete">
+<div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
   {{nextIncompleteNodeTitle}}
 </div>
 <mat-card class="oppia-story-dashboard-card">
@@ -42,7 +42,7 @@
     opacity: 1;
     text-align: left;
   }
-  .oppia-next-incomplete-chapter {
+  .next-incomplete-chapter {
     color: #333;
     font-size: 17px;
     font-weight: 500;
