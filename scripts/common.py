@@ -344,6 +344,7 @@ def get_current_branch_name():
     branch_message_prefix = b'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
+    # Standard output is in bytes, we need to decode the line to print it.
     return git_status_first_line[len(branch_message_prefix):].decode('utf-8')
 
 
@@ -800,7 +801,11 @@ def write_stdout_safe(string):
         try:
             num_bytes_written += os.write(
                 sys.stdout.fileno(), string_bytes[num_bytes_written:])
+        # The os.write might not be supported, thus we need
+        # to try sys.stdout.write.
         except io.UnsupportedOperation:
+            # Standard output accepts str, we need to decode the string_bytes
+            # in order to write it.
             sys.stdout.write(string_bytes.decode('utf-8'))
             return
         except OSError as e:

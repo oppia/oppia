@@ -68,13 +68,19 @@ def run_lighthouse_puppeteer_script():
     if process.returncode == 0:
         python_utils.PRINT(stdout)
         for line in stdout.split(b'\n'):
+            # Standard output is in bytes, we need to decode the line to
+            # print it.
             export_url(line.decode('utf-8'))
         python_utils.PRINT('Puppeteer script completed successfully.')
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
         python_utils.PRINT(stdout.decode('utf-8'))
         python_utils.PRINT('ERROR:')
+        # Error output is in bytes, we need to decode the line to
+        # print it.
         python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Puppeteer script failed. More details can be found above.')
@@ -146,8 +152,12 @@ def run_lighthouse_checks(lighthouse_mode):
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
+        # Standard output is in bytes, we need to decode the line to
+        # print it.
         python_utils.PRINT(stdout.decode('utf-8'))
         python_utils.PRINT('ERROR:')
+        # Error output is in bytes, we need to decode the line to
+        # print it.
         python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Lighthouse checks failed. More details can be found above.')

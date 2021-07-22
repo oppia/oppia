@@ -674,6 +674,12 @@ class ManagedProcessTests(test_utils.TestBase):
             IOError, 'First build never completed',
             lambda: self.exit_stack.enter_context(
                 servers.managed_webpack_compiler(watch_mode=True)))
+        self.assert_matches_regexps(str_io.getvalue().strip().split('\n'), [
+            'Starting new Webpack Compiler',
+            'abc',
+            'def',
+            'Stopping Webpack Compiler',
+        ])
 
     def test_managed_webpack_compiler_uses_explicit_config_path(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(

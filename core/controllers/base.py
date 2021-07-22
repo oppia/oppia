@@ -740,6 +740,8 @@ class CsrfTokenManager(python_utils.OBJECT):
         digester.update(python_utils.convert_to_bytes(issued_on))
 
         digest = digester.digest()
+        # The b64encode returns bytes, so we first need to decode the returned
+        # bytes to string.
         token = '%s/%s' % (
             issued_on, base64.urlsafe_b64encode(digest).decode('utf-8'))
 

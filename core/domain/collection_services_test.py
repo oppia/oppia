@@ -1274,7 +1274,7 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
                 duration.microseconds, 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %
-                (collection.title.encode('utf-8'), processing_time))
+                (collection.title, processing_time))
 
         self.assertEqual(
             collection_models.CollectionModel.get_collection_count(),

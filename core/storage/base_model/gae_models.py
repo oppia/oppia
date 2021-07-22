@@ -420,10 +420,12 @@ class BaseModel(datastore_services.Model):
 
         result = query.order(-cls.last_updated).fetch_page(
             page_size, start_cursor=start_cursor)
+        # The urlsafe returns bytes and we need to decode them to string.
         return (
             result[0],
             (result[1].urlsafe().decode('utf-8') if result[1] else None),
-            result[2])
+            result[2]
+        )
 
 
 class BaseHumanMaintainedModel(BaseModel):

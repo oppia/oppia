@@ -33,7 +33,8 @@ import pkg_resources
 from . import common
 
 
-OPPIA_REQUIRED_PIP_VERSION = '20.3.4'
+# This is the version that is set in install_prerequisites.sh.
+OPPIA_REQUIRED_PIP_VERSION = '21.1.3'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -429,7 +430,7 @@ def verify_pip_is_installed():
     """
     python_utils.PRINT('Checking if pip is installed on the local machine')
     try:
-        import pip  # pylint: disable=unused-import
+        import pip
     except ImportError as e:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
@@ -450,6 +451,15 @@ def verify_pip_is_installed():
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e)
+    else:
+        if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
+            common.print_each_string_after_two_new_lines([
+                'Oppia requires pip==%s, but you have pip==%s installed.' % (
+                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
+                'Upgrading pip on your behalf...',
+            ])
+            _run_pip_command(
+                ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])
 
 
 def _run_pip_command(cmd_parts):

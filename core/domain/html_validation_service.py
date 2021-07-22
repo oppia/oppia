@@ -510,13 +510,13 @@ def get_latex_strings_without_svg_from_html(html_string):
         html_string: str. The HTML string.
 
     Returns:
-        list(str). List of unique LaTeX strings from math-tags without svg
+        list(bytes). List of unique LaTeX bytes from math-tags without svg
         filename.
     """
 
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    latex_strings = set()
+    latex_bytes_set = set()
     for math_tag in soup.findAll(name='oppia-noninteractive-math'):
         math_content_dict = (
             json.loads(unescape_html(
@@ -526,9 +526,11 @@ def get_latex_strings_without_svg_from_html(html_string):
         svg_filename = (
             objects.UnicodeString.normalize(math_content_dict['svg_filename']))
         if svg_filename == '':
-            latex_strings.add(raw_latex.encode('utf-8'))
+            # The raw_latex is string, but we want to return list of bytes,
+            # so we need to need to encode it.
+            latex_bytes_set.add(raw_latex.encode('utf-8'))
 
-    unique_latex_strings = list(latex_strings)
+    unique_latex_strings = list(latex_bytes_set)
     return unique_latex_strings
 
 

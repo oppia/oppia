@@ -47,12 +47,15 @@ CLIENT = ndb.Client()
 
 
 def get_ndb_context(**kwargs):
-    """Get the context of the Cloud NDB. This context need to be entered in
+    """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
     Returns:
         ndb.context.Context. Cloud NDB context.
     """
+    # The raise_context_error is set to False, because we want to generate
+    # new context if we are outside of one. This is used because in some places
+    # we need a context but we are unsure if it exists.
     context = ndb.get_context(raise_context_error=False)
     return (
         CLIENT.context(**kwargs) if context is None else

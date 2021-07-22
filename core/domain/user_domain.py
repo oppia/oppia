@@ -1086,6 +1086,11 @@ class ModifiableUserData(python_utils.OBJECT):
         if data_schema_version is None:
             raise Exception(
                 'Invalid modifiable user data: no schema version specified.')
+        if not isinstance(data_schema_version, int):
+            raise Exception(
+                'Version has invalid type, expected int, '
+                'received %s' % type(data_schema_version)
+            )
         if (
                 not isinstance(data_schema_version, int) or
                 data_schema_version < 1 or

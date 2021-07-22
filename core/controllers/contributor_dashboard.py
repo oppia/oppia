@@ -274,9 +274,10 @@ class TranslatableTextHandler(base.BaseHandler):
         minus any contents found in suggestions.
 
         Args:
-            state_names_to_content_id_mapping: dict(str, dict(str, TranslatableItem)). A dict # pylint: disable=line-too-long
-                where state_name is the key and a dict with content_id as
-                the key and TranslatableItem as value.
+            state_names_to_content_id_mapping:
+                dict(str, dict(str, TranslatableItem)). A dict where state_name
+                is the key and a dict with content_id as the key and
+                TranslatableItem as value.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
@@ -288,21 +289,21 @@ class TranslatableTextHandler(base.BaseHandler):
         for state_name in state_names_to_content_id_mapping:
             content_id_to_translatable_item = dict(
                 state_names_to_content_id_mapping[state_name])
-            content_id_to_not_reviewed_translatable_item = {}
+            content_id_to_unsubmitted_translatable_item = {}
             for content_id, item in content_id_to_translatable_item.items():
-                if not self._content_in_review(
+                if not self._is_content_in_review(
                         state_name, content_id, suggestions):
-                    content_id_to_not_reviewed_translatable_item[content_id] = (
+                    content_id_to_unsubmitted_translatable_item[content_id] = (
                         item)
-            if content_id_to_not_reviewed_translatable_item:
+            if content_id_to_unsubmitted_translatable_item:
                 final_mapping[state_name] = {
                     cid: translatable_item.to_dict()
                     for cid, translatable_item in (
-                        content_id_to_not_reviewed_translatable_item.items())
+                        content_id_to_unsubmitted_translatable_item.items())
                 }
         return final_mapping
 
-    def _content_in_review(self, state_name, content_id, suggestions):
+    def _is_content_in_review(self, state_name, content_id, suggestions):
         """Returns whether a suggestion exists in suggestions with a change dict
         matching the supplied state_name and content_id.
 

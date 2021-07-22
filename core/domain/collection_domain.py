@@ -358,18 +358,18 @@ class Collection(python_utils.OBJECT):
         return collection
 
     @classmethod
-    def deserialize(cls, json_string):
-        """Returns a Collection domain object decoded from a JSON string.
+    def deserialize(cls, json_bytes):
+        """Returns a Collection domain object decoded from a JSON bytes.
 
         Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
+            json_bytes: bytes. A JSON-encoded utf-8 bytes that can be
                 decoded into a dictionary representing a Collection. Only call
-                on strings that were created using serialize().
+                on bytes that were created using serialize().
 
         Returns:
             Collection. The corresponding Collection domain object.
         """
-        collection_dict = json.loads(json_string.decode('utf-8'))
+        collection_dict = json.loads(json_bytes.decode('utf-8'))
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(
@@ -388,10 +388,10 @@ class Collection(python_utils.OBJECT):
         return collection
 
     def serialize(self):
-        """Returns the object serialized as a JSON string.
+        """Returns the object serialized as a JSON bytes.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
+            bytes. JSON-encoded utf-8 string encoding all of the information
             composing the object.
         """
         collection_dict = self.to_dict()

@@ -133,8 +133,11 @@ def main(args=None):
         if len(line) == 0 and task.poll() is not None:
             break
         if line:
+            # Standard output is in bytes, we need to decode
+            # the line to print it.
             python_utils.PRINT(line.decode('utf-8'), end='')
             output_lines.append(line)
+    # Standard output is in bytes, we need to decode the line to print it.
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)
 

@@ -10233,18 +10233,35 @@ class ExplorationChangesMergeabilityUnitTests(
                 self.EXP_0_ID, 2, change_list_3)
             self.assertEqual(changes_are_not_mergeable, False)
 
-            expected_email_html_body = re.escape(
+            change_list_3_dict = [{
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'state_name': 'End',
+                'new_value': {
+                    'html': '<p>End State Changed</p>',
+                    'content_id': 'content'
+                },
+                'old_value': {
+                    'html': 'End State',
+                    'content_id': 'content'
+                },
+            }]
+            expected_email_html_body = (
                 '(Sent from dev-project-id)<br/><br/>'
                 'Hi Admin,<br><br>'
                 'Some draft changes were rejected in exploration %s because '
-                'the changes were conflicting and could not be saved.'
-                % self.EXP_0_ID)
+                'the changes were conflicting and could not be saved. Please '
+                'see the rejected change list below:<br>'
+                'Discarded change list: %s <br><br>'
+                'Frontend Version: %s<br>'
+                'Backend Version: %s<br><br>'
+                'Thanks!' % (self.EXP_0_ID, change_list_3_dict, 2, 3)
+            )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
-            self.assertRegexpMatches(
-                messages[0].html.decode(),
-                expected_email_html_body)
+            self.assertEqual(
+                expected_email_html_body, messages[0].html.decode())
 
             # Add a translation after state renames.
             change_list_4 = [exp_domain.ExplorationChange({
@@ -10260,15 +10277,28 @@ class ExplorationChangesMergeabilityUnitTests(
                 self.EXP_0_ID, 2, change_list_4)
             self.assertEqual(changes_are_not_mergeable_2, False)
 
-            expected_email_html_body_2 = re.escape(
+            change_list_4_dict = [{
+                'cmd': 'add_written_translation',
+                'state_name': 'End',
+                'content_id': 'content',
+                'language_code': 'de',
+                'content_html': 'N/A',
+                'translation_html': '<p>State 2 Content Translation.</p>',
+                'data_format': 'html'
+            }]
+            expected_email_html_body_2 = (
                 '(Sent from dev-project-id)<br/><br/>'
                 'Hi Admin,<br><br>'
                 'Some draft changes were rejected in exploration %s because '
-                'the changes were conflicting and could not be saved.'
-                % self.EXP_0_ID)
+                'the changes were conflicting and could not be saved. Please '
+                'see the rejected change list below:<br>'
+                'Discarded change list: %s <br><br>'
+                'Frontend Version: %s<br>'
+                'Backend Version: %s<br><br>'
+                'Thanks!' % (self.EXP_0_ID, change_list_4_dict, 2, 3)
+            )
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
-            self.assertRegexpMatches(
-                messages[1].html.decode(),
-                expected_email_html_body_2)
+            self.assertEqual(
+                expected_email_html_body_2, messages[1].html.decode())

@@ -881,6 +881,8 @@ def main(args=None):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = process.communicate()
+    # Standard and error output is in bytes, we need to decode the line to
+    # print it.
     python_utils.PRINT(stdout.decode('utf-8'))
     python_utils.PRINT(stderr.decode('utf-8'))
     if process.returncode == 0:

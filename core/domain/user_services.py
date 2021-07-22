@@ -205,6 +205,7 @@ def get_gravatar_url(email):
     Returns:
         str. The gravatar url for the specified email.
     """
+    # The md5 accepts only bytes, so we first need to encode the email to bytes.
     return (
         'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' %
         (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))

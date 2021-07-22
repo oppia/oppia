@@ -888,18 +888,18 @@ class Story(python_utils.OBJECT):
         }
 
     @classmethod
-    def deserialize(cls, json_string):
-        """Returns a Story domain object decoded from a JSON string.
+    def deserialize(cls, json_bytes):
+        """Returns a Story domain object decoded from a JSON bytes.
 
         Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
+            json_bytes: bytes. A JSON-encoded bytes that can be
                 decoded into a dictionary representing a Story. Only call
-                on strings that were created using serialize().
+                on bytes that were created using serialize().
 
         Returns:
             Story. The corresponding Story domain object.
         """
-        story_dict = json.loads(json_string.decode('utf-8'))
+        story_dict = json.loads(json_bytes.decode('utf-8'))
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 story_dict['created_on'])
@@ -918,10 +918,10 @@ class Story(python_utils.OBJECT):
         return story
 
     def serialize(self):
-        """Returns the object serialized as a JSON string.
+        """Returns the object serialized as a JSON bytes.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
+            bytes. JSON-encoded utf-8 bytes encoding all of the information
             composing the object.
         """
         story_dict = self.to_dict()

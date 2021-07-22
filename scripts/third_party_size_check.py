@@ -40,14 +40,18 @@ def _get_skip_files_list():
         list. The list of files which are to be skipped.
 
     Raises:
-        yaml.YAMLError. If failed to parse app_dev.yaml.
-        IOError. If failed to open app_dev.yaml in read mode.
+        yaml.YAMLError. If failed to parse .gcloudignore.
+        IOError. If failed to open .gcloudignore in read mode.
     """
     try:
         with python_utils.open_file('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
-            skip_files_list = [os.getcwd() + '/' + gcloudignore_line
-                               for gcloudignore_line in gcloudignore_lines]
+
+            skip_files_list = [
+                os.path.join(os.getcwd(), gcloudignore_line)
+                for gcloudignore_line in gcloudignore_lines
+                if not gcloudignore_lines.strip().startswith('#')
+            ]
         return skip_files_list
     except IOError as io_error:
         python_utils.PRINT(io_error)

@@ -2181,10 +2181,10 @@ class Exploration(python_utils.OBJECT):
         })
 
     def serialize(self):
-        """Returns the object serialized as a JSON string.
+        """Returns the object serialized as a JSON bytes.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
+            bytes. JSON-encoded utf-8 bytes encoding all of the information
             composing the object.
         """
         exploration_dict = self.to_dict()
@@ -2209,18 +2209,18 @@ class Exploration(python_utils.OBJECT):
         return json.dumps(exploration_dict).encode('utf-8')
 
     @classmethod
-    def deserialize(cls, json_string):
-        """Returns an Exploration domain object decoded from a JSON string.
+    def deserialize(cls, json_bytes):
+        """Returns an Exploration domain object decoded from a JSON bytes.
 
         Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
+            json_bytes: str. A JSON-encoded utf-8 bytes that can be
                 decoded into a dictionary representing an Exploration. Only call
-                on strings that were created using serialize().
+                on bytes that were created using serialize().
 
         Returns:
             Exploration. The corresponding Exploration domain object.
         """
-        exploration_dict = json.loads(json_string.decode('utf-8'))
+        exploration_dict = json.loads(json_bytes.decode('utf-8'))
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 exploration_dict['created_on'])

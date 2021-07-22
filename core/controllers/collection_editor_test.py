@@ -428,6 +428,9 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         exploration_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
+        # The b64encode accepts and returns bytes, so we first need to encode
+        # the exploration_id to bytes, then decode the returned bytes back
+        # to string.
         exploration_id = (
             base64.b64encode(exploration_id.encode('utf-8')).decode('utf-8'))
 

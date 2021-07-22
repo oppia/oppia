@@ -843,9 +843,13 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv()
         )
+        # Downloadable file accepts only bytes, so we need to encode
+        # topic_similarities to bytes.
         self.render_downloadable_file(
             topic_similarities.encode('utf-8'),
-            'topic_similarities.csv', 'text/csv')
+            'topic_similarities.csv',
+            'text/csv'
+        )
 
 
 class DataExtractionQueryHandler(base.BaseHandler):

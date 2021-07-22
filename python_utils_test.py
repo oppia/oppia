@@ -19,11 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-try:
-    import StringIO
-except ImportError:
-    from io import StringIO  # pylint: disable=import-only-modules
-
 import ast
 import builtins
 import io
@@ -298,7 +293,7 @@ class PythonUtilsForPython2Tests(test_utils.GenericTestBase):
 
     def test_string_io(self):
         stdout = python_utils.string_io()
-        self.assertIsInstance(stdout, StringIO.StringIO)
+        self.assertIsInstance(stdout, io.StringIO)
 
     def test_unicode_and_str_chars_in_file(self):
         self.assertIsInstance(

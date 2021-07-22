@@ -161,6 +161,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
         return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
 
+    def test_wrong_pip_version_raises_import_error(self):
+        import pip
+
+        with self.swap_Popen, self.swap(pip, '__version__', '21.1.3'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [
+            ['pip', 'install', 'pip==21.1.3'],
+        ])
+
     def test_correct_pip_version_does_nothing(self):
         import pip
 

@@ -784,10 +784,10 @@ class Skill(python_utils.OBJECT):
         }
 
     def serialize(self):
-        """Returns the object serialized as a JSON string.
+        """Returns the object serialized as a JSON bytes.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
+            bytes. JSON-encoded utf-8 bytes encoding all of the information
             composing the object.
         """
         skill_dict = self.to_dict()
@@ -812,18 +812,18 @@ class Skill(python_utils.OBJECT):
         return json.dumps(skill_dict).encode('utf-8')
 
     @classmethod
-    def deserialize(cls, json_string):
-        """Returns a Skill domain object decoded from a JSON string.
+    def deserialize(cls, json_bytes):
+        """Returns a Skill domain object decoded from a JSON bytes.
 
         Args:
-            json_string: str. A JSON-encoded string that can be
+            json_bytes: bytes. A JSON-encoded bytes that can be
                 decoded into a dictionary representing a Skill. Only call
-                on strings that were created using serialize().
+                on bytes that were created using serialize().
 
         Returns:
             Skill. The corresponding Skill domain object.
         """
-        skill_dict = json.loads(json_string.decode('utf-8'))
+        skill_dict = json.loads(json_bytes.decode('utf-8'))
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 skill_dict['created_on'])

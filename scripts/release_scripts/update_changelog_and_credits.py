@@ -162,6 +162,7 @@ def get_previous_release_version(branch_type, current_release_version_number):
     all_tags = subprocess.check_output(['git', 'tag'])[:-1].split(b'\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
+    # Standard output is in bytes, we need to decode the line to print it.
     if branch_type == constants.release_constants.BRANCH_TYPE_RELEASE:
         previous_release_version = all_tags[-1][1:].decode('utf-8')
     elif branch_type == constants.release_constants.BRANCH_TYPE_HOTFIX:
