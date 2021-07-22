@@ -27,6 +27,16 @@ class ExplorationFeaturesHandler(base.BaseHandler):
     """Returns features the given exploration is configured to support."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):

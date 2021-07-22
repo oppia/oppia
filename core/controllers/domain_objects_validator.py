@@ -21,6 +21,7 @@ handler arguments.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.controllers import base
 from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
@@ -96,3 +97,28 @@ def validate_collection_change(obj):
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
     collection_domain.CollectionChange(obj)
+
+
+def validate_task_entriy_for_improvements(task_entry):
+    # type: (Dict[String, Any]) -> None
+    """Validates collection change.
+
+    Args:
+        task_entry: dict. Data that needs to be validated.
+    """
+    # There is no validate method in domain layer.
+    entity_version = task_entry.get('entity_version', None)
+    if entity_version is None:
+        raise base.BaseHandler.InvalidInputException(
+            'No entity_version provided')
+    task_type = task_entry.get('task_type', None)
+    if task_type is None:
+        raise base.BaseHandler.InvalidInputException('No task_type provided')
+    target_id = task_entry.get('target_id', None)
+    if target_id is None:
+        raise base.BaseHandler.InvalidInputException('No target_id provided')
+    status = task_entry.get('status', None)
+    if status is None:
+        raise base.BaseHandler.InvalidInputException('No status provided')
+    # The issue_description is allowed to be None.
+    task_entry.get('issue_description', None)
