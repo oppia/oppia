@@ -35,6 +35,9 @@ var thumbnailResetButton = element(by.css(
   '.protractor-test-thumbnail-reset-button'));
 var stateNameText = element(
   by.css('.protractor-test-state-name-text'));
+var activityCreationModal = element(by.css('.protractor-test-creation-modal'));
+var createExplorationButton = element(
+  by.css('.protractor-test-create-exploration'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -87,13 +90,9 @@ var createExplorationAndStartTutorial = async function() {
 
   await creatorDashboardPage.clickCreateActivityButton();
   if (isAdmin) {
-    var activityCreationModal = element(
-      by.css('.protractor-test-creation-modal'));
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
-    var createExplorationButton = element(
-      by.css('.protractor-test-create-exploration'));
     await action.click('Create Exploration Button', createExplorationButton);
   }
 

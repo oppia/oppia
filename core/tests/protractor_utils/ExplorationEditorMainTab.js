@@ -104,7 +104,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-answer-description'));
   var deleteNodeLocator = by.css('.protractor-test-delete-node');
   var titleLocator = by.css('.ng-joyride-title');
-  var CKEditor = element(by.css('.protractor-test-ck-editor'));
+  var CkEditorElement = element(by.css('.protractor-test-ck-editor'));
   var interactionHtmlElement = element(
     by.css('.protractor-test-interaction-html'));
 
@@ -162,9 +162,9 @@ var ExplorationEditorMainTab = function() {
   var answerTab = element(by.css('.protractor-test-answer-tab'));
   var submitSolutionButton = element(
     by.css('.protractor-test-submit-solution-button'));
-  var hintTextButton = element(
+  var hintTextElement = element(
     by.css('.protractor-test-hint-text'));
-  var explanationTextArea = element(
+  var explanationTextAreaElement = element(
     by.css('.protractor-test-explanation-textarea'));
 
   /*
@@ -553,9 +553,10 @@ var ExplorationEditorMainTab = function() {
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
-    hintTextButton.all(by.tagName('p')).last();
+    var hintTextButton = hintTextElement.all(by.tagName('p')).last();
     await action.click('Hint Text Button', hintTextButton);
-    CKEditor.all(by.className('oppia-rte-resizer')).first();
+    var CKEditor = CkEditorElement.all(by.className(
+      'oppia-rte-resizer')).first();
     await action.sendKeys('Text CKEditor', CKEditor, hint);
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
@@ -571,10 +572,10 @@ var ExplorationEditorMainTab = function() {
     var interaction = await interactions.getInteraction(interactionId);
     await interaction.submitAnswer(
       interactionHtmlElement, solution.correctAnswer);
-    explanationTextArea.all(
+    var explanationTextArea = explanationTextAreaElement.all(
       by.tagName('p')).first();
     await action.click('Explanation Text Area', explanationTextArea);
-    CKEditor.all(by.className(
+    var CKEditor = CkEditorElement.all(by.className(
       'oppia-rte-resizer')).first();
     await action.sendKeys(
       'Text CKEditor', CKEditor, solution.explanation);

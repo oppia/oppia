@@ -35,6 +35,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-add-worked-example'));
   var saveWorkedExampleButton = element(
     by.css('.protractor-test-save-worked-example-button'));
+  var deleteExampleButtonLocator = by.css(
+    '.protractor-test-delete-example-button');
   var workedExampleSummary = function(index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
@@ -51,7 +53,7 @@ var SkillEditorPage = function() {
   var deleteWorkedExampleButton = function(index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
-      .element(by.css('.protractor-test-delete-example-button'));
+      .element(deleteExampleButtonLocator);
   };
   var confirmDeleteWorkedExample = element(
     by.css('.protractor-test-confirm-delete-worked-example-button'));
@@ -74,7 +76,7 @@ var SkillEditorPage = function() {
   var deleteMisconceptionButton = function(index) {
     return element(
       by.css('.protractor-test-misconception-' + index))
-      .element(by.css('.protractor-test-delete-example-button'));
+      .element(deleteExampleButtonLocator);
   };
   var confirmDeleteMisconception =
     element(by.css('.protractor-test-confirm-delete-misconception-button'));
@@ -106,6 +108,17 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-changes-count-text'));
   var selectRubricDifficulty = element(
     by.css('.protractor-test-select-rubric-difficulty'));
+  var editor = element(
+    by.css('.protractor-test-rubric-explanation-text'));
+  var addWorkedExampleModal = element(
+    by.css('.protractor-test-add-worked-example-modal'));
+  var deleteWorkedExampleModal = element(
+    by.css('.protractor-test-delete-worked-example-modal'));
+  var addMisconceptionModal = element(
+    by.css('.protractor-test-add-misconception-modal'));
+  var deleteMisconceptionModal = element(
+    by.css('.protractor-test-delete-misconception-modal'));
+  var conceptCardTextLocator = by.css('.protractor-test-concept-card-text');
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -130,8 +143,6 @@ var SkillEditorPage = function() {
       addRubricExplanationButton,
       'Add Rubric Explanation button takes too long to be clickable');
     await addRubricExplanationButton.click();
-    var editor = element(
-      by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
@@ -156,8 +167,6 @@ var SkillEditorPage = function() {
     await waitFor.elementToBeClickable(
       button, 'Edit Rubric Explanation button takes too long to be clickable');
     await button.click();
-    var editor = element(
-      by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
     await deleteRubricExplanationButton.click();
@@ -175,8 +184,6 @@ var SkillEditorPage = function() {
       editRubricExplanationButtons.get(explIndex),
       'Edit Rubric Explanation button takes too long to be clickable');
     await editRubricExplanationButtons.get(explIndex).click();
-    var editor = element(
-      by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
@@ -253,7 +260,7 @@ var SkillEditorPage = function() {
     await action.click(
       'Edit concept card explanation', editConceptCardExplanationButton);
 
-    var editor = element(by.css('.protractor-test-concept-card-text'));
+    var editor = element(conceptCardTextLocator);
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
 
@@ -274,8 +281,6 @@ var SkillEditorPage = function() {
   this.addWorkedExample = async function(question, explanation) {
     await action.click('Add worked example', addWorkedExampleButton);
 
-    var addWorkedExampleModal = (
-      element(by.css('.protractor-test-add-worked-example-modal')));
     await waitFor.visibilityOf(
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to appear');
@@ -297,8 +302,6 @@ var SkillEditorPage = function() {
     await action.click(
       'Delete Worked Example button', deleteWorkedExampleButton(index));
 
-    var deleteWorkedExampleModal = (
-      element(by.css('.protractor-test-delete-worked-example-modal')));
     await waitFor.visibilityOf(
       deleteWorkedExampleModal,
       'Delete Worked Example Modal takes too long to appear');
@@ -341,8 +344,6 @@ var SkillEditorPage = function() {
   this.addMisconception = async function(name, notes, feedback) {
     await action.click('Add misconception', addMisconceptionButton);
 
-    var addMisconceptionModal = (
-      element(by.css('.protractor-test-add-misconception-modal')));
     await waitFor.visibilityOf(
       addMisconceptionModal,
       'Add Misconception Modal takes too long to appear');
@@ -374,8 +375,6 @@ var SkillEditorPage = function() {
     await action.click(
       'Delete misconception button', deleteMisconceptionButton(index));
 
-    var deleteMisconceptionModal = (
-      element(by.css('.protractor-test-delete-misconception-modal')));
     await waitFor.visibilityOf(
       deleteMisconceptionModal,
       'Delete Misconception Modal takes too long to appear');

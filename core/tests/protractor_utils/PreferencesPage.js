@@ -53,6 +53,10 @@ var PreferencesPage = function() {
     by.css('.protractor-test-delete-account-button'));
   var exportAccountButton = element(
     by.css('.protractor-test-export-account-button'));
+  var languageSelector = element(
+    by.css('.protractor-test-site-language-selector'));
+  var selectedLanguageElement = element(
+    by.css('.protractor-test-site-language-selector'));
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
@@ -107,8 +111,6 @@ var PreferencesPage = function() {
   };
 
   this.selectSystemLanguage = async function(language) {
-    var languageSelector = element(
-      by.css('.protractor-test-site-language-selector'));
     await action.click('system language selector', languageSelector);
     var dropdownOption = element(
       by.cssContainingText('mat-option .mat-option-text', language));
@@ -177,8 +179,6 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredSiteLanguageToBe = async function(language) {
-    var selectedLanguageElement = element(
-      by.css('.protractor-test-site-language-selector'));
     await waitFor.visibilityOf(
       selectedLanguageElement,
       'selectedLanguageElement taking too long to appear.');
