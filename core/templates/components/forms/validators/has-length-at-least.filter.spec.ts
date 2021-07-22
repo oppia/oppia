@@ -40,16 +40,18 @@ describe('Normalizer tests', function() {
     expect($filter(filterName)).not.toEqual(null);
   }));
 
-  it('should impose minimum length bounds', angular.mock.inject(function($filter) {
-    var filter = $filter('hasLengthAtLeast');
-    var args = {
-      minValue: 3
-    };
-    expect(filter("12", args)).toBe(false);
-    expect(filter("123", args)).toBe(true);
-    expect(filter("1234", args)).toBe(true);
-    expect(filter(["1", "2"], args)).toBe(false);
-    expect(filter(["1", "2", "3"], args)).toBe(true);
-    expect(filter(["1", "2", "3", "4"], args)).toBe(true);
-  }));
+  it('should impose minimum length bounds', angular.mock.inject(
+    function($filter) {
+      var filter = $filter('hasLengthAtLeast');
+      var args = {
+        minValue: 3
+      };
+      expect(filter('12', args)).toBe(false);
+      expect(filter('123', args)).toBe(true);
+      expect(filter('1234', args)).toBe(true);
+      expect(filter(['1', '2'], args)).toBe(false);
+      expect(filter(['1', '2', '3'], args)).toBe(true);
+      expect(filter(['1', '2', '3', '4'], args)).toBe(true);
+    }
+  ));
 });

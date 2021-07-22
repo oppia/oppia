@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Validator to check if input has length at 
+ * @fileoverview Validator to check if input has length at
  * least some value.
  */
 
