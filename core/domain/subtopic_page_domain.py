@@ -249,6 +249,31 @@ class SubtopicPage(python_utils.OBJECT):
         return page_contents_dict
 
     @classmethod
+    def _convert_page_contents_v2_dict_to_v3_dict(cls, page_contents_dict):
+        """Converts v2 SubtopicPage Contents schema to the v3 schema.
+        v3 schema deprecates oppia-noninteractive-svgdiagram tag and converts
+        existing occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+                domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+        page_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                page_contents_dict['written_translations'],
+                html_validation_service.
+                convert_svg_diagram_tags_to_image_tags))
+        page_contents_dict['subtitled_html']['html'] = (
+            html_validation_service.
+            convert_svg_diagram_tags_to_image_tags(
+                page_contents_dict['subtitled_html']['html']))
+        return page_contents_dict
+
+    @classmethod
     def update_page_contents_from_model(
             cls, versioned_page_contents, current_version):
         """Converts the page_contents blob contained in the given

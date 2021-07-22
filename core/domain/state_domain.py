@@ -3285,7 +3285,7 @@ class State(python_utils.OBJECT):
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
                 schema v36).
-            state_uses_old_rule_template_schema: bool. Wheter the rule inputs
+            state_uses_old_rule_template_schema: bool. Whether the rule inputs
                 contain html in the form of DragAndDropHtmlString,
                 SetOfHtmlString, or ListOfSetsOfHtmlString (shoud be True if
                 prior to state schema v42).
