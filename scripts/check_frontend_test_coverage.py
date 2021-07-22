@@ -140,7 +140,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-set-input.component.ts',
     'oppia-visualization-enumerated-frequency-table.directive.ts',
     'outcome-destination-editor.directive.ts',
-    'outcome-editor.component.ts',
     'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
