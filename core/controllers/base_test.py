@@ -505,7 +505,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/community-library', expected_status_int=503)
 
-        self.assertIn(b'<maintenance-page>', response.body)
+        self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<library-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 

@@ -47,7 +47,8 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(
-            b'<oppia-profile-page></oppia-profile-page>', response.body)
+            b'<oppia-profile-page-root></oppia-profile-page-root>',
+            response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
