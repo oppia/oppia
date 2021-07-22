@@ -5,16 +5,19 @@
 <div class="modal-body oppia-long-text">
   <p class="oppia-signup-objective-text"
      translate="I18N_SIGNUP_SITE_OBJECTIVE"
-     [translateParams]="{sitename: siteName}">
+     [translateParams]="{sitename: SITE_NAME}">
   </p>
 
   <p class="oppia-signup-objective-text"
-    innerHTML="{{ 'I18N_SIGNUP_LICENSE_OBJECTIVE' | translate: { licenselink: licenseLink  } }}">
+    innerHTML="{{ 'I18N_SIGNUP_LICENSE_OBJECTIVE' | translate: { licenselink: LICENSE_LINK  } }}">
   </p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()" translate="I18N_SIGNUP_CLOSE_BUTTON"></button>
+  <button class="btn btn-secondary"
+          (click)="cancel()"
+          translate="I18N_SIGNUP_CLOSE_BUTTON">
+  </button>
 </div>
 
 <style>

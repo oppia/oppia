@@ -48,24 +48,25 @@ export class SignupPageBackendApiService {
   SIGNUP_DATA_URL = '/signuphandler/data';
   USERNAME_HANDLER = '/usernamehandler/data';
 
-  constructor(
-    private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   async fetchSignupPageDataAsync(): Promise<SignupPageBackendDict> {
     return this.http.get<SignupPageBackendDict>(
       this.SIGNUP_DATA_URL).toPromise();
   }
 
-  async checkUsernameAvailableAsync(username: string):
-   Promise<UsernameAvailabilityResponse> {
+  async checkUsernameAvailableAsync(
+      username: string
+  ): Promise<UsernameAvailabilityResponse> {
     return this.http.post<UsernameAvailabilityResponse>(
       this.USERNAME_HANDLER, {
         username: username
       }).toPromise();
   }
 
-  async updateUsernameAsync(requestParams: UpdateUsernameRequestParams):
-  Promise<UpdateUsernameResponseAsync> {
+  async updateUsernameAsync(
+      requestParams: UpdateUsernameRequestParams
+  ): Promise<UpdateUsernameResponseAsync> {
     return this.http.post<UpdateUsernameResponseAsync>(
       this.SIGNUP_DATA_URL, requestParams).toPromise();
   }

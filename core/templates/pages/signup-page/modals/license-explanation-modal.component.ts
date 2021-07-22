@@ -26,8 +26,8 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './license-explanation-modal.component.html'
 })
 export class LicenseExplanationModalComponent extends ConfirmOrCancelModal {
-  siteName = AppConstants.SITE_NAME;
-  licenseLink = '<a href=&quot;https://creativecommons.org/licenses/by-sa/4.0/&quot; target=&quot;_blank&quot;>CC-BY-SA v4.0</a>';
+  SITE_NAME = AppConstants.SITE_NAME;
+  LICENSE_LINK = '<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0</a>';
 
   constructor(
     private ngbActiveModal: NgbActiveModal

@@ -4,12 +4,17 @@ link before completing the signup process, they will be logged out.
 
 <div class="oppia-page-cards-container oppia-signup-page-container">
   <mat-card class="oppia-page-card">
-    <h2 class="oppia-signup-page-title" translate="I18N_SIGNUP_COMPLETE_REGISTRATION"></h2>
+    <h2 class="oppia-signup-page-title"
+        translate="I18N_SIGNUP_COMPLETE_REGISTRATION">
+    </h2>
 
     <form>
       <div *ngIf="!hasUsername" role="form" class="form-horizontal">
         <div class="form-group row">
-          <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_USERNAME"></label>
+          <label for="username"
+                 class="col-lg-3 col-md-3 col-sm-3"
+                 translate="I18N_SIGNUP_USERNAME">
+          </label>
 
           <div class="col-lg-9 col-md-9 col-sm-9">
             <input type="text"
@@ -21,7 +26,9 @@ link before completing the signup process, they will be logged out.
                    (change)="updateWarningText(username)"
                    oppiaFocusOn="usernameInputField"
                    autofocus="true">
-            <span class="form-text oppia-username-explanation-text" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
+            <span class="form-text oppia-username-explanation-text"
+                  translate="I18N_SIGNUP_USERNAME_EXPLANATION">
+            </span>
             <div class="oppia-warning-text-container">
               <p class="oppia-warning-text"
                  aria-live="assertive"
@@ -34,21 +41,37 @@ link before completing the signup process, they will be logged out.
         </div>
 
         <div *ngIf="showEmailPreferencesForm" class="form-group row">
-          <label for="canReceiveEmailUpdates" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_EMAIL_PREFERENCES"></label>
+          <label for="canReceiveEmailUpdates"
+                 class="col-lg-3 col-md-3 col-sm-3"
+                 translate="I18N_SIGNUP_EMAIL_PREFERENCES">
+          </label>
           <div class="col-lg-9 col-md-9 col-sm-9">
             <div class="radio">
               <label>
-                <input type="radio" [(ngModel)]="canReceiveEmailUpdates" [ngModelOptions]="{standalone: true}" value="yes" name="canReceiveEmailUpdates" (change)="onSelectEmailPreference()">
+                <input type="radio"
+                       [(ngModel)]="canReceiveEmailUpdates"
+                       [ngModelOptions]="{standalone: true}"
+                       value="yes"
+                       name="canReceiveEmailUpdates"
+                       (change)="onSelectEmailPreference()">
                 <span translate="I18N_SIGNUP_SEND_ME_NEWS"></span>
               </label>
               <label>
-                <input type="radio" [(ngModel)]="canReceiveEmailUpdates" [ngModelOptions]="{standalone: true}" value="no" name="canReceiveEmailUpdates" (change)="onSelectEmailPreference()">
+                <input type="radio"
+                       [(ngModel)]="canReceiveEmailUpdates"
+                       [ngModelOptions]="{standalone: true}"
+                       value="no"
+                       name="canReceiveEmailUpdates"
+                       (change)="onSelectEmailPreference()">
                 <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
               </label>
-              <span class="form-text oppia-form-text-size" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
+              <span class="form-text oppia-form-text-size"
+                    translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
               </span>
               <div class="alert alert-warning" *ngIf="showEmailSignupLink">
-                <span class="help-block oppia-form-text" translate="I18N_PREFERENCES_EMAIL_SIGNUP_TEXT"></span>
+                <span class="help-block oppia-form-text"
+                      translate="I18N_PREFERENCES_EMAIL_SIGNUP_TEXT">
+                </span>
                 <a class="help-block oppia-form-text"
                    [href]="emailSignupLink"
                    target="_blank"
@@ -84,24 +107,29 @@ link before completing the signup process, they will be logged out.
       <div>
         <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
         <br>
-        <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}" (click)="showLicenseExplanationModal($event)"></span>
+        <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}"
+              (click)="showLicenseExplanationModal($event)">
+        </span>
       </div>
 
       <hr>
 
       <div class="checkbox oppia-long-text">
         <label>
-          <input type="checkbox" [(ngModel)]="hasAgreedToLatestTerms"
+          <input type="checkbox"
+                 [(ngModel)]="hasAgreedToLatestTerms"
                  [ngModelOptions]="{standalone: true}"
-                 class="protractor-test-agree-to-terms-checkbox" id="terms-checkbox">
-          <span innerHTML=" {{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
+                 class="protractor-test-agree-to-terms-checkbox"
+                 id="terms-checkbox">
+          <span innerHTML="{{ 'I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION' | translate: { sitename: siteName } }}">
           </span>
         </label>
       </div>
 
       <br>
 
-      <button type="submit" class="btn btn-success protractor-test-register-user"
+      <button type="submit"
+              class="btn btn-success protractor-test-register-user"
               [disabled]="warningI18nCode || !hasAgreedToLatestTerms || submissionInProcess || usernameCheckIsInProgress"
               (click)="submitPrerequisitesForm(hasAgreedToLatestTerms, username, canReceiveEmailUpdates)"
               translate="I18N_SIGNUP_BUTTON_SUBMIT"
