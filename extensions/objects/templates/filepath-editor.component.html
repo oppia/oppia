@@ -1,10 +1,11 @@
 <svg-filename-editor *ngIf="svgFilenameEditorIsShown"
+                     (validityChange)="validityHasChanged($event)"
                      (valueChanged)="valueHasChanged($event)"
                      [value]="value">
 </svg-filename-editor>
 <image-editor *ngIf="imageEditorIsShown"
-              (valueChanged)="valueHasChanged($event)"
               (validityChange)="validityHasChanged($event)"
+              (valueChanged)="valueHasChanged($event)"
               [value]="value"
               [modalId]="modalId"></image-editor>
 <div *ngIf="!svgFilenameEditorIsShown && !imageEditorIsShown" class="create-or-upload-image-selector-container">

@@ -52,6 +52,7 @@ export class PolyPoint {
 export class SvgFilenameEditorComponent implements OnInit {
   @Input() value: string;
   @Output() valueChanged = new EventEmitter();
+  @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
   STATUS_EDITING = 'editing';
@@ -207,7 +208,9 @@ export class SvgFilenameEditorComponent implements OnInit {
         height: dimensions.height + 'px',
         width: dimensions.width + 'px'
       };
+      this.validityChange.emit({ empty: true });
     } else {
+      this.validityChange.emit({ empty: false });
       domReady.then(() => {
         this.initializeFabricJs();
         this.changeDetectorRef.detectChanges();
@@ -405,6 +408,7 @@ export class SvgFilenameEditorComponent implements OnInit {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
         this.saveImageToLocalStorage(dimensions, resampledFile);
+        this.validityChange.emit({ empty: true });
       } else {
         this.loadingIndicatorIsShown = true;
         this.postSvgToServer(
@@ -423,6 +427,7 @@ export class SvgFilenameEditorComponent implements OnInit {
           };
           img.src = this.getTrustedResourceUrlForSvgFileName(
             data.filename).unsafeUrl;
+          this.validityChange.emit({ empty: true });
         }, (parsedResponse) => {
           this.loadingIndicatorIsShown = false;
           this.alertsService.addWarning(

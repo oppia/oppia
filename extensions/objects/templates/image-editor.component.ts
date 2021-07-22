@@ -533,7 +533,9 @@
      }
      const encodedFilepath = window.encodeURIComponent(imageFileName);
      return this.assetsBackendApiService.getImageUrlForPreview(
-       this.entityType, this.entityId, encodedFilepath);
+       this.contextService.getEntityType(),
+       this.contextService.getEntityId(),
+       encodedFilepath);
    }
  
    resetFilePathEditor(): void {

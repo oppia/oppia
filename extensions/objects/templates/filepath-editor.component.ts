@@ -102,6 +102,7 @@ export class FilepathEditorComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.value) {
+      this.validityChange.emit({ empty: false });
       return
     }
     if (this.value.endsWith('.svg')) {
@@ -112,11 +113,10 @@ export class FilepathEditorComponent implements OnInit {
   }
 
   valueHasChanged(event) {
-    console.log('valueHasChanged');
     this.valueChanged.emit(event);
   }
   validityHasChanged(event) {
-    console.log('validityHasChanged');
+    this.validityChange.emit(event);
   }
   onClickCreateImage() {
     this.svgFilenameEditorIsShown = true;
