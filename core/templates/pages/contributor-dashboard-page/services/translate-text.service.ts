@@ -30,10 +30,11 @@ import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
  */
 
 interface TranslatableObject {
-  translationHtml: string,
+  translation: string,
   status: Status,
   text: string,
   more: boolean
+  dataFormat: string
 }
 
 export type Status = 'pending' | 'submitted';
@@ -44,7 +45,8 @@ export class StateAndContent {
     private _contentID: string,
     private _contentText: string,
     private _status: Status,
-    private _translationHtml: string
+    private _translation: string,
+    private _dataFormat: string
   ) { }
 
   get stateName(): string {
@@ -79,12 +81,16 @@ export class StateAndContent {
     this._status = newStatus;
   }
 
-  get translationHtml(): string {
-    return this._translationHtml;
+  get translation(): string {
+    return this._translation;
   }
 
-  set translationHtml(newTranslationHtml: string) {
-    this._translationHtml = newTranslationHtml;
+  set translation(newTranslation: string) {
+    this._translation = newTranslation;
+  }
+
+  get dataFormat(): string {
+    return this._dataFormat;
   }
 }
 
@@ -120,7 +126,8 @@ export class TranslateTextService {
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
     this.activeContentId = this.stateAndContent[this.activeIndex].contentID;
-    this.activeContentText = this.stateAndContent[this.activeIndex].contentText;
+    this.activeContentText = (
+      this.stateAndContent[this.activeIndex].contentText);
     return this.activeContentText;
   }
 
@@ -163,15 +170,18 @@ export class TranslateTextService {
       for (const stateName in this.stateWiseContents) {
         let stateHasText: boolean = false;
         const contentIds = [];
-        for (const [contentId, text] of Object.entries(
-          this.stateWiseContents[stateName]
-        )) {
-          if (text !== '') {
+        const contentIdToContentMapping = this.stateWiseContents[stateName];
+        for (const contentId in contentIdToContentMapping) {
+          let translatableItem = contentIdToContentMapping[contentId];
+          if (translatableItem.content !== '') {
             contentIds.push(contentId);
 
             this.stateAndContent.push(
               new StateAndContent(
-                stateName, contentId, text as string, this.PENDING as Status, ''
+                stateName, contentId,
+                translatableItem.content,
+                this.PENDING as Status, '',
+                translatableItem.dataFormat
               )
             );
             stateHasText = true;
@@ -194,32 +204,38 @@ export class TranslateTextService {
   getTextToTranslate(): TranslatableObject {
     let {
       status = this.PENDING,
-      translationHtml = ''
+      translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return {
       text: this._getNextText(),
       more: this._isMoreTextAvailabelForTranslation(),
       status: status,
-      translationHtml: translationHtml
+      translation: translation,
+      dataFormat: (
+        this.stateAndContent[this.activeIndex] &&
+        this.stateAndContent[this.activeIndex].dataFormat)
     };
   }
 
   getPreviousTextToTranslate(): TranslatableObject {
     let {
       status = this.PENDING,
-      translationHtml = ''
+      translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     return {
       text: this._getPreviousText(),
       more: this._isPreviousTextAvailableForTranslation(),
       status: status,
-      translationHtml: translationHtml
+      translation: translation,
+      dataFormat: (
+        this.stateAndContent[this.activeIndex] &&
+        this.stateAndContent[this.activeIndex].dataFormat)
     };
   }
 
   suggestTranslatedText(
-      translationHtml: string, languageCode: string, imagesData:
-      ImagesData[], successCallback: () => void,
+      translation: string, languageCode: string, imagesData:
+      ImagesData[], dataFormat: string, successCallback: () => void,
       errorCallback: () => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
@@ -227,13 +243,15 @@ export class TranslateTextService {
       this.activeContentId,
       this.activeStateName,
       languageCode,
-      this.stateWiseContents[this.activeStateName][this.activeContentId],
-      translationHtml,
-      imagesData
+      this.stateWiseContents[
+        this.activeStateName][this.activeContentId].content,
+      translation,
+      imagesData,
+      dataFormat
     ).then(() => {
       this.stateAndContent[this.activeIndex].status = this.SUBMITTED;
-      this.stateAndContent[this.activeIndex].translationHtml = (
-        translationHtml);
+      this.stateAndContent[this.activeIndex].translation = (
+        translation);
       successCallback();
     }, errorCallback);
   }

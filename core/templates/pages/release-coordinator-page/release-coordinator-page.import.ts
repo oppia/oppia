@@ -13,25 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in release-coordinator panel.
+ * @fileoverview Directive scripts for the release-coordinator panel.
  */
 
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
+import 'pages/mock-ajs';
+import 'Polyfills.ts';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
+import { ReleaseCoordinatorPageModule } from './release-coordinator-page.module';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui.sortable', uiValidate
-]);
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-require('Polyfills.ts');
+platformBrowserDynamic().bootstrapModule(ReleaseCoordinatorPageModule).catch(
+  // eslint-disable-next-line no-console
+  (err) => console.error(err)
+);
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/release-coordinator-page/release-coordinator-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';
