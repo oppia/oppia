@@ -104,6 +104,22 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v45_dict_to_v46_dict(cls, draft_change_list):
+        """Converts draft change list from state version 45 to 46. State
+        version 46 ensures that written translations corresponding to
+        unicode text have data_format field set to 'unicode' and that they
+        do not contain any HTML tags. This should not affect drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list):
         """Converts draft change list from state version 44 to 45. State
         version 45 adds a linked skill id property to the
