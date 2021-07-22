@@ -94,8 +94,8 @@ var ExplorationEditorMainTab = function() {
   var stateNameInput = element(
     by.css('.protractor-test-state-name-input'));
   var ruleDetails = element(by.css('.protractor-test-rule-details'));
-  var stateContentEditor = stateEditorTag.element(
-    by.css('.protractor-test-state-content-editor'));
+  var stateContentEditorLocator = by.css(
+    '.protractor-test-state-content-editor');
   var addOrUpdateSolutionModal = element(
     by.css('.protractor-test-add-or-update-solution-modal'));
   var answerDescriptionFragment = element.all(
@@ -515,6 +515,7 @@ var ExplorationEditorMainTab = function() {
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
+    var stateContentEditor = stateEditorTag.element(stateContentEditorLocator);
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
