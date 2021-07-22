@@ -465,6 +465,8 @@ angular.module('oppia').directive('conversationSkin', [
               return false;
             }
             var interaction = $scope.displayedCard.getInteraction();
+            console.log(interaction)
+            console.log(INTERACTION_SPECS[interaction.id].is_linear)
             if (INTERACTION_SPECS[interaction.id].is_linear) {
               return false;
             }
@@ -521,6 +523,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           $scope.getExplorationLink = function() {
+            console.log($scope.recommendedExplorationSummaries)
             if ($scope.recommendedExplorationSummaries &&
                 $scope.recommendedExplorationSummaries[0]) {
               if (!$scope.recommendedExplorationSummaries[0].id) {
@@ -1175,6 +1178,8 @@ angular.module('oppia').directive('conversationSkin', [
             var conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
               !ExplorationPlayerStateService.isInQuestionMode());
+            console.log(conceptCardIsBeingShown)
+            console.log(PlayerTranscriptService.isLastCard(currentIndex))
             if (conceptCardIsBeingShown &&
                 PlayerTranscriptService.isLastCard(currentIndex)) {
               $scope.returnToExplorationAfterConceptCard();
