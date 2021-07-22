@@ -42,7 +42,7 @@ export class AdminRolesTabComponent implements OnInit {
   managedTopicIds = [];
   roleInUpdate = null;
   errorMessage = null;
-  changingBannedValue = false;
+  bannedStatusChangeInProgress = false;
   userIsBanned = false;
   roleIsCurrentlyBeingEdited = false;
 
@@ -126,9 +126,9 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   markUserBanned(): void {
-    this.changingBannedValue = true;
+    this.bannedStatusChangeInProgress = true;
     this.adminBackendApiService.markUserBannedAsync(this.username).then(() => {
-      this.changingBannedValue = false;
+      this.bannedStatusChangeInProgress = false;
       this.userIsBanned = true;
       this.userRoles = [];
     }, data => {
@@ -140,10 +140,10 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   unmarkUserBanned(): void {
-    this.changingBannedValue = true;
+    this.bannedStatusChangeInProgress = true;
     this.adminBackendApiService.unmarkUserBannedAsync(
       this.username).then(() => {
-      this.changingBannedValue = false;
+      this.bannedStatusChangeInProgress = false;
       this.userIsBanned = false;
       this.startEditing();
     }, data => {
@@ -162,7 +162,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.possibleRolesToAdd = [];
     this.managedTopicIds = [];
     this.roleInUpdate = null;
-    this.changingBannedValue = false;
+    this.bannedStatusChangeInProgress = false;
     this.userIsBanned = false;
     this.roleIsCurrentlyBeingEdited = false;
   }

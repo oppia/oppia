@@ -286,16 +286,13 @@ describe('Admin backend api service', () => {
 
   it('should add the role to the user given the name' +
     'when calling addUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
     let newRole = 'ADMIN';
     let username = 'validUser';
     let payload = {
       role: newRole,
       username: username,
-      topic_id: topicId
     };
-    abas.addUserRoleAsync(newRole, username, topicId)
-      .then(successHandler, failHandler);
+    abas.addUserRoleAsync(newRole, username).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminrolehandler');
     expect(req.request.method).toEqual('PUT');
@@ -312,16 +309,13 @@ describe('Admin backend api service', () => {
 
   it('should fail to add the role to user when user does' +
     'not exists when calling addUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
     let newRole = 'ADMIN';
     let username = 'InvalidUser';
     let payload = {
       role: newRole,
       username: username,
-      topic_id: topicId
     };
-    abas.addUserRoleAsync(newRole, username, topicId)
-      .then(successHandler, failHandler);
+    abas.addUserRoleAsync(newRole, username).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminrolehandler');
     expect(req.request.method).toEqual('PUT');

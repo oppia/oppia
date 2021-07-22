@@ -167,7 +167,7 @@ describe('Admin roles tab component ', function() {
   });
 
   describe('on unmarkUserBanned', function() {
-    it('should enable changingBannedValue', function() {
+    it('should enable bannedStatusChangeInProgress', function() {
       expect(component.roleIsCurrentlyBeingEdited).toBeFalse();
 
       component.startEditing();

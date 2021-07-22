@@ -35,8 +35,10 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Full exploration editor', function() {
+  var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -47,6 +49,7 @@ describe('Full exploration editor', function() {
   var explorationEditorSettingsTab = null;
 
   beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -221,6 +224,7 @@ describe('Full exploration editor', function() {
       'a refresher exploration ID', async function() {
     await users.createCollectionEditor('testadm@collections.com', 'testadm');
     await users.login('testadm@collections.com');
+    await adminPage.addRole('testadm', 'curriculum admin');
 
     // Create Parent Exploration not added to collection.
     await creatorDashboardPage.get();
