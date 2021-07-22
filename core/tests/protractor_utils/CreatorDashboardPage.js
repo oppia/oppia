@@ -56,6 +56,8 @@ var CreatorDashboardPage = function() {
     by.css('.protractor-test-exp-summary-row-rating'));
   var expSummaryRowViewsElements = element.all(
     by.css('.protractor-test-exp-summary-row-num-views'));
+  var expSummaryTileFeedbackElements = element.all(
+    by.css('.protractor-test-exp-summary-tile-open-feedback'));
   // Dashboard stat elements.
   var averageRating = element(by.css('.protractor-test-oppia-average-rating'));
   var totalPlays = element(by.css('.protractor-test-oppia-total-plays'));
