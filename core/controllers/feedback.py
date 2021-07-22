@@ -28,6 +28,28 @@ class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'subject': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'text': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
@@ -43,15 +65,8 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_create_feedback_thread
     def post(self, exploration_id):
-        subject = self.payload.get('subject')
-        if not subject:
-            raise self.InvalidInputException(
-                'A thread subject must be specified.')
-
-        text = self.payload.get('text')
-        if not text:
-            raise self.InvalidInputException(
-                'Text for the first message in the thread must be specified.')
+        subject = self.normalized_payload.get('subject')
+        text = self.normalized_payload.get('text')
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id, self.user_id,
@@ -63,6 +78,16 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
@@ -78,6 +103,35 @@ class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'thread_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'updated_status': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'text': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'updated_subject': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
@@ -99,11 +153,9 @@ class ThreadHandler(base.BaseHandler):
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
-        text = self.payload.get('text')
-        updated_status = self.payload.get('updated_status')
-        if not text and not updated_status:
-            raise self.InvalidInputException(
-                'Text for the message must be specified.')
+        text = self.normalized_payload.get('text')
+        updated_status = self.normalized_payload.get('updated_status')
+
         if suggestion and updated_status:
             raise self.InvalidInputException(
                 'Suggestion thread status cannot be changed manually.')
@@ -111,7 +163,7 @@ class ThreadHandler(base.BaseHandler):
         messages = feedback_services.get_messages(thread_id)
         new_message = feedback_services.create_message(
             thread_id, self.user_id, updated_status,
-            self.payload.get('updated_subject'), text)
+            self.normalized_payload.get('updated_subject'), text)
 
         # Currently we are manually adding new message to the messages list as
         # the feedback_services.get_messages is not returning a correct list of
@@ -131,10 +183,21 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_access_moderator_page
     def get(self):
-        urlsafe_start_cursor = self.request.get('cursor')
+        urlsafe_start_cursor = self.normalized_request.get('cursor')
 
         all_feedback_messages, new_urlsafe_start_cursor, more = (
             feedback_services.get_next_page_of_all_feedback_messages(
@@ -154,6 +217,16 @@ class FeedbackStatsHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
@@ -174,6 +247,17 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     viewed feedback messages from emails that might be sent in future to this
     user.
     """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'thread_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
 
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):

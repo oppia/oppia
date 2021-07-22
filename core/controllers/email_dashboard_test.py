@@ -132,7 +132,8 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
             self.get_html_response('/emaildashboard')
         with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
-            self.get_html_response('/querystatuscheck')
+            self.get_html_response(
+                '/querystatuscheck?query_id=%s' % 'random_query_id')
         self.logout()
 
     def test_that_exception_is_raised_for_invalid_input(self):
@@ -238,8 +239,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             '/emaildashboarddatahandler',
             params={'invalid_param_key': '2'},
             expected_status_int=400)
-        self.assertEqual(
-            response['error'], '400 Invalid input for query results.')
+
+        error_msg = (
+            'Missing key in handler args: num_queries_to_fetch.\n'
+            'Found extra args: [u\'invalid_param_key\'].')
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -293,9 +297,16 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             0)
 
         csrf_token = self.get_new_csrf_token()
-
+        params = {
+            'data': {
+                'email_body': 'random_email_body',
+                'email_subject': 'random_email_subject',
+                'email_intent': 'random_email_intent',
+                'max_recipients': 0
+            }
+        }
         response = self.post_json(
-            '/emaildashboardresult/%s' % 'invalid_query_id', {},
+            '/emaildashboardresult/%s' % 'invalid_query_id', params,
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(response['error'], '400 Invalid query id.')
         self.logout()
@@ -332,11 +343,18 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             0)
 
         csrf_token = self.get_new_csrf_token()
-
+        params = {
+            'data': {
+                'email_body': 'random_email_body',
+                'email_subject': 'random_email_subject',
+                'email_intent': 'random_email_intent',
+                'max_recipients': 0
+            }
+        }
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            '/emaildashboardresult/%s' % user_query_2_id, {},
+            '/emaildashboardresult/%s' % user_query_2_id, params,
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -441,10 +459,13 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             0)
 
         csrf_token = self.get_new_csrf_token()
-
+        params = {
+            'email_body': 'random_email_body',
+            'email_subject': 'random_email_subject'
+        }
         response = self.post_json(
-            '/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id', {},
-            csrf_token=csrf_token, expected_status_int=400)
+            '/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id',
+            params, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(response['error'], '400 Invalid query id.')
         self.logout()
 
@@ -479,12 +500,16 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             0)
 
         csrf_token = self.get_new_csrf_token()
+        params = {
+            'email_body': 'random_email_body',
+            'email_subject': 'random_email_subject'
+        }
 
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            '/emaildashboardtestbulkemailhandler/%s' % user_query_2_id, {},
-            csrf_token=csrf_token, expected_status_int=401)
+            '/emaildashboardtestbulkemailhandler/%s' % user_query_2_id,
+            params, csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
             '%s is not an authorized user for this query.'
@@ -539,7 +564,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                     'data': {
                         'email_subject': 'subject',
                         'email_body': 'body',
-                        'max_recipients': None,
+                        'max_recipients': 0,
                         'email_intent': 'bulk_email_marketing'
                     }}, csrf_token=csrf_token)
             self.logout()

@@ -17,9 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
@@ -29,6 +29,11 @@ import feconf
 
 class EmailDashboardPage(base.BaseHandler):
     """Page to submit query and show past queries."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_manage_email_dashboard
     def get(self):
@@ -66,20 +71,46 @@ class EmailDashboardDataHandler(base.BaseHandler):
     """Query data handler."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'num_queries_to_fetch': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        # The min_value ensures that the value is non-negative.
+                        'min_value': 0
+                    }]
+                }
+            }
+        },
+        'POST': {
+            'data': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': (
+                        domain_objects_validator.validate_email_dashboard_data)
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_manage_email_dashboard
     def get(self):
-        cursor = self.request.get('cursor')
-        num_queries_to_fetch = self.request.get('num_queries_to_fetch')
-
-        # num_queries_to_fetch should be convertible to int type and positive.
-        if not num_queries_to_fetch.isdigit():
-            raise self.InvalidInputException(
-                '400 Invalid input for query results.')
+        cursor = self.normalized_request.get('cursor')
+        num_queries_to_fetch = (
+            self.normalized_request.get('num_queries_to_fetch'))
 
         user_queries, next_cursor = (
             user_query_services.get_recent_user_queries(
-                int(num_queries_to_fetch), cursor))
+                num_queries_to_fetch, cursor))
 
         data = {
             'recent_queries': _generate_user_query_dicts(user_queries),
@@ -90,9 +121,8 @@ class EmailDashboardDataHandler(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def post(self):
         """Post handler for query."""
-        data = self.payload['data']
+        data = self.normalized_payload.get('data')
         kwargs = {key: data[key] for key in data if data[key] is not None}
-        self._validate(kwargs)
 
         user_query_id = user_query_services.save_new_user_query(
             self.user_id, kwargs)
@@ -110,25 +140,25 @@ class EmailDashboardDataHandler(base.BaseHandler):
         }
         self.render_json(data)
 
-    def _validate(self, data):
-        """Validator for data obtained from frontend."""
-        predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
-        possible_keys = [predicate['backend_attr'] for predicate in predicates]
-
-        for key, _ in data.items():
-            if key not in possible_keys:
-                # Raise exception if key is not one of the allowed keys.
-                raise self.InvalidInputException('400 Invalid input for query.')
-
 
 class QueryStatusCheckHandler(base.BaseHandler):
     """Handler for checking status of individual queries."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'query_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_manage_email_dashboard
     def get(self):
-        query_id = self.request.get('query_id')
+        query_id = self.normalized_request.get('query_id')
 
         user_query = user_query_services.get_user_query(query_id)
         if user_query is None:
@@ -142,6 +172,45 @@ class QueryStatusCheckHandler(base.BaseHandler):
 
 class EmailDashboardResultPage(base.BaseHandler):
     """Handler for email dashboard result page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'query_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'data': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'email_subject',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }, {
+                        'name': 'email_body',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }, {
+                        'name': 'email_intent',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }, {
+                        'name': 'max_recipients',
+                        'schema': {
+                            'type': 'int'
+                        }
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_manage_email_dashboard
     def get(self, query_id):
@@ -171,7 +240,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
-        data = self.payload['data']
+        data = self.normalized_payload.get('data')
         email_subject = data['email_subject']
         email_body = data['email_body']
         max_recipients = data['max_recipients']
@@ -183,6 +252,17 @@ class EmailDashboardResultPage(base.BaseHandler):
 
 class EmailDashboardCancelEmailHandler(base.BaseHandler):
     """Handler for not sending any emails using query result."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'query_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {}
+    }
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
@@ -207,6 +287,28 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
     qualfied users in bulk.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'query_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'email_subject': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'email_body': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
         user_query = user_query_services.get_user_query(query_id)
@@ -220,8 +322,8 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
-        email_subject = self.payload['email_subject']
-        email_body = self.payload['email_body']
+        email_subject = self.normalized_payload.get('email_subject')
+        email_body = self.normalized_payload.get('email_body')
         test_email_body = '[This is a test email.]<br><br> %s' % email_body
         email_manager.send_test_email_for_bulk_emails(
             user_query.submitter_id, email_subject, test_email_body)

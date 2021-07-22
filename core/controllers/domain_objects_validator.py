@@ -21,11 +21,13 @@ handler arguments.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 import python_utils
+
 
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
@@ -96,3 +98,21 @@ def validate_collection_change(obj):
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
     collection_domain.CollectionChange(obj)
+
+
+def validate_email_dashboard_data(data):
+    # type: (Dict[String, Any]) -> None
+    """Validates email dashboard data.
+
+    Args:
+        data: dict. Data that needs to be validated.
+    """
+    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    possible_keys = [predicate['backend_attr'] for predicate in predicates]
+
+    for key, _ in data.items():
+        if _ is None:
+            continue
+        if key not in possible_keys:
+            # Raise exception if key is not one of the allowed keys.
+            raise Exception('400 Invalid input for query.')
