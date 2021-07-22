@@ -22,7 +22,7 @@ import { TestBed } from '@angular/core/testing';
 
 describe('Blog Post update service', () => {
   let blogPostUpdateService: BlogPostUpdateService;
-  let sampleBlogPost: BlogPostData = null;
+  let sampleBlogPost: BlogPostData;
 
   beforeEach(() => {
     blogPostUpdateService = TestBed.inject(BlogPostUpdateService);
