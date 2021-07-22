@@ -368,7 +368,7 @@ describe('OutcomeEditorComponent', () => {
   });
 
   it('should set refresher exploration ID as null on saving destination' +
-    ' when state is not in self loop ', () => {
+    ' when state is not in self loop', () => {
     ctrl.savedOutcome = {
       feedback: {
         contentId: 'savedContentId',

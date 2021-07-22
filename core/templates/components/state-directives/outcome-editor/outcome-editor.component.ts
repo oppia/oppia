@@ -238,4 +238,4 @@ angular.module('oppia').component('outcomeEditor', {
       };
     }
   ]
-  });
+});
