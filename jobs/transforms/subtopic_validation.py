@@ -25,7 +25,7 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
 
 (subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic]) # type: ignore[no-untyped-call]
 
@@ -74,5 +74,3 @@ class ValidateSubtopicPageCommitLogEntryModel(
             return subtopic_page_domain.SubtopicPageChange
         else:
             return None
-
-# reveal_type(ValidateSubtopicPageCommitLogEntryModel())

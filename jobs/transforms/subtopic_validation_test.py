@@ -73,12 +73,13 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
-                invalid_commit_cmd_model,
-                {'invalid': 'data'},
-                'Missing cmd key in change dict')
-        ])
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
+                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                    invalid_commit_cmd_model,
+                    {'invalid': 'data'},
+                    'Missing cmd key in change dict')
+            ])
 
     def test_subtopic_page_change_object_with_invalid_cmd(self):
         # type: () -> None
@@ -99,12 +100,13 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
-                invalid_commit_cmd_model,
-                {'cmd': 'invalid'},
-                'Command invalid is not allowed')
-        ])
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
+                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                    invalid_commit_cmd_model,
+                    {'cmd': 'invalid'},
+                    'Command invalid is not allowed')
+            ])
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self):
         # type: () -> None
@@ -129,17 +131,18 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
-                invalid_commit_cmd_model,
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'property_name': '<p>page_contents_html</p>',
-                    'subtopic_id': 'subtopic_id'
-                },
-                'The following required attributes are missing: '
-                'new_value, old_value')
-        ])
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
+                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                    invalid_commit_cmd_model,
+                    {
+                        'cmd': 'update_subtopic_page_property',
+                        'property_name': '<p>page_contents_html</p>',
+                        'subtopic_id': 'subtopic_id'
+                    },
+                    'The following required attributes are missing: '
+                    'new_value, old_value')
+            ])
 
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self):
         # type: () -> None
@@ -165,17 +168,18 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
-                invalid_commit_cmd_model,
-                {
-                    'cmd': 'create_new',
-                    'topic_id': 'topic_id',
-                    'subtopic_id': 'subtopic_id',
-                    'invalid': 'invalid'
-                },
-                'The following extra attributes are present: invalid')
-        ])
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
+                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                    invalid_commit_cmd_model,
+                    {
+                        'cmd': 'create_new',
+                        'topic_id': 'topic_id',
+                        'subtopic_id': 'subtopic_id',
+                        'invalid': 'invalid'
+                    },
+                    'The following extra attributes are present: invalid')
+            ])
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
             self):
@@ -203,19 +207,20 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
-                invalid_commit_cmd_model,
-                {
-                    'cmd': 'update_subtopic_page_property',
-                    'subtopic_id': 'subtopic_id',
-                    'property_name': 'invalid',
-                    'old_value': 'old_value',
-                    'new_value': 'new_value',
-                },
-                'Value for property_name in cmd update_subtopic_page_property: '
-                'invalid is not allowed')
-        ])
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
+                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                    invalid_commit_cmd_model,
+                    {
+                        'cmd': 'update_subtopic_page_property',
+                        'subtopic_id': 'subtopic_id',
+                        'property_name': 'invalid',
+                        'old_value': 'old_value',
+                        'new_value': 'new_value',
+                    },
+                    'Value for property_name in cmd '
+                    'update_subtopic_page_property: invalid is not allowed')
+            ])
 
 
 class ValidateSubtopicPageCommitLogEntryModelTests(
@@ -268,6 +273,8 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
                 ))
         )
 
-        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
-            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model) # type: ignore[no-untyped-call]
-        ])
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+            output, [
+                base_validation_errors.CommitCmdsNoneError( # type: ignore[no-untyped-call]
+                    invalid_commit_cmd_model)
+            ])
