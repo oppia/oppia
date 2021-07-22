@@ -19,8 +19,6 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -28,6 +26,7 @@ import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { LogoutPageRootComponent } from './logout-page-root.component';
 
 @NgModule({
   imports: [
@@ -38,9 +37,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     LogoutPageComponent,
+    LogoutPageRootComponent
   ],
   entryComponents: [
     LogoutPageComponent,
+    LogoutPageRootComponent,
   ],
   providers: [
     {
@@ -55,18 +56,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       multi: true,
     },
   ],
+  bootstrap: [LogoutPageRootComponent]
 })
-class LogoutPageModule {
-  ngDoBootstrap() {}
-}
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(
-  downgradeModule(async(providers) => {
-    return platformBrowserDynamic(providers).bootstrapModule(LogoutPageModule);
-  }));
-
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}) as angular.IDirectiveFactory);
+export class LogoutPageModule {}

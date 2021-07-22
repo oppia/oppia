@@ -16,20 +16,18 @@
  * @fileoverview Module for the participation playbook page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { PlaybookPageComponent } from './playbook.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { PlaybookPageRootComponent } from './playbook-page-root.component';
 
 @NgModule({
   imports: [
@@ -40,9 +38,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   declarations: [
     PlaybookPageComponent,
+    PlaybookPageRootComponent
   ],
   entryComponents: [
     PlaybookPageComponent,
+    PlaybookPageRootComponent,
   ],
   providers: [
     {
@@ -56,30 +56,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
+  bootstrap: [PlaybookPageRootComponent]
 })
-class PlaybookPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(PlaybookPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class PlaybookPageModule {}
