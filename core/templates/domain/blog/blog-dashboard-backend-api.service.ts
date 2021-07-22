@@ -33,7 +33,7 @@ interface BlogDashboardBackendResponse {
 }
 
 interface NewBlogPostBackendResponse {
-  'blog_post_id': string
+  'blog_post_id': string;
 }
 export interface BlogDashboardData {
   username: string;
@@ -41,14 +41,13 @@ export interface BlogDashboardData {
   numOfPublishedBlogPosts: number;
   numOfDraftBlogPosts: number;
   publishedBlogPostSummaryDicts: BlogPostSummary[];
-  draftBlogPostSummaryDicts: BlogPostSummary[]
+  draftBlogPostSummaryDicts: BlogPostSummary[];
 }
 @Injectable({
   providedIn: 'root'
 })
 export class BlogDashboardBackendApiService {
-  constructor(
-    private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   async fetchBlogDashboardDataAsync(): Promise<BlogDashboardData> {
     return new Promise((resolve, reject) => {

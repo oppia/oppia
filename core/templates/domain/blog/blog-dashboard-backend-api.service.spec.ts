@@ -21,12 +21,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Blog Dashboard backend api service', () => {
   let bdbas: BlogDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
   let successHandler = null;
   let failHandler = null;
   let blogDashboardBackendResponse = {
@@ -67,13 +65,8 @@ describe('Blog Dashboard backend api service', () => {
 
     bdbas = TestBed.inject(BlogDashboardBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
-
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
-      return Promise.resolve('sample-csrf-token');
-    });
   });
 
   afterEach(() => {

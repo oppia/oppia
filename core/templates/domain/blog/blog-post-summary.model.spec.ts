@@ -45,14 +45,14 @@ describe('Blog post summary object factory', () => {
     sampleSummary = BlogPostSummary.createFromBackendDict(
       sampleSummaryBackendObject);
 
-    expect(sampleSummary.getId()).toEqual('sampleId');
-    expect(sampleSummary.getAuthorUsername()).toEqual('test_user');
-    expect(sampleSummary.getTitle()).toEqual('Title');
-    expect(sampleSummary.getTags()).toEqual(['news']);
-    expect(sampleSummary.getSummary()).toEqual('Hello World');
-    expect(sampleSummary.getUrlFragment()).toEqual('title');
-    expect(sampleSummary.getLastUpdated()).toEqual(3232323);
-    expect(sampleSummary.getPublishedOn()).toEqual(3232323);
-    expect(sampleSummary.getThumbnailFilename()).toEqual('image.png');
+    expect(sampleSummary.Id).toEqual('sampleId');
+    expect(sampleSummary.AuthorUsername).toEqual('test_user');
+    expect(sampleSummary.Title).toEqual('Title');
+    expect(sampleSummary.Tags).toEqual(['news']);
+    expect(sampleSummary.Summary).toEqual('Hello World');
+    expect(sampleSummary.UrlFragment).toEqual('title');
+    expect(sampleSummary.LastUpdated).toEqual(3232323);
+    expect(sampleSummary.PublishedOn).toEqual(3232323);
+    expect(sampleSummary.ThumbnailFilename).toEqual('image.png');
   });
 });

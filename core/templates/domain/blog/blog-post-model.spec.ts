@@ -13,18 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for BlogPostObjectFactory.
+ * @fileoverview Tests for blog post model.
  */
-import { TestBed } from '@angular/core/testing';
-
-import { BlogPostData, BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
+import { BlogPostData } from 'domain/blog/blog-post-model';
 
 describe('Blog Post Object Factory', () => {
-  let blogPostObjectFactory: BlogPostObjectFactory;
-  let _sampleBlogPostData: BlogPostData = null;
+  let sampleBlogPostData: BlogPostData;
 
   beforeEach(() => {
-    blogPostObjectFactory = TestBed.inject(BlogPostObjectFactory);
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
       author_username: 'testUsername',
@@ -36,19 +32,19 @@ describe('Blog Post Object Factory', () => {
       last_updated: 3454354354,
       published_on: 3454354354,
     };
-    _sampleBlogPostData = blogPostObjectFactory.createFromBackendDict(
+    sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
   });
 
   it('should not find issues with a valid blog post', () => {
-    expect(_sampleBlogPostData.validate()).toEqual([]);
+    expect(sampleBlogPostData.validate()).toEqual([]);
   });
 
   it('should raise correct validation issues', () => {
-    _sampleBlogPostData.setTitle('');
-    _sampleBlogPostData.setContent('');
+    sampleBlogPostData.Title = '';
+    sampleBlogPostData.Content = '';
 
-    expect(_sampleBlogPostData.validate()).toEqual([
+    expect(sampleBlogPostData.validate()).toEqual([
       'Blog Post title should not be empty.',
       'Blog Post content should not be empty.'
     ]);
@@ -56,18 +52,18 @@ describe('Blog Post Object Factory', () => {
 
   it('should not find issues with a valid publishable blog post', () => {
     let maxTags = 2;
-    expect(_sampleBlogPostData.prepublishValidate(maxTags)).toEqual([]);
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([]);
   });
 
   it('should raise correct validation issues for pre publish' +
   'validation', () => {
-    _sampleBlogPostData.setTitle('');
-    _sampleBlogPostData.setContent('');
-    _sampleBlogPostData.removeTag('news');
-    _sampleBlogPostData.setThumbnailFilename(null);
+    sampleBlogPostData.Title = '';
+    sampleBlogPostData.Content = '';
+    sampleBlogPostData.removeTag('news');
+    sampleBlogPostData.ThumbnailFilename = null;
     let maxTags = 2;
 
-    expect(_sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
       'Blog Post title should not be empty.',
       'Blog Post should have a thumbnail.',
       'Blog Post should have atleast one tag linked to it.',
@@ -77,31 +73,30 @@ describe('Blog Post Object Factory', () => {
 
   it('should raise correct validation issues for' +
   'exceeding property limits', () => {
-    _sampleBlogPostData.addTag('Learner');
-    _sampleBlogPostData.setTitle(
-      'Title exceeding character limit of 40 characters should' +
-      'raise error.');
+    sampleBlogPostData.addTag('Learner');
+    sampleBlogPostData.Title = 'Title exceeding character limit of 40' +
+      ' characters should raise error.';
     let maxTags = 1;
 
-    expect(_sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
+    expect(sampleBlogPostData.prepublishValidate(maxTags)).toEqual([
       'Blog Post title should not exceed 40 characters.',
       'Blog Post should atmost have 1 tag(s) linked to it.'
     ]);
   });
 
   it('should be able to create an interstitial blog post object', () => {
-    let blogPost = blogPostObjectFactory.createInterstitialBlogPost();
-    expect(blogPost.getId()).toEqual(null);
-    expect(blogPost.getAuthorUsername()).toEqual('loading');
-    expect(blogPost.getTitle()).toEqual('Blog Post Title loading');
-    expect(blogPost.getContent()).toEqual('');
-    expect(blogPost.getTags()).toEqual([]);
-    expect(blogPost.getThumbnailFilename()).toEqual(null);
-    expect(blogPost.getUrlFragment()).toEqual('Url Fragment loading');
+    let blogPost = BlogPostData.createInterstitialBlogPost();
+    expect(blogPost.Id).toEqual(null);
+    expect(blogPost.AuthorUsername).toEqual('loading');
+    expect(blogPost.Title).toEqual('Blog Post Title loading');
+    expect(blogPost.Content).toEqual('');
+    expect(blogPost.Tags).toEqual([]);
+    expect(blogPost.ThumbnailFilename).toEqual(null);
+    expect(blogPost.UrlFragment).toEqual('Url Fragment loading');
   });
 
   it('should return correct property values', () => {
-    expect(_sampleBlogPostData.getLastUpdated()).toEqual(3454354354);
-    expect(_sampleBlogPostData.getPublishedOn()).toEqual(3454354354);
+    expect(sampleBlogPostData.LastUpdated).toEqual(3454354354);
+    expect(sampleBlogPostData.PublishedOn).toEqual(3454354354);
   });
 });

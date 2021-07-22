@@ -17,16 +17,14 @@
  */
 
 import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
-import { BlogPostData, BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
+import { BlogPostData } from 'domain/blog/blog-post-model';
 import { TestBed } from '@angular/core/testing';
 
 describe('Blog Post update service', () => {
   let blogPostUpdateService: BlogPostUpdateService;
-  let blogPostObjectFactory: BlogPostObjectFactory;
   let sampleBlogPost: BlogPostData = null;
 
   beforeEach(() => {
-    blogPostObjectFactory = TestBed.inject(BlogPostObjectFactory);
     blogPostUpdateService = TestBed.inject(BlogPostUpdateService);
     let sampleBlogPostBackendDict = {
       id: 'sampleId',
@@ -39,7 +37,7 @@ describe('Blog Post update service', () => {
       last_updated: 3454354354,
       published_on: 3454354354,
     };
-    sampleBlogPost = blogPostObjectFactory.createFromBackendDict(
+    sampleBlogPost = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
   });
 
@@ -48,11 +46,11 @@ describe('Blog Post update service', () => {
       let expectedChangeDict = {
         title: 'story'
       };
-      expect(sampleBlogPost.getTitle()).toEqual('sampleTitle');
+      expect(sampleBlogPost.Title).toEqual('sampleTitle');
 
       blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
 
-      expect(sampleBlogPost.getTitle()).toEqual('story');
+      expect(sampleBlogPost.Title).toEqual('story');
       expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
         expectedChangeDict);
     });
@@ -68,27 +66,27 @@ describe('Blog Post update service', () => {
       thumbnail_filename: 'sample_image'
     };
 
-    expect(sampleBlogPost.getThumbnailFilename()).toEqual('image');
+    expect(sampleBlogPost.ThumbnailFilename).toEqual('image');
 
     blogPostUpdateService.setBlogPostThumbnail(sampleBlogPost, image);
 
-    expect(sampleBlogPost.getThumbnailFilename()).toEqual('sample_image');
+    expect(sampleBlogPost.ThumbnailFilename).toEqual('sample_image');
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       expectedChangeDict);
   });
 
   it('should update the blog post tags and add the change', () => {
-    expect(sampleBlogPost.getTags()).toEqual(['news']);
+    expect(sampleBlogPost.Tags).toEqual(['news']);
 
     blogPostUpdateService.addBlogPostTag(sampleBlogPost, 'learners');
 
-    expect(sampleBlogPost.getTags()).toEqual(['news', 'learners']);
+    expect(sampleBlogPost.Tags).toEqual(['news', 'learners']);
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       { tags: ['news', 'learners'] });
 
     blogPostUpdateService.removeBlogPostTag(sampleBlogPost, 'learners');
 
-    expect(sampleBlogPost.getTags()).toEqual(['news']);
+    expect(sampleBlogPost.Tags).toEqual(['news']);
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       { tags: ['news']});
   });
@@ -98,12 +96,12 @@ describe('Blog Post update service', () => {
       let expectedChangeDict = {
         content: '<p>Hello World</p>'
       };
-      expect(sampleBlogPost.getContent()).toEqual('<p>Hello</p>');
+      expect(sampleBlogPost.Content).toEqual('<p>Hello</p>');
 
       blogPostUpdateService.setBlogPostContent(
         sampleBlogPost, '<p>Hello World</p>');
 
-      expect(sampleBlogPost.getContent()).toEqual('<p>Hello World</p>');
+      expect(sampleBlogPost.Content).toEqual('<p>Hello World</p>');
       expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
         expectedChangeDict);
     });

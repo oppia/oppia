@@ -18,15 +18,15 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { BlogPostBackendDict, BlogPostData, BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
+import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post-model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClient } from '@angular/common/http';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostChangeDict } from 'domain/blog/blog-post-update.service';
 
 interface ImageData {
-  filename: string,
-  imageBlob: Blob
+  filename: string;
+  imageBlob: Blob;
 }
 
 interface BlogPostUpdateBackendDict {
@@ -34,7 +34,7 @@ interface BlogPostUpdateBackendDict {
 }
 
 interface BlogPostUpdatedData {
-  blogPostDict: BlogPostData
+  blogPostDict: BlogPostData;
 }
 
 interface DeleteBlogPostBackendResponse {
@@ -63,7 +63,6 @@ export interface BlogPostEditorData {
 export class BlogPostEditorBackendApiService {
   constructor(
     private http: HttpClient,
-    private blogPostObjectFactory: BlogPostObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
@@ -79,7 +78,7 @@ export class BlogPostEditorBackendApiService {
         (response) => {
           resolve({
             username: response.username,
-            blogPostDict: this.blogPostObjectFactory.createFromBackendDict(
+            blogPostDict: BlogPostData.createFromBackendDict(
               response.blog_post_dict),
             maxNumOfTags: response.max_no_of_tags,
             profilePictureDataUrl: response.profile_picture_data_url,
@@ -126,7 +125,7 @@ export class BlogPostEditorBackendApiService {
       this.http.put<BlogPostUpdateBackendDict>(
         blogPostDataUrl, putData).toPromise().then(response => {
         resolve({
-          blogPostDict: this.blogPostObjectFactory.createFromBackendDict(
+          blogPostDict: BlogPostData.createFromBackendDict(
             response.blog_post)
         });
       }, errorResponse => {

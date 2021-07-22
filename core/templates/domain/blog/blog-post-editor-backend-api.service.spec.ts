@@ -19,12 +19,11 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from './blog-post-editor-backend-api.service';
-import { BlogPostObjectFactory } from 'domain/blog/BlogPostObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { BlogPostData } from 'domain/blog/blog-post-model';
 
 describe('Blog Post Editor backend api service', () => {
   let bpebas: BlogPostEditorBackendApiService;
-  let blogPostObjectFactory: BlogPostObjectFactory;
   let httpTestingController: HttpTestingController;
   let blogPostEditorDataObject: BlogPostEditorData;
   let csrfService: CsrfTokenService = null;
@@ -58,7 +57,6 @@ describe('Blog Post Editor backend api service', () => {
       imports: [HttpClientTestingModule]
     });
     bpebas = TestBed.inject(BlogPostEditorBackendApiService);
-    blogPostObjectFactory = TestBed.inject(BlogPostObjectFactory);
     httpTestingController = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
@@ -69,7 +67,7 @@ describe('Blog Post Editor backend api service', () => {
         blogPostEditorBackendResponse.profile_picture_data_url),
       maxNumOfTags: blogPostEditorBackendResponse.max_no_of_tags,
       listOfDefaulTags: blogPostEditorBackendResponse.list_of_default_tags,
-      blogPostDict: blogPostObjectFactory.createFromBackendDict(
+      blogPostDict: BlogPostData.createFromBackendDict(
         blogPostEditorBackendResponse.blog_post_dict)
     };
     spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
@@ -162,7 +160,7 @@ describe('Blog Post Editor backend api service', () => {
       };
       blogPostEditorBackendResponse.blog_post_dict.title = changeDict.title;
       blogPostEditorBackendResponse.blog_post_dict.content = changeDict.content;
-      let updatedBlogPost = blogPostObjectFactory.createFromBackendDict(
+      let updatedBlogPost = BlogPostData.createFromBackendDict(
         blogPostEditorBackendResponse.blog_post_dict);
 
       bpebas.updateBlogPostDataAsync(

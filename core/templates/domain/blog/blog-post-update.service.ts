@@ -16,19 +16,19 @@
  * @fileoverview Service to handle the updating of a blog post.
  */
 import { Injectable } from '@angular/core';
-import { BlogPostData } from 'domain/blog/BlogPostObjectFactory';
+import { BlogPostData } from 'domain/blog/blog-post-model';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface BlogPostChangeDict {
-  'title'?: string,
-  'thumbnail_filename'?: string,
-  'content'?: string,
-  'tags'?: string[],
+  'title'?: string;
+  'thumbnail_filename'?: string;
+  'content'?: string;
+  'tags'?: string[];
 }
 
 interface ImageData {
-  filename: string,
-  imageBlob: Blob
+  filename: string;
+  imageBlob: Blob;
 }
 
 @Injectable({
@@ -36,31 +36,30 @@ interface ImageData {
 })
 export class BlogPostUpdateService {
   changeDict: BlogPostChangeDict = {};
-  constructor() {}
 
   setBlogPostTitle(blogPost: BlogPostData, title: string): void {
-    blogPost.setTitle(title);
+    blogPost.Title = title;
     this.changeDict.title = title;
   }
 
   setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
     let filename = image[0].filename;
-    blogPost.setThumbnailFilename(filename);
+    blogPost.ThumbnailFilename = filename;
     this.changeDict.thumbnail_filename = filename;
   }
 
   addBlogPostTag(blogPost: BlogPostData, tag: string): void {
     blogPost.addTag(tag);
-    this.changeDict.tags = blogPost.getTags();
+    this.changeDict.tags = blogPost.Tags;
   }
 
   removeBlogPostTag(blogPost: BlogPostData, tag: string): void {
     blogPost.removeTag(tag);
-    this.changeDict.tags = blogPost.getTags();
+    this.changeDict.tags = blogPost.Tags;
   }
 
   setBlogPostContent(blogPost: BlogPostData, content: string): void {
-    blogPost.setContent(content);
+    blogPost.Content = content;
     this.changeDict.content = content;
   }
 

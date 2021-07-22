@@ -13,14 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * blog post domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 export interface BlogPostBackendDict {
   'id': string ;
   'author_username': string;
@@ -63,31 +60,31 @@ export class BlogPostData {
     this._publishedOn = publishedOn;
   }
 
-  getId(): string | null {
+  get Id(): string | null {
     return this._id;
   }
 
-  getAuthorUsername(): string {
+  get AuthorUsername(): string {
     return this._authorUsername;
   }
 
-  getLastUpdated(): number | undefined {
+  get LastUpdated(): number | undefined {
     return this._lastUpdated;
   }
 
-  getPublishedOn(): number | undefined {
+  get PublishedOn(): number | undefined {
     return this._publishedOn;
   }
 
-  setTitle(title: string): void {
+  set Title(title: string) {
     this._title = title;
   }
 
-  getTitle(): string {
+  get Title(): string {
     return this._title;
   }
 
-  getTags(): string[] {
+  get Tags(): string[] {
     return this._tags.slice();
   }
 
@@ -100,28 +97,28 @@ export class BlogPostData {
     this._tags.splice(index, 1);
   }
 
-  getUrlFragment(): string {
+  get UrlFragment(): string {
     return this._urlFragment;
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  set ThumbnailFilename(thumbnailFilename: string) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string | null {
+  get ThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
-  getContent(): string {
+  get Content(): string {
     return this._content;
   }
 
-  setContent(content: string): void {
+  set Content(content: string) {
     this._content = content;
   }
 
   validate(): string[] {
-    var issues = [];
+    let issues = [];
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
@@ -134,15 +131,15 @@ export class BlogPostData {
   }
 
   prepublishValidate(maxTags: number): string[] {
-    var issues = [];
+    let issues = [];
     if (this._title === '') {
       issues.push(
         'Blog Post title should not be empty.');
     }
-    if (this._title.length > constants.MAX_CHARS_IN_BLOG_POST_TITLE) {
+    if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +
-        `${constants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (!this._thumbnailFilename) {
@@ -163,15 +160,7 @@ export class BlogPostData {
     }
     return issues;
   }
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class BlogPostObjectFactory {
-  constructor() {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
       blogPostBackendDict: BlogPostBackendDict): BlogPostData {
     return new BlogPostData (
       blogPostBackendDict.id,
@@ -187,12 +176,10 @@ export class BlogPostObjectFactory {
 
   // Create an interstitial blog post that would be displayed in the editor
   // until the actual blog post is fetched from the backend.
-  createInterstitialBlogPost(): BlogPostData {
+  static createInterstitialBlogPost(): BlogPostData {
     return new BlogPostData (
       null, 'loading', 'Blog Post Title loading', '', [],
       null, 'Url Fragment loading'
     );
   }
 }
-angular.module('oppia').factory('BlogPostObjectFactory',
-  downgradeInjectable(BlogPostObjectFactory));
