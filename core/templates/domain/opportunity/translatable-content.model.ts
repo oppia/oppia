@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file is using templateUrl which is not allowed.
+ * @fileoverview Frontend Model for translatable item.
  */
 
-import { Component } from '@angular/core';
+export interface TranslatableItemBackendDict {
+  'content': string,
+  'data_format': string
+}
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html', // Use of templateUrl is not allowed.
-  styleUrls: ['./app.component.css']
-})
+export class TranslatableItem {
+  constructor(
+      public content: string,
+      public dataFormat: string
+  ) {}
 
-export class AppComponent {
-  name='Name';
-  title = 'angular programming.';
+  static createFromBackendDict(
+      backendDict: TranslatableItemBackendDict): TranslatableItem {
+    return new TranslatableItem(backendDict.content, backendDict.data_format);
+  }
 }

@@ -51,7 +51,8 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(
-            '<oppia-profile-page></oppia-profile-page>', response.body)
+            '<oppia-profile-page-root></oppia-profile-page-root>',
+            response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -1277,6 +1278,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
+            'role': 'EXPLORATION_EDITOR',
             'is_moderator': False,
             'is_admin': False,
             'is_topic_manager': False,

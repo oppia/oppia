@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file contain relative import which is not allowed.
+ * @fileoverview Root component for Preferences Page.
  */
 
-var forms = require('../protractor_utils/forms.js');
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'oppia-preferences-page-root',
+  templateUrl: './preferences-page-root.component.html'
+})
+export class PreferencesPageRootComponent {}

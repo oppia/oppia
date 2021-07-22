@@ -21,61 +21,26 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AdminBackendApiService, RoleToActionsBackendResponse, UserRolesBackendResponse } from 'domain/admin/admin-backend-api.service';
 import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { AdminDataService } from '../services/admin-data.service';
 import { AdminTaskManagerService } from '../services/admin-task-manager.service';
 
 export interface ViewUserRolesAction {
-    filterCriterion: string;
-    role: string;
-    username: string;
-    isValid: () => boolean;
+  filterCriterion: string;
+  role: string;
+  username: string;
+  isValid: () => boolean;
 }
 
 export interface UpdateRoleAction {
-    newRole: string;
-    username: string;
-    topicId: string;
-    isValid: () => boolean;
-}
-
-export interface ViewContributionReviewersAction {
-  category: string;
-  filterCriterion: string;
-  isValid: () => boolean;
-  languageCode: string;
+  newRole: string;
   username: string;
-}
-
-export interface AddContributionRightsAction {
-  category: string;
+  topicId: string;
   isValid: () => boolean;
-  languageCode: string;
-  username: string;
-}
-
-export interface RemoveContributionRightsAction {
-  category: string;
-  isValid: () => boolean;
-  languageCode: string;
-  method: string;
-  username: string
 }
 
 export interface AdminRolesFormData {
   viewUserRoles: ViewUserRolesAction;
   updateRole: UpdateRoleAction;
-  viewContributionReviewers: ViewContributionReviewersAction;
-  addContributionReviewer: AddContributionRightsAction;
-  removeContributionReviewer: RemoveContributionRightsAction;
-}
-
-export interface ContributionReviewersResult {
-  usernames: string[] | null;
-  translationLanguages: string[];
-  voiceoverLanguages: string[];
-  questions: boolean | null;
-  'can_submit_questions': boolean | null;
 }
 
 @Component({
@@ -86,50 +51,24 @@ export class AdminRolesTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
   userRolesResult: UserRolesBackendResponse = null;
   resultRolesVisible: boolean = false;
-  languageCodesAndDescriptions: { id: string; description: string; }[];
-  contributionReviewersResult: ContributionReviewersResult = null;
-  contributionReviewersDataFetched: boolean = false;
   topicSummaries: CreatorTopicSummary[] = null;
   roleToActions: RoleToActionsBackendResponse = null;
   formData: AdminRolesFormData;
-  ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
-    AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-  ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
-    AppConstants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
+
   USER_FILTER_CRITERION_USERNAME = AppConstants.USER_FILTER_CRITERION_USERNAME;
   USER_FILTER_CRITERION_ROLE = AppConstants.USER_FILTER_CRITERION_ROLE;
   UPDATABLE_ROLES: UserRolesBackendResponse = {};
   VIEWABLE_ROLES: UserRolesBackendResponse = {};
-  CONTRIBUTION_RIGHT_CATEGORIES = {
-    REVIEW_TRANSLATION: (
-      AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION),
-    REVIEW_VOICEOVER: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-    REVIEW_QUESTION: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-    SUBMIT_QUESTION: AppConstants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-  };
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
     private adminDataService: AdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private languageUtilService: LanguageUtilService,
   ) {}
 
   ngOnInit(): void {
     this.refreshFormData();
     this.setStatusMessage.emit('');
-
-    this.languageCodesAndDescriptions = (
-      this.languageUtilService.getAllVoiceoverLanguageCodes().map(
-        (languageCode) => {
-          return {
-            id: languageCode,
-            description: (
-              this.languageUtilService.getAudioLanguageDescription(
-                languageCode))
-          };
-        }));
-
     this.adminDataService.getDataAsync().then((adminDataObject) => {
       this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
       this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
@@ -140,24 +79,6 @@ export class AdminRolesTabComponent {
 
   handleErrorResponse(errorResponse: string): void {
     this.setStatusMessage.emit('Server error: ' + errorResponse);
-  }
-
-  getLanguageDescriptions(languageCodes: string[]): string[] {
-    let languageDescriptions = [];
-    languageCodes.forEach((languageCode) => {
-      languageDescriptions.push(
-        this.languageUtilService.getAudioLanguageDescription(
-          languageCode));
-    });
-    return languageDescriptions;
-  }
-
-  isLanguageSpecificReviewCategory(reviewCategory: string): boolean {
-    return (
-      reviewCategory ===
-      AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
-      reviewCategory ===
-      AppConstants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
   }
 
   submitRoleViewForm(formResponse: ViewUserRolesAction): void {
@@ -204,98 +125,7 @@ export class AdminRolesTabComponent {
     this.adminTaskManagerService.finishTask();
   }
 
-  submitAddContributionRightsForm(
-      formResponse: AddContributionRightsAction): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    this.setStatusMessage.emit('Adding new reviewer...');
-    this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.addContributionReviewerAsync(
-      formResponse.category, formResponse.username,
-      formResponse.languageCode
-    ).then(() => {
-      this.setStatusMessage.emit(
-        'Successfully added "' + formResponse.username + '" as ' +
-        formResponse.category + ' reviewer.');
-      this.refreshFormData();
-    }, this.handleErrorResponse.bind(this));
-    this.adminTaskManagerService.finishTask();
-  }
-
-  submitViewContributorUsersForm(
-      formResponse: ViewContributionReviewersAction): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    this.setStatusMessage.emit('Processing query...');
-    this.adminTaskManagerService.startTask();
-    this.contributionReviewersResult = {
-      usernames: null,
-      translationLanguages: [],
-      voiceoverLanguages: [],
-      questions: null,
-      can_submit_questions: null
-    };
-    if (formResponse.filterCriterion ===
-      AppConstants.USER_FILTER_CRITERION_ROLE) {
-      this.adminBackendApiService.viewContributionReviewersAsync(
-        formResponse.category, formResponse.languageCode
-      ).then((usersObject) => {
-        this.contributionReviewersResult.usernames = (
-          usersObject.usernames);
-        if (this.contributionReviewersResult.usernames.length === 0) {
-          this.contributionReviewersDataFetched = false;
-          this.setStatusMessage.emit('No results.');
-        } else {
-          this.contributionReviewersDataFetched = true;
-          this.setStatusMessage.emit('Success.');
-        }
-        this.refreshFormData();
-      }, this.handleErrorResponse.bind(this));
-    } else {
-      let translationLanguages = [];
-      let voiceoverLanguages = [];
-      this.adminBackendApiService.contributionReviewerRightsAsync(
-        formResponse.username
-      ).then((contributionRights) => {
-        translationLanguages = this.getLanguageDescriptions(
-          contributionRights.can_review_translation_for_language_codes);
-        voiceoverLanguages = this.getLanguageDescriptions(
-          contributionRights.can_review_voiceover_for_language_codes);
-        this.contributionReviewersResult = {
-          usernames: null,
-          translationLanguages: translationLanguages,
-          voiceoverLanguages: voiceoverLanguages,
-          questions: contributionRights.can_review_questions,
-          can_submit_questions: contributionRights.can_submit_questions
-        };
-        this.contributionReviewersDataFetched = true;
-        this.setStatusMessage.emit('Success.');
-      }, this.handleErrorResponse.bind(this));
-    }
-    this.adminTaskManagerService.finishTask();
-  }
-
-  submitRemoveContributionRightsForm(
-      formResponse: RemoveContributionRightsAction): void {
-    if (this.adminTaskManagerService.isTaskRunning()) {
-      return;
-    }
-    this.setStatusMessage.emit('Processing query...');
-    this.adminTaskManagerService.startTask();
-    this.adminBackendApiService.removeContributionReviewerAsync(
-      formResponse.username, formResponse.method,
-      formResponse.category, formResponse.languageCode
-    ).then(() => {
-      this.setStatusMessage.emit('Success.');
-      this.refreshFormData();
-    }, this.handleErrorResponse.bind(this));
-    this.adminTaskManagerService.finishTask();
-  }
-
   refreshFormData(): void {
-    let that = this;
     this.formData = {
       viewUserRoles: {
         filterCriterion: AppConstants.USER_FILTER_CRITERION_ROLE,
@@ -325,77 +155,13 @@ export class AdminRolesTabComponent {
           }
           return false;
         }
-      },
-      viewContributionReviewers: {
-        filterCriterion: AppConstants.USER_FILTER_CRITERION_ROLE,
-        username: '',
-        category: null,
-        languageCode: null,
-        isValid: function() {
-          if (this.filterCriterion ===
-            AppConstants.USER_FILTER_CRITERION_ROLE) {
-            if (this.category === null) {
-              return false;
-            }
-            if (that.isLanguageSpecificReviewCategory(this.category)) {
-              return Boolean(this.languageCode);
-            }
-            return true;
-          }
-
-          if (this.filterCriterion ===
-            AppConstants.USER_FILTER_CRITERION_USERNAME) {
-            return Boolean(this.username);
-          }
-        }
-      },
-      addContributionReviewer: {
-        username: '',
-        category: null,
-        languageCode: null,
-        isValid: function() {
-          if (this.username === '') {
-            return false;
-          }
-          if (this.category === null) {
-            return false;
-          }
-          if (that.isLanguageSpecificReviewCategory(this.category)) {
-            return Boolean(this.languageCode);
-          }
-          return true;
-        }
-      },
-      removeContributionReviewer: {
-        username: '',
-        method: AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-        category: null,
-        languageCode: null,
-        isValid: function() {
-          if (this.username === '') {
-            return false;
-          }
-          if (this.method === AppConstants.ACTION_REMOVE_ALL_REVIEW_RIGHTS) {
-            return Boolean(this.username);
-          } else {
-            if (this.category === null) {
-              return false;
-            }
-            if (that.isLanguageSpecificReviewCategory(this.category)) {
-              return Boolean(this.languageCode);
-            }
-            return true;
-          }
-        }
       }
     };
   }
 
   clearResults(): void {
-    this.contributionReviewersDataFetched = false;
     this.resultRolesVisible = false;
     this.userRolesResult = {};
-    this.contributionReviewersResult = null;
   }
 }
 
