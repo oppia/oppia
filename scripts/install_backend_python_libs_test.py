@@ -164,7 +164,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_wrong_pip_version_raises_import_error(self):
         import pip
 
-        with self.swap_Popen, self.swap(pip, '__version__', '21.1.3'):
+        with self.swap_Popen, self.swap(pip, '__version__', '21.1.0'):
             install_backend_python_libs.verify_pip_is_installed()
 
         self.assertEqual(self.cmd_token_list, [

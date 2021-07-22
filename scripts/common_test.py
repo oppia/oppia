@@ -777,7 +777,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
 
-    def test_write_stdout_safe_with_repeat_oserror(self):
+    def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self):
 
         raised_once = False
 
@@ -791,7 +791,15 @@ class CommonTests(test_utils.GenericTestBase):
 
             return 4
 
-        write_swap = self.swap_with_checks(os, 'write', write_raise_oserror)
+        write_swap = self.swap_with_checks(
+            os,
+            'write',
+            write_raise_oserror,
+            expected_args=(
+                (sys.stdout.fileno(), 'test'),
+                (sys.stdout.fileno(), 'test')
+            )
+        )
         with write_swap:
             common.write_stdout_safe('test')
 

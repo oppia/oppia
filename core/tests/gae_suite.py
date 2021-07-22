@@ -80,7 +80,7 @@ def main(args=None):
 
     # Remove coverage from path since it causes conflicts with the standard
     # Python html library.
-    sys.path = [path for path in sys.path if 'coverage' not in path]
+    # sys.path = [path for path in sys.path if 'coverage' not in path]
 
     # The devappserver function fixes the system path by adding certain google
     # appengine libraries that we need in oppia to the system path. The Google

@@ -418,13 +418,18 @@ class BaseModel(datastore_services.Model):
         else:
             start_cursor = None
 
-        result = query.order(-cls.last_updated).fetch_page(
+        last_updated_query = query.order(-cls.last_updated)
+        query_models, next_cursor, _ = last_updated_query.fetch_page(
             page_size, start_cursor=start_cursor)
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = last_updated_query.fetch_page(
+            page_size + 1, start_cursor=start_cursor)
         # The urlsafe returns bytes and we need to decode them to string.
         return (
-            result[0],
-            (result[1].urlsafe().decode('utf-8') if result[1] else None),
-            result[2]
+            query_models,
+            (next_cursor.urlsafe().decode('utf-8') if next_cursor else None),
+            len(plus_one_query_models) == page_size + 1
         )
 
 

@@ -25,13 +25,26 @@ from google.cloud import storage
 
 
 @functools.lru_cache(maxsize=1)
-def get_client():
+def _get_client():
     """Gets Cloud Storage client.
 
     Returns:
         storage.Client. Cloud Storage client.
     """
     return storage.Client()
+
+
+@functools.lru_cache(maxsize=1)
+def _get_bucket(bucket_name):
+    """Gets Cloud Storage bucket.
+
+    Args:
+        bucket_name: str. The name of the storage bucket to return.
+
+    Returns:
+        storage.bucket.Bucket. Cloud Storage bucket.
+    """
+    return _get_client().get_bucket(bucket_name)
 
 
 def isfile(bucket_name, filepath):
@@ -45,7 +58,7 @@ def isfile(bucket_name, filepath):
     Returns:
         bool. Whether the file exists in GCS.
     """
-    return get_client().get_bucket(bucket_name).get_blob(filepath) is not None
+    return _get_bucket(bucket_name).get_blob(filepath) is not None
 
 
 def get(bucket_name, filepath):
@@ -60,13 +73,13 @@ def get(bucket_name, filepath):
         FileStream or None. It returns FileStream domain object if the file
         exists. Otherwise, it returns None.
     """
-    blob = get_client().get_bucket(bucket_name).get_blob(filepath)
+    blob = _get_bucket(bucket_name).get_blob(filepath)
     data = blob.download_as_bytes()
     return data
 
 
 def commit(bucket_name, filepath, raw_bytes, mimetype):
-    """Commit raw_bytes to the relevant file in the entity's assets folder.
+    """Commits raw_bytes to the relevant file in the entity's assets folder.
 
     Args:
         bucket_name: str. The name of the GCS bucket.
@@ -75,7 +88,7 @@ def commit(bucket_name, filepath, raw_bytes, mimetype):
         raw_bytes: str. The content to be stored in the file.
         mimetype: str. The content-type of the cloud file.
     """
-    blob = get_client().get_bucket(bucket_name).blob(filepath)
+    blob = _get_bucket(bucket_name).blob(filepath)
     blob.upload_from_string(raw_bytes, content_type=mimetype)
 
 
@@ -87,12 +100,12 @@ def delete(bucket_name, filepath):
         filepath: str. The path to the relevant file within the entity's
             assets folder.
     """
-    blob = get_client().get_bucket(bucket_name).get_blob(filepath)
+    blob = _get_bucket(bucket_name).get_blob(filepath)
     blob.delete()
 
 
 def copy(bucket_name, source_assets_path, dest_assets_path):
-    """Copy images from source_path.
+    """Copies images from source_path.
 
     Args:
         bucket_name: str. The name of the GCS bucket.
@@ -101,11 +114,9 @@ def copy(bucket_name, source_assets_path, dest_assets_path):
         dest_assets_path: str. The path to the relevant file within the entity's
             assets folder.
     """
-    src_blob = get_client().get_bucket(bucket_name).get_blob(source_assets_path)
-    get_client().get_bucket(bucket_name).copy_blob(
-        src_blob,
-        get_client().get_bucket(bucket_name),
-        new_name=dest_assets_path
+    src_blob = _get_bucket(bucket_name).get_blob(source_assets_path)
+    _get_bucket(bucket_name).copy_blob(
+        src_blob, _get_bucket(bucket_name), new_name=dest_assets_path
     )
 
 
@@ -121,5 +132,4 @@ def listdir(bucket_name, dir_name):
         list(str). A lexicographically-sorted list of filenames.
     """
     return list(
-        get_client().list_blobs(
-            get_client().get_bucket(bucket_name), prefix=dir_name))
+        _get_client().list_blobs(_get_bucket(bucket_name), prefix=dir_name))

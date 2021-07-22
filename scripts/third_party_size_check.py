@@ -50,7 +50,7 @@ def _get_skip_files_list():
             skip_files_list = [
                 os.path.join(os.getcwd(), gcloudignore_line)
                 for gcloudignore_line in gcloudignore_lines
-                if not gcloudignore_lines.strip().startswith('#')
+                if not gcloudignore_line.strip().startswith('#')
             ]
         return skip_files_list
     except IOError as io_error:

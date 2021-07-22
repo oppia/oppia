@@ -52,7 +52,7 @@ def get(unused_bucket_name, filepath):
 
 
 def commit(unused_bucket_name, filepath, raw_bytes, mimetype):
-    """Commit bytes to the relevant file.
+    """Commits bytes to the relevant file.
 
     Args:
         unused_bucket_name: str. Unused name of the GCS bucket.
@@ -76,7 +76,7 @@ def delete(unused_bucket_name, filepath):
 
 
 def copy(unused_bucket_name, source_assets_path, dest_assets_path):
-    """Copy images from source_path.
+    """Copies images from source_path.
 
     Args:
         unused_bucket_name: str. Unused name of the GCS bucket.

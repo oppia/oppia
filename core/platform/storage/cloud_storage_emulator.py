@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
-import pickle
+import mimetypes
 
 import feconf
 import python_utils
@@ -29,7 +29,7 @@ import redis
 REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.STORAGE_EMULATOR_REDIS_DB_NUMBER
+    db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX
 )
 
 
@@ -43,11 +43,14 @@ class Blob(python_utils.OBJECT):
             name: str. The name of the blob.
             data: str|bytes. The data of the blob. If the data are string,
                 they are encoded to bytes.
-            content_type: str. The content type of the blob.
+            content_type: str. The content type of the blob, it should be in
+                the MIME format.
         """
         self._name = name
         self._raw_bytes = (
             data.encode('utf-8') if isinstance(data, str) else data)
+        if mimetypes.guess_extension(content_type) is None:
+            raise Exception('Content type contains unknown MIME type.')
         self._content_type = content_type
 
     @classmethod
@@ -65,6 +68,39 @@ class Blob(python_utils.OBJECT):
             new_name,
             original_blob.download_as_bytes(),
             original_blob.content_type
+        )
+
+    def to_dict(self):
+        """Transform the Blob into dictionary that can be saved into Redis.
+
+        Returns:
+            dict(bytes, bytes). Dictionary containing all values of Blob.
+        """
+        # Since Redis saves all values in bytes, we do an encode on values and
+        # also use byte keys.
+        return {
+            b'name': self._name.encode('utf-8'),
+            b'raw_bytes': self._raw_bytes,
+            b'content_type': self._content_type.encode('utf-8')
+        }
+
+    @classmethod
+    def from_dict(cls, blob_dict):
+        """Transform dictionary from Redis into Blob.
+
+        Args:
+            blob_dict: dict(bytes, bytes). Dictionary containing all values
+                of Blob.
+
+        Returns:
+            Blob. Blob created from the dictionary.
+        """
+        # Since Redis saves all values in bytes, we do a decode on values and
+        # also use byte keys.
+        return cls(
+            blob_dict[b'name'].decode('utf-8'),
+            blob_dict[b'raw_bytes'],
+            blob_dict[b'content_type'].decode('utf-8')
         )
 
     @property
@@ -134,8 +170,8 @@ class CloudStorageEmulator(python_utils.OBJECT):
         Returns:
             Blob. The blob.
         """
-        blob_bytes = REDIS_CLIENT.get(self._get_redis_key(filepath))
-        return pickle.loads(blob_bytes) if blob_bytes is not None else None
+        blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
+        return Blob.from_dict(blob_dict) if blob_dict is not None else None
 
     def upload_blob(self, filepath, blob):
         """Upload the given blob to the filepath.
@@ -144,8 +180,8 @@ class CloudStorageEmulator(python_utils.OBJECT):
             filepath: str. Filepath where upload the blob to.
             blob: Blob. The blob to upload.
         """
-        if not REDIS_CLIENT.set(
-                self._get_redis_key(filepath), pickle.dumps(blob)):
+        if not REDIS_CLIENT.hset(
+                self._get_redis_key(filepath), mapping=blob.to_dict()):
             raise Exception('Blob was not set.')
 
     def delete_blob(self, filepath):
@@ -163,9 +199,9 @@ class CloudStorageEmulator(python_utils.OBJECT):
             blob: Blob. The blob to copy.
             filepath: str. The filepath to copy the blob to.
         """
-        REDIS_CLIENT.set(
+        REDIS_CLIENT.hset(
             self._get_redis_key(filepath),
-            pickle.dumps(Blob.create_copy(blob, filepath)))
+            mapping=Blob.create_copy(blob, filepath).to_dict())
 
     def list_blobs(self, prefix):
         """Get blobs whose filepaths start with the given prefix.
@@ -179,9 +215,15 @@ class CloudStorageEmulator(python_utils.OBJECT):
         """
         matching_filepaths = (
             REDIS_CLIENT.scan_iter(match='%s*' % self._get_redis_key(prefix)))
+
+        # Create a pipeline that is then executed at one.
+        pipeline = REDIS_CLIENT.pipeline()
+        for filepath in matching_filepaths:
+            pipeline.hgetall(filepath)
+        blob_dicts = pipeline.execute()
+
         return [
-            pickle.loads(blob_bytes) for blob_bytes
-            in REDIS_CLIENT.mget(matching_filepaths)
+            Blob.from_dict(blob_dict) for blob_dict in blob_dicts
         ]
 
     def reset(self):

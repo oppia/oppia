@@ -504,9 +504,9 @@ def convert_to_bytes(string_to_convert) -> bytes:
         return string_to_convert.encode('utf-8')
     elif isinstance(string_to_convert, int):
         raise Exception(
-            'Passing int is not allowed, since it is insecure, because when '
-            'big number is passed to the bytes function it can spent some time '
-            'generating array with empty bytes. '
+            'Passing int is not allowed, since it is insecure, because when a '
+            'big number is passed to the bytes function it can spend some time '
+            'generating an array with empty bytes. '
             'See: https://beginnersbook.com/2019/05/python-bytes/'
         )
     return bytes(string_to_convert)

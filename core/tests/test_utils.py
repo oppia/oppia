@@ -1298,11 +1298,11 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegex(
+        return super(TestBase, self).assertRaisesRegexp(
             expected_exception, expected_regex, *args, **kwargs)
 
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
-        """An unordered sequence comparison asserting that the same elements,
+        """Compares unordered sequences if they contain the same elements,
         regardless of order. If the same element occurs more than once,
         it verifies that the elements occur the same number of times.
 
@@ -1413,10 +1413,6 @@ class AppEngineTestBase(TestBase):
             self._platform_taskqueue_services_stub.create_http_task)
         with platform_taskqueue_services_swap:
             super(AppEngineTestBase, self).run(result=result)
-
-    def _get_all_queue_names(self):
-        """Returns a list of all queue names."""
-        return [q['name'] for q in []]
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
@@ -1888,9 +1884,9 @@ title: Title
         Example:
             import datetime
             mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-            with mock_datetime_for_datastore(mocked_now):
+            with mock_datetime_utcnow(mocked_now):
                 self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            not_now = datetime.datetime.utcnow() # Returns actual time.
+            actual_now = datetime.datetime.utcnow() # Returns actual time.
 
         Args:
             mocked_now: datetime.datetime. The datetime which will be used
@@ -1974,7 +1970,7 @@ title: Title
             m.request(requests_mock.ANY, requests_mock.ANY)
 
             response = self.get_html_response(feconf.SIGNUP_URL)
-            # self.assertEqual(response.status_int, 200)
+            self.assertEqual(response.status_int, 200)
 
             response = self.testapp.post(feconf.SIGNUP_DATA_URL, params={
                 'csrf_token': self.get_new_csrf_token(),
@@ -2150,7 +2146,11 @@ title: Title
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
-                url, params=params, expect_errors=expect_errors)
+                url,
+                params=params,
+                expect_errors=expect_errors,
+                status=expected_status_int
+            )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
@@ -2164,7 +2164,7 @@ title: Title
         #
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
-        # self.assertEqual(response.status_int, expected_status_int)
+        self.assertEqual(response.status_int, expected_status_int)
 
         self.assertEqual(response.content_type, expected_content_type)
 
@@ -2259,7 +2259,8 @@ title: Title
 
         json_response = self.testapp.get(
             url, params=params, expect_errors=expect_errors,
-            status=expected_status_int, headers=headers)
+            status=expected_status_int, headers=headers
+        )
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -2374,7 +2375,7 @@ title: Title
         if upload_files is not None:
             upload_files = tuple(
                 tuple(
-                    f.encode() if isinstance(f, str) else f
+                    f.encode('utf-8') if isinstance(f, str) else f
                     for f in upload_file
                 ) for upload_file in upload_files
             )

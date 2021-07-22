@@ -281,7 +281,7 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
             sorted(all_event_handlers), sorted(expected_event_handlers))
 
 
-class HelperFunctionsTests(test_utils.GenericTestBase):
+class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super().setUp()
@@ -290,7 +290,7 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
         self.exploration = (
             self.save_new_valid_exploration('exp_id', self.admin_id))
 
-    def test_handle_exploration_rating_with_existing_empty_user_stats(self):
+    def test_average_ratings_of_users_exps_are_calculated_correctly(self):
         user_models.UserStatsModel(
             id=self.admin_id, average_ratings=None, num_ratings=0, total_plays=0
         ).put()
@@ -314,7 +314,7 @@ class HelperFunctionsTests(test_utils.GenericTestBase):
             user_services.get_dashboard_stats(self.admin_id)['average_ratings'])
         self.assertEqual(admin_average_ratings, 1)
 
-    def test_handle_exploration_start(self):
+    def test_total_plays_of_users_exps_are_calculated_correctly(self):
         admin_total_plays = (
             user_services.get_dashboard_stats(self.admin_id)['total_plays'])
         self.assertEqual(admin_total_plays, 0)

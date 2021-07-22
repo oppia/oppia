@@ -63,7 +63,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             ({}, re.escape('Expected bool, received {}')),
             ([], re.escape('Expected bool, received []')),
             (['a'], re.escape('Expected bool, received [\'a\']')),
-            ('aabcc', r'Expected bool, received aabcc')]
+            ('aabcc', 'Expected bool, received aabcc')]
 
         self.check_normalization(
             objects.Boolean, mappings, invalid_values_with_error_messages)
@@ -424,7 +424,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                     'Extra keys: [\'a\']'
                 )
             ),
-            ([1, 2, 1], r'Expected dict, received \[1, 2, 1\]'),
+            ([1, 2, 1], re.escape('Expected dict, received [1, 2, 1]')),
             (None, 'Expected dict, received None'),
             (
                 {'raw_latex': 1, 'svg_filename': 2},
@@ -942,12 +942,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             ([3, 'a'], 'Expected unicode string, received 3'),
             (
                 ['a', 'a', 'b'],
-                r'Validation failed: is_uniquified \(\{\}\) '
-                r'for object \[\'a\', \'a\', \'b\'\]'),
+                re.escape(
+                    'Validation failed: is_uniquified ({}) '
+                    'for object [\'a\', \'a\', \'b\']'
+                )
+            ),
             (
                 ['a', 'invalid_identifier', 'b'],
                 'Received invalid_identifier which is not in the allowed '
-                'range of choices')]
+                'range of choices'
+            )
+        ]
 
         self.check_normalization(
             objects.SetOfAlgebraicIdentifier, mappings,

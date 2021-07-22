@@ -88,7 +88,7 @@ class _Gae(Platform):
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
             elif name == NAMES.app_feedback_report:
-                from core.storage.app_feedback_report import gae_models as app_feedback_report_models  # isort:skip pylint: disable=line-too-long
+                from core.storage.app_feedback_report import gae_models as app_feedback_report_models  # pylint: disable=line-too-long
                 returned_models.append(app_feedback_report_models)
             elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models

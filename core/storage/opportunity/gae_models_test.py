@@ -67,12 +67,13 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_all_translation_opportunities(self):
-        results, cursor, _ = (
+        results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(5, None, 'hi'))
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_translation_opportunities_pagination(self):
@@ -84,20 +85,22 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
-        results, new_cursor, _ = (
+        results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, cursor, 'hi'))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertFalse(more)
         self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities(self):
-        results, cursor, _ = (
+        results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_voiceover_opportunities(5, None, 'en'))
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities_pagination(self):
@@ -114,6 +117,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             .get_all_voiceover_opportunities(1, cursor, 'en'))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertFalse(more)
         self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
     def test_get_by_topic(self):
@@ -148,6 +152,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
         self.assertEqual(len(results), 0)
+        self.assertFalse(more)
 
 
 class SkillOpportunityModelTest(test_utils.GenericTestBase):
@@ -173,39 +178,43 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_skill_opportunities(self):
-        results, cursor, _ = (
+        results, cursor, more = (
             opportunity_models.SkillOpportunityModel
             .get_skill_opportunities(5, None))
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
+        self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_skill_opportunities_pagination(self):
         results, cursor, more = (
-            opportunity_models.SkillOpportunityModel
-            .get_skill_opportunities(1, None))
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, None))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
-        self.assertTrue(more)
+        self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
-        results, cursor, _ = (
-            opportunity_models.SkillOpportunityModel
-            .get_skill_opportunities(1, cursor))
+        results, cursor, more = (
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, cursor))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
+        self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_delete_all_skill_opportunities(self):
-        results, _, _ = (
+        results, _, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
                 1, None))
         self.assertEqual(len(results), 1)
+        self.assertFalse(more)
 
         opportunity_models.SkillOpportunityModel.delete_all()
 
-        results, _, _ = (
+        results, _, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
                 1, None))
         self.assertEqual(len(results), 0)
+        self.assertFalse(more)

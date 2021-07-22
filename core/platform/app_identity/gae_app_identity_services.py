@@ -27,7 +27,9 @@ _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 def get_application_id():
     """Returns the application's App Engine ID.
 
-    Locally we set the GOOGLE_CLOUD_PROJECT when starting the dev server.
+    Locally we set the GOOGLE_CLOUD_PROJECT environment variable in
+    scripts/servers.py when starting the dev server. In production
+    the GOOGLE_CLOUD_PROJECT is set by the server.
 
     Returns:
         str. The application ID.

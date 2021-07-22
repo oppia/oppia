@@ -2114,15 +2114,21 @@ class UserQueryModel(base_models.BaseModel):
                     this batch.
         """
         cursor = datastore_services.make_cursor(urlsafe_cursor=cursor)
-        query_models, next_cursor, more = (
-            cls.query().order(-cls.created_on).
-            fetch_page(page_size, start_cursor=cursor))
+
+        created_on_query = cls.query().order(-cls.created_on)
+        query_models, next_cursor, _ = (
+            created_on_query.fetch_page(page_size, start_cursor=cursor))
+        # TODO(#13462): Refactor this so that we don't do the lookup.
+        # Do a forward lookup so that we can know if there are more values.
+        plus_one_query_models, _, _ = (
+            created_on_query.fetch_page(page_size + 1, start_cursor=cursor))
+        more_results = len(plus_one_query_models) == page_size + 1
         # The urlsafe returns bytes and we need to decode them to string.
         next_cursor = (
             next_cursor.urlsafe().decode('utf-8')
-            if (next_cursor and more) else None
+            if (next_cursor and more_results) else None
         )
-        return query_models, next_cursor, more
+        return query_models, next_cursor, more_results
 
 
 class UserBulkEmailsModel(base_models.BaseModel):
