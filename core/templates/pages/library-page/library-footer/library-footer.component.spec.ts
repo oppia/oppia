@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for libraryFooter.
  */
 
-import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { LibraryFooterComponent } from './library-footer.component';
 import { SharedComponentsModule } from './../../../../templates/components/shared-component.module';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -46,7 +46,7 @@ describe('Library Footer Component', () => {
   let fixture: ComponentFixture<LibraryFooterComponent>;
   let component: LibraryFooterComponent;
 
-  beforeEach(() => {
+  beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [
@@ -63,7 +63,7 @@ describe('Library Footer Component', () => {
         HttpClientModule
       ]
     }).compileComponents();
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LibraryFooterComponent);
