@@ -523,11 +523,10 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             ValidationError. The given selection items and text input for the
                 category are not valid.
         """
-        if category in (
-                constants.ALLOWED_SELECTION_ITEMS_CATEGORIES
-        ):
+        if category in constants.ALLOWED_SELECTION_ITEMS_CATEGORIES:
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
+            assert selected_items is not None
             cls.require_valid_selected_items_for_category(
                 category, selected_items)
             if cls._selected_items_include_other(selected_items):
@@ -545,9 +544,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
-        if category in (
-                constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES
-        ):
+        if category in constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES:
             if selected_items is not None:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
@@ -606,7 +603,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
 
     @classmethod
     def _selected_items_include_other(cls, selected_items):
-        # type: (Optional[List[Text]]) -> bool
+        # type: (List[Text]) -> bool
         """Checks whether the user_feedback_selected_items include an 'other'
         option. Unless the category is one of ALLOWED_INPUT_TEXT_CATEGORIES, an
         'other' option must be selected for the user to add input text to the

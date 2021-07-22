@@ -486,16 +486,6 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             self.user_supplied_feedback,
             'Report cannot have selection options for category ')
 
-    def test_validation_selection_items_is_none_for_selection_category_fails(
-            self):
-        # type: () -> None
-        self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
-        self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
-        self.user_supplied_feedback.user_feedback_selected_items = None
-        self._assert_validation_error(
-            self.user_supplied_feedback,
-            'requires selection options in the report.')
-
     def test_validation_has_text_input_without_other_selected_fails(self):
         # type: () -> None
         self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE

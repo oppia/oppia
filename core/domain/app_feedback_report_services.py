@@ -279,7 +279,7 @@ def get_ticket_from_model(ticket_model):
 def get_stats_from_model(stats_model):
     # type: (app_feedback_report_models.AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
     """Create and return a domain object AppFeedbackReportDailyStats given a
-    model loaded from the the data.
+    model loaded from the the storage.
 
     Args:
         stats_model: AppFeedbackReportStatsModel. The model loaded from the
@@ -289,12 +289,14 @@ def get_stats_from_model(stats_model):
         AppFeedbackReportDailyStats. An AppFeedbackReportDailyStats domain
         object corresponding tothe given model.
     """
-    ticket = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
-        stats_model.ticket_id)
+    ticket_model = (
+        app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+            stats_model.ticket_id))
+    ticket_obj = get_ticket_from_model(ticket_model)
     param_stats = create_app_daily_stats_from_model_json(
         stats_model.daily_param_stats)
     return app_feedback_report_domain.AppFeedbackReportDailyStats(
-        stats_model.id, ticket, stats_model.platform,
+        stats_model.id, ticket_obj, stats_model.platform,
         stats_model.stats_tracking_date, stats_model.total_reports_submitted,
         param_stats)
 
@@ -329,7 +331,7 @@ def create_app_daily_stats_from_model_json(daily_param_stats):
 
 def get_android_report_from_model(android_report_model):
     # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
-    """Creates a domain object that represents an android feedback report from
+    """Creates a domain object that represents an Android feedback report from
     the given model.
 
     Args:
@@ -436,7 +438,7 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     report.user_supplied_feedback.user_feedback_other_text_input = None
     if report.platform == PLATFORM_ANDROID:
         report.app_context = cast(
-            report.app_context, app_feedback_report_domain.AndroidAppContext)
+            app_feedback_report_domain.AndroidAppContext, report.app_context)
         report.app_context.event_logs = None
         report.app_context.logcat_logs = None
     save_feedback_report_to_storage(report)
@@ -457,10 +459,10 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
 
     user_supplied_feedback = report.user_supplied_feedback
     device_system_context = cast(
-        report.device_system_context,
-        app_feedback_report_domain.AndroidDeviceSystemContext)
+        app_feedback_report_domain.AndroidDeviceSystemContext,
+        report.device_system_context)
     app_context = cast(
-        report.app_context, app_feedback_report_domain.AndroidAppContext)
+        app_feedback_report_domain.AndroidAppContext, report.app_context)
     entry_point = app_context.entry_point
 
     report_info_json = {
@@ -555,8 +557,8 @@ def reassign_ticket(report, new_ticket):
             constants.UNTICKETED_ANDROID_REPORTS_STATS_TICKET_ID, platform,
             stats_date, report, -1)
     else:
-        # The report was ticketed so the report needs to be removed
-        # from a ticket in storage.
+        # The report was ticketed so the report needs to be removed from its old
+        # ticket in storage.
         old_ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 old_ticket_id))
@@ -565,17 +567,23 @@ def reassign_ticket(report, new_ticket):
                 'The report is being removed from an invalid ticket id: %s.'
                 % old_ticket_id)
         old_ticket_obj = get_ticket_from_model(old_ticket_model)
-        old_ticket_obj.reports.remove(report.report_id)
-        if old_ticket_obj.newest_report_creation_timestamp == (
-                report.submitted_on_timestamp):
-            report_models = get_report_models(old_ticket_obj.reports)
-            latest_timestamp = report_models[0].submitted_on_datetime
-            for index in python_utils.RANGE(1, len(report_models)):
-                if report_models[index].submitted_on_datetime > (
-                        latest_timestamp):
-                    latest_timestamp = (
-                        report_models[index].submitted_on_datetime)
-            old_ticket_obj.newest_report_creation_timestamp = latest_timestamp
+        if len(old_ticket_obj.reports) == 1:
+            # We are removing the only report associated with this ticket.
+            old_ticket_obj.newest_report_creation_timestamp = None
+        else:
+            old_ticket_obj.reports.remove(report.report_id)
+            if old_ticket_obj.newest_report_creation_timestamp == (
+                    report.submitted_on_timestamp):
+                # Update the newest report timestamp.
+                report_models = get_report_models(old_ticket_obj.reports)
+                latest_timestamp = report_models[0].submitted_on
+                for index in python_utils.RANGE(1, len(report_models)):
+                    if report_models[index].submitted_on_datetime > (
+                            latest_timestamp):
+                        latest_timestamp = (
+                            report_models[index].submitted_on_datetime)
+                old_ticket_obj.newest_report_creation_timestamp = (
+                    latest_timestamp)
         _save_ticket(old_ticket_obj)
         _update_report_stats_model_in_transaction(
             old_ticket_id, platform, stats_date, report, -1)
