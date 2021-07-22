@@ -102,7 +102,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-answer-description-fragment'));
   var answerDescription = element(
     by.css('.protractor-test-answer-description'));
-  var deleteNode = nodeElement.element(by.css('.protractor-test-delete-node'));
+  var deleteNodeLocator = by.css('.protractor-test-delete-node');
   var titleLocator = by.css('.ng-joyride-title');
   var CKEditor = element(by.css('.protractor-test-ck-editor'));
   var interactionHtmlElement = element(
@@ -858,6 +858,7 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
+    var deleteNode = nodeElement.element(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
 
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
