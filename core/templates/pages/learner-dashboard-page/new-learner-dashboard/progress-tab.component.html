@@ -17,6 +17,16 @@
     </div>
   </div>
 </div>
+<div class="empty-completed-stories"
+  *ngIf="checkMobileView() && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
+  <div class="completed-stories-heading">
+    <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
+    </p>
+  </div>
+  <div class="empty-completed-stories-content">
+    <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_STORIES_SECTION' | translate">
+    </p>
+  </div>
 <style>
   .completed-stories {
     background-color: #fff;
@@ -29,6 +39,17 @@
     padding: 0 0 30px 40px;
     width: 736px;
   }
+  .empty-completed-stories {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 4px #0000001a;
+    margin: auto;
+    margin-top: 15px;
+    min-height: 206px;
+    opacity: 1;
+    padding: 0 0 30px 40px;
+    width: 360px;
+  }
   .completed-stories .completed-stories-content {
     display: inline-block;
   }
@@ -36,7 +57,8 @@
     display: inline-block;
     padding: 0 30px 0 0;
   }
-  .completed-stories .completed-stories-title {
+  .completed-stories .completed-stories-title,
+  .empty-completed-stories .completed-stories-title {
     color: #00645C;
     display: inline-block;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -45,7 +67,12 @@
     opacity: 1;
     text-align: left;
   }
-  .completed-stories .completed-stories-heading {
+  .empty-completed-stories-content {
+    font-size: 16px;
+    padding: 0px 32px 0 0;
+  }
+  .completed-stories .completed-stories-heading,
+  .empty-completed-stories .completed-stories-heading {
     padding: 32px 0;
   }
   .completed-stories .completed-stories-length {
@@ -66,6 +93,11 @@
       padding: 0 0 30px 25px;
       position: relative;
       right: 20px;
+      width: 555px;
+    }
+    .empty-completed-stories {
+      right: 25px;
+      position: relative;
       width: 555px;
     }
     .completed-stories .scroll-content {
