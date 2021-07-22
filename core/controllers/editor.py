@@ -618,7 +618,7 @@ class ExplorationFileDownloader(EditorHandler):
         """Handles GET requests."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
 
-        version_str = self.normalized_request.get('v', exploration.version)
+        version = self.normalized_request.get('v', exploration.version)
         output_format = self.normalized_request.get('output_format')
 
         # If the title of the exploration has changed, we use the new title.
