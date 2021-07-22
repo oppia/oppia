@@ -26,13 +26,14 @@ from jobs.types import base_validation_errors
 
 import apache_beam as beam
 
-(base_models, subtopic_models) = models.Registry.import_models(
+(base_models, subtopic_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
     [models.NAMES.base_model, models.NAMES.subtopic])
 
 
 class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
+        # type: () -> None
         valid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -51,9 +52,10 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [])
+        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
 
     def test_subtopic_page_change_object_with_missing_cmd(self):
+        # type: () -> None
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -71,14 +73,15 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsValidateError(
+        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
+            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                 invalid_commit_cmd_model,
                 {'invalid': 'data'},
                 'Missing cmd key in change dict')
         ])
 
     def test_subtopic_page_change_object_with_invalid_cmd(self):
+        # type: () -> None
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -96,14 +99,15 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsValidateError(
+        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
+            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                 invalid_commit_cmd_model,
                 {'cmd': 'invalid'},
                 'Command invalid is not allowed')
         ])
 
     def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self):
+        # type: () -> None
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -125,8 +129,8 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsValidateError(
+        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
+            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'update_subtopic_page_property',
@@ -138,6 +142,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         ])
 
     def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self):
+        # type: () -> None
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -160,8 +165,8 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsValidateError(
+        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
+            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'create_new',
@@ -174,6 +179,7 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
 
     def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
             self):
+        # type: () -> None
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel(
                 id='123',
@@ -197,8 +203,8 @@ class ValidateSubtopicCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 subtopic_validation.ValidateSubtopicPageSnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsValidateError(
+        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
+            base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'update_subtopic_page_property',
@@ -216,6 +222,7 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_subtopic_page_model(self):
+        # type: () -> None
         valid_commit_cmd_model = (
             subtopic_models.SubtopicPageCommitLogEntryModel(
                 id='subtopicpage_id123',
@@ -236,9 +243,10 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
                 subtopic_validation.ValidateSubtopicPageCommitLogEntryModel())
         )
 
-        self.assert_pcoll_equal(output, [])
+        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
 
     def test_raises_commit_cmd_none_error(self):
+        # type: () -> None
         invalid_commit_cmd_model = (
             subtopic_models.SubtopicPageCommitLogEntryModel(
                 id='model_id123',
@@ -260,6 +268,6 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
                 ))
         )
 
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
+        self.assert_pcoll_equal(output, [ # type: ignore[no-untyped-call]
+            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model) # type: ignore[no-untyped-call]
         ])

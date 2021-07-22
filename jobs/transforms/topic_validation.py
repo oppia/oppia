@@ -97,7 +97,7 @@ class ValidateTopicCommitLogEntryModel(
     """Overrides _get_change_domain_class for TopicCommitLogEntryModel.
     """
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+    def _get_change_domain_class(self, input_model):
         """Returns a change domain class.
 
         Args:

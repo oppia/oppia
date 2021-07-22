@@ -25,10 +25,12 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
+from typing import Any, Optional, Type
+
+(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic]) # type: ignore[no-untyped-call]
 
 
-@validation_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
     subtopic_models.SubtopicPageSnapshotMetadataModel)
 class ValidateSubtopicPageSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
@@ -36,6 +38,7 @@ class ValidateSubtopicPageSnapshotMetadataModel(
     """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        # type: (Any) -> Type[subtopic_page_domain.SubtopicPageChange]
         """Returns a change domain class.
 
         Args:
@@ -48,14 +51,15 @@ class ValidateSubtopicPageSnapshotMetadataModel(
         return subtopic_page_domain.SubtopicPageChange
 
 
-@validation_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]
     subtopic_models.SubtopicPageCommitLogEntryModel)
 class ValidateSubtopicPageCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for SubtopicPageCommitLogEntryModel.
     """
 
-    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+    def _get_change_domain_class(self, input_model):
+        # type: (Any) -> Optional[Type[subtopic_page_domain.SubtopicPageChange]]
         """Returns a change domain class.
 
         Args:
@@ -65,8 +69,10 @@ class ValidateSubtopicPageCommitLogEntryModel(
             subtopic_page_domain.SubtopicPageChange. A domain object class for
             the changes made by commit commands of the model.
         """
-        model = job_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model) # type: ignore[no-untyped-call]
         if model.id.startswith('subtopicpage'):
             return subtopic_page_domain.SubtopicPageChange
         else:
             return None
+
+# reveal_type(ValidateSubtopicPageCommitLogEntryModel())
