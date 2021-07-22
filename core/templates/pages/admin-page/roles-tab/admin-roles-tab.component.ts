@@ -53,6 +53,11 @@ export class AdminRolesTabComponent implements OnInit {
     private modalService: NgbModal
   ) {}
 
+  addWarning(errorMessage: string): void {
+    this.alertsService.addWarning(
+      errorMessage || 'Error communicating with server.');
+  }
+
   startEditing(): void {
     this.roleIsCurrentlyBeingEdited = true;
     this.adminBackendApiService.viewUsersRoleAsync(
@@ -117,12 +122,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.adminBackendApiService.addUserRoleAsync(
       role, this.username).then(() => {
       this.roleInUpdate = null;
-    }, data => {
-      var transformedData = data.responseText.substring(5);
-      var parsedResponse = JSON.parse(transformedData);
-      this.alertsService.addWarning(
-        parsedResponse.error || 'Error communicating with server.');
-    });
+    }, this.addWarning.bind(this));
   }
 
   markUserBanned(): void {
@@ -131,12 +131,7 @@ export class AdminRolesTabComponent implements OnInit {
       this.bannedStatusChangeInProgress = false;
       this.userIsBanned = true;
       this.userRoles = [];
-    }, data => {
-      var transformedData = data.responseText.substring(5);
-      var parsedResponse = JSON.parse(transformedData);
-      this.alertsService.addWarning(
-        parsedResponse.error || 'Error communicating with server.');
-    });
+    }, this.addWarning.bind(this));
   }
 
   unmarkUserBanned(): void {
@@ -146,12 +141,7 @@ export class AdminRolesTabComponent implements OnInit {
       this.bannedStatusChangeInProgress = false;
       this.userIsBanned = false;
       this.startEditing();
-    }, data => {
-      var transformedData = data.responseText.substring(5);
-      var parsedResponse = JSON.parse(transformedData);
-      this.alertsService.addWarning(
-        parsedResponse.error || 'Error communicating with server.');
-    });
+    }, this.addWarning.bind(this));
   }
 
   clearEditor(): void {
@@ -168,7 +158,6 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.roleToActions = null;
     this.adminDataService.getDataAsync().then(adminDataObject => {
       this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
       this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
