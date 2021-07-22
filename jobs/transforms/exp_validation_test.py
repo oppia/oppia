@@ -21,7 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import rights_domain
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import exp_validation
 from jobs.types import base_validation_errors
 
@@ -254,6 +256,23 @@ class ValidateExplorationSnapshotMetadataModelTests(
                 'Value for property_name in cmd edit_state_property: '
                 'invalid is not allowed')
         ])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_exploration_context_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExplorationContextModel', 'story_id'), ['StoryModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExplorationContextModel', 'id'), ['ExplorationModel'])
+
+    def test_exp_summary_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExpSummaryModel', 'id'),
+            ['ExplorationRightsModel', 'ExplorationModel'])
 
 
 class ValidateExplorationRightsSnapshotMetadataModelTests(

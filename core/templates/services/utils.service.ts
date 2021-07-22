@@ -70,7 +70,7 @@ export class UtilsService {
    * @param {Object} b - the second object to be compared.
    * @return {boolean} - true if a is equivalent to b, false otherwise.
    */
-  isEquivalent(a: Object, b: Object): boolean {
+  isEquivalent(a: Object | null, b: Object | null): boolean {
     if (a === null || b === null) {
       return a === b;
     }
@@ -114,7 +114,6 @@ export class UtilsService {
   isError(value: Object | undefined | null): boolean {
     switch (Object.prototype.toString.call(value)) {
       case '[object Error]': return true;
-      case '[object Exception]': return true;
       case '[object DOMException]': return true;
       default: return value instanceof Error;
     }
