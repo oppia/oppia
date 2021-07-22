@@ -34,6 +34,7 @@ import { ExplorationDataBackendApiService } from './exploration-data-backend-api
 export interface DraftAutoSaveResponse {
   'draft_change_list_id': number;
   'is_version_of_draft_valid': boolean;
+  'changes_are_mergeable': boolean;
 }
 @Injectable({
   providedIn: 'root'
@@ -107,7 +108,7 @@ export class ExplorationDataService {
   async autosaveChangeListAsync(
       changeList: ExplorationChange[],
       successCallback: (response: DraftAutoSaveResponse) => void,
-      errorCallback = () => {}
+      errorCallback: () => void
   ): Promise<void> {
     return this._autosaveChangeListAsync(changeList).then(
       (response) => {

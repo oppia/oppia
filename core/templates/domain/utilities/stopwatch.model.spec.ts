@@ -19,13 +19,13 @@
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 describe('Stopwatch model', () => {
-  let nowSpy = null;
+  let nowSpy: jasmine.Spy<() => number>;
 
   beforeEach(() => {
     nowSpy = spyOn(Date, 'now');
   });
 
-  const changeCurrentTime = (desiredCurrentTime) => {
+  const changeCurrentTime = (desiredCurrentTime: number) => {
     nowSpy.and.returnValue(desiredCurrentTime);
   };
 

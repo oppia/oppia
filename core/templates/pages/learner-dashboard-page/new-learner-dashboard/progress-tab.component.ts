@@ -35,6 +35,7 @@ export class ProgressTabComponent implements OnInit {
   topicsInSkillProficiency: LearnerTopicSummary[] = [];
   emptySkillProficiency: boolean = true;
   displaySkills: boolean[];
+  widthConst: number = 233;
   width: number;
 
   constructor(
@@ -43,7 +44,7 @@ export class ProgressTabComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.width = 233 * (this.completedStoriesList.length);
+    this.width = this.widthConst * (this.completedStoriesList.length);
     this.topicsInSkillProficiency.push(
       ...this.partiallyLearntTopicsList, ...this.learntTopicsList);
     this.displaySkills = new Array(
@@ -64,6 +65,7 @@ export class ProgressTabComponent implements OnInit {
 
   showSkills(index: number): void {
     this.displaySkills[index] = !this.displaySkills[index];
+    this.width = this.widthConst * (this.completedStoriesList.length);
   }
 
   getStaticImageUrl(imagePath: string): string {

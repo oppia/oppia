@@ -39,6 +39,7 @@ from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import classifier_services
 from core.domain import draft_upgrade_services
+from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -251,8 +252,8 @@ def get_story_id_linked_to_exploration(exp_id):
         str|None. The ID of the story if the exploration is linked to some
         story, otherwise None.
     """
-    exploration_context_model = exp_models.ExplorationContextModel.get_by_id(
-        exp_id)
+    exploration_context_model = exp_models.ExplorationContextModel.get(
+        exp_id, strict=False)
     if exploration_context_model is not None:
         return exploration_context_model.story_id
     return None
@@ -388,7 +389,9 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    state.update_next_content_id_index(change.new_value)
+                    next_content_id_index = max(
+                        change.new_value, state.next_content_id_index)
+                    state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
                     state.update_linked_skill_id(change.new_value)
@@ -1622,7 +1625,7 @@ def get_number_of_ratings(ratings):
     Returns:
         int. The total number of ratings given.
     """
-    return sum(ratings.values())
+    return sum(ratings.values()) if ratings else 0
 
 
 def get_average_rating(ratings):
@@ -1708,6 +1711,90 @@ def is_voiceover_change_list(change_list):
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
+
+
+def get_composite_change_list(exp_id, from_version, to_version):
+    """Returns a list of ExplorationChange domain objects consisting of
+    changes from from_version to to_version in an exploration.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        from_version: int. The version of the exploration from where we
+            want to start the change list.
+        to_version: int. The version of the exploration till which we
+            want are change list.
+
+    Returns:
+        list(ExplorationChange). List of ExplorationChange domain objects
+        consisting of changes from from_version to to_version.
+    """
+    if from_version > to_version:
+        raise Exception(
+            'Unexpected error: Trying to find change list from version %s '
+            'of exploration to version %s.'
+            % (from_version, to_version))
+
+    version_nums = list(python_utils.RANGE(from_version + 1, to_version + 1))
+    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, version_nums, allow_deleted=False)
+
+    composite_change_list_dict = []
+    for snapshot in snapshots_metadata:
+        composite_change_list_dict += snapshot['commit_cmds']
+
+    composite_change_list = [
+        exp_domain.ExplorationChange(change)
+        for change in composite_change_list_dict]
+
+    return composite_change_list
+
+
+def are_changes_mergeable(exp_id, change_list_version, change_list):
+    """Checks whether the change list can be merged when the
+    intended exploration version of changes_list is not same as
+    the current exploration version.
+
+    Args:
+        exp_id: str. The id of the exploration where the change_list is to
+            be applied.
+        change_list_version: int. Version of an exploration on which the change
+            list was applied.
+        change_list: list(ExplorationChange). List of the changes made by the
+            user on the frontend, which needs to be checked for mergeability.
+
+    Returns:
+        boolean. Whether the changes are mergeable.
+    """
+    current_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+    if current_exploration.version == change_list_version:
+        return True
+    if current_exploration.version < change_list_version:
+        return False
+
+    # A complete list of changes from one version to another
+    # is composite_change_list.
+    composite_change_list = get_composite_change_list(
+        exp_id, change_list_version,
+        current_exploration.version)
+
+    exp_at_change_list_version = exp_fetchers.get_exploration_by_id(
+        exp_id, version=change_list_version)
+
+    changes_are_mergeable, send_email = (
+        exp_domain.ExplorationChangeMergeVerifier(
+            composite_change_list).is_change_list_mergeable(
+                change_list, exp_at_change_list_version,
+                current_exploration))
+
+    if send_email:
+        change_list_dict = [change.to_dict() for change in change_list]
+        (
+            email_manager
+            .send_not_mergeable_change_list_to_admin_for_review(
+                exp_id, change_list_version,
+                current_exploration.version,
+                change_list_dict))
+    return changes_are_mergeable
 
 
 def is_version_of_draft_valid(exp_id, version):
@@ -1875,8 +1962,10 @@ def get_exp_with_draft_applied(exp_id, user_id):
     updated_exploration = None
 
     if (exp_user_data and exp_user_data.draft_change_list and
-            is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
-        updated_exploration = apply_change_list(exp_id, draft_change_list)
+            are_changes_mergeable(
+                exp_id, draft_change_list_exp_version, draft_change_list)):
+        updated_exploration = apply_change_list(
+            exp_id, draft_change_list)
         updated_exploration_has_no_invalid_math_tags = True
         # verify that all the math-tags are valid before returning the
         # updated exploration.

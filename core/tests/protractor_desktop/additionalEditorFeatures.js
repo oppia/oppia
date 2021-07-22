@@ -32,6 +32,8 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
+var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
+
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
@@ -67,7 +69,7 @@ describe('Full exploration editor', function() {
 
       await workflow.createExploration(true);
 
-      var postTutorialPopover = element(by.css('.popover-content'));
+      var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
       var stateEditButton = element(
         by.css('.protractor-test-edit-content-pencil-button'));
       await waitFor.invisibilityOf(
@@ -83,7 +85,8 @@ describe('Full exploration editor', function() {
 
       var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
 
-      var heightMessage = element(by.css('.oppia-card-height-limit-warning'));
+      var heightMessage = element(
+        by.css('.protractor-test-card-height-limit-warning'));
       await richTextEditor.appendPlainText(content);
       expect(await heightMessage.isPresent()).toBe(false);
 
@@ -99,7 +102,7 @@ describe('Full exploration editor', function() {
         heightMessage, 'Card height limit message not displayed');
 
       var hideHeightWarningIcon = element(
-        by.css('.oppia-hide-card-height-warning-icon'));
+        by.css('.protractor-test-hide-card-height-warning-icon'));
       await action.click('Hide Height Warning icon', hideHeightWarningIcon);
       await waitFor.invisibilityOf(
         heightMessage, 'Height message taking too long to disappear.');
@@ -381,6 +384,408 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.expectInteractionToMatch('EndExploration');
     await users.logout();
   });
+
+  it(
+    'should merge changes when the changes are not conflicting ' +
+      'and the frontend version of an exploration is not equal to ' +
+      'the backend version',
+    async function() {
+      await users.createUser('user9@editor.com', 'user9Editor');
+      await users.createUser('user10@editor.com', 'user10Editor');
+
+      // Create an exploration as user user9Editor with title, category, and
+      // objective set and add user user10Editor as a collaborator.
+      await users.login('user9@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user10Editor');
+      await explorationEditorPage.navigateToMainTab();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      // Login as collaborator and make changes in title and objective which
+      // do not conflict with the user user9editor's unsaved content changes.
+      await users.login('user10@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Title Changed');
+      await explorationEditorSettingsTab.setObjective('Objective Changed.');
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      // Open the exploration again from the first user's account and try saving
+      // the unsaved changes. They should be saved.
+      await users.login('user9@editor.com');
+      await general.openEditor(explorationId, false);
+      await waitFor.pageToFullyLoad();
+      expect(await lostChangesModal.isPresent()).toBe(false);
+      await explorationEditorPage.saveChanges();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorPage.verifyExplorationSettingFields(
+        'Title Changed',
+        'Algebra',
+        'Objective Changed.',
+        'English',
+        []
+      );
+      await users.logout();
+    });
+
+  it(
+    'should show discard changes modal when the changes are conflicting',
+    async function() {
+      await users.createUser('user11@editor.com', 'user11Editor');
+      await users.createUser('user12@editor.com', 'user12Editor');
+
+      // Create an exploration as user user11Editor with title, category, and
+      // objective set and add user user12Editor as a collaborator.
+      await users.login('user11@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user12Editor');
+      await explorationEditorPage.navigateToMainTab();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      // Login as collaborator and make changes in the content of first state
+      // which conflicts with the user user11editor's unsaved content changes
+      // in the same first state.
+      await users.login('user12@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('You must be feeling great?');
+      });
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      // Open the exploration again from the first user's account and the
+      // lost changes should appear.
+      await users.login('user11@editor.com');
+      await general.openEditor(explorationId, false);
+      await waitFor.visibilityOf(
+        lostChangesModal, 'Lost Changes Modal taking too long to appear');
+      await explorationEditorPage.discardLostChanges();
+      await waitFor.pageToFullyLoad();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('You must be feeling great?');
+        }
+      );
+      await users.logout();
+    });
+
+  it(
+    'should show discard changes modal and allow downloading of lost changes',
+    async function() {
+      await users.createUser('user13@editor.com', 'user13Editor');
+      await users.createUser('user14@editor.com', 'user14Editor');
+
+      // Create an exploration as user user13Editor with title, category, and
+      // objective set and add user user14Editor as a collaborator.
+      await users.login('user13@editor.com');
+      await workflow.createExploration(true);
+      var explorationId = await general.getExplorationIdFromEditor();
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user14Editor');
+      await explorationEditorPage.navigateToMainTab();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      await users.logout();
+
+      // Login as collaborator and make changes in the content of first state
+      // which conflicts with the user user13editor's unsaved content changes
+      // in the same first state.
+      await users.login('user14@editor.com');
+      await general.openEditor(explorationId, true);
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('You must be feeling great?');
+      });
+      await explorationEditorPage.saveChanges();
+      await users.logout();
+
+      // Open the exploration again from the first user's account and the
+      // lost changes modal should appear. Try downloading the lost changes
+      // file.
+      await users.login('user13@editor.com');
+      await general.openEditor(explorationId, false);
+      await waitFor.visibilityOf(
+        lostChangesModal, 'Lost Changes Modal taking too long to appear');
+      await explorationEditorPage.discardLostChanges();
+      await waitFor.pageToFullyLoad();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('You must be feeling great?');
+        }
+      );
+      await users.logout();
+    });
+
+  it(
+    'should show a warning notification to merge the changes' +
+    ' if there are more than 50 changes in the draft',
+    async function() {
+      await users.createUser('user15@editor.com', 'user15Editor');
+
+      // Create an exploration as user user15editor and add
+      // 50 changes to the draft.
+      await users.login('user15@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 1');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 2');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 3');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 4');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 5');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 6');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 7');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 8');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 9');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 10');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 11');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 12');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 13');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 14');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 15');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 16');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 17');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 18');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 19');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 20');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 21');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 22');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 23');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 24');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 25');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 26');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 27');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 28');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 29');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 30');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 31');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 32');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 33');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 34');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 35');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 36');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 37');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 38');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 39');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 40');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 41');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 42');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 43');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 44');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 45');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 46');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 47');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 48');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 49');
+      });
+      await action.waitForAutosave();
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('Content 50');
+      });
+      await action.waitForAutosave();
+
+      // After 50th change, modal should appear recommending user to save the
+      // changes.
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-save-prompt-modal')),
+        'Save Recommendation Prompt Modal taking too long to appear');
+      await explorationEditorPage.acceptSaveRecommendationPrompt(
+        'Changed Content so many times');
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('Content 50');
+        }
+      );
+
+      await users.logout();
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);

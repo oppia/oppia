@@ -25,14 +25,9 @@ import os
 import subprocess
 import sys
 
-
+import python_utils
 from scripts import common
 from scripts import install_third_party_libs
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, python_utils).
-install_third_party_libs.main()
-
-import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 
 # List of directories whose files won't be type-annotated ever.
@@ -44,18 +39,20 @@ EXCLUDED_DIRECTORIES = [
 
 # List of files who should be type-annotated but are not.
 NOT_FULLY_COVERED_FILES = [
-    'android_validation_constants.py',
-    'android_validation_constants_test.py',
-    'appengine_config.py',
-    'appengine_config_test.py',
-    'constants.py',
-    'constants_test.py',
     'core/controllers/acl_decorators.py',
     'core/controllers/acl_decorators_test.py',
     'core/controllers/admin.py',
     'core/controllers/admin_test.py',
+    'core/controllers/android_e2e_config.py',
+    'core/controllers/android_e2e_config_test.py',
     'core/controllers/base.py',
     'core/controllers/base_test.py',
+    'core/controllers/blog_admin.py',
+    'core/controllers/blog_admin_test.py',
+    'core/controllers/blog_dashboard.py',
+    'core/controllers/blog_dashboard_test.py',
+    'core/controllers/blog_homepage.py',
+    'core/controllers/blog_homepage_test.py',
     'core/controllers/classifier.py',
     'core/controllers/classifier_test.py',
     'core/controllers/classroom.py',
@@ -68,12 +65,16 @@ NOT_FULLY_COVERED_FILES = [
     'core/controllers/concept_card_viewer_test.py',
     'core/controllers/contributor_dashboard.py',
     'core/controllers/contributor_dashboard_test.py',
+    'core/controllers/contributor_dashboard_admin.py',
+    'core/controllers/contributor_dashboard_admin_test.py',
     'core/controllers/creator_dashboard.py',
     'core/controllers/creator_dashboard_test.py',
     'core/controllers/cron.py',
     'core/controllers/cron_test.py',
     'core/controllers/custom_landing_pages.py',
     'core/controllers/custom_landing_pages_test.py',
+    'core/controllers/domain_objects_validator.py',
+    'core/controllers/domain_objects_validator_test.py',
     'core/controllers/editor.py',
     'core/controllers/editor_test.py',
     'core/controllers/email_dashboard.py',
@@ -162,11 +163,13 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/auth_validators_test.py',
     'core/domain/base_model_validators.py',
     'core/domain/base_model_validators_test.py',
+    'core/domain/beam_job_domain.py',
     'core/domain/beam_job_domain_test.py',
     'core/domain/beam_job_services.py',
     'core/domain/beam_job_services_test.py',
     'core/domain/beam_job_validators.py',
     'core/domain/beam_job_validators_test.py',
+    'core/domain/blog_domain.py',
     'core/domain/blog_domain_test.py',
     'core/domain/blog_services.py',
     'core/domain/blog_services_test.py',
@@ -232,8 +235,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/expression_parser_test.py',
     'core/domain/feedback_domain.py',
     'core/domain/feedback_domain_test.py',
-    'core/domain/feedback_jobs_continuous.py',
-    'core/domain/feedback_jobs_continuous_test.py',
     'core/domain/feedback_jobs_one_off.py',
     'core/domain/feedback_jobs_one_off_test.py',
     'core/domain/feedback_services.py',
@@ -407,8 +408,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/translation_validators_test.py',
     'core/domain/user_domain.py',
     'core/domain/user_domain_test.py',
-    'core/domain/user_jobs_continuous.py',
-    'core/domain/user_jobs_continuous_test.py',
     'core/domain/user_jobs_one_off.py',
     'core/domain/user_jobs_one_off_test.py',
     'core/domain/user_query_domain.py',
@@ -587,11 +586,10 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/value_generators/models/generators.py',
     'extensions/value_generators/models/generators_test.py',
     'extensions/visualizations/models.py',
-    'feconf.py',
     'jobs/base_jobs.py',
     'jobs/base_jobs_test.py',
-    'jobs/base_validation_jobs.py',
-    'jobs/base_validation_jobs_test.py',
+    'jobs/batch_jobs/validation_jobs.py',
+    'jobs/batch_jobs/validation_jobs_test.py',
     'jobs/decorators/validation_decorators.py',
     'jobs/decorators/validation_decorators_test.py',
     'jobs/io/job_io.py',
@@ -644,13 +642,8 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/types/topic_validation_errors_test.py',
     'jobs/types/user_validation_errors.py',
     'jobs/types/user_validation_errors_test.py',
-    'main.py',
-    'main_cron.py',
-    'main_taskqueue.py',
     'python_utils.py',
     'python_utils_test.py',
-    'schema_utils.py',
-    'schema_utils_test.py',
     'scripts/build.py',
     'scripts/build_test.py',
     'scripts/check_e2e_tests_are_captured_in_ci.py',
@@ -743,15 +736,26 @@ NOT_FULLY_COVERED_FILES = [
 
 
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
-# TODO(#13113): Change mypy command to mypy path after Python3 migration.
-MYPY_CMD = 'mypy'
-MYPY_REQUIREMENTS_PATH = os.path.join('.', 'mypy_requirements.txt')
+MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
+MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
 PYTHON3_CMD = 'python3'
 
 
 _PARSER = argparse.ArgumentParser(
     description='Python type checking using mypy script.'
 )
+
+_PARSER.add_argument(
+    '--skip-install',
+    help='If passed, skips installing dependencies.'
+    ' By default, they are installed.',
+    action='store_true')
+
+_PARSER.add_argument(
+    '--install-globally',
+    help='optional; if specified, installs mypy and its requirements globally.'
+    ' By default, they are installed to %s' % MYPY_TOOLS_DIR,
+    action='store_true')
 
 _PARSER.add_argument(
     '--files',
@@ -761,47 +765,95 @@ _PARSER.add_argument(
 )
 
 
-def get_mypy_cmd(files):
+def install_third_party_libraries(skip_install):
+    """Run the installation script.
+
+    Args:
+        skip_install: bool. Whether to skip running the installation script.
+    """
+    if not skip_install:
+        install_third_party_libs.main()
+
+
+def get_mypy_cmd(files, using_global_mypy):
     """Return the appropriate command to be run.
 
     Args:
         files: list(list(str)). List having first element as list of string.
+        using_global_mypy: bool. Whether generated command should run using
+            global mypy.
 
     Returns:
         list(str). List of command line arguments.
     """
+    if using_global_mypy:
+        mypy_cmd = 'mypy'
+    else:
+        mypy_cmd = os.path.join(
+            os.getcwd(), 'third_party', 'python3_libs', 'bin', 'mypy')
     if files:
-        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files
+        cmd = [mypy_cmd, '--config-file', CONFIG_FILE_PATH] + files
     else:
         excluded_files_regex = (
             '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
         cmd = [
-            MYPY_CMD, '--exclude', excluded_files_regex,
+            mypy_cmd, '--exclude', excluded_files_regex,
             '--config-file', CONFIG_FILE_PATH, '.'
         ]
     return cmd
 
 
-def install_mypy_prerequisites():
+def install_mypy_prerequisites(install_globally):
     """Install mypy and type stubs from mypy_requirements.txt.
+
+    Args:
+        install_globally: bool. Whether mypy and its requirements are to be
+            installed globally.
 
     Returns:
         int. The return code from installing prerequisites.
     """
-    cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
-    process = subprocess.call(
-        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    return process
+    # TODO(#13398): Change MyPy installation after Python3 migration. Now, we
+    # install packages globally for CI. In CI, pip installation is not in a way
+    # we expect.
+    if install_globally:
+        cmd = [
+            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
+            MYPY_REQUIREMENTS_FILE_PATH
+        ]
+    else:
+        cmd = [
+            PYTHON3_CMD, '-m', 'pip', 'install', '-r',
+            MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
+            '--upgrade'
+        ]
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output = process.communicate()
+    if 'can\'t combine user with prefix' in output[1]:
+        uextention_text = ['--user', '--prefix=', '--system']
+        process = subprocess.Popen(
+            cmd + uextention_text, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+
+    return process.returncode
 
 
 def main(args=None):
     """Runs the MyPy type checks."""
     parsed_args = _PARSER.parse_args(args=args)
 
+    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
+        sys.path.insert(1, directory)
+
+    install_third_party_libraries(parsed_args.skip_install)
     common.fix_third_party_imports()
 
     python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
-    return_code = install_mypy_prerequisites()
+    return_code = install_mypy_prerequisites(parsed_args.install_globally)
     if return_code != 0:
         python_utils.PRINT(
             'Cannot install Mypy and stubs for third party libraries.')
@@ -811,16 +863,32 @@ def main(args=None):
         'Installed Mypy and stubs for third party libraries.')
 
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = get_mypy_cmd(getattr(parsed_args, 'files'))
-    process = subprocess.call(cmd, stdin=subprocess.PIPE)
+    cmd = get_mypy_cmd(
+        parsed_args.files, parsed_args.install_globally)
 
-    if process == 0:
+    _paths_to_insert = [
+        MYPY_TOOLS_DIR,
+        os.path.join(MYPY_TOOLS_DIR, 'bin'),
+    ]
+    env = os.environ.copy()
+    for path in _paths_to_insert:
+        env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
+    env['PYTHONPATH'] = MYPY_TOOLS_DIR
+
+    process = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+    stdout, stderr = process.communicate()
+    python_utils.PRINT(stdout)
+    python_utils.PRINT(stderr)
+    if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
         python_utils.PRINT(
-            'Mypy type checks unsuccessful. Please fix the errors.')
+            'Mypy type checks unsuccessful. Please fix the errors. '
+            'For more information, visit: '
+            'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
         sys.exit(1)
-    return process
+    return process.returncode
 
 
 if __name__ == '__main__': # pragma: no cover

@@ -31,15 +31,16 @@ import { StorySummary } from 'domain/story/story-summary.model';
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary: StorySummary;
+  @Input() topicName?: string;
   nodeCount: number;
   completedNodeCount: number;
   storyProgress: number;
   thumbnailUrl: string = null;
   storyLink: string;
   storyTitle: string;
-  topicName: string;
   storyCompleted: boolean = false;
   thumbnailBgColor: string;
+  starImageUrl: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -77,7 +78,10 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
-    this.topicName = this.storySummary.getTopicName();
+    if (!this.topicName) {
+      this.topicName = this.storySummary.getTopicName();
+    }
+    this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
   getStaticImageUrl(imagePath: string): string {
