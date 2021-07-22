@@ -25,8 +25,8 @@ import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 describe('Blog Dashboard backend api service', () => {
   let bdbas: BlogDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
-  let successHandler = null;
-  let failHandler = null;
+  let successHandler;
+  let failHandler;
   let blogDashboardBackendResponse = {
     username: 'testUsername',
     profile_picture_data_url: 'image',
@@ -113,7 +113,7 @@ describe('Blog Dashboard backend api service', () => {
     fakeAsync(() => {
       bdbas.fetchBlogDashboardDataAsync().then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
+      let req = httpTestingController.expectOne(
         BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE);
       expect(req.request.method).toEqual('GET');
 

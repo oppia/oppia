@@ -60,31 +60,31 @@ export class BlogPostData {
     this._publishedOn = publishedOn;
   }
 
-  get Id(): string | null {
+  get id(): string | null {
     return this._id;
   }
 
-  get AuthorUsername(): string {
+  get authorUsername(): string {
     return this._authorUsername;
   }
 
-  get LastUpdated(): number | undefined {
+  get lastUpdated(): number | undefined {
     return this._lastUpdated;
   }
 
-  get PublishedOn(): number | undefined {
+  get publishedOn(): number | undefined {
     return this._publishedOn;
   }
 
-  set Title(title: string) {
+  set title(title: string) {
     this._title = title;
   }
 
-  get Title(): string {
+  get title(): string {
     return this._title;
   }
 
-  get Tags(): string[] {
+  get tags(): string[] {
     return this._tags.slice();
   }
 
@@ -97,23 +97,23 @@ export class BlogPostData {
     this._tags.splice(index, 1);
   }
 
-  get UrlFragment(): string {
+  get urlFragment(): string {
     return this._urlFragment;
   }
 
-  set ThumbnailFilename(thumbnailFilename: string) {
+  set thumbnailFilename(thumbnailFilename: string) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  get ThumbnailFilename(): string | null {
+  get thumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
-  get Content(): string {
+  get content(): string {
     return this._content;
   }
 
-  set Content(content: string) {
+  set content(content: string) {
     this._content = content;
   }
 

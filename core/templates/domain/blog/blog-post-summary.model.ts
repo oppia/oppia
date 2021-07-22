@@ -60,39 +60,39 @@ export class BlogPostSummary {
     this._publishedOn = publishedOn;
   }
 
-  get Id(): string {
+  get id(): string {
     return this._id;
   }
 
-  get AuthorUsername(): string {
+  get authorUsername(): string {
     return this._authorUsername;
   }
 
-  get LastUpdated(): number | undefined {
+  get lastUpdated(): number | undefined {
     return this._lastUpdated;
   }
 
-  get PublishedOn(): number | undefined {
+  get publishedOn(): number | undefined {
     return this._publishedOn;
   }
 
-  get Title(): string {
+  get title(): string {
     return this._title;
   }
 
-  get Tags(): string[] {
+  get tags(): string[] {
     return this._tags.slice();
   }
 
-  get UrlFragment(): string {
+  get urlFragment(): string {
     return this._urlFragment;
   }
 
-  get Summary(): string {
+  get summary(): string {
     return this._summary;
   }
 
-  get ThumbnailFilename(): string | null {
+  get thumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 

@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post-model';
+import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HttpClient } from '@angular/common/http';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';

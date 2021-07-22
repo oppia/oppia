@@ -19,16 +19,14 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from './blog-post-editor-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { BlogPostData } from 'domain/blog/blog-post-model';
+import { BlogPostData } from 'domain/blog/blog-post.model';
 
 describe('Blog Post Editor backend api service', () => {
   let bpebas: BlogPostEditorBackendApiService;
   let httpTestingController: HttpTestingController;
   let blogPostEditorDataObject: BlogPostEditorData;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let successHandler;
+  let failHandler;
 
   const fakeImage = (): File => {
     const blob = new Blob([''], { type: 'image/jpeg' });
@@ -58,7 +56,6 @@ describe('Blog Post Editor backend api service', () => {
     });
     bpebas = TestBed.inject(BlogPostEditorBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
     blogPostEditorDataObject = {
@@ -70,9 +67,6 @@ describe('Blog Post Editor backend api service', () => {
       blogPostDict: BlogPostData.createFromBackendDict(
         blogPostEditorBackendResponse.blog_post_dict)
     };
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
-      return Promise.resolve('sample-csrf-token');
-    });
   });
 
   afterEach(() => {

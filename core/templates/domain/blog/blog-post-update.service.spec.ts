@@ -17,7 +17,7 @@
  */
 
 import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
-import { BlogPostData } from 'domain/blog/blog-post-model';
+import { BlogPostData } from 'domain/blog/blog-post.model';
 import { TestBed } from '@angular/core/testing';
 
 describe('Blog Post update service', () => {
@@ -46,11 +46,11 @@ describe('Blog Post update service', () => {
       let expectedChangeDict = {
         title: 'story'
       };
-      expect(sampleBlogPost.Title).toEqual('sampleTitle');
+      expect(sampleBlogPost.title).toEqual('sampleTitle');
 
       blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
 
-      expect(sampleBlogPost.Title).toEqual('story');
+      expect(sampleBlogPost.title).toEqual('story');
       expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
         expectedChangeDict);
     });
@@ -66,27 +66,27 @@ describe('Blog Post update service', () => {
       thumbnail_filename: 'sample_image'
     };
 
-    expect(sampleBlogPost.ThumbnailFilename).toEqual('image');
+    expect(sampleBlogPost.thumbnailFilename).toEqual('image');
 
     blogPostUpdateService.setBlogPostThumbnail(sampleBlogPost, image);
 
-    expect(sampleBlogPost.ThumbnailFilename).toEqual('sample_image');
+    expect(sampleBlogPost.thumbnailFilename).toEqual('sample_image');
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       expectedChangeDict);
   });
 
   it('should update the blog post tags and add the change', () => {
-    expect(sampleBlogPost.Tags).toEqual(['news']);
+    expect(sampleBlogPost.tags).toEqual(['news']);
 
     blogPostUpdateService.addBlogPostTag(sampleBlogPost, 'learners');
 
-    expect(sampleBlogPost.Tags).toEqual(['news', 'learners']);
+    expect(sampleBlogPost.tags).toEqual(['news', 'learners']);
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       { tags: ['news', 'learners'] });
 
     blogPostUpdateService.removeBlogPostTag(sampleBlogPost, 'learners');
 
-    expect(sampleBlogPost.Tags).toEqual(['news']);
+    expect(sampleBlogPost.tags).toEqual(['news']);
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
       { tags: ['news']});
   });
@@ -96,12 +96,12 @@ describe('Blog Post update service', () => {
       let expectedChangeDict = {
         content: '<p>Hello World</p>'
       };
-      expect(sampleBlogPost.Content).toEqual('<p>Hello</p>');
+      expect(sampleBlogPost.content).toEqual('<p>Hello</p>');
 
       blogPostUpdateService.setBlogPostContent(
         sampleBlogPost, '<p>Hello World</p>');
 
-      expect(sampleBlogPost.Content).toEqual('<p>Hello World</p>');
+      expect(sampleBlogPost.content).toEqual('<p>Hello World</p>');
       expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
         expectedChangeDict);
     });

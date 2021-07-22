@@ -16,7 +16,7 @@
  * @fileoverview Service to handle the updating of a blog post.
  */
 import { Injectable } from '@angular/core';
-import { BlogPostData } from 'domain/blog/blog-post-model';
+import { BlogPostData } from 'domain/blog/blog-post.model';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export interface BlogPostChangeDict {
@@ -38,28 +38,28 @@ export class BlogPostUpdateService {
   changeDict: BlogPostChangeDict = {};
 
   setBlogPostTitle(blogPost: BlogPostData, title: string): void {
-    blogPost.Title = title;
+    blogPost.title = title;
     this.changeDict.title = title;
   }
 
   setBlogPostThumbnail(blogPost: BlogPostData, image: ImageData[]): void {
     let filename = image[0].filename;
-    blogPost.ThumbnailFilename = filename;
+    blogPost.thumbnailFilename = filename;
     this.changeDict.thumbnail_filename = filename;
   }
 
   addBlogPostTag(blogPost: BlogPostData, tag: string): void {
     blogPost.addTag(tag);
-    this.changeDict.tags = blogPost.Tags;
+    this.changeDict.tags = blogPost.tags;
   }
 
   removeBlogPostTag(blogPost: BlogPostData, tag: string): void {
     blogPost.removeTag(tag);
-    this.changeDict.tags = blogPost.Tags;
+    this.changeDict.tags = blogPost.tags;
   }
 
   setBlogPostContent(blogPost: BlogPostData, content: string): void {
-    blogPost.Content = content;
+    blogPost.content = content;
     this.changeDict.content = content;
   }
 
