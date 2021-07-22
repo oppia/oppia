@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for libraryFooter.
+ * @fileoverview Unit tests for oppiaLibraryFooter.
  */
 
 import { TestBed, ComponentFixture } from '@angular/core/testing';
@@ -34,12 +34,6 @@ class MockWindowRef {
       set pathname(val: string) {
         this._pathname = val;
       },
-      get href(): string {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      }
     }
   };
   get nativeWindow() {

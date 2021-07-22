@@ -13,33 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the library footer.
+ * @fileoverview Component for the library footer.
  */
 
-import {Component, OnInit} from '@angular/core';
-import {LibraryPageConstants} from 'pages/library-page/library-page.constants';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {downgradeComponent} from '@angular/upgrade/static';
+import { Component, OnInit } from '@angular/core';
+import { LibraryPageConstants } from 'pages/library-page/library-page.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'library-footer',
-  templateUrl: './library-footer.component.html',
-  styleUrls: []
+  selector: 'oppia-library-footer',
+  templateUrl: './library-footer.component.html'
 })
 export class LibraryFooterComponent implements OnInit {
-    footerIsDisplayed: boolean = true;
+    footerIsDisplayed: boolean;
 
     constructor(private windowRef: WindowRef) {}
 
     ngOnInit(): void {
-      var path = this.windowRef.nativeWindow.location.pathname;
-      var pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[path];
+      let path = this.windowRef.nativeWindow.location.pathname;
+      const pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[path];
       this.footerIsDisplayed =
           (pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH);
     }
 }
 
-angular.module('oppia').directive('libraryFooter',
+angular.module('oppia').directive('oppiaLibraryFooter',
     downgradeComponent({
       component: LibraryFooterComponent
     }) as angular.IDirectiveFactory);
