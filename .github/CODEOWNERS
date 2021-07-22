@@ -638,10 +638,10 @@
 
 
 # Frontend unit tests
-/core/templates/**/*.spec.ts @nithusha21
-/core/templates/**/*Spec.ts @nithusha21
-/extensions/**/*.spec.ts @nithusha21
-/extensions/**/*Spec.ts @nithusha21
+/core/templates/**/*.spec.ts @oppia/frontend-test-reviewers
+/core/templates/**/*Spec.ts @oppia/frontend-test-reviewers
+/extensions/**/*.spec.ts @oppia/frontend-test-reviewers
+/extensions/**/*Spec.ts @oppia/frontend-test-reviewers
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
