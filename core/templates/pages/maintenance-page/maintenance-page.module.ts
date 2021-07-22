@@ -22,8 +22,6 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { MaintenancePageComponent } from
   'pages/maintenance-page/maintenance-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';

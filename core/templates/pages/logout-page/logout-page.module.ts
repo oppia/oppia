@@ -20,7 +20,6 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';

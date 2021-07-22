@@ -22,8 +22,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 import { ProfilePageComponent } from './profile-page.component';
