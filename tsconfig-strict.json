@@ -167,6 +167,8 @@
     "core/templates/domain/feedback_message/feedback-message-summary.model.spec.ts",
     "core/templates/domain/feedback_thread/FeedbackThreadObjectFactory.ts",
     "core/templates/domain/feedback_thread/FeedbackThreadObjectFactorySpec.ts",
+    "core/templates/domain/improvements/exploration-improvements-config.model.ts",
+    "core/templates/domain/improvements/exploration-improvements-config.model.spec.ts",
     "core/templates/domain/improvements/high-bounce-rate-task.model.ts",
     "core/templates/domain/improvements/high-bounce-rate-task.model.spec.ts",
     "core/templates/domain/improvements/improvements.constants.ts",
