@@ -130,10 +130,10 @@
                   <span class="oppia-user-role-description protractor-test-user-role-description">
                     <strong>{{ UPDATABLE_ROLES[role] | titlecase }}</strong>
                   </span>
-                  <div class="oppia-progress-spinner protractor-test-progress-spinner" *ngIf="roleInUpdate === role">
+                  <div class="oppia-progress-spinner protractor-test-progress-spinner" *ngIf="roleCurrentlyBeingUpdatedInBackend === role">
                     <mat-spinner [diameter]="24"></mat-spinner>
                   </div>
-                  <div class="d-flex" *ngIf="roleInUpdate !== role">
+                  <div class="d-flex" *ngIf="roleCurrentlyBeingUpdatedInBackend !== role">
                     <button *ngIf="role === 'TOPIC_MANAGER'" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="openTopicManagerRoleEditor()">
                       <mat-icon matListIcon>edit</mat-icon>
                     </button>

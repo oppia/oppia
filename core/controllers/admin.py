@@ -893,6 +893,7 @@ class BannedUsersHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
+        topic_services.deassign_user_from_all_topics(self.user, user_id)
         user_services.mark_user_banned(user_id)
 
         self.render_json({})
@@ -905,7 +906,6 @@ class BannedUsersHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
-        topic_services.deassign_user_from_all_topics(self.user, user_id)
         user_services.unmark_user_banned(user_id)
 
         self.render_json({})

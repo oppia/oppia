@@ -40,7 +40,7 @@ export class AdminRolesTabComponent implements OnInit {
   userRoles = [];
   possibleRolesToAdd = [];
   managedTopicIds = [];
-  roleInUpdate = null;
+  roleCurrentlyBeingUpdatedInBackend = null;
   errorMessage = null;
   bannedStatusChangeInProgress = false;
   userIsBanned = false;
@@ -76,7 +76,9 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   removeRole(roleToRemove: string): void {
-    this.roleInUpdate = roleToRemove;
+    // Updating roleCurrentlyBeingUpdatedInBackend as the given roleToRemove
+    // is being removed from the user roles.
+    this.roleCurrentlyBeingUpdatedInBackend = roleToRemove;
 
     var roleIndex = this.userRoles.indexOf(roleToRemove);
     this.adminBackendApiService.removeUserRoleAsync(
@@ -85,7 +87,7 @@ export class AdminRolesTabComponent implements OnInit {
         this.managedTopicIds = [];
       }
       this.userRoles.splice(roleIndex, 1);
-      this.roleInUpdate = null;
+      this.roleCurrentlyBeingUpdatedInBackend = null;
     });
   }
 
@@ -115,13 +117,15 @@ export class AdminRolesTabComponent implements OnInit {
       this.openTopicManagerRoleEditor();
       return;
     }
-    this.roleInUpdate = role;
+    // Updating roleCurrentlyBeingUpdatedInBackend as the given role is being
+    // added to the user roles.
+    this.roleCurrentlyBeingUpdatedInBackend = role;
     this.userRoles.push(role);
     this.roleSelectorIsShown = false;
 
     this.adminBackendApiService.addUserRoleAsync(
       role, this.username).then(() => {
-      this.roleInUpdate = null;
+      this.roleCurrentlyBeingUpdatedInBackend = null;
     }, this.addWarning.bind(this));
   }
 
@@ -151,7 +155,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.userRoles = [];
     this.possibleRolesToAdd = [];
     this.managedTopicIds = [];
-    this.roleInUpdate = null;
+    this.roleCurrentlyBeingUpdatedInBackend = null;
     this.bannedStatusChangeInProgress = false;
     this.userIsBanned = false;
     this.roleIsCurrentlyBeingEdited = false;

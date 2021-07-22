@@ -138,13 +138,13 @@ describe('Admin roles tab component ', function() {
 
   it('should flush the value to properties on calling clearEditor', () => {
     component.userRoles = ['MODERATOR'];
-    component.roleInUpdate = 'FULL_USER';
+    component.roleCurrentlyBeingUpdatedInBackend = 'FULL_USER';
     component.userIsBanned = true;
 
     component.clearEditor();
 
     expect(component.userRoles).toEqual([]);
-    expect(component.roleInUpdate).toEqual(null);
+    expect(component.roleCurrentlyBeingUpdatedInBackend).toEqual(null);
     expect(component.userIsBanned).toEqual(false);
   });
 
