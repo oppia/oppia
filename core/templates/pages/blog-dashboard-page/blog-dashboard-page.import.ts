@@ -40,3 +40,5 @@ require(
   'pages/blog-dashboard-page/navbar/' +
   'blog-dashboard-navbar-breadcrumb.component.ts'
 );
+require(
+  'pages/blog-dashboard-page/' + 'blog-dashboard-page.component.ts');

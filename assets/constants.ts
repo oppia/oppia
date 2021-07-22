@@ -5588,7 +5588,7 @@ export default {
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
   "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
-  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 240,
+  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the

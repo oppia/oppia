@@ -1,0 +1,10 @@
+<mat-card>
+    <mat-card-header>
+        <img mat-card-avatar
+        [src]="authorProfilePictureUrl">
+    </img>
+    <mat-card-title class="blog-card-title">{{blogPostSummary.Title}}</mat-card-title>
+    <mat-card-subtitle>{{blogPostSummary.AuthorUsername}}</mat-card-subtitle>
+      <mat-card-subtitle class="blog-card-published-date">{{blogPostSummary.PublishedOn}}</mat-card-subtitle>
+    </mat-card-header>
+</mat-card>
