@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for oppiaLibraryFooter.
+ * @fileoverview Unit tests for libraryFooter.
  */
 
 import { TestBed, ComponentFixture } from '@angular/core/testing';
