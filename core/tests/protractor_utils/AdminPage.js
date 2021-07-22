@@ -75,8 +75,6 @@ var AdminPage = function() {
     '.protractor-test-one-off-jobs-start-btn');
   var oneOffjobsStopBtnCssSelector = by.css(
     '.protractor-test-one-off-jobs-stop-btn');
-  var oneOffJobsIdCssSelector = by.css(
-    '.protractor-test-unfinished-one-off-jobs-id');
   var unfinishedJobsCardCssSelector = by.css(
     '.protractor-test-unfinished-jobs-card');
 
@@ -302,7 +300,7 @@ var AdminPage = function() {
   };
 
   this.expectNumberOfRunningOneOffJobs = async function(count) {
-    var len = await element.all(oneOffJobsIdCssSelector).count();
+    var len = await element.all(by.css(unfinishedOffJobIDClassName)).count();
     expect(len).toEqual(count);
   };
 
