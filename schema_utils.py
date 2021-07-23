@@ -641,7 +641,4 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object matched with the regex pattern.
         """
-        regex_match = re.findall(regex_pattern, obj)
-        if regex_match:
-            return True
-        return False
+        return bool(re.search(regex_pattern, obj))

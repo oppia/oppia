@@ -92,7 +92,10 @@ class CreatorDashboardHandler(base.BaseHandler):
             'display_preference': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values() # pylint: disable=line-too-long
+                    'choices': (
+                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS
+                        .values()
+                    )
                 }
             }
         }
