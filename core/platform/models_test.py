@@ -353,12 +353,12 @@ class RegistryUnitTest(test_utils.TestBase):
         with self.swap(constants, 'EMULATOR_MODE', False):
             from core.platform.translate import cloud_translate_services
             self.assertEqual(
-                self.registry_instance.import_cloud_translate_services(),
+                self.registry_instance.import_translate_services(),
                 cloud_translate_services)
 
         from core.platform.translate import dev_mode_translate_services
         self.assertEqual(
-            self.registry_instance.import_cloud_translate_services(),
+            self.registry_instance.import_translate_services(),
             dev_mode_translate_services)
 
     def test_import_search_services(self):

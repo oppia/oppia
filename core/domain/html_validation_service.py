@@ -502,38 +502,6 @@ def check_for_math_component_in_html(html_string):
     return bool(math_tags)
 
 
-def get_latex_strings_without_svg_from_html(html_string):
-    """Extract LaTeX strings from math rich-text components whose svg_filename
-    field is empty.
-
-    Args:
-        html_string: str. The HTML string.
-
-    Returns:
-        list(bytes). List of unique LaTeX bytes from math-tags without svg
-        filename.
-    """
-
-    soup = bs4.BeautifulSoup(
-        html_string.encode(encoding='utf-8'), 'html.parser')
-    latex_bytes_set = set()
-    for math_tag in soup.findAll(name='oppia-noninteractive-math'):
-        math_content_dict = (
-            json.loads(unescape_html(
-                math_tag['math_content-with-value'])))
-        raw_latex = (
-            objects.UnicodeString.normalize(math_content_dict['raw_latex']))
-        svg_filename = (
-            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
-        if svg_filename == '':
-            # The raw_latex is string, but we want to return list of bytes,
-            # so we need to need to encode it.
-            latex_bytes_set.add(raw_latex.encode('utf-8'))
-
-    unique_latex_strings = list(latex_bytes_set)
-    return unique_latex_strings
-
-
 def extract_svg_filenames_in_math_rte_components(html_string):
     """Extracts the svg_filenames from all the math-rich text components in
     an HTML string.

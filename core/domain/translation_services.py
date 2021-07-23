@@ -24,7 +24,7 @@ import logging
 from core.domain import translation_fetchers
 from core.platform import models
 
-cloud_translate_services = models.Registry.import_cloud_translate_services()
+translate_services = models.Registry.import_translate_services()
 
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
@@ -57,7 +57,7 @@ def get_and_cache_machine_translation(
 
     translated_text = None
     try:
-        translated_text = cloud_translate_services.translate_text(
+        translated_text = translate_services.translate_text(
             source_text, source_language_code, target_language_code)
     # An error here indicates a valid, but not allowlisted language code, or an
     # error raised by the Google Cloud Translate API. The error is logged

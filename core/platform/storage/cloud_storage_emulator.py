@@ -49,12 +49,12 @@ class Blob(python_utils.OBJECT):
         self._name = name
         self._raw_bytes = (
             data.encode('utf-8') if isinstance(data, str) else data)
-        if (
-                content_type is not None and
-                mimetypes.guess_extension(content_type) is None
-        ):
-            raise Exception('Content type contains unknown MIME type.')
-        self._content_type = content_type
+        if content_type is None:
+            self._content_type, _ = mimetypes.guess_type(name)
+        else:
+            if mimetypes.guess_extension(content_type) is None:
+                raise Exception('Content type contains unknown MIME type.')
+            self._content_type = content_type
 
     @classmethod
     def create_copy(cls, original_blob, new_name):
@@ -81,11 +81,12 @@ class Blob(python_utils.OBJECT):
         """
         # Since Redis saves all values in bytes, we do an encode on values and
         # also use byte keys.
-        return {
+        blob_dict = {
             b'name': self._name.encode('utf-8'),
             b'raw_bytes': self._raw_bytes,
             b'content_type': self._content_type.encode('utf-8')
         }
+        return blob_dict
 
     @classmethod
     def from_dict(cls, blob_dict):
@@ -174,13 +175,14 @@ class CloudStorageEmulator(python_utils.OBJECT):
             Blob. The blob.
         """
         blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
-        return Blob.from_dict(blob_dict) if blob_dict is not None else None
+        print(blob_dict)
+        return Blob.from_dict(blob_dict) if blob_dict else None
 
     def upload_blob(self, filepath, blob):
         """Upload the given blob to the filepath.
 
         Args:
-            filepath: str. Filepath where upload the blob to.
+            filepath: str. Filepath to upload the blob to.
             blob: Blob. The blob to upload.
         """
         if not REDIS_CLIENT.hset(

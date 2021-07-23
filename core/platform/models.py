@@ -331,7 +331,7 @@ class _Gae(Platform):
         return elastic_search_services
 
     @classmethod
-    def import_cloud_translate_services(cls):
+    def import_translate_services(cls):
         """Imports and returns cloud_translate_services module.
 
         Returns:
@@ -490,13 +490,13 @@ class Registry(python_utils.OBJECT):
         return cls._get().import_taskqueue_services()
 
     @classmethod
-    def import_cloud_translate_services(cls):
+    def import_translate_services(cls):
         """Imports and returns cloud_translate_services module.
 
         Returns:
             module. The cloud_translate_services module.
         """
-        return cls._get().import_cloud_translate_services()
+        return cls._get().import_translate_services()
 
     @classmethod
     def import_search_services(cls):

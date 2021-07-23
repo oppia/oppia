@@ -275,9 +275,9 @@ class TranslatableTextHandler(base.BaseHandler):
 
         Args:
             state_names_to_content_id_mapping:
-                dict(str, dict(str, TranslatableItem)). A dict where state_name
-                is the key and a dict with content_id as the key and
-                TranslatableItem as value.
+                dict(str, dict(str, TranslatableItem)). A dict whose keys are
+                state names, and whose corresponding values are each dicts
+                mapping content IDs to the corresponding translatable items.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
