@@ -50,8 +50,7 @@ export class HybridRouterModuleProvider {
     // Checks whether the page is using angular router.
     if (bodyContent) {
       // eslint-disable-next-line oppia/no-inner-html
-      if (bodyContent.innerHTML.indexOf(
-        '<router-outlet></router-outlet>') > -1) {
+      if (bodyContent.innerHTML.indexOf('</router-outlet>') > -1) {
         return {
           ngModule: RouterModule
         };
