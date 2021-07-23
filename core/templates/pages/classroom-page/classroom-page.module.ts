@@ -18,6 +18,7 @@
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -27,7 +28,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { ClassroomPageComponent } from './classroom-page.component';
 import { TopicSummaryTileComponent } from
   'components/summary-tile/topic-summary-tile.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClassroomPageRootComponent } from './classroom-page-root.component';
 
 @NgModule({

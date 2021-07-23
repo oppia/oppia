@@ -33,8 +33,8 @@ export class SideNavigationBarComponent {
    @Input() display!: boolean;
    currentUrl!: string;
    classroomSubmenuIsShown: boolean = false;
-   ROUTES_REGISTERED_WITH_FRONTEND = (
-     AppConstants.ROUTES_REGISTERED_WITH_FRONTEND);
+   PAGES_REGISTERED_WITH_FRONTEND = (
+     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
    constructor(
      private windowRef: WindowRef,

@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateCacheService } from 'ngx-translate-cache';
@@ -124,7 +124,7 @@ const componentMap = {
   }
 };
 
-let areRteElementsInitialized = false;
+let rteElementsAreInitialized = false;
 
 @Component({
   selector: 'oppia-angular-root',
@@ -151,7 +151,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static injector: Injector;
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
@@ -170,19 +169,21 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private urlService: UrlService,
     private injector: Injector
   ) {
-    if (!areRteElementsInitialized) {
-      for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
-        const rteElement = createCustomElement(
-          componentMap[rteKey].component_class,
-          {injector: this.injector});
-        customElements.define(
-          'oppia-noninteractive-' +
-          ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
-          rteElement
-        );
-      }
+    if (rteElementsAreInitialized) {
+      return;
     }
-    areRteElementsInitialized = true;
+
+    for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
+      const rteElement = createCustomElement(
+        componentMap[rteKey].component_class,
+        {injector: this.injector});
+      customElements.define(
+        'oppia-noninteractive-' +
+        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
+        rteElement
+      );
+    }
+    rteElementsAreInitialized = true;
   }
 
   public ngAfterViewInit(): void {

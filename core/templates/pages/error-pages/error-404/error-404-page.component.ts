@@ -23,7 +23,7 @@ import { UrlInterpolationService } from
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
-  selector: 'error-404-page',
+  selector: 'oppia-error-404-page',
   templateUrl: './error-404-page.component.html',
   styleUrls: []
 })

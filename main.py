@@ -925,10 +925,10 @@ if constants.DEV_MODE:
             android_e2e_config.InitializeAndroidTestDataHandler))
 
 # Redirect all routes handled using angular router to the oppia root page.
-for route in constants.ROUTES_REGISTERED_WITH_FRONTEND.values():
+for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     URLS.append(
         get_redirect_route(
-            r'/%s' % route,
+            r'/%s' % page['ROUTE'],
             oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).

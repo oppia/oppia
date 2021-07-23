@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { WindowRef } from './window-ref.service';
 
-interface MetaAttribute {
+export interface MetaAttribute {
   propertyType: string;
   propertyValue: string;
   content: string;

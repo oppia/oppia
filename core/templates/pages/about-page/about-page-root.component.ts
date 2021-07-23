@@ -17,7 +17,8 @@
  */
 
 import { Component } from '@angular/core';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { AppConstants } from 'app.constants';
+import { MetaAttribute, MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -31,18 +32,19 @@ export class AboutPageRootComponent {
   ) {}
 
   ngOnInit(): void {
-    // Update default title and meta tags.
-    this.pageTitleService.setPageTitle('About | Oppia');
-    this.metaTagCustomizationService.addOrReplaceMetaTags([
-      {
-        propertyType: 'name',
-        propertyValue: 'description',
-        content: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      }
-    ]);
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+
+    let metaAttributes: MetaAttribute[] = [];
+    for (let i = 0; i < pageData.META.length; i++) {
+      metaAttributes.push({
+        propertyType: pageData.META[i].PROPERTY_TYPE,
+        propertyValue: pageData.META[i].PROPERTY_VALUE,
+        content: pageData.META[i].CONTENT
+      });
+    }
+    // Update meta tags.
+    this.metaTagCustomizationService.addOrReplaceMetaTags(metaAttributes);
   }
 }
