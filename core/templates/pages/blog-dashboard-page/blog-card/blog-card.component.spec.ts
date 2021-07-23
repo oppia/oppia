@@ -74,6 +74,9 @@ describe('Blog Dashboard Tile Component', () => {
     dateTimeFormatService = TestBed.inject(DateTimeFormatService) as
       jasmine.SpyObj<DateTimeFormatService>;
     component = fixture.componentInstance;
+
+    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
+      sampleBlogPostSummary);
   });
 
   it('should create', () => {
@@ -92,8 +95,6 @@ describe('Blog Dashboard Tile Component', () => {
     });
 
   it('should initialize', () => {
-    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
     component.authorProfilePicDataUrl = 'data_image_url';
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('sample_url');
