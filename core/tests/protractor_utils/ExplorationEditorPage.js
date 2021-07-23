@@ -86,7 +86,7 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-exploration-category-dropdown'));
   var expLanguage = element(
     by.css('.protractor-test-exploration-language-select'));
-  var neutralElement = element(
+  var explorationMetaDataModalHeaderElement = element(
     by.css('.protractor-test-metadata-modal-header'));
   var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
   var explorationTitle = element(by.css(
@@ -162,11 +162,15 @@ var ExplorationEditorPage = function() {
     await action.click('Publish button', publishExplorationButton);
 
     await action.sendKeys('Exploration title', expTitle, title);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetaDataModalHeaderElement);
     await action.waitForAutosave();
 
     await action.sendKeys('Exploration objective', expObjective, objective);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetaDataModalHeaderElement);
     await action.waitForAutosave();
 
     await waitFor.presenceOf(
@@ -174,17 +178,23 @@ var ExplorationEditorPage = function() {
     await (
       await forms.AutocompleteDropdownEditor(expCategory)
     ).setValue(category);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetaDataModalHeaderElement);
     await action.waitForAutosave();
 
     await action.select('Exploration Language', expLanguage, language);
-    await action.click('Neutral Element', neutralElement);
+    await action.click(
+      'Exploration metadata modal header',
+      explorationMetaDataModalHeaderElement);
     await action.waitForAutosave();
 
     for (var elem of tags) {
       await action.click('Exploration input', expInput);
       await action.sendKeys('Exploration input', expInput, elem + '\n');
-      await action.click('Neutral Element', neutralElement);
+      await action.click(
+        'Exploration metadata modal header',
+        explorationMetaDataModalHeaderElement);
       await action.waitForAutosave();
     }
 
