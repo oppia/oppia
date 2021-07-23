@@ -640,7 +640,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['signup'],
       filename: 'signup-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Sign up for Oppia and begin exploring a new subject.'

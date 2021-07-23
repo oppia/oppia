@@ -566,7 +566,7 @@
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_ADMIN": "Používateľské mená s \"admin\" sú rezervované.",
 	"I18N_SIGNUP_ERROR_USERNAME_WITH_SPACES": "Prosím uistite sa, že Vaše používateľské meno neobsahuje medzery.",
 	"I18N_SIGNUP_FIELD_REQUIRED": "Toto políčko je povinné.",
-	"I18N_SIGNUP_LICENSE_NOTE": "Prosím vezmite na vedomie, že odsúhlasením podmienok používania súhlasíte, že akýkoľvek obsah alebo príspevok, ktorý urobíte na našich stránka sú a budú licencované cez CC-BY-SA v.4.0. Prosím preskúmajte naše <a href=\"/terms\">Podmienky používania</a> pre viac informácií o licenčnom grante. Pre viac informácií o CC-BY-SA, kliknite <a href=\"#\" ng-click=\"$ctrl.showLicenseExplanationModal()\">sem</a>.",
+	"I18N_SIGNUP_LICENSE_NOTE": "Prosím vezmite na vedomie, že odsúhlasením podmienok používania súhlasíte, že akýkoľvek obsah alebo príspevok, ktorý urobíte na našich stránka sú a budú licencované cez CC-BY-SA v.4.0. Prosím preskúmajte naše <a href=\"/terms\">Podmienky používania</a> pre viac informácií o licenčnom grante. Pre viac informácií o CC-BY-SA, kliknite <a href=\"#\">sem</a>.",
 	"I18N_SIGNUP_LICENSE_OBJECTIVE": "Používanie <[licenselink]> licencie povoľuje, aby bol obsah prieskumných výprav voľne kopírovateľný, používaný, upravovaný a prerozdelený. Hlavná podmienka je, že ak niekto vytvorí alebo upraví na základe tohto materiálu tak jeho/jej výtvor podlieha tej istej licencii.",
 	"I18N_SIGNUP_LOADING": "Načítavanie",
 	"I18N_SIGNUP_PAGE_TITLE": "Pridajte sa ku komunite - Oppia",
