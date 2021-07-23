@@ -67,7 +67,6 @@ describe('TopNavigationBarComponent', () => {
   let fixture: ComponentFixture<TopNavigationBarComponent>;
   let component: TopNavigationBarComponent;
   let mockWindowRef: MockWindowRef;
-  let cbas: ClassroomBackendApiService;
   let searchService: SearchService;
   let wds: WindowDimensionsService;
   let userService: UserService;
@@ -76,30 +75,8 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let debouncerService: DebouncerService;
   let sidebarStatusService: SidebarStatusService;
-  let urlInterpolationService: UrlInterpolationService;
 
   let mockResizeEmitter: EventEmitter<void>;
-
-  // let userInfo = {
-  //   _isModerator: true,
-  //   _isAdmin: true,
-  //   _isTopicManager: false,
-  //   _isSuperAdmin: false,
-  //   _canCreateCollections: true,
-  //   _preferredSiteLanguageCode: 'en',
-  //   _username: 'username1',
-  //   _email: 'tester@example.org',
-  //   _isLoggedIn: true,
-  //   isModerator: () => true,
-  //   isAdmin: () => false,
-  //   isSuperAdmin: () => false,
-  //   isTopicManager: () => false,
-  //   canCreateCollections: () => true,
-  //   getPreferredSiteLanguageCode: () =>'en',
-  //   getUsername: () => 'username1',
-  //   getEmail: () => 'tester@example.org',
-  //   isLoggedIn: () => true
-  // } as UserInfo;
 
   beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
@@ -135,7 +112,6 @@ describe('TopNavigationBarComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopNavigationBarComponent);
     component = fixture.componentInstance;
-    cbas = TestBed.inject(ClassroomBackendApiService);
     searchService = TestBed.inject(SearchService);
     wds = TestBed.inject(WindowDimensionsService);
     userService = TestBed.inject(UserService);
@@ -144,80 +120,10 @@ describe('TopNavigationBarComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     debouncerService = TestBed.inject(DebouncerService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     spyOn(searchService, 'onSearchBarLoaded')
       .and.returnValue(new EventEmitter<string>());
   });
-
-  // it('should set component properties on initialization', fakeAsync(() => {
-  //   spyOn(userService, 'getProfileImageDataUrlAsync').and.resolveTo(
-  //     '%2Fprofile%2Fpicture');
-  //   spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
-  //     .and.resolveTo(true);
-  //   spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-  //   spyOn(component, 'truncateNavbar').and.stub();
-
-  //   expect(component.currentUrl).toBe(undefined);
-  //   expect(component.labelForClearingFocus).toBe(undefined);
-  //   expect(component.logoutUrl).toBe(undefined);
-  //   expect(component.userMenuIsShown).toBe(undefined);
-  //   expect(component.inClassroomPage).toBe(undefined);
-  //   expect(component.windowIsNarrow).toBe(false);
-  //   expect(component.navElementsVisibilityStatus).toEqual({});
-  //   expect(component.profilePictureDataUrl).toBe(undefined);
-  //   expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(false);
-
-  //   component.ngOnInit();
-  //   tick(10);
-
-  //   fixture.whenStable().then(() => {
-  //     expect(component.currentUrl).toBe('learn');
-  //     expect(component.labelForClearingFocus)
-  //       .toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
-  //     expect(component.logoutUrl).toBe(AppConstants.LOGOUT_URL);
-  //     expect(component.userMenuIsShown).toBe(true);
-  //     expect(component.inClassroomPage).toBe(true);
-  //     expect(component.windowIsNarrow).toBe(true);
-  //     expect(component.navElementsVisibilityStatus).toEqual({
-  //       I18N_TOPNAV_DONATE: true,
-  //       I18N_TOPNAV_CLASSROOM: true,
-  //       I18N_TOPNAV_ABOUT: true,
-  //       I18N_CREATE_EXPLORATION_CREATE: true,
-  //       I18N_TOPNAV_LIBRARY: true
-  //     });
-  //     expect(component.profilePictureDataUrl).toBe('/profile/picture');
-  //     expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-  //   });
-  // }));
-
-  // it('should get user info on initialization', fakeAsync(() => {
-  //   spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-  //   spyOn(urlInterpolationService, 'interpolateUrl')
-  //     .and.returnValue('/profile/username1');
-  //   spyOn(component, 'truncateNavbar').and.stub();
-
-  //   expect(component.isModerator).toBe(undefined);
-  //   expect(component.isAdmin).toBe(undefined);
-  //   expect(component.isTopicManager).toBe(undefined);
-  //   expect(component.isSuperAdmin).toBe(undefined);
-  //   expect(component.userIsLoggedIn).toBe(undefined);
-  //   expect(component.username).toBe(undefined);
-  //   expect(component.profilePageUrl).toBe(undefined);
-
-  //   component.ngOnInit();
-  //   tick(10);
-
-  //   fixture.whenStable().then(() => {
-  //     expect(component.isModerator).toBe(true);
-  //     expect(component.isAdmin).toBe(false);
-  //     expect(component.isTopicManager).toBe(false);
-  //     expect(component.isSuperAdmin).toBe(false);
-  //     expect(component.userIsLoggedIn).toBe(true);
-  //     expect(component.username).toBe('username1');
-  //     expect(component.profilePageUrl).toBe('/profile/username1');
-  //   });
-  // }));
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
