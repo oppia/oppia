@@ -30,43 +30,43 @@ const routes: Route[] = [
       .then(m => m.AboutPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.CONTACT,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE,
     loadChildren: () => import('pages/contact-page/contact-page.module')
       .then(m => m.ContactPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.DONATE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE,
     loadChildren: () => import('pages/donate-page/donate-page.module')
       .then(m => m.DonatePageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.GET_STARTED,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.ROUTE,
     loadChildren: () => import('pages/get-started-page/get-started-page.module')
       .then(m => m.GetStartedPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE,
     loadChildren: () => import(
       'pages/partnerships-page/partnerships-page.module')
       .then(m => m.PartnershipsPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.PRIVACY,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE,
     loadChildren: () => import('pages/privacy-page/privacy-page.module')
       .then(m => m.PrivacyPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.TEACH,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE,
     loadChildren: () => import('pages/teach-page/teach-page.module')
       .then(m => m.TeachPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.TERMS,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE,
     loadChildren: () => import('pages/terms-page/terms-page.module')
       .then(m => m.TermsPageModule)
   },
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.THANKS,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.THANKS.ROUTE,
     loadChildren: () => import('pages/thanks-page/thanks-page.module')
       .then(m => m.ThanksPageModule)
   },

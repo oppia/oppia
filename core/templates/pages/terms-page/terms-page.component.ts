@@ -26,8 +26,8 @@ import { AppConstants } from 'app.constants';
   styleUrls: []
 })
 export class TermsPageComponent {
-  ROUTES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.ROUTES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
   scrollTo(el: HTMLElement): void {
     el.scrollIntoView({behavior: 'smooth'});
   }
