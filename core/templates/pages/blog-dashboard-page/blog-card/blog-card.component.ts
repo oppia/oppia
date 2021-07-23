@@ -16,7 +16,7 @@
  * @fileoverview Component for a blog card.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
@@ -27,30 +27,26 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   selector: 'oppia-blog-card',
   templateUrl: './blog-card.component.html'
 })
-export class BlogCardComponent {
-  // @Input() blogPostSummary: BlogPostSummary;
+export class BlogCardComponent implements OnInit {
+  @Input() blogPostSummary: BlogPostSummary;
   @Input() displayedOnBlogDasboard: boolean;
   @Input() authorProfilePicDataUrl: string;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
-  blogPostSummary = {
-    Title: 'Sample Title',
-    Summary: 'In late 2020, Oppia launched its first full curriculum, the Basic Mathematics Classroom. This Math Classroom is an exciting step for Oppia, as it is our first project that involves different series of sequential lessons that build upon each other to form its curricul…',
-    PublishedOn: '21st July 2020'
-  }
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
   ngOnInit(): void {
-    // if (this.blogPostSummary.ThumbnailFilename) {
-    //   this.thumbnailUrl = this.assetsBackendApiService
-    //     .getThumbnailUrlForPreview(
-    //       AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.Id,
-    //       this.blogPostSummary.ThumbnailFilename);
-    // }
+    if (this.blogPostSummary.thumbnailFilename) {
+      this.thumbnailUrl = this.assetsBackendApiService
+        .getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
+          this.blogPostSummary.thumbnailFilename);
+    }
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
     .getStaticImageUrl('/general/no_profile_picture.png')
     this.authorProfilePictureUrl = decodeURIComponent((
@@ -58,7 +54,7 @@ export class BlogCardComponent {
   }
 }
  
-angular.module('oppia').directive('oppiaBlogCardComponent',
+angular.module('oppia').directive('oppiaBlogCard',
   downgradeComponent({
     component: BlogCardComponent
   }) as angular.IDirectiveFactory);

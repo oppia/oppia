@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for a blog card.
+ * @fileoverview Component for the navbar breadcrumb of the blog dashboard.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogDashboardData, BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { LoaderService } from 'services/loader.service';
@@ -29,7 +28,7 @@ import { LoaderService } from 'services/loader.service';
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html'
 })
-export class BlogDashboardPageComponent {
+export class BlogDashboardPageComponent implements OnInit {
   blogDashboardData: BlogDashboardData;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
@@ -58,10 +57,9 @@ export class BlogDashboardPageComponent {
         }
       });
   }
-
 }
 
-angular.module('oppia').directive('oppiaBlogDashboardPageComponent',
+angular.module('oppia').directive('oppiaBlogDashboardPage',
   downgradeComponent({
     component: BlogDashboardPageComponent
-  }) as angular.IDirectiveFactory);
+  }));

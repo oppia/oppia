@@ -20,12 +20,12 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'oppia-blog-dashboard-navbar-breadcrumb',
-  templateUrl: './blog-dashboard-navbar-breadcrumb.component.html'
-})
-export class BlogDashboardNavbarBreadcrumbComponent {}
+    selector: 'oppia-blog-dashboard-navbar',
+    templateUrl: './blog-dashboard-navbar.component.html'
+  })
+export class BlogDashboardNavbar {}
 
-angular.module('oppia').directive('oppiaBlogDashboardNavbarBreadcrumb',
+angular.module('oppia').directive('oppiaBlogDashboardNavbar',
   downgradeComponent({
-    component: BlogDashboardNavbarBreadcrumbComponent
+    component: BlogDashboardNavbar
   }));

@@ -10,7 +10,8 @@
     <mat-card-header>
       <img mat-card-avatar
            class="example-header-image"
-           [src]="authorProfilePictureUrl">
+           [src]="authorProfilePictureUrl"
+           alt="Profile image of the author of the blog post">
       </img>
       <mat-card-subtitle>{{blogPostSummary.AuthorUsername}}</mat-card-subtitle>
       <mat-card-subtitle class="blog-card-published-date">{{blogPostSummary.PublishedOn}}</mat-card-subtitle>
@@ -79,15 +80,11 @@
   line-height: 2.4rem;
   color: #555555;
 }
-.example-header-image {
-  background-size: cover;
-}
 
 @media(min-width: 1320px) {
   .blog-card-content {
     margin: 4px 50px;
   }
-
 }
 </style>
   
