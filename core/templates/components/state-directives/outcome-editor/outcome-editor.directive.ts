@@ -40,7 +40,7 @@ require('services/external-save.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -55,8 +55,8 @@ angular.module('oppia').directive('outcomeEditor', [
         addState: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
+      template: require(
+        'components/state-directives/outcome-editor/' +
         'outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [

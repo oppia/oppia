@@ -37,18 +37,18 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
   '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
   'ExplorationStatesService', 'RouterService', 'StateEditorRefreshService',
   'StateObjectFactory', 'ThreadDataBackendApiService',
-  'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
+  'ACTION_ACCEPT_SUGGESTION',
   function(
       $log, $rootScope, $uibModal, ExplorationDataService,
       ExplorationStatesService, RouterService, StateEditorRefreshService,
       StateObjectFactory, ThreadDataBackendApiService,
-      UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
+      ACTION_ACCEPT_SUGGESTION) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
         setActiveThread = (threadId => {}), threadUibModalInstance = null) {
       return $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
+        template: require(
+          'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
           'exploration-editor-suggestion-modal.template.html'),
         backdrop: 'static',
         size: 'lg',

@@ -307,8 +307,8 @@ angular.module('oppia').component('stateResponses', {
         var addState = ctrl.addState;
         var currentInteractionId = $scope.getCurrentInteractionId();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/add-answer-group-modal.template.html'),
           // Clicking outside this modal should not dismiss it.
           backdrop: 'static',
@@ -355,8 +355,8 @@ angular.module('oppia').component('stateResponses', {
 
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/delete-answer-group-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'

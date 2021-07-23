@@ -42,10 +42,8 @@ angular.module('oppia').component('questionMisconceptionEditor', {
   template: require('./question-misconception-editor.component.html'),
   controller: [
     '$uibModal', 'ExternalSaveService', 'StateEditorService',
-    'UrlInterpolationService',
     function(
-        $uibModal, ExternalSaveService, StateEditorService,
-        UrlInterpolationService) {
+        $uibModal, ExternalSaveService, StateEditorService) {
       var ctrl = this;
 
       ctrl.containsMisconceptions = function() {
@@ -62,8 +60,8 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         var taggedSkillMisconceptionId = (
           ctrl.getTaggedSkillMisconceptionId());
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topic-editor-page/modal-templates/' +
+          template: require(
+            'pages/topic-editor-page/modal-templates/' +
             'tag-misconception-modal.template.html'),
           backdrop: 'static',
           controller: 'TagMisconceptionModalController',

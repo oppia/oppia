@@ -36,12 +36,12 @@ angular.module('oppia').component('explorationGraph', {
     '$uibModal', 'AlertsService', 'EditabilityService',
     'ExplorationStatesService', 'ExplorationWarningsService',
     'GraphDataService', 'LoggerService', 'RouterService',
-    'StateEditorService', 'UrlInterpolationService',
+    'StateEditorService',
     function(
         $uibModal, AlertsService, EditabilityService,
         ExplorationStatesService, ExplorationWarningsService,
         GraphDataService, LoggerService, RouterService,
-        StateEditorService, UrlInterpolationService) {
+        StateEditorService) {
       var ctrl = this;
       // We hide the graph at the outset in order not to confuse new
       // exploration creators.
@@ -69,8 +69,8 @@ angular.module('oppia').component('explorationGraph', {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/exploration-graph-modal.template.html'),
           backdrop: true,
           resolve: {

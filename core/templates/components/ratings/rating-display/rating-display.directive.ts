@@ -19,7 +19,7 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('ratingDisplay', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       // This will display a star-rating based on the given data. The attributes
       // passed in are as follows:
@@ -34,8 +34,8 @@ angular.module('oppia').directive('ratingDisplay', [
         onEdit: '=',
         ratingValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/ratings/rating-display/rating-display.directive.html'),
+      template: require(
+        'components/ratings/rating-display/rating-display.directive.html'),
       link: function(scope, element) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more

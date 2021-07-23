@@ -23,10 +23,8 @@ require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedDictViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
   function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+      NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {
         localValue: '=',
@@ -34,8 +32,8 @@ angular.module('oppia').directive('schemaBasedDictViewer', [
         // properties and the corresponding schemas.
         propertySchemas: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
+      template: require(
+        'components/forms/schema-viewers/' +
         'schema-based-dict-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,

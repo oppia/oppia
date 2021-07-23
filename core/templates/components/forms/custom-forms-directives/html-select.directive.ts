@@ -25,15 +25,15 @@ require('domain/utilities/url-interpolation.service.ts');
 // corresponding attribute 'id' is assigned to 'selection'.
 
 angular.module('oppia').directive('htmlSelect', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {
         options: '=',
         selection: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/html-select.directive.html'),
+      template: require(
+        'components/forms/custom-forms-directives/html-select.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.select = function(id) {
           $scope.selection = id;

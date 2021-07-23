@@ -16,7 +16,6 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/rte-helper-modal.controller.ts');
@@ -31,10 +30,10 @@ require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal', 'HtmlEscaperService',
-  'UrlInterpolationService', 'INLINE_RTE_COMPONENTS',
+  'INLINE_RTE_COMPONENTS',
   'RTE_COMPONENT_SPECS', function(
       $document, $log, $uibModal, HtmlEscaperService,
-      UrlInterpolationService, INLINE_RTE_COMPONENTS,
+      INLINE_RTE_COMPONENTS,
       RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
@@ -90,8 +89,8 @@ angular.module('oppia').factory('RteHelperService', [
           onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/ck-editor-helpers/' +
+          template: require(
+            'components/ck-editor-helpers/' +
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
           resolve: {

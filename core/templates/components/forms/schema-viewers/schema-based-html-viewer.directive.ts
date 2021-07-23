@@ -19,13 +19,13 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('schemaBasedHtmlViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       scope: {
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
+      template: require(
+        'components/forms/schema-viewers/' +
         'schema-based-html-viewer.directive.html'),
       restrict: 'E'
     };

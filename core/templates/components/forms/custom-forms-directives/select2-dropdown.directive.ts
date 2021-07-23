@@ -20,7 +20,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('third-party-imports/select2.import.ts');
 
 angular.module('oppia').directive('select2Dropdown', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     // Directive for incorporating select2 dropdowns.
     return {
       restrict: 'E',
@@ -45,8 +45,8 @@ angular.module('oppia').directive('select2Dropdown', [
         placeholder: '@',
         width: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
+      template: require(
+        'components/forms/custom-forms-directives/' +
         'select2-dropdown.directive.html'),
       controller: ['$element', '$scope', function($element, $scope) {
         var ctrl = this;

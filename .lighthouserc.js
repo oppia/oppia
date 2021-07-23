@@ -379,8 +379,9 @@ module.exports = {
         {
           'matchingUrlPattern': 'http://[^/]+/create/.*$',
           'assertions': {
+            // TODO(#13465): Change this maxLength to 0 once images are migrated.
             'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+              'error', {'maxLength': 3, 'strategy': 'pessimistic'}
             ],
             // We need to use passive event listeners on this page so that
             // the page works correctly.
