@@ -42,7 +42,7 @@ export class AdminRolesTabComponent implements OnInit {
   managedTopicIds = [];
   // The roleCurrentlyBeingUpdatedInBackend holds the role which is either being
   // removed or added to user roles. This value is used to present a progress
-  // spinner around the role which is currently being updated in the backend.
+  // spinner next to the role which is currently being updated in the backend.
   roleCurrentlyBeingUpdatedInBackend = null;
   errorMessage = null;
   bannedStatusChangeInProgress = false;
