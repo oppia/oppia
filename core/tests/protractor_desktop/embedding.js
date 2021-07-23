@@ -105,7 +105,7 @@ describe('Embedding', function() {
     // Publish changes.
     await workflow.publishExploration();
   };
-
+  // These errors occur when
   var EMBEDDING_ERRORS_TO_IGNORE = [
     _.escapeRegExp(
       'http://localhost:9001/assets/scripts/' +
@@ -363,6 +363,6 @@ describe('Embedding', function() {
       await checkPlaceholder('Ingresa un número');
 
       await users.logout();
-      await general.checkForConsoleErrors([EMBEDDING_ERRORS_TO_IGNORE]);
+      await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
     });
 });
