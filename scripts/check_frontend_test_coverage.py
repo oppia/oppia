@@ -139,7 +139,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-pencil-code-editor.directive.ts',
     'oppia-short-response-set-input.component.ts',
     'oppia-visualization-enumerated-frequency-table.directive.ts',
-    'outcome-destination-editor.directive.ts',
+    'outcome-destination-editor.component.ts',
     'outcome-editor.directive.ts',
     'parameter-name-editor.directive.ts',
     'parameterize-rule-description.filter.ts',
