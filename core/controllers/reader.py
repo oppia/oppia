@@ -114,7 +114,13 @@ class ExplorationPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -140,7 +146,13 @@ class ExplorationPage(base.BaseHandler):
             },
             'collection_id': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': 12 # Max length of an exploration_id
+                    }, {
+                        'id': 'is_nonempty'
+                    }]
                 },
                 'default_value': None
             }
@@ -184,7 +196,13 @@ class ExplorationHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }

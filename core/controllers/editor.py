@@ -37,6 +37,7 @@ from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 import feconf
@@ -65,7 +66,13 @@ class ExplorationPage(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -87,7 +94,13 @@ class ExplorationHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -243,7 +256,13 @@ class UserExplorationPermissionsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -287,7 +306,13 @@ class ExplorationRightsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -302,7 +327,7 @@ class ExplorationRightsHandler(EditorHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             },
             'new_member_username': {
                 'schema': {
@@ -312,7 +337,8 @@ class ExplorationRightsHandler(EditorHandler):
             },
             'new_member_role': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': feconf.ALLOWED_ACTIVITY_ROLES
                 },
                 'default_value': None
             },
@@ -320,7 +346,7 @@ class ExplorationRightsHandler(EditorHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             }
         },
         'DELETE': {
@@ -370,7 +396,7 @@ class ExplorationRightsHandler(EditorHandler):
             rights_manager.release_ownership_of_exploration(
                 self.user, exploration_id)
 
-        elif viewable_if_private is not None:
+        elif viewable_if_private:
             rights_manager.set_private_viewability_of_exploration(
                 self.user, exploration_id, viewable_if_private)
 
@@ -409,7 +435,13 @@ class ExplorationStatusHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -419,7 +451,7 @@ class ExplorationStatusHandler(EditorHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             }
         }
     }
@@ -447,7 +479,7 @@ class ExplorationStatusHandler(EditorHandler):
     def put(self, exploration_id):
         make_public = self.payload.get('make_public')
 
-        if make_public is not None:
+        if make_public:
             self._publish_exploration(exploration_id)
 
         self.render_json({
@@ -462,7 +494,13 @@ class ExplorationModeratorRightsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -525,7 +563,13 @@ class UserExplorationEmailsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -588,7 +632,13 @@ class ExplorationFileDownloader(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -596,7 +646,11 @@ class ExplorationFileDownloader(EditorHandler):
         'GET': {
             'v': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1 # Version must be grater than zero.
+                    }]
                 },
                 'default_value': None
             },
@@ -617,9 +671,11 @@ class ExplorationFileDownloader(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-
-        version = self.normalized_request.get('v', exploration.version)
+        version = self.normalized_request.get('v')
         output_format = self.normalized_request.get('output_format')
+
+        if version > exploration.version or version is None:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         if not exploration.title:
@@ -649,7 +705,13 @@ class StateYamlHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -663,8 +725,13 @@ class StateYamlHandler(EditorHandler):
             },
             'width': {
                 'schema': {
-                    'type': 'int'
-                }
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1 # Width must be greater than zero.
+                    }]
+                },
+                'default_value': 80
             }
         }
     }
@@ -688,7 +755,13 @@ class ExplorationSnapshotsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -720,7 +793,13 @@ class ExplorationRevertHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -728,12 +807,20 @@ class ExplorationRevertHandler(EditorHandler):
         'POST': {
             'current_version': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
                 }
             },
             'revert_to_version': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1
+                    }]
                 }
             }
         }
@@ -745,7 +832,7 @@ class ExplorationRevertHandler(EditorHandler):
         current_version = self.normalized_payload.get('current_version')
         revert_to_version = self.normalized_payload.get('revert_to_version')
 
-        if revert_to_version < 1 or revert_to_version >= current_version:
+        if revert_to_version >= current_version:
             raise self.InvalidInputException(
                 'Cannot revert to version %s from version %s.' %
                 (revert_to_version, current_version))
@@ -765,7 +852,13 @@ class ExplorationStatisticsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -788,7 +881,13 @@ class StateInteractionStatsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         },
         'escaped_state_name': {
@@ -826,7 +925,13 @@ class FetchIssuesHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -834,7 +939,11 @@ class FetchIssuesHandler(EditorHandler):
         'GET': {
             'exp_version': {
                 'schema': {
-                    'type': 'int'
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 1 # Version must be greater than zero.
+                    }]
                 }
             }
         }
@@ -865,7 +974,13 @@ class FetchPlaythroughHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         },
         'playthrough_id': {
@@ -896,7 +1011,13 @@ class ResolveIssueHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -905,8 +1026,7 @@ class ResolveIssueHandler(EditorHandler):
             'exp_issue_dict': {
                 'schema': {
                     'type': 'object_dict',
-                    'validation_method': (
-                        objects_validator.validate_exp_issue_dict)
+                    'object_class': stats_domain.ExplorationIssue
                 },
                 'default_value': None
             },
@@ -974,7 +1094,11 @@ class ImageUploadHandler(EditorHandler):
         'POST': {
             'image': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': 100 * 1024
+                    }]
                 }
             },
             'filename': {
@@ -984,7 +1108,8 @@ class ImageUploadHandler(EditorHandler):
             },
             'filename_prefix': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': ['thumbnail', 'image']
                 },
                 'default_value': constants.ASSET_TYPE_IMAGE
             }
@@ -1030,7 +1155,13 @@ class StartedTutorialEventHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -1051,7 +1182,13 @@ class EditorAutosaveHandler(ExplorationHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -1150,7 +1287,13 @@ class StateAnswerStatisticsHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -1170,7 +1313,13 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }
@@ -1199,7 +1348,13 @@ class LearnerAnswerInfoHandler(EditorHandler):
         },
         'entity_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of any entity_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }

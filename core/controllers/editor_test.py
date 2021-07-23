@@ -641,7 +641,7 @@ written_translations:
         # Check downloading an invalid version results in downloading the
         # latest version.
         download_url = (
-            '/createhandler/download/%s?output_format=%s&v=xxx' %
+            '/createhandler/download/%s?output_format=%s&v=123' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
@@ -752,7 +752,7 @@ written_translations:
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/download/invalid_exploration_id',
+            '/createhandler/download/invalid_id',
             expected_status_int=404)
 
         self.logout()
@@ -792,7 +792,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/snapshots/invalid_exploration_id',
+            '/createhandler/snapshots/invalid_id',
             expected_status_int=404)
 
         self.logout()
@@ -848,7 +848,7 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/statistics/invalid_exploration_id',
+            '/createhandler/statistics/invalid_id',
             expected_status_int=404)
 
         self.logout()
@@ -953,7 +953,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
         self.get_json(
             '/createhandler/state_interaction_stats/%s/%s' % (
-                'invalid_exp_id', 'state_name'),
+                'invalid_id', 'state_name'),
             expected_status_int=404)
 
         self.logout()
@@ -1009,7 +1009,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
-        unpublished_exp_id = 'unpublished_eid'
+        unpublished_exp_id = 'unpub_eid' # Unpublished exploration id.
         exploration = exp_domain.Exploration.create_default_exploration(
             unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1038,7 +1038,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_published_exploration(self):
         """Test rights management for deletion of published explorations."""
-        published_exp_id = 'published_eid'
+        published_exp_id = 'pub_eid' # Published exploration id.
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1097,7 +1097,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         with self.swap(logging, 'info', mock_logging_function), self.swap(
             logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
-            exp_id = 'unpublished_eid'
+            exp_id = 'unpub_eid' # Unpublished exploration id
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1116,7 +1116,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             # Checking for admin.
             observed_log_messages = []
-            exp_id = 'unpublished_eid2'
+            exp_id = 'unpub_eid2' # Unpublished exploration id.
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.admin_id, exploration)
@@ -1134,7 +1134,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             # Checking for moderator.
             observed_log_messages = []
-            exp_id = 'unpublished_eid3'
+            exp_id = 'unpub_eid3' # Unpublished exploration id.
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.moderator_id, exploration)
@@ -1195,22 +1195,14 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # May not revert to any version that's not 1.
-        for rev_version in (-1, 0, 2, 3, 4, '10', ()):
+        for rev_version in (2, 3, 4, '10'):
             response_dict = self.post_json(
                 '/createhandler/revert/%s' % self.EXP_ID, {
                     'current_version': 2,
                     'revert_to_version': rev_version
                 }, csrf_token=csrf_token, expected_status_int=400)
 
-            # Check error message.
-            try:
-                rev_version = int(rev_version)
-                self.assertIn(
-                    'Cannot revert to version', response_dict['error'])
-            except Exception:
-                self.assertIn(
-                    'Schema validation for \'revert_to_version\' '
-                    'failed:', response_dict['error'])
+            self.assertIn('Cannot revert to version', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
@@ -1221,6 +1213,18 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             init_content = init_state_data['content']['html']
             self.assertIn('ABC', init_content)
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
+
+        # May not revert to any version that's not convertible to int.
+        for rev_version in ('abc', ()):
+            response_dict = self.post_json(
+                '/createhandler/revert/%s' % self.EXP_ID, {
+                    'current_version': 2,
+                    'revert_to_version': rev_version
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.assertIn(
+                'Schema validation for \'revert_to_version\' '
+                'failed:', response_dict['error'])
 
         # Revert to version 1.
         rev_version = 1
@@ -2583,8 +2587,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             'Schema validation for \'change_list\' failed: Command '
             'edit_exploration_propert is not allowed'
         )
-        self.assertEqual(
-            response['error'], error_msg)
+        self.assertEqual(response['error'], error_msg)
 
     def test_draft_not_updated_because_newer_draft_exists(self):
         payload = {
@@ -2616,8 +2619,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         error_msg = (
             'Schema validation for \'change_list\' failed: Command '
             'edit_exploration_propert is not allowed')
-        self.assertEqual(
-            response['error'], error_msg)
+        self.assertEqual(response['error'], error_msg)
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(
