@@ -91,6 +91,7 @@ import { CollectionRightsBackendApiService } from
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConnectionService } from 'services/connection-service.service';
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
@@ -543,6 +544,8 @@ export class UpgradedServices {
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['ConnectionService'] = new ConnectionService(
+      upgradedServices['HttpClient']);
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();

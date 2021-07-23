@@ -29,11 +29,15 @@ import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ConnectionService } from 'services/connection-service.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChangeListService implements OnInit {
+  hasNetworkConnection: boolean;
+  hasInternetAccess: boolean;
+  status: string;
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
   undoneChangeStack: ExplorationChange[] = [];
@@ -41,6 +45,7 @@ export class ChangeListService implements OnInit {
   // undone change.
   ndoneChangeStack = [];
   loadingMessage: string = '';
+  tempChanges: ExplorationChange[] = [];
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -88,7 +93,25 @@ export class ChangeListService implements OnInit {
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-  ) {}
+    private connectionService: ConnectionService,
+  ) {
+    this.connectionService.monitor.subscribe(currentState => {
+      this.hasNetworkConnection = currentState.hasNetworkConnection;
+      this.hasInternetAccess = currentState.hasInternetAccess;
+      if (this.hasNetworkConnection && this.hasInternetAccess) {
+        this.status = 'ONLINE';
+        if (this.tempChanges.length > 0) {
+          for (let change of this.tempChanges) {
+            this.addChange(change);
+          }
+          this.tempChanges = [];
+        }
+      } else {
+        this.status = 'OFFLINE';
+        console.error('OFFLIENE');
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loaderService.onLoadingMessageChange.subscribe(
@@ -137,14 +160,18 @@ export class ChangeListService implements OnInit {
       return;
     }
     this.explorationChangeList.push(changeDict);
-    this.undoneChangeStack = [];
-    this.autosaveInProgressEventEmitter.emit(true);
-    if (this.changeListAddedTimeoutId) {
-      clearTimeout(this.changeListAddedTimeoutId);
+    if (this.status === 'OFFLINE') {
+      this.tempChanges.push(changeDict);
+    } else {
+      this.undoneChangeStack = [];
+      this.autosaveInProgressEventEmitter.emit(true);
+      if (this.changeListAddedTimeoutId) {
+        clearTimeout(this.changeListAddedTimeoutId);
+      }
+      this.changeListAddedTimeoutId = setTimeout(() => {
+        this.autosaveChangeListOnChange(this.explorationChangeList);
+      }, this.DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
     }
-    this.changeListAddedTimeoutId = setTimeout(() => {
-      this.autosaveChangeListOnChange(this.explorationChangeList);
-    }, this.DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
   }
 
   /**

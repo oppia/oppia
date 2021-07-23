@@ -88,6 +88,19 @@ transaction_services = models.Registry.import_transaction_services() # type: ign
 logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
+class InternetConnectivityHandler(base.BaseHandler):
+    """Returns whether the system to connected to the internet."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access # type: ignore[misc]
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'is_internet_connected': True
+        })
+
+
 class FrontendErrorHandler(base.BaseHandler):
     """Handles errors arising from the frontend."""
 
@@ -222,7 +235,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
-
+    get_redirect_route(
+        r'/connectivity/check', InternetConnectivityHandler),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),

@@ -53,6 +53,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
+import { ConnectionService } from 'services/connection-service.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -90,6 +91,7 @@ describe('Exploration editor page component', function() {
   var stfts = null;
   var tds = null;
   var ueps = null;
+  var cns = null;
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
   var registerDeclineTutorialModalEventSpy;
@@ -201,6 +203,7 @@ describe('Exploration editor page component', function() {
         AutosaveInfoModalsService,
         ChangeListService,
         ContextService,
+        ConnectionService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
         ExplorationFeaturesService,
@@ -246,6 +249,7 @@ describe('Exploration editor page component', function() {
     $uibModal = $injector.get('$uibModal');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
+    cns = $injector.get('ConnectionService');
     eis = $injector.get('ExplorationImprovementsService');
     ers = $injector.get('ExplorationRightsService');
     es = $injector.get('EditabilityService');
@@ -587,7 +591,7 @@ describe('Exploration editor page component', function() {
 
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
-
+      spyOn(cns, 'checkInternetState');
       var successCallback = jasmine.createSpy('success');
       mockInitExplorationPageEmitter.emit(successCallback);
       // Need to flush and $apply twice to fire the callback. In practice, this
@@ -688,6 +692,7 @@ describe('Exploration editor page component', function() {
     });
 
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
+      spyOn(cns, 'checkInternetState');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(true));
 
@@ -699,6 +704,7 @@ describe('Exploration editor page component', function() {
     }));
 
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
+      spyOn(cns, 'checkInternetState');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
         Promise.resolve(false));
 

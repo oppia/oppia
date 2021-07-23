@@ -1,3 +1,4 @@
+import { ConnectionService } from 'services/connection-service.service';
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -149,6 +150,8 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/connection-service.service.ts');
+require('services/alerts.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
@@ -156,9 +159,9 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', '$uibModal',
+    '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ContextService',
+    'ChangeListService', 'ConnectionService', 'ContextService',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
@@ -179,9 +182,9 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, $uibModal,
+        $q, $rootScope, $scope, $uibModal, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
-        ChangeListService, ContextService,
+        ChangeListService, ConnectionService, ContextService,
         EditabilityService, ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesBackendApiService,
@@ -204,6 +207,9 @@ angular.module('oppia').component('explorationEditorPage', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
+      ctrl.hasNetworkConnection = true;
+      ctrl.hasInternetAccess = true;
+      ctrl.status = '';
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -271,8 +277,9 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
-
+          ctrl.alertsService = AlertsService;
           ctrl.explorationTitleService = ExplorationTitleService;
+          ctrl.connectionService = ConnectionService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
           ctrl.explorationObjectiveService = ExplorationObjectiveService;
           ctrl.ExplorationRightsService = ExplorationRightsService;
@@ -373,7 +380,25 @@ angular.module('oppia').component('explorationEditorPage', {
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
-
+          ctrl.connectionService.checkNetworkState();
+          ctrl.connectionService.checkInternetState();
+          ctrl.connectionService.monitor.subscribe(currentState => {
+            ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
+            ctrl.hasInternetAccess = currentState.hasInternetAccess;
+            if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
+              console.error('ONLINE');
+              if (ctrl.status === 'OFFLINE') {
+                ctrl.alertsService.addWarning('You are Online');
+              }
+              ctrl.status = 'ONLINE';
+            } else {
+              if (ctrl.status === 'ONLINE') {
+                ctrl.alertsService.addWarning('You are OFFLINE');
+              }
+              ctrl.status = 'OFFLINE';
+              console.error('OFFLIENE');
+            }
+          });
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
           $scope.$applyAsync();

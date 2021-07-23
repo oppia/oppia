@@ -284,6 +284,7 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConnectionService } from 'services/connection-service.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -417,6 +418,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
   ['ComputeGraphService', ComputeGraphService],
+  ['ConnectionService', ConnectionService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
