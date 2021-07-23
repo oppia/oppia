@@ -1,10 +1,83 @@
-<mat-card>
-    <mat-card-header>
-        <img mat-card-avatar
-        [src]="authorProfilePictureUrl">
+
+<mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
+  <mat-card-header class="blog-dashboard-header">
+    <img mat-card-avatar
+         [src]="authorProfilePictureUrl">
     </img>
-    <mat-card-title class="blog-card-title">{{blogPostSummary.Title}}</mat-card-title>
-    <mat-card-subtitle>{{blogPostSummary.AuthorUsername}}</mat-card-subtitle>
-      <mat-card-subtitle class="blog-card-published-date">{{blogPostSummary.PublishedOn}}</mat-card-subtitle>
-    </mat-card-header>
+    <mat-card-title class="blog-dashboard-card-title">{{blogDashboardData.username}}</mat-card-title>
+    <mat-card-subtitle>
+      <button mat-button class="new-post-button">
+        <mat-icon class="new-post-icon position-absolute">+</mat-icon>
+        <span>{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase}}</span>
+      </button>
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+      <mat-tab-group>
+        <mat-tab>
+          <ng-template mat-tab-label>
+           {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate }} ({{blogDashboardData.numOfDraftBlogPosts}})
+          </ng-template>
+          <div>
+            <oppia-blog-card [displayedOnBlogDasboard]="true"
+                             [authorProfilePicDataUrl]="blogDashboardData.profilePictureDataUrl">
+            </oppia-blog-card>
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+           {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate }} ({{blogDashboardData.numOfPublishedBlogPosts}})
+          </ng-template>
+          <!-- <div *ngFor = "let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
+            <oppia-blog-card [blogPostSummary]="blogPostSummary"
+                             [displayedOnBlogDasboard]="true">
+            </oppia-blog-card>
+          </div> -->
+        </mat-tab>
+      </mat-tab-group>
+  </mat-card-content>
 </mat-card>
+<style>
+  .blog-dashboard-card {
+    width: 62.5vw;
+    max-width: 835px;
+  }
+
+  .blog-dashboard-card .mat-card-avatar {
+    height: 7.5vw;
+    width: 7.5vw;
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .blog-dashboard-card-title {
+    text-align: left;
+    font-family: Roboto;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: #333333;
+  }
+
+  .new-post-button {
+    border-radius: 4px;
+    background-color: #00609C;
+    color: #FFFFFF;
+    display: flex;
+    font-size: 1.4rem;
+    justify-content: center;
+    height: 2.813vw;
+    max-height: 40px;
+    max-width: 150px;
+    width: 8.906vw;
+  }
+
+  .new-post-icon {
+    display: flex;
+    align-items: center;
+    margin-left: -8px;
+  }
+
+  mat-card-header.blog-dashboard-header {
+    margin: 3.75vw 3.438vw;
+  }
+</style>

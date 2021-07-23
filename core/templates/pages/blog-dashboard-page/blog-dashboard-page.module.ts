@@ -17,6 +17,7 @@
  */
 
  import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
+ import { MatTabsModule } from '@angular/material/tabs'
  import { BrowserModule } from '@angular/platform-browser';
  import { downgradeComponent } from '@angular/upgrade/static';
  import { HttpClientModule } from '@angular/common/http';
@@ -36,7 +37,8 @@ declare var angular: ng.IAngularStatic;
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    MatTabsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
