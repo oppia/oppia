@@ -19,9 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import topic_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
+from jobs.transforms import base_validation
 from jobs.types import topic_validation_errors
 
 import apache_beam as beam
@@ -48,6 +50,71 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
         name = model.name
         if name.lower() != model.canonical_name:
             yield topic_validation_errors.ModelCanonicalNameMismatchError(model)
+
+
+@validation_decorators.AuditsExisting(
+    topic_models.TopicSnapshotMetadataModel)
+class ValidateTopicSnapshotMetadataModel(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for TopicSnapshotMetadataModel."""
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            topic_domain.TopicChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        return topic_domain.TopicChange
+
+
+@validation_decorators.AuditsExisting(
+    topic_models.TopicRightsSnapshotMetadataModel)
+class ValidateTopicRightsSnapshotMetadataModel(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for TopicRightsSnapshotMetadataModel.
+    """
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            topic_domain.TopicRightsChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        return topic_domain.TopicRightsChange
+
+
+@validation_decorators.AuditsExisting(topic_models.TopicCommitLogEntryModel)
+class ValidateTopicCommitLogEntryModel(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for TopicCommitLogEntryModel.
+    """
+
+    def _get_change_domain_class(self, input_model):
+        """Returns a change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            topic_domain.TopicRightsChange|topic_domain.TopicChange.
+            A domain object class for the changes made by commit commands of
+            the model.
+        """
+        model = job_utils.clone_model(input_model)
+        if model.id.startswith('rights'):
+            return topic_domain.TopicRightsChange
+        elif model.id.startswith('topic'):
+            return topic_domain.TopicChange
+        else:
+            return None
 
 
 @validation_decorators.RelationshipsOf(topic_models.TopicSummaryModel)
