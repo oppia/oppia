@@ -17,7 +17,7 @@
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { MathEquationEditorComponent } from './math-equation-editor.component';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -74,14 +74,14 @@ describe('MathEquationEditor', () => {
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.currentValue = undefined;
     component.warningText = '';
     component.isCurrentAnswerValid();
@@ -90,7 +90,7 @@ describe('MathEquationEditor', () => {
 
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.value = null;
     MockGuppy.focused = false;
     component.ngOnInit();
@@ -125,7 +125,7 @@ describe('MathEquationEditor', () => {
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });

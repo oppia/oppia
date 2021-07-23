@@ -22,7 +22,7 @@ import { OperatorFunction, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseEvent } from './app-events';
 
-type NewableType<T> = new(message: string) => T;
+export type NewableType<T> = new(message: unknown) => T;
 
 @Injectable({
   providedIn: 'root'
