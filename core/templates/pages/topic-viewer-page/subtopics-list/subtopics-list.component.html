@@ -9,36 +9,37 @@
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
-          <subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
-                                 [subtopic]="subtopic"
-                                 [topicId]="topicId"
-                                 [topicUrlFragment]="topicUrlFragment">
-          </subtopic-summary-tile>
+          <oppia-subtopic-summary-tile [classroomUrlFragment]="classroomUrlFragment"
+                                       [subtopic]="subtopic"
+                                       [topicId]="topicId"
+                                       [topicUrlFragment]="topicUrlFragment">
+          </oppia-subtopic-summary-tile>
         </div>
       </div>
     </mat-card>
   </div>
 </div>
 <style>
-  .subtopics-list .oppia-page-card.oppia-long-text {
+  .oppia-page-card.oppia-long-text {
     padding: 30px 30px 30px 40px;
+    width: 50vw;
   }
 
-  .subtopics-list .oppia-page-card {
+  .oppia-page-card {
     margin-top: 10em;
   }
 
-  .subtopics-list .tab-title {
+  .tab-title {
     margin: .83em 0;
   }
 
-  .subtopics-list .subtopic-subheading {
+  .subtopic-subheading {
     font-family: Roboto, Arial, sans-serif;
     font-size: 1.2em;
     margin-bottom: 2.5vh;
   }
 
-  .subtopics-list .subtopics-container {
+  .subtopics-container {
     display: grid;
     grid-row-gap: 2vh;
     grid-template-columns: 170px 170px 170px;
@@ -46,26 +47,26 @@
     margin-left: 20px;
   }
 
-  .subtopics-list subtopic-summary-tile {
+  subtopic-summary-tile {
     margin-right: 2vw;
   }
 
   @media(max-width: 1024px) {
-    .subtopics-list .subtopics-container {
+    .subtopics-container {
       grid-template-columns: 150px 150px 150px;
       margin-left: 2vw;
     }
   }
 
   @media(max-width: 680px) {
-    .subtopics-list .subtopics-container {
+    .subtopics-container {
       grid-template-columns: 130px 130px 130px;
       margin-left: 0;
     }
   }
 
   @media(max-width: 500px) {
-    .subtopics-list .subtopics-container {
+    .subtopics-container {
       display: grid;
       grid-template-columns: 130px 130px;
       justify-content: space-between;
@@ -74,7 +75,7 @@
   }
 
   @media(max-width: 350px) {
-    .subtopics-list .subtopics-container {
+    .subtopics-container {
       display: grid;
       grid-template-columns: 120px 120px;
       justify-content: space-between;
