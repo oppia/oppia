@@ -124,8 +124,6 @@ const componentMap = {
   }
 };
 
-let rteElementsAreInitialized = false;
-
 @Component({
   selector: 'oppia-angular-root',
   templateUrl: './oppia-angular-root.component.html'
@@ -141,6 +139,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
+  static rteElementsAreInitialized: boolean = false;
   static rteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
@@ -169,7 +168,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private urlService: UrlService,
     private injector: Injector
   ) {
-    if (rteElementsAreInitialized) {
+    if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
     }
 
@@ -183,7 +182,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         rteElement
       );
     }
-    rteElementsAreInitialized = true;
+    OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
   public ngAfterViewInit(): void {
