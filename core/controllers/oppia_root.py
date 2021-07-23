@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the unified entry to frontend."""
+"""Controllers for the oppia root page."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -22,7 +22,7 @@ from core.controllers import base
 
 
 class OppiaRootPage(base.BaseHandler):
-    """Renders unified entry point for all routes registered
+    """Renders oppia root page (unified entry point) for all routes registered
        with angular router.
     """
 
@@ -31,7 +31,9 @@ class OppiaRootPage(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.open_access # type: ignore[misc]
     def get(self):
+        # type: () -> None
         """Handles GET requests."""
-        self.render_template('oppia-root.mainpage.html')
+        self.render_template( # type: ignore[no-untyped-call]
+            'oppia-root.mainpage.html')

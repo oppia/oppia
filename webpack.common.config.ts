@@ -192,7 +192,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['classroom'],
       filename: 'classroom-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Learn and practice all major math topics, functions, ' +
@@ -413,7 +412,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['license'],
       filename: 'license.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'License terms that Oppia is attributed under.'
@@ -434,7 +432,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['logout'],
       filename: 'logout-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/logout-page/logout-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -443,7 +440,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['maintenance'],
       filename: 'maintenance-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
@@ -482,7 +478,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['playbook'],
       filename: 'playbook.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'The Oppia library is full of user-created lessons ' +
@@ -508,7 +503,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['preferences'],
       filename: 'preferences-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Change your Oppia profile settings and preferences'
@@ -521,7 +515,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['profile'],
       filename: 'profile-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/profile-page/profile-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -530,7 +523,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['release_coordinator'],
       filename: 'release-coordinator-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on ' +
@@ -596,7 +588,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['stewards'],
       filename: 'stewards-landing-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix +
@@ -619,7 +610,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['story_viewer'],
       filename: 'story-viewer-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/story-viewer-page/' +

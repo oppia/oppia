@@ -24,8 +24,9 @@ from core.tests import test_utils
 class OppiaRootPageTests(test_utils.GenericTestBase):
 
     def test_oppia_root_page(self):
+        # type: () -> None
         """Tests access to the unified entry page."""
-        for route in constants.ROUTES_REGISTERED_WITH_FRONTEND.values():
-            response = self.get_html_response(
-                '/%s' % route, expected_status_int=200)
+        for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+            response = self.get_html_response( # type: ignore[no-untyped-call]
+                '/%s' % page['ROUTE'], expected_status_int=200)
             response.mustcontain('<oppia-root></oppia-root>')

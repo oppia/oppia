@@ -5952,17 +5952,44 @@ export default {
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
-  // Routes registered with angular router.
-  "ROUTES_REGISTERED_WITH_FRONTEND": {
-    "ABOUT": "about",
-    "CONTACT": "contact",
-    "DONATE": "donate",
-    "GET_STARTED": "get-started",
-    "PARTNERSHIPS": "partnerships",
-    "PRIVACY": "privacy-policy",
-    "TEACH": "teach",
-    "TERMS": "terms",
-    "THANKS": "thanks"
+  // Pages registered with angular router.
+  "PAGES_REGISTERED_WITH_FRONTEND": {
+    "ABOUT": {
+      "ROUTE": "about",
+      "TITLE": "About | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "CONTACT": {
+      "ROUTE": "contact"
+    },
+    "DONATE": {
+      "ROUTE": "donate"
+    },
+    "GET_STARTED": {
+      "ROUTE": "get-started"
+    },
+    "PARTNERSHIPS": {
+      "ROUTE": "partnerships"
+    },
+    "PRIVACY": {
+      "ROUTE": "privacy-policy"
+    },
+    "TEACH": {
+      "ROUTE": "teach"
+    },
+    "TERMS": {
+      "ROUTE": "terms"
+    },
+    "THANKS": {
+      "ROUTE": "thanks"
+    }
   },
 
   "DEV_MODE": true,

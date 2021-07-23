@@ -20,11 +20,17 @@
 import { Directive, Input, ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
+// TODO(#13443): Remove hybrid router module provider once all pages are
+// migrated to angular router.
+
+/** Mock routerLink directive will be used in pages which are yet to be migrated
+ *  to angular router.
+ */
 @Directive({
   selector: '[routerLink]'
 })
 export class MockRouterLink {
-  @Input() routerLink;
+  @Input() routerLink!: string;
 }
 
 @NgModule({
@@ -39,14 +45,16 @@ export class MockRouterModule {}
 
 export class HybridRouterModuleProvider {
   static provide(): ModuleWithProviders<MockRouterModule | RouterModule> {
-    // eslint-disable-next-line oppia/no-inner-html
-    let bodyContent = window.document.querySelector('body').innerHTML;
+    let bodyContent = window.document.querySelector('body');
 
     // Checks whether the page is using angular router.
-    if (bodyContent.indexOf('<router-outlet></router-outlet>') > -1) {
-      return {
-        ngModule: RouterModule
-      };
+    if (bodyContent) {
+      // eslint-disable-next-line oppia/no-inner-html
+      if (bodyContent.innerHTML.indexOf('</router-outlet>') > -1) {
+        return {
+          ngModule: RouterModule
+        };
+      }
     }
 
     return {

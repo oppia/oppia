@@ -17,16 +17,9 @@
  */
 
 import { Component } from '@angular/core';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-error-page-root',
   templateUrl: './error-404-page-root.component.html'
 })
-export class Error404PageRootComponent {
-  constructor(
-    private pageTitleService: PageTitleService,
-    private windowRef: WindowRef
-  ) {}
-}
+export class Error404PageRootComponent {}

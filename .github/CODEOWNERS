@@ -52,11 +52,11 @@
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
-/core/templates/modules/* @srijanreddy98 @darksun27
+/core/templates/modules/ @srijanreddy98 @darksun27
 /core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
 /core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
 /core/templates/pages/oppia-root/ @srijanreddy98 @darksun27
-/core/templates/i18n/* @srijanreddy98 @darksun27
+/core/templates/i18n/ @srijanreddy98 @darksun27
 /core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @darksun27
 /core/templates/base-components/oppia-root.directive.html @srijanreddy98 @darksun27
 /core/templates/services/angular-services.index.ts @srijanreddy98 @darksun27
@@ -67,11 +67,10 @@
 /core/templates/services/question-validation.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
-/core/templates/hybrid-router-module-provider.ts @srijanreddy98 @darksun27
+/core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @darksun27
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
 /tsconfig-strict.json @vojtechjelinek
-
 
 
 # Answer classification team.
@@ -161,8 +160,7 @@
 
 
 # Dev workflow team.
-# TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
-/.circleci/ @kevintab95 @krishnarao22
+/.circleci/ @kevintab95 @krishnarao22 @U8NWXD
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -659,18 +657,17 @@
 /data/ @nithusha21
 /core/controllers/android_e2e_config*.py @BenHenning
 /core/templates/karma.module.ts @vojtechjelinek
-# TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
-/core/tests/protractor_utils/ @kevintab95 @krishnarao22
-/core/tests/protractor_desktop/ @kevintab95 @krishnarao22
-/core/tests/protractor/ @kevintab95 @krishnarao22
-/core/tests/protractor.conf.js @kevintab95 @krishnarao22
-/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22
-/extensions/interactions/protractor.js @kevintab95 @krishnarao22
-/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22
-/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22
-/extensions/objects/protractor.js @kevintab95 @krishnarao22
-/scripts/backend_test_shards.json @krishnarao22
-/.github/actions @krishnarao22
+/core/tests/protractor_utils/ @kevintab95 @krishnarao22 @U8NWXD
+/core/tests/protractor_desktop/ @kevintab95 @krishnarao22 @U8NWXD
+/core/tests/protractor/ @kevintab95 @krishnarao22 @U8NWXD
+/core/tests/protractor.conf.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/interactions/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/objects/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/scripts/backend_test_shards.json @krishnarao22 @U8NWXD
+/.github/actions @krishnarao22 @U8NWXD
 
 
 # Python 3 Migration project.
@@ -709,5 +706,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-# TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
-/.github/workflows/ @DubeySandeep @krishnarao22
+/.github/workflows/ @DubeySandeep @krishnarao22 @U8NWXD

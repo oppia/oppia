@@ -17,9 +17,18 @@
  */
 
 import { Component } from '@angular/core';
+import { Data, RouterOutlet } from '@angular/router';
+import { fader } from './routing/animation';
 
 @Component({
   selector: 'oppia-root',
-  templateUrl: './oppia-root.component.html'
+  templateUrl: './oppia-root.component.html',
+  animations: [
+    fader
+  ]
 })
-export class OppiaRootComponent {}
+export class OppiaRootComponent {
+  prepareOutlet(outlet: RouterOutlet): Data {
+    return outlet && outlet.activatedRouteData;
+  }
+}

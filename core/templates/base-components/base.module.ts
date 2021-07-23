@@ -41,6 +41,7 @@ import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 import {
   BaseContentComponent,
   BaseContentNavBarBreadCrumbDirective,
+  BaseContentNavBarPreLogoActionDirective,
   BaseContentPageFooterDirective
 } from './base-content.component';
 
@@ -88,6 +89,8 @@ const toastrConfig = {
     CookieModule.forChild(),
     DirectivesModule,
     I18nModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     SharedPipesModule,
     ToastrModule.forRoot(toastrConfig),
@@ -104,6 +107,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentNavBarPreLogoActionDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
@@ -139,6 +143,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BaseContentComponent,
     BaseContentNavBarBreadCrumbDirective,
+    BaseContentNavBarPreLogoActionDirective,
     BaseContentPageFooterDirective,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
@@ -149,4 +154,4 @@ const toastrConfig = {
     WarningsAndAlertsComponent,
   ],
 })
-export class BaseModule { }
+export class BaseModule {}

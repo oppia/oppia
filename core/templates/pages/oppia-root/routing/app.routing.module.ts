@@ -25,7 +25,7 @@ import { AppConstants } from 'app.constants';
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
-    path: AppConstants.ROUTES_REGISTERED_WITH_FRONTEND.ABOUT,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)
   },
