@@ -18,6 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SelectTopicsComponent } from './select-topics.component';
+import { FormsModule } from '@angular/forms';
 
 describe('Topic Selector Component', () => {
   let fixture: ComponentFixture<SelectTopicsComponent>;
@@ -65,6 +66,9 @@ describe('Topic Selector Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        FormsModule
+      ],
       declarations: [
         SelectTopicsComponent
       ]
@@ -76,6 +80,7 @@ describe('Topic Selector Component', () => {
     componentInstance = fixture.componentInstance;
     componentInstance.topicSummaries = topicSummaries;
     componentInstance.selectedTopicIds = [];
+    componentInstance.filteredTopics = [];
     spyOn(componentInstance.selectedTopicIdsChange, 'emit');
   });
 
@@ -84,15 +89,31 @@ describe('Topic Selector Component', () => {
   });
 
   it('should allow select and deselect the topics', () => {
-    componentInstance.selectOrDeselectTopic(topicSummaries[0].id, 0);
+    componentInstance.selectOrDeselectTopic(topicSummaries[0].id);
     expect(componentInstance.selectedTopicIds).toEqual([topicSummaries[0].id]);
     expect(topicSummaries[0].isSelected).toEqual(true);
-    componentInstance.selectOrDeselectTopic(topicSummaries[1].id, 1);
+    componentInstance.selectOrDeselectTopic(topicSummaries[1].id);
     expect(componentInstance.selectedTopicIds).toEqual(
       [topicSummaries[0].id, topicSummaries[1].id]);
     expect(topicSummaries[1].isSelected).toEqual(true);
-    componentInstance.selectOrDeselectTopic(topicSummaries[0].id, 0);
+    componentInstance.selectOrDeselectTopic(topicSummaries[0].id);
     expect(componentInstance.selectedTopicIds).toEqual([topicSummaries[1].id]);
     expect(topicSummaries[0].isSelected).toEqual(false);
+  });
+
+  it('should allow filter the topics', () => {
+    componentInstance.searchInTopics(topicSummaries[0].name);
+    expect(componentInstance.filteredTopics[0].name).toEqual(
+      topicSummaries[0].name);
+    componentInstance.searchInTopics(topicSummaries[1].name);
+    expect(componentInstance.filteredTopics[1].name).toEqual(
+      topicSummaries[1].name);
+  });
+
+  it('should throw error if topicId is wrong and no' +
+     ' topicSummaries exist', () => {
+    expect(() => {
+      componentInstance.selectOrDeselectTopic('');
+    }).toThrowError('No Topic with given topicId exists!');
   });
 });

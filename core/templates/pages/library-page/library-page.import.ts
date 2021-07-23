@@ -24,9 +24,9 @@ import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate', ngInfiniteScroll,
+  require('angular-cookies'), 'ngAnimate', ngInfiniteScroll,
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+  'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
 require('Polyfills.ts');
@@ -37,7 +37,7 @@ require('pages/library-page/library-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require('pages/library-page/library-page.component.ts');
 require('pages/library-page/library-footer/library-footer.component.ts');
 require('pages/library-page/search-bar/search-bar.component.ts');

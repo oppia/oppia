@@ -6,7 +6,7 @@
 apache-beam[gcp]==2.24.0
 backports.functools-lru-cache==1.6.1
 beautifulSoup4==4.9.1
-bleach==3.1.5
+bleach==3.3.0
 callbacks==0.3.0
 contextlib2==0.6.0.post1
 # TODO(#11474): Use a regular dependency after upgrading to Python 3. Until
@@ -36,3 +36,5 @@ google-cloud-translate==2.0.1
 googleapis_common_protos==1.52.0
 webapp2==3.0.0b1
 elasticsearch==7.10.0
+mailchimp3==3.0.14
+typing==3.7.4.3

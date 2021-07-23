@@ -41,11 +41,11 @@ describe('Assets Backend API Service', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
+        imports: [HttpClientTestingModule]
       });
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      csrfTokenService = TestBed.get(CsrfTokenService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
@@ -172,6 +172,27 @@ describe('Assets Backend API Service', () => {
         '/createhandler/imageupload/exploration/expid12345'
       ).flush(successMessage);
       flushMicrotasks();
+
+      expect(onSuccess).toHaveBeenCalledWith(successMessage);
+      expect(onFailure).not.toHaveBeenCalled();
+    }));
+
+    it('should successfully post a thumbnail to server', fakeAsync(() => {
+      const successMessage = 'Thumbnail SVG was successfully saved.';
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
+      assetsBackendApiService.postThumbnailFile(
+        new Blob(['abc']),
+        'filename.svg',
+        'entity_type',
+        'entity_id'
+      ).subscribe(onSuccess, onFailure);
+      flushMicrotasks();
+
+      httpTestingController.expectOne(
+        '/createhandler/imageupload/entity_type/entity_id'
+      ).flush(successMessage);
 
       expect(onSuccess).toHaveBeenCalledWith(successMessage);
       expect(onFailure).not.toHaveBeenCalled();
@@ -364,9 +385,10 @@ describe('Assets Backend API Service', () => {
   });
 
   describe('on emulator mode', () => {
-    let assetsBackendApiService: AssetsBackendApiService = null;
-    let httpTestingController: HttpTestingController = null;
-    const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
+    let assetsBackendApiService: AssetsBackendApiService;
+    let httpTestingController: HttpTestingController;
+    const gcsPrefix: string =
+      'https://storage.googleapis.com/app_default_bucket';
 
     beforeEach(() => {
       spyOnProperty(AssetsBackendApiService, 'EMULATOR_MODE', 'get')
@@ -375,8 +397,8 @@ describe('Assets Backend API Service', () => {
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
-      httpTestingController = TestBed.get(HttpTestingController);
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+      httpTestingController = TestBed.inject(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     });
 
     it('should correctly formulate the download URL for audios', () => {

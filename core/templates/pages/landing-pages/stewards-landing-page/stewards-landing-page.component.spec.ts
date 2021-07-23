@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,239 +13,154 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for stewardsLandingPage.
+ * @fileoverview Unit tests for stewards landing page.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-import { UrlService } from
-  'services/contextual/url.service';
-import { of } from 'rxjs';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { StewardsLandingPageComponent } from './stewards-landing-page.component';
 
-require(
-  'pages/landing-pages/stewards-landing-page/' +
-  'stewards-landing-page.component.ts');
+describe('Stewards Landing Page Component', () => {
+  let fixture: ComponentFixture<StewardsLandingPageComponent>;
+  let componentInstance: StewardsLandingPageComponent;
+  let urlService: UrlService;
+  let urlInterpolationService: UrlInterpolationService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
-describe('Stewards Landing Page', function() {
-  var $scope = null, ctrl = null;
-  var $timeout = null;
-  var SiteAnalyticsService = null;
-  var windowRef = new WindowRef();
-  var windowDimensions = new WindowDimensionsService(windowRef);
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRef);
-    $provide.value('WindowDimensionsService', windowDimensions);
-    $provide.value('UrlService', new UrlService(windowRef));
-    $provide.value('UrlService', {
-      getPathname: function() {
-        return '/parents';
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: ''
       }
-    });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('stewardsLandingPage', {
-      $scope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    ctrl.$onDestroy();
-  });
-
-  it('should change to parents tab', function() {
-    ctrl.$onInit();
-
-    var activeTabName = 'Parents';
-    ctrl.setActiveTabName(activeTabName);
-
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
-      text: 'Browse Lessons',
-      href: '/community-library'
-    }, {
-      text: 'Subscribe to our Newsletter',
-      href: 'https://eepurl.com/g5v9Df'
-    }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
-
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
-  });
-
-  it('should change to teachers tab', function() {
-    ctrl.$onInit();
-
-    var activeTabName = 'Teachers';
-    ctrl.setActiveTabName(activeTabName);
-
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
-      text: 'Browse Lessons',
-      href: '/community-library'
-    }, {
-      text: 'Subscribe to our Newsletter',
-      href: 'https://eepurl.com/g5v9Df'
-    }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
-
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Teacher');
-  });
-
-  it('should change to nonprofits tab', function() {
-    ctrl.$onInit();
-
-    var activeTabName = 'NGOs';
-    ctrl.setActiveTabName(activeTabName);
-
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
-      text: 'Get Involved',
-      href: (
-        'https://www.oppiafoundation.org/partnerships#get-in-touch')
-    }, {
-      text: 'Browse Lessons',
-      href: '/community-library'
-    }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
-
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Nonprofit');
-  });
-
-  it('should change to volunteers tab', function() {
-    ctrl.$onInit();
-
-    var activeTabName = 'Volunteers';
-    ctrl.setActiveTabName(activeTabName);
-
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.buttonDefinitions).toEqual([{
-      text: 'Browse Volunteer Opportunities',
-      href: 'https://www.oppiafoundation.org/volunteer'
-    }]);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Volunteer');
-  });
-
-  it('should not change button definitions when tab is invalid', function() {
-    ctrl.$onInit();
-
-    var activeTabName = 'Invalid';
-    expect(function() {
-      ctrl.setActiveTabName(activeTabName);
-    }).toThrowError('Invalid tab name: ' + activeTabName);
-    expect(ctrl.activeTabName).toBe(activeTabName);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(ctrl.isActiveTab('Parents')).toBe(false);
-    expect(ctrl.isActiveTab('Teachers')).toBe(false);
-    expect(ctrl.isActiveTab('NGOs')).toBe(false);
-    expect(ctrl.isActiveTab('Volunteers')).toBe(false);
-
-    expect(function() {
-      ctrl.getActiveTabNameInSingularForm();
-    }).toThrowError('Invalid active tab name: ' + activeTabName);
-  });
-
-  it('should click on active button', function() {
-    ctrl.$onInit();
-    var stewardsLandingPageEventSpy = spyOn(
-      SiteAnalyticsService, 'registerStewardsLandingPageEvent').and
-      .callThrough();
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: ''
-    });
-
-    var activeTabName = 'Parents';
-    var buttonDefinition = {
-      text: 'Browse Lessons',
-      href: '/community-library'
     };
-    ctrl.setActiveTabName(activeTabName);
-    ctrl.onClickButton(buttonDefinition);
-    $timeout.flush(1000);
+  }
 
-    expect(stewardsLandingPageEventSpy).toHaveBeenCalledWith(
-      activeTabName, buttonDefinition.text);
-    expect(ctrl.isActiveTab(activeTabName)).toBe(true);
-    expect(windowRef.nativeWindow.location).toBe(buttonDefinition.href);
+  class MockWindowDimensionsService {
+    getResizeEvent() {
+      return {
+        subscribe(next) {
+          next();
+        }
+      };
+    }
+
+    getWidth(): number {
+      return 700;
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [],
+      declarations: [
+        StewardsLandingPageComponent
+      ],
+      providers: [
+        SiteAnalyticsService,
+        UrlInterpolationService,
+        UrlService,
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StewardsLandingPageComponent);
+    componentInstance = fixture.componentInstance;
+    urlService = TestBed.inject(UrlService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  it('should get static image url', function() {
-    expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image');
+  afterEach(() => {
+    componentInstance.ngOnDestory();
   });
 
-  it('should get static subject image url', function() {
-    expect(ctrl.getStaticSubjectImageUrl('subject-file-name')).toBe(
-      '/assets/images/subjects/subject-file-name.svg');
+  it('should be defined', () => {
+    expect(componentInstance).toBeDefined();
   });
 
-  it('should set up active tab when init is called', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: '/parents'
-      },
-      innerWidth: 100
+  it('should intialize', () => {
+    const buttonDefinitions = [{
+      text: 'button',
+      href: 'test_href'
+    }];
+    spyOn(urlService, 'getPathname').and.returnValue('/parents');
+    spyOn(componentInstance, 'getButtonDefinitions').and.returnValue(
+      buttonDefinitions);
+    spyOn(componentInstance, 'isWindowNarrow').and.returnValue(true);
+    componentInstance.ngOnInit();
+    expect(componentInstance.activeTabName).toEqual('Parents');
+    expect(componentInstance.buttonDefinitions).toEqual(buttonDefinitions);
+    expect(componentInstance.windowIsNarrow).toBeTrue();
+  });
+
+  it('should handle tab changes', () => {
+    componentInstance.setActiveTabName(componentInstance.TAB_NAME_PARENTS);
+    expect(componentInstance.getActiveTabNameInSingularForm()).toEqual(
+      'Parent');
+    expect(componentInstance.isActiveTab(
+      componentInstance.TAB_NAME_PARENTS)).toBeTrue();
+    componentInstance.setActiveTabName(componentInstance.TAB_NAME_NONPROFITS);
+    expect(componentInstance.getActiveTabNameInSingularForm()).toEqual(
+      'Nonprofit');
+    componentInstance.setActiveTabName(componentInstance.TAB_NAME_TEACHERS);
+    expect(componentInstance.getActiveTabNameInSingularForm()).toEqual(
+      'Teacher');
+    componentInstance.setActiveTabName(componentInstance.TAB_NAME_VOLUNTEERS);
+    expect(componentInstance.getActiveTabNameInSingularForm()).toEqual(
+      'Volunteer');
+    expect(() => {
+      componentInstance.setActiveTabName('NOT_VALID');
+    }).toThrowError(
+      'Invalid tab name: NOT_VALID');
+    expect(() => {
+      componentInstance.getActiveTabNameInSingularForm();
+    }).toThrowError(
+      'Invalid active tab name: NOT_VALID');
+  });
+
+  it('should get static image url', () => {
+    let imageUrl = 'image_url';
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      imageUrl);
+    expect(componentInstance.getStaticImageUrl('')).toEqual(imageUrl);
+  });
+
+  it('should get static subject image url', () => {
+    let imageUrl = 'static_image_url';
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      imageUrl);
+    expect(componentInstance.getStaticSubjectImageUrl('')).toEqual(imageUrl);
+  });
+
+  it('should handle click', fakeAsync(() => {
+    spyOn(siteAnalyticsService, 'registerStewardsLandingPageEvent');
+    let href = 'href';
+    componentInstance.onClickButton({
+      text: 'text',
+      href: href
     });
-    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    ctrl.$onInit();
+    tick(200);
+    expect(siteAnalyticsService.registerStewardsLandingPageEvent)
+      .toHaveBeenCalled();
+  }));
 
-    expect(ctrl.activeTabName).toBe('Parents');
-    expect(ctrl.isActiveTab('Parents')).toBe(true);
-    expect(ctrl.getActiveTabNameInSingularForm()).toBe('Parent');
-    expect(ctrl.buttonDefinitions).toEqual([{
-      text: 'Browse Lessons',
-      href: '/community-library'
-    }, {
-      text: 'Subscribe to our Newsletter',
-      href: 'https://eepurl.com/g5v9Df'
-    }]);
-    expect(ctrl.windowIsNarrow).toBe(true);
-  });
-
-  it('should check evalutes window is narrow on resize event', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: ''
-      },
-      innerWidth: 998
-    });
-    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    ctrl.$onInit();
-    expect(ctrl.windowIsNarrow).toBe(false);
-  });
-
-  it('should evalutes window is not narrow on resize event', function() {
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        pathname: ''
-      },
-      innerWidth: 768
-    });
-    spyOn(windowDimensions, 'getResizeEvent').and.returnValue(
-      of(new Event('resize')));
-    ctrl.$onInit();
-    expect(ctrl.windowIsNarrow).toBe(true);
+  it('should tell if window is narrow', () => {
+    expect(componentInstance.isWindowNarrow(800)).toBeTrue();
+    expect(componentInstance.isWindowNarrow(900)).toBeFalse();
   });
 });

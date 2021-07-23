@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,10 +23,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { UserInfo } from 'domain/user/user-info.model';
 import { AlertsService } from 'services/alerts.service';
 import { AuthService } from 'services/auth.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
+import { UserService } from 'services/user.service';
 import { LoginPageComponent } from './login-page.component';
 
 class MockWindowRef {
@@ -70,6 +72,7 @@ describe('Login Page', () => {
   let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
   let loaderService: jasmine.SpyObj<LoaderService>;
+  let userService: jasmine.SpyObj<UserService>;
   let windowRef: MockWindowRef;
 
   let loginPageComponent: LoginPageComponent;
@@ -78,6 +81,12 @@ describe('Login Page', () => {
   const spyOnHandleRedirectResultAsync = () => {
     const pending = new PendingPromise<boolean>();
     authService.handleRedirectResultAsync.and.returnValue(pending.promise);
+    return pending;
+  };
+
+  const spyOnSignInWithRedirectAsync = () => {
+    const pending = new PendingPromise<void>();
+    authService.signInWithRedirectAsync.and.returnValue(pending.promise);
     return pending;
   };
 
@@ -100,6 +109,9 @@ describe('Login Page', () => {
       'showLoadingScreen',
       'hideLoadingScreen',
     ]);
+    userService = jasmine.createSpyObj<UserService>('UserService', {
+      getUserInfoAsync: Promise.resolve(UserInfo.createDefault()),
+    });
     windowRef = new MockWindowRef();
 
     TestBed.configureTestingModule({
@@ -116,6 +128,7 @@ describe('Login Page', () => {
         { provide: AlertsService, useValue: alertsService },
         { provide: AuthService, useValue: authService },
         { provide: LoaderService, useValue: loaderService },
+        { provide: UserService, useValue: userService },
         { provide: WindowRef, useValue: windowRef },
       ],
     }).compileComponents();
@@ -124,25 +137,30 @@ describe('Login Page', () => {
     loginPageComponent = fixture.componentInstance;
   });
 
-  it('should be enabled by default', () => {
-    expect(loginPageComponent.enabled).toBeTrue();
-  });
-
   it('should be in emulator mode by default', () => {
     expect(loginPageComponent.emulatorModeIsEnabled).toBeTrue();
   });
 
-  it('should redirect immediately if login page disabled', fakeAsync(() => {
-    spyOnProperty(loginPageComponent, 'enabled', 'get').and.returnValue(false);
+  it('should redirect to home page when already logged in', fakeAsync(() => {
+    userService.getUserInfoAsync.and.resolveTo(UserInfo.createFromBackendDict({
+      role: 'EXPLORATION_EDITOR',
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: false,
+      preferred_site_language_code: null,
+      username: null,
+      email: null,
+      user_is_logged_in: true,
+    }));
+
+    expect(windowRef.location).toBeNull();
 
     loginPageComponent.ngOnInit();
     flush();
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Sign-in is temporarily disabled. Please try again later.');
     expect(windowRef.location).toEqual('/');
-    expect(authService.handleRedirectResultAsync).not.toHaveBeenCalled();
-    expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
   }));
 
   describe('Emulator mode', function() {
@@ -155,7 +173,6 @@ describe('Login Page', () => {
     it('should not handle redirect results', fakeAsync(() => {
       loginPageComponent.ngOnInit();
 
-      expect(loaderService.showLoadingScreen).not.toHaveBeenCalled();
       expect(authService.handleRedirectResultAsync).not.toHaveBeenCalled();
     }));
 
@@ -289,7 +306,7 @@ describe('Login Page', () => {
 
       expect(authService.signInWithRedirectAsync).not.toHaveBeenCalled();
 
-      redirectResultPromise.resolve(null);
+      redirectResultPromise.resolve(false);
       flushMicrotasks();
 
       expect(authService.signInWithRedirectAsync).toHaveBeenCalled();
@@ -309,6 +326,35 @@ describe('Login Page', () => {
       flushMicrotasks();
 
       expect(windowRef.location).toEqual('/signup?return_url=/admin');
+    }));
+
+    it('should redirect to home page when sign in with redirect fails',
+      fakeAsync(() => {
+        const signInWithRedirectAsyncPromise = spyOnSignInWithRedirectAsync();
+
+        loginPageComponent.ngOnInit();
+        flushMicrotasks();
+
+        expect(windowRef.location).toBeNull();
+
+        signInWithRedirectAsyncPromise.reject(
+          {code: 'auth/unknown-error', message: '?'});
+
+        flush();
+
+        expect(windowRef.location).toEqual('/');
+      }));
+
+    it('should redirect to home page when it cannot determine if user is ' +
+      'logged in', fakeAsync(() => {
+      userService.getUserInfoAsync.and.rejectWith(Error('uh-oh!'));
+
+      expect(windowRef.location).toBeNull();
+
+      loginPageComponent.ngOnInit();
+      flush();
+
+      expect(windowRef.location).toEqual('/');
     }));
   });
 });

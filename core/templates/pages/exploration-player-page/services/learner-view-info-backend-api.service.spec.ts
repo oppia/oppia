@@ -46,7 +46,7 @@ describe('Learner View Info Backend Api Service', () => {
         summaries: ['response1',
           'response2']
       };
-      lvibas.fetchLearnerInfo(
+      lvibas.fetchLearnerInfoAsync(
         stringifiedExpIds,
         includePrivateExplorations).then(successHandler, failHandler);
 

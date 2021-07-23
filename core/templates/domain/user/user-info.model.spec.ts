@@ -19,7 +19,8 @@
 import { UserInfo } from 'domain/user/user-info.model';
 
 describe('User info model', () => {
-  var sampleUserInfoBackendObject = {
+  let sampleUserInfoBackendObject = {
+    role: 'USER_ROLE',
     is_moderator: true,
     is_admin: false,
     is_super_admin: false,
@@ -32,13 +33,15 @@ describe('User info model', () => {
   };
 
   it('should create correct UserInfo object from backend dict', () => {
-    var userInfo = UserInfo.createFromBackendDict(
+    let userInfo = UserInfo.createFromBackendDict(
       sampleUserInfoBackendObject);
 
     expect(userInfo.isModerator()).toBe(true);
     expect(userInfo.isAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
+    expect(userInfo.isTranslationAdmin()).toBe(false);
+    expect(userInfo.isQuestionAdmin()).toBe(false);
     expect(userInfo.canCreateCollections()).toBe(true);
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('en');
     expect(userInfo.getUsername()).toBe('tester');
@@ -47,7 +50,7 @@ describe('User info model', () => {
   });
 
   it('should create correct default UserInfo object', () => {
-    var userInfo = UserInfo.createDefault();
+    let userInfo = UserInfo.createDefault();
     expect(userInfo.isModerator()).toBe(false);
     expect(userInfo.isAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);

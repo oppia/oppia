@@ -16,36 +16,23 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-import { Pipe, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { SplashPageComponent } from './splash-page.component';
 import { of } from 'rxjs';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
 class MockI18nLanguageCodeService {
   codeChangeEventEmitter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -79,7 +66,6 @@ describe('Splash Page', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        { provide: TranslateService, useClass: MockTranslateService },
         { provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub },
         UrlInterpolationService,
         {
@@ -95,8 +81,6 @@ describe('Splash Page', () => {
       ]
     }).compileComponents();
   });
-
-  beforeEach(angular.mock.module('oppia'));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -168,6 +152,7 @@ describe('Splash Page', () => {
 
   it('should evaluate if user is logged in', fakeAsync(() => {
     const UserInfoObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -188,6 +173,7 @@ describe('Splash Page', () => {
 
   it('should evaluate if user is not logged in', fakeAsync(() => {
     const UserInfoObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,

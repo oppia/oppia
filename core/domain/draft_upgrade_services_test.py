@@ -170,6 +170,92 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v45_dict_to_v46_dict(self):
+        draft_change_list_v45 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 46.
+        self.create_and_migrate_new_exploration('45', '46')
+        migrated_draft_change_list_v46 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v45, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v45_dict_list = [
+            change.to_dict() for change in draft_change_list_v45
+        ]
+        migrated_draft_change_list_v46_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v46
+        ]
+        self.assertEqual(
+            draft_change_list_v45_dict_list,
+            migrated_draft_change_list_v46_dict_list)
+
+    def test_convert_states_v44_dict_to_v45_dict(self):
+        draft_change_list_v44 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 45.
+        self.create_and_migrate_new_exploration('44', '45')
+        migrated_draft_change_list_v45 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v44, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v44_dict_list = [
+            change.to_dict() for change in draft_change_list_v44
+        ]
+        migrated_draft_change_list_v45_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v45
+        ]
+        self.assertEqual(
+            draft_change_list_v44_dict_list,
+            migrated_draft_change_list_v45_dict_list)
+
+    def test_convert_states_v43_dict_to_v44_dict(self):
+        draft_change_list_v43 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 44.
+        self.create_and_migrate_new_exploration('43', '44')
+        # Migrate the draft change list's state schema to the migrated
+        # exploration's schema. In this case there are no change to the
+        # draft change list since version 44 adds the
+        # card_is_checkpoint boolean variable to the exploration
+        # state, for which there should be no changes to drafts.
+        migrated_draft_change_list_v44 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v43, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v43_dict_list = [
+            change.to_dict() for change in draft_change_list_v43
+        ]
+        migrated_draft_change_list_v44_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v44
+        ]
+        self.assertEqual(
+            draft_change_list_v43_dict_list,
+            migrated_draft_change_list_v44_dict_list)
+
     def test_convert_states_v42_dict_to_v43_dict(self):
         draft_change_list_1_v42 = [
             exp_domain.ExplorationChange({

@@ -19,13 +19,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExpressionParserService } from
-  'expressions/expression-parser.service.ts';
+import { ExpressionParserService } from 'expressions/expression-parser.service';
 
 export type Expr = string | number | boolean;
 
 export interface SystemEnv {
-  eval: (args: Expr[]) => Expr;
+  eval: (args: string[]) => Expr;
 }
 
 export type Env = SystemEnv | Expr;

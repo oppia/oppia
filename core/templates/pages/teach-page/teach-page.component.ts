@@ -23,8 +23,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
-import { LoaderService } from 'services/loader.service.ts';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { Subscription } from 'rxjs';
 
@@ -47,6 +47,7 @@ export class TeachPageComponent implements OnInit {
   classroomUrlFragment: string;
   classroomUrl: string;
   displayedTestimonialId: number;
+  libraryUrl: string;
   testimonialCount: number;
   testimonials = [];
   userIsLoggedIn: boolean = null;
@@ -69,6 +70,7 @@ export class TeachPageComponent implements OnInit {
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
+    this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
@@ -135,18 +137,19 @@ export class TeachPageComponent implements OnInit {
 
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+    this.windowRef.nativeWindow.location.href = '/community-library';
     return;
   }
 
   onClickGuideParentsButton(): void {
     this.siteAnalyticsService.registerClickGuideParentsButtonEvent();
-    this.windowRef.nativeWindow.location.href = ('/teach');
+    this.windowRef.nativeWindow.location.href = '/teach';
     return;
   }
 
   onClickTipforParentsButton(): void {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
-    this.windowRef.nativeWindow.location.href = ('/teach');
+    this.windowRef.nativeWindow.location.href = '/teach';
     return;
   }
 

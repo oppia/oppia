@@ -48,7 +48,7 @@
         </p>
         <a class="btn oppia-learner-dashboard-intro-button oppia-transition-200 protractor-mobile-test-learner-dashboard-intro-button"
            [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-           [href]="community-library"
+           href="/community-library"
            [oppiaFocusOn]="'ourLessonsBtn'">
         </a>
       </blockquote>
@@ -66,6 +66,22 @@
     <div class="col-md-2 oppia-learner-dashboard-side-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
       <mat-card class="oppia-learner-dashboard-main-menu">
+        <h4 class="oppia-learner-dashboard-menu"
+            *ngIf="newLearnerDashboardPageIsDisplayed"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate"></span>
+        </h4>
+        <h4 class="oppia-learner-dashboard-menu" *ngIf="newLearnerDashboardPageIsDisplayed"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate"></span>
+        </h4>
+        <h4 class="oppia-learner-dashboard-menu" *ngIf="newLearnerDashboardPageIsDisplayed"
+            [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
+            (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
+          <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
+        </h4>
         <h4 class="dropdown-toggle oppia-learner-dashboard-menu protractor-test-play-later-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
@@ -137,7 +153,7 @@
     <div class="col-md-8 oppia-learner-dashboard-main-content"
          [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
       <div>
-        <span class="oppia-learner-dashboard-main-content-title">
+        <span class="oppia-learner-dashboard-main-content-title" *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS">
           <span [innerHTML]="activeSection | translate">
           </span>
           <span *ngIf="activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.SUBSCRIPTIONS && activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK">
@@ -211,10 +227,33 @@
         </span>
       </div>
       <div class="oppia-learner-dashboard-main-content-container">
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS && newLearnerDashboardPageIsDisplayed">
+          <oppia-goals-tab [currentGoals]="topicsToLearn"
+                           [editGoals]="allTopics"
+                           [completedGoals]="learntTopics"
+                           [learntToPartiallyLearntTopics]="learntToPartiallyLearntTopics">
+          </oppia-goals-tab>
+        </div>
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && newLearnerDashboardPageIsDisplayed">
+          <oppia-progress-tab [completedStoriesList]="completedStoriesList"
+                              [partiallyLearntTopicsList]="partiallyLearntTopicsList">
+          </oppia-progress-tab>
+        </div>
+        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS && newLearnerDashboardPageIsDisplayed">
+          <oppia-community-lessons-tab [incompleteExplorationsList]="incompleteExplorationsList"
+                                       [incompleteCollectionsList]="incompleteCollectionsList"
+                                       [completedExplorationsList]="completedExplorationsList"
+                                       [completedCollectionsList]="completedCollectionsList"
+                                       [explorationPlaylist]="explorationPlaylist"
+                                       [collectionPlaylist]="collectionPlaylist"
+                                       [subscriptionsList]="subscriptionsList"
+                                       [completedToIncompleteCollections]="completedToIncompleteCollections">
+          </oppia-community-lessons-tab>
+        </div>
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteExplorations !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentIncompleteExplorations}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentIncompleteExplorations, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -231,7 +270,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library"
+                 href="/community-library"
                  [oppiaFocusOn]="'ourLessonsBtn'">
               </a>
             </div>
@@ -281,7 +320,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCompletedExplorations !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentCompletedExplorations}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentCompletedExplorations, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -293,7 +332,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-exploration-summary-tile-container"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -343,7 +382,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -379,7 +418,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteCollections !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentIncompleteCollections}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentIncompleteCollections, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -396,7 +435,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -441,7 +480,7 @@
           </span>
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCollectionsFromPlaylist !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentCollectionsFromPlaylist}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentCollectionsFromPlaylist, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -453,7 +492,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -496,7 +535,7 @@
 
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCompletedCollections !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentCompletedCollections}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentCompletedCollections, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -508,7 +547,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -549,7 +588,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -589,7 +628,7 @@
 
               <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
                  [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-                 [href]="community-library">
+                 href="/community-library">
               </a>
             </div>
           </mat-card>
@@ -827,7 +866,6 @@
   }
 
   .oppia-learner-dashboard-menu {
-    border: 1px solid #d0d0d0;
     color: black;
     cursor: pointer;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -854,12 +892,12 @@
   }
 
   .oppia-learner-dashboard-section-active {
-    background-color: #018477;
-    color: white;
+    background-color: #00645C1A;
+    color: #00645C;
   }
 
   .oppia-learner-dashboard-side-content {
-    min-width: 200px;
+    min-width: 241px;
     padding-left: 20px;
     width: 20%;
   }

@@ -33,7 +33,7 @@ import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/lear
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import { AlertsService } from 'services/alerts.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -41,7 +41,8 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 @Component({
   selector: 'oppia-learner-dashboard-page',
@@ -98,6 +99,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   PAGE_SIZE = 8;
   Math = window.Math;
   username: string = '';
+  newLearnerDashboardPageIsDisplayed: boolean = false;
 
   isCurrentExpSortDescending: boolean;
   isCurrentSubscriptionSortDescending: boolean;
@@ -112,17 +114,29 @@ export class LearnerDashboardPageComponent implements OnInit {
 
   completedExplorationsList: LearnerExplorationSummary[];
   completedCollectionsList: CollectionSummary[];
+  completedStoriesList: StorySummary[];
+  partiallyLearntTopicsList: LearnerTopicSummary[];
+  learntTopics: LearnerTopicSummary[];
   incompleteExplorationsList: LearnerExplorationSummary[];
   incompleteCollectionsList: CollectionSummary[];
+  partiallyLearntTopics: LearnerTopicSummary[];
+  topicsToLearn: LearnerTopicSummary[];
+  allTopics: LearnerTopicSummary[];
+  untrackedTopics: LearnerTopicSummary[];
   subscriptionsList: ProfileSummary[];
 
   numberNonexistentIncompleteExplorations: number;
   numberNonexistentIncompleteCollections: number;
+  numberNonexistentPartiallyLearntTopics: number;
   numberNonexistentCompletedExplorations: number;
   numberNonexistentCompletedCollections: number;
+  numberNonexistentCompletedStories: number;
+  numberNonexistentLearntTopics: number;
+  numberNonexistentTopicsToLearn: number;
   numberNonexistentExplorationsFromPlaylist: number;
   numberNonexistentCollectionsFromPlaylist: number;
   completedToIncompleteCollections: string[];
+  learntToPartiallyLearntTopics: string[];
   threadSummaries: FeedbackThreadSummary[];
   numberOfUnreadThreads: number;
   explorationPlaylist: LearnerExplorationSummary[];
@@ -205,10 +219,24 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.completedExplorationsList);
         this.completedCollectionsList = (
           responseData.completedCollectionsList);
+        this.completedStoriesList = (
+          responseData.completedStoriesList);
+        this.partiallyLearntTopicsList = (
+          responseData.partiallyLearntTopicsList);
+        this.learntTopics = (
+          responseData.learntTopicsList);
         this.incompleteExplorationsList = (
           responseData.incompleteExplorationsList);
         this.incompleteCollectionsList = (
           responseData.incompleteCollectionsList);
+        this.partiallyLearntTopics = (
+          responseData.partiallyLearntTopicsList);
+        this.topicsToLearn = (
+          responseData.topicsToLearnList);
+        this.untrackedTopics = (
+          responseData.untrackedTopicsList);
+        this.allTopics = (
+          responseData.allTopicsList);
         this.subscriptionsList = responseData.subscriptionList;
         this.numberNonexistentIncompleteExplorations = (
           responseData.numberOfNonexistentActivities
@@ -225,6 +253,8 @@ export class LearnerDashboardPageComponent implements OnInit {
           responseData.numberOfNonexistentActivities.collectionPlaylist);
         this.completedToIncompleteCollections = (
           responseData.completedToIncompleteCollections);
+        this.learntToPartiallyLearntTopics = (
+          responseData.learntToPartiallyLearntTopics);
         this.threadSummaries = responseData.threadSummaries;
         this.numberOfUnreadThreads =
           responseData.numberOfUnreadThreads;
@@ -257,19 +287,15 @@ export class LearnerDashboardPageComponent implements OnInit {
       }
     );
 
-
     Promise.all([
       userInfoPromise,
       dashboardDataPromise,
     ]).then(() => {
-      // The timeout is required because at execution time,
-      // the element may not be present in the DOM yet.Thus it ensure
-      // that the element is visible before focussing.
       setTimeout(() => {
         this.loaderService.hideLoadingScreen();
-        this.addFocusWithoutScroll('ourLessonsBtn');
+        // So that focus is applied after the loading screen has dissapeared.
+        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);
-    // eslint-disable-next-line dot-notation
     }).catch(errorResponse => {
       // This is placed here in order to satisfy Unit tests.
     });
@@ -279,13 +305,6 @@ export class LearnerDashboardPageComponent implements OnInit {
     this.newMessage = {
       text: ''
     };
-  }
-
-  addFocusWithoutScroll(label: string): void {
-    this.focusManagerService.setFocus(label);
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 5);
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -550,7 +569,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   openRemoveActivityModal(
       sectionNameI18nId: string, subsectionName: string,
       activity: LearnerExplorationSummary | CollectionSummary): void {
-    this.learnerDashboardActivityBackendApiService.removeActivityModal(
+    this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activity.id, activity.title)
       .then(() => {

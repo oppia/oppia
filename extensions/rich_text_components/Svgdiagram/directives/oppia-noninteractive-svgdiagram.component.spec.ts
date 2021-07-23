@@ -17,16 +17,26 @@
  */
 
 import { AppConstants } from 'app.constants';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NoninteractiveSvgdiagram } from './oppia-noninteractive-svgdiagram.component';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SimpleChanges, SimpleChange } from '@angular/core';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
-describe('oppiaNoninteractiveSvgdiagram', function() {
-  var contextService = null;
-  var ctrl = null;
-  var mockAssetsBackendApiService = {
+describe('oppiaNoninteractiveSvgdiagram', () => {
+  let component: NoninteractiveSvgdiagram;
+  let fixture: ComponentFixture<NoninteractiveSvgdiagram>;
+  let contextService: ContextService;
+  const mockAssetsBackendApiService = {
     getImageUrlForPreview: function(contentType, contentId, filename) {
       return 'imageUrl:' + contentType + '_' + contentId + '_' + filename;
     }
   };
-  var mockImagePreloaderService = {
+  const mockImagePreloaderService = {
     getDimensionsOfImage: function() {
       return {
         width: 450,
@@ -35,72 +45,137 @@ describe('oppiaNoninteractiveSvgdiagram', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
-    $provide.value('ImagePreloaderService', mockImagePreloaderService);
-    $provide.value('ImageLocalStorageService', {});
-    $provide.value('$attrs', {
-      svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
-      altWithValue: '&quot;altText&quot;'
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        imports: [HttpClientTestingModule],
+        declarations: [NoninteractiveSvgdiagram],
+        providers: [
+          {
+            provide: AssetsBackendApiService,
+            useValue: mockAssetsBackendApiService
+          },
+          {
+            provide: ImagePreloaderService,
+            useValue: mockImagePreloaderService
+          }
+        ]
+      }
+    ).compileComponents();
   }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    contextService = $injector.get('ContextService');
+
+  beforeEach(() => {
+    contextService = TestBed.inject(ContextService);
+    fixture = TestBed.createComponent(
+      NoninteractiveSvgdiagram);
+    component = fixture.componentInstance;
+    component.svgFilenameWithValue = '&quot;svgFilename.svg&quot;';
+    component.altWithValue = '&quot;altText&quot;';
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
-    ctrl = $componentController('oppiaNoninteractiveSvgdiagram');
-    ctrl.$onInit();
-  }));
+    fixture.detectChanges();
+  });
 
-  it('should fetch the svg file', function() {
-    expect(ctrl.filename).toBe('svgFilename.svg');
-    expect(ctrl.svgAltText).toBe('altText');
-    expect(ctrl.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+  it('should run update on change', () => {
+    component.svgFilenameWithValue = undefined;
+    component.altWithValue = undefined;
+    component.ngOnInit();
+    component.svgFilenameWithValue = '&quot;svgFilename.svg&quot;';
+    component.altWithValue = '&quot;altText&quot;';
+    let changes: SimpleChanges = {};
+    changes.svgFilenameWithValue = new SimpleChange(
+      undefined,
+      '&quot;svgFilename.svg&quot;',
+      true
+    );
+    changes.svgFilenameWithValue = new SimpleChange(
+      undefined,
+      '&quot;altText&quot;',
+      true
+    );
+    component.ngOnChanges(changes);
+    expect(component.filename).toBe('svgFilename.svg');
+    expect(component.svgAltText).toBe('altText');
+    expect(component.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+  });
+
+  it('should fetch the svg file', () => {
+    component.ngOnInit();
+    expect(component.filename).toBe('svgFilename.svg');
+    expect(component.svgAltText).toBe('altText');
+    expect(component.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+    component.svgFilenameWithValue = '&quot;&quot;';
+    component.ngOnInit();
+    expect(component.filename).toBe('');
   });
 });
 
-describe('oppiaNoninteractiveSvgdiagram with image save destination as' +
-  ' local storage', function() {
-  var contextService = null;
-  var ctrl = null;
-  var mockImageLocalStorageService = {
-    getObjectUrlForImage: function() {
-      return 'imageUrl:exploration_1_svgFilename.svg';
-    }
-  };
-  var mockImagePreloaderService = {
-    getDimensionsOfImage: function() {
-      return {
-        width: 450,
-        height: 350
-      };
-    }
-  };
+describe(
+  'OppiaNoninteractiveSvgdiagram with image save destination as local storage',
+  () => {
+    let component: NoninteractiveSvgdiagram;
+    let fixture: ComponentFixture<NoninteractiveSvgdiagram>;
+    let contextService: ContextService;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AssetsBackendApiService', {});
-    $provide.value('ImageLocalStorageService', mockImageLocalStorageService);
-    $provide.value('ImagePreloaderService', mockImagePreloaderService);
-    $provide.value('$attrs', {
-      svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
-      altWithValue: '&quot;altText&quot;'
+    const mockImageLocalStorageService = {
+      getRawImageData: function() {
+        return 'imageUrl:exploration_1_svgFilename.svg';
+      }
+    };
+    const mockImagePreloaderService = {
+      getDimensionsOfImage: function() {
+        return {
+          width: 450,
+          height: 350
+        };
+      }
+    };
+
+    const mockSvgSanitizerService = {
+      getTrustedSvgResourceUrl: (url) => url
+    };
+
+    beforeEach(waitForAsync(() => {
+      TestBed.configureTestingModule(
+        {
+          imports: [HttpClientTestingModule],
+          declarations: [NoninteractiveSvgdiagram],
+          providers: [
+            {
+              provide: ImageLocalStorageService,
+              useValue: mockImageLocalStorageService
+            },
+            {
+              provide: ImagePreloaderService,
+              useValue: mockImagePreloaderService
+            },
+            {
+              provide: SvgSanitizerService,
+              useValue: mockSvgSanitizerService
+            }
+          ]
+        }
+      ).compileComponents();
+    }));
+
+    beforeEach(() => {
+      contextService = TestBed.inject(ContextService);
+      fixture = TestBed.createComponent(
+        NoninteractiveSvgdiagram);
+      component = fixture.componentInstance;
+      component.svgFilenameWithValue = '&quot;svgFilename.svg&quot;';
+      component.altWithValue = '&quot;altText&quot;';
+      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      fixture.detectChanges();
     });
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    contextService = $injector.get('ContextService');
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-    ctrl = $componentController('oppiaNoninteractiveSvgdiagram');
-    ctrl.$onInit();
-  }));
 
-  it('should fetch the svg file', function() {
-    expect(ctrl.filename).toBe('svgFilename.svg');
-    expect(ctrl.svgAltText).toBe('altText');
-    expect(ctrl.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+    it('should fetch the svg file', () => {
+      component.ngOnInit();
+      expect(component.filename).toBe('svgFilename.svg');
+      expect(component.svgAltText).toBe('altText');
+      expect(component.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+    });
   });
-});

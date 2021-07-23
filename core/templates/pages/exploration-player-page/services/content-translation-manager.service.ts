@@ -19,21 +19,21 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
+import isObject from 'lodash/isObject';
 
 import { BaseTranslatableObject, InteractionRuleInputs } from
   'interactions/rule-input-defs';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
-import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
+  'components/forms/schema-based-editors/schema.constants';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { SubtitledUnicode } from
@@ -144,7 +144,8 @@ export class ContentTranslationManagerService {
 
     const contentTranslation = writtenTranslations.translationsMapping[
       card.contentId][languageCode];
-    const contentTranslationText = contentTranslation.getTranslation();
+    const contentTranslationText = (
+      contentTranslation && contentTranslation.getTranslation());
 
     // The isString() check is needed for the TypeScript compiler to narrow the
     // type down from string|string[] to string. See "Using type predicates" at
@@ -218,7 +219,8 @@ export class ContentTranslationManagerService {
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    const caSpecs = InteractionSpecsConstants.INTERACTION_SPECS[
+      interactionId].customization_arg_specs;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {
@@ -269,7 +271,7 @@ export class ContentTranslationManagerService {
   _isTranslatableObject(
       ruleInputValue: InteractionRuleInputs):
       ruleInputValue is BaseTranslatableObject {
-    return 'contentId' in ruleInputValue;
+    return isObject(ruleInputValue) && 'contentId' in ruleInputValue;
   }
 
   _isString(translation: string|string[]): translation is string {

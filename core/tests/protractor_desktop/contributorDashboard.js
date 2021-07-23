@@ -24,6 +24,8 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ContributorDashboardPage = require(
   '../protractor_utils/ContributorDashboardPage.js');
+var ContributorDashboardAdminPage = require(
+  '../protractor_utils/ContributorDashboardAdminPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var SkillEditorPage = require(
@@ -41,6 +43,8 @@ describe('Contributor dashboard page', function() {
     'Review Material 1'];
   const ADMIN_EMAIL = 'management@contributor.com';
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
+  const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const QUESTION_ADMIN_USERNAME = 'user4321';
   const HINDI_LANGUAGE = 'Hindi';
   let contributorDashboardPage = null;
   let contributorDashboardTranslateTextTab = null;
@@ -49,6 +53,7 @@ describe('Contributor dashboard page', function() {
   let explorationEditorPage = null;
   let explorationEditorMainTab = null;
   let adminPage = null;
+  let contributorDashboardAdminPage = null;
 
   beforeAll(async function() {
     contributorDashboardPage = (
@@ -62,29 +67,55 @@ describe('Contributor dashboard page', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     adminPage = new AdminPage.AdminPage();
+    contributorDashboardAdminPage = (
+      new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
+
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
+    await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
+
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
-    await adminPage.assignQuestionContributor('user0');
-    await adminPage.assignQuestionContributor('user1');
+
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
+    const URL = await browser.getCurrentUrl();
+    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
+    const TOPIC_ID_URL_PART = URL.split('/')[4];
+    // We have to remove the ending "#".
+    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
+      0, TOPIC_ID_URL_PART.length - 1);
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
 
-    // Allow user1 to review question suggestions.
     await adminPage.get();
-    await adminPage.assignQuestionReviewer('user1');
+    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    // Add topic to classroom to make it available for question contributions.
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(TOPIC_ID);
+      });
+    await users.logout();
+
+    await users.login(QUESTION_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionContributor('user0');
+    await contributorDashboardAdminPage.assignQuestionContributor('user1');
+    await contributorDashboardAdminPage.assignQuestionReviewer('user1');
     await users.logout();
   });
 
@@ -227,10 +258,16 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Admin page contribution rights form', function() {
-  var HINDI_LANGUAGE = 'Hindi';
+describe('Contributor dashboard admin page contribution rights form', () => {
+  const HINDI_LANGUAGE = 'Hindi';
+  const QUESTION_ADMIN_EMAIL = 'userX@contributor.com';
+  const QUESTION_ADMIN_USERNAME = 'user1234';
+  const TRANSLATION_ADMIN_EMAIL = 'userY@contributor.com';
+  const TRANSLATION_ADMIN_USERNAME = 'user12345';
+
   var adminPage = null;
   var contributorDashboardPage = null;
+  var contributorDashboardAdminPage = null;
   var translationReviewerUsername = 'translator';
   var translationReviewerEmail = 'translator@contributor.com';
   var voiceoverReviewerUsername = 'voiceartist';
@@ -242,12 +279,20 @@ describe('Admin page contribution rights form', function() {
     adminPage = new AdminPage.AdminPage();
     contributorDashboardPage = (
       new ContributorDashboardPage.ContributorDashboardPage());
+    contributorDashboardAdminPage = (
+      new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
     await users.createUser(
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
+    await users.createUser(QUESTION_ADMIN_EMAIL, QUESTION_ADMIN_USERNAME);
+    await users.createUser(TRANSLATION_ADMIN_EMAIL, TRANSLATION_ADMIN_USERNAME);
+
     await users.createAndLoginAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
+
+    await adminPage.updateRole(QUESTION_ADMIN_USERNAME, 'question admin');
+    await adminPage.updateRole(TRANSLATION_ADMIN_USERNAME, 'translation admin');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {
@@ -256,44 +301,30 @@ describe('Admin page contribution rights form', function() {
     await users.logout();
   });
 
-  it('should allow admin to add translation reviewer', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAssignTranslationReviewer@adminTab.com',
-      'assignTranslationReviewer');
-    await adminPage.assignTranslationReviewer(
-      translationReviewerUsername, HINDI_LANGUAGE);
-    await adminPage.expectUserToBeTranslationReviewer(
-      translationReviewerUsername, HINDI_LANGUAGE);
-    await users.logout();
+  it('should allow translation admin to add translation reviewer',
+    async function() {
+      await users.login(TRANSLATION_ADMIN_EMAIL);
+      await contributorDashboardAdminPage.get();
+      await contributorDashboardAdminPage.assignTranslationReviewer(
+        translationReviewerUsername, HINDI_LANGUAGE);
+      await contributorDashboardAdminPage.expectUserToBeTranslationReviewer(
+        translationReviewerUsername, HINDI_LANGUAGE);
+      await users.logout();
 
-    await users.login(translationReviewerEmail);
-    await contributorDashboardPage.get();
-    await contributorDashboardPage.expectUserToBeTranslationReviewer(
-      HINDI_LANGUAGE);
-    await users.logout();
-  });
-
-  it('should allow admin to add voiceover reviewer', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAssignVoiceoverReviewer@adminTab.com', 'assignVoiceoverReviewer');
-    await adminPage.assignVoiceoverReviewer(
-      voiceoverReviewerUsername, HINDI_LANGUAGE);
-    await adminPage.expectUserToBeVoiceoverReviewer(
-      voiceoverReviewerUsername, HINDI_LANGUAGE);
-    await users.logout();
-
-    await users.login(voiceoverReviewerEmail);
-    await contributorDashboardPage.get();
-    await contributorDashboardPage.expectUserToBeVoiceoverReviewer(
-      HINDI_LANGUAGE);
-    await users.logout();
-  });
+      await users.login(translationReviewerEmail);
+      await contributorDashboardPage.get();
+      await contributorDashboardPage.expectUserToBeTranslationReviewer(
+        HINDI_LANGUAGE);
+      await users.logout();
+    });
 
   it('should allow admin to add question reviewer', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAssignQuestionReviewer@adminTab.com', 'assignQuestionReviewer');
-    await adminPage.assignQuestionReviewer(questionReviewerUsername);
-    await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
+    await users.login(QUESTION_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionReviewer(
+      questionReviewerUsername);
+    await contributorDashboardAdminPage.expectUserToBeQuestionReviewer(
+      questionReviewerUsername);
     await users.logout();
 
     await users.login(questionReviewerEmail);
@@ -303,14 +334,17 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question contributor', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAddQuestionContributor@adminTab.com', 'addQuestionContributor');
-    await adminPage.assignQuestionContributor(questionReviewerUsername);
-    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+    await users.login(QUESTION_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionContributor(
+      questionReviewerUsername);
+    await contributorDashboardAdminPage.expectUserToBeQuestionContributor(
+      questionReviewerUsername);
 
     // Confirm rights persist on page reload.
     await browser.refresh();
-    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+    await contributorDashboardAdminPage.expectUserToBeQuestionContributor(
+      questionReviewerUsername);
     await users.logout();
   });
 
@@ -330,12 +364,12 @@ describe('Translation contribution featured languages', () => {
       contributorDashboardPage.getTranslateTextTab());
     await users.createAndLoginAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
-    const adminPage = new AdminPage.AdminPage();
+    var adminPage = new AdminPage.AdminPage();
     await adminPage.editConfigProperty(
       'Featured Translation Languages',
       'List',
       async function(elem) {
-        const featured = await elem.addItem('Dictionary');
+        var featured = await elem.addItem('Dictionary');
         await (await featured.editEntry(0, 'Unicode')).setValue('fr');
         await (await featured.editEntry(1, 'Unicode'))
           .setValue('Partnership with ABC');

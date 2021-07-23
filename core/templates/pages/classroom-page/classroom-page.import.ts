@@ -19,19 +19,24 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
+import 'pages/mock-ajs';
+import 'Polyfills.ts';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ClassroomPageModule } from './classroom-page.module';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
 
-require('Polyfills.ts');
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/classroom-page/classroom-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+platformBrowserDynamic().bootstrapModule(ClassroomPageModule).catch(
+  // eslint-disable-next-line no-console
+  (err) => console.error(err)
+);
 
-require('pages/classroom-page/classroom-page.component.ts');
-require('pages/OppiaFooterDirective.ts');
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';

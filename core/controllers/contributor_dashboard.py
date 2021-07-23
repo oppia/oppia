@@ -15,7 +15,7 @@
 """Controllers for the contributor dashboard page."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 import json
 
@@ -30,11 +30,15 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.domain import user_services
 import feconf
-import utils
 
 
 class ContributorDashboardPage(base.BaseHandler):
     """Page showing the contributor dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -49,13 +53,40 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
     """Provides data for opportunities available in different categories."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'opportunity_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'cursor': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self, opportunity_type):
         """Handles GET requests."""
         if not config_domain.CONTRIBUTOR_DASHBOARD_IS_ENABLED.value:
             raise self.PageNotFoundException
-        search_cursor = self.request.get('cursor', None)
+        search_cursor = self.normalized_request.get('cursor')
+        language_code = self.normalized_request.get('language_code')
 
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             opportunities, next_cursor, more = (
@@ -63,18 +94,14 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
-            language_code = self.request.get('language_code')
-            if language_code is None or not (
-                    utils.is_supported_audio_language_code(language_code)):
+            if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
                     language_code, search_cursor))
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_VOICEOVER:
-            language_code = self.request.get('language_code')
-            if language_code is None or not (
-                    utils.is_supported_audio_language_code(language_code)):
+            if language_code is None:
                 raise self.InvalidInputException
             opportunities, next_cursor, more = (
                 self._get_voiceover_opportunity_dicts(
@@ -111,13 +138,22 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        topics_with_skills = topic_fetchers.get_all_topics_with_skills()
+        # We want to focus attention on lessons that are part of a classroom.
+        # See issue #12221.
+        classroom_topic_ids = []
+        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
+            classroom_topic_ids.extend(classroom_dict['topic_ids'])
+        classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
+        classroom_topics_with_skills = [
+            topic for topic in classroom_topics
+            if topic and topic.get_all_skill_ids()
+        ]
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
         id_to_skill_opportunity_dict = {
             opp.id: opp.to_dict() for opp in skill_opportunities}
         opportunities = []
-        for topic in topics_with_skills:
+        for topic in classroom_topics_with_skills:
             for skill_id in topic.get_all_skill_ids():
                 if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
                     break
@@ -185,16 +221,30 @@ class TranslatableTextHandler(base.BaseHandler):
     """Provides lessons content which can be translated in a given language."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }]
+                }
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        language_code = self.request.get('language_code')
-        exp_id = self.request.get('exp_id')
-
-        if not utils.is_supported_audio_language_code(language_code):
-            raise self.InvalidInputException('Invalid language_code: %s' % (
-                language_code))
+        language_code = self.normalized_request.get('language_code')
+        exp_id = self.normalized_request.get('exp_id')
 
         if not opportunity_services.is_exploration_available_for_contribution(
                 exp_id):
@@ -207,10 +257,10 @@ class TranslatableTextHandler(base.BaseHandler):
             self._get_state_names_to_not_in_review_content_id_mapping(
                 state_names_to_content_id_mapping,
                 suggestion_services
-                .get_translation_suggestions_in_review_by_exploration(exp_id)
+                .get_translation_suggestions_in_review_by_exploration(
+                    exp_id, language_code)
             )
         )
-
         self.values = {
             'state_names_to_content_id_mapping': (
                 state_names_to_not_in_review_content_id_mapping),
@@ -225,24 +275,29 @@ class TranslatableTextHandler(base.BaseHandler):
         minus any contents found in suggestions.
 
         Args:
-            state_names_to_content_id_mapping: dict(str, dict(str, str)). A dict
-                where state_name is the key and a dict with content_id as the
-                key and html content as value.
+            state_names_to_content_id_mapping: dict(str, dict(str, TranslatableItem)). A dict # pylint: disable=line-too-long
+                where state_name is the key and a dict with content_id as
+                the key and TranslatableItem as value.
             suggestions: list(Suggestion). A list of translation suggestions.
 
         Returns:
-            dict(str, dict(str, str)). A dict where state_name is the key and a
-            dict with content_id as the key and html content as value.
+            dict(str, dict(str, TranslatableItem)). A dict where state_name
+            is the key and a dict with content_id as the key and
+            TranslatableItem as value.
         """
         final_mapping = {}
         for state_name in state_names_to_content_id_mapping:
-            content_id_to_text = dict(
+            content_id_to_translatable_item = dict(
                 state_names_to_content_id_mapping[state_name])
-            for content_id in content_id_to_text.keys():
+            for content_id in content_id_to_translatable_item.keys():
                 if self._content_in_review(state_name, content_id, suggestions):
-                    del content_id_to_text[content_id]
-            if content_id_to_text:
-                final_mapping[state_name] = content_id_to_text
+                    del content_id_to_translatable_item[content_id]
+            if content_id_to_translatable_item:
+                final_mapping[state_name] = {
+                    cid: translatable_item.to_dict()
+                    for cid, translatable_item in (
+                        content_id_to_translatable_item.items())
+                }
         return final_mapping
 
     def _content_in_review(self, state_name, content_id, suggestions):
@@ -267,6 +322,36 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
     """Provides a machine translation of exploration content."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'content_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_language_code': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_supported_audio_language_code'
+                    }, {
+                        'id': 'is_valid_audio_language_code'
+                    }]
+                }
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -300,15 +385,11 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             404 (Not Found): PageNotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
         """
-        exp_id = self.request.get('exp_id')
-        if not exp_id:
-            raise self.InvalidInputException('Missing exp_id')
+        exp_id = self.normalized_request.get('exp_id')
 
-        state_name = self.request.get('state_name')
-        if not state_name:
-            raise self.InvalidInputException('Missing state_name')
+        state_name = self.normalized_request.get('state_name')
 
-        content_ids_string = self.request.get('content_ids')
+        content_ids_string = self.normalized_request.get('content_ids')
         content_ids = []
         try:
             content_ids = json.loads(content_ids_string)
@@ -316,19 +397,8 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Improperly formatted content_ids: %s' % content_ids_string)
 
-        target_language_code = self.request.get('target_language_code')
-        if not target_language_code:
-            raise self.InvalidInputException('Missing target_language_code')
-
-        # TODO(#12341): Tidy up this logic once we have a canonical list of
-        # language codes.
-        if not utils.is_supported_audio_language_code(
-                target_language_code
-            ) and not utils.is_valid_language_code(
-                target_language_code
-            ):
-            raise self.InvalidInputException(
-                'Invalid target_language_code: %s' % target_language_code)
+        target_language_code = self.normalized_request.get(
+            'target_language_code')
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
@@ -337,15 +407,16 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
             target_language_code)
         if state_name not in state_names_to_content_id_mapping:
             raise self.PageNotFoundException()
-        content_id_to_text_mapping = (
+        content_id_to_translatable_item_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts = {}
         for content_id in content_ids:
-            if content_id not in content_id_to_text_mapping:
+            if content_id not in content_id_to_translatable_item_mapping:
                 translated_texts[content_id] = None
                 continue
 
-            source_text = content_id_to_text_mapping[content_id]
+            source_text = content_id_to_translatable_item_mapping[
+                content_id].content
             translated_texts[content_id] = (
                 translation_services.get_and_cache_machine_translation(
                     exp.language_code, target_language_code, source_text)
@@ -363,6 +434,8 @@ class UserContributionRightsDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self):
@@ -392,6 +465,10 @@ class FeaturedTranslationLanguagesHandler(base.BaseHandler):
     """Provides featured translation languages set in admin config."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

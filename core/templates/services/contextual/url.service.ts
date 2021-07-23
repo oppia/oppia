@@ -26,7 +26,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 // This makes the UrlParamsType like a dict whose keys and values both are
 // string.
-interface UrlParamsType {
+export interface UrlParamsType {
   [param: string]: string
 }
 
@@ -61,7 +61,7 @@ export class UrlService {
   So exact type of this function can not be determined
   https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
   getUrlParams(): UrlParamsType {
-    let params = {};
+    let params: UrlParamsType = {};
     this.getCurrentQueryString().replace(
       /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         return params[decodeURIComponent(key)] = decodeURIComponent(value);
@@ -107,7 +107,7 @@ export class UrlService {
    * @return {string} the topic URL fragment.
    * @throws Will throw an error if the url is invalid.
    */
-  getTopicUrlFragmentFromLearnerUrl(): string {
+  getTopicUrlFragmentFromLearnerUrl(): string | undefined {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[3]);
@@ -125,7 +125,7 @@ export class UrlService {
     }
   }
 
-  getStoryUrlFragmentFromLearnerUrl(): string {
+  getStoryUrlFragmentFromLearnerUrl(): string | null {
     let pathname = this.getPathname();
     // The following segment is for getting the fragment from the new learner
     // pages.
@@ -149,7 +149,7 @@ export class UrlService {
     return null;
   }
 
-  getSubtopicUrlFragmentFromLearnerUrl(): string {
+  getSubtopicUrlFragmentFromLearnerUrl(): string | undefined {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn') && pathname.includes('/revision')) {
       return decodeURIComponent(pathname.split('/')[5]);
@@ -157,7 +157,7 @@ export class UrlService {
     throw new Error('Invalid URL for subtopic');
   }
 
-  getClassroomUrlFragmentFromLearnerUrl(): string {
+  getClassroomUrlFragmentFromLearnerUrl(): string | undefined {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[2]);

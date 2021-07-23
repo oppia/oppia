@@ -26,7 +26,7 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-class SkillOpportunitiesDict {
+export class SkillOpportunitiesDict {
   opportunities: SkillOpportunity[];
   more: boolean;
 }
@@ -45,8 +45,8 @@ export class ContributionOpportunitiesService {
       ContributionOpportunitiesBackendApiService,
       private readonly modalService: NgbModal) {}
 
-  public readonly reloadOpportunitiesEventEmitter = new EventEmitter<void>();
-  public readonly removeOpportunitiesEventEmitter = new EventEmitter<void>();
+  private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+  private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
   private _skillOpportunitiesCursor: string = null;
   private _translationOpportunitiesCursor: string = null;
   private _voiceoverOpportunitiesCursor: string = null;
@@ -54,7 +54,7 @@ export class ContributionOpportunitiesService {
   private _moreTranslationOpportunitiesAvailable = true;
   private _moreVoiceoverOpportunitiesAvailable = true;
 
-  private _getSkillOpportunities(cursor: string):
+  private async _getSkillOpportunitiesAsync(cursor: string):
   Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor)
@@ -67,7 +67,8 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-  private _getTranslationOpportunities(languageCode: string, cursor: string) {
+  private async _getTranslationOpportunitiesAsync(
+      languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(languageCode, cursor)
       .then(({ opportunities, nextCursor, more }) => {
@@ -79,7 +80,8 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-  private _getVoiceoverOpportunities(languageCode: string, cursor: string) {
+  private async _getVoiceoverOpportunitiesAsync(
+      languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
       .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
       .then(({ opportunities, nextCursor, more }) => {
@@ -96,34 +98,42 @@ export class ContributionOpportunitiesService {
   }
 
   async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
-    return this._getSkillOpportunities('');
+    return this._getSkillOpportunitiesAsync('');
   }
   async getTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunities(languageCode, '');
+    return this._getTranslationOpportunitiesAsync(languageCode, '');
   }
-  async getVoiceoverOpportunities(languageCode: string):
+  async getVoiceoverOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
-    return this._getVoiceoverOpportunities(languageCode, '');
+    return this._getVoiceoverOpportunitiesAsync(languageCode, '');
   }
   async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
-      return this._getSkillOpportunities(this._skillOpportunitiesCursor);
+      return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
   }
   async getMoreTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
-      return this._getTranslationOpportunities(
+      return this._getTranslationOpportunitiesAsync(
         languageCode, this._translationOpportunitiesCursor);
     }
   }
-  async getMoreVoiceoverOpportunities(languageCode: string):
+  async getMoreVoiceoverOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreVoiceoverOpportunitiesAvailable) {
-      return this._getVoiceoverOpportunities(
+      return this._getVoiceoverOpportunitiesAsync(
         languageCode, this._voiceoverOpportunitiesCursor);
     }
+  }
+
+  get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
+    return this._reloadOpportunitiesEventEmitter;
+  }
+
+  get removeOpportunitiesEventEmitter(): EventEmitter<string[]> {
+    return this._removeOpportunitiesEventEmitter;
   }
 }
 

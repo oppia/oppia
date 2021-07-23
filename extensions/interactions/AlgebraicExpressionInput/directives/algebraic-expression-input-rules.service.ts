@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service';
 import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
 import {
   AlgebraicExpressionRuleInputsWithPlaceholder,
@@ -40,7 +40,11 @@ export class AlgebraicExpressionInputRulesService {
     answer = mis.insertMultiplicationSigns(answer);
     inputs.x = mis.insertMultiplicationSigns(inputs.x);
 
-    return nerdamer(nerdamer(answer).text()).eq(nerdamer(inputs.x).text());
+    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
+    // typing is fixed.
+    return nerdamer(
+      nerdamer(answer).text()
+    ).eq(nerdamer(inputs.x).text()) as unknown as boolean;
   }
 
   IsEquivalentTo(
@@ -59,7 +63,11 @@ export class AlgebraicExpressionInputRulesService {
     let simplifiedCreatorAnswer = nerdamer(
       `simplify(${expandedCreatorAnswer})`).text();
 
-    return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
+    // TODO(#13083): Remove the 'as unknown as boolean' part after the library
+    // typing is fixed.
+    return nerdamer(
+      simplifiedLearnerAnswer
+    ).eq(simplifiedCreatorAnswer) as unknown as boolean;
   }
 
   ContainsSomeOf(

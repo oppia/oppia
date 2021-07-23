@@ -35,17 +35,29 @@ interface MusicPhraseSchema {
   'ui_config': {'add_element_text': string;};
   validators: { id: string; 'max_value': number; }[];
 }
+
 @Component({
   selector: 'music-phrase-editor',
   templateUrl: './music-phrase-editor.component.html',
   styleUrls: []
 })
 export class MusicPhraseEditorComponent implements OnInit {
-  @Input() modalId;
-  @Input() value;
+  @Input() modalId!: symbol;
+  @Input() value!: unknown;
 
   @Output() valueChanged = new EventEmitter();
-  localValue: unknown[] = [];
+
+  _localValue: string[] = [];
+
+  _proxy!: string[];
+
+  get localValue(): string[] {
+    return this._proxy;
+  }
+  set localValue(val: string[]) {
+    this._localValue = val;
+    this._createProxy();
+  }
   // The maximum number of notes allowed in a music phrase.
   _MAX_NOTES_IN_PHRASE = 8;
   schema: MusicPhraseSchema = {
@@ -65,15 +77,36 @@ export class MusicPhraseEditorComponent implements OnInit {
       max_value: this._MAX_NOTES_IN_PHRASE
     }]
   };
-  constructor(private alertsService: AlertsService) { }
+  constructor(private alertsService: AlertsService) {
+    this._createProxy();
+  }
 
   ngOnInit(): void {
   }
 
-  updateValue(newValue: unknown[]): void {
-    if (newValue === this.localValue) {
-      return;
-    }
+  private _createProxy(): void {
+    this._proxy = new Proxy(this._localValue, {
+      apply: function(target, thisArg, argumentsList) {
+        return thisArg[
+          target as unknown as string].apply(this, argumentsList);
+      },
+      deleteProperty: function(target, property) {
+        return true;
+      },
+      set: (target, property, value, receiver) => {
+        // This throws "The Element implicitly has an 'any' type because index
+        // expression is not of type 'number'." The type 'any' comes here from
+        // the dependency interface ProxyConstructor at lib.es2015.proxy.d.ts.
+        // We need to suppress this error because of strict type checking.
+        // @ts-ignore
+        target[property] = value;
+        this._updateValue(this._localValue);
+        return true;
+      }
+    });
+  }
+
+  private _updateValue(newValue: string[]): void {
     if (newValue && this.value) {
       if (newValue.length > this._MAX_NOTES_IN_PHRASE) {
         this.alertsService.addWarning(
@@ -90,8 +123,19 @@ export class MusicPhraseEditorComponent implements OnInit {
           });
         }
         this.value = parentValues;
+        this.valueChanged.emit(this.value);
+      }
+    }
+  }
+
+  updateValue(newValue: string[]): void {
+    if (newValue.length !== this._localValue.length) {
+      return;
+    }
+    for (let i = 0; i < newValue.length; i++) {
+      if (newValue[i] !== this._localValue[i]) {
         this.localValue = newValue;
-        this.valueChanged.emit();
+        break;
       }
     }
   }

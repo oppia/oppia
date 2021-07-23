@@ -23,6 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
+import { TopicRightsBackendDict } from './topic-rights.model';
 
 interface TopicRightsBackendResponse {
   'topic_id': string,
@@ -42,7 +43,7 @@ export class TopicRightsBackendApiService {
 
   private _fetchTopicRights(
       topicId: string,
-      successCallback: (value?: TopicRightsBackendResponse) => void,
+      successCallback: (value?: TopicRightsBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
     let topicRightsUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
@@ -50,7 +51,7 @@ export class TopicRightsBackendApiService {
       });
 
     this.httpClient.get(topicRightsUrl).toPromise().then(
-      (response: TopicRightsBackendResponse) => {
+      (response: TopicRightsBackendDict) => {
         successCallback(response);
       }, (errorResponse) => {
         errorCallback(errorResponse.error.error);
@@ -106,7 +107,8 @@ export class TopicRightsBackendApiService {
     return this.topicRightsCache.hasOwnProperty(topicId);
   }
 
-  fetchTopicRights(topicId: string): Promise<TopicRightsBackendResponse> {
+  async fetchTopicRightsAsync(
+      topicId: string): Promise<TopicRightsBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchTopicRights(topicId, resolve, reject);
     });
@@ -121,7 +123,8 @@ export class TopicRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  loadTopicRights(topicId: string): Promise<TopicRightsBackendResponse> {
+  async loadTopicRightsAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(topicId)) {
         resolve(this.topicRightsCache[topicId]);
@@ -157,13 +160,15 @@ export class TopicRightsBackendApiService {
   /**
    * Publishes a topic.
    */
-  publishTopic(topicId: string): Promise<TopicRightsBackendResponse> {
+  async publishTopicAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, true, resolve, reject);
     });
   }
 
-  sendMail(topicId: string, topicName: string): Promise<void> {
+  async sendMailAsync(
+      topicId: string, topicName: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._sendMail(topicId, topicName, resolve, reject);
     });
@@ -172,7 +177,8 @@ export class TopicRightsBackendApiService {
   /**
    * Unpublishes a topic.
    */
-  unpublishTopic(topicId: string): Promise<TopicRightsBackendResponse> {
+  async unpublishTopicAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, false, resolve, reject);
     });

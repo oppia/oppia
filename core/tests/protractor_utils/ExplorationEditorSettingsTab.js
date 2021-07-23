@@ -66,13 +66,10 @@ var ExplorationEditorSettingsTab = function() {
   this.deleteExploration = async function() {
     await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
-    await waitFor.elementToBeClickable(
-      deleteExplorationButton, 'Delete Exploration button is not clickable');
-    await deleteExplorationButton.click();
-    await waitFor.elementToBeClickable(
-      confirmDeleteExplorationButton,
-      'Confirm Delete Exploration button is not clickable');
-    await confirmDeleteExplorationButton.click();
+    await action.click('Delete Exploration Button', deleteExplorationButton);
+    await action.click(
+      'Confirm Delete Exploration Button',
+      confirmDeleteExplorationButton);
     await waitFor.invisibilityOf(
       confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
@@ -93,6 +90,9 @@ var ExplorationEditorSettingsTab = function() {
       initialStateSelect, 'Initial state select takes too long to be visible.');
     var options = await initialStateSelect.all(by.tagName('option'))
       .map(async function(elem) {
+        await waitFor.visibilityOf(
+          elem,
+          'option element taking too long to appear');
         return await elem.getText();
       });
     expect(options.sort()).toEqual(names.sort());
@@ -104,7 +104,9 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.visibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to appear');
     expect(await explorationSummaryTile.isPresent()).toBeTruthy();
-    await closePreviewSummaryButton.click();
+    await action.click(
+      'Close Preview Summary Button',
+      closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
@@ -112,14 +114,11 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
-    await action.click('Neutral element', neutralElement);
-    await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(explorationCategoryInput)
     ).setValue(category);
-    await action.click('Neutral element', neutralElement);
   };
 
   this.setFirstState = async function(stateName) {

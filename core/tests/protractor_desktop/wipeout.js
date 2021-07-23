@@ -18,11 +18,14 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
+var pendingAccountDeletionHeading =
+  element(by.css('.protractor-test-pending-account-deletion'));
 
 describe('When account is deleted it', function() {
   var EXPLORATION_TITLE = 'Exploration';
@@ -50,30 +53,39 @@ describe('When account is deleted it', function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('user1@delete.com');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
 
   it('should delete private exploration', async function() {
-    await users.createUser('voiceArtist@oppia.com', 'voiceArtist');
+    await users.createUser('ExpCollaborator@oppia.com', 'ExpCollaborator');
     await users.createAndLoginUser('user2@delete.com', 'userToDelete2');
     await workflow.createExploration(true);
     var explorationId = await general.getExplorationIdFromEditor();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voice artists');
-    await workflow.addExplorationVoiceArtist('voiceArtist');
+    await workflow.addExplorationCollaborator('ExpCollaborator');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
-    await users.login('voiceArtist@oppia.com');
+    await users.login('ExpCollaborator@oppia.com');
     await general.openEditor(explorationId, false);
-    await general.expect404Error();
+    await general.expectErrorPage(404);
     expectedConsoleErrors.push(
       'Failed to load resource: the server responded with a status of 404');
     await users.logout();
@@ -92,6 +104,9 @@ describe('When account is deleted it', function() {
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete3');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
@@ -111,6 +126,9 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationManager('secondOwner');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete4');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 

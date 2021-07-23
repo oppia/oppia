@@ -1,80 +1,92 @@
 <div>
   <div class="oppia-content">
     <br>
-    <uib-tabset>
-      <uib-tab heading="Recent Commits" active>
-        <h3>Recent Commits (all non-private explorations)</h3>
-        <div ng-show="$ctrl.allCommits.length">
-          <table class="oppia-padded-table">
-            <tr>
-              <th>Timestamp</th>
-              <th>Exploration</th>
-              <th>Category</th>
-              <th>Username</th>
-              <th>Commit message</th>
-              <th>Community-owned?</th>
-            </tr>
-            <tr ng-repeat="commit in $ctrl.allCommits track by $index">
-              <td><[$ctrl.getDatetimeAsString(commit.last_updated)]></td>
-              <td>
-                <a ng-href="<[$ctrl.getExplorationCreateUrl(commit.exploration_id)]>">
-                  <[$ctrl.explorationData[commit.exploration_id].title]>
-                </a>
-              </td>
-              <td>
-                <[$ctrl.explorationData[commit.exploration_id].category]>
-              </td>
-              <td><[commit.username]></td>
-              <td><[commit.commit_message]></td>
-              <td><[commit.post_commit_community_owned]></td>
-            </tr>
-          </table>
-        </div>
-      </uib-tab>
+    <ul ngbNav #nav="ngbNav" [animation]="false">
+      <li [ngbNavItem]="1">
+        <a ngbNavLink>Recent Commits</a>
+        <ng-template ngbNavContent>
+          <h3>Recent Commits (all non-private explorations)</h3>
+          <div *ngIf="allCommits.length">
+            <table class="oppia-padded-table">
+              <tr>
+                <th>Timestamp</th>
+                <th>Exploration</th>
+                <th>Category</th>
+                <th>Username</th>
+                <th>Commit message</th>
+                <th>Community-owned?</th>
+              </tr>
+              <tr *ngFor="let commit of allCommits">
+                <td>{{ getDatetimeAsString(commit.last_updated) }}</td>
+                <td>
+                  <a [href]="getExplorationCreateUrl(commit.exploration_id)">
+                    {{ explorationData[commit.exploration_id].title }}
+                  </a>
+                </td>
+                <td>
+                  {{ explorationData[commit.exploration_id].category }}
+                </td>
+                <td>{{ commit.username }}</td>
+                <td>{{ commit.commit_message }}</td>
+                <td>{{ commit.post_commit_community_owned }}</td>
+              </tr>
+            </table>
+          </div>
+        </ng-template>
+      </li>
 
-      <uib-tab heading="Recent Feedback Messages">
-        <h3>Recent Feedback Messages</h3>
-        (Note that some of these links may be to private explorations, and thus result in authorization errors.)
-        <br>
-        <br>
-        <div ng-show="$ctrl.allFeedbackMessages.length">
-          <table class="oppia-padded-table">
-            <tr>
-              <th>Timestamp</th>
-              <th>Exploration ID</th>
-              <th>Username</th>
-            </tr>
-            <tr ng-repeat="message in $ctrl.allFeedbackMessages track by $index">
-              <td><[$ctrl.getDatetimeAsString(message.createdOnMsecs)]></td>
-              <td>
-                <a ng-if="$ctrl.isMessageFromExploration(message)"
-                   ng-href="<[$ctrl.getExplorationCreateUrl(message.entityId)]>">
-                  <[message.entityId]>
-                </a>
-              </td>
-              <td><[message.authorUsername]></td>
-            </tr>
-          </table>
-        </div>
-      </uib-tab>
+      <li [ngbNavItem]="2">
+        <a ngbNavLink>Recent Feedback Messages</a>
+        <ng-template ngbNavContent>
+          <h3>Recent Feedback Messages</h3>
+          (Note that some of these links may be to private explorations, and thus result in authorization errors.)
+          <br>
+          <br>
+          <div *ngIf="allFeedbackMessages.length">
+            <table class="oppia-padded-table">
+              <tr>
+                <th>Timestamp</th>
+                <th>Exploration ID</th>
+                <th>Username</th>
+              </tr>
+              <tr *ngFor="let message of allFeedbackMessages">
+                <td>{{ getDatetimeAsString(message.createdOnMsecs) }}</td>
+                <td>
+                  <a *ngIf="isMessageFromExploration(message)"
+                     [href]="getExplorationCreateUrl(message.entityId)">
+                    {{ message.entityId }}
+                  </a>
+                </td>
+                <td>{{ message.authorUsername }}</td>
+              </tr>
+            </table>
+          </div>
+        </ng-template>
+      </li>
 
-      <uib-tab heading="Featured Activities">
-        <h3>Activities to feature in the library</h3>
-        <br>
-        <br>
+      <li [ngbNavItem]="3">
+        <a ngbNavLink>Featured Activities</a>
+        <ng-template ngbNavContent>
+          <h3>Activities to feature in the library</h3>
+          <br>
+          <br>
 
-        <schema-based-editor schema="$ctrl.FEATURED_ACTIVITY_REFERENCES_SCHEMA"
-                             local-value="$ctrl.displayedFeaturedActivityReferences">
-        </schema-based-editor>
-        <br>
-        <br>
+          <schema-based-editor [schema]="getSchema.bind(this)"
+                               [localValue]="displayedFeaturedActivityReferences"
+                               (localValueChange)="updateDisplayedFeaturedActivityReferences($event)">
+          </schema-based-editor>
+          <br>
+          <br>
 
-        <button class="btn btn-success" ng-click="$ctrl.saveFeaturedActivityReferences()"
-                ng-disabled="$ctrl.isSaveFeaturedActivitiesButtonDisabled()">
-          Save Featured Activities
-        </button>
-      </uib-tab>
-    </uib-tabset>
+          <button class="btn btn-success"
+                  (click)="saveFeaturedActivityReferences()"
+                  [disabled]="isSaveFeaturedActivitiesButtonDisabled()">
+            Save Featured Activities
+          </button>
+        </ng-template>
+      </li>
+    </ul>
+    <div [ngbNavOutlet]="nav"></div>
   </div>
 </div>
 <style>

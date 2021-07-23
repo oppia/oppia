@@ -32,16 +32,29 @@ export class ContextService {
   constructor(
     private urlService: UrlService) {}
 
-  pageContext = null;
-  explorationId = null;
-  explorationIsLinkedToStory = false;
-  questionPlayerIsManuallySet = false;
-  questionId = null;
-  editorContext = null;
-  customEntityContext = null;
+  // Entity context needs to be a static variable since multiple instances of
+  // the ContextService class accesses the same class variable.
+  // Eg: In the translation modal, a custom entity context was defined, and this
+  // was accessed in the filepath component when the copy service was called.
+  // Without the static declaration, the latter call returned undefined.
+  // NOTE TO DEV: Make sure any tests that directly access these variables clear
+  // it (using the appropriate reset fn) initially. Since these are static,
+  // depending on the order of tests, values may be retained across tests.
+  static customEntityContext: EntityContext | null = null;
+  static imageSaveDestination: string = (
+    AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+
+  // Page Context is null initially when no shared service exist.
+  pageContext: string | null = null;
+  // Null ExplorationId implies that no exploration has been created.
+  explorationId: string | null = null;
+  explorationIsLinkedToStory: boolean = false;
+  questionPlayerIsManuallySet: boolean = false;
+  // Context of the editor is null until initialized by init fuctions
+  // at respective editors.
+  editorContext: string | null = null;
   // Depending on this value, new images can be either saved in the localStorage
   // or uploaded directly to the datastore.
-  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -50,7 +63,7 @@ export class ContextService {
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
   // respective editors.
-  getEditorContext(): string {
+  getEditorContext(): string | null {
     return this.editorContext;
   }
   // Returns a string representing the current tab of the editor (either
@@ -153,17 +166,17 @@ export class ContextService {
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
   setCustomEntityContext(entityType: string, entityId: string): void {
-    this.customEntityContext = new EntityContext(
+    ContextService.customEntityContext = new EntityContext(
       entityId, entityType);
   }
 
   removeCustomEntityContext(): void {
-    this.customEntityContext = null;
+    ContextService.customEntityContext = null;
   }
 
   getEntityId(): string {
-    if (this.customEntityContext !== null) {
-      return this.customEntityContext.getId();
+    if (ContextService.customEntityContext !== null) {
+      return ContextService.customEntityContext.getId();
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
@@ -179,9 +192,9 @@ export class ContextService {
   }
 
   // Add constants for entity type.
-  getEntityType(): string {
-    if (this.customEntityContext !== null) {
-      return this.customEntityContext.getType();
+  getEntityType(): string | undefined {
+    if (ContextService.customEntityContext !== null) {
+      return ContextService.customEntityContext.getType();
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
@@ -211,7 +224,7 @@ export class ContextService {
 
   // Returns a string representing the explorationId (obtained from the
   // URL).
-  getExplorationId(): string {
+  getExplorationId(): string | undefined {
     if (this.explorationId) {
       return this.explorationId;
     } else if (!this.isInQuestionPlayerMode()) {
@@ -230,7 +243,6 @@ export class ContextService {
           return this.explorationId;
         }
       }
-
       throw new Error(
         'ContextService should not be used outside the ' +
         'context of an exploration or a question.');
@@ -283,16 +295,17 @@ export class ContextService {
 
   // Sets the current context to save images to the server.
   resetImageSaveDestination(): void {
-    this.imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+    ContextService.imageSaveDestination = (
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
   }
 
   setImageSaveDestinationToLocalStorage(): void {
-    this.imageSaveDestination = (
+    ContextService.imageSaveDestination = (
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
   }
 
   getImageSaveDestination(): string {
-    return this.imageSaveDestination;
+    return ContextService.imageSaveDestination;
   }
 }
 

@@ -20,7 +20,6 @@
 // question-update.service.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -38,7 +37,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 require('App.ts');
@@ -68,7 +67,6 @@ describe('Question update service', function() {
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(),
         new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory());
     $provide.value(
@@ -145,6 +143,7 @@ describe('Question update service', function() {
         hints: [],
         id: 'TextInput',
       },
+      linked_skill_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},
@@ -206,6 +205,7 @@ describe('Question update service', function() {
         hints: [],
         id: 'TextInput',
       },
+      linked_skill_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},

@@ -23,6 +23,7 @@ import ast
 import collections
 import contextlib
 import copy
+import functools
 import inspect
 import itertools
 import json
@@ -63,12 +64,11 @@ from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
 import main_taskqueue
-from proto import text_classifier_pb2
+from proto_files import text_classifier_pb2
 import python_utils
 import schema_utils
 import utils
 
-import contextlib2
 import elasticsearch
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
@@ -83,7 +83,6 @@ import webtest
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
-current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
@@ -181,9 +180,8 @@ def get_storage_model_module_names():
     """Get all module names in storage."""
     # As models.NAMES is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES.__dict__:
-        if '__' not in name:
-            yield name
+    for name in models.NAMES:
+        yield name
 
 
 def get_storage_model_classes():
@@ -533,7 +531,7 @@ class AuthServicesStub(python_utils.OBJECT):
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -1129,7 +1127,7 @@ class TestBase(unittest.TestCase):
 
     @contextlib.contextmanager
     def swap_with_checks(
-            self, obj, attr, new_value, expected_args=None,
+            self, obj, attr, new_function, expected_args=None,
             expected_kwargs=None, called=True):
         """Swap an object's function value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -1155,7 +1153,7 @@ class TestBase(unittest.TestCase):
         Args:
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
-            new_value: function. The new function you want to use.
+            new_function: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you want
                 this function to be invoked with. When its value is None, args
                 will not be checked. If the value type is list, the function
@@ -1169,53 +1167,84 @@ class TestBase(unittest.TestCase):
         Yields:
             context. The context with function replaced.
         """
-        original = getattr(obj, attr)
-        # The actual error message will also include detail assert error message
-        # via the `self.longMessage` below.
-        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+        original_function = getattr(obj, attr)
+        original_long_message_value = self.longMessage
+        msg = '%s.%s() failed the expectations of swap_with_checks()' % (
             obj.__name__, attr)
 
-        def wrapper(*args, **kwargs):
-            """Wrapper function for the new value. This function will do the
-            check before the wrapped function is invoked. After the function
-            finished, the wrapper will update how many times this function is
-            invoked.
+        expected_args_iter = iter(expected_args or ())
+        expected_kwargs_iter = iter(expected_kwargs or ())
+
+        @functools.wraps(original_function)
+        def new_function_with_checks(*args, **kwargs):
+            """Wrapper function for the new value which keeps track of how many
+            times this function is invoked.
 
             Args:
                 *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                *. Result of `new_value`.
+                *. Result of `new_function`.
             """
-            wrapper.called = True
-            if expected_args is not None:
-                self.assertEqual(args, expected_args[0], msg=msg)
-                expected_args.pop(0)
-            if expected_kwargs is not None:
-                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
-                expected_kwargs.pop(0)
-            result = new_value(*args, **kwargs)
-            return result
+            new_function_with_checks.call_num += 1
 
-        wrapper.called = False
-        setattr(obj, attr, wrapper)
-        error_occurred = False
-        try:
-            # This will show the detailed assert message.
+            # Includes assertion error information in addition to the message.
             self.longMessage = True
+
+            if expected_args:
+                next_args = python_utils.NEXT(expected_args_iter, None)
+                self.assertEqual(
+                    args, next_args, msg='*args to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            if expected_kwargs:
+                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                self.assertEqual(
+                    kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            # Reset self.longMessage just in case `new_function()` raises.
+            self.longMessage = original_long_message_value
+
+            return new_function(*args, **kwargs)
+
+        new_function_with_checks.call_num = 0
+        setattr(obj, attr, new_function_with_checks)
+
+        try:
             yield
-        except Exception:
-            error_occurred = True
-            # Raise issues thrown by the called function or assert error.
-            raise
+            # Includes assertion error information in addition to the message.
+            self.longMessage = True
+
+            self.assertEqual(
+                new_function_with_checks.call_num > 0, called, msg=msg)
+            pretty_unused_args = [
+                ', '.join(itertools.chain(
+                    (repr(a) for a in args),
+                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                for args, kwargs in python_utils.zip_longest(
+                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+            ]
+            if pretty_unused_args:
+                num_expected_calls = (
+                    new_function_with_checks.call_num + len(pretty_unused_args))
+                missing_call_summary = '\n'.join(
+                    '\tCall %d of %d: %s(%s)' % (
+                        i, num_expected_calls, attr, call_args)
+                    for i, call_args in enumerate(
+                        pretty_unused_args,
+                        start=new_function_with_checks.call_num + 1))
+                self.fail(
+                    msg='Only %d of the %d expected calls were made.\n'
+                    '\n'
+                    'Missing:\n'
+                    '%s : %s' % (
+                        new_function_with_checks.call_num, num_expected_calls,
+                        missing_call_summary, msg))
         finally:
-            setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
+            self.longMessage = original_long_message_value
+            setattr(obj, attr, original_function)
 
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
@@ -1513,8 +1542,14 @@ class GenericTestBase(AppEngineTestBase):
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
     ADMIN_USERNAME = 'adm'
+    BLOG_ADMIN_EMAIL = 'blogadmin@example.com'
+    BLOG_ADMIN_USERNAME = 'blogadm'
+    BLOG_EDITOR_EMAIL = 'blogeditor@example.com'
+    BLOG_EDITOR_USERNAME = 'blogeditor'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
+    RELEASE_COORDINATOR_EMAIL = 'releasecoordinator@example.com'
+    RELEASE_COORDINATOR_USERNAME = 'releasecoordinator'
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
@@ -1523,6 +1558,8 @@ class GenericTestBase(AppEngineTestBase):
     TOPIC_MANAGER_USERNAME = 'topicmanager'
     VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
     VOICE_ARTIST_USERNAME = 'voiceartist'
+    VOICEOVER_ADMIN_EMAIL = 'voiceoveradm@example.com'
+    VOICEOVER_ADMIN_USERNAME = 'voiceoveradm'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -1691,6 +1728,31 @@ class GenericTestBase(AppEngineTestBase):
         'next_node_id': 'node_2',
     }
 
+    VERSION_5_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p>'
+                '<oppia-noninteractive-math math_content-with-value="{'
+                '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                '}">'
+                '</oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+        }],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2',
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
@@ -1719,6 +1781,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1739,6 +1802,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1751,6 +1815,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1771,6 +1836,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1810,7 +1876,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
@@ -1922,16 +1988,19 @@ title: Title
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username):
+    def signup(self, email, username, is_super_admin=False):
         """Complete the signup process for the user with the given username.
 
         Args:
             email: str. Email of the given user.
             username: str. Username of the given user.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        login_context = self.login_context(email, is_super_admin=is_super_admin)
+
+        with login_context, requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
@@ -2001,6 +2070,15 @@ title: Title
         """
         for name in moderator_usernames:
             self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
+
+    def set_voiceover_admin(self, voiceover_admin_username):
+        """Sets role of given users as VOICEOVER ADMIN.
+
+        Args:
+            voiceover_admin_username: list(str). List of usernames.
+        """
+        for name in voiceover_admin_username:
+            self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def set_banned_users(self, banned_usernames):
         """Sets role of given users as BANNED_USER.
@@ -2205,12 +2283,37 @@ title: Title
         return self._parse_json_response(json_response, expect_errors)
 
     def post_json(
-            self, url, payload, csrf_token=None, expected_status_int=200,
-            upload_files=None):
-        """Post an object to the server by JSON; return the received object."""
-        data = {'payload': json.dumps(payload)}
+            self, url, data, csrf_token=None, expected_status_int=200,
+            upload_files=None, use_payload=True, source=None):
+        """Post an object to the server by JSON; return the received object.
+
+        Args:
+            url: str. The URL to send the POST request to.
+            data: dict. The dictionary that acts as the body of the request.
+            csrf_token: str. The csrf token to identify the user.
+            expected_status_int: int. Expected return status of the POST
+                request.
+            upload_files: list(tuple). List of
+                (fieldname, filename, file_content) tuples. Can also provide
+                just (fieldname, filename) to have the file contents be
+                read from disk.
+            use_payload: bool. If true, a new dict is created (which is sent as
+                the body of the POST request) with one key - 'payload' - and the
+                dict passed in 'data' is used as the value for that key. If
+                false, the dict in 'data' is directly passed as the body of the
+                request. For all requests called from the frontend, this should
+                be set to 'true'.
+            source: unicode. The url from which the post call is requested.
+
+        Returns:
+            dict. The JSON response for the request in dict form.
+        """
+        if use_payload:
+            data = {'payload': json.dumps(data)}
         if csrf_token:
             data['csrf_token'] = csrf_token
+        if source:
+            data['source'] = source
 
         expect_errors = expected_status_int >= 400
 
@@ -2680,7 +2783,8 @@ title: Title
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, thumbnail_filename, thumbnail_bg_color,
-            owner_id, title, description, notes, corresponding_topic_id,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             url_fragment='story-frag',
             meta_tag_content='story meta tag content'):
@@ -2700,6 +2804,8 @@ title: Title
             thumbnail_filename: str|None. Thumbnail filename for the story.
             thumbnail_bg_color: str|None. Thumbnail background color for the
                 story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -2714,8 +2820,10 @@ title: Title
         """
         story_model = story_models.StoryModel(
             id=story_id, thumbnail_filename=thumbnail_filename,
-            thumbnail_bg_color=thumbnail_bg_color, description=description,
-            title=title, language_code=language_code,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
             story_contents_schema_version=1, notes=notes,
             corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
@@ -2724,6 +2832,83 @@ title: Title
         story_model.commit(
             owner_id, commit_message,
             [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+
+    def save_new_story_with_story_contents_schema_v5(
+            self, story_id, thumbnail_filename, thumbnail_bg_color,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
+        """Saves a new story with a default version 1 story contents data dict.
+
+        This function should only be used for creating stories in tests
+        involving migration of datastore stories that use an old story contents
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating stories. This is because
+        the latter approach would result in a story with the *current* story
+        contents schema version.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            thumbnail_filename: str|None. Thumbnail filename for the story.
+            thumbnail_bg_color: str|None. Thumbnail background color for the
+                story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level description of the story.
+            notes: str. A set of notes, that describe the characters, main
+                storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
+            url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
+        """
+        story_content_v5 = {
+            'nodes': [{
+                'outline': (
+                    '<p>Value</p>'
+                    '<oppia-noninteractive-math math_content-with-value="{'
+                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' #pylint: disable=line-too-long
+                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                    '}">'
+                    '</oppia-noninteractive-math>'),
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': None,
+                'thumbnail_size_in_bytes': 21131,
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
+        }
+        story_model = story_models.StoryModel(
+            id=story_id, thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
+            story_contents_schema_version=5, notes=notes,
+            corresponding_topic_id=corresponding_topic_id,
+            story_contents=story_content_v5,
+            url_fragment=url_fragment, meta_tag_content=meta_tag_content)
+        commit_message = 'New story created with title \'%s\'.' % title
+        story_model.commit(
+            owner_id, commit_message,
+            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+        story_services.create_story_summary(story_id)
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
         """Creates an Oppia subtopic and saves it.
@@ -2756,6 +2941,7 @@ title: Title
             thumbnail_filename='topic.svg',
             thumbnail_bg_color=(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+            thumbnail_size_in_bytes=21131,
             description='description', canonical_story_ids=None,
             additional_story_ids=None, uncategorized_skill_ids=None,
             subtopics=None, next_subtopic_id=0,
@@ -2774,6 +2960,8 @@ title: Title
             thumbnail_filename: str|None. The thumbnail filename of the topic.
             thumbnail_bg_color: str|None. The thumbnail background color of the
                 topic.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the topic.
             description: str. The description of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -2807,8 +2995,9 @@ title: Title
         subtopics = subtopics or []
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
-            thumbnail_bg_color, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids, subtopics,
+            thumbnail_bg_color, thumbnail_size_in_bytes, description,
+            canonical_story_references, additional_story_references,
+            uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,

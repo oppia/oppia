@@ -22,18 +22,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
-from core.domain import exp_fetchers
-from core.domain import story_fetchers
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 import feconf
-import python_utils
 
-(skill_models, topic_models) = models.Registry.import_models(
-    [models.NAMES.skill, models.NAMES.topic])
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
 class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -98,10 +97,15 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class InteractionsInStoriesAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """An audit job to report all interaction ids used in Story models
-    associated to a topic.
-    """
+class PopulateTopicThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate the thumbnail_size_in_bytes attribute in topic
+     models.
+     """
+
+    _DELETED_KEY = 'topic_deleted'
+    _ERROR_KEY = 'thumbnail_size_update_error'
+    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_exists'
+    _NEW_SUCCESS_KEY = 'thumbnail_size_newly_added'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -109,134 +113,67 @@ class InteractionsInStoriesAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not item.deleted:
-            topic = topic_fetchers.get_topic_from_model(item)
-            story_references = topic.get_all_story_references()
-            interaction_ids = set()
+        if item.deleted:
+            yield (PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY, 1)
+            return
 
-            for story_reference in story_references:
-                story = story_fetchers.get_story_by_id(story_reference.story_id)
-                exp_ids = story.story_contents.get_all_linked_exp_ids()
-                explorations = exp_fetchers.get_multiple_explorations_by_id(
-                    exp_ids)
-                for exploration in explorations.values():
-                    for state in exploration.states.values():
-                        interaction_ids.add(state.interaction.id)
-            yield ('%s (%s)' % (topic.name, topic.id), list(interaction_ids))
+        if item.thumbnail_size_in_bytes is None:
+
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_TOPIC, item.id))
+
+            filepath = '%s/%s' % (
+                constants.ASSET_TYPE_THUMBNAIL,
+                item.thumbnail_filename)
+
+            if fs.isfile(filepath):
+                item.thumbnail_size_in_bytes = len(fs.get(filepath))
+                item.update_timestamps(update_last_updated_time=False)
+                topic_models.TopicModel.put_multi([item])
+                yield (
+                    PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
+            else:
+                yield (
+                    PopulateTopicThumbnailSizeOneOffJob._ERROR_KEY,
+                    'Thumbnail %s for topic %s not found on the filesystem' % (
+                        item.thumbnail_filename,
+                        item.id
+                    ))
+        else:
+            # The attribute thumbnail_size_in_bytes is already updated.
+            yield (
+                PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY, 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if (key == PopulateTopicThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY or
+                key == PopulateTopicThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
+                key == PopulateTopicThumbnailSizeOneOffJob._DELETED_KEY
+           ):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class SubtopicThumbnailSizeAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that outputs the thumbnail sizes of all subtopics in a topic."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [topic_models.TopicModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        topic = topic_fetchers.get_topic_from_model(item)
+        for subtopic in topic.subtopics:
+            thumbnail_filename_and_size_value = '%s %s' % (
+                subtopic.thumbnail_filename, subtopic.thumbnail_size_in_bytes)
+            yield (item.id, thumbnail_filename_and_size_value)
 
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class RemoveDeletedSkillsFromTopicOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to remove deleted uncategorized skills linked to a topic."""
-
-    _DELETED_KEY = 'topic_deleted'
-    _PROCESSED_KEY = 'topic_processed'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [topic_models.TopicModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (RemoveDeletedSkillsFromTopicOneOffJob._DELETED_KEY, 1)
-            return
-
-        # Note: the read will bring the topic up to the newest version.
-        topic = topic_fetchers.get_topic_by_id(item.id)
-        skill_ids_to_be_removed_from_subtopic = []
-        all_skill_ids_to_be_removed = []
-        commit_cmds = []
-
-        # This block of code removes deleted skills from subtopics, but keeps
-        # them in the topic.
-        for subtopic in topic.get_all_subtopics():
-            subtopic_skill_models = skill_models.SkillModel.get_multi(
-                subtopic['skill_ids'])
-            for skill_id, skill_model in python_utils.ZIP(
-                    subtopic['skill_ids'], subtopic_skill_models):
-                if skill_model is None:
-                    commit_cmds.append(topic_domain.TopicChange({
-                        'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
-                        'skill_id': skill_id,
-                        'subtopic_id': subtopic['id']
-                    }))
-                    skill_ids_to_be_removed_from_subtopic.append(skill_id)
-
-        all_skill_models = skill_models.SkillModel.get_multi(
-            topic.get_all_skill_ids())
-
-        # This block of code removes all deleted skills from topics.
-        for skill_id, skill_model in python_utils.ZIP(
-                topic.get_all_skill_ids(), all_skill_models):
-            if skill_model is None:
-                commit_cmds.append(topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
-                    'uncategorized_skill_id': skill_id
-                }))
-                all_skill_ids_to_be_removed.append(skill_id)
-        if commit_cmds:
-            topic_services.update_topic_and_subtopic_pages(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Remove deleted skill id.')
-            yield (
-                'Skill IDs deleted for topic %s:' % item.id,
-                all_skill_ids_to_be_removed)
-        yield (RemoveDeletedSkillsFromTopicOneOffJob._PROCESSED_KEY, 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == RemoveDeletedSkillsFromTopicOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == RemoveDeletedSkillsFromTopicOneOffJob._PROCESSED_KEY:
-            yield (key, ['Processed %d topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)
-
-
-class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to regenerate topic summaries."""
-
-    _DELETED_KEY = 'topic_deleted'
-    _PROCESSED_KEY = 'topic_processed'
-    _ERROR_KEY = 'topic_errored'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [topic_models.TopicModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            yield (RegenerateTopicSummaryOneOffJob._DELETED_KEY, 1)
-            return
-
-        try:
-            topic_services.generate_topic_summary(item.id)
-        except Exception as e:
-            error_message = (
-                'Failed to create topic summary %s: %s' % (item.id, e))
-            logging.exception(error_message)
-            yield (
-                RegenerateTopicSummaryOneOffJob._ERROR_KEY,
-                error_message.encode('utf-8'))
-            return
-
-        yield (RegenerateTopicSummaryOneOffJob._PROCESSED_KEY, 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key == RegenerateTopicSummaryOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == RegenerateTopicSummaryOneOffJob._PROCESSED_KEY:
-            yield (key, ['Successfully processed %d topics.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        else:
-            yield (key, values)

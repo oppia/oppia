@@ -75,10 +75,11 @@ var skillOpenConceptCard = '.protractor-test-open-concept-card';
 var confirmSkillCreationButton =
   '.protractor-test-confirm-skill-creation-button';
 var skillReviewMaterialInput = '.oppia-rte';
+var skillCkEditor = '.protractor-test-ck-editor';
 
-var updateFormName = '.protractor-update-form-name';
-var updateFormSubmit = '.protractor-update-form-submit';
-var roleSelect = '.protractor-update-form-role-select';
+var updateFormName = '.protractor-test-update-form-name';
+var updateFormSubmit = '.protractor-test-update-form-submit';
+var roleSelect = '.protractor-test-update-form-role-select';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
@@ -105,6 +106,7 @@ const login = async function(browser, page) {
     console.log('Login Failed');
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -118,19 +120,20 @@ const setRole = async function(browser, page, role) {
     await page.select(roleSelect, role);
     await page.waitForSelector(updateFormSubmit);
     await page.click(updateFormSubmit);
-    await page.waitForSelector(statusMessage);
+    await page.waitForSelector(statusMessage, {visible: true});
     await page.waitForFunction(
-      'document.querySelector(' +
-        '".protractor-test-status-message").innerText.includes(' +
-        '"successfully updated to")'
+      'Array.prototype.slice.call(' +
+      '  document.querySelectorAll(".protractor-test-status-message")' +
+      ').some(' +
+      '  (statusMessageElem) => statusMessageElem.innerText.includes(' +
+      '    "' + role + '"))', {
+        polling: 250
+      }
     );
-    // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Changing role to admin failed');
-    // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -148,12 +151,12 @@ const getExplorationEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
 const getCollectionEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'string:COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -169,12 +172,12 @@ const getCollectionEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
 const getTopicEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'string:ADMIN');
     // eslint-disable-next-line dot-notation
     await page.goto(
       TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
@@ -213,6 +216,7 @@ const getTopicEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -244,6 +248,7 @@ const getStoryEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -258,7 +263,8 @@ const getSkillEditorUrl = async function(browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitForTimeout(5000);
+    await page.waitForSelector(skillCkEditor, {visible: true});
+    await page.click(skillCkEditor);
     await page.keyboard.type('Skill Overview here');
 
     await page.waitForSelector(confirmSkillCreationButton, {visible: true});
@@ -274,6 +280,7 @@ const getSkillEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -289,7 +296,11 @@ const main = async function() {
   });
   await login(browser, page);
   await getExplorationEditorUrl(browser, page);
+
+  await setRole(browser, page, 'COLLECTION_EDITOR');
   await getCollectionEditorUrl(browser, page);
+
+  await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
@@ -303,7 +314,7 @@ const main = async function() {
     ].join('\n')
   );
   await page.close();
-  process.exit();
+  process.exit(0);
 };
 
 main();

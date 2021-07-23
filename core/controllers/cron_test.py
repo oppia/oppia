@@ -84,6 +84,17 @@ class CronJobTests(test_utils.GenericTestBase):
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
+        self.task_status = 'Not Started'
+        def _mock_taskqueue_service_defer(
+                unused_function_id, unused_queue_name):
+            """Mocks taskqueue_services.defer() so that it can be checked
+            if the method is being invoked or not.
+            """
+            self.task_status = 'Started'
+
+        self.taskqueue_service_defer_swap = self.swap(
+            taskqueue_services, 'defer', _mock_taskqueue_service_defer)
+
     def test_send_mail_to_admin_on_job_success(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -150,39 +161,20 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def test_cron_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
-        with self.testapp_swap:
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
             self.get_html_response('/cron/users/user_deletion')
-
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
-        self.assertEqual(len(all_jobs), 1)
-        self.assertEqual(all_jobs[0].job_type, 'UserDeletionOneOffJob')
+            self.assertEqual(self.task_status, 'Started')
         self.logout()
 
     def test_cron_fully_complete_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
-        with self.testapp_swap:
+        self.assertEqual(self.task_status, 'Not Started')
+        with self.testapp_swap, self.taskqueue_service_defer_swap:
             self.get_html_response('/cron/users/fully_complete_user_deletion')
-
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
-        self.assertEqual(len(all_jobs), 1)
-        self.assertEqual(
-            all_jobs[0].job_type, 'FullyCompleteUserDeletionOneOffJob')
+            self.assertEqual(self.task_status, 'Started')
         self.logout()
 
     def test_cron_exploration_recommendations_handler(self):
@@ -338,6 +330,8 @@ class CronJobTests(test_utils.GenericTestBase):
             id=admin_user_id,
             exploration_ids=[],
             collection_ids=[],
+            story_ids=[],
+            learnt_topic_ids=[],
             last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
             deleted=True
         )
@@ -386,6 +380,26 @@ class CronJobTests(test_utils.GenericTestBase):
 
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
+    def test_cron_translation_contribution_stats_handler(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+
+        with self.testapp_swap:
+            self.get_html_response(
+                '/cron/suggestions/translation_contribution_stats')
+
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
+        self.assertEqual(len(all_jobs), 1)
+        self.assertEqual(
+            all_jobs[0].job_type,
+            'PopulateTranslationContributionStatsOneOffJob')
+        self.logout()
+
 
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         test_utils.GenericTestBase):
@@ -401,12 +415,13 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def _create_translation_suggestion(self):
         """Creates a translation suggestion."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': self.default_translation_html
+            'translation_html': self.default_translation_html,
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -572,12 +587,13 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(

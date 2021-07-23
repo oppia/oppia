@@ -19,10 +19,10 @@
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service.ts';
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateTutorialFirstTimeService } from
-  'pages/exploration-editor-page/services/state-tutorial-first-time.service.ts';
+  'pages/exploration-editor-page/services/state-tutorial-first-time.service';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
 describe('State Tutorial First Time Service', () => {

@@ -20,7 +20,7 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
@@ -32,7 +32,7 @@ import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.componen
   templateUrl: './topics-list.component.html'
 })
 export class TopicsListComponent {
-  @Input() topicSummaries: TopicSummary[];
+  @Input() topicSummaries: CreatorTopicSummary[];
   @Input() pageNumber: number;
   @Input() itemsPerPage: number;
   @Input() userCanDeleteTopic: boolean;
@@ -61,7 +61,7 @@ export class TopicsListComponent {
    * topic ID provided in the args.
    */
   getTopicEditorUrl(topicId: string): string {
-    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
+    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       TOPIC_EDITOR_URL_TEMPLATE, {
         topic_id: topicId
@@ -109,7 +109,7 @@ export class TopicsListComponent {
     });
     modalRef.componentInstance.topicName = topicName;
     modalRef.result.then(() => {
-      this.editableTopicBackendApiService.deleteTopic(topicId).then(
+      this.editableTopicBackendApiService.deleteTopicAsync(topicId).then(
         (status: number) => {
           this.topicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.emit();

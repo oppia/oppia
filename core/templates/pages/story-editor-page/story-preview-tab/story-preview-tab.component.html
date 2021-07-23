@@ -1,23 +1,26 @@
 <div class="parent-container">
   <div class="oppia-story-viewer-title">
-    <[$ctrl.story.getTitle()]>
+    {{ story.getTitle() }}
   </div>
   <div class="oppia-story-viewer-description">
-    <[$ctrl.story.getDescription()]>
+    {{ story.getDescription() }}
   </div>
   <div class="oppia-story-header-text">
     <strong>
-      1 out of <[$ctrl.nodes.length]> Chapters Completed
+  <!-- Angular here attempts to resolve nodes.length before it is resolved from our component file.
+  This gives errors in console like "cannot read property length of undefined"
+  so we are using "safe navigation operator(?.)" to avoid rendering content,until data is retrieved.-->
+  1 out of {{ nodes?.length }} Chapters Completed
     </strong>
   </div>
   <div class="d-md-block oppia-story-viewer-card-container">
-    <div ng-repeat="node in $ctrl.storyContents.getNodes() track by $index;"
+    <div *ngFor="let node of storyContents?._nodes let i = index;"
          target="_blank" rel="noopener">
       <div class="oppia-story-viewer-desktop">
-        <div ng-style="($index > 0 && !$ctrl.nodes[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
-          <a class="oppia-story-viewer-card" ng-href="<[$ctrl.getExplorationUrl(node)]>">
+        <div [ngStyle]="(i > 0 && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
+          <a class="oppia-story-viewer-card" [href]="getExplorationUrl(node)">
             <span class="oppia-chapter-title" aria-live="assertive">
-              <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
+              <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{ node.getTitle() }}
             </span>
             <div class="oppia-story-viewer-card-content">
               <svg width="320"
@@ -27,17 +30,17 @@
                    version="1.1"
                    class="oppia-story-viewer-card-img">
                 <defs>
-                  <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="180" width="320">
+                  <pattern id="image{{i}}" patternUnits="userSpaceOnUse" height="180" width="320">
                     <rect width="320"
                           height="180"
-                          ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                          [attr.fill]="pathIconParameters[i].thumbnailBgColor">
                     </rect>
 
                     <image x="0"
                            y="0"
                            height="180"
                            width="320"
-                           ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
+                           [attr.xlink:href]="pathIconParameters[i].thumbnailIconUrl"
                            xlink:href="">
                     </image>
                   </pattern>
@@ -45,14 +48,14 @@
                 <a target="_blank" rel="noopener">
                   <rect width="320"
                         height="180"
-                        fill="url(#image<[$index]>)"
+                        attr.fill="url(#image{{i}})"
                         rx="4">
                   </rect>
                 </a>
               </svg>
 
               <div class="oppia-story-viewer-card-description-box">
-                <p class="oppia-description-text"><[node.getDescription()]></p>
+                <p class="oppia-description-text">{{node.getDescription()}}</p>
               </div>
             </div>
           </a>
@@ -63,39 +66,39 @@
           <svg xmlns="http://www.w3.org/1600/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
                version="1.1"
-              viewBox="0 0 192 108" preserveAspectRatio="xMidYMid Meet">
+               viewBox="0 0 192 108" preserveAspectRatio="xMidYMid Meet">
             <defs>
-              <pattern id="image2<[$index]>" patternUnits="userSpaceOnUse" height="108" width="192">
+              <pattern id="image2{{i}}" patternUnits="userSpaceOnUse" height="108" width="192">
                 <rect width="192"
                       height="108"
-                      ng-attr-fill="<[$ctrl.pathIconParameters[$index].thumbnailBgColor]>">
+                      [attr.fill]="pathIconParameters[i].thumbnailBgColor">
                 </rect>
 
                 <image x="0"
                        y="0"
                        width="192"
                        height="108"
-                       ng-attr-xlink:href="<[$ctrl.pathIconParameters[$index].thumbnailIconUrl]>"
+                       [attr.xlink:href]="pathIconParameters[i].thumbnailIconUrl"
                        xlink:href="">
                 </image>
               </pattern>
             </defs>
-            <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
+            <a xlink:href="getExplorationUrl(node)">
               <rect width="192"
                     height="108"
                     x="0"
                     y="0"
-                    fill="url(#image2<[$index]>)">
+                    attr.fill="url(#image2{{i}})">
               </rect>
             </a>
           </svg>
         </div>
         <div class="story-text">
           <span class="oppia-chapter-title" aria-live="assertive">
-            <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
+            <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{node.getTitle()}}
           </span>
           <div class="oppia-story-viewer-mobile-card-description-box">
-            <p><[node.getDescription()]></p>
+            <p>{{node.getDescription()}}</p>
           </div>
           <i class="fa fa-check chapter-complete-icon"></i>
         </div>
@@ -104,7 +107,7 @@
   </div>
 </div>
 <style>
-  story-preview-tab .parent-container {
+  .parent-container {
     background-color: #FFF;
     border-radius: 4px;
     box-shadow: 0 0 8px 6px rgba(0, 0, 0, 0.05);
@@ -113,16 +116,16 @@
     padding-top: 30px;
     width: 60%;
   }
-  story-preview-tab .oppia-story-viewer-desktop {
+  .oppia-story-viewer-desktop {
     display: block;
   }
-  story-preview-tab .oppia-story-viewer-mobile-card-content {
+  .oppia-story-viewer-mobile-card-content {
     display: none;
   }
-  story-preview-tab .oppia-story-header-text {
+  .oppia-story-header-text {
     display: none;
   }
-  story-preview-tab .oppia-story-viewer-title {
+  .oppia-story-viewer-title {
     color: #00645C;
     font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 2.4em;
@@ -133,7 +136,7 @@
     padding-top: 30px;
     text-align: left;
   }
-  story-preview-tab .oppia-story-viewer-description {
+  .oppia-story-viewer-description {
     font-family: Roboto, Arial, sans-serif;
     font-size: 1.2em;
     padding-bottom: 4vh;
@@ -141,10 +144,10 @@
     padding-right: 45px;
     text-align: left;
   }
-  story-preview-tab .oppia-story-viewer-card-container {
+  .oppia-story-viewer-card-container {
     padding: 40px 110px;
   }
-  story-preview-tab .oppia-story-viewer-card {
+  .oppia-story-viewer-card {
     color: rgb(51, 51, 51);
     flex: 1;
     font-family: Roboto, Arial, sans-serif;
@@ -153,13 +156,13 @@
     text-decoration: none;
   }
 
-  story-preview-tab .oppia-story-viewer-card-content {
+  .oppia-story-viewer-card-content {
     display: flex;
     flex-wrap: wrap;
     margin-top: 16px;
   }
 
-  story-preview-tab .oppia-story-viewer-card-description-box {
+  .oppia-story-viewer-card-description-box {
     border-radius: 4px;
     box-shadow: 0 0 4px #00000029;
     display: flex;
@@ -169,7 +172,7 @@
     padding: 20px;
   }
 
-  story-preview-tab .oppia-chapter-title {
+  .oppia-chapter-title {
     font-family: Roboto, Arial, sans-serif;
     font-size: 23px;
     font-weight: 600;
@@ -177,71 +180,71 @@
     padding-top: 3px;
   }
 
-  story-preview-tab .oppia-story-viewer-card-img {
+  .oppia-story-viewer-card-img {
     margin-bottom: 10px;
     margin-right: 10px;
   }
 
-  story-preview-tab .oppia-description-text {
+  .oppia-description-text {
     font-size: 20px;
   }
 
   @media screen and (max-width: 768px) {
-    story-preview-tab .parent-container {
+    .parent-container {
       margin-top: -50px;
       padding-bottom: 50px;
       padding-top: 0;
       width: 100%;
     }
-    story-preview-tab .oppia-story-viewer-desktop {
+    .oppia-story-viewer-desktop {
       display: none;
     }
-    story-preview-tab .oppia-story-viewer-title {
+    .oppia-story-viewer-title {
       font-size: 20px;
       padding-left: 1%;
     }
-    story-preview-tab .oppia-story-viewer-description {
+    .oppia-story-viewer-description {
       display: none;
     }
-    story-preview-tab .oppia-story-viewer-card-container {
+    .oppia-story-viewer-card-container {
       margin: 0 auto;
       padding: 0;
       width: 80%;
     }
-    story-preview-tab .oppia-story-viewer-card {
+    .oppia-story-viewer-card {
       margin-bottom: 0;
       margin-right: 0;
     }
-    story-preview-tab .oppia-story-viewer-mobile-card-content {
+    .oppia-story-viewer-mobile-card-content {
       border: 2px solid #009C8A;
       border-radius: 4px;
       display: block;
       margin: 0 0 40px;
       position: relative;
     }
-    story-preview-tab .chapter-complete-icon {
+    .chapter-complete-icon {
       bottom: 10px;
       color: #009C8A;
       position: absolute;
       right: 10px;
     }
-    story-preview-tab .story-thumbnail-image {
+    .story-thumbnail-image {
       border-bottom: 2px solid #009C8A;
     }
-    story-preview-tab .oppia-chapter-title {
+    .oppia-chapter-title {
       display: block;
       font-size: 16px;
       margin-left: 0;
       padding: 10px 0 0;
     }
-    story-preview-tab .oppia-story-viewer-mobile-card-description-box {
+    .oppia-story-viewer-mobile-card-description-box {
       margin: 5px 0 12px;
     }
-    story-preview-tab .story-text {
+    .story-text {
       margin: 0 auto;
       width: 90%;
     }
-    story-preview-tab .oppia-story-header-text {
+    .oppia-story-header-text {
       display: block;
       font-size: 19px;
       margin: 25px auto 6px;

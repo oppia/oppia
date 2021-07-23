@@ -17,7 +17,7 @@
  *  LogicProof interaction.
  */
 import logicProofParser from
-  'interactions/LogicProof/static/js/generatedParser.ts';
+  'interactions/LogicProof/static/js/generatedParser';
 
 var logicProofShared = (function() {
   // Used by parseLineString() to limit the number of possible parsings of a

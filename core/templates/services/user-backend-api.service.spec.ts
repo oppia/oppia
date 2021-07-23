@@ -20,29 +20,30 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { PreferencesBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
-  let userBackendApiService: UserBackendApiService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
+  let userBackendApiService: UserBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    userBackendApiService = TestBed.get(UserBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
-    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    userBackendApiService = TestBed.inject(UserBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    csrfService = TestBed.inject(CsrfTokenService);
+
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
-      () => {
+      async() => {
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
         });
@@ -56,6 +57,7 @@ describe('User Backend Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -94,6 +96,7 @@ describe('User Backend Api Service', () => {
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
+      role: 'GUEST',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -178,5 +181,49 @@ describe('User Backend Api Service', () => {
     req.flush(sampleUserContributionRightsDict);
 
     flushMicrotasks();
+  }));
+
+  it('should return user preferences data', fakeAsync(() => {
+    let samplePreferencesData: PreferencesBackendDict = {
+      preferred_language_codes: ['en', 'hi'],
+      preferred_site_language_code: 'en',
+      preferred_audio_language_code: 'en',
+      profile_picture_data_url: '',
+      default_dashboard: 'learner',
+      user_bio: '',
+      subject_interests: '',
+      can_receive_email_updates: true,
+      can_receive_editor_role_email: true,
+      can_receive_feedback_message_email: true,
+      can_receive_subscription_email: true,
+      subscription_list: []
+    };
+    userBackendApiService.getPreferencesAsync().then((preferencesData) => {
+      expect(preferencesData).toEqual(samplePreferencesData);
+    });
+
+    const req = httpTestingController.expectOne('/preferenceshandler/data');
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePreferencesData);
+
+    flushMicrotasks();
+  }));
+
+  it('should update preferred site langauge', fakeAsync(() => {
+    let siteLanguageUrl = '/save_site_language';
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    userBackendApiService.updatePreferredSiteLanguageAsync('en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(siteLanguageUrl);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 });

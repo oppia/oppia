@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,31 +16,35 @@
  * @fileoverview Component for a subtopic tile.
  */
 
-import { AppConstants } from 'app.constants';
 import { Component, Input, OnInit } from '@angular/core';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { AppConstants } from 'app.constants';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-subtopic-summary-tile',
-  templateUrl: './subtopic-summary-tile.component.html',
-  styleUrls: []
+  templateUrl: './subtopic-summary-tile.component.html'
 })
 export class SubtopicSummaryTileComponent implements OnInit {
-  @Input() classroomUrlFragment: string;
-  @Input() subtopic: Subtopic;
-  @Input() topicId: string;
-  @Input() topicUrlFragment: string;
-  thumbnailUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() classroomUrlFragment!: string;
+  @Input() subtopic!: Subtopic;
+  @Input() topicId!: string;
+  @Input() topicUrlFragment!: string;
+  thumbnailUrl!: string;
+  thumbnailBgColor!: string;
+  subtopicTitle !: string;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private windowRef: WindowRef,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
   ) {}
 
   openSubtopicPage(): void {
@@ -61,6 +65,8 @@ export class SubtopicSummaryTileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.thumbnailBgColor = this.subtopic.getThumbnailBgColor();
+    this.subtopicTitle = this.subtopic.getTitle();
     if (this.subtopic.getThumbnailFilename()) {
       this.thumbnailUrl = (
         this.assetsBackendApiService.getThumbnailUrlForPreview(
@@ -73,5 +79,6 @@ export class SubtopicSummaryTileComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaSubtopicSummaryTile',
-  downgradeComponent({component: SubtopicSummaryTileComponent}));
+  'oppiaSubtopicSummaryTile', downgradeComponent({
+    component: SubtopicSummaryTileComponent
+  }) as angular.IDirectiveFactory);

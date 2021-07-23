@@ -63,7 +63,7 @@ export class ReadOnlyExplorationBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _fetchExploration(
+  private async _fetchExplorationAsync(
       explorationId: string, version: number | null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
@@ -110,9 +110,9 @@ export class ReadOnlyExplorationBackendApiService {
    * is called instead, if present. The rejection callback function is
    * passed any data returned by the backend in the case of an error.
    */
-  fetchExploration(explorationId: string, version: number):
+  async fetchExplorationAsync(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
-    return this._fetchExploration(explorationId, version);
+    return this._fetchExplorationAsync(explorationId, version);
   }
 
   /**
@@ -125,7 +125,7 @@ export class ReadOnlyExplorationBackendApiService {
    * will store the exploration in the cache to avoid requests from the
    * backend in further function calls.
    */
-  loadLatestExploration(explorationId: string):
+  async loadLatestExplorationAsync(explorationId: string):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
@@ -133,7 +133,7 @@ export class ReadOnlyExplorationBackendApiService {
           resolve(this._explorationCache[explorationId]);
         }
       } else {
-        this._fetchExploration(explorationId, null).then(exploration => {
+        this._fetchExplorationAsync(explorationId, null).then(exploration => {
           // Save the fetched exploration to avoid future fetches.
           this._explorationCache[explorationId] = exploration;
           if (resolve) {
@@ -151,10 +151,10 @@ export class ReadOnlyExplorationBackendApiService {
    * cache. All previous data in the cache will still be retained after
    * this call.
    */
-  loadExploration(explorationId: string, version: number):
+  async loadExplorationAsync(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchExploration(explorationId, version).then(exploration => {
+      this._fetchExplorationAsync(explorationId, version).then(exploration => {
         resolve(exploration);
       }, reject);
     });

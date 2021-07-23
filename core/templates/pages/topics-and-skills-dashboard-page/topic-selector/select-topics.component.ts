@@ -24,22 +24,47 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './select-topics.component.html'
 })
 export class SelectTopicsComponent {
-   @Input() topicSummaries: { isSelected: boolean }[];
-   @Input() selectedTopicIds: string[];
-   @Output() selectedTopicIdsChange: EventEmitter<string[]> = (
-     new EventEmitter());
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() topicSummaries!:
+    { id: string, name: string, isSelected: boolean }[];
+  @Input() selectedTopicIds!: string[];
+  @Output() selectedTopicIdsChange: EventEmitter<string[]> = (
+    new EventEmitter());
+  topicsSelected: string[] = [];
+  topicFilterText: string = '';
+  filteredTopics: { id: string, name: string, isSelected: boolean }[] = [];
 
-   selectOrDeselectTopic(topicId: string, index: number): void {
-     if (!this.topicSummaries[index].isSelected) {
-       this.selectedTopicIds.push(topicId);
-       this.topicSummaries[index].isSelected = true;
-     } else {
-       let idIndex: number = this.selectedTopicIds.indexOf(topicId);
-       this.selectedTopicIds.splice(idIndex, 1);
-       this.topicSummaries[index].isSelected = false;
-     }
-     this.selectedTopicIdsChange.emit(this.selectedTopicIds);
-   }
+  selectOrDeselectTopic(topicId: string): void {
+    let topic = this.topicSummaries.find(
+      topic => topic.id === topicId);
+    if (topic === undefined) {
+      throw new Error('No Topic with given topicId exists!');
+    }
+    let index: number = this.topicSummaries.indexOf(topic);
+    if (!this.topicSummaries[index].isSelected) {
+      this.selectedTopicIds.push(topicId);
+      this.topicSummaries[index].isSelected = true;
+      this.topicsSelected.push(this.topicSummaries[index].name);
+    } else {
+      let idIndex: number = this.selectedTopicIds.indexOf(topicId);
+      let nameIndex = this.topicsSelected.indexOf(
+        this.topicSummaries[index].name);
+      this.selectedTopicIds.splice(idIndex, 1);
+      this.topicSummaries[index].isSelected = false;
+      this.topicsSelected.splice(nameIndex, 1);
+    }
+    this.selectedTopicIdsChange.emit(this.selectedTopicIds);
+  }
+
+  searchInTopics(searchText: string):
+  { id: string, name: string, isSelected: boolean }[] {
+    this.filteredTopics = this.topicSummaries.filter(
+      topic => topic.name.toLowerCase().indexOf(
+        searchText.toLowerCase()) !== -1);
+    return this.filteredTopics;
+  }
 }
 
 angular.module('oppia').directive('oppiaSelectTopics',

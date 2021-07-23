@@ -4,11 +4,17 @@
      on-finish="$ctrl.onFinishTutorial()"
      on-skip="$ctrl.onSkipTutorial()">
   <div class="exp-editor-main-editor">
-    <div class="oppia-editor-cards-container">
+    <div class="oppia-editor-cards-container protractor-test-editor-cards-container">
       <div class="oppia-editor-header">
         <state-name-editor></state-name-editor>
       </div>
-
+      <div>
+        <md-checkbox class="checkpoint-selection-checkbox protractor-test-checkpoint-selection-checkbox"
+                     ng-change="$ctrl.onChangeCardIsCheckpoint()"
+                     ng-model="$ctrl.stateCardIsCheckpointService.displayed">
+          Set as a checkpoint for learners
+        </md-checkbox>
+      </div>
       <div ng-if="$ctrl.areParametersEnabled()">
         <state-param-changes-editor></state-param-changes-editor>
       </div>
@@ -19,6 +25,7 @@
                     on-save-interaction-id="$ctrl.saveInteractionId"
                     on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
                     on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
+                    on-save-linked-skill-id="$ctrl.saveLinkedSkillId"
                     on-save-solution="$ctrl.saveSolution"
                     on-save-hints="$ctrl.saveHints"
                     on-save-solicit-answer-details="$ctrl.saveSolicitAnswerDetails"
@@ -29,7 +36,8 @@
                     navigate-to-state="$ctrl.navigateToState"
                     add-state="$ctrl.addState"
                     refresh-warnings="$ctrl.refreshWarnings"
-                    interaction-is-shown="$ctrl.interactionIsShown">
+                    interaction-is-shown="$ctrl.interactionIsShown"
+                    exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
       </state-editor>
     </div>
   </div>
@@ -63,5 +71,12 @@
       margin-right: 0;
       width: 100%;
     }
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-icon {
+    border-color: #0d48a1;
+    top: 2px;
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
+    background-color: rgba(71, 151, 136, 1);
   }
 </style>

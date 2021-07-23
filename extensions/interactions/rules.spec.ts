@@ -21,7 +21,6 @@
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
@@ -40,9 +39,9 @@ import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/
 import { MathEquationInputRulesService } from
   'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import { NumberWithUnitsRulesService } from
-  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory.ts';
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
@@ -67,7 +66,6 @@ describe('Rule spec services', function() {
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('CodeNormalizerService', new CodeNormalizerService());
     $provide.value('GraphUtilsService', new GraphUtilsService());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('SetInputRulesService', new SetInputRulesService());
     $provide.value(
       'AlgebraicExpressionInputRulesService',
@@ -94,14 +92,14 @@ describe('Rule spec services', function() {
     $provide.value(
       'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
         new NumberWithUnitsObjectFactory(
-          new UnitsObjectFactory(), new FractionObjectFactory(),
+          new UnitsObjectFactory(),
         ), new UtilsService()));
     $provide.value(
       'NumericExpressionInputRulesService',
       new NumericExpressionInputRulesService());
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
-        new FractionObjectFactory(), new UtilsService()));
+        new UtilsService()));
     $provide.value(
       'GraphInputRulesService', new GraphInputRulesService(
         new GraphUtilsService(), new UtilsService()));

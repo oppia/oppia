@@ -10,20 +10,26 @@
   </textarea>
 
   <span ng-if="!$ctrl.getCodingMode() && !$ctrl.getRows()">
-    <input type="text" ng-disabled="$ctrl.isDisabled()" class="form-control display-inline"
-           ng-model="$ctrl.localValue" ng-blur="$ctrl.onInputBlur()"
-           ng-focus="$ctrl.onInputFocus()" focus-on="<[$ctrl.labelForFocusTarget()]>"
-           ng-keypress="$ctrl.onKeypress($event)" placeholder="<[$ctrl.getPlaceholder()]>" apply-validation validators="$ctrl.validators()"
+    <input type="text"
+           ng-disabled="$ctrl.isDisabled()"
+           class="form-control display-inline"
+           ng-model="$ctrl.localValue"
+           ng-blur="$ctrl.onInputBlur()"
+           ng-focus="$ctrl.onInputFocus()"
+           focus-on="<[$ctrl.labelForFocusTarget()]>"
+           ng-keypress="$ctrl.onKeypress($event)"
+           placeholder="<[$ctrl.getPlaceholder()]>"
+           apply-validation validators="$ctrl.validators()"
            aria-label="text input">
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
   <div ng-if="$ctrl.getCodingMode()" class="oppia-coding-editor">
-    <div ui-codemirror
-         ng-model="$ctrl.localValue"
-         ui-codemirror-opts="$ctrl.codemirrorOptions"
-         ui-refresh="$ctrl.codemirrorStatus">
-    </div>
+    <oppia-codemirror [value]="$ctrl.localValue"
+                      [options]="$ctrl.codemirrorOptions"
+                      [refresh]="$ctrl.codemirrorStatus"
+                      (value-change)="$ctrl.updateLocalValue($event)">
+    </oppia-codemirror>
   </div>
 </span>
 <style>

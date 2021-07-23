@@ -357,7 +357,7 @@ class NewSkillHandler(base.BaseHandler):
         for filename in image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging.exception(
                     'Image not provided for file with name %s when the skill '
                     'with id %s was created.' % (filename, skill.id))
                 raise self.InvalidInputException(
@@ -399,10 +399,11 @@ class MergeSkillHandler(base.BaseHandler):
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))
-        question_services.replace_skill_id_for_all_questions(
-            old_skill_id, old_skill.description, new_skill_id)
+
         skill_services.replace_skill_id_in_all_topics(
             self.user_id, old_skill_id, new_skill_id)
+        question_services.replace_skill_id_for_all_questions(
+            old_skill_id, old_skill.description, new_skill_id)
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,

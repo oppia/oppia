@@ -46,15 +46,10 @@ class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
-        config_property = config_domain.Registry.get_config_property(
-            'classroom_page_is_accessible')
-        config_property.set_value('committer_id', True)
         response = self.get_html_response('/learn/math')
-        self.assertIn('<classroom-page></classroom-page>', response)
-        config_property.set_value('committer_id', False)
-
-    def test_get_fails_when_classroom_page_is_accessible_not_enabled(self):
-        self.get_html_response('/learn/math', expected_status_int=404)
+        self.assertIn(
+            '<oppia-classroom-page-root></oppia-classroom-page-root>',
+            response)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
@@ -81,7 +76,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         public_topic.next_subtopic_id = 2
         topic_services.save_new_topic(admin_id, public_topic)

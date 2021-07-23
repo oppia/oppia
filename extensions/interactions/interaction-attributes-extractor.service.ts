@@ -35,7 +35,17 @@ export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
     'Continue',
     'FractionInput',
-    'GraphInput'
+    'GraphInput',
+    'ImageClickInput',
+    'CodeRepl',
+    'NumericExpressionInput',
+    'NumericInput',
+    'InteractiveMap',
+    'LogicProof',
+    'MultipleChoiceInput',
+    'SetInput',
+    'TextInput',
+    'MathEquationInput'
   ];
 
   constructor(

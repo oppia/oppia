@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -40,12 +40,12 @@ class MockWindowRef {
 }
 
 describe('User Api Service', () => {
-  let userService: UserService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let urlService: UrlService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
-  let windowRef: MockWindowRef = null;
+  let userService: UserService;
+  let urlInterpolationService: UrlInterpolationService;
+  let urlService: UrlService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
+  let windowRef: MockWindowRef;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -60,7 +60,7 @@ describe('User Api Service', () => {
     csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
-      () =>{
+      async() => {
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
         });
@@ -74,6 +74,7 @@ describe('User Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -129,19 +130,10 @@ describe('User Api Service', () => {
       });
     }));
 
-  it('should return new userInfo data when url path is login',
-    fakeAsync(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/login');
-      const sampleUserInfo = UserInfo.createDefault();
-
-      userService.getUserInfoAsync().then((userInfo) => {
-        expect(userInfo).toEqual(sampleUserInfo);
-      });
-    }));
-
   it('should not fetch userInfo if it is was fetched before', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,
@@ -172,6 +164,7 @@ describe('User Api Service', () => {
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
     // Creating a test user for checking profile picture of user.
     const sampleUserInfoBackendObject = {
+      role: 'USER_ROLE',
       is_moderator: false,
       is_admin: false,
       is_super_admin: false,

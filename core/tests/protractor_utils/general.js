@@ -62,8 +62,8 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  const browserLogs = await browser.manage().logs().get('browser');
-  const browserErrors = browserLogs.filter(logEntry => (
+  var browserLogs = await browser.manage().logs().get('browser');
+  var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
@@ -135,14 +135,14 @@ var moveToEditor = async function(welcomeModalIsShown) {
   await openEditor(explorationId, welcomeModalIsShown);
 };
 
-var expect404Error = async function() {
+var expectErrorPage = async function(errorNum) {
   var errorContainer = element(
     by.css('.protractor-test-error-container'));
   await waitFor.visibilityOf(
     errorContainer,
     'Protractor test error container taking too long to appear');
   expect(await errorContainer.getText()).
-    toMatch('Error 404');
+    toMatch(`Error ${errorNum}`);
 };
 
 // Checks no untranslated values are shown in the page.
@@ -150,11 +150,17 @@ var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
-    '.oppia-base-container'));
+    '.protractor-test-base-container'));
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
-  var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
+
+  // We try to avoid browser.executeScript whereas possible as it
+  // can introduce flakiness.
+  // The usage here is only allowed because this the recommended approach
+  // by protractor to read innerHTML.
+  let promiseValue = await browser.executeScript(
+    'return arguments[0].innerHTML;', oppiaBaseContainer);
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
@@ -172,7 +178,7 @@ var ensurePageHasNoTranslationIds = async function() {
 
 var acceptPrompt = async function(promptResponse) {
   await waitFor.alertToBePresent();
-  const alert = await browser.switchTo().alert();
+  var alert = await browser.switchTo().alert();
   await alert.sendKeys(promptResponse);
   await alert.accept();
   await waitFor.pageToFullyLoad();
@@ -264,7 +270,7 @@ exports.openEditor = openEditor;
 exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
-exports.expect404Error = expect404Error;
+exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
 

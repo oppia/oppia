@@ -28,6 +28,7 @@ import { SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { Observable } from 'rxjs';
 
 interface FetchSkillBackendResponse {
   'skill': SkillBackendDict;
@@ -70,7 +71,7 @@ export class SkillBackendApiService {
     private skillObjectFactory: SkillObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchSkill(skillId: string): Promise<FetchSkillResponse> {
+  async fetchSkillAsync(skillId: string): Promise<FetchSkillResponse> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -93,7 +94,13 @@ export class SkillBackendApiService {
     });
   }
 
-  fetchMultiSkills(skillIds: string[]): Promise<Skill[]> {
+  fetchAllSkills(): Observable<{skills: SkillBackendDict[]}> {
+    return this.http.get<{skills: SkillBackendDict[]}>(
+      SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE
+    );
+  }
+
+  async fetchMultiSkillsAsync(skillIds: string[]): Promise<Skill[]> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
@@ -112,14 +119,13 @@ export class SkillBackendApiService {
     });
   }
 
-  deleteSkill(skillId: string): Promise<void> {
+  async deleteSkillAsync(skillId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
           skill_id: skillId
         });
 
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(skillDataUrl).toPromise().then(() => {
         resolve();
       }, function(errorResponse) {
@@ -128,7 +134,7 @@ export class SkillBackendApiService {
     });
   }
 
-  updateSkill(
+  async updateSkillAsync(
       skillId: string, skillVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<Skill> {

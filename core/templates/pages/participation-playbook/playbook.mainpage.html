@@ -1,21 +1,11 @@
 <!DOCTYPE html>
-<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Creator Guidelines | Oppia"})
   </head>
 
   <body>
-    <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
-          <navbar-breadcrumb>
-          </navbar-breadcrumb>
-          <content>
-            <participation-playbook></participation-playbook>
-          </content>
-        </base-content>
-      </div>
-    </oppia-root>
+    <oppia-playbook-page-root></oppia-playbook-page-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

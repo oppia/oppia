@@ -22,7 +22,7 @@ import { async, TestBed } from '@angular/core/testing';
 import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
 import { KeyboardShortcutHelpModalComponent } from
   // eslint-disable-next-line max-len
-  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component.ts';
+  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -125,11 +125,6 @@ describe('Keyboard Shortcuts', () => {
     expect(windowRef.nativeWindow.location.href).toBe('');
 
     Mousetrap.trigger('ctrl+5');
-    expect(windowRef.nativeWindow.location.href).toEqual('/notifications');
-    mockWindow.location.href = '';
-    expect(windowRef.nativeWindow.location.href).toBe('');
-
-    Mousetrap.trigger('ctrl+6');
     expect(windowRef.nativeWindow.location.href).toEqual('/preferences');
     mockWindow.location.href = '';
     expect(windowRef.nativeWindow.location.href).toBe('');

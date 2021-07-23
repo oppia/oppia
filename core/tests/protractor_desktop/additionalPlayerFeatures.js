@@ -19,6 +19,7 @@
  * refresher explorations, state parameters, etc.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -138,12 +139,13 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.moveToState('card 2');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'this is card 2 with non-inline interaction'));
-    await explorationEditorMainTab.setInteraction(
-      'LogicProof',
-      '', '', 'from p we have p');
+    await explorationEditorMainTab.setInteraction('CodeRepl');
     await explorationEditorMainTab.addResponse(
-      'LogicProof', await forms.toRichText('Great'),
-      'final card', true, 'Correct');
+      'CodeRepl', await forms.toRichText('Nice. Press continue button'),
+      'final card', true, 'CodeDoesNotContain', 'test');
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(
+      'default');
+    await responseEditor.setFeedback(await forms.toRichText('try again'));
 
     // Setup a terminating state.
     await explorationEditorMainTab.moveToState('final card');
@@ -155,7 +157,7 @@ describe('Full exploration editor', function() {
     var backButton = element(by.css('.protractor-test-back-button'));
     var nextCardButton = element(by.css('.protractor-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
-    await explorationPlayerPage.submitAnswer('LogicProof');
+    await explorationPlayerPage.submitAnswer('CodeRepl');
     await waitFor.visibilityOf(
       nextCardButton, 'Next Card button taking too long to show up.');
     await waitFor.invisibilityOf(
@@ -298,7 +300,8 @@ describe('Full exploration editor', function() {
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, refresherExplorationId);
-    await explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    await explorationEditorPage.publishChanges(
+      'Add Refresher Exploration Id');
 
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(
@@ -306,7 +309,8 @@ describe('Full exploration editor', function() {
     responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
     await responseEditor.setDestination(null, false, refresherExplorationId);
-    await explorationEditorPage.saveChanges('Add Refresher Exploration Id');
+    await explorationEditorPage.publishChanges(
+      'Add Refresher Exploration Id');
 
     // Create collection and add created exploration.
     await creatorDashboardPage.get();
@@ -507,8 +511,9 @@ describe('Full exploration editor', function() {
     await libraryPage.playExploration('Exploration with Recommendation');
     var recommendedExplorationTile = element(
       by.css('.protractor-test-exp-summary-tile-title'));
-    expect(await recommendedExplorationTile.getText())
-      .toEqual('Recommended Exploration 1');
+    var recommendedExplorationName = await action.getText(
+      'Recommended Exploration Tile', recommendedExplorationTile);
+    expect(recommendedExplorationName).toEqual('Recommended Exploration 1');
     await recommendedExplorationTile.click();
     await explorationPlayerPage.expectExplorationNameToBe(
       'Recommended Exploration 1');

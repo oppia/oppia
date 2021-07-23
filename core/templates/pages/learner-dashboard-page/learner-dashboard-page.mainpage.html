@@ -2,11 +2,19 @@
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Learner Dashboard | Oppia"})
+    <script>
+      // This prevents angular pages to cause side effects to hybrid pages.
+      // TODO(#13080): Remove fake resumeBootstrap once angularjs is removed
+      // from this page.
+      if (!window.angular.resumeBootstrap) {
+        window.angular.resumeBootstrap = function(extraModules) {};
+      }
+    </script>
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
           <navbar-breadcrumb>
             <ul class="nav navbar-nav oppia-navbar-breadcrumb">
               <li>
@@ -17,11 +25,11 @@
           </navbar-breadcrumb>
 
           <content>
-            <oppia-learner-dashboard-page></oppia-learner-dashboard-page>
+            <oppia-learner-dashboard-page class="protractor-test-learner-dashboard-page"></oppia-learner-dashboard-page>
           </content>
 
           <page-footer></page-footer>
-        </base-content>
+        </oppia-base-content>
       </div>
 
     </oppia-root>

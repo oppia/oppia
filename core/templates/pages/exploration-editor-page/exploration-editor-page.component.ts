@@ -17,8 +17,6 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
@@ -74,7 +72,7 @@ require(
   'conversation-skin.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
+  'exploration-footer.component.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('interactions/interactionsRequires.ts');
@@ -174,9 +172,10 @@ angular.module('oppia').component('explorationEditorPage', {
     'FocusManagerService', 'GraphDataService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
@@ -196,9 +195,10 @@ angular.module('oppia').component('explorationEditorPage', {
         FocusManagerService, GraphDataService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
@@ -231,10 +231,11 @@ angular.module('oppia').component('explorationEditorPage', {
       // Called on page load.
       ctrl.initExplorationPage = () => {
         return $q.all([
-          ExplorationDataService.getData((explorationId, lostChanges) => {
+          ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
+              $rootScope.$applyAsync();
             }
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
@@ -242,11 +243,14 @@ angular.module('oppia').component('explorationEditorPage', {
           ThreadDataBackendApiService.getOpenThreadsCountAsync()
         ]).then(async([explorationData, featuresData, openThreadsCount]) => {
           if (explorationData.exploration_is_linked_to_story) {
+            ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
 
           ExplorationFeaturesService.init(explorationData, featuresData);
 
+          StateClassifierMappingService.init(
+            ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(explorationData.states);
 
           ExplorationTitleService.init(explorationData.title);
@@ -331,6 +335,7 @@ angular.module('oppia').component('explorationEditorPage', {
           if (explorationData.draft_changes !== null) {
             ChangeListService.loadAutosavedChangeList(
               explorationData.draft_changes);
+            $rootScope.$applyAsync();
           }
 
           if (explorationData.is_version_of_draft_valid === false &&
@@ -340,6 +345,7 @@ angular.module('oppia').component('explorationEditorPage', {
             // changes is invalid, and draft_changes is not `null`.
             AutosaveInfoModalsService.showVersionMismatchModal(
               ChangeListService.getChangeList());
+            $rootScope.$applyAsync();
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
@@ -362,30 +368,8 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
-          // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and is being played by
-          // learners.
-          if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
-
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
-          }
+          // TODO(#13352): Initialize StateTopAnswersStatsService and register
+          // relevant callbacks.
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
@@ -434,8 +418,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeModalController',
@@ -459,7 +443,10 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
       ctrl.hasCriticalWarnings = () => (
         ExplorationWarningsService.hasCriticalWarnings);
-      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectMainTab = () => {
+        RouterService.navigateToMainTab();
+        $rootScope.$applyAsync();
+      };
       ctrl.selectTranslationTab = (
         () => RouterService.navigateToTranslationTab());
       ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();
@@ -483,8 +470,8 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',
@@ -507,6 +494,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
               setPageTitle();
+              $rootScope.$applyAsync();
             }
           )
         );

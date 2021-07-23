@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 // ^^^ This block is to be removed.
 
 describe('Contributions and review component', function() {
@@ -391,7 +391,7 @@ describe('Contributions and review component', function() {
             details: null
           }
         }));
-      spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: 'skill1',
@@ -615,7 +615,7 @@ describe('Contributions and review component', function() {
             details: 'skill_1'
           }
         }));
-      spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: 'skill1',

@@ -16,8 +16,8 @@
  * @fileoverview Components used by the LogicProof interaction reader.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 
 var logicProofStudent = (function() {
   // ---- BUILD INSTANCE ----
@@ -861,6 +861,7 @@ var logicProofStudent = (function() {
       var protoLines = logicProofShared.parseLineString(
         lineString.trim(), language.operators, vocabulary, false);
     } catch (err) {
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: logicProofShared.renderError(err, generalMessages, language)
       };
@@ -882,6 +883,7 @@ var logicProofStudent = (function() {
       }
     }
     if (!lineIdentified) {
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: errorMessage
       };
@@ -913,6 +915,7 @@ var logicProofStudent = (function() {
             questionInstance.language, questionInstance.vocabulary,
             questionInstance.general_messages);
         } catch (err) {
+          // eslint-disable-next-line no-throw-literal
           throw {
             message: err.message,
             line: i
@@ -1041,6 +1044,7 @@ var logicProofStudent = (function() {
             lineStrings[i], questionInstance.line_templates,
             questionInstance.language, questionInstance.vocabulary));
       } catch (err) {
+        // eslint-disable-next-line no-throw-literal
         throw {
           message: logicProofShared.renderError(
             err, questionInstance.general_messages, questionInstance.language),
@@ -1251,6 +1255,7 @@ var logicProofStudent = (function() {
                 section: questionInstance.mistake_table[i].name,
                 entry: mistake.name
               });
+              // eslint-disable-next-line no-throw-literal
             throw {
               message: logicProofShared.renderError(
                 error, questionInstance.general_messages,

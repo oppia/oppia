@@ -19,8 +19,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants.ts';
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -62,13 +61,6 @@ export class AdminRouterService {
   isActivitiesTabOpen(): boolean {
     return this.currentTabHash === (
       AdminPageConstants.ADMIN_TAB_URLS.ACTIVITIES);
-  }
-
-  /**
-   * @returns {boolean} Whether the jobs tab is open.
-   */
-  isJobsTabOpen(): boolean {
-    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.JOBS;
   }
 
   /**

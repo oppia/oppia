@@ -22,7 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import logging
 
+from constants import constants
 from core import jobs
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -30,23 +33,6 @@ from core.platform import models
 import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
-
-
-class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that audits and validates description length"""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryModel]
-
-    @staticmethod
-    def map(model_instance):
-        if len(model_instance.description) > 1000:
-            yield (model_instance.corresponding_topic_id, model_instance.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield ('Topic Id: %s' % key, 'Story Id: %s' % values)
 
 
 class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -113,12 +99,13 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to regenerate story summaries."""
+class PopulateStoryThumbnailSizeOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to update the thumbnail_size_in_bytes in story models. """
 
     _DELETED_KEY = 'story_deleted'
-    _PROCESSED_KEY = 'story_processed'
-    _ERROR_KEY = 'story_errored'
+    _ERROR_KEY = 'thumbnail_size_update_error'
+    _NEW_SUCCESS_KEY = 'thumbnail_size_newly_added'
+    _EXISTING_SUCCESS_KEY = 'thumbnail_size_already_exists'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -127,37 +114,50 @@ class RegenerateStorySummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (RegenerateStorySummaryOneOffJob._DELETED_KEY, 1)
+            yield (PopulateStoryThumbnailSizeOneOffJob._DELETED_KEY, 1)
             return
 
-        try:
-            story_services.create_story_summary(item.id)
-        except Exception as e:
+        if item.thumbnail_size_in_bytes is None:
+            file_system_class = fs_services.get_entity_file_system_class()
+            fs = fs_domain.AbstractFileSystem(file_system_class(
+                feconf.ENTITY_TYPE_STORY, item.id))
+
+            filepath = '%s/%s' % (
+                constants.ASSET_TYPE_THUMBNAIL, item.thumbnail_filename)
+
+            if fs.isfile(filepath):
+                item.thumbnail_size_in_bytes = len(fs.get(filepath))
+                item.update_timestamps(update_last_updated_time=False)
+                story_models.StoryModel.put_multi([item])
+                yield (
+                    PopulateStoryThumbnailSizeOneOffJob._NEW_SUCCESS_KEY, 1)
+            else:
+                yield (
+                    PopulateStoryThumbnailSizeOneOffJob._ERROR_KEY,
+                    'Thumbnail %s for story %s not found on the filesystem' % (
+                        item.thumbnail_filename,
+                        item.id
+                    ))
+        else:
+            # The attribute thumbnail_size_in_bytes is already updated.
             yield (
-                RegenerateStorySummaryOneOffJob._ERROR_KEY,
-                'Failed to create story summary %s: %s' % (item.id, e))
-            return
-
-        yield (RegenerateStorySummaryOneOffJob._PROCESSED_KEY, 1)
+                PopulateStoryThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY, 1)
 
     @staticmethod
     def reduce(key, values):
-        if key == RegenerateStorySummaryOneOffJob._DELETED_KEY:
-            yield (key, ['Encountered %d deleted stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
-        elif key == RegenerateStorySummaryOneOffJob._PROCESSED_KEY:
-            yield (key, ['Successfully processed %d stories.' % (
-                sum(ast.literal_eval(v) for v in values))])
+        if (key == PopulateStoryThumbnailSizeOneOffJob._NEW_SUCCESS_KEY or
+                key == PopulateStoryThumbnailSizeOneOffJob._EXISTING_SUCCESS_KEY
+                or key == PopulateStoryThumbnailSizeOneOffJob._DELETED_KEY
+           ):
+            yield (key, len(values))
         else:
             yield (key, values)
 
 
-class StoryExplorationsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to validate explorations in stories."""
-
-    _DELETED_KEY = 'story_deleted'
-    _PROCESSED_KEY = 'story_processed'
-    _ERROR_KEY = 'story_failed_validation'
+class StoryThumbnailSizeAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Audit job that output the thumbnail size of all
+    the story nodes in story.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -166,48 +166,14 @@ class StoryExplorationsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (StoryExplorationsAuditOneOffJob._DELETED_KEY, 1)
             return
 
-        story = story_fetchers.get_story_by_id(item.id)
-        exp_ids = story.story_contents.get_all_linked_exp_ids()
-        validation_errors = story_services.validate_explorations_for_story(
-            exp_ids, False)
-        if validation_errors:
-            yield (
-                StoryExplorationsAuditOneOffJob._ERROR_KEY,
-                'Failed to validate explorations for story %s: %s' % (
-                    item.id, validation_errors))
-            return
-
-        yield (StoryExplorationsAuditOneOffJob._PROCESSED_KEY, 1)
+        story = story_fetchers.get_story_from_model(item)
+        for node in story.story_contents.nodes:
+            thumbnail_filename_and_size_value = '%s %s' % (
+                node.thumbnail_filename, node.thumbnail_size_in_bytes)
+            yield (item.id, thumbnail_filename_and_size_value)
 
     @staticmethod
     def reduce(key, values):
-        if key == StoryExplorationsAuditOneOffJob._DELETED_KEY:
-            num_deleted = sum(ast.literal_eval(v) for v in values)
-            values = ['Encountered %d deleted stories.' % num_deleted]
-        elif key == StoryExplorationsAuditOneOffJob._PROCESSED_KEY:
-            num_processed = sum(ast.literal_eval(v) for v in values)
-            values = ['Successfully processed %d stories.' % num_processed]
         yield (key, values)
-
-
-class DeleteStoryCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to delete unneeded story commit logs."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [story_models.StoryCommitLogEntryModel]
-
-    @staticmethod
-    def map(model):
-        if story_models.StoryModel.get(model.story_id, strict=False) is None:
-            model.delete()
-            yield ('SUCCESS_DELETED', model.story_id)
-        else:
-            yield ('SUCCESS_NO_ACTION', model.story_id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))

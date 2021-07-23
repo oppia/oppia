@@ -24,7 +24,7 @@ from core.domain import classifier_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
 import feconf
-from proto import training_job_response_payload_pb2
+from proto_files import training_job_response_payload_pb2
 
 
 def validate_job_result_message_proto(job_result_proto):
@@ -50,6 +50,28 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'exploration_version': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        },
+        'POST': {}
+    }
 
     def extract_request_message_vm_id_and_signature(self):
         """Returns message, vm_id and signature retrieved from incoming request.
@@ -106,11 +128,12 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
         Retrieves the name of the file on GCS storing the trained model
         parameters and transfers it to the frontend.
         """
-        exploration_id = self.request.get('exploration_id')
-        state_name = self.request.get('state_name')
+        exploration_id = self.normalized_request.get('exploration_id')
+        state_name = self.normalized_request.get('state_name')
 
         try:
-            exp_version = int(self.request.get('exploration_version'))
+            exp_version = int(self.normalized_request.get(
+                'exploration_version'))
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=exp_version)
             interaction_id = exploration.states[state_name].interaction.id
@@ -118,8 +141,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             raise self.InvalidInputException(
                 'Entity for exploration with id %s, version %s and state %s '
                 'not found.' % (
-                    exploration_id, self.request.get('exploration_version'),
-                    state_name))
+                    exploration_id, self.normalized_request.get(
+                        'exploration_version'), state_name))
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
             raise self.PageNotFoundException(
@@ -171,6 +194,8 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
                 'No valid classifier exists for the given exploration state')
 
         return self.render_json({
+            'algorithm_id': algorithm_id,
+            'algorithm_version': algorithm_version,
             'gcs_filename': training_job.classifier_data_filename
         })
 
@@ -181,6 +206,26 @@ class NextJobHandler(base.OppiaMLVMHandler):
     """
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'vm_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'message': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'signature': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     def extract_request_message_vm_id_and_signature(self):
         """Returns message, vm_id and signature retrieved from incoming request.
@@ -189,9 +234,9 @@ class NextJobHandler(base.OppiaMLVMHandler):
             tuple(str). Message at index 0, vm_id at index 1 and signature at
             index 2.
         """
-        signature = self.payload.get('signature')
-        vm_id = self.payload.get('vm_id')
-        message = self.payload.get('message')
+        signature = self.normalized_payload.get('signature')
+        vm_id = self.normalized_payload.get('vm_id')
+        message = self.normalized_payload.get('message')
         return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
 
     @acl_decorators.is_from_oppia_ml

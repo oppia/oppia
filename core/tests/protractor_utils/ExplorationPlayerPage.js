@@ -33,7 +33,7 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
-  var conversationFeedback = element.all(
+  var conversationFeedback = element(
     by.css('.protractor-test-conversation-feedback'));
   var explorationHeader = element(
     by.css('.protractor-test-exploration-header'));
@@ -58,7 +58,7 @@ var ExplorationPlayerPage = function() {
   var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
   var continueToSolutionButton = element(
     by.css('.protractor-test-continue-to-solution-btn'));
-  var gotItButton = element(by.css('.oppia-learner-got-it-button'));
+  var gotItButton = element(by.css('.protractor-test-learner-got-it-button'));
   var confirmRedirectionButton =
       element(by.css('.protractor-test-confirm-redirection-button'));
   var cancelRedirectionButton = element(
@@ -127,15 +127,16 @@ var ExplorationPlayerPage = function() {
 
   this.reportExploration = async function() {
     await action.click('Report Exploration Button', reportExplorationButton);
-    let radioButton = await element.all(by.tagName('input')).get(0);
+    let radioButton = element.all(by.tagName('input')).get(0);
     await waitFor.visibilityOf(
       radioButton, 'Radio Buttons takes too long to appear');
     await action.click('Radio Button', radioButton);
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
-    let submitButton = await element.all(by.tagName('button')).get(1);
+    let submitButton = element(by.css('.protractor-test-submit-report-button'));
     await action.click('Submit Button', submitButton);
-    let afterSubmitText = await element(by.tagName('p')).getText();
+    let afterSubmitText = await element(
+      by.css('.protractor-test-exploration-flagged-success-message')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };
@@ -193,11 +194,11 @@ var ExplorationPlayerPage = function() {
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
     await waitFor.visibilityOf(
-      await conversationContent.first(), 'Conversation not visible');
+      conversationContent.first(), 'Conversation not visible');
     await waitFor.visibilityOf(
-      await conversationContent.last(), 'Conversation not fully present');
+      conversationContent.last(), 'Conversation not fully present');
     await forms.expectRichText(
-      await conversationContent.last()
+      conversationContent.last()
     ).toMatch(richTextInstructions);
   };
 
@@ -238,8 +239,9 @@ var ExplorationPlayerPage = function() {
   // Note that the 'latest' feedback may be on either the current or a
   // previous card.
   this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(conversationFeedback);
     await forms.expectRichText(
-      await conversationFeedback.last()
+      conversationFeedback
     ).toMatch(richTextInstructions);
   };
 

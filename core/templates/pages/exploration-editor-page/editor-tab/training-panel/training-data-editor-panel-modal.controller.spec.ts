@@ -18,9 +18,11 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('TrainingDataEditorPanelServiceModalController', function() {
   importAllAngularServices();
@@ -35,6 +37,22 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
   var TrainingModalService = null;
   var AlertsService = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -47,9 +65,6 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       getActiveStateName: function() {
         return 'Hola';
       }
-    });
-    $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
     });
   }));
 
@@ -180,8 +195,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
         expect($scope.inputTemplate).toBe(
           '<oppia-interactive-text-input ' +
-          'label-for-focus-target="testInteractionInput" last-answer="null">' +
-          '</oppia-interactive-text-input>');
+          'label-for-focus-target="testInteractionInput" [last-answer]="null"' +
+          '></oppia-interactive-text-input>');
       });
 
     it('should call init when controller is initialized', function() {

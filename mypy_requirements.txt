@@ -1,0 +1,4 @@
+# TODO(#13131): Merge this file into requirements.txt after python3 migration.
+# These packages are python3 packages to be used by MyPy.
+mypy==0.812
+typed-ast==1.4.2

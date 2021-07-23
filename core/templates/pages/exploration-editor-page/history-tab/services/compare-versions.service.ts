@@ -94,9 +94,9 @@ angular.module('oppia').factory('CompareVersionsService', [
           throw new Error('Tried to compare v1 > v2.');
         }
         return $q.all({
-          v1Data: ReadOnlyExplorationBackendApiService.loadExploration(
+          v1Data: ReadOnlyExplorationBackendApiService.loadExplorationAsync(
             ExplorationDataService.explorationId, v1),
-          v2Data: ReadOnlyExplorationBackendApiService.loadExploration(
+          v2Data: ReadOnlyExplorationBackendApiService.loadExplorationAsync(
             ExplorationDataService.explorationId, v2)
         }).then(function(response) {
           var v1StatesDict = response.v1Data.exploration.states;

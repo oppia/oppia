@@ -86,9 +86,19 @@ export class UtilsService {
     if (aProps.length !== bProps.length) {
       return false;
     }
+    // The indexing of an Object with a string implicitly returns
+    // 'any' type. This issue is solved according to
+    // https://github.com/microsoft/TypeScript/issues/35859.
+    // Additionally a cast was added to the Record type in order not
+    // to modify the structure of the Object interface.
     for (var i = 0; i < aProps.length; i++) {
       var propName = aProps[i];
-      if (!this.isEquivalent(a[propName], b[propName])) {
+      const getKeyValue = (key: string) =>
+        (obj: Record<string, Object>) => obj[key];
+      if (!this.isEquivalent(
+        getKeyValue(propName)(<Record<string, object>>a),
+        getKeyValue(propName)(<Record<string, object>>b))
+      ) {
         return false;
       }
     }
@@ -104,7 +114,6 @@ export class UtilsService {
   isError(value: Object): boolean {
     switch (Object.prototype.toString.call(value)) {
       case '[object Error]': return true;
-      case '[object Exception]': return true;
       case '[object DOMException]': return true;
       default: return value instanceof Error;
     }

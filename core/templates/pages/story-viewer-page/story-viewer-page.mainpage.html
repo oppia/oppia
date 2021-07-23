@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Oppia"})
 
@@ -297,30 +297,7 @@
     </style>
   </head>
   <body>
-    <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
-          <navbar-pre-logo-action>
-            <story-viewer-navbar-pre-logo-action>
-            </story-viewer-navbar-pre-logo-action>
-          </navbar-pre-logo-action>
-
-          <navbar-breadcrumb>
-            <story-viewer-navbar-breadcrumb>
-            </story-viewer-navbar-breadcrumb>
-          </navbar-breadcrumb>
-
-          <content>
-            <background-banner></background-banner>
-            <story-viewer-page></story-viewer-page>
-          </content>
-
-          <page-footer></page-footer>
-
-        </base-content>
-      </div>
-
-    </oppia-root>
+    <oppia-story-viewer-page-root></oppia-story-viewer-page-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

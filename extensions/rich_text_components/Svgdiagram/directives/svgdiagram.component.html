@@ -1,8 +1,9 @@
 <figure>
-  <div ng-if="!$ctrl.isLoadingIndicatorShown && !$ctrl.isTryAgainShown">
-    <img ng-src="<[$ctrl.svgUrl]>"
-         alt="<[$ctrl.svgAltText]>"
+  <div>
+    <img *ngIf="svgUrl"
+         [src]="svgUrl"
+         alt="{{ svgAltText }}"
          class="center-element-horizontally protractor-test-svg-diagram"
-         ng-style="$ctrl.svgContainerStyle">
+         [ngStyle]="svgContainerStyle">
   </div>
 </figure>

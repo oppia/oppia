@@ -70,7 +70,7 @@ describe('Learner playlist Backend Api service ', () => {
     csrfService = TestBed.inject(CsrfTokenService);
     alertsService = TestBed.inject(AlertsService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
@@ -160,6 +160,67 @@ describe('Learner playlist Backend Api service ', () => {
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
+  it('should successfully add topic to learn list of learner goals',
+    fakeAsync(() => {
+      let response = {
+        belongs_to_learnt_list: false,
+        goals_limit_exceeded: false
+      };
+      let activityType = 'learntopic';
+      learnerDashboardActivityBackendApiService.addToLearnerGoals(
+        activityId, activityType);
+      let req = http.expectOne(
+        '/learnergoalshandler/learntopic/1');
+      expect(req.request.method).toEqual('POST');
+      req.flush(response);
+
+      flushMicrotasks();
+      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+        'Successfully added to your \'Current Goals\' list.');
+      expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
+    }));
+
+  it('should not add topic to learn list of learner goals ' +
+    'and show belongs to learnt list', fakeAsync(() => {
+    let response = {
+      belongs_to_learnt_list: true,
+      playlist_limit_exceeded: false
+    };
+    let activityType = 'learntopic';
+    learnerDashboardActivityBackendApiService.addToLearnerGoals(
+      activityId, activityType);
+    let req = http.expectOne(
+      '/learnergoalshandler/learntopic/1');
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
+
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+      'You have already learnt this activity.');
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
+
+  it('should not add topic to learn list of learner goals ' +
+    'and show goals limit exceeded', fakeAsync(() => {
+    let response = {
+      belongs_to_learnt_list: false,
+      goals_limit_exceeded: true
+    };
+    let activityType = 'learntopic';
+    learnerDashboardActivityBackendApiService.addToLearnerGoals(
+      activityId, activityType);
+    let req = http.expectOne(
+      '/learnergoalshandler/learntopic/1');
+    expect(req.request.method).toEqual('POST');
+    req.flush(response);
+
+    flushMicrotasks();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+      'Your \'Current Goals\' list is full! Please finish existing ' +
+      'goals or remove some to add new goals to your list.');
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
+  }));
+
   it('should open an ngbModal when removing from learner playlist' +
     ' when calling removeFromLearnerPlaylistModal', () => {
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
@@ -169,7 +230,13 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: [],
-        collection_playlist_ids: []
+        collection_playlist_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        untracked_topic_ids: []
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       setTimeout(opt.beforeDismiss);
@@ -200,7 +267,13 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: ['0', '1', '2'],
-        collection_playlist_ids: []
+        collection_playlist_ids: [],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        untracked_topic_ids: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -229,7 +302,13 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
+        collection_playlist_ids: ['0', '1', '2'],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        untracked_topic_ids: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -259,7 +338,13 @@ describe('Learner playlist Backend Api service ', () => {
         completed_exploration_ids: [],
         completed_collection_ids: [],
         exploration_playlist_ids: [],
-        collection_playlist_ids: ['0', '1', '2']
+        collection_playlist_ids: ['0', '1', '2'],
+        completed_story_ids: [],
+        learnt_topic_ids: [],
+        partially_learnt_topic_ids: [],
+        topic_ids_to_learn: [],
+        all_topic_ids: [],
+        untracked_topic_ids: []
       });
 
     learnerDashboardActivityBackendApiService.removeFromLearnerPlaylistModal(
@@ -287,7 +372,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
 
@@ -316,7 +401,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
@@ -344,7 +429,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
 
@@ -373,7 +458,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
@@ -401,7 +486,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();

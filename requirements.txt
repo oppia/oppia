@@ -12,7 +12,7 @@ apache-beam[gcp]==2.24.0  # via -r requirements.in
 avro==1.9.2               # via apache-beam
 backports.functools-lru-cache==1.6.1  # via -r requirements.in, soupsieve
 beautifulsoup4==4.9.1     # via -r requirements.in
-bleach==3.1.5             # via -r requirements.in
+bleach==3.3.0             # via -r requirements.in
 cachecontrol==0.12.6      # via firebase-admin
 cachetools==3.1.1         # via apache-beam, google-auth
 callbacks==0.3.0          # via -r requirements.in
@@ -62,6 +62,7 @@ hdfs==2.5.8               # via apache-beam
 html5lib==1.0.1           # via -r requirements.in
 httplib2==0.17.4          # via apache-beam, google-api-python-client, google-apitools, google-auth-httplib2, oauth2client
 idna==2.10                # via requests
+mailchimp3==3.0.14        # via -r requirements.in
 mock==2.0.0               # via apache-beam, googleappenginemapreduce
 monotonic==1.5            # via fasteners
 mox==0.5.3                # via googleappenginemapreduce
@@ -85,13 +86,13 @@ pyvcf==0.6.8              # via apache-beam
 redis==3.5.3              # via -r requirements.in
 requests-mock==1.5.2      # via -r requirements.in
 requests-toolbelt==0.9.1  # via -r requirements.in
-requests==2.24.0          # via -r requirements.in, apache-beam, cachecontrol, google-api-core, google-cloud-storage, hdfs, requests-mock, requests-toolbelt
+requests==2.24.0          # via -r requirements.in, apache-beam, cachecontrol, google-api-core, google-cloud-storage, hdfs, mailchimp3, requests-mock, requests-toolbelt
 rsa==4.5                  # via google-auth, oauth2client
 simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
 six==1.15.0               # via -r requirements.in, bleach, fasteners, firebase-admin, google-api-core, google-api-python-client, google-apitools, google-auth, google-auth-httplib2, google-cloud-bigquery, google-cloud-core, google-resumable-media, grpcio, hdfs, html5lib, mock, oauth2client, packaging, protobuf, pyarrow, python-dateutil, requests-mock, webapp2
 soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
 typing-extensions==3.7.4.3  # via apache-beam
-typing==3.7.4.3           # via apache-beam, typing-extensions
+typing==3.7.4.3           # via -r requirements.in, apache-beam, typing-extensions
 uritemplate==3.0.1        # via google-api-python-client
 urllib3==1.25.11          # via elasticsearch, requests
 webapp2==3.0.0b1          # via -r requirements.in

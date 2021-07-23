@@ -42,8 +42,8 @@ import {
   TopicsAndSkillsDashboardFilter
 // eslint-disable-next-line max-len
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { TopicSummary, TopicSummaryBackendDict } from
-  'domain/topic/topic-summary.model';
+import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from
+  'domain/topic/creator-topic-summary.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -61,11 +61,11 @@ export interface CategorizedSkills {
   };
 }
 
-interface TopicsAndSkillsDashboardDataBackendDict {
+export interface TopicsAndSkillsDashboardDataBackendDict {
   'all_classroom_names': string[];
   'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
   'mergeable_skill_summary_dicts': SkillSummaryBackendDict[];
-  'topic_summary_dicts': TopicSummaryBackendDict[];
+  'topic_summary_dicts': CreatorTopicSummaryBackendDict[];
   'can_delete_topic': boolean;
   'can_create_topic': boolean;
   'can_delete_skill': boolean;
@@ -74,7 +74,7 @@ interface TopicsAndSkillsDashboardDataBackendDict {
   'categorized_skills_dict': CategorizedSkillsBackendDict;
 }
 
-interface TopicsAndSkillDashboardData {
+export interface TopicsAndSkillDashboardData {
   allClassroomNames: string[];
   canDeleteTopic: boolean;
   canCreateTopic: boolean;
@@ -83,23 +83,23 @@ interface TopicsAndSkillDashboardData {
   untriagedSkillSummaries: SkillSummary[];
   mergeableSkillSummaries: SkillSummary[];
   totalSkillCount: number;
-  topicSummaries: TopicSummary[];
+  topicSummaries: CreatorTopicSummary[];
   categorizedSkillsDict: CategorizedSkills;
 }
 
-interface SkillsDashboardDataBackendDict {
+export interface SkillsDashboardDataBackendDict {
   'skill_summary_dicts': AugmentedSkillSummaryBackendDict[];
   'next_cursor': string;
   'more': boolean;
 }
 
-interface SkillsDashboardData {
+export interface SkillsDashboardData {
   skillSummaries: AugmentedSkillSummary[];
   nextCursor: string;
   more: boolean;
 }
 
-interface AssignedSkillDataBackendDict {
+export interface AssignedSkillDataBackendDict {
   'topic_assignment_dicts': AssignedSkillBackendDict[];
 }
 
@@ -148,7 +148,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
         totalSkillCount: response.total_skill_count,
         topicSummaries: (
           response.topic_summary_dicts.map(
-            backendDict => TopicSummary.createFromBackendDict(backendDict))),
+            backendDict => CreatorTopicSummary.createFromBackendDict(
+              backendDict))),
         categorizedSkillsDict: categorizedSkills
       };
     }, errorResponse => {
@@ -205,7 +206,11 @@ export class TopicsAndSkillsDashboardBackendApiService {
     };
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
-      mergeSkillsData).toPromise();
+      mergeSkillsData).toPromise().then(
+      response => response,
+      erroResponse => {
+        throw new Error(erroResponse.error.error);
+      });
   }
 
   get onTopicsAndSkillsDashboardReinitialized(): EventEmitter<boolean> {

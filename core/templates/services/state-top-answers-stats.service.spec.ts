@@ -58,6 +58,7 @@ describe('StateTopAnswersStatsService', () => {
 
   const stateBackendDict: StateBackendDict = {
     content: {content_id: 'content', html: 'Say "hello" in Spanish!'},
+    linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
     interaction: {
@@ -111,6 +112,7 @@ describe('StateTopAnswersStatsService', () => {
       },
     },
     solicit_answer_details: false,
+    card_is_checkpoint: false,
     written_translations: {
       translations_mapping: {
         content: {},
@@ -141,13 +143,13 @@ describe('StateTopAnswersStatsService', () => {
   it('should identify unaddressed issues', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 5},
-      {answer: 'adios', frequency: 3},
-      {answer: 'ciao', frequency: 1},
+      {answer: 'hola', frequency: 5, is_addressed: false},
+      {answer: 'adios', frequency: 3, is_addressed: false},
+      {answer: 'ciao', frequency: 1, is_addressed: false},
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     const stateStats = stateTopAnswersStatsService.getStateStats('Hola');
     expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
@@ -155,16 +157,32 @@ describe('StateTopAnswersStatsService', () => {
     expect(stateStats).toContain(joC({answer: 'ciao', isAddressed: false}));
   }));
 
+  it('should reject with error', fakeAsync(async() => {
+    const states = makeStates();
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    spyOn(stateTopAnswersStatsBackendApiService, 'fetchStatsAsync')
+      .and.callFake(() => {
+        throw new Error('Random Error');
+      });
+
+    stateTopAnswersStatsService.initAsync(expId, states).then(
+      successHandler, failHandler);
+    flushMicrotasks();
+
+    expect(failHandler).toHaveBeenCalledWith(new Error('Random Error'));
+  }));
+
   it('should order results by frequency', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 7},
-      {answer: 'adios', frequency: 4},
-      {answer: 'ciao', frequency: 2},
+      {answer: 'hola', frequency: 7, is_addressed: false},
+      {answer: 'adios', frequency: 4, is_addressed: false},
+      {answer: 'ciao', frequency: 2, is_addressed: false},
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getStateStats('Hola')).toEqual([
       joC({answer: 'hola', frequency: 7}),
@@ -176,13 +194,13 @@ describe('StateTopAnswersStatsService', () => {
   it('should throw when stats for state do not exist', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync('Hola', [
-      {answer: 'hola', frequency: 7},
-      {answer: 'adios', frequency: 4},
-      {answer: 'ciao', frequency: 2},
+      {answer: 'hola', frequency: 7, is_addressed: false},
+      {answer: 'adios', frequency: 4, is_addressed: false},
+      {answer: 'ciao', frequency: 2, is_addressed: false},
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
       .toThrowError('Me Llamo does not exist.');
@@ -191,10 +209,10 @@ describe('StateTopAnswersStatsService', () => {
   it('should have stats for state provided by backend', fakeAsync(async() => {
     const states = makeStates();
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'hola', frequency: 3}]);
+      'Hola', [{answer: 'hola', frequency: 3, is_addressed: false}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
   }));
@@ -204,7 +222,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
   }));
@@ -215,7 +233,7 @@ describe('StateTopAnswersStatsService', () => {
       spyOnBackendApiFetchStatsAsync('Hola', []);
       stateTopAnswersStatsService.initAsync(expId, states);
       flushMicrotasks();
-      await stateTopAnswersStatsService.getInitPromise();
+      await stateTopAnswersStatsService.getInitPromiseAsync();
 
       expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
     }));
@@ -225,7 +243,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getStateNamesWithStats())
       .toEqual(['Hola']);
@@ -236,7 +254,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
       .toThrowError('Me Llamo does not exist.');
@@ -252,7 +270,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     stateTopAnswersStatsService.onStateDeleted('Hola');
     flushMicrotasks();
@@ -266,7 +284,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     const oldStats = stateTopAnswersStatsService.getStateStats('Hola');
 
@@ -283,10 +301,10 @@ describe('StateTopAnswersStatsService', () => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'adios', frequency: 3}]);
+      'Hola', [{answer: 'adios', frequency: 3, is_addressed: false}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .toContain(joC({answer: 'adios'}));
@@ -311,14 +329,50 @@ describe('StateTopAnswersStatsService', () => {
       .not.toContain(joC({answer: 'adios'}));
   }));
 
+  it('should add new answer when Interaction Id\'s are not equal',
+    fakeAsync(async() => {
+      const states = makeStates();
+      spyOnBackendApiFetchStatsAsync(
+        'Hola', [{answer: 'adios', frequency: 3, is_addressed: false}]);
+      stateTopAnswersStatsService.initAsync(expId, states);
+      flushMicrotasks();
+      await stateTopAnswersStatsService.getInitPromiseAsync();
+
+      const updatedState = states.getState('Hola');
+      updatedState.interaction.answerGroups[0].rules.push(
+        ruleObjectFactory.createFromBackendDict(
+          {
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['adios']
+              }
+            }
+          },
+          'MultipleChoiceInput'
+        ));
+      updatedState.interaction.id = 'MultipleChoiceInput';
+
+      // Pre-checks.
+      expect(stateTopAnswersStatsService.getStateStats('Hola'))
+        .toEqual([new AnswerStats('adios', 'adios', 3, false)]);
+
+      // Action.
+      stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
+
+      // Post-Check.
+      expect(stateTopAnswersStatsService.getStateStats('Hola')).toEqual([]);
+    }));
+
   it('should recognize newly unresolved answers', fakeAsync(async() => {
     const states = makeStates();
 
     spyOnBackendApiFetchStatsAsync(
-      'Hola', [{answer: 'hola', frequency: 3}]);
+      'Hola', [{answer: 'hola', frequency: 3, is_addressed: false}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .not.toContain(joC({answer: 'hola'}));
@@ -342,5 +396,48 @@ describe('StateTopAnswersStatsService', () => {
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .toContain(joC({answer: 'hola'}));
+  }));
+
+  it('should throw error if state does not exist', fakeAsync(async() => {
+    const states = makeStates();
+
+    const updatedState = states.getState('Hola');
+    updatedState.interaction.answerGroups[0].rules.push(
+      ruleObjectFactory.createFromBackendDict(
+        {
+          rule_type: 'Contains',
+          inputs: {
+            x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['adios']
+            }
+          }
+        },
+        'TextInput'
+      ));
+
+    expect(() => {
+      stateTopAnswersStatsService.onStateInteractionSaved(updatedState);
+    }).toThrowError('Hola does not exist.');
+  }));
+
+  it('should getTopAnswersByStateNameAsync', fakeAsync(() => {
+    const states = makeStates();
+    spyOnBackendApiFetchStatsAsync('Hola', [
+      {answer: 'hola', frequency: 7, is_addressed: false},
+      {answer: 'adios', frequency: 4, is_addressed: false},
+      {answer: 'ciao', frequency: 2, is_addressed: false},
+    ]);
+    stateTopAnswersStatsService.initAsync(expId, states);
+
+    flushMicrotasks();
+
+    stateTopAnswersStatsService.getTopAnswersByStateNameAsync().then(
+      (data) => {
+        expect(data.get('Hola')).toEqual([
+          new AnswerStats('hola', 'hola', 7, true),
+          new AnswerStats('adios', 'adios', 4, false),
+          new AnswerStats('ciao', 'ciao', 2, false)]);
+      });
   }));
 });

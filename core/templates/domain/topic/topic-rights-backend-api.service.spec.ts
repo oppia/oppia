@@ -46,7 +46,7 @@ describe('Topic rights backend API service', () => {
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('simple-csrf-token');
     });
   });
@@ -56,7 +56,7 @@ describe('Topic rights backend API service', () => {
   });
 
   it('should fetch a topic rights', fakeAsync(() => {
-    topicRightsBackendApiService.fetchTopicRights(topicId).then(
+    topicRightsBackendApiService.fetchTopicRightsAsync(topicId).then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -71,7 +71,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should not fetch a topic rights', fakeAsync(() => {
-    topicRightsBackendApiService.fetchTopicRights(topicId).then(
+    topicRightsBackendApiService.fetchTopicRightsAsync(topicId).then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -86,7 +86,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should successfully publish and unpublish a topic', fakeAsync(() => {
-    topicRightsBackendApiService.publishTopic(topicId).then(
+    topicRightsBackendApiService.publishTopicAsync(topicId).then(
       successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -99,7 +99,7 @@ describe('Topic rights backend API service', () => {
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
-    topicRightsBackendApiService.unpublishTopic(topicId).then(
+    topicRightsBackendApiService.unpublishTopicAsync(topicId).then(
       successHandler, failHandler);
 
     req = httpTestingController.expectOne(
@@ -114,7 +114,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
-    topicRightsBackendApiService.publishTopic(topicId).then(
+    topicRightsBackendApiService.publishTopicAsync(topicId).then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -138,7 +138,7 @@ describe('Topic rights backend API service', () => {
 
       // A new topic should be fetched from the backend. Also,
       // the returned topic should match the expected topic object.
-      topicRightsBackendApiService.loadTopicRights(topicId).then(
+      topicRightsBackendApiService.loadTopicRightsAsync(topicId).then(
         successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -174,7 +174,7 @@ describe('Topic rights backend API service', () => {
 
     // A new topic should not have been fetched from the backend. Also,
     // the returned topic should match the expected topic object.
-    topicRightsBackendApiService.loadTopicRights(topicId).then(
+    topicRightsBackendApiService.loadTopicRightsAsync(topicId).then(
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/a-tip-for-angular-unit-tests-with-promises.html
@@ -189,7 +189,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should send a topic rights mail', fakeAsync(() => {
-    topicRightsBackendApiService.sendMail(topicId, null).then(
+    topicRightsBackendApiService.sendMailAsync(topicId, null).then(
       successHandler, failHandler);
     const req = httpTestingController.expectOne(
       '/rightshandler/send_topic_publish_mail/' + topicId);
@@ -203,7 +203,7 @@ describe('Topic rights backend API service', () => {
   }));
 
   it('should handler error on sending topic rights mail', fakeAsync(() => {
-    topicRightsBackendApiService.sendMail(topicId, null).then(
+    topicRightsBackendApiService.sendMailAsync(topicId, null).then(
       successHandler, failHandler);
 
     const req = httpTestingController.expectOne(

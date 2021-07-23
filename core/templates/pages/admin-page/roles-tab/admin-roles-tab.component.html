@@ -1,0 +1,132 @@
+<style>
+  .roles-tab .form-horizontal .col-form-label {
+    padding-left: 0;
+    text-align: left;
+  }
+  .roles-tab .view-results-table {
+    margin-top: 20px;
+  }
+</style>
+
+<div class="container-fluid roles-tab protractor-test-roles-tab-container">
+  <div class="row">
+    <div class="col-md-8">
+      <mat-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal"
+              (submit)="submitRoleViewForm(formData.viewUserRoles)">
+          <legend class="text-center">View User Roles</legend>
+          <div class="d-xl-inline-flex form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="label-target-role-method">
+              Select Method
+            </label>
+            <div class="col-md-8 ml-auto">
+              <select id="label-target-role-method"
+                      [(ngModel)]="formData.viewUserRoles.filterCriterion"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control protractor-test-role-method"
+                      (change)="clearResults()">
+                <option [value]="USER_FILTER_CRITERION_ROLE">By Role</option>
+                <option [value]="USER_FILTER_CRITERION_USERNAME">By Username</option>
+              </select>
+            </div>
+          </div>
+          <div class="d-xl-inline-flex form-group" *ngIf="formData.viewUserRoles.filterCriterion === USER_FILTER_CRITERION_ROLE">
+            <label for="label-target-role-value" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <select id="label-target-role-value"
+                      [(ngModel)]="formData.viewUserRoles.role"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control protractor-test-role-value"
+                      (change)="clearResults()">
+                <option *ngFor="let role of VIEWABLE_ROLES | keyvalue" [value]="role.key">{{ role.value }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-xl-inline-flex form-group" *ngIf="formData.viewUserRoles.filterCriterion===USER_FILTER_CRITERION_USERNAME">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <input type="text"
+                     name="username"
+                     placeholder="Enter username"
+                     [(ngModel)]="formData.viewUserRoles.username"
+                     [ngModelOptions]="{standalone: true}"
+                     class="form-control protractor-test-username-value">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success protractor-test-role-success"
+                  [disabled]="!formData.viewUserRoles.isValid()"
+                  value="view role">
+            View Role
+          </button>
+        </form>
+
+        <div *ngIf="resultRolesVisible">
+          <table class="table text-center view-results-table">
+            <thead>
+              <tr>
+                <td><strong>Username</strong></td>
+                <td><strong>Role</strong></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let userRole of userRolesResult | keyvalue">
+                <td class="protractor-test-roles-result-rows">{{ userRole.key }}</td>
+                <td>{{ userRole.value }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card>
+
+      <mat-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal" (submit)="submitUpdateRoleForm(formData.updateRole)">
+          <legend class="text-center">Update Role</legend>
+          <div class="d-xl-inline-flex form-group">
+            <label for="label-target-update-form-name" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <input type="text"
+                     id="label-target-update-form-name"
+                     placeholder="Enter username"
+                     [(ngModel)]="formData.updateRole.username"
+                     [ngModelOptions]="{standalone: true}"
+                     class="form-control protractor-test-update-form-name">
+            </div>
+          </div>
+
+          <div class="d-xl-inline-flex form-group">
+            <label for="label-target-update-form-role-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <select id="label-target-update-form-role-select"
+                      [(ngModel)]="formData.updateRole.newRole"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control protractor-test-update-form-role-select">
+                <option *ngFor="let role of UPDATABLE_ROLES | keyvalue" [value]="role.key">{{ role.value }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="formData.updateRole.newRole === 'TOPIC_MANAGER'">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Topic for Topic Manager</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select [(ngModel)]="formData.updateRole.topicId"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control protractor-test-update-form-role-select">
+                <option *ngFor="let topic of topicSummaries" [value]="topic.getId()">{{ topic.getName() }}</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success protractor-test-update-form-submit" [disabled]="!formData.updateRole.isValid()" value="update role">Update Role</button>
+        </form>
+      </mat-card>
+    </div>
+
+    <div class="col-md-4">
+      <mat-card class="oppia-page-card oppia-long-text" *ngIf="roleToActions">
+        <legend class="text-center">Roles</legend>
+        <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions"></oppia-roles-and-actions-visualizer>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -22,7 +22,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
+  'components/forms/schema-based-editors/schema.constants';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -247,8 +247,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         return;
       }
       $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/modal-templates/' +
+        template: require(
+          'pages/exploration-editor-page/modal-templates/' +
           'confirm-leave-modal.template.html'),
         backdrop: 'static',
         keyboard: false,

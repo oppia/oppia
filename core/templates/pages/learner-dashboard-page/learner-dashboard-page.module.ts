@@ -24,10 +24,15 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
+import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
+import { ProgressTabComponent } from './new-learner-dashboard/progress-tab.component';
+import { GoalsTabComponent } from './new-learner-dashboard-page/goals-tab.component';
+import { CommunityLessonsTabComponent } from './new-learner-dashboard/community-lessons-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 
 @NgModule({
   imports: [
@@ -38,12 +43,22 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
   declarations: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
-    RemoveActivityModalComponent
+    LearnerStorySummaryTileComponent,
+    ProgressTabComponent,
+    GoalsTabComponent,
+    CommunityLessonsTabComponent,
+    RemoveActivityModalComponent,
+    LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
-    RemoveActivityModalComponent
+    LearnerStorySummaryTileComponent,
+    ProgressTabComponent,
+    GoalsTabComponent,
+    CommunityLessonsTabComponent,
+    RemoveActivityModalComponent,
+    LearnerDashboardSuggestionModalComponent
   ],
   providers: [
     {
@@ -67,11 +82,11 @@ class LearnerDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(LearnerDashboardPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

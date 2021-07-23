@@ -26,7 +26,7 @@ require(
   'state-translation-editor.component.ts'
 );
 
-require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
+require('components/ck-editor-helpers/ck-editor-copy-content.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
@@ -549,7 +549,7 @@ angular.module('oppia').component('stateTranslation', {
           $scope.stateInteractionId ? (
             ExplorationHtmlFormatterService.getInteractionHtml(
               $scope.stateInteractionId,
-              $scope.stateInteractionCustomizationArgs, false)
+              $scope.stateInteractionCustomizationArgs, false, undefined, null)
           ) : '');
         $scope.interactionCustomizationArgTranslatableContent = (
           $scope.getInteractionCustomizationArgTranslatableContents(

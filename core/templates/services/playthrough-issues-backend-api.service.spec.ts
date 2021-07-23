@@ -193,7 +193,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         .createFromBackendDict(backendIssues[0]);
 
       playthroughIssuesBackendApiService.fetchIssuesAsync('7', 1)
-        .then(() => playthroughIssuesBackendApiService.resolveIssueAsync(
+        .then(async() => playthroughIssuesBackendApiService.resolveIssueAsync(
           playthroughIssue, explorationId, 1))
         .then(successHandler, failureHandler);
       let req = httpTestingController.expectOne(
@@ -221,7 +221,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
           .createFromBackendDict(backendIssues[0]);
 
         playthroughIssuesBackendApiService.fetchIssuesAsync('7', 1)
-          .then(() => playthroughIssuesBackendApiService.resolveIssueAsync(
+          .then(async() => playthroughIssuesBackendApiService.resolveIssueAsync(
             playthroughIssue, explorationId, 1))
           .then(successHandler, failHandler);
 

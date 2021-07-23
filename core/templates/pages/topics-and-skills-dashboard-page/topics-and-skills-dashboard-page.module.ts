@@ -27,6 +27,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
 import { SelectTopicsComponent } from './topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list/skills-list.component';
 import { DeleteSkillModalComponent } from './modals/delete-skill-modal.component';
@@ -35,12 +36,14 @@ import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    FormsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -51,7 +54,7 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
     AssignSkillToTopicModalComponent,
     MergeSkillModalComponent,
     TopicsListComponent,
-    DeleteTopicModalComponent,
+    DeleteTopicModalComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -65,6 +68,7 @@ import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-
     DeleteTopicModalComponent,
   ],
   providers: [
+    SkillCreationService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
@@ -86,11 +90,11 @@ class TopicsAndSkillsDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(TopicsAndSkillsDashboardPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

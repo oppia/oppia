@@ -21,6 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -34,24 +35,34 @@ import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
+import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
+import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
+import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
+    InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
-    SubtopicsListComponent
+    SubtopicsListComponent,
+    SubtopicPreviewTab,
+    TopicPreviewTabComponent,
+    TopicEditorNavbarBreadcrumbComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
+    SubtopicPreviewTab,
+    TopicPreviewTabComponent,
+    TopicEditorNavbarBreadcrumbComponent,
   ],
   providers: [
     {
@@ -75,11 +86,11 @@ class TopicEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(TopicEditorPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

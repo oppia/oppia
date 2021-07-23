@@ -12,7 +12,7 @@
           <span [innerHTML]="'I18N_ERROR_HEADER_401' | translate"></span>
           - Unauthorized
         </div>
-        <div *ngIf="getStatusCode() === 404" class="protractor-test-error-page">
+        <div *ngIf="getStatusCode() === 404">
           <span [innerHTML]="'I18N_ERROR_HEADER_404' | translate"></span>
           - Page Not Found
         </div>

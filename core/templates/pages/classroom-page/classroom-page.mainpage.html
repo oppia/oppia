@@ -3,25 +3,12 @@
 otherwise the default color is shown when the page is scrolled, at the very
 bottom.
 -->
-<html class="oppia-classroom-mainpage" ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html class="oppia-classroom-mainpage" itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Oppia"})
   </head>
   <body class="oppia-classroom-mainpage">
-    <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
-
-          <content>
-            <classroom-page></classroom-page>
-          </content>
-
-          <page-footer>
-            <oppia-footer></oppia-footer>
-          </page-footer>
-        </base-content>
-      </div>
-    </oppia-root>
+    <oppia-classroom-page-root></oppia-classroom-page-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

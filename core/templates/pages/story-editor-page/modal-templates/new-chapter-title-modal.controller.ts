@@ -29,11 +29,13 @@ import newChapterConstants from 'assets/constants';
 angular.module('oppia').controller('CreateNewChapterModalController', [
   '$controller', '$scope', '$uibModalInstance',
   'ExplorationIdValidationService', 'StoryEditorStateService',
-  'StoryUpdateService', 'nodeTitles', 'MAX_CHARS_IN_CHAPTER_TITLE',
+  'StoryUpdateService', 'ValidatorsService', 'nodeTitles',
+  'MAX_CHARS_IN_CHAPTER_TITLE',
   function(
       $controller, $scope, $uibModalInstance,
       ExplorationIdValidationService, StoryEditorStateService,
-      StoryUpdateService, nodeTitles, MAX_CHARS_IN_CHAPTER_TITLE) {
+      StoryUpdateService, ValidatorsService, nodeTitles,
+      MAX_CHARS_IN_CHAPTER_TITLE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -63,6 +65,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       StoryUpdateService.setStoryNodeThumbnailFilename(
         $scope.story, $scope.nodeId, newThumbnailFilename);
       $scope.editableThumbnailFilename = newThumbnailFilename;
+      $scope.$applyAsync();
     };
 
     $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {
@@ -92,7 +95,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         }
       }
       if (StoryEditorStateService.isStoryPublished()) {
-        ExplorationIdValidationService.isExpPublished(
+        ExplorationIdValidationService.isExpPublishedAsync(
           $scope.explorationId).then(function(expIdIsValid) {
           $scope.expIdIsValid = expIdIsValid;
           if ($scope.expIdIsValid) {
@@ -116,10 +119,16 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
       $scope.invalidExpErrorString = 'Please enter a valid exploration id.';
     };
 
+    $scope.validateExplorationId = function() {
+      return ValidatorsService.isValidExplorationId(
+        $scope.explorationId, false);
+    };
+
     $scope.isValid = function() {
       return Boolean(
-        $scope.title && $scope.explorationId &&
-          $scope.editableThumbnailFilename);
+        $scope.title &&
+        ValidatorsService.isValidExplorationId($scope.explorationId, false) &&
+        $scope.editableThumbnailFilename);
     };
 
     $scope.save = function() {

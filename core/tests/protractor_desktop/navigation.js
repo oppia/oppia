@@ -17,6 +17,7 @@
  */
 var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
@@ -130,6 +131,32 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Login page', async function() {
+    await browser.get('/login');
+    await waitFor.pageToFullyLoad();
+    var loginPage = element(by.css('.protractor-test-login-page'));
+    await waitFor.presenceOf(loginPage, 'Login page did not load');
+  });
+
+  it('should redirect away from the Login page when visited by logged-in user',
+    async function() {
+      var loginPage = element(by.css('.protractor-test-login-page'));
+      var learnerDashboardPage = (
+        element(by.css('.protractor-test-learner-dashboard-page')));
+
+      await users.createAndLoginUser('user@navigation.com', 'navigationUser');
+      await browser.get('/login');
+      await waitFor.pageToFullyLoad();
+      await waitFor.presenceOf(
+        learnerDashboardPage, 'Learner dashboard page did not load');
+      expect(await loginPage.isPresent()).toBe(false);
+
+      await users.logout();
+      await browser.get('/login');
+      await waitFor.pageToFullyLoad();
+      await waitFor.presenceOf(loginPage, 'Login page did not load');
+    });
+
   it('should visit the Teach page', async function() {
     await browser.get('/teach');
     await waitFor.pageToFullyLoad();
@@ -165,6 +192,13 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Partnerships page', async function() {
+    await browser.get('/partnerships');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-partnerships-page')).isPresent()).toBe(true);
+  });
+
   it('should visit the Privacy page', async function() {
     await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
@@ -190,7 +224,6 @@ describe('Static Pages Tour', function() {
     async function() {
       await browser.get('/splashes');
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+      await general.expectErrorPage(404);
     });
 });

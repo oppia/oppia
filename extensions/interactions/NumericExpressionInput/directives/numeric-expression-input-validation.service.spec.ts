@@ -30,7 +30,7 @@ import { Rule, RuleObjectFactory } from
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { AppConstants } from 'app.constants';
 
@@ -51,10 +51,10 @@ describe('NumericExpressionInputValidationService', () => {
       providers: [NumericExpressionInputValidationService]
     });
 
-    validatorService = TestBed.get(NumericExpressionInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(NumericExpressionInputValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -92,7 +92,7 @@ describe('NumericExpressionInputValidationService', () => {
       }
     }, 'NumericExpressionInput');
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {

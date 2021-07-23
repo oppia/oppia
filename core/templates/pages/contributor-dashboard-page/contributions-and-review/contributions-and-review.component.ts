@@ -18,7 +18,7 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
@@ -232,7 +232,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var _showTranslationSuggestionModal = function(
-          suggestionIdToSuggestion, initialSuggestionId, reviewable) {
+          suggestionIdToContribution, initialSuggestionId, reviewable) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
@@ -245,8 +245,8 @@ angular.module('oppia').component('contributionsAndReview', {
           backdrop: 'static',
           size: 'lg',
           resolve: {
-            suggestionIdToSuggestion: function() {
-              return cloneDeep(suggestionIdToSuggestion);
+            suggestionIdToContribution: function() {
+              return cloneDeep(suggestionIdToContribution);
             },
             initialSuggestionId: function() {
               return initialSuggestionId;
@@ -286,7 +286,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var skillId = suggestion.change.skill_id;
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
-          SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
+          SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
             misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
@@ -297,15 +297,15 @@ angular.module('oppia').component('contributionsAndReview', {
           });
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
-          const suggestionIdToSuggestion = {};
+          const suggestionIdToContribution = {};
           for (let suggestionId in ctrl.contributions) {
             var contribution = ctrl.contributions[suggestionId];
-            suggestionIdToSuggestion[suggestionId] = contribution.suggestion;
+            suggestionIdToContribution[suggestionId] = contribution;
           }
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS, suggestion.target_id);
           _showTranslationSuggestionModal(
-            suggestionIdToSuggestion, suggestionId, reviewable);
+            suggestionIdToContribution, suggestionId, reviewable);
         }
       };
 

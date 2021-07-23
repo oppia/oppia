@@ -38,7 +38,7 @@ export class AttributionService {
 
   init(): void {
     this.explorationSummaryBackendApiService
-      .loadPublicAndPrivateExplorationSummaries(
+      .loadPublicAndPrivateExplorationSummariesAsync(
         [this.contextService.getExplorationId()]).then(responseObject => {
         let summaries = responseObject.summaries;
         let contributorSummary = (

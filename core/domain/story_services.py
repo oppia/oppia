@@ -72,6 +72,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         title=story.title,
         thumbnail_bg_color=story.thumbnail_bg_color,
         thumbnail_filename=story.thumbnail_filename,
+        thumbnail_size_in_bytes=story.thumbnail_size_in_bytes,
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
@@ -386,8 +387,14 @@ def validate_explorations_for_story(exp_ids, strict):
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
-            validation_error_messages.extend(
-                exp_services.validate_exploration_for_story(exp, strict))
+            try:
+                validation_error_messages.extend(
+                    exp_services.validate_exploration_for_story(exp, strict))
+            except Exception as e:
+                logging.exception(
+                    'Exploration validation failed for exploration with ID: '
+                    '%s. Error: %s' % (exp_id, e))
+                raise Exception(e)
 
     return validation_error_messages
 
@@ -451,6 +458,7 @@ def _save_story(
     story_model.title = story.title
     story_model.thumbnail_bg_color = story.thumbnail_bg_color
     story_model.thumbnail_filename = story.thumbnail_filename
+    story_model.thumbnail_size_in_bytes = story.thumbnail_size_in_bytes
     story_model.notes = story.notes
     story_model.language_code = story.language_code
     story_model.story_contents_schema_version = (
@@ -467,7 +475,7 @@ def _save_story(
     story.version += 1
 
 
-def _is_story_published_and_present_in_topic(story):
+def is_story_published_and_present_in_topic(story):
     """Returns whether a story is published. Raises an exception if the story
     is not present in the corresponding topic's story references.
 
@@ -525,7 +533,7 @@ def update_story(
     old_story = story_fetchers.get_story_by_id(story_id)
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
-    story_is_published = _is_story_published_and_present_in_topic(new_story)
+    story_is_published = is_story_published_and_present_in_topic(new_story)
     exploration_context_models_to_be_deleted = (
         exp_models.ExplorationContextModel.get_multi(
             exp_ids_removed_from_story))

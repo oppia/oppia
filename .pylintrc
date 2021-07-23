@@ -6,6 +6,7 @@
 init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/google_appengine")'
 
 [MASTER]
+init-hook='import sys; sys.path.append(".")'
 
 # Checks for correct docstring style
 load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions
@@ -58,39 +59,43 @@ bad-functions=apply,input
 [FORMAT]
 
 max-line-length=80
+ignore-long-lines=^.*#\stype:.*$|^\s*(# )?<?https?://\S+>?$
 
 indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
 forbidden-imports=
-    core.storage:core.domain,
+    core.controllers:core.platform|core.storage,
     core.domain:core.controllers,
-    core.controllers:core.platform|core.storage
+    core.storage:core.domain
 
 disallowed-functions-and-replacements-str=
-  now=>datetime.datetime.utcnow,
   assertEquals=>self.assertEqual,
-  StringIO=>python_utils.string_io,
-  urlparse.urlsplit=>python_utils.url_split,
-  urlparse.urlparse=>python_utils.url_parse,
-  urlparse.urlunsplit=>python_utils.url_unsplit,
-  urlparse.parse_qs=>python_utils.parse_query_string,
-  urlparse.urljoin=>python_utils.url_join,
-  urllib.unquote=>python_utils.urllib_unquote,
-  urllib.urlparse.unquote=>python_utils.urllib_unquote,
+  basestring=>python_utils.BASESTRING,
+  contextlib2.ExitStack=>python_utils.ExitStack,
+  contextlib2.nullcontext=>python_utils.nullcontext,
+  contextlib2.redirect_stdout=>python_utils.redirect_stdout,
+  input=>python_utils.INPUT,
+  iteritems=>items,
+  iterkeys=>keys,
+  itervalues=>values,
+  map=>python_utils.MAP,
   next=>python_utils.NEXT,
+  now=>datetime.datetime.utcnow,
+  open=>python_utils.open_file,
+  print=>python_utils.PRINT,
   range=>python_utils.RANGE,
   round=>python_utils.ROUND,
   str=>python_utils.convert_to_bytes or python_utils.UNICODE,
-  zip=>python_utils.ZIP,
-  basestring=>python_utils.BASESTRING,
-  iteritems=>items,
-  itervalues=>values,
-  iterkeys=>keys,
-  print=>python_utils.PRINT,
-  open=>python_utils.open_file,
-  input=>python_utils.INPUT,
-  map=>python_utils.MAP
+  StringIO=>python_utils.string_io,
+  urllib.unquote=>python_utils.urllib_unquote,
+  urllib.urlparse.unquote=>python_utils.urllib_unquote,
+  urlparse.parse_qs=>python_utils.parse_query_string,
+  urlparse.urljoin=>python_utils.url_join,
+  urlparse.urlparse=>python_utils.url_parse,
+  urlparse.urlsplit=>python_utils.url_split,
+  urlparse.urlunsplit=>python_utils.url_unsplit,
+  zip=>python_utils.ZIP
 
 disallowed-functions-and-replacements-regex=
   \.put_async\(=>put,

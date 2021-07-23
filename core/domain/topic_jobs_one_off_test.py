@@ -21,15 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
+import os
 
 from constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
+from core.domain import fs_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
@@ -37,6 +32,7 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -53,6 +49,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         'skill_ids': ['skill_1'],
         'thumbnail_bg_color': None,
         'thumbnail_filename': None,
+        'thumbnail_size_in_bytes': None,
         'title': 'A subtitle',
         'url_fragment': 'subtitle'
     }
@@ -151,7 +148,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'title': 'A subtitle'
             })
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.subtopic_schema_version, 3)
+        self.assertEqual(topic.subtopic_schema_version, 4)
         self.assertEqual(
             topic.subtopics[0].to_dict(),
             self.MIGRATED_SUBTOPIC_DICT)
@@ -209,447 +206,208 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
 
-class RemoveDeletedSkillsFromTopicOneOffJobTests(
-        test_utils.GenericTestBase):
+class PopulateTopicThumbnailSizeOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
-
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(RemoveDeletedSkillsFromTopicOneOffJobTests, self).setUp()
+        super(PopulateTopicThumbnailSizeOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_job_with_existing_thumbnail_size_skips(self):
+        """Tests that PopulateTopicThumbnailSizeOneOffJob job results in
+        existing update success key when the thumbnail_size_in_bytes is to
+        be updated.
+        """
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the topic
+        # thumbnail_size_in_bytes is updated resulting in existing update
+        # success key.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_already_exists', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+    def test_job_with_thumbnail_not_in_filesystem_logs_error(self):
+        """Tests that PopulateTopicThumbnailSizeOneOffJob job results error
+        key if the thumbnail_filename does not exist in the filesystem and
+        thumbnail_filename does not exist in the filesystem.
+        """
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description',
+            thumbnail_filename='dummy.svg',
+            thumbnail_size_in_bytes=None)
+
+        # Start job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates the topic thumbnail_filename
+        # not present in filesystem is resulting in error key.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_update_error',
+                     [u'Thumbnail dummy.svg for topic topic_id not found on'
+                      u' the filesystem']]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+    def test_job_with_topic_deleted_skips(self):
+        """Tests that PopulateThumbnailSizeOneOffJob skips deleted topics."""
+        self.save_new_topic(self.TOPIC_ID, self.albert_id)
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'topic_deleted', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_job_with_thumbnail_in_filesystem_logs_success(self):
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, name='A name',
+            abbreviated_name='abbrev', description='description',
+            thumbnail_size_in_bytes=None)
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID))
+        fs.commit(
+            '%s/topic.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.create_new()
+        )
+        topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = (
+            topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob.get_output(
+                job_id))
+        expected = [[u'thumbnail_size_newly_added', 1]]
+
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
+
+
+class SubtopicThumbnailSizeAuditOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for the SubtopicThumbnailSizeAuditOneOffJob."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+    TOPIC_ID = 'topic_id'
+
+    def setUp(self):
+        super(SubtopicThumbnailSizeAuditOneOffJobTest, self).setUp()
         # Setup user who will own the test topics.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
-        self.rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
 
-    def test_job_removes_deleted_uncategorized_skill_ids(self):
-        """Tests that the RemoveDeletedSkillsFromTopicOneOffJob job removes
-        deleted uncategorized skills ids from the topic.
+    def test_job_skips_deleted_topics(self):
+        """Tests that SubtopicThumbnailSizeAuditOneOffJob skips deleted
+        topic.
         """
-        valid_skill_1 = skill_domain.Skill.create_default_skill(
-            'valid_skill_1', 'A description', self.rubrics)
-        valid_skill_2 = skill_domain.Skill.create_default_skill(
-            'valid_skill_2', 'A description', self.rubrics)
-        valid_skill_3 = skill_domain.Skill.create_default_skill(
-            'valid_skill_3', 'A description', self.rubrics)
-        skill_services.save_new_skill(self.albert_id, valid_skill_1)
-        skill_services.save_new_skill(self.albert_id, valid_skill_2)
-        skill_services.save_new_skill(self.albert_id, valid_skill_3)
-        # Create a new topic that should not be affected by the
-        # job.
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A name', 'abbrev', 'description')
-        topic.add_subtopic(1, 'A subtitle')
-        topic.add_uncategorized_skill_id('valid_skill_1')
-        topic.add_uncategorized_skill_id('valid_skill_2')
-        topic.add_uncategorized_skill_id('valid_skill_3')
-        topic.add_uncategorized_skill_id('deleted_skill_1')
-        topic.add_uncategorized_skill_id('deleted_skill_2')
-        topic.add_uncategorized_skill_id('deleted_skill_3')
-        topic.move_skill_id_to_subtopic(None, 1, 'valid_skill_3')
-        topic.move_skill_id_to_subtopic(None, 1, 'deleted_skill_3')
-        topic_services.save_new_topic(self.albert_id, topic)
-        # Pre-assert that all skills are added correctly.
-        self.assertEqual(
-            set(topic.uncategorized_skill_ids),
-            set([
-                'valid_skill_1',
-                'valid_skill_2',
-                'deleted_skill_1',
-                'deleted_skill_2'
-            ]))
-        self.assertEqual(
-            set(topic.subtopics[0].skill_ids),
-            set(['valid_skill_3', 'deleted_skill_3']))
-
-        # Start RemoveDeletedSkillsFromTopicOneOffJob.
-        job_id = (
-            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
-            .create_new())
-        topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Assert that only valid skills remain after
-        # RemoveDeletedSkillsFromTopicOneOffJob.
-        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(
-            updated_topic.uncategorized_skill_ids,
-            ['valid_skill_1', 'valid_skill_2'])
-        self.assertEqual(
-            updated_topic.subtopics[0].skill_ids, ['valid_skill_3'])
-        output = (
-            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
-            .get_output(job_id))
-        expected = [
-            [
-                u'Skill IDs deleted for topic topic_id:',
-                [u'[u\'deleted_skill_1\', u\'deleted_skill_2\','
-                 ' u\'deleted_skill_3\']']
-            ],
-            [u'topic_processed', [u'Processed 1 topics.']]
-        ]
-
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_job_skips_deleted_topic(self):
-        """Tests that RemoveDeletedSkillsFromTopicOneOffJob job skips
-        deleted topic and does not attempt to remove uncategorized skills for
-        skills that are deleted.
-        """
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A name', 'abbrev', 'description')
-        topic.add_uncategorized_skill_id('skill_1')
-        topic.add_uncategorized_skill_id('skill_2')
-        topic_services.save_new_topic(self.albert_id, topic)
-
-        # Delete the topic before migration occurs.
-        topic_services.delete_topic(
-            self.albert_id, self.TOPIC_ID)
-
-        # Ensure the topic is deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-
-        # Start migration job on sample topic.
-        job_id = (
-            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
-            .create_new())
-        topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob.enqueue(
-            job_id)
-
-        # This running without errors indicates the deleted topic is
-        # being ignored.
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Ensure the topic is still deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-
-        output = (
-            topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob
-            .get_output(job_id))
-        expected = [[u'topic_deleted',
-                     [u'Encountered 1 deleted topics.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-
-class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    def setUp(self):
-        super(RegenerateTopicSummaryOneOffJobTests, self).setUp()
-
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.process_and_flush_pending_mapreduce_tasks()
-
-    def test_job_skips_deleted_topic(self):
-        """Tests that the regenerate summary job skips deleted topic."""
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A title', 'url-frag-one', 'description')
-        topic_services.save_new_topic(self.albert_id, topic)
+        self.save_new_topic(self.TOPIC_ID, self.albert_id)
         topic_services.delete_topic(self.albert_id, self.TOPIC_ID)
 
-        # Ensure the topic is deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        # Start migration job on sample topic.
+        job_id = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.create_new()
+        )
+        topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.enqueue(job_id)
+
+        # This running without errors indicates that deleted topics are
+        # skipped.
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.get_output(
+                job_id))
+        expected_output = []
+        self.assertEqual(
+            expected_output, [ast.literal_eval(x) for x in actual_output])
+
+    def test_job_logs_thumbnail_filename_and_size_for_subtopics(self):
+        """Test that SubtopicThumbnailSizeAuditOneOffJob logs the
+        thumbnail_filename and thumbnail_size_in_bytes for all the subtopics.
+        """
+        subtopic_schema_v4 = topic_domain.Subtopic.from_dict(
+            {
+                'id': 0,
+                'title': 'subtopic title',
+                'skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color':
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'thumbnail_size_in_bytes': 21131,
+                'url_fragment': 'dummy-subtopic-one'
+            }
+        )
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, subtopics=[subtopic_schema_v4],
+            next_subtopic_id=1)
 
         # Start migration job on sample topic.
         job_id = (
-            topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
-        topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
-
-        # This running without errors indicates the deleted topic is
-        # being ignored.
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Ensure the topic is still deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-
-        output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
-            job_id)
-        expected = [[u'topic_deleted',
-                     [u'Encountered 1 deleted topics.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_job_converts_old_topic_summary(self):
-        """Tests that the one off job creates the new summary correctly."""
-        topic_model = topic_models.TopicModel(
-            id=self.TOPIC_ID,
-            name='Topic name',
-            abbreviated_name='Topic',
-            url_fragment='topic-frag',
-            thumbnail_bg_color='#C6DCDA',
-            thumbnail_filename='topic.svg',
-            canonical_name='topic name',
-            description='Topic description',
-            language_code='en',
-            canonical_story_references=[],
-            additional_story_references=[],
-            uncategorized_skill_ids=[],
-            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
-            next_subtopic_id=1,
-            subtopics=[]
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.create_new()
         )
-        commit_message = (
-            'New topic created with name \'Topic name\'.')
+        topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.enqueue(job_id)
 
-        topic_models.TopicRightsModel(
-            id=self.TOPIC_ID,
-            manager_ids=[self.albert_id],
-            topic_is_published=True
-        ).commit(
-            self.albert_id, 'Created new topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
-
-        topic_model.commit(
-            self.albert_id, commit_message, [{
-                'cmd': topic_domain.CMD_CREATE_NEW,
-                'name': 'Topic name'
-            }])
-
-        # The topic summary model isn't created yet.
-        topic_summary_model = (
-            topic_models.TopicSummaryModel.get(self.TOPIC_ID, strict=False))
-        self.assertIsNone(topic_summary_model)
-
-        # Start migration job.
-        job_id = (
-            topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
-        topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
+        # This running without errors indicates that deleted topics are
+        # skipped.
         self.process_and_flush_pending_mapreduce_tasks()
 
-        # Verify the topic summary is created correctly.
-        topic_summary_model = (
-            topic_models.TopicSummaryModel.get(self.TOPIC_ID, strict=False))
-        self.assertEqual(
-            topic_summary_model.thumbnail_filename, 'topic.svg')
-        self.assertEqual(
-            topic_summary_model.thumbnail_bg_color, '#C6DCDA')
-
-        output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
-            job_id)
-        expected = [[u'topic_processed',
-                     [u'Successfully processed 1 topics.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_regeneration_job_skips_invalid_topic(self):
-        observed_log_messages = []
-
-        def _mock_get_topic_by_id(unused_topic_id):
-            """Mocks get_topic_by_id()."""
-            return 'invalid_topic'
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'A title', 'url-frag-two', 'description')
-        topic_services.save_new_topic(self.albert_id, topic)
-
-        get_topic_by_id_swap = self.swap(
-            topic_fetchers, 'get_topic_by_id', _mock_get_topic_by_id)
-        logging_exception_swap = self.swap(
-            logging, 'exception', _mock_logging_function)
-
-        with get_topic_by_id_swap, logging_exception_swap:
-            job_id = (
-                topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.create_new())
-            topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_mapreduce_tasks()
-
-        output = topic_jobs_one_off.RegenerateTopicSummaryOneOffJob.get_output(
-            job_id)
-
-        self.assertEqual(
-            observed_log_messages,
-            [u'Failed to create topic summary %s: \'unicode\' '
-             'object has no attribute \'canonical_story_references\''
-             % topic.id])
-        for message in output:
-            self.assertRegexpMatches(
-                message,
-                'object has no attribute \'canonical_story_references\'')
-
-
-class InteractionsInStoriesAuditOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    def _create_dummy_skill(self, skill_id, skill_description, explanation):
-        """Creates a dummy skill object with the given values.
-
-        Args:
-            skill_id: str. The ID of the skill to be created.
-            skill_description: str. The description of the skill.
-            explanation: str. The review material for the skill.
-
-        Returns:
-            Skill. The dummy skill with given values.
-        """
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        skill = skill_domain.Skill.create_default_skill(
-            skill_id, skill_description, rubrics)
-        skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
-        return skill
-
-    def setUp(self):
-        super(InteractionsInStoriesAuditOneOffJobTests, self).setUp()
-
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.user_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.set_admins([self.ALBERT_NAME])
-        self.login(self.ALBERT_EMAIL, is_super_admin=True)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-    def test_interactions_are_reported_correctly(self):
-        topic_id_1 = 'topicid1'
-        topic_id_2 = 'topicid2'
-        story_id = story_services.get_new_story_id()
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        skill_id_3 = skill_services.get_new_skill_id()
-
-        skill_1 = self._create_dummy_skill(
-            skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
-        skill_2 = self._create_dummy_skill(
-            skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>')
-        skill_3 = self._create_dummy_skill(
-            skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
-
-        topic_1 = topic_domain.Topic.create_default_topic(
-            topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
-        topic_2 = topic_domain.Topic.create_default_topic(
-            topic_id_2, 'Empty Topic', 'empty-topic', 'description')
-
-        topic_1.add_canonical_story(story_id)
-        topic_1.add_uncategorized_skill_id(skill_id_1)
-        topic_1.add_uncategorized_skill_id(skill_id_2)
-        topic_1.add_uncategorized_skill_id(skill_id_3)
-        topic_1.add_subtopic(1, 'Dummy Subtopic Title')
-        topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
-        topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
-
-        # These explorations were chosen since they pass the validations
-        # for published stories.
-        exp_services.load_demo('15')
-        exp_services.load_demo('25')
-        exp_services.load_demo('13')
-        exp_services.update_exploration(
-            self.user_id, '15', [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'correctness_feedback_enabled',
-                'new_value': True
-            })], 'Changed correctness_feedback_enabled.')
-        exp_services.update_exploration(
-            self.user_id, '25', [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'correctness_feedback_enabled',
-                'new_value': True
-            })], 'Changed correctness_feedback_enabled.')
-        exp_services.update_exploration(
-            self.user_id, '13', [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'correctness_feedback_enabled',
-                'new_value': True
-            })], 'Changed correctness_feedback_enabled.')
-
-        story = story_domain.Story.create_default_story(
-            story_id, 'Help Jaime win the Arcade', 'Description',
-            topic_id_1, 'help-jamie-win-arcade')
-
-        story_node_dicts = [{
-            'exp_id': '15',
-            'title': 'What are the place values?',
-            'description': 'a'
-        }, {
-            'exp_id': '25',
-            'title': 'Finding the value of a number',
-            'description': 'b'
-        }, {
-            'exp_id': '13',
-            'title': 'Comparing Numbers',
-            'description': 'c'
-        }]
-
-        def generate_dummy_story_nodes(node_id, exp_id, title, description):
-            """Generates and connects sequential story nodes.
-
-            Args:
-                node_id: int. The node id.
-                exp_id: str. The exploration id.
-                title: str. The title of the story node.
-                description: str. The description of the story node.
-            """
-
-            story.add_node(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                title)
-            story.update_node_description(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                description)
-            story.update_node_exploration_id(
-                '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
-
-            if node_id != len(story_node_dicts):
-                story.update_node_destination_node_ids(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
-
-            exp_services.update_exploration(
-                self.user_id, exp_id, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                    'property_name': 'category',
-                    'new_value': 'Astronomy'
-                })], 'Change category')
-
-        for i, story_node_dict in enumerate(story_node_dicts):
-            generate_dummy_story_nodes(i + 1, **story_node_dict)
-
-        skill_services.save_new_skill(self.user_id, skill_1)
-        skill_services.save_new_skill(self.user_id, skill_2)
-        skill_services.save_new_skill(self.user_id, skill_3)
-        story_services.save_new_story(self.user_id, story)
-        topic_services.save_new_topic(self.user_id, topic_1)
-        topic_services.save_new_topic(self.user_id, topic_2)
-
-        topic_services.publish_story(topic_id_1, story_id, self.user_id)
-        job_id = (
-            topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.create_new())
-        topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.get_output(
+        actual_output = (
+            topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob.get_output(
                 job_id))
-
-        expected = [
-            ['%s (%s)' % ('Dummy Topic 1', topic_id_1), [
-                u'[u\'EndExploration\', u\'ImageClickInput\', u\'Continue\', '
-                u'u\'MultipleChoiceInput\', u\'TextInput\']']],
-            ['%s (%s)' % ('Empty Topic', topic_id_2), [u'[]']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        expected_output = [[u'topic_id', [u'image.svg 21131']]]
+        self.assertEqual(
+            expected_output, [ast.literal_eval(x) for x in actual_output])

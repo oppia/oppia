@@ -26,12 +26,14 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service.ts';
+  'interactions/base-interaction-validation.service';
 import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory.ts';
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root'
@@ -59,11 +61,11 @@ export class NumberWithUnitsValidationService {
       this.unitObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
 
-    var checkEquality = (earlierRule, laterRule) => {
+    var checkEquality = (earlierRule: Rule, laterRule: Rule) => {
       var answer = this.unitObjectFactory.fromDict(
-        earlierRule.inputs.f);
+         <NumberWithUnitsAnswer> earlierRule.inputs.f);
       var inputs = this.unitObjectFactory.fromDict(
-        laterRule.inputs.f);
+         <NumberWithUnitsAnswer> laterRule.inputs.f);
 
       var answerString = answer.toMathjsCompatibleString();
       var inputsString = inputs.toMathjsCompatibleString();
@@ -76,11 +78,11 @@ export class NumberWithUnitsValidationService {
         inputsList).toLowerCase();
     };
 
-    var checkEquivalency = (earlierRule, laterRule) => {
+    var checkEquivalency = (earlierRule: Rule, laterRule: Rule) => {
       var earlierInput = this.unitObjectFactory.fromDict(
-        earlierRule.inputs.f);
+        <NumberWithUnitsAnswer> earlierRule.inputs.f);
       var laterInput = this.unitObjectFactory.fromDict(
-        laterRule.inputs.f);
+         <NumberWithUnitsAnswer> laterRule.inputs.f);
       if (earlierInput.type === 'fraction') {
         earlierInput.type = 'real';
         earlierInput.real = earlierInput.fraction.toFloat();

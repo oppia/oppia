@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -46,7 +48,11 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
+import { ChangeListService } from './services/change-list.service';
+import { ExplorationDataService } from './services/exploration-data.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -62,8 +68,8 @@ describe('Exploration editor page component', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
-  var aims = null;
-  var cls = null;
+  let aims: AutosaveInfoModalsService = null;
+  let cls: ChangeListService = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -81,7 +87,6 @@ describe('Exploration editor page component', function() {
   var sers = null;
   var ses = null;
   var sts = null;
-  var stass = null;
   var stfts = null;
   var tds = null;
   var ueps = null;
@@ -183,16 +188,18 @@ describe('Exploration editor page component', function() {
     show_state_editor_tutorial_on_load: true,
     show_state_translation_tutorial_on_load: true
   };
-  var mockExplorationDataService = {
-    getData: function(callback) {
-      callback();
-      return $q.resolve(explorationData);
-    }
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        NgbModule
+      ],
+      declarations: [
+        LostChangesModalComponent
+      ],
       providers: [
+        AutosaveInfoModalsService,
+        ChangeListService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
@@ -208,21 +215,35 @@ describe('Exploration editor page component', function() {
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
         UrlInterpolationService,
-        FocusManagerService
-      ]
+        FocusManagerService,
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            getDataAsync: function(callback) {
+              callback();
+              return $q.resolve(explorationData);
+            },
+            autosaveChangeListAsync: function() {
+              return;
+            }
+          }
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [LostChangesModalComponent]
+      }
     });
-  });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ExplorationDataService', mockExplorationDataService);
-  }));
+    aims = TestBed.inject(AutosaveInfoModalsService);
+    cls = TestBed.inject(ChangeListService);
+  });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    aims = $injector.get('AutosaveInfoModalsService');
-    cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     eis = $injector.get('ExplorationImprovementsService');
@@ -240,7 +261,6 @@ describe('Exploration editor page component', function() {
     sers = $injector.get('StateEditorRefreshService');
     ses = $injector.get('StateEditorService');
     sts = $injector.get('StateTutorialFirstTimeService');
-    stass = $injector.get('StateTopAnswersStatsService');
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
     ueps = $injector.get('UserExplorationPermissionsService');
@@ -269,7 +289,6 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
@@ -377,15 +396,15 @@ describe('Exploration editor page component', function() {
     });
 
     it('should load change list by draft changes successfully', () => {
-      spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
+      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
       $scope.$apply();
 
-      expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
+      expect(loadSpy).toHaveBeenCalledWith(
         explorationData.draft_changes);
     });
 
     it('should show mismatch version modal when draft change exists', () => {
-      spyOn(aims, 'showVersionMismatchModal').and.callThrough();
+      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
       $scope.$apply();
 
       expect(aims.showVersionMismatchModal)
@@ -488,7 +507,6 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
@@ -655,7 +673,6 @@ describe('Exploration editor page component', function() {
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
       spyOn(tds, 'getOpenThreadsCountAsync')
         .and.returnValue(Promise.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
@@ -698,94 +715,5 @@ describe('Exploration editor page component', function() {
       mockEnterEditorForTheFirstTime.emit();
       expect(ctrl.showWelcomeExplorationModal).toHaveBeenCalled();
     });
-  });
-
-  describe('State-change registration', () => {
-    beforeEach(() => {
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue($q.resolve({}));
-      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
-      spyOn(ers, 'isPublic').and.returnValue(true);
-      spyOn(ews, 'updateWarnings').and.callThrough();
-      spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setPageTitle').and.callThrough();
-      spyOn(stass, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue($q.resolve({canEdit: false}));
-      $scope.$apply();
-
-      explorationData.is_version_of_draft_valid = true;
-
-      ctrl.$onInit();
-    });
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    afterEach(() => {
-      ctrl.$onDestroy();
-    });
-
-    it('should callback state-added method for stats', fakeAsync(() => {
-      let onStateAddedSpy = spyOn(stass, 'onStateAdded');
-      spyOn(cls, 'addState');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.addState('Prologue');
-
-      flushMicrotasks();
-      expect(onStateAddedSpy).toHaveBeenCalledWith('Prologue');
-    }));
-
-    it('should callback state-deleted method for stats', fakeAsync(() => {
-      let onStateDeletedSpy = spyOn(stass, 'onStateDeleted');
-      spyOn(cls, 'deleteState');
-      spyOn($uibModal, 'open').and.returnValue({result: Promise.resolve()});
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.deleteState('Final');
-
-      flushMicrotasks();
-      expect(onStateDeletedSpy).toHaveBeenCalledWith('Final');
-    }));
-
-    it('should callback state-renamed method for stats', fakeAsync(() => {
-      let onStateRenamedSpy = spyOn(stass, 'onStateRenamed');
-      spyOn(cls, 'renameState');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.renameState('Introduction', 'Start');
-
-      flushMicrotasks();
-      expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
-    }));
-
-    it('should callback interaction-changed method for stats', fakeAsync(() => {
-      let onStateInteractionSavedSpy = spyOn(stass, 'onStateInteractionSaved');
-      spyOn(cls, 'editStateProperty');
-
-      $scope.$apply();
-      flushMicrotasks();
-
-      ess.saveInteractionAnswerGroups('Introduction', []);
-
-      flushMicrotasks();
-      expect(onStateInteractionSavedSpy)
-        .toHaveBeenCalledWith(ess.getState('Introduction'));
-    }));
   });
 });

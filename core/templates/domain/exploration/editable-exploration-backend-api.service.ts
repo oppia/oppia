@@ -35,16 +35,16 @@ export class EditableExplorationBackendApiService {
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService) {}
-  private _fetchExploration(
+  private async _fetchExplorationAsync(
       explorationId: string,
       applyDraft: boolean): Promise<ExplorationBackendDict> {
     return this.httpClient.get<ExplorationBackendDict>(
       this._getExplorationUrl(explorationId, applyDraft)).toPromise();
   }
 
-  private _updateExploration(
+  private async _updateExplorationAsync(
       explorationId: string,
-      explorationVersion: string,
+      explorationVersion: number,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
     const putData = {
@@ -62,8 +62,8 @@ export class EditableExplorationBackendApiService {
     )).toPromise();
   }
 
-  private _deleteExploration(explorationId: string): Promise<void> {
-    return this.httpClient['delete']<void>(
+  private async _deleteExplorationAsync(explorationId: string): Promise<void> {
+    return this.httpClient.delete<void>(
       this._getExplorationUrl(explorationId, false)).pipe(tap(
       // Delete item from the ReadOnlyExplorationBackendApiService's cache.
       _ => this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
@@ -88,13 +88,14 @@ export class EditableExplorationBackendApiService {
     );
   }
 
-  fetchExploration(explorationId: string): Promise<ExplorationBackendDict> {
-    return this._fetchExploration(explorationId, false);
+  async fetchExplorationAsync(
+      explorationId: string): Promise<ExplorationBackendDict> {
+    return this._fetchExplorationAsync(explorationId, false);
   }
 
-  fetchApplyDraftExploration(
+  async fetchApplyDraftExplorationAsync(
       explorationId: string): Promise<ExplorationBackendDict> {
-    return this._fetchExploration(explorationId, true);
+    return this._fetchExplorationAsync(explorationId, true);
   }
 
   /**
@@ -113,12 +114,12 @@ export class EditableExplorationBackendApiService {
    * we are unable to cache any Exploration object obtained from the
    * editor beackend.
    */
-  updateExploration(
+  async updateExplorationAsync(
       explorationId: string,
-      explorationVersion: string,
+      explorationVersion: number,
       commitMessage: string,
       changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
-    return this._updateExploration(
+    return this._updateExplorationAsync(
       explorationId, explorationVersion, commitMessage, changeList);
   }
 
@@ -128,8 +129,8 @@ export class EditableExplorationBackendApiService {
    * ReadOnlyExplorationBackendApiService cache as well.
    * Errors are passed to the error callback, if one is provided.
    */
-  deleteExploration(explorationId: string): Promise<void> {
-    return this._deleteExploration(explorationId);
+  async deleteExplorationAsync(explorationId: string): Promise<void> {
+    return this._deleteExplorationAsync(explorationId);
   }
 }
 

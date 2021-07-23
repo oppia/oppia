@@ -16,7 +16,7 @@
  * @fileoverview Component for the explaration player page.
  */
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -45,7 +45,7 @@ angular.module('oppia').component('explorationPlayerPage', {
       var ctrl = this;
       ctrl.$onInit = function() {
         var explorationId = ContextService.getExplorationId();
-        ReadOnlyExplorationBackendApiService.fetchExploration(
+        ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
           explorationId, null)
           .then(function(response) {
             PageTitleService.setPageTitle(

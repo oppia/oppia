@@ -17,7 +17,7 @@
  */
 
 import { ReviewTestEngineService } from
-  'pages/review-test-page/review-test-engine.service.ts';
+  'pages/review-test-page/review-test-engine.service';
 
 describe('Review test engine service', () => {
   let rtes: ReviewTestEngineService = null;

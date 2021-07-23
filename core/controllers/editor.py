@@ -117,7 +117,14 @@ class ExplorationHandler(EditorHandler):
         """Updates properties of the given exploration."""
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
-        _require_valid_version(version, exploration.version)
+        if version is None:
+            raise base.BaseHandler.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+        if version > exploration.version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of exploration from version %s, '
+                'which is not possible. Please reload the page and try again.'
+                % (exploration.version, version))
 
         commit_message = self.payload.get('commit_message')
 
@@ -137,6 +144,8 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        changes_are_mergeable = exp_services.are_changes_mergeable(
+            exploration_id, version, change_list)
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
@@ -145,10 +154,10 @@ class ExplorationHandler(EditorHandler):
             self.user, exploration_rights)
 
         try:
-            if can_edit:
+            if can_edit and changes_are_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message)
-            elif can_voiceover:
+            elif can_voiceover and changes_are_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
                     is_by_voice_artist=True)
@@ -196,7 +205,7 @@ class UserExplorationPermissionsHandler(EditorHandler):
             'can_edit': rights_manager.check_can_edit_activity(
                 self.user, exploration_rights),
             'can_modify_roles': (
-                rights_manager.check_can_modify_activity_roles(
+                rights_manager.check_can_modify_core_activity_roles(
                     self.user, exploration_rights)),
             'can_publish': rights_manager.check_can_publish_activity(
                 self.user, exploration_rights),
@@ -208,6 +217,9 @@ class UserExplorationPermissionsHandler(EditorHandler):
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
+            'can_manage_voice_artist':
+                rights_manager.check_can_manage_voice_artist_in_activity(
+                    self.user, exploration_rights),
         })
         self.render_json(self.values)
 
@@ -545,16 +557,13 @@ class StateInteractionStatsHandler(EditorHandler):
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % (
+            logging.exception('Could not find state: %s' % state_name)
+            logging.exception('Available states: %s' % (
                 list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 
-        self.render_json({
-            'visualizations_info': stats_services.get_visualizations_info(
-                current_exploration.id, state_name,
-                current_exploration.states[state_name].interaction.id),
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'visualizations_info': []})
 
 
 class FetchIssuesHandler(EditorHandler):
@@ -649,9 +658,6 @@ class ResolveIssueHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
-    # The string to prefix to the filename (before tacking the whole thing on
-    # to the end of 'assets/').
-    _FILENAME_PREFIX = 'image'
     _decorator = None
 
     @acl_decorators.can_edit_entity
@@ -662,7 +668,7 @@ class ImageUploadHandler(EditorHandler):
         filename = self.payload.get('filename')
         filename_prefix = self.payload.get('filename_prefix')
         if filename_prefix is None:
-            filename_prefix = self._FILENAME_PREFIX
+            filename_prefix = constants.ASSET_TYPE_IMAGE
 
         try:
             file_format = image_validation_services.validate_image_and_filename(
@@ -673,7 +679,8 @@ class ImageUploadHandler(EditorHandler):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))
-        filepath = '%s/%s' % (filename_prefix, filename)
+        filepath = '%s/%s' % (
+            filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
@@ -739,12 +746,14 @@ class EditorAutosaveHandler(ExplorationHandler):
         exp_user_data = exp_services.get_user_exploration_data(
             self.user_id, exploration_id)
         # If the draft_change_list_id is False, have the user discard the draft
-        # changes. We save the draft to the datastore even if the version is
-        # invalid, so that it is available for recovery later.
+        # changes. We save the draft to the datastore even if the changes are
+        # not mergeable, so that it is available for recovery later.
         self.render_json({
             'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
-                exploration_id, version)})
+                exploration_id, version),
+            'changes_are_mergeable': exp_services.are_changes_mergeable(
+                exploration_id, version, change_list)})
 
     @acl_decorators.can_save_exploration
     def post(self, exploration_id):
@@ -759,20 +768,10 @@ class StateAnswerStatisticsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests."""
-        current_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-
-        top_state_answers = stats_services.get_top_state_answer_stats_multi(
-            exploration_id, current_exploration.states)
-        top_state_interaction_ids = {
-            state_name: current_exploration.states[state_name].interaction.id
-            for state_name in top_state_answers
-        }
-        self.render_json({
-            'answers': top_state_answers,
-            'interaction_ids': top_state_interaction_ids,
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'answers': {}, 'interaction_ids': {}})
 
 
 class TopUnresolvedAnswersHandler(EditorHandler):
@@ -781,19 +780,10 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
+    def get(self, unused_exploration_id):
         """Handles GET requests for unresolved answers."""
-        state_name = self.request.get('state_name')
-        if not state_name:
-            raise self.PageNotFoundException
-
-        unresolved_answers_with_frequency = (
-            stats_services.get_top_state_unresolved_answers(
-                exploration_id, state_name))
-
-        self.render_json({
-            'unresolved_answers': unresolved_answers_with_frequency
-        })
+        # TODO(#11475): Return visualizations info based on Apache Beam job.
+        self.render_json({'unresolved_answers': []})
 
 
 class LearnerAnswerInfoHandler(EditorHandler):

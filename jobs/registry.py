@@ -17,7 +17,7 @@
 """Entry point for accessing the full collection of Apache Beam jobs.
 
 This module imports all of the "jobs.*_jobs" modules so that they can be fetched
-from the _JobMetaclass which keeps track of them all.
+from the JobMetaclass which keeps track of them all.
 
 TODO(#11475): Add lint checks that ensure all "jobs.*_jobs" modules are imported
 into this file.
@@ -26,8 +26,9 @@ into this file.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs import audit_jobs  # pylint: disable=unused-import
 from jobs import base_jobs
+from jobs import blog_validation_jobs # pylint: disable=unused-import
+from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
 
 
 def get_all_jobs():
@@ -36,4 +37,13 @@ def get_all_jobs():
     Returns:
         list(class). The classes that have inherited from JobBase.
     """
-    return base_jobs._JobMetaclass.get_all_jobs() # pylint: disable=protected-access
+    return base_jobs.JobMetaclass.get_all_jobs()
+
+
+def get_all_job_names():
+    """Returns the names of all jobs that have inherited from the JobBase class.
+
+    Returns:
+        list(str). The names of all classes that hae inherited from JobBase.
+    """
+    return base_jobs.JobMetaclass.get_all_job_names()

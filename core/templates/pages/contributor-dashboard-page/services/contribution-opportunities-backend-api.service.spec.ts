@@ -121,6 +121,35 @@ describe('Contribution Opportunities backend API service', function() {
     })
   );
 
+  it('should fail to fetch the skill opportunities data ' +
+    'given invalid cursor ' +
+    'when calling \'fetchSkillOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService.fetchSkillOpportunitiesAsync(
+      'invalidCursor').then(successHandler, failHandler);
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/opportunitiessummaryhandler/<opportunityType>',
+        { opportunityType: 'skill' }
+      ) + '?cursor=invalidCursor'
+    );
+
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to fetch skill opportunities data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch skill opportunities data.'));
+  }));
+
   it('should successfully fetch the translation opportunities data',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
@@ -149,6 +178,36 @@ describe('Contribution Opportunities backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should fail to fetch the translation opportunities data ' +
+    'given invalid language code ' +
+    'when calling \'fetchTranslationOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync('invlaidCode', 'invalidCursor',).then(
+        successHandler, failHandler
+      );
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/opportunitiessummaryhandler/<opportunityType>',
+        { opportunityType: 'translation' }
+      ) + '?language_code=invlaidCode&cursor=invalidCursor'
+    );
+
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to fetch translation opportunities data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch translation opportunities data.'));
+  }));
 
   it('should successfully fetch the voiceover opportunities data',
     fakeAsync(() => {
@@ -179,6 +238,36 @@ describe('Contribution Opportunities backend API service', function() {
     })
   );
 
+  it('should fail to fetch the voiceover opportunities data ' +
+    'given invalid language code ' +
+    'when calling \'fetchVoiceoverOpportunitiesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchVoiceoverOpportunitiesAsync('invalidCode', 'invalidCursor',).then(
+        successHandler, failHandler
+      );
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/opportunitiessummaryhandler/<opportunityType>',
+        { opportunityType: 'voiceover' }
+      ) + '?language_code=invalidCode&cursor=invalidCursor'
+    );
+
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to fetch voiceover opportunities data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to fetch voiceover opportunities data.'));
+  }));
+
   it('should successfully fetch the featured translation languages',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
@@ -207,4 +296,30 @@ describe('Contribution Opportunities backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should fail to fetch the featured translation languages ' +
+    'when calling \'fetchFeaturedTranslationLanguagesAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    let emptyList: FeaturedTranslationLanguage[] = [];
+
+    contributionOpportunitiesBackendApiService
+      .fetchFeaturedTranslationLanguagesAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/retrivefeaturedtranslationlanguages'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to fetch featured translation languages.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(emptyList);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

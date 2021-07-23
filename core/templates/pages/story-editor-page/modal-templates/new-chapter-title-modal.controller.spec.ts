@@ -27,10 +27,10 @@ import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { ExplorationIdValidationService } from
-  'domain/exploration/exploration-id-validation.service.ts';
+  'domain/exploration/exploration-id-validation.service';
 import { ExplorationSummaryBackendApiService } from
-  'domain/summary/exploration-summary-backend-api.service.ts';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+  'domain/summary/exploration-summary-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
@@ -140,6 +140,14 @@ describe('Create New Chapter Modal Controller', function() {
       expect($scope.errorMsg).toBe(null);
     });
 
+  it('should validate explorationId correctly',
+    function() {
+      $scope.explorationId = 'validId';
+      expect($scope.validateExplorationId()).toBeTrue();
+      $scope.explorationId = 'oppia.org/validId';
+      expect($scope.validateExplorationId()).toBeFalse();
+    });
+
   it('should update thumbnail filename when changing thumbnail file',
     function() {
       var storyUpdateSpy = spyOn(
@@ -188,8 +196,8 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(false);
-    spyOn(explorationIdValidationService, 'isExpPublished').and.returnValue(
-      deferred.promise);
+    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      .and.returnValue(deferred.promise);
     $scope.save();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
@@ -210,8 +218,8 @@ describe('Create New Chapter Modal Controller', function() {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
       var deferred = $q.defer();
       deferred.resolve(true);
-      spyOn(explorationIdValidationService, 'isExpPublished').and.returnValue(
-        deferred.promise);
+      spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+        .and.returnValue(deferred.promise);
       $scope.save();
       $rootScope.$apply();
       expect($uibModalInstance.close).toHaveBeenCalled();

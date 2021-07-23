@@ -77,6 +77,16 @@ interface Dimensions {
   width: number;
 }
 
+// Reference: https://github.com/yahoo/gifshot#creategifoptions-callback.
+interface GifshotCallbackObject {
+  image: string,
+  cameraStream: MediaStream,
+  error: boolean,
+  errorCode: string,
+  errorMsg: string,
+  savedRenderingContexts: ImageData
+}
+
 @Component({
   selector: 'filepath-editor',
   templateUrl: './filepath-editor.component.html',
@@ -86,6 +96,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   @Input() modalId;
   @Input() value;
   @Output() valueChanged = new EventEmitter();
+  @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   MODE_EMPTY = 1;
   MODE_UPLOADED = 2;
   MODE_SAVED = 3;
@@ -161,6 +172,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
+    this.validityChange.emit({empty: false});
     this.CROP_CURSORS[this.MOUSE_TOP_LEFT] = 'nwse-resize';
     this.CROP_CURSORS[this.MOUSE_TOP] = 'ns-resize';
     this.CROP_CURSORS[this.MOUSE_TOP_RIGHT] = 'nesw-resize';
@@ -247,6 +259,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         height: dimensions.height + 'px',
         width: dimensions.width + 'px'
       };
+      this.validityChange.emit({empty: true});
     }
   }
 
@@ -308,7 +321,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   }
 
 
-  private async getCroppedGIFDataAsync(imageDataURI, x, y, width, height) {
+  private async getCroppedGIFDataAsync(
+      x: number, y: number, width: number, height: number,
+      imageDataURI: string): Promise<string> {
     return new Promise((resolve, reject) => {
       // Put the original image in a canvas.
       let img = new Image();
@@ -504,15 +519,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  private getTrustedResourceUrlForImageFileName(
-      imageFileName, sanitizeSvg = false) {
+  private getTrustedResourceUrlForImageFileName(imageFileName) {
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
       this.imageLocalStorageService.isInStorage(imageFileName)) {
-      const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
+      const imageUrl = this.imageLocalStorageService.getRawImageData(
         imageFileName);
-      if (imageFileName.endsWith('.svg') && sanitizeSvg) {
+      if (imageFileName.endsWith('.svg')) {
         return this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl);
       }
       return imageUrl;
@@ -543,6 +557,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       tags: [],
       attrs: []
     };
+    this.validityChange.emit({empty: false});
   }
 
   validate(data: FilepathData): boolean {
@@ -688,35 +703,18 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     let newImageFile;
 
     if (mimeType === 'data:image/gif') {
-      // Looping through individual gif frames can take a while
-      // especially if there are a lot. Changing the cursor will let the
-      // user know that something is happening.
-      document.body.style.cursor = 'wait';
-      gifFrames({
-        url: imageDataURI,
-        frames: 'all',
-        outputType: 'canvas',
-      }).then(async frameData => {
-        let frames = [];
-        for (let i = 0; i < frameData.length; i += 1) {
-          let canvas = frameData[i].getImage();
-          frames.push(
-            await this.getCroppedGIFDataAsync(
-              canvas.toDataURL('image/png'), x1, y1, width, height
-            ));
-        }
-        gifshot.createGIF({
-          gifWidth: width,
-          gifHeight: height,
-          images: frames
-        }, (obj) => {
-          newImageFile = (
-            this.imageUploadHelperService.convertImageDataToImageFile(
-              obj.image));
-          this.updateDimensions(newImageFile, obj.image, width, height);
-          document.body.style.cursor = 'default';
-        });
-      });
+      let successCb = obj => {
+        this.validateProcessedFilesize(obj.image);
+        newImageFile = (
+          this.imageUploadHelperService.convertImageDataToImageFile(
+            obj.image));
+        this.updateDimensions(newImageFile, obj.image, width, height);
+        document.body.style.cursor = 'default';
+      };
+      let processFrameCb = this.getCroppedGIFDataAsync.bind(
+        null, x1, y1, width, height);
+      this.processGIFImage(
+        imageDataURI, width, height, processFrameCb, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
       // Check point 2 in the note before imports and after fileoverview.
       const imageData = this.imgData || (
@@ -739,7 +737,6 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.updateDimensions(newImageFile, newImageData, width, height);
     }
   }
-
 
   updateDimensions(
       newImageFile: File,
@@ -807,24 +804,34 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     // Do not allow to decrease size below 10%.
     this.imageResizeRatio = Math.max(
       0.1, this.imageResizeRatio - amount / 100);
-    const dimensions = this.calculateTargetImageDimensions();
-    // Check point 2 in the note before imports and after fileoverview.
-    const imageDataURI = this.imgData || this.data.metadata.uploadedImageData;
-    const resampledImageData = this.getResampledImageData(
-      imageDataURI, dimensions.width, dimensions.height);
-    this.validateProcessedFilesize(resampledImageData);
+    this.updateValidationWithLatestDimensions();
   }
 
   increaseResizePercent(amount: number): void {
     // Do not allow to increase size above 100% (only downsize allowed).
     this.imageResizeRatio = Math.min(
       1, this.imageResizeRatio + amount / 100);
+    this.updateValidationWithLatestDimensions();
+  }
+
+  private updateValidationWithLatestDimensions(): void {
     const dimensions = this.calculateTargetImageDimensions();
-    // Check point 2 in the note before imports and after fileoverview.
-    const imageDataURI = this.imgData || this.data.metadata.uploadedImageData;
-    const resampledImageData = this.getResampledImageData(
-      imageDataURI, dimensions.width, dimensions.height);
-    this.validateProcessedFilesize(resampledImageData);
+    const imageDataURI = (
+      this.imgData || <string> this.data.metadata.uploadedImageData);
+    const mimeType = (<string>imageDataURI).split(';')[0];
+    if (mimeType === 'data:image/gif') {
+      let successCb = obj => {
+        this.validateProcessedFilesize(obj.image);
+        document.body.style.cursor = 'default';
+      };
+      this.processGIFImage(
+        imageDataURI, dimensions.width, dimensions.height,
+        null, successCb);
+    } else {
+      const resampledImageData = this.getResampledImageData(
+        imageDataURI, dimensions.width, dimensions.height);
+      this.validateProcessedFilesize(resampledImageData);
+    }
   }
 
   calculateTargetImageDimensions(): Dimensions {
@@ -870,10 +877,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           x2: dimensions.width,
           y2: dimensions.height
         };
-        const imageDataURI = (<FileReader>e.target).result;
-        const resampledImageData = this.getResampledImageData(
-          imageDataURI, dimensions.width, dimensions.height);
-        this.validateProcessedFilesize(resampledImageData);
+        this.updateValidationWithLatestDimensions();
       };
       img.src = <string>((<FileReader>e.target).result);
     };
@@ -887,7 +891,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         savedImageFilename: filename,
         // Check point 2 in the note before imports and after fileoverview.
         savedImageUrl: this.getTrustedResourceUrlForImageFileName(
-          filename, true) as string
+          filename) as string
       },
       crop: true
     };
@@ -895,6 +899,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.alertsService.clearWarnings();
       this.value = filename;
       this.valueChanged.emit(filename);
+      this.validityChange.emit({empty: true});
       this.resetComponent(filename);
     }
   }
@@ -905,11 +910,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   discardUploadedFile(): void {
     this.resetFilePathEditor();
+    this.processedImageIsTooLarge = false;
   }
 
   validateProcessedFilesize(resampledImageData: string): void {
+    const mimeType = resampledImageData.split(';')[0];
     const imageSize = atob(
-      resampledImageData.replace('data:image/png;base64,', '')).length;
+      resampledImageData.replace(`${mimeType};base64,`, '')).length;
     // The processed image can sometimes be larger than 100 KB. This is
     // because the output of HTMLCanvasElement.toDataURL() operation in
     // getResampledImageData() is browser specific and can vary in size.
@@ -937,40 +944,28 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     let resampledFile;
 
     if (mimeType === 'data:image/gif') {
-      // Looping through individual gif frames can take a while
-      // especially if there are a lot. Changing the cursor will let the
-      // user know that something is happening.
-      document.body.style.cursor = 'wait';
-      gifFrames({
-        url: imageDataURI,
-        frames: 'all',
-        outputType: 'canvas',
-      }).then((frameData) => {
-        let frames = [];
-        for (let i = 0; i < frameData.length; i += 1) {
-          let canvas = frameData[i].getImage();
-          frames.push(
-            canvas.toDataURL('image/png')
-          );
-        }
-        gifshot.createGIF({
-          gifWidth: dimensions.width,
-          gifHeight: dimensions.height,
-          images: frames
-        }, (obj) => {
-          if (!obj.error) {
-            resampledFile = (
-              this.imageUploadHelperService.convertImageDataToImageFile(
-                obj.image));
-            if (resampledFile === null) {
-              this.alertsService.addWarning('Could not get resampled file.');
-              return;
-            }
-            this.saveImage(dimensions, resampledFile, 'gif');
+      let successCb = obj => {
+        if (!obj.error) {
+          this.validateProcessedFilesize(obj.image);
+          if (this.processedImageIsTooLarge) {
             document.body.style.cursor = 'default';
+            return;
           }
-        });
-      });
+          resampledFile = (
+            this.imageUploadHelperService.convertImageDataToImageFile(
+              obj.image));
+          if (resampledFile === null) {
+            this.alertsService.addWarning('Could not get resampled file.');
+            document.body.style.cursor = 'default';
+            return;
+          }
+          this.saveImage(dimensions, resampledFile, 'gif');
+          document.body.style.cursor = 'default';
+        }
+      };
+      let gifWidth = dimensions.width;
+      let gifHeight = dimensions.height;
+      this.processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
       this.invalidTagsAndAttributes = (
         this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
@@ -1002,6 +997,54 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     }
   }
 
+  private processGIFImage(
+      imageDataURI: string, width: number, height: number,
+      processFrameCallback: (dataUrl: string) => void,
+      successCallback: (gifshotCallbackObject: GifshotCallbackObject) => void
+  ): void {
+    // Looping through individual gif frames can take a while
+    // especially if there are a lot. Changing the cursor will let the
+    // user know that something is happening.
+    document.body.style.cursor = 'wait';
+    gifFrames({
+      url: imageDataURI,
+      frames: 'all',
+      outputType: 'canvas',
+    }).then(async function(frameData) {
+      let frames = [];
+      for (let i = 0; i < frameData.length; i += 1) {
+        let sourceCanvas = frameData[i].getImage();
+        // Some GIFs may be optimised such that frames are stacked and
+        // only incremental changes are present in individual frames.
+        // For such GIFs, no additional operation needs to be done to
+        // handle transparent content. These GIFs have 0 or 1 Disposal
+        // method value.
+        // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+        if (frameData[i].frameInfo.disposal > 1) {
+          // Frames that have transparent content may not render
+          // properly in the gifshot output. As a workaround, add a
+          // white background to individual frames before creating a
+          // GIF.
+          let ctx = sourceCanvas.getContext('2d');
+          ctx.globalCompositeOperation = 'destination-over';
+          ctx.fillStyle = '#FFF';
+          ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+          ctx.globalCompositeOperation = 'source-over';
+        }
+        let dataURL = sourceCanvas.toDataURL('image/png');
+        let updatedFrame = (
+          processFrameCallback ?
+          await processFrameCallback(dataURL) : dataURL);
+        frames.push(updatedFrame);
+      }
+      gifshot.createGIF({
+        gifWidth: width,
+        gifHeight: height,
+        images: frames
+      }, successCallback);
+    });
+  }
+
   saveImageToLocalStorage(
       dimensions: Dimensions,
       resampledFile: Blob,
@@ -1014,18 +1057,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       // Check point 2 in the note before imports and after fileoverview.
       this.imgData = imageData;
       this.imageLocalStorageService.saveImage(filename, imageData);
-      const img = new Image();
-      img.onload = () => {
-        this.setSavedImageFilename(filename, true);
-        const dimensions = (
-          this.imagePreloaderService.getDimensionsOfImage(filename));
-        this.imageContainerStyle = {
-          height: dimensions.height + 'px',
-          width: dimensions.width + 'px'
-        };
+      this.setSavedImageFilename(filename, true);
+      const dimensions = (
+        this.imagePreloaderService.getDimensionsOfImage(filename));
+      this.imageContainerStyle = {
+        height: dimensions.height + 'px',
+        width: dimensions.width + 'px'
       };
-      // Check point 2 in the note before imports and after fileoverview.
-      img.src = this.getTrustedResourceUrlForImageFileName(filename) as string;
     };
     reader.readAsDataURL(resampledFile);
   }

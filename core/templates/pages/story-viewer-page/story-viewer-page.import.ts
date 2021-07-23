@@ -13,28 +13,30 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts required in story viewer.
+ * @fileoverview Directive scripts for the story viewer page.
  */
 
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
+import 'pages/mock-ajs';
+import 'Polyfills.ts';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { StoryViewerPageModule } from './story-viewer-page.module';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
-]);
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-require('Polyfills.ts');
+platformBrowserDynamic().bootstrapModule(StoryViewerPageModule).catch(
+  // eslint-disable-next-line no-console
+  (err) => console.error(err)
+);
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/story-viewer-page/story-viewer-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
-
-require('base-components/base-content.directive.ts');
-require('pages/story-viewer-page/story-viewer-page.component.ts');
+// This prevents angular pages to cause side effects to hybrid pages.
+// TODO(#13080): Remove window.name statement from import.ts files
+// after migration is complete.
+window.name = '';

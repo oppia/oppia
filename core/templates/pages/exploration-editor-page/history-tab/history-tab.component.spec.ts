@@ -17,11 +17,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
@@ -45,6 +43,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('History tab component', function() {
   var ctrl = null;
@@ -78,11 +77,7 @@ describe('History tab component', function() {
     commit_cmds: []
   }];
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  importAllAngularServices();
 
   beforeEach(function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
@@ -97,8 +92,6 @@ describe('History tab component', function() {
     $provide.value('EditabilityService', TestBed.get(EditabilityService));
     $provide.value(
       'ExplorationDiffService', TestBed.get(ExplorationDiffService));
-    $provide.value(
-      'FractionObjectFactory', TestBed.get(FractionObjectFactory));
     $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
     $provide.value(
       'HintObjectFactory', TestBed.get(HintObjectFactory));
@@ -122,7 +115,7 @@ describe('History tab component', function() {
       data: {
         version: 2
       },
-      getData: () => $q.resolve({
+      getDataAsync: () => $q.resolve({
         version: 2,
       })
     });

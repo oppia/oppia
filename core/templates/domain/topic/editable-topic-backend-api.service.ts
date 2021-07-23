@@ -47,7 +47,7 @@ interface FetchTopicBackendResponse {
   'skill_creation_is_allowed': boolean;
 }
 
-interface FetchTopicResponse {
+export interface FetchTopicResponse {
   topicDict: TopicBackendDict;
   groupedSkillSummaries: {
     [topicName: string]: SkillSummaryBackendDict[];
@@ -83,7 +83,7 @@ interface UpdateTopicBackendResponse {
   };
 }
 
-interface UpdateTopicResponse {
+export interface UpdateTopicResponse {
   topicDict: TopicBackendDict;
   skillIdToDescriptionDict: SkillIdToDescriptionMap;
   skillIdToRubricsDict: {
@@ -191,7 +191,7 @@ export class EditableTopicBackendApiService {
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
       });
-    this.http['delete']<DeleteTopicBackendResponse>(
+    this.http.delete<DeleteTopicBackendResponse>(
       topicDataUrl).toPromise().then((response) => {
       if (successCallback) {
         successCallback(response.status);
@@ -270,19 +270,19 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  fetchTopic(topicId: string): Promise<FetchTopicResponse> {
+  async fetchTopicAsync(topicId: string): Promise<FetchTopicResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopic(topicId, resolve, reject);
     });
   }
 
-  fetchStories(topicId: string): Promise<StorySummaryBackendDict[]> {
+  async fetchStoriesAsync(topicId: string): Promise<StorySummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });
   }
 
-  fetchSubtopicPage(
+  async fetchSubtopicPageAsync(
       topicId: string,
       subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
@@ -300,7 +300,7 @@ export class EditableTopicBackendApiService {
    * the success callback, if one is provided to the returned promise
    * object. Errors are passed to the error callback, if one is provided.
    */
-  updateTopic(
+  async updateTopicAsync(
       topicId: string,
       topicVersion: number,
       commitMessage: string,
@@ -312,7 +312,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  deleteTopic(topicId: string): Promise<number> {
+  async deleteTopicAsync(topicId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteTopic(topicId, resolve, reject);
     });

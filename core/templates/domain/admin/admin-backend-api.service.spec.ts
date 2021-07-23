@@ -21,13 +21,11 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { ComputationData } from 'domain/admin/computation-data.model';
-import { Job } from 'domain/admin/job.model';
-import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { Schema } from 'services/schema-default-value.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -36,17 +34,8 @@ describe('Admin backend api service', () => {
   let successHandler = null;
   let failHandler = null;
   let adminBackendResponse = {
-    unfinished_job_data: [],
-    role_graph_data: {
-      links: [
-        {
-          source: 'TOPIC_MANAGER',
-          target: 'MODERATOR'
-        }
-      ],
-      nodes: {
-        TOPIC_MANAGER: 'topic manager'
-      }
+    role_to_actions: {
+      guest: ['action for guest']
     },
     topic_summaries: [
       {
@@ -66,41 +55,25 @@ describe('Admin backend api service', () => {
         thumbnail_bg_color: '#C6DCDA'
       }
     ],
-    one_off_job_status_summaries: [],
     updatable_roles: {
       TOPIC_MANAGER: 'topic manager'
     },
-    human_readable_current_time: 'June 03 15:31:20',
-    audit_job_status_summaries: [],
     demo_collections: [],
     config_properties: {
       oppia_csrf_secret: {
         schema: {
           type: 'unicode'
-        },
+        } as Schema,
         value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
         description: 'Text used to encrypt CSRF tokens.'
       }
     },
     demo_exploration_ids: ['19'],
-    recent_job_data: [],
     demo_explorations: [
       [
         '0',
         'welcome.yaml'
       ]
-    ],
-    continuous_computations_data: [
-      {
-        is_startable: true,
-        status_code: 'never_started',
-        computation_type: 'FeedbackAnalyticsAggregator',
-        last_started_msec: null,
-        active_realtime_layer_index: null,
-        last_stopped_msec: null,
-        is_stoppable: false,
-        last_finished_msec: null
-      }
     ],
     viewable_roles: {
       TOPIC_MANAGER: 'topic manager'
@@ -125,7 +98,6 @@ describe('Admin backend api service', () => {
   let adminDataObject: AdminPageData;
   let configPropertyValues = {
     always_ask_learners_for_answer_details: false,
-    classroom_page_is_accessible: true,
     classroom_pages_data: {
       course_details: 'fds',
       name: 'mathfas',
@@ -181,33 +153,18 @@ describe('Admin backend api service', () => {
       demoExplorations: adminBackendResponse.demo_explorations,
       demoCollections: adminBackendResponse.demo_collections,
       demoExplorationIds: adminBackendResponse.demo_exploration_ids,
-      oneOffJobStatusSummaries:
-        adminBackendResponse.one_off_job_status_summaries.map(
-          JobStatusSummary.createFromBackendDict),
-      humanReadableCurrentTime:
-        adminBackendResponse.human_readable_current_time,
-      auditJobStatusSummaries:
-        adminBackendResponse.audit_job_status_summaries.map(
-          JobStatusSummary.createFromBackendDict),
       updatableRoles: adminBackendResponse.updatable_roles,
-      roleGraphData: adminBackendResponse.role_graph_data,
+      roleToActions: adminBackendResponse.role_to_actions,
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
-      unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
-        Job.createFromBackendDict),
-      recentJobData: adminBackendResponse.recent_job_data.map(
-        Job.createFromBackendDict),
-      continuousComputationsData:
-        adminBackendResponse.continuous_computations_data.map(
-          ComputationData.createFromBackendDict),
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        TopicSummary.createFromBackendDict),
+        CreatorTopicSummary.createFromBackendDict),
       featureFlags: adminBackendResponse.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict)
       )
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -247,173 +204,6 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
-
-  // Test cases for Admin Jobs Tab.
-  it('should request to start a new job when calling startNewJobAsync',
-    fakeAsync(() => {
-      let jobType = 'ActivityContributorsSummaryOneOffJob';
-      let payload = {
-        action: 'start_new_job',
-        job_type: jobType
-      };
-      abas.startNewJobAsync(jobType).then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne('/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
-      req.flush(200);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should request to cancel the job given its id' +
-    'and type when calling cancelJobAsync', fakeAsync(() => {
-    let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
-    let jobType = 'AuditContributorsOneOffJob';
-    let payload = {
-      action: 'cancel_job',
-      job_id: jobId,
-      job_type: jobType
-    };
-    abas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should request to start computation given the job' +
-    'name when calling startComputationAsync', fakeAsync(() => {
-    let computationType = 'FeedbackAnalyticsAggregator';
-    let payload = {
-      action: 'start_computation',
-      computation_type: computationType
-    };
-    abas.startComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should request to stop computation given the job' +
-    'name when calling stopComputationAsync', fakeAsync(() => {
-    let computationType = 'FeedbackAnalyticsAggregator';
-    let payload = {
-      action: 'stop_computation',
-      computation_type: computationType
-    };
-    abas.stopComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to stop computation given the job' +
-    'name when calling stopComputationAsync', fakeAsync(() => {
-    let computationType = 'InvalidComputaionType';
-    let payload = {
-      action: 'stop_computation',
-      computation_type: computationType
-    };
-    abas.stopComputationAsync(computationType)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-  }
-  ));
-
-  it('should request to show the output of valid' +
-    'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
-      'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let jobOutput = {output: ['[u\'fully-validated UserSettingsModel\', 1]']};
-    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(jobOutput);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should request to show the sorted output of valid' +
-    'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
-      'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let jobOutput = {output: ['[u\'SUCCESS_KEPT\', 1]',
-      '[u\'SUCCESS_DELETED\', 1]']};
-    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(jobOutput);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to show the output of invalid' +
-    'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'Invalid jobId';
-    let adminJobOutputUrl = '/adminjoboutput?job_id=Invalid%20jobId';
-    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Internal Server Error'
-    }, {
-      status: 500, statusText: 'NoneType object has no attribute output'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Internal Server Error');
-  }
-  ));
 
   // Test cases for Admin Roles Tab.
   it('should get the data of user given the username' +
@@ -548,351 +338,7 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should add contribution rights to the user given the' +
-    'name when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'validUser';
-    let payload = {
-      category: category,
-      username: username,
-      language_code: languageCode
-    };
-    abas.addContributionReviewerAsync(
-      category, username, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to add contribution rights to the user when user does' +
-    'not exists when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'InvalidUser';
-    let payload = {
-      category: category,
-      username: username,
-      language_code: languageCode
-    };
-    abas.addContributionReviewerAsync(
-      category, username, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { error: 'User with given username does not exist'},
-      { status: 500, statusText: 'Internal Server Error'});
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist');
-  }
-  ));
-
-  it('should get the data of contribution rights given the role' +
-    'when calling viewContributionReviewersAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let result = ['validUsername'];
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=voiceover&language_code=en');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(
-      ['validUsername'],
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-
-    category = 'question';
-    languageCode = null;
-
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=question');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(
-      ['validUsername'],
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to get the data of contribution rights when category does' +
-  'not exists when calling viewContributionReviewersAsync', fakeAsync(() => {
-    let category = 'InvalidCategory';
-    let languageCode = 'en';
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=InvalidCategory&language_code=en');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      error: 'Invalid Category'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Invalid Category');
-  }
-  ));
-
-  it('should get the data of contribution rights given the' +
-    'username when calling contributionReviewerRightsAsync', fakeAsync(() => {
-    let username = 'validUsername';
-    let result = {
-      can_review_questions: false,
-      can_review_translation_for_language_codes: ['en'],
-      can_review_voiceover_for_language_codes: [],
-      can_submit_questions: false
-    };
-    abas.contributionReviewerRightsAsync(username)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
-      '?username=validUsername');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      can_review_questions: false,
-      can_review_translation_for_language_codes: ['en'],
-      can_review_voiceover_for_language_codes: [],
-      can_submit_questions: false
-    }, {
-      status: 200, statusText: 'Success.'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to get the data of contribution rights when username does' +
-  'not exists when calling contributionReviewerRightsAsync', fakeAsync(() => {
-    let username = 'InvalidUsername';
-    abas.contributionReviewerRightsAsync(username)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
-      '?username=InvalidUsername');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
-  }
-  ));
-
-  it('should remove all contribution rights given the username' +
-    'when calling emoveContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = null;
-    let username = 'validUser';
-    let method = 'all';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to remove all contribution rights when user does' +
-    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = null;
-    let username = 'InvalidUser';
-    let method = 'all';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
-  }
-  ));
-
-  it('should remove specific contribution rights given the' +
-    'username when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'validUser';
-    let method = 'specific';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to remove specific contribution rights when username does' +
-    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'InvalidUser';
-    let method = 'specific';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
-  }
-  ));
-
   // Test cases for Admin Misc Tab.
-  it('should flush the memory cache when calling' +
-    'flushMemoryCacheAsync', fakeAsync(() => {
-    abas.flushMemoryCacheAsync()
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/memorycacheadminhandler');
-    expect(req.request.method).toEqual('POST');
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to flush the memory cache when calling' +
-    'flushMemoryCacheAsync', fakeAsync(() => {
-    abas.flushMemoryCacheAsync()
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/memorycacheadminhandler');
-    expect(req.request.method).toEqual('POST');
-    req.flush({
-      error: 'Failed to flush memory cache.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to flush memory cache.');
-  }
-  ));
-
   it('should clear search index when calling clearSearchIndexAsync',
     fakeAsync(() => {
       abas.clearSearchIndexAsync()
@@ -928,58 +374,6 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Failed to clear search index.');
     }
     ));
-
-  it('should populate exploration stats when calling' +
-    'populateExplorationStatsRegenerationCsvResultAsync', fakeAsync(() => {
-    let action = 'regenerate_missing_exploration_stats';
-    let expIdToRegenerate = '11';
-    let payload = {
-      action: action,
-      exp_id: expIdToRegenerate
-    };
-
-    abas.populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to populate exploration stats when calling' +
-    'populateExplorationStatsRegenerationCsvResultAsync', fakeAsync(() => {
-    let action = 'regenerate_missing_exploration_stats';
-    let expIdToRegenerate = 'InvalidId';
-    let payload = {
-      action: action,
-      exp_id: expIdToRegenerate
-    };
-
-    abas.populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/adminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush({
-      error: 'Failed to get data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }
-  ));
 
   it('should regenerate topic related oppurtunities when' +
     'calling regenerateOpportunitiesRelatedToTopicAsync', fakeAsync(() => {
@@ -1114,40 +508,6 @@ describe('Admin backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Failed to send dummy mail.');
-  }
-  ));
-
-  it('should get the data of memory cache profile when' +
-    'calling getMemoryCacheProfileAsync', fakeAsync(() => {
-    abas.getMemoryCacheProfileAsync()
-      .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/memorycacheadminhandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to get the data of memory cache profile' +
-    'when calling getMemoryCacheProfileAsync', fakeAsync(() => {
-    abas.getMemoryCacheProfileAsync()
-      .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/memorycacheadminhandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Failed to get data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
   }
   ));
 

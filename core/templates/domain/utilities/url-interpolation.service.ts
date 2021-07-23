@@ -111,7 +111,8 @@ export class UrlInterpolationService {
    *   { 'exploration_id': '0', 'escaped_state_name': 'InputBinaryNumber' }
    *
    * If a URL requires a value which is not keyed within the
-   * interpolationValues object, this will return null.
+   * interpolationValues object, the function execution will stop
+   * after throwing an error.
    */
   interpolateUrl(
       urlTemplate: string,
@@ -119,7 +120,6 @@ export class UrlInterpolationService {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
-      return null;
     }
 
     // http://stackoverflow.com/questions/4775722
@@ -129,7 +129,6 @@ export class UrlInterpolationService {
       this.alertsService.fatalWarning(
         'Expected an object of interpolation values to be passed into ' +
           'interpolateUrl.');
-      return null;
     }
 
     // Valid pattern: <alphanum>
@@ -143,7 +142,6 @@ export class UrlInterpolationService {
         urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
       this.alertsService.fatalWarning(
         'Invalid URL template received: \'' + urlTemplate + '\'');
-      return null;
     }
 
     let nonStringParams = Object.entries(interpolationValues).filter(
@@ -155,7 +153,7 @@ export class UrlInterpolationService {
           ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
     }
 
-    let escapedInterpolationValues = {};
+    let escapedInterpolationValues: Record<string, string> = {};
     for (let varName in interpolationValues) {
       let value = interpolationValues[varName];
       escapedInterpolationValues[varName] = encodeURIComponent(value);
@@ -171,7 +169,6 @@ export class UrlInterpolationService {
         this.alertsService.fatalWarning(
           'Expected variable \'' + currentVarName +
           '\' when interpolating URL.');
-        return null;
       }
       filledUrl = filledUrl.replace(
         INTERPOLATION_VARIABLE_REGEX,

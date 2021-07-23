@@ -19,27 +19,22 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
-import atexit
 import os
-import re
 import subprocess
 import sys
 
 from constants import constants
-import feconf
 import python_utils
 from scripts import build
 from scripts import common
+from scripts import servers
 
 
-WEBPACK_BIN_PATH = os.path.join(
-    common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
 SERVER_MODE_PROD = 'dev'
 SERVER_MODE_DEV = 'prod'
 GOOGLE_APP_ENGINE_PORT = 8181
-SUBPROCESSES = []
 LIGHTHOUSE_CONFIG_FILENAMES = {
     LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc.js',
     LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
@@ -57,48 +52,30 @@ Note that the root folder MUST be named 'oppia'.
 """)
 
 _PARSER.add_argument(
-    '--mode',
-    help='Sets the mode for the lighthouse tests',
-    required=True,
-    choices=['accessibility', 'performance'],)
-
-
-def cleanup():
-    """Deactivates webpages and deletes html lighthouse reports."""
-    pattern = '"ENABLE_ACCOUNT_DELETION": .*'
-    replace = '"ENABLE_ACCOUNT_DELETION": false,'
-    common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
-
-    build.set_constants_to_default()
-
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
-    processes_to_kill = [
-        '.*%s.*' % re.escape(google_app_engine_path),
-    ]
-    for p in SUBPROCESSES:
-        p.kill()
-
-    for p in processes_to_kill:
-        common.kill_processes_based_on_regex(p)
-
-    common.stop_redis_server()
+    '--mode', help='Sets the mode for the lighthouse tests',
+    required=True, choices=['accessibility', 'performance'],)
 
 
 def run_lighthouse_puppeteer_script():
     """Runs puppeteer script to collect dynamic urls."""
-    puppeteer_path = os.path.join(
-        'core', 'tests', 'puppeteer', 'lighthouse_setup.js')
+    puppeteer_path = (
+        os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
 
-    try:
-        script_output = subprocess.check_output(bash_command).split('\n')
-        python_utils.PRINT(script_output)
-        for url in script_output:
-            export_url(url)
-        python_utils.PRINT(
-            'Puppeteer script completed successfully.')
-
-    except subprocess.CalledProcessError:
+    process = subprocess.Popen(
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+        for line in stdout.split('\n'):
+            export_url(line)
+        python_utils.PRINT('Puppeteer script completed successfully.')
+    else:
+        python_utils.PRINT('Return code: %s' % process.returncode)
+        python_utils.PRINT('OUTPUT:')
+        python_utils.PRINT(stdout)
+        python_utils.PRINT('ERROR:')
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Puppeteer script failed. More details can be found above.')
         sys.exit(1)
@@ -110,10 +87,8 @@ def run_webpack_compilation():
     webpack_bundles_dir_name = 'webpack_bundles'
     for _ in python_utils.RANGE(max_tries):
         try:
-            webpack_config_file = build.WEBPACK_DEV_CONFIG
-            subprocess.check_call([
-                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-                webpack_config_file])
+            with servers.managed_webpack_compiler() as proc:
+                proc.wait()
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
@@ -121,26 +96,31 @@ def run_webpack_compilation():
         if os.path.isdir(webpack_bundles_dir_name):
             break
     if not os.path.isdir(webpack_bundles_dir_name):
-        python_utils.PRINT(
-            'Failed to complete webpack compilation, exiting ...')
+        python_utils.PRINT('Failed to complete webpack compilation, exiting...')
         sys.exit(1)
 
 
-def export_url(url):
-    """Exports the url to an environmental variable."""
-    url_list = url.split('/')
-    if 'collection_editor' in url:
-        os.environ['collection_editor'] = url_list[5]
-    elif 'create' in url:
-        os.environ['exploration_editor'] = url_list[4]
-    elif 'topic_editor' in url:
-        os.environ['topic_editor'] = url_list[4]
-    elif 'story_editor' in url:
-        os.environ['story_editor'] = url_list[4]
-    elif 'skill_editor' in url:
-        os.environ['skill_editor'] = url_list[4]
-    else:
-        return
+def export_url(line):
+    """Exports the entity ID in the given line to an environment variable, if
+    the line is a URL.
+
+    Args:
+        line: str. The line to parse and extract the entity ID from. If no
+            recognizable URL is present, nothing is exported to the
+            environment.
+    """
+    url_parts = line.split('/')
+    python_utils.PRINT('Parsing and exporting entity ID in line: %s' % line)
+    if 'collection_editor' in line:
+        os.environ['collection_id'] = url_parts[5]
+    elif 'create' in line:
+        os.environ['exploration_id'] = url_parts[4]
+    elif 'topic_editor' in line:
+        os.environ['topic_id'] = url_parts[4]
+    elif 'story_editor' in line:
+        os.environ['story_id'] = url_parts[4]
+    elif 'skill_editor' in line:
+        os.environ['skill_id'] = url_parts[4]
 
 
 def run_lighthouse_checks(lighthouse_mode):
@@ -151,24 +131,28 @@ def run_lighthouse_checks(lighthouse_mode):
             accessibility mode or performance mode.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
+    # The max-old-space-size is a quick fix for node running out of heap memory
+    # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
-        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode]]
+        '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
+        '--max-old-space-size=4096'
+    ]
 
-    try:
-        subprocess.check_call(bash_command)
+    process = subprocess.Popen(
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
         python_utils.PRINT('Lighthouse checks completed successfully.')
-    except subprocess.CalledProcessError:
+    else:
+        python_utils.PRINT('Return code: %s' % process.returncode)
+        python_utils.PRINT('OUTPUT:')
+        python_utils.PRINT(stdout)
+        python_utils.PRINT('ERROR:')
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
-
-
-def enable_webpages():
-    """Enables deactivated webpages for testing."""
-    pattern = '"ENABLE_ACCOUNT_DELETION": .*'
-    replace = '"ENABLE_ACCOUNT_DELETION": true,'
-    common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
 
 def main(args=None):
@@ -186,40 +170,31 @@ def main(args=None):
             'Invalid parameter passed in: \'%s\', please choose'
             'from \'accessibility\' or \'performance\'' % parsed_args.mode)
 
-    enable_webpages()
-    atexit.register(cleanup)
-
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         python_utils.PRINT('Building files in production mode.')
-        # We are using --source_maps here, so that we have at least one CI check
-        # that builds using source maps in prod env. This is to ensure that
-        # there are no issues while deploying oppia.
-        build.main(args=['--prod_env', '--source_maps'])
+        build.main(args=['--prod_env'])
     elif lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         build.main(args=[])
         run_webpack_compilation()
-    else:
-        raise Exception(
-            'Invalid lighthouse mode: \'%s\', please choose'
-            'from \'accessibility\' or \'performance\'' % lighthouse_mode)
 
-    common.start_redis_server()
+    with python_utils.ExitStack() as stack:
+        stack.enter_context(common.inplace_replace_file_context(
+            common.CONSTANTS_FILE_PATH,
+            '"ENABLE_ACCOUNT_DELETION": .*',
+            '"ENABLE_ACCOUNT_DELETION": true,'))
 
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-    managed_dev_appserver = common.managed_dev_appserver(
-        APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
-        clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
+        stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(servers.managed_elasticsearch_dev_server())
 
-    with contextlib2.ExitStack() as stack:
-        stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
-            stack.enter_context(common.managed_firebase_auth_emulator())
-        stack.enter_context(managed_dev_appserver)
+            stack.enter_context(servers.managed_firebase_auth_emulator())
 
-        # Wait for the servers to come up.
-        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
-        common.wait_for_port_to_be_in_use(GOOGLE_APP_ENGINE_PORT)
+        stack.enter_context(servers.managed_dev_appserver(
+            APP_YAML_FILENAMES[server_mode],
+            port=GOOGLE_APP_ENGINE_PORT,
+            clear_datastore=True,
+            log_level='critical',
+            skip_sdk_update_check=True))
 
         run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode)

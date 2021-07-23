@@ -43,13 +43,11 @@ angular.module('oppia').component('historyTab', {
     '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
     'LoaderService', 'RouterService',
-    'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
         $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
         LoaderService, RouterService,
-        UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -88,7 +86,7 @@ angular.module('oppia').component('historyTab', {
       // Refreshes the displayed version history log.
       ctrl.refreshVersionHistory = function() {
         LoaderService.showLoadingScreen('Loading');
-        ExplorationDataService.getData().then(function(data) {
+        ExplorationDataService.getDataAsync().then(function(data) {
           var currentVersion = data.version;
           ctrl.currentVersion = currentVersion;
           // The ctrl.compareVersionMetadata is an object with keys
@@ -231,8 +229,8 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.showRevertExplorationModal = function(version) {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/history-tab/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/history-tab/modal-templates/' +
             'revert-exploration-modal.template.html'),
           backdrop: true,
           resolve: {

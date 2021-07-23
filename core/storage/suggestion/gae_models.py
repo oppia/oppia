@@ -38,12 +38,6 @@ STATUS_CHOICES = [
     STATUS_REJECTED
 ]
 
-# The types of suggestions that are offered on the Contributor Dashboard.
-CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    feconf.SUGGESTION_TYPE_ADD_QUESTION
-]
-
 # Daily emails are sent to reviewers to notify them of suggestions on the
 # Contributor Dashboard to review. The constants below define the number of
 # question and translation suggestions to fetch to come up with these daily
@@ -157,6 +151,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
     language_code = datastore_services.StringProperty(indexed=True)
+    # A flag that indicates whether the suggestion is edited by the reviewer.
+    edited_by_reviewer = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -188,7 +185,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
             'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -271,13 +269,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+    def get_translation_suggestions_in_review_with_exp_id(
+            cls, exp_id, language_code):
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
         Args:
             exp_id: str. Exploration ID matching the target ID of the
                 translation suggestions.
+            language_code: str. Language code.
 
         Returns:
             list(SuggestionModel). A list of translation suggestions in review
@@ -287,6 +287,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.language_code == language_code)
             .filter(
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id == exp_id)
@@ -315,11 +316,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.target_id.IN(exp_ids))
         )
         suggestion_models = []
-        cursor, more = (None, True)
+        offset, more = (0, True)
         while more:
-            results, cursor, more = query.fetch_page(
-                feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
-            suggestion_models.extend(results)
+            results = query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset)
+            if len(results):
+                offset = offset + len(results)
+                suggestion_models.extend(results)
+            else:
+                more = False
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
@@ -354,7 +358,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             Exception. If there are no suggestion types offered on the
                 Contributor Dashboard.
         """
-        if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
+        if not feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
             raise Exception(
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.')
@@ -366,7 +370,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.last_updated < threshold_time)
             .filter(cls.suggestion_type.IN(
-                CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
             .order(cls.last_updated)
             .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
@@ -396,12 +400,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_suggestions_of_suggestion_type(
-            cls, suggestion_type, user_id):
-        """Gets all suggestions of suggestion_type which are in review.
+    def get_in_review_translation_suggestions(cls, user_id, language_codes):
+        """Gets all translation suggestions which are in review.
 
         Args:
-            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+            language_codes: list(str). The list of language codes.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+            type, which are in review, but not created by the given user.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.author_id != user_id)
+            .filter(cls.language_code.IN(language_codes))
+            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+
+    @classmethod
+    def get_in_review_question_suggestions(cls, user_id):
+        """Gets all question suggestions which are in review.
+
+        Args:
             user_id: str. The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
@@ -410,9 +435,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which are in review, but not created by the given user.
         """
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
-            cls.suggestion_type == suggestion_type).filter(
-                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
+            .filter(cls.author_id != user_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(cls):
@@ -514,7 +542,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd
+                'change_cmd': suggestion_model.change_cmd,
+                'language_code': suggestion_model.language_code,
+                'edited_by_reviewer': suggestion_model.edited_by_reviewer
             }
 
         return user_data
@@ -774,3 +804,234 @@ class CommunityContributionStatsModel(base_models.BaseModel):
             'question_suggestion_count':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+
+class TranslationContributionStatsModel(base_models.BaseModel):
+    """Records the contributor dashboard translation contribution stats. There
+    is one instance of this model per (language_code, contributor_user_id,
+    topic_id) tuple. See related design doc for more details:
+    https://docs.google.com/document/d/1JEDiy-f1vnBLwibu8hsfuo3JObBWiaFvDTTU9L18zpY/edit#
+    """
+
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
+    # The ISO 639-1 language code for which the translation contributions were
+    # made.
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ID of the translation contributor.
+    contributor_user_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The topic ID of the translation contribution.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The number of submitted translations.
+    submitted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of submitted translations. Excludes HTML tags and
+    # attributes.
+    submitted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations.
+    accepted_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of accepted translations without reviewer edits.
+    accepted_translations_without_reviewer_edits_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
+    # The total word count of accepted translations. Excludes HTML tags and
+    # attributes.
+    accepted_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The number of rejected translations.
+    rejected_translations_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The total word count of rejected translations. Excludes HTML tags and
+    # attributes.
+    rejected_translation_word_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The unique last_updated dates of the translation suggestions.
+    contribution_dates = datastore_services.DateProperty(
+        repeated=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, language_code, contributor_user_id, topic_id,
+            submitted_translations_count, submitted_translation_word_count,
+            accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count,
+            accepted_translation_word_count, rejected_translations_count,
+            rejected_translation_word_count, contribution_dates):
+        """Creates a new TranslationContributionStatsModel instance and returns
+        its ID.
+        """
+        entity_id = cls.generate_id(
+            language_code, contributor_user_id, topic_id)
+        entity = cls(
+            id=entity_id,
+            language_code=language_code,
+            contributor_user_id=contributor_user_id,
+            topic_id=topic_id,
+            submitted_translations_count=submitted_translations_count,
+            submitted_translation_word_count=submitted_translation_word_count,
+            accepted_translations_count=accepted_translations_count,
+            accepted_translations_without_reviewer_edits_count=(
+                accepted_translations_without_reviewer_edits_count),
+            accepted_translation_word_count=accepted_translation_word_count,
+            rejected_translations_count=rejected_translations_count,
+            rejected_translation_word_count=rejected_translation_word_count,
+            contribution_dates=contribution_dates)
+        entity.update_timestamps()
+        entity.put()
+        return entity_id
+
+    @staticmethod
+    def generate_id(
+            language_code, contributor_user_id, topic_id):
+        """Generates a unique ID for a TranslationContributionStatsModel
+        instance.
+
+        Args:
+            language_code: str. ISO 639-1 language code.
+            contributor_user_id: str. User ID.
+            topic_id: str. Topic ID.
+
+        Returns:
+            str. An ID of the form:
+
+            [language_code].[contributor_user_id].[topic_id]
+        """
+        return (
+            '%s.%s.%s' % (language_code, contributor_user_id, topic_id)
+        )
+
+    @classmethod
+    def get(cls, language_code, contributor_user_id, topic_id):
+        """Gets the TranslationContributionStatsModel matching the supplied
+        language_code, contributor_user_id, topic_id.
+
+        Returns:
+            TranslationContributionStatsModel. The matching
+            TranslationContributionStatsModel.
+        """
+        entity_id = cls.generate_id(
+            language_code, contributor_user_id, topic_id)
+        return cls.get_by_id(entity_id)
+
+    @classmethod
+    def get_all_by_user_id(cls, user_id):
+        """Gets all TranslationContributionStatsModels matching the supplied
+        user_id.
+
+        Returns:
+            list(TranslationContributionStatsModel). The matching
+            TranslationContributionStatsModels.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.contributor_user_id == user_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TranslationContributionStatsModel references the
+        supplied user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.contributor_user_id == user_id
+        ).get(keys_only=True) is not None
+
+    @classmethod
+    def get_deletion_policy(cls):
+        """Model contains corresponding to a user: contributor_user_id."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple languages and topics relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data to export corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_code':
+                base_models.EXPORT_POLICY.EXPORTED,
+            # User ID is not exported in order to keep internal ids private.
+            'contributor_user_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_id':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'submitted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translations_without_reviewer_edits_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'accepted_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translations_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'rejected_translation_word_count':
+                base_models.EXPORT_POLICY.EXPORTED,
+            'contribution_dates':
+                base_models.EXPORT_POLICY.EXPORTED
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of TranslationContributionStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Exports the data from TranslationContributionStatsModel into dict
+        format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from TranslationContributionStatsModel.
+        """
+        user_data = dict()
+        stats_models = (
+            cls.get_all()
+            .filter(cls.contributor_user_id == user_id).fetch())
+        for model in stats_models:
+            user_data[model.id] = {
+                'language_code': model.language_code,
+                'topic_id': model.topic_id,
+                'submitted_translations_count': (
+                    model.submitted_translations_count),
+                'submitted_translation_word_count': (
+                    model.submitted_translation_word_count),
+                'accepted_translations_count': (
+                    model.accepted_translations_count),
+                'accepted_translations_without_reviewer_edits_count': (
+                    model.accepted_translations_without_reviewer_edits_count),
+                'accepted_translation_word_count': (
+                    model.accepted_translation_word_count),
+                'rejected_translations_count': (
+                    model.rejected_translations_count),
+                'rejected_translation_word_count': (
+                    model.rejected_translation_word_count),
+                'contribution_dates': [
+                    date.isoformat() for date in model.contribution_dates]
+            }
+        return user_data

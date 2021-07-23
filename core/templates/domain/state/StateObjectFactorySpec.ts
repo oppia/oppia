@@ -65,6 +65,7 @@ describe('State Object Factory', () => {
         hints: [],
         solution: null
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       recorded_voiceovers: {
@@ -74,6 +75,7 @@ describe('State Object Factory', () => {
         }
       },
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {
           content: {},
@@ -125,9 +127,11 @@ describe('State Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {
           content: {},

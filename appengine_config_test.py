@@ -23,11 +23,14 @@ import appengine_config
 from core.tests import test_utils
 import pkg_resources
 
+from typing import Text # isort:skip # pylint: disable=unused-import
+
 
 class AppengineConfigTests(test_utils.GenericTestBase):
     """Test the appengine config mock methods."""
 
     def _mock_get_distribution_which_raises_error(self, distribution_name):
+        # type: (Text) -> None
         """Mock function for pkg_resources.get_distribution().
 
         Args:
@@ -42,22 +45,37 @@ class AppengineConfigTests(test_utils.GenericTestBase):
         raise pkg_resources.DistributionNotFound(distribution_name, 'tests')
 
     def test_monkeypatched_get_distribution_for_google_cloud_tasks(self):
+        # type: () -> None
         """Test that the monkey-patched get_distribution() method returns an
         object with a suitable version string for google-cloud-tasks.
         """
         with self.swap(
             appengine_config, 'old_get_distribution',
             self._mock_get_distribution_which_raises_error
-            ):
+        ):
             mock_distribution = appengine_config.monkeypatched_get_distribution(
                 'google-cloud-tasks')
         self.assertEqual(mock_distribution.version, '1.5.0')
 
-    def test_monkeypatched_get_distribution_behaves_like_existing_one(self):
+    def test_monkeypatched_get_distribution_for_google_cloud_translate(self):
+        # type: () -> None
         """Test that the monkey-patched get_distribution() method returns an
         object with a suitable version string for google-cloud-tasks.
         """
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        with self.swap(
+            appengine_config, 'old_get_distribution',
+            self._mock_get_distribution_which_raises_error
+        ):
+            mock_distribution = appengine_config.monkeypatched_get_distribution(
+                'google-cloud-translate')
+        self.assertEqual(mock_distribution.version, '2.0.1')
+
+    def test_monkeypatched_get_distribution_behaves_like_existing_one(self):
+        # type: () -> None
+        """Test that the monkey-patched get_distribution() method returns an
+        object with a suitable version string for google-cloud-tasks.
+        """
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             pkg_resources.DistributionNotFound, 'invalid-lib')
         with self.swap(
             appengine_config, 'old_get_distribution',

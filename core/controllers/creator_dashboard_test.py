@@ -33,7 +33,6 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
-from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
@@ -45,21 +44,6 @@ import python_utils
     models.Registry.import_models(
         [models.NAMES.user, models.NAMES.statistics, models.NAMES.suggestion,
          models.NAMES.feedback]))
-
-
-class OldNotificationsDashboardRedirectPageTest(test_utils.GenericTestBase):
-    """Test for redirecting the old notifications dashboard page URL
-    to the new one.
-    """
-
-    def test_old_notifications_dashboard_page_url(self):
-        """Test to validate that the old notifications dashboard page url
-        redirects to the new one.
-        """
-        response = self.get_html_response(
-            '/notifications_dashboard', expected_status_int=301)
-        self.assertEqual(
-            'http://localhost/notifications', response.headers['location'])
 
 
 class OldContributorDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -93,58 +77,13 @@ class OldCreatorDashboardRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/creator-dashboard', response.headers['location'])
 
 
-class MockUserStatsAggregator(
-        user_jobs_continuous.UserStatsAggregator):
-    """A modified UserStatsAggregator that does not start a new
-     batch job when the previous one has finished.
-    """
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockUserStatsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class MockUserStatsMRJobManager(
-        user_jobs_continuous.UserStatsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockUserStatsAggregator
-
-
 class HomePageTests(test_utils.GenericTestBase):
 
     def test_logged_out_homepage(self):
         """Test the logged-out version of the home page."""
         response = self.get_html_response('/')
         self.assertEqual(response.status_int, 200)
-        self.assertIn('</splash-page>', response)
-
-    def test_notifications_dashboard_redirects_for_logged_out_users(self):
-        """Test the logged-out view of the notifications dashboard."""
-        response = self.get_html_response(
-            '/notifications', expected_status_int=302)
-        # This should redirect to the login page.
-        self.assertIn('login', response.headers['location'])
-        self.assertIn('notifications', response.headers['location'])
-
-        self.login('reader@example.com')
-        self.get_html_response(
-            '/notifications', expected_status_int=302)
-        # This should redirect the user to complete signup.
-        self.logout()
-
-    def test_logged_in_notifications_dashboard(self):
-        """Test the logged-in view of the notifications dashboard."""
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
-        self.login(self.EDITOR_EMAIL)
-        self.get_html_response('/notifications')
-        self.logout()
+        self.assertIn('</oppia-splash-page-root>', response)
 
 
 class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
@@ -202,17 +141,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
                 user_id, exp_id, ratings[ind])
         self.process_and_flush_pending_tasks()
 
-    def _run_user_stats_aggregator_job(self):
-        """Runs the User Stats Aggregator job."""
-        MockUserStatsAggregator.start_computation()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         self.assertEqual(
@@ -229,7 +157,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(response['explorations_list'], [])
-        self._run_user_stats_aggregator_job()
         self.assertIsNone(user_models.UserStatsModel.get(
             self.owner_id_1, strict=False))
         self.logout()
@@ -248,11 +175,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._record_start(exp_id, exp_version, state)
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 1)
-        self.assertEqual(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model.impact_score)
         self.assertEqual(user_model.num_ratings, 0)
         self.assertIsNone(user_model.average_ratings)
         self.logout()
@@ -268,11 +194,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         exp_id = self.EXP_ID_1
         self._rate_exploration(exp_id, [4])
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 0)
-        self.assertEqual(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model.impact_score)
         self.assertEqual(user_model.num_ratings, 1)
         self.assertEqual(user_model.average_ratings, 4)
         self.logout()
@@ -294,8 +219,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id, [3])
 
-        self._run_user_stats_aggregator_job()
-
         def _mock_get_date_after_one_week():
             """Returns the date of the next week."""
             return (
@@ -315,8 +238,8 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 1)
-        self.assertEqual(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model.impact_score)
         self.assertEqual(user_model.num_ratings, 1)
         self.assertEqual(user_model.average_ratings, 3)
 
@@ -356,11 +279,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id, [3, 4, 5])
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 4)
-        self.assertEqual(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model.impact_score)
         self.assertEqual(user_model.num_ratings, 3)
         self.assertEqual(user_model.average_ratings, 4)
         self.logout()
@@ -384,11 +306,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id_1, [4])
 
-        self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 1)
-        self.assertEqual(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model.impact_score)
         self.assertEqual(user_model.num_ratings, 1)
         self.assertEqual(user_model.average_ratings, 4)
         self.logout()
@@ -417,12 +338,10 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self._rate_exploration(exp_id_1, [4])
         self._rate_exploration(exp_id_2, [3, 3])
 
-        self._run_user_stats_aggregator_job()
-
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(user_model.total_plays, 3)
-        self.assertEqual(
-            user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model.impact_score)
         self.assertEqual(user_model.num_ratings, 3)
         self.assertEqual(
             user_model.average_ratings, python_utils.divide(10, 3.0))
@@ -456,21 +375,19 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
 
         self._rate_exploration(exp_id, [3, 4, 5])
 
-        self._run_user_stats_aggregator_job()
-
         user_model_1 = user_models.UserStatsModel.get(
             self.owner_id_1)
         self.assertEqual(user_model_1.total_plays, 2)
-        self.assertEqual(
-            user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model_1.impact_score)
         self.assertEqual(user_model_1.num_ratings, 3)
         self.assertEqual(user_model_1.average_ratings, 4)
 
         user_model_2 = user_models.UserStatsModel.get(
             self.owner_id_2)
         self.assertEqual(user_model_2.total_plays, 2)
-        self.assertEqual(
-            user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model_2.impact_score)
         self.assertEqual(user_model_2.num_ratings, 3)
         self.assertEqual(user_model_2.average_ratings, 4)
         self.logout()
@@ -508,8 +425,6 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         self._rate_exploration(exp_id_1, [5, 3])
         self._rate_exploration(exp_id_2, [5, 5])
 
-        self._run_user_stats_aggregator_job()
-
         expected_results = {
             'total_plays': 5,
             'num_ratings': 4,
@@ -519,8 +434,8 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)
         self.assertEqual(
             user_model_2.total_plays, expected_results['total_plays'])
-        self.assertEqual(
-            user_model_2.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model_2.impact_score)
         self.assertEqual(
             user_model_2.num_ratings, expected_results['num_ratings'])
         self.assertEqual(
@@ -534,8 +449,8 @@ class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
         user_model_1 = user_models.UserStatsModel.get(self.owner_id_1)
         self.assertEqual(
             user_model_1.total_plays, expected_results['total_plays'])
-        self.assertEqual(
-            user_model_1.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
+        # TODO(#11475): Calculate impact_score with an Apache Beam job.
+        self.assertIsNone(user_model_2.impact_score)
         self.assertEqual(
             user_model_1.num_ratings, expected_results['num_ratings'])
         self.assertEqual(
@@ -903,79 +818,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertIn('Creator Dashboard | Oppia', response.body)
 
         self.logout()
-
-
-class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
-
-    DASHBOARD_DATA_URL = '/notificationsdashboardhandler/data'
-
-    def setUp(self):
-        super(NotificationsDashboardHandlerTests, self).setUp()
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-    def _get_recent_user_changes_mock_by_viewer(self, unused_user_id):
-        """Returns a single feedback thread by VIEWER_ID."""
-        return (
-            100000, [{
-                'activity_id': 'exp_id',
-                'activity_title': 'exp_title',
-                'author_id': self.viewer_id,
-                'last_updated_ms': 100000,
-                'subject': 'Feedback Message Subject',
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-            }])
-
-    def _get_recent_user_changes_mock_by_anonymous_user(self, unused_user_id):
-        """Returns a single feedback thread by an anonymous user."""
-        return (
-            200000, [{
-                'activity_id': 'exp_id',
-                'activity_title': 'exp_title',
-                'author_id': None,
-                'last_updated_ms': 100000,
-                'subject': 'Feedback Message Subject',
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-            }])
-
-    def test_author_ids_are_handled_correctly(self):
-        """Test that author ids are converted into author usernames
-        and that anonymous authors are handled correctly.
-        """
-        with self.swap(
-            user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_user_changes',
-            self._get_recent_user_changes_mock_by_viewer):
-
-            self.login(self.VIEWER_EMAIL)
-            response = self.get_json(self.DASHBOARD_DATA_URL)
-            self.assertEqual(len(response['recent_notifications']), 1)
-            self.assertEqual(
-                response['recent_notifications'][0]['author_username'],
-                self.VIEWER_USERNAME)
-            self.assertNotIn('author_id', response['recent_notifications'][0])
-
-        with self.swap(
-            user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_user_changes',
-            self._get_recent_user_changes_mock_by_anonymous_user):
-
-            self.login(self.VIEWER_EMAIL)
-            response = self.get_json(self.DASHBOARD_DATA_URL)
-            self.assertEqual(len(response['recent_notifications']), 1)
-            self.assertEqual(
-                response['recent_notifications'][0]['author_username'], '')
-            self.assertNotIn('author_id', response['recent_notifications'][0])
-
-    def test_get_unseen_notifications_data(self):
-        with self.swap(
-            user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_user_changes',
-            self._get_recent_user_changes_mock_by_anonymous_user):
-            self.login(self.VIEWER_EMAIL)
-            response = self.get_json('/notificationshandler')
-            self.assertEqual(response['num_unseen_notifications'], 1)
-            self.logout()
 
 
 class CreationButtonsTests(test_utils.GenericTestBase):

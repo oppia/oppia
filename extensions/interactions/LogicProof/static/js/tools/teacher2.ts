@@ -18,11 +18,11 @@
     used in an instance of the LogicProof interaction.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofParser from
-  'interactions/LogicProof/static/js/generatedParser.ts';
+  'interactions/LogicProof/static/js/generatedParser';
 
 var logicProofTeacher2 = (function() {
   // ---- LINE TEMPLATES ----
@@ -775,6 +775,7 @@ var logicProofTeacher2 = (function() {
           controlFunctionStrings[i].LHS, controlFunctionStrings[i].RHS,
           controlFunctionStrings[i].description, controlLanguage);
       } catch (err) {
+        // eslint-disable-next-line no-throw-literal
         throw {
           message: logicProofShared.renderError(
             err, logicProofTeacher.TEACHER_ERROR_MESSAGES,

@@ -22,7 +22,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Subtopic editor tab', function() {
   importAllAngularServices();
@@ -53,7 +53,7 @@ describe('Subtopic editor tab', function() {
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIdsAsync: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIdsAsync: async() => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
@@ -332,8 +332,9 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should redirect to topic editor if subtopic id is invalid', function() {
+    spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl').and
+      .returnValue(99);
     var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
-    $location.path('/subtopic_editor/99');
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

@@ -23,7 +23,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { PreferencesBackendDict, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { UpdatePreferencesResponse, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,16 +36,20 @@ export class UserService {
     private userBackendApiService: UserBackendApiService
   ) {}
 
-    private userContributionRightsInfo = null;
-    private userInfo = null;
+    // This property will be null when the user does not have
+    // enough rights to review translations, voiceover and questions.
+    private userContributionRightsInfo:
+      UserContributionRightsDataBackendDict | null = null;
+    // This property will be null when the user is not logged in.
+    private userInfo: UserInfo | null = null;
     private returnUrl = '';
 
     async getUserInfoAsync(): Promise<UserInfo> {
       const pathname = this.urlService.getPathname();
-      if (['/login', '/logout', '/signup'].includes(pathname)) {
+      if (['/logout', '/signup'].includes(pathname)) {
         return UserInfo.createDefault();
       }
-      if (!this.userInfo) {
+      if (this.userInfo === null) {
         this.userInfo = await this.userBackendApiService.getUserInfoAsync();
       }
       return this.userInfo;
@@ -56,7 +60,7 @@ export class UserService {
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
-        (userInfo) => {
+        async(userInfo) => {
           if (userInfo.isLoggedIn()) {
             return this.userBackendApiService.getProfileImageDataUrlAsync(
               defaultUrl);
@@ -69,7 +73,7 @@ export class UserService {
     }
 
     async setProfileImageDataUrlAsync(
-        newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
+        newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
       return this.userBackendApiService.setProfileImageDataUrlAsync(
         newProfileImageDataUrl);
     }
@@ -85,7 +89,7 @@ export class UserService {
     }
 
     async getUserContributionRightsDataAsync():
-      Promise<UserContributionRightsDataBackendDict> {
+      Promise<UserContributionRightsDataBackendDict | null> {
       if (this.userContributionRightsInfo) {
         return new Promise((resolve, reject) => {
           resolve(this.userContributionRightsInfo);

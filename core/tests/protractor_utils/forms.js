@@ -24,6 +24,7 @@ var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -170,19 +171,22 @@ var ListEditor = function(elem) {
 var RealEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(value);
+      await action.clear('Text Input', elem.element(by.tagName('input')));
+      await action.sendKeys(
+        'Text Input', elem.element(by.tagName('input')), value);
     }
   };
 };
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(elem.all(by.css('.oppia-rte')).first());
-  await (await elem.all(by.css('.oppia-rte')).first()).click();
+  await waitFor.elementToBeClickable(elem.all(
+    by.css('.protractor-test-rte')).first());
+  await (await elem.all(by.css('.protractor-test-rte')).first()).click();
 
   var _appendContentText = async function(text) {
-    await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
+    await (await elem.all(
+      by.css('.protractor-test-rte')).first()).sendKeys(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
@@ -192,9 +196,9 @@ var RichTextEditor = async function(elem) {
   };
   var _clearContent = async function() {
     expect(
-      await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
+      await (await elem.all(by.css('.protractor-test-rte')).first()).isPresent()
     ).toBe(true);
-    await (await elem.all(by.css('.oppia-rte')).first()).clear();
+    await (await elem.all(by.css('.protractor-test-rte')).first()).clear();
   };
 
   return {
@@ -242,7 +246,7 @@ var RichTextEditor = async function(elem) {
         'cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM.
-      var modal = await element.all(by.css('.modal-dialog')).last();
+      var modal = element.all(by.css('.modal-dialog')).last();
 
       // Need to convert arguments to an actual array; we tell the component
       // which modal to act on but drop the componentName.
@@ -268,11 +272,11 @@ var RichTextEditor = async function(elem) {
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
         await elem.all(
-          by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+          by.css('.protractor-test-rte')).first().sendKeys(protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
-      await elem.all(by.css('.oppia-rte')).first().sendKeys(
+      await elem.all(by.css('.protractor-test-rte')).first().sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -304,6 +308,7 @@ var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: async function(text) {
       await elem.element(by.css('.select2-container')).click();
+      await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
@@ -386,7 +391,7 @@ var MultiSelectEditor = function(elem) {
     }
 
     if (filteredElementsCount !== texts.length) {
-      throw (
+      throw new Error(
         'Could not toggle element selection. Values requested: ' + texts +
       '. Found ' + filteredElementsCount + ' matching elements.');
     }
@@ -442,6 +447,7 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(elem, 'RTE taking too long to become visible');
     // TODO(#9821): Find a better way to parse through the tags rather than
     // using xpath.
     // We select all top-level non-paragraph elements, as well as all children

@@ -89,6 +89,10 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-confirm-discard-changes'));
   var discardChangesButton = element(
     by.css('.protractor-test-discard-changes'));
+  var discardLostChangesButton = element(
+    by.css('.protractor-test-discard-lost-changes-button'));
+  var discardAndExportLostChangesButton = element(
+    by.css('.protractor-test-discard-and-export-lost-changes-button'));
   var navigateToImprovementsTabButton = element(
     by.css('.protractor-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
@@ -106,7 +110,14 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
-  var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
+  var commitChangesButton = element(
+    by.css('.protractor-test-save-draft-button'));
+  var saveDraftButtonTextContainer = element(
+    by.css('.protractor-test-save-draft-message'));
+  var recommendationPromptSaveButton = element(
+    by.css('.protractor-test-recommendation-prompt-save-button'));
+  var publishChangesButtonTextContainer = element(
+    by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
 
@@ -160,7 +171,7 @@ var ExplorationEditorPage = function() {
       await action.waitForAutosave();
     }
 
-    const saveChangesButton = element(by.css(
+    var saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
     await action.click('Save Changes', saveChangesButton);
     await waitFor.invisibilityOf(
@@ -170,7 +181,7 @@ var ExplorationEditorPage = function() {
       element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
 
-    const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
+    var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
     await action.click('Confirm Publish', confirmPublish);
     await waitFor.invisibilityOf(
       confirmPublish,
@@ -179,7 +190,7 @@ var ExplorationEditorPage = function() {
       '.protractor-test-share-publish-modal')),
     'Awesome modal taking too long to appear');
 
-    const closeButton = element(by.css('.protractor-test-share-publish-close'));
+    var closeButton = element(by.css('.protractor-test-share-publish-close'));
     await action.click('Share publish button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
@@ -187,17 +198,17 @@ var ExplorationEditorPage = function() {
 
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
-    const explorationTitle = element(by.css(
+    var explorationTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
-    const explorationObjective = element(by.css(
+    var explorationObjective = element(by.css(
       '.protractor-test-exploration-objective-input'
     ));
-    const explorationCategory = await element(by.css(
+    var explorationCategory = await element(by.css(
       '.select2-selection__rendered')).getText();
-    const explorationLanguage = await element(by.css(
+    var explorationLanguage = await element(by.css(
       '.protractor-test-exploration-language-select'
     )).$('option:checked').getText();
-    const explorationTags = element.all(by.css(
+    var explorationTags = element.all(by.css(
       '.select2-selection__choice'
     ));
     await waitFor.visibilityOf(
@@ -208,28 +219,39 @@ var ExplorationEditorPage = function() {
     expect(explorationLanguage).toMatch(language);
     for (var i = 0; i < await explorationTags.count(); i++) {
       expect(
-        await (await explorationTags.get(i)).getText()
+        await explorationTags.get(i).getText()
       ).toMatch(tags[i]);
     }
   };
 
   this.saveChanges = async function(commitMessage) {
-    var toastSuccessElement = element(by.css('.toast-success'));
     await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
       await action.sendKeys(
         'Commit message input', commitMessageInput, commitMessage);
     }
-    await action.click('Save draft button', saveDraftButton);
-    await waitFor.visibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to appear after saving changes');
-    // This is necessary to give the page time to record the changes,
-    // so that it does not attempt to stop the user leaving.
-    await waitFor.invisibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to disappear after saving changes');
+    await action.click('Save draft button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      saveDraftButtonTextContainer, 'Save Draft',
+      'Changes could not be saved');
+  };
+
+  this.publishChanges = async function(commitMessage) {
+    await action.waitForAutosave();
+    await action.click('Save changes button', saveChangesButton);
+    await action.sendKeys(
+      'Commit message input', commitMessageInput, commitMessage);
+    await action.click('Publish changes button', commitChangesButton);
+    // TODO(#13096): Remove browser.sleep from e2e files.
+    /* eslint-disable-next-line oppia/protractor-practices */
+    await browser.sleep(2500);
+    await waitFor.textToBePresentInElement(
+      publishChangesButtonTextContainer, 'Publish Changes',
+      'Changes could not be saved');
   };
 
   this.discardChanges = async function() {
@@ -242,6 +264,25 @@ var ExplorationEditorPage = function() {
       loadingModal, 'Loading modal taking too long to disappear');
     await waitFor.invisibilityOfInfoToast(
       'Changes take too long to be discarded.');
+    // Expect editor page to completely reload.
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.discardLostChanges = async function() {
+    await action.click('Discard Lost Changes button', discardLostChangesButton);
+    // Expect editor page to completely reload.
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.discardAndExportLostChanges = async function() {
+    await action.click(
+      'Discard Lost Changes button', discardAndExportLostChangesButton);
+    await browser.driver.get('chrome://downloads/');
+    var items = (
+      await browser.executeScript(
+        'return downloads.Manager.get().items_'));
+    expect(items.length).toBe(1);
+    expect(items[0].file_name).toBe('lostChanges.txt');
     // Expect editor page to completely reload.
     await waitFor.pageToFullyLoad();
   };
@@ -259,6 +300,22 @@ var ExplorationEditorPage = function() {
   this.expectCannotPublishChanges = async function() {
     await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
+  };
+
+  this.acceptSaveRecommendationPrompt = async function(commitMessage) {
+    await action.click(
+      'Recommendation prompt Save button', recommendationPromptSaveButton);
+    await waitFor.invisibilityOf(
+      element(by.css('.protractor-test-save-prompt-modal')),
+      'Save Recommendation Prompt modal does not disappear.');
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-exploration-save-modal')),
+      'Exploration Save Modal taking too long to appear');
+    if (commitMessage) {
+      await action.sendKeys(
+        'Commit message input', commitMessageInput, commitMessage);
+    }
+    await action.click('Save draft button', commitChangesButton);
   };
 
   // ---- NAVIGATION ----

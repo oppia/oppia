@@ -30,22 +30,17 @@ import feconf
 import python_utils
 import utils
 
+from typing import Any, Dict, List, Text, Union # isort:skip # pylint: disable=unused-import
+
+# TODO(#13059): Remove #type: ignore[attr-defined] from constants after
+# introduction of protobuf for constants.
+
 
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
 
-    def test_create_enum_method(self):
-        """Test create_enum method."""
-        enum = utils.create_enum('first', 'second', 'third')
-        self.assertEqual(enum.first, 'first')
-        self.assertEqual(enum.second, 'second')
-        self.assertEqual(enum.third, 'third')
-        with self.assertRaisesRegexp(
-            AttributeError,
-            'type object \'Enum\' has no attribute \'fourth\''):
-            enum.fourth  # pylint: disable=pointless-statement
-
     def test_get_comma_sep_string_from_list(self):
+        # type: () -> None
         """Test get_comma_sep_string_from_list method."""
         alist = ['a', 'b', 'c', 'd']
         results = ['', 'a', 'a and b', 'a, b and c', 'a, b, c and d']
@@ -55,6 +50,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertEqual(comma_sep_string, results[i])
 
     def test_to_ascii(self):
+        # type: () -> None
         """Test to_ascii method."""
         parsed_str = utils.to_ascii('abc')
         self.assertEqual(parsed_str, b'abc')
@@ -71,43 +67,59 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(parsed_str, b'')
 
     def test_yaml_dict_conversion(self):
+        # type: () -> None
         """Test yaml_from_dict and dict_from_yaml methods."""
         test_dicts = [{}, {'a': 'b'}, {'a': 2}, {'a': ['b', 2, {'c': 3.5}]}]
 
         for adict in test_dicts:
-            yaml_str = python_utils.yaml_from_dict(adict)
+            yaml_str = python_utils.yaml_from_dict(adict) # type: ignore[no-untyped-call]
+
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
             yaml_str = utils.dict_from_yaml('{')
 
-    def test_recursively_remove_key(self):
-        """Test recursively_remove_key method."""
+    def test_recursively_remove_key_for_empty_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method for an empty dict."""
+        d = {} # type: Dict[None, None]
+        utils.recursively_remove_key(d, 'a')
+        self.assertEqual(d, {})
+
+    def test_recursively_remove_key_for_single_key_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method for single key dict."""
         d = {'a': 'b'}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {})
 
-        d = {}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {})
-
+    def test_recursively_remove_key_for_multi_key_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method for multi key dict."""
         d = {'a': 'b', 'c': 'd'}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': 'd'})
 
+    def test_recursively_remove_key_for_dict_with_value_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method for dict with a value dict."""
         d = {'a': 'b', 'c': {'a': 'b'}}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': {}})
 
-        d = ['a', 'b', {'c': 'd'}]
-        utils.recursively_remove_key(d, 'c')
-        self.assertEqual(d, ['a', 'b', {}])
+    def test_recursively_remove_key_for_list(self):
+        # type: () -> None
+        """Test recursively_remove_key method for list."""
+        l = ['a', 'b', {'c': 'd'}]
+        utils.recursively_remove_key(l, 'c')
+        self.assertEqual(l, ['a', 'b', {}])
 
     def test_camelcase_to_hyphenated(self):
+        # type: () -> None
         """Test camelcase_to_hyphenated method."""
         test_cases = [
             ('AbcDef', 'abc-def'),
@@ -122,6 +134,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.camelcase_to_hyphenated(test_case[0]), test_case[1])
 
     def test_camelcase_to_snakecase(self):
+        # type: () -> None
         """Test camelcase_to_hyphenated method."""
         test_cases = [
             ('AbcDef', 'abc_def'),
@@ -137,6 +150,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.camelcase_to_snakecase(test_case[0]), test_case[1])
 
     def test_set_url_query_parameter(self):
+        # type: () -> None
         """Test set_url_query_parameter method."""
         self.assertEqual(
             utils.set_url_query_parameter('http://www.test.com', 'a', 'b'),
@@ -154,12 +168,13 @@ class UtilsTests(test_utils.GenericTestBase):
             'http://test.com?a=b&redirectUrl=http%3A%2F%2Fredirect.com'
         )
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'URL query parameter name must be a string'
             ):
-            utils.set_url_query_parameter('http://test.com?a=b', None, 'value')
+            utils.set_url_query_parameter('http://test.com?a=b', None, 'value') # type: ignore[arg-type]
 
     def test_convert_to_hash(self):
+        # type: () -> None
         """Test convert_to_hash() method."""
         orig_string = 'name_to_convert'
         full_hash = utils.convert_to_hash(orig_string, 28)
@@ -171,6 +186,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertTrue(full_hash.isalnum())
 
     def test_vfs_construct_path(self):
+        # type: () -> None
         """Test vfs_construct_path method."""
         p = utils.vfs_construct_path('a', 'b', 'c')
         self.assertEqual(p, 'a/b/c')
@@ -184,6 +200,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '/a/b/')
 
     def test_vfs_normpath(self):
+        # type: () -> None
         p = utils.vfs_normpath('/foo/../bar')
         self.assertEqual(p, '/bar')
         p = utils.vfs_normpath('foo//bar')
@@ -198,8 +215,8 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '//foo/bar/baz')
 
     def test_capitalize_string(self):
+        # type: () -> None
         test_data = [
-            [None, None],
             ['', ''],
             ['a', 'A'],
             ['A', 'A'],
@@ -209,18 +226,20 @@ class UtilsTests(test_utils.GenericTestBase):
             ['Partially', 'Partially'],
             ['miDdle', 'MiDdle'],
             ['2be', '2be'],
-        ]
+        ] # type: List[List[Text]]
 
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
 
     def test_generate_random_string(self):
+        # type: () -> None
         # Generate a random string of length 12.
         random_string = utils.generate_random_string(12)
         self.assertTrue(isinstance(random_string, python_utils.BASESTRING))
         self.assertEqual(len(random_string), 12)
 
     def test_get_thumbnail_icon_url_for_category(self):
+        # type: () -> None
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
             '/subjects/Architecture.svg')
@@ -232,6 +251,7 @@ class UtilsTests(test_utils.GenericTestBase):
             '/subjects/Lightbulb.svg')
 
     def test_are_datetimes_close(self):
+        # type: () -> None
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
         with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
             self.assertTrue(utils.are_datetimes_close(
@@ -242,6 +262,7 @@ class UtilsTests(test_utils.GenericTestBase):
                 initial_time))
 
     def test_conversion_between_string_and_naive_datetime_object(self):
+        # type: () -> None
         """Tests to make sure converting a naive datetime object to a string and
         back doesn't alter the naive datetime object data.
         """
@@ -252,12 +273,14 @@ class UtilsTests(test_utils.GenericTestBase):
             now)
 
     def test_datetime_conversion_to_string_returns_correct_format(self):
+        # type: () -> None
         initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
         self.assertEqual(
             utils.convert_naive_datetime_to_string(initial_time),
             '12/01/2016, 01:02:03:000000')
 
     def test_string_to_datetime_conversion_returns_correct_datetime(self):
+        # type: () -> None
         time_string = '12/01/2016, 01:02:03:000000'
         initial_time = datetime.datetime(2016, 12, 1, 1, 2, 3)
         self.assertEqual(
@@ -266,23 +289,26 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_create_string_from_largest_unit_in_timedelta_raises_for_zero_diff(
             self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(days=0)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected a positive timedelta, received: %s.' % (
                 timedelta_object.total_seconds())):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
 
     def test_create_string_from_largest_unit_in_timedelta_raises_for_neg_diff(
             self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(days=-40)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected a positive timedelta, received: %s.' % (
                 timedelta_object.total_seconds())):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
 
     def test_create_string_from_largest_unit_in_timedelta_returns_days(self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=4, hours=1, minutes=1, seconds=1)
 
@@ -293,6 +319,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '4 days')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_day(self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=1, hours=1, minutes=1, seconds=1)
 
@@ -303,6 +330,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 day')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_hours(self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=2, minutes=1, seconds=1)
 
@@ -313,6 +341,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '2 hours')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_an_hour(self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=1, minutes=1, seconds=1)
 
@@ -323,6 +352,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 hour')
 
     def test_create_string_from_largest_unit_in_timedelta_returns_minutes(self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=4, seconds=1)
 
@@ -334,6 +364,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_minute(
             self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=1, seconds=12)
 
@@ -345,6 +376,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_min_for_min(
             self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=1, seconds=0)
 
@@ -356,6 +388,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_create_string_from_largest_unit_in_timedelta_returns_minute_if_sec(
             self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=0, seconds=1)
 
@@ -367,6 +400,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_create_string_from_largest_unit_in_timedelta_returns_a_min_if_msec(
             self):
+        # type: () -> None
         timedelta_object = datetime.timedelta(
             days=0, hours=0, minutes=0, seconds=0, milliseconds=1)
 
@@ -377,6 +411,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(time_string, '1 minute')
 
     def test_get_hashable_value(self):
+        # type: () -> None
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]
         json1_deepcopy = copy.deepcopy(json1)
@@ -392,38 +427,44 @@ class UtilsTests(test_utils.GenericTestBase):
             })
 
     def test_is_supported_audio_language_code(self):
+        # type: () -> None
         self.assertTrue(utils.is_supported_audio_language_code('hi-en'))
         self.assertFalse(utils.is_supported_audio_language_code('unknown'))
 
     def test_is_valid_language_code(self):
+        # type: () -> None
         self.assertTrue(utils.is_valid_language_code('en'))
         self.assertFalse(utils.is_valid_language_code('unknown'))
 
     def test_require_valid_name(self):
-        name = 'name'
+        # type: () -> None
+        name = 'name' # type: Any
         utils.require_valid_name(name, 'name_type')
 
         name = 0
-        with self.assertRaisesRegexp(Exception, '0 must be a string.'):
+        with self.assertRaisesRegexp(Exception, '0 must be a string.'): # type: ignore[no-untyped-call]
             utils.require_valid_name(name, 'name_type')
 
     def test_require_valid_meta_tag_content(self):
+        # type: () -> None
         meta_tag_content = 'name'
         utils.require_valid_meta_tag_content(meta_tag_content)
 
         non_string_meta_tag_content = 0
         invalid_type_error = (
             'Expected meta tag content to be a string, received 0')
-        with self.assertRaisesRegexp(Exception, invalid_type_error):
-            utils.require_valid_meta_tag_content(non_string_meta_tag_content)
+        with self.assertRaisesRegexp(Exception, invalid_type_error): # type: ignore[no-untyped-call]
+            utils.require_valid_meta_tag_content(non_string_meta_tag_content) # type: ignore[arg-type]
         lengthy_meta_tag_content = 'a' * 200
         max_length_error = (
             'Meta tag content should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_META_TAG_CONTENT)
-        with self.assertRaisesRegexp(Exception, max_length_error):
+
+        with self.assertRaisesRegexp(Exception, max_length_error): # type: ignore[no-untyped-call]
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
     def test_require_valid_page_title_fragment_for_web(self):
+        # type: () -> None
         page_title_fragment_for_web = 'name'
         utils.require_valid_page_title_fragment_for_web(
             page_title_fragment_for_web)
@@ -431,18 +472,20 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_page_title_fragment_for_web = 0
         invalid_type_error = (
             'Expected page title fragment to be a string, received 0')
-        with self.assertRaisesRegexp(Exception, invalid_type_error):
+        with self.assertRaisesRegexp(Exception, invalid_type_error): # type: ignore[no-untyped-call]
             utils.require_valid_page_title_fragment_for_web(
-                non_string_page_title_fragment_for_web)
+                non_string_page_title_fragment_for_web) # type: ignore[arg-type]
         lengthy_page_title_fragment_for_web = 'a' * 60
         max_length_error = (
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
-        with self.assertRaisesRegexp(Exception, max_length_error):
+
+        with self.assertRaisesRegexp(Exception, max_length_error): # type: ignore[no-untyped-call]
             utils.require_valid_page_title_fragment_for_web(
                 lengthy_page_title_fragment_for_web)
 
     def test_require_valid_url_fragment(self):
+        # type: () -> None
         name = 'name'
         utils.require_valid_url_fragment(name, 'name-type', 20)
 
@@ -451,7 +494,7 @@ class UtilsTests(test_utils.GenericTestBase):
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. '
             'Received name with spaces.')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, name_with_spaces_expected_error):
             utils.require_valid_url_fragment(
                 name_with_spaces, 'name-type', 20)
@@ -460,7 +503,7 @@ class UtilsTests(test_utils.GenericTestBase):
         name_in_caps_expected_error = (
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. Received NAME.')
-        with self.assertRaisesRegexp(Exception, name_in_caps_expected_error):
+        with self.assertRaisesRegexp(Exception, name_in_caps_expected_error): # type: ignore[no-untyped-call]
             utils.require_valid_url_fragment(
                 name_in_caps, 'name-type', 20)
 
@@ -468,7 +511,7 @@ class UtilsTests(test_utils.GenericTestBase):
         name_with_numbers_expected_error = (
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. Received nam3.')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, name_with_numbers_expected_error):
             utils.require_valid_url_fragment(
                 name_with_numbers, 'name-type', 20)
@@ -477,50 +520,53 @@ class UtilsTests(test_utils.GenericTestBase):
         long_name_expected_error = (
             'name-type field should not exceed 10 characters, '
             'received %s' % long_name)
-        with self.assertRaisesRegexp(Exception, long_name_expected_error):
+        with self.assertRaisesRegexp(Exception, long_name_expected_error): # type: ignore[no-untyped-call]
             utils.require_valid_url_fragment(
                 long_name, 'name-type', 10)
 
         empty_name = ''
         empty_name_expected_error = 'name-type field should not be empty.'
-        with self.assertRaisesRegexp(Exception, empty_name_expected_error):
+        with self.assertRaisesRegexp(Exception, empty_name_expected_error): # type: ignore[no-untyped-call]
             utils.require_valid_url_fragment(empty_name, 'name-type', 20)
 
         non_string_name = 0
         non_string_name_expected_error = (
             'name-type field must be a string. Received 0.')
-        with self.assertRaisesRegexp(
-            Exception, non_string_name_expected_error):
-            utils.require_valid_url_fragment(non_string_name, 'name-type', 20)
+        with self.assertRaisesRegexp(Exception, non_string_name_expected_error): # type: ignore[no-untyped-call]
+            utils.require_valid_url_fragment(non_string_name, 'name-type', 20) # type: ignore[arg-type]
 
     def test_validate_convert_to_hash(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected string, received 1 of type %s' % type(1)):
-            utils.convert_to_hash(1, 10)
+            utils.convert_to_hash(1, 10) # type: ignore[arg-type]
 
     def test_convert_png_to_data_url_with_non_png_image_raises_error(self):
+        # type: () -> None
         favicon_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'favicon.ico')
+            self.get_static_asset_filepath(), 'assets', 'favicon.ico') # type: ignore[no-untyped-call]
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG image.'):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
             self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'Found invalid non-asset file .+'
             'There should only be a single non-asset file, and it should have '
             'a .yaml suffix.'):
             utils.get_exploration_components_from_dir('core/tests/load_tests')
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The only directory in . should be assets/'):
             utils.get_exploration_components_from_dir('.')
 
     def test_get_exploration_components_from_dir_with_multiple_yaml_files(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'More than one non-asset file specified for '
             'core/tests/data/dummy_assets/assets'):
@@ -528,21 +574,25 @@ class UtilsTests(test_utils.GenericTestBase):
                 'core/tests/data/dummy_assets/assets/')
 
     def test_get_exploration_components_from_dir_with_no_yaml_file(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'No yaml file specifed for core/tests/data/dummy_assets'):
             utils.get_exploration_components_from_dir(
                 'core/tests/data/dummy_assets/')
 
     def test_get_asset_dir_prefix_with_prod_mode(self):
+        # type: () -> None
         with self.swap(constants, 'DEV_MODE', False):
             self.assertEqual(utils.get_asset_dir_prefix(), '/build')
 
     def test_base64_from_int(self):
+        # type: () -> None
         base64_number = utils.base64_from_int(108)
         self.assertEqual(base64.b64decode(base64_number), '[108]')
 
     def test_get_supported_audio_language_description_with_invalid_code(self):
+        # type: () -> None
         valid_language_code = 'en'
         expected_language_description = 'English'
         self.assertEqual(
@@ -550,12 +600,13 @@ class UtilsTests(test_utils.GenericTestBase):
             expected_language_description)
 
         invalid_language_code = 'invalid_code'
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Unsupported audio language code: invalid_code'):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
     def test_is_user_id_valid(self):
+        # type: () -> None
         self.assertTrue(
             utils.is_user_id_valid(
                 feconf.SYSTEM_COMMITTER_ID, allow_system_user_id=True))
@@ -579,6 +630,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertFalse(utils.is_user_id_valid('a' * 36))
 
     def test_is_pseudonymous_id(self):
+        # type: () -> None
         self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
         self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
         self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
@@ -586,6 +638,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertFalse(utils.is_pseudonymous_id('a' * 36))
 
     def test_snake_case_to_camel_case(self):
+        # type: () -> None
         camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
         camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
         camel_case_str3 = utils.snake_case_to_camel_case('test1')
@@ -595,16 +648,18 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def _assert_valid_thumbnail_filename(
             self, expected_error_substring, thumbnail_filename):
+        # type: (Text, Text) -> None
         """Helper method for test_require_valid_thumbnail_filename."""
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring):
             utils.require_valid_thumbnail_filename(
                 thumbnail_filename)
 
     def test_require_valid_thumbnail_filename(self):
+        # type: () -> None
         """Test thumbnail filename validation."""
         self._assert_valid_thumbnail_filename(
-            'Expected thumbnail filename to be a string, received 10', 10)
+            'Expected thumbnail filename to be a string, received 10', 10) # type: ignore[arg-type]
         self._assert_valid_thumbnail_filename(
             'Thumbnail filename should not start with a dot.', '.name')
         self._assert_valid_thumbnail_filename(
@@ -621,20 +676,25 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_thumbnail_filename(filename)
 
     def test_get_time_in_millisecs(self):
+        # type: () -> None
         dt = datetime.datetime(2020, 6, 15)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
             dt,
-            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+            datetime.datetime.fromtimestamp(
+                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
 
     def test_get_time_in_millisecs_with_complicated_time(self):
+        # type: () -> None
         dt = datetime.datetime(2020, 6, 15, 5, 18, 23, microsecond=123456)
         msecs = utils.get_time_in_millisecs(dt)
         self.assertEqual(
             dt,
-            datetime.datetime.fromtimestamp(python_utils.divide(msecs, 1000.0)))
+            datetime.datetime.fromtimestamp(
+                python_utils.divide(msecs, 1000.0))) # type: ignore[no-untyped-call]
 
     def test_grouper(self):
+        # type: () -> None
         self.assertEqual(
             [list(g) for g in utils.grouper(python_utils.RANGE(7), 3)],
             [[0, 1, 2], [3, 4, 5], [6, None, None]])
@@ -645,6 +705,7 @@ class UtilsTests(test_utils.GenericTestBase):
             ['ABC', 'DEF', 'Gxx'])
 
     def test_partition(self):
+        # type: () -> None
         is_even = lambda n: (n % 2) == 0
 
         evens, odds = (
@@ -654,6 +715,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(list(odds), [1, 5, 3, 7])
 
     def test_enumerated_partition(self):
+        # type: () -> None
         logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
         is_error = lambda msg: msg.startswith('ERROR: ')
 
@@ -662,3 +724,24 @@ class UtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
         self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])
+
+    def test_convert_png_data_url_to_binary(self):
+        # type: () -> None
+        image_data_url = '%s%s' % (
+            utils.PNG_DATA_URL_PREFIX,
+            python_utils.url_quote(base64.b64encode('test123'))) # type: ignore[no-untyped-call]
+
+        self.assertEqual(
+            utils.convert_png_data_url_to_binary(image_data_url), 'test123')
+
+    def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(self):
+        # type: () -> None
+        image_data_url = python_utils.url_quote(base64.b64encode('test123')) # type: ignore[no-untyped-call]
+
+        self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            Exception, 'The given string does not represent a PNG data URL.',
+            lambda: utils.convert_png_data_url_to_binary(image_data_url))
+
+    def test_quoted_string(self):
+        # type: () -> None
+        self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')

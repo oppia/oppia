@@ -29,9 +29,9 @@ import python_utils
 import utils
 
 
-SERVER_MODES = utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
+SERVER_MODES = python_utils.create_enum('dev', 'test', 'prod') # pylint: disable=invalid-name
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
-DATA_TYPES = utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
+DATA_TYPES = python_utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
@@ -110,8 +110,8 @@ class EvaluationContext(python_utils.OBJECT):
         """Returns the server mode of Oppia.
 
         Returns:
-            str. The the server mode of Oppia, must be one of the following:
-            'dev', 'test', 'prod'.
+            Enum(SERVER_MODES). The the server mode of Oppia,
+            must be one of the following: dev, test, prod.
         """
         return self._server_mode
 
@@ -258,7 +258,7 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         matched = False
         if self._type == 'server_mode' and op == '=':
-            matched = context.server_mode == value
+            matched = context.server_mode.value == value
         elif self._type == 'platform_type' and op == '=':
             matched = context.platform_type == value
         elif self._type == 'browser_type' and op == '=':
@@ -287,7 +287,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         if self._type == 'server_mode':
             for _, mode in self._conditions:
-                if mode not in ALLOWED_SERVER_MODES:
+                if not any([mode == server_mode.value
+                            for server_mode in ALLOWED_SERVER_MODES]):
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
@@ -545,9 +546,10 @@ class PlatformParameter(python_utils.OBJECT):
     """Domain object for platform parameters."""
 
     DATA_TYPE_PREDICATES_DICT = {
-        DATA_TYPES.bool: lambda x: isinstance(x, bool),
-        DATA_TYPES.string: lambda x: isinstance(x, python_utils.BASESTRING),
-        DATA_TYPES.number: lambda x: isinstance(x, (float, int)),
+        DATA_TYPES.bool.value: lambda x: isinstance(x, bool),
+        DATA_TYPES.string.value: (
+            lambda x: isinstance(x, python_utils.BASESTRING)),
+        DATA_TYPES.number.value: lambda x: isinstance(x, (float, int)),
     }
 
     PARAMETER_NAME_REGEXP = r'^[A-Za-z0-9_]{1,100}$'
@@ -718,15 +720,15 @@ class PlatformParameter(python_utils.OBJECT):
         """Validates the PlatformParameter domain object that is a feature
         flag.
         """
-        if self._data_type != DATA_TYPES.bool:
+        if self._data_type != DATA_TYPES.bool.value:
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
-        if self._feature_stage not in ALLOWED_FEATURE_STAGES:
+        if not any([self._feature_stage == feature_stage.value
+                    for feature_stage in ALLOWED_FEATURE_STAGES]):
             raise utils.ValidationError(
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
-
         enabling_rules = [
             rule for rule in self._rules if rule.value_when_matched]
         for rule in enabling_rules:
@@ -736,15 +738,15 @@ class PlatformParameter(python_utils.OBJECT):
             for server_mode_filter in server_mode_filters:
                 server_modes = [
                     value for _, value in server_mode_filter.conditions]
-                if self._feature_stage == FEATURE_STAGES.dev:
+                if self._feature_stage == FEATURE_STAGES.dev.value:
                     if (
-                            SERVER_MODES.test in server_modes or
-                            SERVER_MODES.prod in server_modes):
+                            SERVER_MODES.test.value in server_modes or
+                            SERVER_MODES.prod.value in server_modes):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
-                elif self._feature_stage == FEATURE_STAGES.test:
-                    if SERVER_MODES.prod in server_modes:
+                elif self._feature_stage == FEATURE_STAGES.test.value:
+                    if SERVER_MODES.prod.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')

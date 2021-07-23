@@ -34,6 +34,7 @@ PREREQUISITES = [
     ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
     ('certifi', '2020.12.5', os.path.join(
         TOOLS_DIR, 'certifi-2020.12.5')),
+    ('typing', '3.7.4.3', os.path.join('third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
@@ -95,6 +96,8 @@ PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
     os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+# Path to typescript plugin required to compile ts compatible files from proto.
+PROTOC_GEN_TS_PATH = os.path.join(common.NODE_MODULES_PATH, 'protoc-gen-ts')
 
 
 def tweak_yarn_executable():
@@ -154,6 +157,7 @@ def compile_protobuf_files(proto_files_paths):
     """
     proto_env = os.environ.copy()
     proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_DIR)
+    proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_GEN_TS_PATH)
     buf_path = os.path.join(
         BUF_DIR,
         BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
@@ -319,17 +323,17 @@ def main():
                 # this open does nothing.
                 pass
 
-    # Compile protobuf files.
-    python_utils.PRINT('Installing buf and protoc binary.')
-    install_buf_and_protoc()
-    python_utils.PRINT('Compiling protobuf files.')
-    compile_protobuf_files(PROTO_FILES_PATHS)
-
     if common.is_windows_os():
         tweak_yarn_executable()
 
     # Install third-party node modules needed for the build process.
     subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
+
+    # Compile protobuf files.
+    python_utils.PRINT('Installing buf and protoc binary.')
+    install_buf_and_protoc()
+    python_utils.PRINT('Compiling protobuf files.')
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')

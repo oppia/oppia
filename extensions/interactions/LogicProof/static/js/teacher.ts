@@ -16,10 +16,10 @@
  * @fileoverview Components used by the LogicProof interaction editor.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofData from 'interactions/LogicProof/static/js/data';
 import logicProofParser from
-  'interactions/LogicProof/static/js/generatedParser.ts';
+  'interactions/LogicProof/static/js/generatedParser';
 
 var logicProofTeacher = (function() {
   // ---- QUESTION ----
@@ -57,6 +57,7 @@ var logicProofTeacher = (function() {
         var error = new logicProofShared.UserError('unparseable', {
           field: 'assumptions'
         });
+        // eslint-disable-next-line no-throw-literal
         throw {
           message: logicProofShared.renderError(
             error, TEACHER_ERROR_MESSAGES, logicProofData.BASE_STUDENT_LANGUAGE)
@@ -70,6 +71,7 @@ var logicProofTeacher = (function() {
       var error = new logicProofShared.UserError('unparseable', {
         field: 'target'
       });
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: logicProofShared.renderError(
           error, TEACHER_ERROR_MESSAGES, logicProofData.BASE_STUDENT_LANGUAGE)
@@ -98,6 +100,7 @@ var logicProofTeacher = (function() {
         expressions, logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary
       );
     } catch (err) {
+      // eslint-disable-next-line no-throw-literal
       throw {
         message: logicProofShared.renderError(
           err, TEACHER_ERROR_MESSAGES, logicProofData.BASE_STUDENT_LANGUAGE)

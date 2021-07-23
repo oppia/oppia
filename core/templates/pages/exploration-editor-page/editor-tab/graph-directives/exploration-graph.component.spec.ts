@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Exploration Graph Component', function() {
   var ctrl = null;
@@ -27,6 +27,7 @@ describe('Exploration Graph Component', function() {
   var alertsService = null;
   var editabilityService = null;
   var explorationStatesService = null;
+  var explorationWarningsService = null;
   var loggerService = null;
   var routerService = null;
   var stateEditorService = null;
@@ -39,6 +40,7 @@ describe('Exploration Graph Component', function() {
     alertsService = $injector.get('AlertsService');
     editabilityService = $injector.get('EditabilityService');
     explorationStatesService = $injector.get('ExplorationStatesService');
+    explorationWarningsService = $injector.get('ExplorationWarningsService');
     loggerService = $injector.get('LoggerService');
     routerService = $injector.get('RouterService');
     stateEditorService = $injector.get('StateEditorService');
@@ -144,5 +146,21 @@ describe('Exploration Graph Component', function() {
     $rootScope.$apply();
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
+  });
+
+  it('should return checkpoint count', function() {
+    spyOn(explorationStatesService, 'getCheckpointCount').and.returnValue(5);
+
+    expect(ctrl.getCheckpointCount()).toEqual(5);
+  });
+
+  it('should return checkpoint count warning', function() {
+    spyOn(explorationWarningsService, 'getCheckpointCountWarning').and
+      .returnValue('Only a maximum of 8 checkpoints are allowed per lesson.');
+
+    expect(ctrl.showCheckpointCountWarningSign()).toEqual(
+      'Only a maximum of 8 checkpoints are allowed per lesson.');
+    expect(ctrl.checkpointCountWarning).toEqual(
+      'Only a maximum of 8 checkpoints are allowed per lesson.');
   });
 });

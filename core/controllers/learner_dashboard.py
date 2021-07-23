@@ -58,8 +58,7 @@ class LearnerDashboardHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         (
-            learner_progress, number_of_nonexistent_activities,
-            completed_to_incomplete_collections) = (
+            learner_progress, number_of_nonexistent_activities) = (
                 learner_progress_services.get_activity_progress(self.user_id))
 
         completed_exp_summary_dicts = (
@@ -77,12 +76,34 @@ class LearnerDashboardHandler(base.BaseHandler):
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
 
+        completed_story_summary_dicts = (
+            learner_progress_services.get_displayable_story_summary_dicts(
+                self.user_id, learner_progress.completed_story_summaries))
+
+        learnt_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, learner_progress.learnt_topic_summaries))
+        partially_learnt_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress.partially_learnt_topic_summaries))
+
         exploration_playlist_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.exploration_playlist_summaries))
         collection_playlist_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.collection_playlist_summaries))
+
+        topics_to_learn_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, learner_progress.topics_to_learn_summaries))
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, learner_progress.all_topic_summaries))
+        untracked_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id, learner_progress.untracked_topic_summaries))
 
         full_thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
@@ -114,14 +135,25 @@ class LearnerDashboardHandler(base.BaseHandler):
         self.values.update({
             'completed_explorations_list': completed_exp_summary_dicts,
             'completed_collections_list': completed_collection_summary_dicts,
+            'completed_stories_list': completed_story_summary_dicts,
+            'learnt_topics_list': learnt_topic_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'partially_learnt_topics_list': (
+                partially_learnt_topic_summary_dicts),
             'exploration_playlist': exploration_playlist_summary_dicts,
             'collection_playlist': collection_playlist_summary_dicts,
+            'topics_to_learn_list': topics_to_learn_summary_dicts,
+            'all_topics_list': all_topic_summary_dicts,
+            'untracked_topics_list': untracked_topic_summary_dicts,
             'number_of_nonexistent_activities': (
                 number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
-                completed_to_incomplete_collections),
+                learner_progress.completed_to_incomplete_collections),
+            'completed_to_incomplete_stories': (
+                learner_progress.completed_to_incomplete_stories),
+            'learnt_to_partially_learnt_topics': (
+                learner_progress.learnt_to_partially_learnt_topics),
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list

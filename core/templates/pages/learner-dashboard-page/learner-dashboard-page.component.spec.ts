@@ -36,7 +36,6 @@ import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
@@ -46,13 +45,9 @@ import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/su
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -69,7 +64,7 @@ class MockTrunctePipe {
 }
 
 class MockLearnerDashboardActivityBackendApiService {
-  removeActivityModal(): Promise<void> {
+  async removeActivityModalAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -107,7 +102,6 @@ describe('Learner dashboard page', () => {
   let userService: UserService = null;
 
   let profilePictureDataUrl = 'profile-picture-url';
-  let windowRef: WindowRef = null;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -116,8 +110,9 @@ describe('Learner dashboard page', () => {
     param_changes: [],
     param_specs: {},
     is_version_of_draft_valid: true,
+    correctness_feedback_enabled: false,
     draft_changes: [],
-    version: '1',
+    version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
 
@@ -233,18 +228,30 @@ describe('Learner dashboard page', () => {
   let learnerDashboardData = {
     completed_explorations_list: [],
     completed_collections_list: [],
+    completed_stories_list: [],
+    learnt_topic_list: [],
     incomplete_explorations_list: [],
     incomplete_collections_list: [],
+    partially_learnt_topics_list: [],
+    topics_to_learn_list: [],
+    all_topics_list: [],
+    untracked_topics_list: [],
     subscription_list: subscriptionsList,
+    completed_to_incomplete_collections: [],
+    completed_to_incomplete_stories: [],
+    learnt_to_partially_learnt_topics: [],
     number_of_nonexistent_activities: {
       incomplete_explorations: 0,
       incomplete_collections: 0,
+      partially_learnt_topics: 0,
       completed_explorations: 0,
       completed_collections: 0,
+      completed_stories: 0,
+      learnt_topics: 0,
+      topics_to_learn: 0,
       exploration_playlist: 0,
       collection_playlist: 0
     },
-    completed_to_incomplete_collections: [],
     thread_summaries: threadSummaryList,
     number_of_unread_threads: 10,
     exploration_playlist: [],
@@ -252,6 +259,7 @@ describe('Learner dashboard page', () => {
   };
 
   let userInfo = {
+    _role: 'USER_ROLE',
     _isModerator: true,
     _isAdmin: false,
     _isTopicManager: false,
@@ -265,6 +273,8 @@ describe('Learner dashboard page', () => {
     isAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -304,7 +314,6 @@ describe('Learner dashboard page', () => {
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
-          WindowRef,
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -324,9 +333,8 @@ describe('Learner dashboard page', () => {
       suggestionModalForLearnerDashboardService =
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
-      windowRef = TestBed.inject(WindowRef);
 
-      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
+      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
       });
       // Generate completed explorations and exploration playlist.
@@ -388,12 +396,12 @@ describe('Learner dashboard page', () => {
       }
 
       spyOn(userService, 'getProfileImageDataUrlAsync').and
-        .callFake(() => {
+        .callFake(async() => {
           return Promise.resolve(profilePictureDataUrl);
         });
 
       spyOn(userService, 'getUserInfoAsync').and
-        .callFake(() => {
+        .callFake(async() => {
           return Promise.resolve(userInfo);
         });
 
@@ -419,6 +427,30 @@ describe('Learner dashboard page', () => {
             learnerDashboardData.incomplete_collections_list.map(
               collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
+          completedStoriesList: (
+            learnerDashboardData.completed_stories_list.map(
+              storySummary => StorySummary.createFromBackendDict(
+                storySummary))),
+          learntTopicsList: (
+            learnerDashboardData.learnt_topic_list.map(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
+                topicSummary))),
+          partiallyLearntTopicsList: (
+            learnerDashboardData.partially_learnt_topics_list.map(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
+                topicSummary))),
+          topicsToLearnList: (
+            learnerDashboardData.topics_to_learn_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          allTopicsList: (
+            learnerDashboardData.all_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          untrackedTopicsList: (
+            learnerDashboardData.untracked_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary
@@ -430,6 +462,10 @@ describe('Learner dashboard page', () => {
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
+          completedToIncompleteStories: (
+            learnerDashboardData.completed_to_incomplete_stories),
+          learntToPartiallyLearntTopics: (
+            learnerDashboardData.learnt_to_partially_learnt_topics),
           numberOfNonexistentActivities: (
             NonExistentActivities.createFromBackendDict(
               learnerDashboardData.number_of_nonexistent_activities)),
@@ -461,16 +497,11 @@ describe('Learner dashboard page', () => {
       expect(component.explorationPlaylist.length).toBe(10);
     }));
 
-    it('should set focus on browse lesson btn and' +
-      ' scroll back to top of window after focusing', fakeAsync(() => {
-      const focusSpy = spyOn(focusManagerService, 'setFocus');
-      const windowSpy = spyOn(windowRef.nativeWindow, 'scrollTo');
-      component.addFocusWithoutScroll('ourLessonsBtn');
-
+    it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
+      const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      component.ngOnInit();
       flush();
-
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-      expect(windowSpy).toHaveBeenCalled();
     }));
 
     it('should get static image url', () => {

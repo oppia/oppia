@@ -21,9 +21,8 @@ import { TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { InteractionAttributesExtractorService } from
   'interactions/interaction-attributes-extractor.service';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
 import { ContinueCustomizationArgs } from './customization-args-defs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Interaction attributes extractor service', () => {
   let iaes: InteractionAttributesExtractorService = null;
@@ -40,17 +39,25 @@ describe('Interaction attributes extractor service', () => {
 
   it('should properly extract customization arguments values from attributes',
     () => {
-      const placeholderWithValue = hes.objToEscapedJson({
+      const choicesWithValue = hes.objToEscapedJson([{
         content_id: 'ca_placeholder_0',
-        unicode_str: 'Enter here.'
-      });
-      const rowsWithValue = hes.objToEscapedJson(2);
-      const attributes = { placeholderWithValue, rowsWithValue };
+        html: 'Enter here.'
+      }]);
+      const allowMultipleItemsInSamePositionWithValue = hes.objToEscapedJson(
+        true
+      );
+      const attributes = {
+        choicesWithValue,
+        allowMultipleItemsInSamePositionWithValue
+      };
 
-      const caValues = iaes.getValuesFromAttributes('TextInput', attributes);
+      const caValues = iaes.getValuesFromAttributes(
+        'DragAndDropSortInput',
+        attributes
+      );
       expect(caValues).toEqual({
-        placeholder: new SubtitledUnicode('Enter here.', 'ca_placeholder_0'),
-        rows: 2
+        choices: [new SubtitledHtml('Enter here.', 'ca_placeholder_0')],
+        allowMultipleItemsInSamePosition: true
       });
     });
 

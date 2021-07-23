@@ -34,12 +34,14 @@ angular.module('oppia').component('explorationGraph', {
   template: require('./exploration-graph.component.html'),
   controller: [
     '$uibModal', 'AlertsService', 'EditabilityService',
-    'ExplorationStatesService', 'GraphDataService', 'LoggerService',
-    'RouterService', 'StateEditorService', 'UrlInterpolationService',
+    'ExplorationStatesService', 'ExplorationWarningsService',
+    'GraphDataService', 'LoggerService', 'RouterService',
+    'StateEditorService',
     function(
         $uibModal, AlertsService, EditabilityService,
-        ExplorationStatesService, GraphDataService, LoggerService,
-        RouterService, StateEditorService, UrlInterpolationService) {
+        ExplorationStatesService, ExplorationWarningsService,
+        GraphDataService, LoggerService, RouterService,
+        StateEditorService) {
       var ctrl = this;
       // We hide the graph at the outset in order not to confuse new
       // exploration creators.
@@ -59,12 +61,16 @@ angular.module('oppia').component('explorationGraph', {
         return StateEditorService.getActiveStateName();
       };
 
+      ctrl.getCheckpointCount = function() {
+        return ExplorationStatesService.getCheckpointCount();
+      };
+
       ctrl.openStateGraphModal = function() {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/exploration-graph-modal.template.html'),
           backdrop: true,
           resolve: {
@@ -94,6 +100,12 @@ angular.module('oppia').component('explorationGraph', {
 
       ctrl.isEditable = function() {
         return EditabilityService.isEditable();
+      };
+
+      ctrl.showCheckpointCountWarningSign = function() {
+        ctrl.checkpointCountWarning = (
+          ExplorationWarningsService.getCheckpointCountWarning());
+        return ctrl.checkpointCountWarning;
       };
     }
   ]

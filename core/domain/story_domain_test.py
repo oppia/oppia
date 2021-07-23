@@ -18,8 +18,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import os
 
 from constants import constants
+from core.domain import fs_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -317,6 +319,53 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_thumbnail_filename_for_story_node(
             'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
+    def test_story_node_thumbnail_size_in_bytes_validation(self):
+        self.story.story_contents.nodes[0].thumbnail_filename = 'image.svg'
+        self.story.story_contents.nodes[0].thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0])
+        self.story.story_contents.nodes[0].thumbnail_size_in_bytes = 0
+        self._assert_validation_error(
+            'Story node thumbnail size in bytes cannot be zero.')
+
+    def test_story_node_update_thumbnail_filename(self):
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The thumbnail img.svg for story node with id %s does not exist'
+            ' in the filesystem.' % (self.STORY_ID)):
+            self.story.update_node_thumbnail_filename(
+                self.NODE_ID_1, 'img.svg')
+
+        # Test successful update of thumbnail_filename when the thumbnail
+        # is found in the filesystem.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs.commit(
+            '%s/new_image.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        self.story.update_node_thumbnail_filename(
+            self.NODE_ID_1,
+            'new_image.svg')
+        node_index = self.story.story_contents.get_node_index(self.NODE_ID_1)
+        self.assertEqual(
+            self.story.story_contents.nodes[node_index].thumbnail_filename,
+            'new_image.svg')
+        self.assertEqual(
+            self.story.story_contents.nodes[node_index].thumbnail_size_in_bytes,
+            len(raw_image))
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The node with id invalid_id is not part of this story'):
+            self.story.update_node_thumbnail_filename(
+                'invalid_id', 'invalid_thumbnail.svg')
+
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
@@ -344,6 +393,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'title': 'Title',
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'description': 'Description',
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
@@ -445,6 +495,32 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.thumbnail_filename = 'test.svg'
         self._assert_validation_error(
             'Story thumbnail background color is not specified.')
+
+    def test_update_thumbnail_filename(self):
+        self.assertEqual(self.story.thumbnail_filename, None)
+        # Test exception when thumbnail is not found on filesystem.
+        with self.assertRaisesRegexp(
+            Exception,
+            'The thumbnail img.svg for story with id %s does not exist'
+            ' in the filesystem.' % (self.STORY_ID)):
+            self.story.update_thumbnail_filename('img.svg')
+
+        # Save the dummy image to the filesystem to be used as thumbnail.
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_STORY, self.story.id))
+        fs.commit(
+            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
+            mimetype='image/svg+xml')
+
+        # Test successful update of thumbnail present in the filesystem.
+        self.story.update_thumbnail_filename('img.svg')
+        self.assertEqual(self.story.thumbnail_filename, 'img.svg')
+        self.assertEqual(self.story.thumbnail_size_in_bytes, len(raw_image))
 
     def test_description_validation(self):
         self.story.description = 1
@@ -568,6 +644,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'id': 'node_1',
                 'thumbnail_filename': None,
                 'thumbnail_bg_color': None,
+                'thumbnail_size_in_bytes': None,
                 'title': 'Title 1',
                 'description': 'Description 1',
                 'destination_node_ids': [self.NODE_ID_2],
@@ -628,6 +705,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_3'],
@@ -642,6 +720,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image2.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_1'],
@@ -656,6 +735,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image3.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': [],
@@ -689,6 +769,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_3'],
@@ -703,6 +784,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_1'],
@@ -717,6 +799,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': [],
@@ -747,6 +830,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_3'],
@@ -774,6 +858,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_3'],
@@ -801,6 +886,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -815,6 +901,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': [],
@@ -829,6 +916,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': [],
@@ -850,6 +938,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -864,6 +953,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': [],
@@ -878,6 +968,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': [],
@@ -902,6 +993,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
@@ -916,6 +1008,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
@@ -930,6 +1023,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
@@ -952,6 +1046,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -966,6 +1061,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_4', 'node_3'],
@@ -980,6 +1076,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': [],
@@ -994,6 +1091,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 4',
             'description': 'Description 4',
             'destination_node_ids': [],
@@ -1039,6 +1137,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -1053,6 +1152,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_4', 'node_3'],
@@ -1099,6 +1199,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
             'destination_node_ids': ['node_2'],
@@ -1113,6 +1214,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
             'destination_node_ids': ['node_4', 'node_3'],
@@ -1127,6 +1229,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
             'destination_node_ids': [],
@@ -1169,7 +1272,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """
         story_node = story_domain.StoryNode(
             self.NODE_ID_1, 'Title', 'Description', None,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0], None,
             [self.NODE_ID_2], [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(

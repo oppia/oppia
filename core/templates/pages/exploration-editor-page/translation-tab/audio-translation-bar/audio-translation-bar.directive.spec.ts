@@ -16,50 +16,24 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+import { EventEmitter, NgZone } from '@angular/core';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { StateWrittenTranslationsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import { IdGenerationService } from 'services/id-generation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { RecordedVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
-import { UserService } from 'services/user.service';
+import { AudioPlayerService } from 'services/audio-player.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 // ^^^ This block is to be removed.
 
 require(
@@ -75,7 +49,7 @@ describe('Audio translation bar directive', function() {
   var $uibModal = null;
   var alertsService = null;
   var assetsBackendApiService = null;
-  var audioPlayerService = null;
+  var audioPlayerService: AudioPlayerService = null;
   var contextService = null;
   var editabilityService = null;
   var explorationStatesService = null;
@@ -87,6 +61,7 @@ describe('Audio translation bar directive', function() {
   var userExplorationPermissionsService = null;
   var userService = null;
   var voiceoverRecordingService = null;
+  let zone = null;
 
   var stateName = 'State1';
   var explorationId = 'exp1';
@@ -100,52 +75,25 @@ describe('Audio translation bar directive', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   beforeEach(angular.mock.module('directiveTemplates'));
+  importAllAngularServices();
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
-  beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    editabilityService = TestBed.get(EditabilityService);
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    stateRecordedVoiceoversService = TestBed.get(
+    alertsService = TestBed.inject(AlertsService);
+    editabilityService = TestBed.inject(EditabilityService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
+    zone = TestBed.inject(NgZone);
+    OppiaAngularRootComponent.ngZone = zone;
+    spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
+    spyOn(zone, 'run').and.callFake((fn: Function) => fn());
   });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value('IdGenerationService', TestBed.get(IdGenerationService));
-    $provide.value(
-      'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
-    $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateEditorService', TestBed.get(StateEditorService));
-    $provide.value(
-      'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
-    $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value(
-      'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    $provide.value(
-      'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value('UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -217,6 +165,7 @@ describe('Audio translation bar directive', function() {
   }));
 
   afterEach(function() {
+    // eslint-disable-next-line oppia/disallow-angularjs-properties
     $rootScope.$broadcast('$destroy');
   });
 
@@ -231,7 +180,7 @@ describe('Audio translation bar directive', function() {
       spyOn(voiceoverRecordingService, 'status').and.returnValue({
         isAvailable: true
       });
-      spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
         $q.reject());
 
       $scope.checkAndStartRecording();
@@ -247,7 +196,7 @@ describe('Audio translation bar directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     $scope.checkAndStartRecording();
 
@@ -259,7 +208,7 @@ describe('Audio translation bar directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
@@ -273,7 +222,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -301,7 +250,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -324,7 +273,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -349,7 +298,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -402,7 +351,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -430,7 +379,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -474,7 +423,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -608,7 +557,7 @@ describe('Audio translation bar directive', function() {
   it('should play a not loaded audio translation', function() {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
-    spyOn(audioPlayerService, 'load').and.returnValue($q.resolve());
+    spyOn(audioPlayerService, 'loadAsync').and.returnValue($q.resolve());
     spyOn(audioPlayerService, 'play');
 
     expect($scope.isPlayingUploadedAudio()).toBe(false);
@@ -631,22 +580,12 @@ describe('Audio translation bar directive', function() {
     expect(audioPlayerService.pause).toHaveBeenCalled();
   });
 
-  it('should get uploded audio timer', function() {
-    spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
-    spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(100);
-    spyOn(audioPlayerService, 'getAudioDuration').and.returnValue(200);
-
-    expect($scope.getUploadedAudioTimer()).toBe('01:40 / 03:20');
-    expect($scope.audioTimerIsShown).toBe(true);
+  it('should get set progress audio timer', function() {
+    const setCurrentTimeSpy = spyOn(audioPlayerService, 'setCurrentTime');
+    setCurrentTimeSpy.and.returnValue(undefined);
+    $scope.setProgress({value: 100});
+    expect(setCurrentTimeSpy).toHaveBeenCalledWith(100);
   });
-
-  it('should get empty uploded audio timer when track is not loaded',
-    function() {
-      spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
-
-      expect($scope.getUploadedAudioTimer()).toBe('--:-- / --:--');
-      expect($scope.audioTimerIsShown).toBe(false);
-    });
 
   it('should delete audio when closing delete audio translation modal',
     function() {
@@ -711,21 +650,12 @@ describe('Audio translation bar directive', function() {
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   });
 
-  it('should set audio progress when progress percentage is defined',
-    function() {
-      spyOn(audioPlayerService, 'setProgress');
-
-      $scope.track.progress(20);
-
-      expect(audioPlayerService.setProgress).toHaveBeenCalledWith(0.2);
-    });
-
-  it('should get audio progress when progress percentage is not defined',
-    function() {
-      spyOn(audioPlayerService, 'getProgress').and.returnValue(30);
-
-      expect($scope.track.progress()).toBe(3000);
-    });
+  it('should apply changed when view update emits', waitForAsync(() => {
+    const applyAsyncSpy = spyOn($scope, '$applyAsync');
+    audioPlayerService.viewUpdate.emit();
+    audioPlayerService.onAudioStop.next();
+    expect(applyAsyncSpy).toHaveBeenCalled();
+  }));
 
   describe('when compiling html element', function() {
     var compiledElement = null;

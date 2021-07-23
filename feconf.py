@@ -25,6 +25,8 @@ import os
 
 from constants import constants
 
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
@@ -165,6 +167,7 @@ ALLOWED_HTML_RULE_VARIABLE_FORMATS = [
 ANSWER_TYPE_LIST_OF_SETS_OF_HTML = 'ListOfSetsOfHtmlStrings'
 ANSWER_TYPE_SET_OF_HTML = 'SetOfHtmlString'
 
+ENTITY_TYPE_BLOG_POST = 'blog_post'
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_SKILL = 'skill'
@@ -184,6 +187,9 @@ PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
+
+# The maximum number of goals allowed in the learner goals of the learner.
+MAX_CURRENT_GOALS_COUNT = 5
 
 # The minimum number of training samples required for training a classifier.
 MIN_TOTAL_TRAINING_EXAMPLES = 50
@@ -247,7 +253,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 43
+CURRENT_STATE_SCHEMA_VERSION = 46
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -256,7 +262,7 @@ CURRENT_STATE_SCHEMA_VERSION = 43
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
@@ -268,7 +274,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -332,14 +338,14 @@ DEFAULT_RECORDED_VOICEOVERS = {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
     'translations_mapping': {
         'content': {},
         'default_outcome': {}
     }
-}
+} # type: Dict[Text, Dict[Text, Dict[Text, Text]]]
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -398,8 +404,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 }
 
 # An array containing the image formats that can be compressed.
-COMPRESSIBLE_IMAGE_FORMATS = [
-    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
+COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
@@ -419,6 +424,7 @@ _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
 
 def get_empty_ratings():
+    # type: () -> Dict[Text, int]
     """Returns a copy of the empty ratings object.
 
     Returns:
@@ -427,6 +433,11 @@ def get_empty_ratings():
     """
     return copy.deepcopy(_EMPTY_RATINGS)
 
+
+# To use mailchimp email service.
+BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP = 'mailchimp_email_service'
+# Use GAE email service by default.
+BULK_EMAIL_SERVICE_PROVIDER = BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
 
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
@@ -441,6 +452,15 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+
+# Audience ID of the mailing list for Oppia in Mailchimp.
+MAILCHIMP_AUDIENCE_ID = None
+# Mailchimp API Key.
+MAILCHIMP_API_KEY = None
+# Mailchimp username.
+MAILCHIMP_USERNAME = None
+# Mailchimp secret, used to authenticate webhook requests.
+MAILCHIMP_WEBHOOK_SECRET = None
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
@@ -618,6 +638,18 @@ MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
 
+# The maximum number of blog post cards to be visible on each page in blog
+# homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
+
+# The maximum number of blog post cards to be visible on each page in author
+# specific blog post page.
+MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12
+
+# The maximum number of blog post cards to be visible as suggestions on the
+# blog post page.
+MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST = 2
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -709,6 +741,7 @@ DEMO_EXPLORATIONS = {
     u'23': 'rating_test.yaml',
     u'24': 'learner_flow_test.yaml',
     u'25': 'exploration_player_test.yaml',
+    u'26': 'android_interactions',
 }
 
 DEMO_COLLECTIONS = {
@@ -751,6 +784,15 @@ TASK_URL_DEFERRED = (
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
+BLOG_ADMIN_PAGE_URL = '/blog-admin'
+BLOG_ADMIN_ROLE_HANDLER_URL = '/blogadminrolehandler'
+BLOG_DASHBOARD_DATA_URL = '/blogdashboardhandler/data'
+BLOG_DASHBOARD_URL = '/blog-dashboard'
+BLOG_EDITOR_DATA_URL_PREFIX = '/blogeditorhandler/data'
+BULK_EMAIL_WEBHOOK_ENDPOINT = '/bulk_email_webhook_endpoint'
+BLOG_HOMEPAGE_DATA_URL = '/blogdatahandler/data'
+BLOG_HOMEPAGE_URL = '/blog'
+AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX = '/blog/author'
 CLASSROOM_DATA_HANDLER = '/classroom_data_handler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
 COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
@@ -762,6 +804,7 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
@@ -804,6 +847,7 @@ LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
 LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_GOALS_DATA_URL = '/learnergoalshandler'
 LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
 LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
@@ -822,7 +866,6 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
-NOTIFICATIONS_DASHBOARD_URL = '/notifications'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
 PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
@@ -864,6 +907,10 @@ SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
+UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
+    '/updatetranslationsuggestionhandler')
+UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
+    '/updatequestionsuggestionhandler')
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
@@ -998,14 +1045,37 @@ HANDLER_TYPE_JSON = 'json'
 HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
-ROLE_ID_GUEST = 'GUEST'
-ROLE_ID_BANNED_USER = 'BANNED_USER'
-ROLE_ID_LEARNER = 'LEARNER'
-ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
-ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
-ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
-ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
+ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
+ROLE_ID_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR'
+ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_LEARNER = 'LEARNER'
+ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_QUESTION_ADMIN = 'QUESTION_ADMIN'
+ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
+ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
+ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
+
+ALLOWED_USER_ROLES = [
+    ROLE_ID_ADMIN,
+    ROLE_ID_BANNED_USER,
+    ROLE_ID_BLOG_ADMIN,
+    ROLE_ID_BLOG_POST_EDITOR,
+    ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_EXPLORATION_EDITOR,
+    ROLE_ID_GUEST,
+    ROLE_ID_LEARNER,
+    ROLE_ID_MODERATOR,
+    ROLE_ID_QUESTION_ADMIN,
+    ROLE_ID_RELEASE_COORDINATOR,
+    ROLE_ID_TOPIC_MANAGER,
+    ROLE_ID_TRANSLATION_ADMIN,
+    ROLE_ID_VOICEOVER_ADMIN
+]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
@@ -1148,9 +1218,7 @@ CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
-
-# TODO(#11462): Delete this after Firebase authentication has been deployed.
-ENABLE_USER_CREATION = True
+FIREBASE_EMULATOR_PORT = 9099
 
 # The name of the cookie Oppia will place the session cookie into. The name is
 # arbitrary. If it is changed later on, then the cookie will live on in the
@@ -1271,6 +1339,11 @@ EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated values from the server data.
+    'deprecated_values': {
+        'new_status': ['publicized']
     }
 })
 
@@ -1370,6 +1443,12 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
 # Possible suggestion types.
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]

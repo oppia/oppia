@@ -1,4 +1,4 @@
-<audio-bar ng-if="showAudioBar()"></audio-bar>
+<oppia-audio-bar ng-if="showAudioBar()"></oppia-audio-bar>
 <div class="oppia-learner-view-card"
      ng-class="{'animate-card-width': startCardChangeAnimation}"
      ng-style="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
@@ -17,7 +17,7 @@
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
-        <div>
+        <div tabindex="1">
           <angular-html-bind class="protractor-test-conversation-content"
                              html-data="getDisplayedCard().getContentHtml()">
           </angular-html-bind>
@@ -46,24 +46,24 @@
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
       <div ng-repeat="responsePair in getDisplayedCard().getInputResponsePairs() track by $index">
         <div ng-if="(!$last || !isInteractionInline())">
-          <input-response-pair data="responsePair"
-                               profile-picture="profilePicture"
-                               oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                               input-response-pair-id="getInputResponsePairId($index)"
-                               is-last-pair="false">
-          </input-response-pair>
+          <oppia-input-response-pair [data]="responsePair"
+                                     [profile-picture]="profilePicture"
+                                     [oppia-avatar-image-url]="OPPIA_AVATAR_IMAGE_URL"
+                                     [input-response-pair-id]="getInputResponsePairId($index)"
+                                     [is-last-pair]="false">
+          </oppia-input-response-pair>
         </div>
       </div>
     </div>
 
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
     <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline() && getDisplayedCard().getInputResponsePairs().length > 0">
-      <input-response-pair data="getDisplayedCard().getInputResponsePairs()[getDisplayedCard().getInputResponsePairs().length - 1]"
-                           profile-picture="profilePicture"
-                           oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                           input-response-pair-id="getInputResponsePairId(getDisplayedCard().getInputResponsePairs().length - 1)"
-                           is-last-pair="true">
-      </input-response-pair>
+      <oppia-input-response-pair [data]="getDisplayedCard().getInputResponsePairs()[getDisplayedCard().getInputResponsePairs().length - 1]"
+                                 [profile-picture]="profilePicture"
+                                 [oppia-avatar-image-url]="OPPIA_AVATAR_IMAGE_URL"
+                                 [input-response-pair-id]="getInputResponsePairId(getDisplayedCard().getInputResponsePairs().length - 1)"
+                                 [is-last-pair]="true">
+      </oppia-input-response-pair>
     </div>
 
     <!--

@@ -58,7 +58,7 @@ describe('User Email Preferences Backend Api Service', () => {
     fakeAsync(() => {
       let result: Promise<EmailPreferencesData> =
       userEmailPreferencesBackendApiService
-        .saveChangeToBackend({
+        .saveChangeToBackendAsync({
           message_type: 'feedback',
           mute: false
         });

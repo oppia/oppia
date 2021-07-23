@@ -15,46 +15,55 @@
 /**
  * @fileoverview Component for set of translatable html content id editor.
  */
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('setOfTranslatableHtmlContentIdsEditor', {
-  bindings: {
-    getInitArgs: '&',
-    value: '='
-  },
-  template: require(
-    './set-of-translatable-html-content-ids-editor.component.html'),
-  controller: [
-    function() {
-      const ctrl = this;
+type Choice = { val: string };
 
-      // The following function is necessary to insert elements into the
-      // answer groups for the Item Selection Widget.
-      ctrl.toggleSelection = function(choiceListIndex) {
-        const choiceContentId = ctrl.choices[choiceListIndex].val;
-        const selectedChoicesIndex = ctrl.value.indexOf(choiceContentId);
-        if (selectedChoicesIndex > -1) {
-          ctrl.value.splice(selectedChoicesIndex, 1);
-        } else {
-          ctrl.value.push(ctrl.choices[choiceListIndex].val);
-        }
-      };
-      ctrl.$onInit = function() {
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'html'
-          }
-        };
-
-        if (!ctrl.value) {
-          ctrl.value = [];
-        }
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
-        ctrl.selections = ctrl.choices.map(
-          choice => ctrl.value.indexOf(choice.val) !== -1
-        );
-      };
+@Component({
+  selector: 'set-of-translatable-html-content-ids-editor',
+  templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
+  styleUrls: []
+})
+export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() initArgs!: { choices: Choice[] };
+  @Input() modalId!: symbol;
+  @Input() value!: string[];
+  @Output() valueChanged = new EventEmitter();
+  choices!: Choice[];
+  selections!: boolean[];
+  SCHEMA = {
+    type: 'list',
+    items: {
+      type: 'html'
     }
-  ]
-});
+  };
+  constructor() { }
+
+  ngOnInit(): void {
+    if (!this.value) {
+      this.value = [];
+    }
+    this.choices = this.initArgs.choices;
+    this.selections = this.choices.map(
+      choice => this.value.indexOf(choice.val) !== -1
+    );
+  }
+
+  toggleSelection(choiceListIndex: number): void {
+    const choiceContentId = this.choices[choiceListIndex].val;
+    const selectedChoicesIndex = this.value.indexOf(choiceContentId);
+    if (selectedChoicesIndex > -1) {
+      this.value.splice(selectedChoicesIndex, 1);
+    } else {
+      this.value.push(this.choices[choiceListIndex].val);
+    }
+  }
+}
+angular.module('oppia').directive(
+  'setOfTranslatableHtmlContentIdsEditor', downgradeComponent({
+    component: SetOfTranslatableHtmlContentIdsEditorComponent
+  }));

@@ -10,8 +10,8 @@
 <mat-card [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
          *ngIf="!isRefresherExploration" [style.padding]="0" class="oppia-exploration-dashboard-card protractor-test-exploration-dashboard-card">
   <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-    <div class="title-section" [ngStyle]="{'background-color': getThumbnailBgColor}">
-      <img class="thumbnail-image" [src]="getCompleteThumbnailIconUrl()" alt="{{ getCategory }}">
+    <div class="title-section protractor-test-exp-hover" [ngStyle]="{'background-color': getThumbnailBgColor}">
+      <img class="thumbnail-image" [src]="thumbnailIcon" alt="{{ getCategory }}">
       <h3 class="activity-title protractor-test-exp-summary-tile-title">
         <span *ngIf="isWindowLarge">{{ getExplorationTitle | truncate:40 }}</span>
         <span *ngIf="!isWindowLarge">{{ getExplorationTitle | truncate:40 }}</span>
@@ -30,14 +30,14 @@
       </div>
       <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-align-space-between-center layout-row">
         <li>
-          <span class="protractor-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !getAverageRating()}">
+          <span class="protractor-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !avgRating}">
             <span class="fas fa-star" ngbTooltip="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate " placement="top" container="body">
               <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
             </span>
-            <span *ngIf="getAverageRating()">
-              {{ getAverageRating() | number:'1.1-1' }}
+            <span *ngIf="avgRating">
+              {{ avgRating | number:'1.1-1' }}
             </span>
-            <span *ngIf="!getAverageRating()" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+            <span *ngIf="!avgRating" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
             </span>
           </span>
         </li>
@@ -52,11 +52,11 @@
           </span>
         </li>
         <li>
-          <span *ngIf="getLastUpdatedDatetime()">
+          <span *ngIf="lastUpdatedDateTime">
             <span class="oppia-icon-accessibility-label">Last Updated</span>
-            {{ getLastUpdatedDatetime() }}
+            {{ lastUpdatedDateTime }}
           </span>
-          <span *ngIf="!getLastUpdatedDatetime()" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+          <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
           </span>
         </li>
       </ul>

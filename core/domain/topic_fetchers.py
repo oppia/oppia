@@ -22,16 +22,19 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from core.domain import caching_services
+from core.domain import classroom_services
+from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (skill_models, topic_models,) = models.Registry.import_models([
     models.NAMES.skill, models.NAMES.topic])
 
 
-def _migrate_subtopics_to_latest_schema(versioned_subtopics):
+def _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_id):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the subtopics structure based on the schema version of the input
     subtopics dictionary. If the current subtopics schema changes, a
@@ -43,6 +46,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
           - schema_version: int. The schema version for the subtopics dict.
           - subtopics: list(dict). The list of dicts comprising the topic's
               subtopics.
+        topic_id: str. The id of the topic to which the subtopics are part of.
 
     Raises:
         Exception. The schema version of subtopics is outside of what
@@ -58,7 +62,7 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
     while (subtopic_schema_version <
            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         topic_domain.Topic.update_subtopics_from_model(
-            versioned_subtopics, subtopic_schema_version)
+            versioned_subtopics, subtopic_schema_version, topic_id)
         subtopic_schema_version += 1
 
 
@@ -121,7 +125,8 @@ def get_topic_from_model(topic_model):
     }
     if (topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
-        _migrate_subtopics_to_latest_schema(versioned_subtopics)
+        _migrate_subtopics_to_latest_schema(
+            versioned_subtopics, topic_model.id)
     if (topic_model.story_reference_schema_version !=
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
         _migrate_story_references_to_latest_schema(
@@ -134,6 +139,7 @@ def get_topic_from_model(topic_model):
         topic_model.url_fragment,
         topic_model.thumbnail_filename,
         topic_model.thumbnail_bg_color,
+        topic_model.thumbnail_size_in_bytes,
         topic_model.description, [
             topic_domain.StoryReference.from_dict(reference)
             for reference in versioned_canonical_story_references[
@@ -244,22 +250,6 @@ def get_topic_by_url_fragment(url_fragment):
 
     topic = get_topic_from_model(topic_model)
     return topic
-
-
-def get_all_topics_with_skills():
-    """Returns a list of topics with linked skills.
-
-    Returns:
-        list(Topic). A list of topics with skills.
-    """
-    all_topic_models = topic_models.TopicModel.get_all()
-    topics_with_skills = []
-    for topic_model in all_topic_models:
-        if topic_model:
-            topic = get_topic_from_model(topic_model)
-            if topic.get_all_skill_ids():
-                topics_with_skills.append(topic)
-    return topics_with_skills
 
 
 def get_all_topics():
@@ -471,3 +461,43 @@ def get_all_topic_rights():
         rights = get_topic_rights_from_model(model)
         topic_rights[rights.id] = rights
     return topic_rights
+
+
+def get_canonical_story_dicts(user_id, topic):
+    """Returns a list of canonical story dicts in the topic.
+
+    Args:
+        user_id: str. The ID of the user.
+        topic: Topic. The topic domain object.
+
+    Returns:
+        list(dict). A list of canonical story dicts in the given topic.
+    """
+    canonical_story_ids = topic.get_canonical_story_ids(
+        include_only_published=True)
+    canonical_story_summaries = [
+        story_fetchers.get_story_summary_by_id(
+            canonical_story_id) for canonical_story_id
+        in canonical_story_ids]
+    canonical_story_dicts = []
+    for story_summary in canonical_story_summaries:
+        pending_and_all_nodes_in_story = (
+            story_fetchers.get_pending_and_all_nodes_in_story(
+                user_id, story_summary.id))
+        all_nodes = pending_and_all_nodes_in_story['all_nodes']
+        pending_nodes = pending_and_all_nodes_in_story['pending_nodes']
+        pending_node_titles = [node.title for node in pending_nodes]
+        completed_node_titles = utils.compute_list_difference(
+            story_summary.node_titles, pending_node_titles)
+        story_summary_dict = story_summary.to_human_readable_dict()
+        story_summary_dict['topic_url_fragment'] = topic.url_fragment
+        story_summary_dict['classroom_url_fragment'] = (
+            classroom_services.get_classroom_url_fragment_for_topic_id(
+                topic.id))
+        story_summary_dict['story_is_published'] = True
+        story_summary_dict['completed_node_titles'] = completed_node_titles
+        story_summary_dict['all_node_dicts'] = [
+            node.to_dict() for node in all_nodes]
+        canonical_story_dicts.append(story_summary_dict)
+
+    return canonical_story_dicts

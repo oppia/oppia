@@ -23,7 +23,7 @@ require(
     'confirm-or-cancel-modal.controller.ts');
 require(
   'components/question-difficulty-selector/' +
-    'question-difficulty-selector.directive.ts');
+    'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
     'question-editor.directive.ts');
@@ -83,7 +83,7 @@ angular.module('oppia').factory('QuestionCreationService', [
     var newQuestionSkillIds = [];
 
     var populateMisconceptions = function() {
-      SkillBackendApiService.fetchMultiSkills(
+      SkillBackendApiService.fetchMultiSkillsAsync(
         newQuestionSkillIds).then(
         function(skills) {
           skills.forEach(function(skill) {
@@ -203,7 +203,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
-      EditableQuestionBackendApiService.createQuestion(
+      EditableQuestionBackendApiService.createQuestionAsync(
         newQuestionSkillIds, newQuestionSkillDifficulties,
         question.toBackendDict(true), imagesData);
     };

@@ -68,6 +68,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
             'prerequisite_skill_ids': [],
@@ -163,6 +164,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_3'],
             'prerequisite_skill_ids': [],

@@ -16,162 +16,209 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable, NgZone } from '@angular/core';
+import { AudioFile } from 'domain/utilities/audio-file.model';
+import { AudioTranslationManagerService, AudioTranslations } from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import { AssetsBackendApiService } from './assets-backend-api.service';
+import { ContextService } from './context.service';
+import { Howl } from 'howler';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { interval, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-angular.module('oppia').factory('AudioPlayerService', [
-  '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
-  'ContextService', 'ngAudio',
-  function(
-      $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
-      ContextService, ngAudio) {
-    var _currentTrackFilename = null;
-    var _currentTrack = null;
+export interface AutoPlayAudioEvent {
+  audioTranslations: AudioTranslations;
+  html: string;
+  componentName: string;
+}
 
-    var _autoplayAudioEventEmitter = new EventEmitter();
+@Injectable({
+  providedIn: 'root'
+})
+export class AudioPlayerService {
+  private _currentTrackFilename: string | null = null;
+  private _currentTrack: Howl | null = null;
+  private _lastPauseOrSeekPos: number | null = null;
+  private _loadingTrack = false;
+  private _updateViewEventEmitter = new EventEmitter<void>();
+  private _autoplayAudioEventEmitter = (
+    new EventEmitter<void | AutoPlayAudioEvent>());
+  private _stopIntervalSubject = new Subject<void>();
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private audioTranslationManagerService: AudioTranslationManagerService,
+    private contextService: ContextService,
+    private ngZone: NgZone
+  ) {}
 
-    var _load = function(
-        filename, successCallback, errorCallback) {
-      if (filename !== _currentTrackFilename) {
-        AssetsBackendApiService.loadAudio(
-          ContextService.getExplorationId(), filename)
-          .then(function(loadedAudiofile) {
-            var blobUrl = URL.createObjectURL(loadedAudiofile.data);
-            _currentTrack = ngAudio.load(blobUrl);
-            _currentTrackFilename = filename;
-
-            // Directive ngAudio doesn't seem to provide any way of detecting
-            // when native audio object has finished loading -- see
-            // https://github.com/danielstern/ngAudio/issues/139. It seems
-            // that after creating an ngAudio object, the native audio
-            // object is asynchronously loaded. So we use a timeout
-            // to grab native audio.
-            // TODO(tjiang11): Look for a better way to handle this.
-            $timeout(function() {
-              // _currentTrack could be null if the learner stops audio
-              // shortly after loading a new card or language. In such
-              // cases, we do not want to attempt setting the 'onended'
-              // property of the audio.
-              if (_currentTrack !== null &&
-                _currentTrack.audio !== undefined) {
-                _currentTrack.audio.onended = function() {
-                  _currentTrack = null;
-                  _currentTrackFilename = null;
-                  AudioTranslationManagerService
-                    .clearSecondaryAudioTranslations();
-                };
-              }
-            }, 100);
-
-            successCallback();
-          }, function(reason) {
-            errorCallback(reason);
-          });
-      }
-    };
-
-    var _play = function() {
-      if (_currentTrack) {
-        _currentTrack.play();
-      }
-    };
-
-    var _pause = function() {
-      if (_currentTrack) {
-        _currentTrack.pause();
-      }
-    };
-
-    var _stop = function() {
-      if (_currentTrack) {
-        _currentTrack.stop();
-        _currentTrackFilename = null;
-        _currentTrack = null;
-      }
-    };
-
-    var _rewind = function(seconds) {
-      if (_currentTrack) {
-        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        if (currentSeconds - seconds > 0) {
-          var rewindedProgress = (
-            (currentSeconds - seconds) / _currentTrack.duration);
-          _currentTrack.progress = rewindedProgress;
-        } else {
-          _currentTrack.progress = 0;
-        }
-      }
-    };
-
-    var _forward = function(seconds) {
-      if (_currentTrack) {
-        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
-        if (currentSeconds + seconds < _currentTrack.duration) {
-          var forwardedProgress = (
-            (currentSeconds + seconds) / _currentTrack.duration);
-          _currentTrack.progress = forwardedProgress;
-        }
-      }
-    };
-
-    return {
-      load: function(filename) {
-        return $q(function(resolve, reject) {
-          _load(filename, resolve, reject);
+  private async _loadAsync(filename: string, successCallback, errorCallback) {
+    if (this._loadingTrack) {
+      throw new Error('Already loading a track... Please try again!');
+    }
+    if (this._currentTrackFilename === filename) {
+      return;
+    }
+    this.assetsBackendApiService.loadAudio(
+      this.contextService.getExplorationId(),
+      filename).then(
+      (loadedAudioFile: AudioFile) => {
+        this._currentTrack = new Howl({
+          src: [URL.createObjectURL(loadedAudioFile.data)],
+          format: ['mp3']
         });
-      },
-      play: function() {
-        _play();
-      },
-      pause: function() {
-        _pause();
-      },
-      stop: function() {
-        _stop();
-      },
-      rewind: function(seconds) {
-        _rewind(seconds);
-      },
-      forward: function(seconds) {
-        _forward(seconds);
-      },
-      getCurrentTime: function() {
-        if (_currentTrack) {
-          return Math.round(_currentTrack.currentTime);
-        } else {
-          return 0;
-        }
-      },
-      getAudioDuration: function() {
-        if (_currentTrack && _currentTrack.audio) {
-          return Math.round(_currentTrack.audio.duration);
-        } else {
-          return 0;
-        }
-      },
-      getProgress: function() {
-        if (!_currentTrack) {
-          return 0;
-        }
-        return _currentTrack.progress;
-      },
-      setProgress: function(progress) {
-        if (_currentTrack) {
-          _currentTrack.progress = progress;
-        }
-      },
-      isPlaying: function() {
-        return Boolean(_currentTrack && !_currentTrack.paused);
-      },
-      isTrackLoaded: function() {
-        return Boolean(_currentTrack);
-      },
-      clear: function() {
-        _currentTrack = null;
-        _currentTrackFilename = null;
-      },
-      get onAutoplayAudio() {
-        return _autoplayAudioEventEmitter;
-      }
-    };
+        this._currentTrack.on('load', () => {
+          this._stopIntervalSubject.next();
+          this._currentTrackFilename = loadedAudioFile.filename;
+          this._loadingTrack = false;
+          this._lastPauseOrSeekPos = 0;
+          successCallback();
+        });
+        this._currentTrack.on('end', () => {
+          this._stopIntervalSubject.next();
+          this._currentTrack = null;
+          this._currentTrackFilename = null;
+          this._lastPauseOrSeekPos = null;
+          this.audioTranslationManagerService.clearSecondaryAudioTranslations();
+        });
+      }, (e) => errorCallback(e)
+    );
   }
-]);
+
+  async loadAsync(filename: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._loadAsync(filename, resolve, reject);
+    });
+  }
+
+  play(): void {
+    if (this.isPlaying()) {
+      return;
+    }
+
+    this.ngZone.runOutsideAngular(() => {
+      if (this._currentTrack !== null) {
+        this._currentTrack.seek(this._lastPauseOrSeekPos);
+      }
+      interval(500).pipe(takeUntil(
+        this._stopIntervalSubject)).subscribe(() => {
+        this.ngZone.run(() => {
+          this._updateViewEventEmitter.emit();
+        });
+      });
+
+      this._currentTrack.play();
+    });
+  }
+
+  pause(): void {
+    if (!this.isPlaying()) {
+      return;
+    }
+    this._lastPauseOrSeekPos = this.getCurrentTime();
+    this._currentTrack.pause();
+    this._stopIntervalSubject.next();
+  }
+
+  stop(): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    this._lastPauseOrSeekPos = 0;
+    this.setCurrentTime(0);
+    this._currentTrack.stop();
+    this._stopIntervalSubject.next();
+  }
+
+  rewind(seconds: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    const currentSeconds = (
+      this._currentTrack.seek());
+    if (typeof currentSeconds !== 'number') {
+      return;
+    }
+    const rewindTo = currentSeconds - seconds;
+    this._currentTrack.seek(rewindTo > 0 ? rewindTo : 0);
+  }
+
+  forward(seconds: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    const currentSeconds = this._currentTrack.seek();
+    if (typeof currentSeconds !== 'number') {
+      return;
+    }
+    if (currentSeconds + seconds < this._currentTrack.duration()) {
+      this._currentTrack.seek(currentSeconds + seconds);
+    }
+  }
+
+  getCurrentTime(): number {
+    if (!this._currentTrack) {
+      return 0;
+    }
+    const currentTime = this._currentTrack.seek();
+    if (typeof currentTime !== 'number') {
+      return 0;
+    }
+    return Math.floor(currentTime);
+  }
+
+  setCurrentTime(val: number): void {
+    if (!this._currentTrack) {
+      return;
+    }
+    if (val < 0) {
+      this._currentTrack.seek(0);
+      return;
+    }
+    if (val > this._currentTrack.duration()) {
+      this._currentTrack.seek(this._currentTrack.duration());
+      return;
+    }
+    this._lastPauseOrSeekPos = val;
+    this._currentTrack.seek(Math.floor(val));
+  }
+
+  getAudioDuration(): number {
+    if (this._currentTrack) {
+      return this._currentTrack.duration();
+    } else {
+      return 0;
+    }
+  }
+
+  isPlaying(): boolean {
+    return this._currentTrack && this._currentTrack.playing();
+  }
+
+  isTrackLoaded(): boolean {
+    return this._currentTrack !== null;
+  }
+
+  clear(): void {
+    if (this.isPlaying()) {
+      this.stop();
+    }
+    this._currentTrackFilename = null;
+    this._currentTrack = null;
+  }
+
+  get viewUpdate(): EventEmitter<void> {
+    return this._updateViewEventEmitter;
+  }
+
+  get onAutoplayAudio(): EventEmitter<void | AutoPlayAudioEvent> {
+    return this._autoplayAudioEventEmitter;
+  }
+
+  get onAudioStop(): Subject<void> {
+    return this._stopIntervalSubject;
+  }
+}
+
+angular.module('oppia').factory('AudioPlayerService', downgradeInjectable(
+  AudioPlayerService
+));

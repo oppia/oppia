@@ -17,6 +17,7 @@
  */
 
 import 'globalthis/auto';
+import 'proxy-polyfill';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
@@ -120,9 +121,9 @@ if (!('outerHTML' in SVGElement.prototype)) {
 // so we set an empty object first.
 if (navigator.mediaDevices === undefined) {
   // This throws "Cannot assign to 'mediaDevices' because it
-  // is a read-only property." We need to suppress this since some browsers
-  // may not have this property at all. So, we need to set it to an empty
-  // object.
+  // is a read-only property.". We need to suppress this error because some
+  // browsers may not have this property at all. So, we need to set it to
+  // an empty object.
   // @ts-ignore
   navigator.mediaDevices = {};
 }
@@ -133,13 +134,13 @@ if (navigator.mediaDevices === undefined) {
 // Here, we will just add the getUserMedia property
 // if it's missing.
 if (navigator.mediaDevices.getUserMedia === undefined) {
-  navigator.mediaDevices.getUserMedia = function(constraints) {
+  navigator.mediaDevices.getUserMedia = async function(constraints) {
     // First get ahold of the legacy getUserMedia, if present.
     var getUserMedia = (
       // This throws "Property 'webkitGetUserMedia' does not exist on
       // type 'Navigator'." This is because this API is deprecated.
-      // (https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia)
-      // We need to suppress this because some browsers
+      // (https://developer.mozilla.org/en-US/docs/Web/API/Navigator
+      // /getUserMedia). We need to suppress this error because some browsers
       // still have this functionality.
       // @ts-ignore
       navigator.webkitGetUserMedia || navigator.mozGetUserMedia);

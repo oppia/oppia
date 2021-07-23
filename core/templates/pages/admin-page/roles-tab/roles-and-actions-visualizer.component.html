@@ -1,0 +1,53 @@
+<style>
+  .oppia-roles-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(204, 204, 204, 0.438);
+    align-content: space-around;
+    padding: 10px;
+  }
+  .oppia-role-container {
+    margin: 10px 0;
+    text-align: justify;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+  }
+  .oppia-role-avatar {
+    display: block;
+    margin: 0 auto;
+    width: 50px;
+  }
+  .oppia-role-name-lable {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+  .oppia-actions-container {
+    min-height: 200px;
+    margin-top: 50px;
+  }
+  .oppia-selected-role {
+    background: #aaa;
+    border-radius: 8px;
+  }
+</style>
+
+<div class="oppia-roles-container">
+  <div class="oppia-role-container" [ngClass]="{'oppia-selected-role': activeRole === role}" *ngFor="let role of roles" (click)="setActiveRole(role)">
+    <img class="oppia-role-avatar" [src]="avatarPictureUrl" alt="User with {{ role }} role">
+    <span class="oppia-role-name-lable"><strong>{{ role }}</strong></span>
+  </div>
+</div>
+
+<div class="oppia-actions-container">
+  <strong>Actions allocated to {{ activeRole }}:</strong>
+  <ul>
+    <li *ngIf="!roleToActions[activeRole]?.length">
+      <i class="oppia-no-actions-message">{{ activeRole }} cannot perform any actions.</i>
+    </li>
+    <li *ngFor="let action of roleToActions[activeRole]">{{ action }}</li>
+  </ul>
+</div>

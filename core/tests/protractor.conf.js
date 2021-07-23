@@ -1,9 +1,13 @@
+require('dotenv').config();
 var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
+var fs = require('fs');
+var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
+var exitCode = 0;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -305,10 +309,6 @@ exports.config = {
   // with relative paths will be prepended with this.
   baseUrl: 'http://localhost:9001',
 
-  // Selector for the element housing the angular app - this defaults to
-  // body, but is necessary if ng-app is on a descendant of <body>.
-  rootElement: 'body',
-
   // A callback function called once protractor is ready and available, and
   // before the specs are executed
   // You can specify a file containing code to run by setting onPrepare to
@@ -319,9 +319,61 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-    var _ADD_SCREENSHOT_REPORTER = true;
 
-    if (_ADD_SCREENSHOT_REPORTER) {
+    var spw = null;
+    var vidPath = '';
+    // Enable ALL_VIDEOS if you want success videos to be saved.
+    const ALL_VIDEOS = false;
+
+    // Only running video recorder on Github Actions, since running it on
+    // CicleCI causes RAM issues (meaning very high flakiness).
+
+    if (process.env.GITHUB_ACTIONS && process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      jasmine.getEnv().addReporter({
+        specStarted: function(result){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1285x1000',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-loglevel', '16',
+          ];
+          const uniqueString = Math.random().toString(36).substring(2,8);
+          var name = uniqueString + '.mp4';
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          vidPath = path.resolve(dirPath, name);
+          console.log('Test name: ' + result.fullName + ' has video path ' + vidPath);
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.on('message', (message) => {console.log(`ffmpeg stdout: ${message}`)});
+          spw.on('error', (errorMessage) => {console.error(`ffmpeg stderr: ${errorMessage}`)});
+          spw.on('close', (code) => {console.log(`ffmpeg exited with code ${code}`)});
+        },
+        specDone: function(result) {
+          spw.kill();
+          if (result.status == 'passed' && !ALL_VIDEOS && fs.existsSync(vidPath)) {
+            fs.unlinkSync(vidPath);
+            console.log(`Video for test: ${result.fullName} was deleted successfully (test passed).`);
+          }
+        },
+      });
+    }
+    else {
+      console.log(
+        'Videos will not be recorded for this suite either because videos' +
+        ' have been disabled for it (using environment variables) or' +
+        ' because it\'s on CircleCI');
+    }
+
+    // Screenshots will only run on CircleCI, since we don't have videos here.
+    // We don't need these on Github Actions since we have videos.
+
+    if (process.env.CIRCLECI) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
@@ -412,10 +464,26 @@ exports.config = {
 
   SELENIUM_PROMISE_MANAGER: false,
 
+  // A callback function called once tests are finished. onComplete can
+  // optionally return a promise, which Protractor will wait for before
+  // shutting down webdriver.
+
+  // At this point, tests will be done but global objects will still be
+  // available.
+  onComplete: function(success){
+    if (!success) {
+      exitCode = 1;
+    }
+  },
+
   // ----- The cleanup step -----
   //
   // A callback function called once the tests have finished running and
   // the webdriver instance has been shut down. It is passed the exit code
   // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  onCleanUp: function() {
+    if (exitCode !== 0){
+      process.exit(exitCode);
+    }
+  }
 };

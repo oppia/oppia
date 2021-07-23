@@ -16,13 +16,13 @@
  * @fileoverview Component for the practice session.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require(
   'components/question-directives/question-player/' +
-  'question-player.directive.ts');
+  'question-player.component.ts');
 
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');

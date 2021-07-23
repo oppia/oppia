@@ -87,7 +87,7 @@ describe('InteractiveMapValidationService', () => {
         }
       }, 'InteractiveMap')],
       goodDefaultOutcome,
-      null,
+      [],
       null
     )];
   });
@@ -103,7 +103,8 @@ describe('InteractiveMapValidationService', () => {
     () => {
       expect(() => {
         validatorService.getAllWarnings(
-          // This throws "Argument of type '{}' is not assignable to
+          // This throws "Argument of type '{}'. We need to suppress this error
+          // because ..  oppia/comment-style is not assignable to
           // parameter of type 'InteractiveMapCustomizationArgs'." We are
           // purposely assigning the wrong type of customization args in
           // order to test validations.

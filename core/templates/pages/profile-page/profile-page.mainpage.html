@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Profile - Oppia"})
     <style>
@@ -163,8 +163,9 @@
         width: calc(100% - 280px);
       }
 
-      md-card.oppia-profile-content-card {
+      .mat-card.oppia-profile-content-card {
         background-color: transparent;
+        box-shadow: none;
         margin-top: 0;
         padding-top: 0;
       }
@@ -181,7 +182,7 @@
         width: 100%;
       }
 
-      md-content.oppia-profile-portfolio-container {
+      .mat-card-content.oppia-profile-portfolio-container {
         background-color: transparent;
       }
 
@@ -290,21 +291,7 @@
     </style>
   </head>
   <body>
-    <oppia-root>
-      <div ng-controller="Base">
-        <base-content>
-          <navbar-breadcrumb>
-            <profile-page-navbar></profile-page-navbar>
-          </navbar-breadcrumb>
-          <content>
-            <profile-page></profile-page>
-          </content>
-          <page-footer>
-            <oppia-footer></oppia-footer>
-          </page-footer>
-        </base-content>
-      </div>
-    </oppia-root>
+    <oppia-profile-page-root></oppia-profile-page-root>
     @load('pages/footer_js_libs.html')
   </body>
 </html>

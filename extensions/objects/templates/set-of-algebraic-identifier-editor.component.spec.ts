@@ -16,25 +16,33 @@
  * @fileoverview Unit tests for the set of algebraic identifier component.
  */
 
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { SetOfAlgebraicIdentifierEditorComponent } from './set-of-algebraic-identifier-editor.component';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
 describe('SetOfAlgebraicIdentifier', function() {
-  var ctrl = null;
+  let component: SetOfAlgebraicIdentifierEditorComponent;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'GuppyInitializationService', new GuppyInitializationService());
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('setOfAlgebraicIdentifierEditor');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [SetOfAlgebraicIdentifierEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialize the value with an empty array', function() {
-    ctrl.$onInit();
-    expect(ctrl.value).toEqual([]);
+  beforeEach(waitForAsync(() => {
+    component = TestBed.createComponent(
+      SetOfAlgebraicIdentifierEditorComponent).componentInstance;
+  }));
+
+  it('should initialize the value with an empty array', () => {
+    component.getSchema();
+    component.ngOnInit();
+    expect(component.value).toEqual([]);
+    component.updateValue(1);
+    component.updateValue(1);
+    expect(component.value).toBe(1);
   });
 });

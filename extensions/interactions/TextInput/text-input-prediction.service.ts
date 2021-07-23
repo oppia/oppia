@@ -25,9 +25,9 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 
 @Injectable({
@@ -42,7 +42,12 @@ export class TextInputPredictionService {
     private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierData: TextInputClassifierData, textInput: string): number {
+  predict(classifierBuffer: ArrayBuffer, textInput: string): number {
+    // The model_json attribute in TextClassifierFrozenModel class can't be
+    // changed to camelcase since the class definition is automatically compiled
+    // with the help of protoc.
+    const classifierData = JSON.parse(TextClassifierFrozenModel.deserialize(
+      new Uint8Array(classifierBuffer)).model_json) as TextInputClassifierData;
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 

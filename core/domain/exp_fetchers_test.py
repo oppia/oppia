@@ -204,6 +204,7 @@ param_specs: {}
 schema_version: %d
 states:
   End:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -218,6 +219,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -228,6 +230,7 @@ states:
       translations_mapping:
         content: {}
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -254,6 +257,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:

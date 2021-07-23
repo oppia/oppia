@@ -22,31 +22,19 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AdminDataService } from
   'pages/admin-page/services/admin-data.service';
-import { AdminPageData } from
+import { AdminPageData, AdminPageDataBackendDict } from
   'domain/admin/admin-backend-api.service';
-import { ComputationData } from 'domain/admin/computation-data.model';
-import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
-import { Job } from 'domain/admin/job.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService = null;
   let httpTestingController: HttpTestingController;
-  var sampleAdminData = {
-    unfinished_job_data: [],
-    role_graph_data: {
-      links: [
-        {
-          source: 'TOPIC_MANAGER',
-          target: 'MODERATOR'
-        }
-      ],
-      nodes: {
-        TOPIC_MANAGER: 'topic manager'
-      }
+  var sampleAdminData: AdminPageDataBackendDict = {
+    role_to_actions: {
+      guest: ['action for guest']
     },
     topic_summaries: [
       {
@@ -63,15 +51,17 @@ describe('Admin Data Service', () => {
         topic_model_last_updated: 1591196558882.2,
         language_code: 'en',
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#C6DCDA'
+        thumbnail_bg_color: '#C6DCDA',
+        total_published_node_count: 10,
+        url_fragment: 'topicurlfrag',
+        can_edit_topic: false,
+        is_published: false
       }
     ],
-    one_off_job_status_summaries: [],
     updatable_roles: {
       TOPIC_MANAGER: 'topic manager'
     },
     human_readable_current_time: 'June 03 15:31:20',
-    audit_job_status_summaries: [],
     demo_collections: [],
     config_properties: {
       oppia_csrf_secret: {
@@ -83,24 +73,11 @@ describe('Admin Data Service', () => {
       }
     },
     demo_exploration_ids: ['19'],
-    recent_job_data: [],
     demo_explorations: [
       [
         '0',
         'welcome.yaml'
       ]
-    ],
-    continuous_computations_data: [
-      {
-        is_startable: true,
-        status_code: 'never_started',
-        computation_type: 'FeedbackAnalyticsAggregator',
-        last_started_msec: null,
-        active_realtime_layer_index: null,
-        last_stopped_msec: null,
-        is_stoppable: false,
-        last_finished_msec: null
-      }
     ],
     viewable_roles: {
       TOPIC_MANAGER: 'topic manager'
@@ -135,27 +112,12 @@ describe('Admin Data Service', () => {
       demoExplorations: sampleAdminData.demo_explorations,
       demoCollections: sampleAdminData.demo_collections,
       demoExplorationIds: sampleAdminData.demo_exploration_ids,
-      oneOffJobStatusSummaries:
-        sampleAdminData.one_off_job_status_summaries.map(
-          JobStatusSummary.createFromBackendDict),
-      humanReadableCurrentTime:
-      sampleAdminData.human_readable_current_time,
-      auditJobStatusSummaries:
-        sampleAdminData.audit_job_status_summaries.map(
-          JobStatusSummary.createFromBackendDict),
       updatableRoles: sampleAdminData.updatable_roles,
-      roleGraphData: sampleAdminData.role_graph_data,
+      roleToActions: sampleAdminData.role_to_actions,
       configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
-      unfinishedJobData: sampleAdminData.unfinished_job_data.map(
-        Job.createFromBackendDict),
-      recentJobData: sampleAdminData.recent_job_data.map(
-        Job.createFromBackendDict),
-      continuousComputationsData:
-        sampleAdminData.continuous_computations_data.map(
-          ComputationData.createFromBackendDict),
       topicSummaries: sampleAdminData.topic_summaries.map(
-        TopicSummary.createFromBackendDict),
+        CreatorTopicSummary.createFromBackendDict),
       featureFlags: sampleAdminData.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict))
     };

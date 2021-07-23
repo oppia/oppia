@@ -24,9 +24,9 @@ import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/dnd-lists.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'dndLists', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable',
+  'ui.bootstrap', 'ui.sortable',
   uiValidate
 ]);
 
@@ -38,12 +38,12 @@ require('pages/story-editor-page/story-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 require(
   'pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts');
 require(
-  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
-require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
+  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.ts');
+require('pages/story-editor-page/navbar/story-editor-navbar.component.ts');
 require('pages/story-editor-page/story-editor-page.component.ts');

@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module contains the Hierarchy Structure of roles for action
-inheritance, Actions permitted to the roles and the functions needed to
-access roles and actions.
+"""This module contains the structure of roles and actions,
+actions permitted to the roles and the functions needed to access roles
+and actions.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import math
 import random
 import time
@@ -38,7 +39,12 @@ ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION = (
 ACTION_ACCESS_CREATOR_DASHBOARD = 'ACCESS_CREATOR_DASHBOARD'
 ACTION_ACCESS_LEARNER_DASHBOARD = 'ACCESS_LEARNER_DASHBOARD'
 ACTION_ACCESS_MODERATOR_PAGE = 'ACCESS_MODERATOR_PAGE'
+ACTION_ACCESS_RELEASE_COORDINATOR_PAGE = 'ACCESS_RELEASE_COORDINATOR_PAGE'
+ACTION_ACCESS_BLOG_DASHBOARD = 'ACCESS_BLOG_DASHBOARD'
+ACTION_ACCESS_BLOG_ADMIN_PAGE = 'ACCESS_BLOG_ADMIN_PAGE'
 ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD = 'ACCESS_TOPICS_AND_SKILLS_DASHBOARD'
+ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE = (
+    'ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE')
 ACTION_CHANGE_TOPIC_STATUS = 'CHANGE_TOPIC_STATUS'
 ACTION_CHANGE_STORY_STATUS = 'CHANGE_STORY_STATUS'
 ACTION_CREATE_COLLECTION = 'CREATE_COLLECTION'
@@ -47,17 +53,20 @@ ACTION_CREATE_NEW_SKILL = 'CREATE_NEW_SKILL'
 ACTION_CREATE_NEW_TOPIC = 'CREATE_NEW_TOPIC'
 ACTION_MANAGE_QUESTION_SKILL_STATUS = 'MANAGE_QUESTION_SKILL_STATUS'
 ACTION_DELETE_ANY_ACTIVITY = 'DELETE_ANY_ACTIVITY'
+ACTION_DELETE_ANY_BLOG_POST = 'DELETE_ANY_BLOG_POST'
 ACTION_DELETE_ANY_PUBLIC_ACTIVITY = 'DELETE_ANY_PUBLIC_ACTIVITY'
 ACTION_DELETE_ANY_QUESTION = 'DELETE_ANY_QUESTION'
 ACTION_DELETE_ANY_SKILL = 'DELETE_ANY_SKILL'
 ACTION_DELETE_OWNED_PRIVATE_ACTIVITY = 'DELETE_OWNED_PRIVATE_ACTIVITY'
 ACTION_DELETE_TOPIC = 'DELETE_TOPIC'
 ACTION_EDIT_ANY_ACTIVITY = 'EDIT_ANY_ACTIVITY'
+ACTION_EDIT_ANY_BLOG_POST = 'EDIT_ANY_BLOG_POST'
 ACTION_EDIT_ANY_PUBLIC_ACTIVITY = 'EDIT_ANY_PUBLIC_ACTIVITY'
 ACTION_EDIT_ANY_QUESTION = 'EDIT_ANY_QUESTION'
 ACTION_EDIT_ANY_SKILL = 'EDIT_ANY_SKILL'
 ACTION_EDIT_ANY_SUBTOPIC_PAGE = 'EDIT_ANY_SUBTOPIC_PAGE'
 ACTION_EDIT_ANY_TOPIC = 'EDIT_ANY_TOPIC'
+ACTION_RUN_ANY_JOB = 'RUN_ANY_JOB'
 ACTION_EDIT_ANY_STORY = 'EDIT_ANY_STORY'
 ACTION_EDIT_OWNED_ACTIVITY = 'EDIT_OWNED_ACTIVITY'
 ACTION_EDIT_OWNED_TOPIC = 'EDIT_OWNED_TOPIC'
@@ -65,12 +74,17 @@ ACTION_EDIT_OWNED_STORY = 'EDIT_OWNED_STORY'
 ACTION_EDIT_SKILL_DESCRIPTION = 'EDIT_SKILL_DESCRIPTION'
 ACTION_EDIT_SKILLS = 'EDIT_SKILLS'
 ACTION_FLAG_EXPLORATION = 'FLAG_EXPLORATION'
-ACTION_MANAGE_EMAIL_DASHBOARD = 'MANAGE_EMAIL_DASHBOARD'
 ACTION_MANAGE_ACCOUNT = 'MANAGE_ACCOUNT'
+ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES = 'MANAGE_TRANSLATION_ROLES'
+ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES = 'MANAGE_QUESTION_ROLES'
+ACTION_MANAGE_EMAIL_DASHBOARD = 'MANAGE_EMAIL_DASHBOARD'
+ACTION_MANAGE_MEMCACHE = 'MANAGE_MEMCACHE'
 ACTION_MANAGE_QUESTION_RIGHTS = 'MANAGE_QUESTION_RIGHTS'
 ACTION_MANAGE_TOPIC_RIGHTS = 'MANAGE_TOPIC_RIGHTS'
-ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY = 'MODIFY_ROLES_FOR_ANY_ACTIVITY'
-ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY = 'MODIFY_ROLES_FOR_OWNED_ACTIVITY'
+ACTION_MANAGE_BLOG_POST_EDITORS = 'MANAGE_BLOG_POST_EDITORS'
+ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY = 'MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY'
+ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY = (
+    'MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY')
 ACTION_PLAY_ANY_PRIVATE_ACTIVITY = 'PLAY_ANY_PRIVATE_ACTIVITY'
 ACTION_PLAY_ANY_PUBLIC_ACTIVITY = 'PLAY_ANY_PUBLIC_ACTIVITY'
 ACTION_PUBLISH_ANY_ACTIVITY = 'PUBLISH_ANY_ACTIVITY'
@@ -84,6 +98,7 @@ ACTION_SUGGEST_CHANGES = 'SUGGEST_CHANGES'
 ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
 ACTION_VISIT_ANY_QUESTION_EDITOR = 'VISIT_ANY_QUESTION_EDITOR'
 ACTION_VISIT_ANY_TOPIC_EDITOR = 'VISIT_ANY_TOPIC_EDITOR'
+ACTION_CAN_MANAGE_VOICE_ARTIST = 'CAN_MANAGE_VOICE_ARTIST'
 
 # Users can be updated to the following list of role IDs via admin interface.
 #
@@ -93,9 +108,14 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
+    feconf.ROLE_ID_QUESTION_ADMIN,
+    feconf.ROLE_ID_TRANSLATION_ADMIN,
     feconf.ROLE_ID_EXPLORATION_EDITOR,
+    feconf.ROLE_ID_VOICEOVER_ADMIN,
     feconf.ROLE_ID_MODERATOR,
-    feconf.ROLE_ID_TOPIC_MANAGER
+    feconf.ROLE_ID_RELEASE_COORDINATOR,
+    feconf.ROLE_ID_TOPIC_MANAGER,
+    feconf.ROLE_ID_BLOG_ADMIN,
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
@@ -106,8 +126,14 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
+    feconf.ROLE_ID_QUESTION_ADMIN,
+    feconf.ROLE_ID_TRANSLATION_ADMIN,
+    feconf.ROLE_ID_VOICEOVER_ADMIN,
     feconf.ROLE_ID_MODERATOR,
-    feconf.ROLE_ID_TOPIC_MANAGER
+    feconf.ROLE_ID_RELEASE_COORDINATOR,
+    feconf.ROLE_ID_TOPIC_MANAGER,
+    feconf.ROLE_ID_BLOG_ADMIN,
+    feconf.ROLE_ID_BLOG_POST_EDITOR
 ]
 
 # The string corresponding to role IDs that should be visible to admin.
@@ -115,128 +141,168 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_ADMIN: 'admin',
     feconf.ROLE_ID_BANNED_USER: 'banned user',
     feconf.ROLE_ID_COLLECTION_EDITOR: 'collection editor',
+    feconf.ROLE_ID_QUESTION_ADMIN: 'question admin',
+    feconf.ROLE_ID_TRANSLATION_ADMIN: 'translation admin',
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
+    feconf.ROLE_ID_VOICEOVER_ADMIN: 'voiceover admin',
     feconf.ROLE_ID_GUEST: 'guest',
     feconf.ROLE_ID_LEARNER: 'learner',
     feconf.ROLE_ID_MODERATOR: 'moderator',
-    feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager'
+    feconf.ROLE_ID_RELEASE_COORDINATOR: 'release coordinator',
+    feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager',
+    feconf.ROLE_ID_BLOG_POST_EDITOR: 'blog post editor',
+    feconf.ROLE_ID_BLOG_ADMIN: 'blog admin'
 }
 
-# This dict represents how the actions are inherited among different
-# roles in the site.
-#   key -> name of role
-#   value -> list of direct neighbour roles from which actions are inherited
-# Eg -
-#   say, key 'COLLECTION_EDITOR' has ['EXPLORATION_EDITOR'] as its value, then
-#   'COLLECTION_EDITOR' can perform {all the actions that can be performed by
-#   'EXPLORATION_EDITOR' and its value recursively} plus {the actions
-#   corresponding to 'COLLECTION_EDITOR'.}
-#
-# NOTE FOR DEVELOPERS:
-# - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
-#   Instructions-for-editing-roles-or-actions) before making any changes to
-#   this dict.
-#
-# CAUTION: Before removing any role from this dict, please ensure that there is
-#   no existing user with that role.
-PARENT_ROLES = {
-    feconf.ROLE_ID_ADMIN: [feconf.ROLE_ID_MODERATOR],
-    feconf.ROLE_ID_BANNED_USER: [feconf.ROLE_ID_GUEST],
-    feconf.ROLE_ID_COLLECTION_EDITOR: [feconf.ROLE_ID_EXPLORATION_EDITOR],
-    feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_LEARNER],
-    feconf.ROLE_ID_GUEST: [],
-    feconf.ROLE_ID_LEARNER: [feconf.ROLE_ID_GUEST],
-    feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_TOPIC_MANAGER],
-    feconf.ROLE_ID_TOPIC_MANAGER: [feconf.ROLE_ID_COLLECTION_EDITOR]
-}
 
-# This dict represents the unique actions that belong to a particular role.
-# Unique in the sense that the action belongs to this role but can't be
-# inherited from any other role.
-#   key -> name of role
-#   value -> list of unique actions.
-#
-# NOTE FOR DEVELOPERS :
-# - Follow the Playbook in wiki (https://github.com/oppia/oppia/wiki/
-#   Instructions-for-editing-roles-or-actions) before making any changes to
-#   this dict.
-ROLE_ACTIONS = {
-    feconf.ROLE_ID_ADMIN: [
-        ACTION_ACCEPT_ANY_SUGGESTION,
-        ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
-        ACTION_CHANGE_STORY_STATUS,
-        ACTION_CHANGE_TOPIC_STATUS,
-        ACTION_CREATE_NEW_SKILL,
-        ACTION_CREATE_NEW_TOPIC,
-        ACTION_DELETE_ANY_ACTIVITY,
-        ACTION_DELETE_ANY_SKILL,
-        ACTION_DELETE_TOPIC,
-        ACTION_EDIT_ANY_ACTIVITY,
-        ACTION_EDIT_ANY_STORY,
-        ACTION_EDIT_ANY_TOPIC,
-        ACTION_EDIT_SKILLS,
-        ACTION_EDIT_SKILL_DESCRIPTION,
-        ACTION_MANAGE_EMAIL_DASHBOARD,
-        ACTION_MANAGE_TOPIC_RIGHTS,
-        ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
-        ACTION_PUBLISH_ANY_ACTIVITY,
-        ACTION_PUBLISH_OWNED_SKILL
-    ],
-    feconf.ROLE_ID_BANNED_USER: [
-    ],
-    feconf.ROLE_ID_COLLECTION_EDITOR: [
-        ACTION_CREATE_COLLECTION,
-    ],
-    feconf.ROLE_ID_EXPLORATION_EDITOR: [
-        ACTION_ACCESS_CREATOR_DASHBOARD,
-        ACTION_CREATE_EXPLORATION,
-        ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
-        ACTION_EDIT_OWNED_ACTIVITY,
-        ACTION_SUBSCRIBE_TO_USERS,
-        ACTION_MANAGE_ACCOUNT,
-        ACTION_MODIFY_ROLES_FOR_OWNED_ACTIVITY,
-        ACTION_PUBLISH_OWNED_ACTIVITY,
-        ACTION_RATE_ANY_PUBLIC_EXPLORATION,
-        ACTION_SUGGEST_CHANGES,
-        ACTION_SUBMIT_VOICEOVER_APPLICATION,
-    ],
-    feconf.ROLE_ID_GUEST: [
-        ACTION_PLAY_ANY_PUBLIC_ACTIVITY,
-    ],
-    feconf.ROLE_ID_LEARNER: [
-        ACTION_FLAG_EXPLORATION,
-        ACTION_ACCESS_LEARNER_DASHBOARD,
-    ],
-    feconf.ROLE_ID_MODERATOR: [
-        ACTION_ACCESS_MODERATOR_PAGE,
-        ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
-        ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
-        ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
-        ACTION_SEND_MODERATOR_EMAILS,
-        ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
-    ],
-    feconf.ROLE_ID_TOPIC_MANAGER: [
-        ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
-        ACTION_DELETE_ANY_QUESTION,
-        ACTION_EDIT_ANY_QUESTION,
-        ACTION_EDIT_OWNED_STORY,
-        ACTION_EDIT_OWNED_TOPIC,
-        ACTION_EDIT_SKILLS,
-        ACTION_EDIT_ANY_SUBTOPIC_PAGE,
-        ACTION_MANAGE_QUESTION_SKILL_STATUS,
-        ACTION_VISIT_ANY_QUESTION_EDITOR,
-        ACTION_VISIT_ANY_TOPIC_EDITOR
-    ]
+# TODO(#12755): Remove this function once user roles are independent and
+# doesn't need the _get_unique_actions_list to generate the unique actions.
+# It is not expected to define a function before defining constants in the
+# module. The _get_unique_actions_list function is needed here
+# as it helps generating values for constants.
+def _get_unique_actions_list(*actions):
+    """Returns a list of unique actions out of the given list of actions.
+
+    Args:
+        *actions: list(str). List of actions which can contain duplicate items.
+
+    Returns:
+        list(str). A list of unique action strings.
+    """
+    return list(set(actions))
+
+
+_GUEST_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_PLAY_ANY_PUBLIC_ACTIVITY)
+
+_LEARNER_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_FLAG_EXPLORATION,
+    ACTION_ACCESS_LEARNER_DASHBOARD,
+    *_GUEST_ALLOWED_ACTIONS)
+
+_EXPLORATION_EDITOR_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCESS_CREATOR_DASHBOARD,
+    ACTION_CREATE_EXPLORATION,
+    ACTION_DELETE_OWNED_PRIVATE_ACTIVITY,
+    ACTION_EDIT_OWNED_ACTIVITY,
+    ACTION_SUBSCRIBE_TO_USERS,
+    ACTION_MANAGE_ACCOUNT,
+    ACTION_MODIFY_CORE_ROLES_FOR_OWNED_ACTIVITY,
+    ACTION_PUBLISH_OWNED_ACTIVITY,
+    ACTION_RATE_ANY_PUBLIC_EXPLORATION,
+    ACTION_SUGGEST_CHANGES,
+    ACTION_SUBMIT_VOICEOVER_APPLICATION,
+    *_LEARNER_ALLOWED_ACTIONS)
+
+_COLLECTION_EDITOR_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_CREATE_COLLECTION,
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+
+_QUESTION_ADMIN_ALLOWED_ACTIONS = (
+    _get_unique_actions_list(
+        ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE,
+        ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES,
+        *_EXPLORATION_EDITOR_ALLOWED_ACTIONS))
+
+_TRANSLATION_ADMIN_ALLOWED_ACTIONS = (
+    _get_unique_actions_list(
+        ACTION_ACCESS_CONTRIBUTOR_DASHBOARD_ADMIN_PAGE,
+        ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES,
+        *_EXPLORATION_EDITOR_ALLOWED_ACTIONS))
+
+_TOPIC_MANAGER_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD,
+    ACTION_DELETE_ANY_QUESTION,
+    ACTION_EDIT_ANY_QUESTION,
+    ACTION_EDIT_OWNED_STORY,
+    ACTION_EDIT_OWNED_TOPIC,
+    ACTION_EDIT_SKILLS,
+    ACTION_EDIT_ANY_SUBTOPIC_PAGE,
+    ACTION_MANAGE_QUESTION_SKILL_STATUS,
+    ACTION_VISIT_ANY_QUESTION_EDITOR,
+    ACTION_VISIT_ANY_TOPIC_EDITOR,
+    *_COLLECTION_EDITOR_ALLOWED_ACTIONS)
+
+_MODERATOR_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCESS_MODERATOR_PAGE,
+    ACTION_DELETE_ANY_PUBLIC_ACTIVITY,
+    ACTION_EDIT_ANY_PUBLIC_ACTIVITY,
+    ACTION_PLAY_ANY_PRIVATE_ACTIVITY,
+    ACTION_SEND_MODERATOR_EMAILS,
+    ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
+    *_TOPIC_MANAGER_ALLOWED_ACTIONS)
+
+_RELEASE_COORDINATOR_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCESS_RELEASE_COORDINATOR_PAGE,
+    ACTION_MANAGE_MEMCACHE,
+    ACTION_RUN_ANY_JOB,
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+
+_BLOG_POST_EDITOR_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCESS_BLOG_DASHBOARD,
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+
+_BLOG_ADMIN_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCESS_BLOG_ADMIN_PAGE,
+    ACTION_ACCESS_BLOG_DASHBOARD,
+    ACTION_DELETE_ANY_BLOG_POST,
+    ACTION_EDIT_ANY_BLOG_POST,
+    ACTION_MANAGE_BLOG_POST_EDITORS,
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+
+_ADMIN_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_ACCEPT_ANY_SUGGESTION,
+    ACTION_ACCEPT_ANY_VOICEOVER_APPLICATION,
+    ACTION_ACCESS_BLOG_ADMIN_PAGE,
+    ACTION_CHANGE_STORY_STATUS,
+    ACTION_CHANGE_TOPIC_STATUS,
+    ACTION_CREATE_NEW_SKILL,
+    ACTION_CREATE_NEW_TOPIC,
+    ACTION_DELETE_ANY_ACTIVITY,
+    ACTION_DELETE_ANY_SKILL,
+    ACTION_DELETE_TOPIC,
+    ACTION_EDIT_ANY_ACTIVITY,
+    ACTION_EDIT_ANY_STORY,
+    ACTION_EDIT_ANY_TOPIC,
+    ACTION_EDIT_SKILLS,
+    ACTION_EDIT_SKILL_DESCRIPTION,
+    ACTION_MANAGE_EMAIL_DASHBOARD,
+    ACTION_MANAGE_TOPIC_RIGHTS,
+    ACTION_MODIFY_CORE_ROLES_FOR_ANY_ACTIVITY,
+    ACTION_PUBLISH_ANY_ACTIVITY,
+    ACTION_PUBLISH_OWNED_SKILL,
+    *_MODERATOR_ALLOWED_ACTIONS)
+
+_VOICEOVER_ADMIN_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_CAN_MANAGE_VOICE_ARTIST,
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+
+# This dict represents all the actions that belong to a particular role.
+_ROLE_ACTIONS = {
+    feconf.ROLE_ID_ADMIN: _ADMIN_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_BANNED_USER: [],
+    feconf.ROLE_ID_COLLECTION_EDITOR: _COLLECTION_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_TRANSLATION_ADMIN: (
+        _TRANSLATION_ADMIN_ALLOWED_ACTIONS),
+    feconf.ROLE_ID_QUESTION_ADMIN: (
+        _QUESTION_ADMIN_ALLOWED_ACTIONS),
+    feconf.ROLE_ID_EXPLORATION_EDITOR: _EXPLORATION_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_GUEST: _GUEST_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_LEARNER: _LEARNER_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_MODERATOR: _MODERATOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_RELEASE_COORDINATOR: _RELEASE_COORDINATOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_TOPIC_MANAGER: _TOPIC_MANAGER_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_BLOG_ADMIN: _BLOG_ADMIN_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_BLOG_POST_EDITOR: _BLOG_POST_EDITOR_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_VOICEOVER_ADMIN: _VOICEOVER_ADMIN_ALLOWED_ACTIONS
 }
 
 
 def get_all_actions(role):
-    """Returns a list of all actions (including inherited actions)
-    that can be performed by the given role.
+    """Returns a list of all actions that can be performed by the given role.
 
     Args:
-        role: str. A string defining user role. It should be a key of
-            PARENT_ROLES.
+        role: str. A string defining the user role.
 
     Returns:
         list(str). A list of actions accessible to the role.
@@ -244,89 +310,34 @@ def get_all_actions(role):
     Raises:
         Exception. The given role does not exist.
     """
-    if role not in PARENT_ROLES:
+    if role not in _ROLE_ACTIONS:
         raise Exception('Role %s does not exist.' % role)
 
-    role_actions = ROLE_ACTIONS[role]
+    role_actions = _ROLE_ACTIONS[role]
 
-    for parent_role in PARENT_ROLES[role]:
-        role_actions.extend(get_all_actions(parent_role))
-
-    return list(set(role_actions))
+    return role_actions
 
 
-def get_role_graph_data():
-    """Returns dict for displaying roles graph.
+def get_role_actions():
+    """Returns the possible role to actions items in the application.
 
     Returns:
-        dict. A dict containing data in following format:
-        {
-            links: list(dict(str:str)). List of dicts defing each edge in
-                following format:
-                    {
-                        source: Role Id from which edge is going out.
-                        target: Role Id to which edge is incoming.
-                    }
-            nodes: dict(str:str). Mapping of role ID to its human readable
-                format.
-        }
+        dict(str, list(str)). A dict presenting key as role and values as list
+        of actions corresponding to the given role.
     """
-    role_graph = {}
-    role_graph['links'] = []
-    role_graph['nodes'] = {}
-    for role in PARENT_ROLES:
-        role_graph['nodes'][role] = HUMAN_READABLE_ROLES[role]
-        for parent in PARENT_ROLES[role]:
-            role_graph['links'].append({'source': parent, 'target': role})
-    return role_graph
+    return copy.deepcopy(_ROLE_ACTIONS)
 
 
-def check_if_path_exists_in_roles_graph(source_node, destination_node):
-    """Breadth-first-search approach to check if a path from source
-    role node to destination role node exists in the roles based hierarchy
-    graph.
+def is_valid_role(role):
+    """Validates whether the given role is valid.
 
     Args:
-        source_node: str. A string defining the role of the source node. It
-            should be a key of PARENT_ROLES.
-        destination_node: str. A string defining the role of the destination
-            node. It should be a key of PARENT_ROLES.
+        role: str. The role to validate.
 
     Returns:
-        Bool. Whether a path from source node role to the destination node role
-        exists in the roles based hierarchy graph or not.
-
-    Raises:
-        Exception. The given role for source node does not exist.
-        Exception. The given role for destination node does not exist.
+        bool. Whether the given role is valid or not.
     """
-
-    if source_node not in PARENT_ROLES:
-        raise Exception(
-            'Role %s defined by the source node does not exist.' % source_node)
-
-    if destination_node not in PARENT_ROLES:
-        raise Exception(
-            'Role %s defined by the destination node does not exist.'
-            % destination_node)
-
-    graph = get_role_graph_data()
-    adjacency_list = {}
-    for node in graph['nodes']:
-        adjacency_list[node] = []
-    for edges in graph['links']:
-        adjacency_list[edges['source']].append(edges['target'])
-    bfs_queue = [source_node]
-    is_path_found = False
-    while len(bfs_queue) > 0:
-        node = bfs_queue.pop(0)
-        if node == destination_node:
-            is_path_found = True
-            break
-        else:
-            for target_node in adjacency_list[node]:
-                bfs_queue.append(target_node)
-    return is_path_found
+    return role in _ROLE_ACTIONS
 
 
 def log_role_query(user_id, intent, role=None, username=None):

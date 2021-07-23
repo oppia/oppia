@@ -23,10 +23,11 @@ import hmac
 import json
 import logging
 import os
-import sys
+import re
 import time
-import traceback
 
+from core.controllers import payload_validator
+from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -38,12 +39,20 @@ import utils
 import backports.functools_lru_cache
 import webapp2
 
-
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
+
+# NOTE: These handlers manage user sessions. Thus, we should never reject or
+# replace them when running in maintenance mode; otherwise admins will be unable
+# to access the site.
+AUTH_HANDLER_PATHS = (
+    '/csrfhandler',
+    '/session_begin',
+    '/session_end',
+)
 
 
 @backports.functools_lru_cache.lru_cache(maxsize=128)
@@ -76,23 +85,6 @@ class SessionEndHandler(webapp2.RequestHandler):
     def get(self):
         """Destroys an existing auth session."""
         auth_services.destroy_auth_session(self.response)
-
-
-class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob.
-
-    TODO(#11462): Delete this handler once the Firebase migration logic is
-    rollback-safe and all backup data is using post-migration data.
-    """
-
-    def get(self):
-        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
-        try:
-            auth_services.seed_firebase()
-        except Exception:
-            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
-        finally:
-            self.redirect('/')
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -128,7 +120,12 @@ class UserFacingExceptions(python_utils.OBJECT):
         maintenance (error code 503).
         """
 
-        pass
+        def __init__(self):
+            super(
+                UserFacingExceptions.TemporaryMaintenanceException, self
+            ).__init__(
+                'Oppia is currently being upgraded, and the site should be up '
+                'and running again in a few hours. Thanks for your patience!')
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -149,6 +146,9 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = None
+    HANDLER_ARGS_SCHEMAS = None
+
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -158,25 +158,37 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
             self.payload = None
         self.iframed = False
 
-        auth_claims = auth_services.get_auth_claims_from_request(request)
-        self.current_user_is_super_admin = (
-            auth_claims is not None and auth_claims.role_is_super_admin)
-
-        if (feconf.ENABLE_MAINTENANCE_MODE and
-                not self.current_user_is_super_admin):
-            return
-
         self.user_id = None
         self.username = None
         self.email = None
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
+        self.current_user_is_super_admin = False
+        self.normalized_request = None
+        self.normalized_payload = None
+
+        try:
+            auth_claims = auth_services.get_auth_claims_from_request(request)
+        except auth_domain.StaleAuthSessionError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        except auth_domain.InvalidAuthSessionError:
+            logging.exception('User session is invalid!')
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        else:
+            self.current_user_is_super_admin = (
+                auth_claims is not None and auth_claims.role_is_super_admin)
 
         if auth_claims:
             auth_id = auth_claims.auth_id
@@ -187,12 +199,10 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if 'signup?' in self.request.uri:
-                    if not feconf.ENABLE_USER_CREATION:
-                        raise Exception('New sign-ups are temporarily disabled')
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
-                    logging.error(
+                    logging.exception(
                         'Cannot find user %s with email %s on page %s' % (
                             auth_id, email, self.request.uri))
                     auth_services.destroy_auth_session(self.response)
@@ -224,6 +234,10 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.user = user_services.get_user_actions_info(self.user_id)
 
+        if not self._is_requested_path_currently_accessible_to_user():
+            auth_services.destroy_auth_session(self.response)
+            return
+
         self.values['is_moderator'] = (
             user_services.is_at_least_moderator(self.user_id))
         self.values['is_admin'] = user_services.is_admin(self.user_id)
@@ -245,14 +259,9 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE and
-                not self.current_user_is_super_admin):
+        if not self._is_requested_path_currently_accessible_to_user():
             self.handle_exception(
-                self.TemporaryMaintenanceException(
-                    'Oppia is currently being upgraded, and the site should '
-                    'be up and running again in a few hours. '
-                    'Thanks for your patience!'),
-                self.app.debug)
+                self.TemporaryMaintenanceException(), self.app.debug)
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -289,12 +298,160 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+                logging.exception('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
 
+        schema_validation_succeeded = True
+        try:
+            self.vaidate_and_normalize_args()
+        except self.InvalidInputException as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+        # TODO(#13155): Remove this clause once all the handlers have had
+        # schema validation implemented.
+        except NotImplementedError as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+
+        if not schema_validation_succeeded:
+            return
+
         super(BaseHandler, self).dispatch()
+
+    def vaidate_and_normalize_args(self):
+        """Validates schema for controller layer handler class arguments.
+
+        Raises:
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
+        """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url_path_args = self.request.route_kwargs
+        handler_class_names_with_no_schema = (
+            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if handler_class_name in handler_class_names_with_no_schema:
+            return
+
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg == 'csrf_token':
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
+                continue
+            elif arg == 'source':
+                source_url = self.request.get('source')
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
+            elif arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = payload_args.keys()
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
+                handler_args[arg] = self.request.get(arg)
+
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
+        extra_args_are_allowed = (
+            self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+            request_method == 'GET')
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
+
+        schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
+        normalized_arg_values, errors = (
+            payload_validator.validate(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        )
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+        # This check ensures that if a request method is not defined
+        # in the handler class then schema validation will not raise
+        # NotImplementedError for that corresponding request method.
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
+                getattr(self.__class__, request_method.lower()) ==
+                getattr(BaseHandler, request_method.lower())):
+            return
+
+        try:
+            schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
+                request_method]
+        except Exception:
+            raise NotImplementedError(
+                'Missing schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name))
+
+        normalized_arg_values, errors = (
+            payload_validator.validate(
+                handler_args, schema_for_request_method, extra_args_are_allowed)
+        )
+
+        self.normalized_payload = {
+            arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_arg_values.get(arg) for arg in request_arg_keys
+        }
+
+        # The following keys are absent in request/payload but present in
+        # normalized_arg_values because these args are populated from their
+        # default_value provided in the schema.
+        keys_that_correspond_to_default_values = list(
+            set(normalized_arg_values.keys()) -
+            set(payload_arg_keys + request_arg_keys)
+        )
+        # Populate the payload/request with the default args before passing
+        # execution onwards to the handler.
+        for arg in keys_that_correspond_to_default_values:
+            if request_method in ['GET', 'DELETE']:
+                self.normalized_request[arg] = normalized_arg_values.get(arg)
+            else:
+                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
+
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
+        """
+        return (
+            self.current_user_is_super_admin or
+            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
@@ -373,7 +530,10 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        self.response.cache_control.no_cache = True
+
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
             b'max-age=31536000; includeSubDomains')
@@ -476,7 +636,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.error(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -486,7 +646,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error': 'Could not find the page %s.' % self.request.uri})
             return
 
-        logging.error('Exception raised: %s', exception)
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)

@@ -1,4 +1,3 @@
-#
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,28 +17,22 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import collections
 import contextlib
 import getpass
 import http.server
 import os
 import re
 import shutil
-import signal
 import socketserver
 import stat
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 
 import constants
 from core.tests import test_utils
 import python_utils
-
-import contextlib2
-import psutil
 
 from . import common
 
@@ -51,37 +44,24 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 import github # isort:skip  pylint: disable=wrong-import-position
 
 
-class MockPsutilProcess(python_utils.OBJECT):
-    """A mock class for Process class in Psutil."""
-
-    cmdlines = [
-        ['dev_appserver.py', '--host', '0.0.0.0', '--port', '9001'],
-        ['downloads']
-    ]
-
-    def __init__(self, index):
-        """Constructor for this mock object.
-
-        Args:
-            index: int. The index of process to be checked.
-        """
-        self.index = index
-
-    def cmdline(self):
-        """Return the command line of this process."""
-        pass
-
-    def kill(self):
-        """Kill the process."""
-        pass
-
-    def is_running(self):
-        """Check whether the function is running."""
-        return True
-
-
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
+
+    @contextlib.contextmanager
+    def open_tcp_server_port(self):
+        """Context manager for starting and stoping an HTTP TCP server.
+
+        Yields:
+            int. The port number of the server.
+        """
+        handler = http.server.SimpleHTTPRequestHandler
+        # NOTE: Binding to port 0 causes the OS to select a random free port
+        # between 1024 to 65535.
+        server = socketserver.TCPServer(('localhost', 0), handler)
+        try:
+            yield server.server_address[1]
+        finally:
+            server.server_close()
 
     def test_is_x64_architecture_in_x86(self):
         maxsize_swap = self.swap(sys, 'maxsize', 1)
@@ -369,13 +349,9 @@ class CommonTests(test_utils.GenericTestBase):
             common.verify_current_branch_name('test')
 
     def test_is_port_in_use(self):
-        self.assertFalse(common.is_port_in_use(4444))
-
-        handler = http.server.SimpleHTTPRequestHandler
-        httpd = socketserver.TCPServer(('', 4444), handler)
-
-        self.assertTrue(common.is_port_in_use(4444))
-        httpd.server_close()
+        with self.open_tcp_server_port() as port:
+            self.assertTrue(common.is_port_in_use(port))
+        self.assertFalse(common.is_port_in_use(port))
 
     def test_wait_for_port_to_not_be_in_use_port_never_closes(self):
         def mock_sleep(unused_seconds):
@@ -638,56 +614,6 @@ class CommonTests(test_utils.GenericTestBase):
                         constants.release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
-    def test_kill_processes_based_on_regex(self):
-        killed = []
-
-        def mock_kill(p):
-            killed.append(MockPsutilProcess.cmdlines[p.index])
-
-        def mock_cmdlines(p):
-            return MockPsutilProcess.cmdlines[p.index]
-
-        def mock_process_iter():
-            return [MockPsutilProcess(0), MockPsutilProcess(1)]
-
-        process_iter_swap = self.swap_with_checks(
-            psutil, 'process_iter', mock_process_iter)
-        kill_swap = self.swap(MockPsutilProcess, 'kill', mock_kill)
-        cmdlines_swap = self.swap(MockPsutilProcess, 'cmdline', mock_cmdlines)
-        with process_iter_swap, kill_swap, cmdlines_swap:
-            common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
-        self.assertEqual(killed, [MockPsutilProcess.cmdlines[0]])
-
-    def test_kill_processes_based_on_regex_when_access_denied(self):
-        killed = []
-
-        def mock_kill(p):
-            killed.append(MockPsutilProcess.cmdlines[p.index])
-
-        def mock_cmdlines(p):
-            if p.index == 0:
-                raise psutil.AccessDenied()
-            return MockPsutilProcess.cmdlines[p.index]
-
-        def mock_process_iter():
-            return [MockPsutilProcess(0), MockPsutilProcess(1)]
-
-        process_iter_swap = self.swap_with_checks(
-            psutil, 'process_iter', mock_process_iter)
-        kill_swap = self.swap(MockPsutilProcess, 'kill', mock_kill)
-        cmdlines_swap = self.swap(MockPsutilProcess, 'cmdline', mock_cmdlines)
-        with process_iter_swap, kill_swap, cmdlines_swap:
-            common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
-        self.assertEqual(killed, [])
-
-    def test_kill_process_when_psutil_not_in_path(self):
-        path_swap = self.swap(sys, 'path', [])
-        def mock_process_iter():
-            return []
-        process_iter_swap = self.swap(psutil, 'process_iter', mock_process_iter)
-        with path_swap, process_iter_swap:
-            common.kill_processes_based_on_regex('')
-
     def test_inplace_replace_file(self):
         origin_file = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
@@ -730,13 +656,60 @@ class CommonTests(test_utils.GenericTestBase):
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
         with self.assertRaisesRegexp(
-            ValueError, r'Exception raised from compile\(\)'), compile_swap:
+            ValueError,
+            re.escape('Exception raised from compile()')
+        ), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
         with python_utils.open_file(origin_file, 'r') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
+
+    def test_inplace_replace_file_context(self):
+        file_path = (
+            os.path.join('core', 'tests', 'data', 'inplace_replace_test.json'))
+        backup_file_path = '%s.bak' % file_path
+
+        with python_utils.open_file(file_path, 'r') as f:
+            self.assertEqual(f.readlines(), [
+                '{\n',
+                '    "RANDMON1" : "randomValue1",\n',
+                '    "312RANDOM" : "ValueRanDom2",\n',
+                '    "DEV_MODE": false,\n',
+                '    "RAN213DOM" : "raNdoVaLue3"\n',
+                '}\n',
+            ])
+
+        replace_file_context = common.inplace_replace_file_context(
+            file_path, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        with replace_file_context, python_utils.open_file(file_path, 'r') as f:
+            self.assertEqual(f.readlines(), [
+                '{\n',
+                '    "RANDMON1" : "randomValue1",\n',
+                '    "312RANDOM" : "ValueRanDom2",\n',
+                '    "DEV_MODE": true,\n',
+                '    "RAN213DOM" : "raNdoVaLue3"\n',
+                '}\n',
+            ])
+            self.assertTrue(os.path.isfile(backup_file_path))
+
+        with python_utils.open_file(file_path, 'r') as f:
+            self.assertEqual(f.readlines(), [
+                '{\n',
+                '    "RANDMON1" : "randomValue1",\n',
+                '    "312RANDOM" : "ValueRanDom2",\n',
+                '    "DEV_MODE": false,\n',
+                '    "RAN213DOM" : "raNdoVaLue3"\n',
+                '}\n',
+            ])
+
+        try:
+            self.assertFalse(os.path.isfile(backup_file_path))
+        except AssertionError:
+            # Just in case the implementation is wrong, erase the file.
+            os.remove(backup_file_path)
+            raise
 
     def test_convert_to_posixpath_on_windows(self):
         def mock_is_windows():
@@ -768,115 +741,6 @@ class CommonTests(test_utils.GenericTestBase):
             if os.path.exists('readme_test_dir'):
                 shutil.rmtree('readme_test_dir')
 
-    def test_windows_os_throws_exception_when_starting_redis_server(self):
-        def mock_is_windows_os():
-            return True
-        windows_not_supported_exception = self.assertRaisesRegexp(
-            Exception,
-            'The redis command line interface is not installed because your '
-            'machine is on the Windows operating system. The redis server '
-            'cannot start.')
-        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
-        with swap_os_check, windows_not_supported_exception:
-            common.start_redis_server()
-
-    def test_windows_os_throws_exception_when_stopping_redis_server(self):
-        def mock_is_windows_os():
-            return True
-        windows_not_supported_exception = self.assertRaisesRegexp(
-            Exception,
-            'The redis command line interface is not installed because your '
-            'machine is on the Windows operating system. There is no redis '
-            'server to shutdown.')
-        swap_os_check = self.swap(common, 'is_windows_os', mock_is_windows_os)
-
-        with swap_os_check, windows_not_supported_exception:
-            common.stop_redis_server()
-
-    def test_start_and_stop_server_calls_are_called(self):
-        # Test that starting the server calls subprocess.call().
-        check_function_calls = {
-            'subprocess_call_is_called': False
-        }
-        expected_check_function_calls = {
-            'subprocess_call_is_called': True
-        }
-
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            check_function_calls['subprocess_call_is_called'] = True
-            class Ret(python_utils.OBJECT):
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-            return Ret()
-
-        def mock_wait_for_port_to_be_in_use(port): # pylint: disable=unused-argument
-            return
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_wait_for_port_to_be_in_use = self.swap(
-            common, 'wait_for_port_to_be_in_use',
-            mock_wait_for_port_to_be_in_use)
-        with swap_call, swap_wait_for_port_to_be_in_use:
-            common.start_redis_server()
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-        # Test that stopping the server calls subprocess.call().
-        check_function_calls = {
-            'subprocess_call_is_called': False
-        }
-        expected_check_function_calls = {
-            'subprocess_call_is_called': True
-        }
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        with swap_call:
-            common.stop_redis_server()
-
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_start_server_removes_redis_dump(self):
-        check_function_calls = {
-            'os_remove_is_called': False
-        }
-
-        def mock_os_remove_file(file_path): # pylint: disable=unused-argument
-            check_function_calls['os_remove_is_called'] = True
-
-        def mock_os_path_exists(file_path): # pylint: disable=unused-argument
-            return True
-
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            class Ret(python_utils.OBJECT):
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-            return Ret()
-
-        def mock_wait_for_port_to_be_in_use(port): # pylint: disable=unused-argument
-            return
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_wait_for_port_to_be_in_use = self.swap(
-            common, 'wait_for_port_to_be_in_use',
-            mock_wait_for_port_to_be_in_use)
-        swap_os_remove = self.swap(os, 'remove', mock_os_remove_file)
-        swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
-        with swap_call, swap_wait_for_port_to_be_in_use, swap_os_remove, (
-            swap_os_path_exists):
-            common.start_redis_server()
-
-        self.assertTrue(check_function_calls['os_remove_is_called'])
-
     def test_fix_third_party_imports_correctly_sets_up_imports(self):
         common.fix_third_party_imports()
         # Asserts that imports from problematic modules do not error.
@@ -896,395 +760,3 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertIsNone(old_value)
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
-
-
-class ManagedProcessTests(test_utils.TestBase):
-
-    # Helper class for improving the readability of tests.
-    POPEN_CALL = (
-        collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
-
-    def assert_proc_was_managed_as_expected(
-            self, logs, pid,
-            manager_should_have_sent_terminate_signal=True,
-            manager_should_have_sent_kill_signal=False):
-        """Asserts that the process ended as expected.
-
-        Args:
-            logs: list(str). The logs emitted during the process's lifetime.
-            pid: int. The process ID to inspect.
-            manager_should_have_sent_terminate_signal: bool. Whether the manager
-                should have sent a terminate signal to the process.
-            manager_should_have_sent_kill_signal: bool. Whether the manager
-                should have sent a kill signal to the process.
-        """
-        proc_pattern = r'Process\((name=\'[A-Za-z]+\', )?pid=%d\)' % (pid,)
-
-        expected_patterns = []
-        if manager_should_have_sent_terminate_signal:
-            expected_patterns.append(r'Terminating %s\.\.\.' % proc_pattern)
-        if manager_should_have_sent_kill_signal:
-            expected_patterns.append(r'Forced to kill %s!' % proc_pattern)
-        else:
-            expected_patterns.append(r'%s has ended\.' % proc_pattern)
-
-        logs_with_pid = [msg for msg in logs if re.search(proc_pattern, msg)]
-        if expected_patterns and not logs_with_pid:
-            self.fail(msg='%r has no match in logs=%r' % (proc_pattern, logs))
-
-        self.assert_matches_regexps(logs_with_pid, expected_patterns)
-
-    @contextlib.contextmanager
-    def _swap_popen(
-            self, make_procs_unresponsive=False, num_children=0, delay_secs=30):
-        """Returns values for inspecting and mocking calls to psutil.Popen.
-
-        Args:
-            make_procs_unresponsive: bool. Whether the processes created by
-                the mock will stall when asked to terminate. Processes will
-                always terminate within ~1 minute regardless of this choice.
-            num_children: int. The number of child processes the process created
-                by the mock should create. Children inherit the same termination
-                behavior.
-            delay_secs: int. The number of seconds before the process ends
-                naturally.
-
-        Returns:
-            Context manager. A context manager in which calls to psutil.Popen
-            create a simple program that simply waits and then exits.
-
-        Yields:
-            list(POPEN_CALL). A list with the most up-to-date arguments passed
-            to psutil.Popen from within the context manager returned.
-        """
-        popen_calls = []
-
-        def popen_mock(program_args, **kwargs):
-            """Mock of psutil.Popen that creates processes using os.fork().
-
-            The processes created will always terminate within ~1 minute.
-
-            Args:
-                program_args: list(*). Unused program arguments that would
-                    otherwise be used by psutil.Popen.
-                **kwargs: dict(str: *). Unused keyword arguments that would
-                    otherwise be used by psutil.Popen.
-
-            Returns:
-                psutil.Process. Handle for the parent of the new process tree.
-            """
-            child_pid = os.fork()
-            if child_pid != 0:
-                popen_calls.append(self.POPEN_CALL(program_args, kwargs))
-                time.sleep(1) # Give child a chance to start running.
-                return psutil.Process(pid=child_pid)
-
-            for _ in python_utils.RANGE(num_children):
-                if os.fork() == 0:
-                    break
-
-            if make_procs_unresponsive:
-                # Register an unresponsive function as the SIGTERM handler.
-                signal.signal(signal.SIGTERM, lambda *_: time.sleep(delay_secs))
-
-            time.sleep(delay_secs)
-            sys.exit()
-
-        with self.swap(psutil, 'Popen', popen_mock):
-            yield popen_calls
-
-    def test_does_not_raise_when_psutil_not_in_path(self):
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self.swap(sys, 'path', []))
-            stack.enter_context(self._swap_popen())
-
-            # Entering the context should not raise.
-            stack.enter_context(common.managed_process(['a'], timeout_secs=10))
-
-    def test_concats_command_args_when_shell_is_true(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            proc = stack.enter_context(
-                common.managed_process(['a', 1], shell=True, timeout_secs=10))
-
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
-
-    def test_passes_command_args_as_list_of_strings_when_shell_is_false(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            proc = stack.enter_context(
-                common.managed_process(['a', 1], shell=False, timeout_secs=10))
-
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(
-            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
-
-    def test_filters_empty_strings_from_command_args_when_shell_is_true(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            proc = stack.enter_context(common.managed_process(
-                ['', 'a', '', 1], shell=True, timeout_secs=10))
-
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
-
-    def test_filters_empty_strings_from_command_args_when_shell_is_false(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            proc = stack.enter_context(common.managed_process(
-                ['', 'a', '', 1], shell=False, timeout_secs=10))
-
-        self.assert_proc_was_managed_as_expected(logs, proc.pid)
-        self.assertEqual(
-            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
-
-    def test_reports_killed_processes_as_warnings(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
-
-            proc = stack.enter_context(
-                common.managed_process(['a'], timeout_secs=10))
-
-        self.assert_proc_was_managed_as_expected(
-            logs, proc.pid,
-            manager_should_have_sent_terminate_signal=True,
-            manager_should_have_sent_kill_signal=True)
-
-    def test_terminates_child_processes(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            stack.enter_context(self._swap_popen(num_children=3))
-
-            proc = stack.enter_context(
-                common.managed_process(['a'], timeout_secs=10))
-            pids = [c.pid for c in proc.children()] + [proc.pid]
-
-        self.assertEqual(len(set(pids)), 4)
-        for pid in pids:
-            self.assert_proc_was_managed_as_expected(logs, pid)
-
-    def test_kills_child_processes(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            stack.enter_context(self._swap_popen(
-                num_children=3, make_procs_unresponsive=True))
-
-            proc = stack.enter_context(
-                common.managed_process(['a'], timeout_secs=10))
-            pids = [c.pid for c in proc.children()] + [proc.pid]
-
-        self.assertEqual(len(set(pids)), 4)
-        for pid in pids:
-            self.assert_proc_was_managed_as_expected(
-                logs, pid,
-                manager_should_have_sent_terminate_signal=True,
-                manager_should_have_sent_kill_signal=True)
-
-    def test_respects_processes_that_are_killed_early(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            stack.enter_context(self._swap_popen())
-
-            proc = stack.enter_context(common.managed_process(
-                ['a'], timeout_secs=10))
-            time.sleep(1)
-            proc.kill()
-            proc.wait()
-
-        self.assert_proc_was_managed_as_expected(
-            logs, proc.pid,
-            manager_should_have_sent_terminate_signal=False)
-
-    def test_respects_processes_that_are_killed_after_delay(self):
-        with contextlib2.ExitStack() as stack:
-            logs = stack.enter_context(self.capture_logging())
-            stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
-
-            proc = stack.enter_context(common.managed_process(
-                ['a'], timeout_secs=10))
-
-            def _kill_after_delay():
-                """Kills the targeted process after a short delay."""
-                time.sleep(5)
-                proc.kill()
-
-            assassin_thread = threading.Thread(target=_kill_after_delay)
-            assassin_thread.start()
-
-        assassin_thread.join()
-
-        self.assert_proc_was_managed_as_expected(
-            logs, proc.pid,
-            manager_should_have_sent_terminate_signal=True,
-            manager_should_have_sent_kill_signal=False)
-
-    def test_managed_firebase_emulator(self):
-        with contextlib2.ExitStack() as stack:
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            stack.enter_context(common.managed_firebase_auth_emulator())
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('firebase', popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-
-    @contextlib.contextmanager
-    def swap_managed_cloud_datastore_emulator_io_operations(
-            self, data_dir_exists):
-        """Safely swaps IO operations used by managed_cloud_datastore_emulator.
-
-        Args:
-            data_dir_exists: bool. Return value of os.path.exists(DATA_DIR).
-
-        Yields:
-            tuple(CallCounter, CallCounter). CallCounter instances for rmtree
-            and makedirs.
-        """
-        old_exists = os.path.exists
-        old_rmtree = shutil.rmtree
-        old_makedirs = os.makedirs
-
-        is_data_dir = lambda p: p == common.CLOUD_DATASTORE_EMULATOR_DATA_DIR
-
-        new_exists = (
-            lambda p: data_dir_exists if is_data_dir(p) else old_exists(p))
-        new_rmtree = test_utils.CallCounter(
-            lambda p, **kw: None if is_data_dir(p) else old_rmtree(p, **kw))
-        new_makedirs = test_utils.CallCounter(
-            lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw))
-
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self.swap(os.path, 'exists', new_exists))
-            stack.enter_context(self.swap(shutil, 'rmtree', new_rmtree))
-            stack.enter_context(self.swap(os, 'makedirs', new_makedirs))
-            yield new_rmtree, new_makedirs
-
-    def test_managed_cloud_datastore_emulator(self):
-        with contextlib2.ExitStack() as stack:
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            stack.enter_context(
-                self.swap_managed_cloud_datastore_emulator_io_operations(True))
-            stack.enter_context(self.swap_to_always_return(
-                common, 'wait_for_port_to_be_in_use'))
-
-            stack.enter_context(common.managed_cloud_datastore_emulator())
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn(
-            'beta emulators datastore start', popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-
-    def test_managed_cloud_datastore_emulator_creates_missing_data_dir(self):
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self._swap_popen())
-
-            rmtree_counter, makedirs_counter = stack.enter_context(
-                self.swap_managed_cloud_datastore_emulator_io_operations(False))
-            stack.enter_context(self.swap_to_always_return(
-                common, 'wait_for_port_to_be_in_use'))
-
-            stack.enter_context(common.managed_cloud_datastore_emulator())
-
-        self.assertEqual(rmtree_counter.times_called, 0)
-        self.assertEqual(makedirs_counter.times_called, 1)
-
-    def test_managed_cloud_datastore_emulator_clears_data_dir(self):
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self._swap_popen())
-
-            rmtree_counter, makedirs_counter = stack.enter_context(
-                self.swap_managed_cloud_datastore_emulator_io_operations(True))
-            stack.enter_context(self.swap_to_always_return(
-                common, 'wait_for_port_to_be_in_use'))
-
-            stack.enter_context(
-                common.managed_cloud_datastore_emulator(clear_datastore=True))
-
-        self.assertEqual(rmtree_counter.times_called, 1)
-        self.assertEqual(makedirs_counter.times_called, 1)
-
-    def test_managed_cloud_datastore_emulator_acknowledges_data_dir(self):
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self._swap_popen())
-
-            rmtree_counter, makedirs_counter = stack.enter_context(
-                self.swap_managed_cloud_datastore_emulator_io_operations(True))
-            stack.enter_context(self.swap_to_always_return(
-                common, 'wait_for_port_to_be_in_use'))
-
-            stack.enter_context(
-                common.managed_cloud_datastore_emulator(clear_datastore=False))
-
-        self.assertEqual(rmtree_counter.times_called, 0)
-        self.assertEqual(makedirs_counter.times_called, 0)
-
-    def test_managed_dev_appserver(self):
-        with contextlib2.ExitStack() as stack:
-            popen_calls = stack.enter_context(self._swap_popen())
-
-            stack.enter_context(
-                common.managed_dev_appserver('app.yaml', env=None))
-
-        self.assertEqual(len(popen_calls), 1)
-        self.assertIn('dev_appserver.py', popen_calls[0].program_args)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
-
-    def test_managed_elasticsearch_dev_server(self):
-        with contextlib2.ExitStack() as stack:
-            popen_calls = stack.enter_context(self._swap_popen())
-            stack.enter_context(common.managed_elasticsearch_dev_server())
-
-        self.assertEqual(
-            popen_calls[0].program_args,
-            '%s/bin/elasticsearch -q' % common.ES_PATH)
-        self.assertEqual(popen_calls[0].kwargs, {
-            'shell': True,
-            'env': {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR},
-        })
-
-    def test_start_server_removes_elasticsearch_data(self):
-        check_function_calls = {
-            'shutil_rmtree_is_called': False
-        }
-
-        old_os_path_exists = os.path.exists
-
-        def mock_os_remove_files(file_path): # pylint: disable=unused-argument
-            check_function_calls['shutil_rmtree_is_called'] = True
-
-        def mock_os_path_exists(file_path): # pylint: disable=unused-argument
-            if file_path == common.ES_PATH_DATA_DIR:
-                return True
-            return old_os_path_exists(file_path)
-
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            class Ret(python_utils.OBJECT):
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-            return Ret()
-
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        swap_os_remove = self.swap(shutil, 'rmtree', mock_os_remove_files)
-        swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
-        stack = contextlib2.ExitStack()
-        with swap_call, swap_os_remove, swap_os_path_exists, stack:
-            stack.enter_context(self._swap_popen())
-            stack.enter_context(common.managed_elasticsearch_dev_server())
-
-        self.assertTrue(check_function_calls['shutil_rmtree_is_called'])

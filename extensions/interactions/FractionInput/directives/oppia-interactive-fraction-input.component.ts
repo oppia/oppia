@@ -20,7 +20,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
@@ -29,6 +29,8 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 
 import { FractionInputRulesService } from './fraction-input-rules.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { FractionAnswer, InteractionAnswer } from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-interactive-fraction-input',
@@ -40,7 +42,8 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   @Input() allowImproperFractionWithValue: string = '';
   @Input() allowNonzeroIntegerPartWithValue: string = '';
   @Input() customPlaceholderWithValue: string = '';
-  @Input() savedSolution: string;
+  @Input() labelForFocusTarget: string;
+  @Input() savedSolution: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   requireSimplestForm: boolean = false;
   allowImproperFraction: boolean = true;
@@ -58,7 +61,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private fractionInputRulesService: FractionInputRulesService,
-    private fractionObjectFactory: FractionObjectFactory,
+    private focusManagerService: FocusManagerService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService
   ) {
@@ -123,15 +126,21 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.allowNonzeroIntegerPart = allowNonzeroIntegerPart.value;
     this.customPlaceholder = customPlaceholder.value.unicode;
     if (this.savedSolution !== undefined) {
-      let savedSolution = JSON.parse(this.savedSolution);
-      savedSolution = this.fractionObjectFactory.fromDict(
-        savedSolution).toString();
+      let savedSolution = this.savedSolution;
+      savedSolution = Fraction.fromDict(
+        savedSolution as FractionAnswer).toString();
       this.answer = savedSolution;
     }
     const submitAnswerFn = () => this.submitAnswer();
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
       submitAnswerFn, isAnswerValid);
+
+    setTimeout(
+      () => {
+        let focusLabel: string = this.labelForFocusTarget;
+        this.focusManagerService.setFocusWithoutScroll(focusLabel);
+      }, 0);
   }
 
   private getAttributesObject() {
@@ -146,10 +155,9 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   submitAnswer(): void {
     const answer: string = this.answer;
     try {
-      const fraction = this.fractionObjectFactory.fromRawInputString(
-        answer);
+      const fraction = Fraction.fromRawInputString(answer);
       if (this.requireSimplestForm &&
-        !fraction.isEqualTo(fraction.convertToSimplestForm())
+        !(fraction === (fraction.convertToSimplestForm()))
       ) {
         this.errorMessage = (
           'Please enter an answer in simplest form ' +

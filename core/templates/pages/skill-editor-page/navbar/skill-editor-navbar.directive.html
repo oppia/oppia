@@ -1,6 +1,6 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right ng-cloak" id="skill-editor-navbar-desktop"
     ng-if="!isLoadingSkill()">
-  <li class="oppia-publish-button-container">
+  <li class="oppia-publish-button-container" ng-if="getActiveTabName() !== 'questions'">
     <div uib-dropdown>
       <button class="btn btn-light oppia-save-changes-button oppia-save-publish-changes-button protractor-test-save-or-publish-skill"
               ng-class="{'btn-success': isSkillSaveable()}"

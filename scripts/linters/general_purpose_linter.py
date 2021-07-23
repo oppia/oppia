@@ -39,11 +39,12 @@ EXCLUDED_PATHS = (
     'core/tests/build_sources/*', '*.mp3', '*.mp4', 'node_modules/*',
     'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
     'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
-    'scripts/linters/test_files/*', 'proto/*',
+    'scripts/linters/test_files/*', 'proto_files/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
+    'extensions/classifiers/proto/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -106,175 +107,6 @@ BAD_PATTERNS_REGEXP = [
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
-        'excluded_dirs': ()
-    }
-]
-
-BAD_PATTERNS_JS_AND_TS_REGEXP = [
-    {
-        'regexp': re.compile(r'\b(browser.explore)\('),
-        'message': 'In tests, please do not use browser.explore().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.pause)\('),
-        'message': 'In tests, please do not use browser.pause().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\b(browser.waitForAngular)\('),
-        'message': 'In tests, please do not use browser.waitForAngular().',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'bypass'),
-        'message': 'The use of the word "bypass" is not allowed, ' +
-                   'particularly with regards to bypassSecurityTrustHTML() ' +
-                   'and similar functions in Angular.',
-        'excluded_files': (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES),
-        'excluded_dirs': (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
-    },
-    {
-        'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
-        'message': 'In tests, please use \'angular.mock.inject\' instead of '
-                   '\'inject\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'templateUrl: \''),
-        'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/pages/exploration-player-page/'
-            'FeedbackPopupDirective.js',
-            '.component.ts'
-        ),
-        'excluded_dirs': (
-            'extensions/answer_summarizers/',
-            'extensions/classifiers/',
-            'extensions/dependencies/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
-    },
-    {
-        'regexp': re.compile(r'toThrow[(]'),
-        'message': 'Please use \'toThrowError\' instead of '
-                   '\'toThrow\'',
-        'excluded_files': (
-            # Note to developers: In the excluded_files below,
-            # we use custom errors which cannot be caught by regex.
-            # The Logic Proof interaction which uses these custom errors
-            # will be deprecated soon (see #9198).
-            'extensions/interactions/LogicProof/static/js/student.spec.ts',
-            'extensions/interactions/LogicProof/static/js/complete.spec.ts',
-            'extensions/interactions/LogicProof/static/js/teacher.spec.ts'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(
-            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})'
-            r'throw\s\b(\bError|\bTypeError|\bRangeError'
-            r'\bSyntaxError|\bDimensionError)\('),
-        'message': 'Please use \'throw new\' instead of \'throw\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(
-            r'(?!catch\s(\n|.)*throw\s\w+;\n.*})throw\s\'.*\';'),
-        'message': 'Please use '
-                   '\'throw new Error\' instead of \'throw\'',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object' +
-                   'for this purpose.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'require\(.*\.\..*\);'),
-        'message': 'Please, don\'t use relative imports in require().',
-        'excluded_files': (),
-        'excluded_dirs': ('core/tests/',)
-    },
-    {
-        'regexp': re.compile(r'innerHTML'),
-        'message': 'Please do not use innerHTML property.',
-        'excluded_files': (
-            'core/templates/Polyfills.ts',
-            'core/templates/filters/translate.pipe.spec.ts',
-            'core/templates/components/ck-editor-helpers/' +
-            'ck-editor-copy-content-service.spec.ts',
-            'core/templates/tests/unit-test-utils.ts',
-            'core/templates/directives/mathjax.directive.ts',
-            'extensions/objects/templates/' +
-            'math-expression-content-editor.component.ts'),
-        'excluded_dirs': ('core/tests/',)
-    },
-    {
-        'regexp': re.compile(
-            r'eslint-(disable|enable)(-next-line)? camelcase'),
-        'message': (
-            'Please do not use eslint disable for camelcase. '
-            'If you are using this statement to define properties '
-            'in an interface for a backend dict. Wrap the property '
-            'name in single quotes instead.'),
-        'excluded_files': (
-            'typings/guppy-defs-b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.d.ts',
-            'core/templates/services/UpgradedServices.ts'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'no-explicit-any'),
-        'message': (
-            'Please do not define "any" types. You can refer '
-            'https://github.com/oppia/oppia/wiki/Guide-on-defining-types '
-            'if you\'re having trouble declaring types.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\$broadcast'),
-        'message': (
-            'Please do not use $broadcast/$on for propagating events. '
-            'Use @Input/@Output instead.'),
-        'excluded_files': (
-            'core/templates/pages/exploration-editor-page/translation-tab/'
-            'audio-translation-bar/audio-translation-bar.directive.spec.ts',
-            'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts',
-            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
-        'message': (
-            'Please do not use "import { someFunction } from \'lodash\'". '
-            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r':\n? *HttpClient'),
-        'message': (
-            'An instance of HttpClient is found in this file. You are not '
-            'allowed to create http requests from files that are not backend '
-            'api services.'),
-        'excluded_files': (
-            'backend-api.service.ts',
-            'core/templates/services/auth-interceptor.service.spec.ts',
-            'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
 ]
@@ -426,8 +258,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
 ]
 
 BAD_PATTERNS_MAP = {
-    '.js': BAD_PATTERNS_JS_AND_TS_REGEXP,
-    '.ts': BAD_PATTERNS_JS_AND_TS_REGEXP,
     '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
     '.py': BAD_PATTERNS_PYTHON_REGEXP
 }
@@ -694,6 +524,36 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_disallowed_flags(self):
+        """This function is used to disallow flags."""
+        name = 'Disallow flags'
+        disallow_flag = (
+            'eslint-disable-next-line oppia/no-bypass-security-phrase')
+        error_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+        excluded_files = (
+            warranted_angular_security_bypasses
+            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES)
+        allowed_files = ''
+        for filepath in files_to_lint:
+            for excluded_file in excluded_files:
+                if excluded_file in filepath:
+                    allowed_files = filepath
+            if not filepath.endswith('.ts') or filepath == allowed_files:
+                continue
+            file_content = self.file_cache.read(filepath)
+
+            if disallow_flag in file_content:
+                error_message = (
+                    '%s --> Please do not use "no-bypass-security-phrase" flag.'
+                    ' It is only expected to be used in files listed in'
+                    ' warranted_angular_security_bypasses.py' % filepath)
+                error_messages.append(error_message)
+                failed = True
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
@@ -742,7 +602,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     ['There are no files to be checked.'])]
         task_results = [
             self.check_mandatory_patterns(), self.check_bad_patterns(),
-            self.check_newline_at_eof(), self.check_extra_js_files()]
+            self.check_newline_at_eof(), self.check_extra_js_files(),
+            self.check_disallowed_flags()]
         return task_results
 
 

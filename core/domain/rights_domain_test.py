@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -108,6 +109,13 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'A user cannot be both a voice artist and a viewer.'):
             self.activity_rights.validate()
 
+    def test_update_activity_first_published_msec(self):
+        rights_manager.update_activity_first_published_msec(
+            constants.ACTIVITY_TYPE_EXPLORATION, self.exp_id, 0.0)
+
+        activity_rights = rights_manager.get_exploration_rights(self.exp_id)
+        self.assertEqual(activity_rights.first_published_msec, 0.0)
+
     def test_cannot_update_activity_first_published_msec_for_invalid_activity(
             self):
         with self.assertRaisesRegexp(
@@ -136,7 +144,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, None))
 
     def test_check_cannot_modify_activity_roles_with_no_activity_rights(self):
-        self.assertFalse(rights_manager.check_can_modify_activity_roles(
+        self.assertFalse(rights_manager.check_can_modify_core_activity_roles(
             self.owner, None))
 
     def test_check_cannot_release_ownership_with_no_activity_rights(self):
@@ -216,6 +224,13 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'This user already owns this exploration.'):
             self.activity_rights.assign_new_role(
                 '123456', rights_domain.ROLE_OWNER)
+
+        self.activity_rights.assign_new_role(
+            '123456', rights_domain.ROLE_EDITOR)
+        with self.assertRaisesRegexp(
+            Exception, 'This user already can edit this exploration.'):
+            self.activity_rights.assign_new_role(
+                '123456', rights_domain.ROLE_EDITOR)
 
     def test_cannot_assign_viewer_to_public_exp(self):
         self.activity_rights.owner_ids = []

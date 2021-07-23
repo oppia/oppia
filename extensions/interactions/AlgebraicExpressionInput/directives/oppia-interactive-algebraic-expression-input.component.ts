@@ -31,6 +31,7 @@ import { AlgebraicExpressionInputRulesService } from './algebraic-expression-inp
 import constants from 'assets/constants';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-interactive-algebraic-expression-input',
@@ -42,7 +43,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
   hasBeenTouched = false;
   warningText: string = '';
   @Input() customOskLettersWithValue: string = '';
-  @Input() savedSolution: string;
+  @Input() savedSolution: InteractionAnswer;
   @Input() useFractionForDivisionWithValue: string;
 
   constructor(
@@ -98,7 +99,7 @@ export class AlgebraicExpressionInputInteractionComponent implements OnInit {
     this.guppyInitializationService.init(
       'guppy-div-learner',
       constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput,
-      this.savedSolution !== undefined ? JSON.parse(this.savedSolution) : ''
+      this.savedSolution !== undefined ? this.savedSolution as string : ''
     );
     const eventType = (
       this.deviceInfoService.isMobileUserAgent() &&

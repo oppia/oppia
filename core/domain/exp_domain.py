@@ -32,11 +32,13 @@ import string
 
 from constants import constants
 from core.domain import change_domain
+from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -50,10 +52,12 @@ import utils
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
+STATE_PROPERTY_CARD_IS_CHECKPOINT = 'card_is_checkpoint'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
+STATE_PROPERTY_LINKED_SKILL_ID = 'linked_skill_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
@@ -79,9 +83,21 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
-# This takes additional 'state_name', 'content_id', 'language_code' and
-# 'content_html' and 'translation_html' parameters.
-CMD_ADD_TRANSLATION = 'add_translation'
+# TODO(#12981): Write a one-off job to modify all existing translation
+# suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
+# CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will only use
+# CMD_ADD_WRITTEN_TRANSLATION.
+# DEPRECATED: This command is deprecated. Please do not use. The command remains
+# here to support old suggestions. This takes additional 'state_name',
+# 'content_id', 'language_code' and 'content_html' and 'translation_html'
+# parameters.
+DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
+# This takes additional 'state_name', 'content_id', 'language_code',
+# 'data_format', 'content_html' and 'translation_html' parameters.
+CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
+# This takes additional 'content_id' and 'state_name' parameters.
+CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+    'mark_written_translations_as_needing_update')
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -227,10 +243,12 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+        STATE_PROPERTY_CARD_IS_CHECKPOINT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+        STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -270,10 +288,22 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
-        'name': CMD_ADD_TRANSLATION,
+        'name': DEPRECATED_CMD_ADD_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_ADD_WRITTEN_TRANSLATION,
+        'required_attribute_names': [
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html', 'data_format'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+        'required_attribute_names': ['content_id', 'state_name'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
@@ -282,7 +312,10 @@ class ExplorationChange(change_domain.BaseChange):
             'property_name', 'state_name', 'new_value'],
         'optional_attribute_names': ['old_value'],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': STATE_PROPERTIES}
+        'allowed_values': {'property_name': STATE_PROPERTIES},
+        # TODO(#12991): Remove this once once we use the migration jobs to
+        # remove the deprecated values from the server data.
+        'deprecated_values': {'property_name': ['fallbacks']}
     }, {
         'name': CMD_EDIT_EXPLORATION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value'],
@@ -300,6 +333,12 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }]
+
+    # TODO(#12991): Remove this once once we use the migration jobs to remove
+    # the deprecated commands from the server data.
+    DEPRECATED_COMMANDS = [
+        'clone', 'add_gadget', 'edit_gadget_property',
+        'delete_gadget', 'rename_gadget']
 
 
 class ExplorationCommitLogEntry(python_utils.OBJECT):
@@ -416,14 +455,18 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
     exploration.
 
     Attributes:
-        added_state_names: list(str). Name of the states added to the
-            exploration from prev_exp_version to current_exp_version.
-        deleted_state_names: list(str). Name of the states deleted from the
-            exploration from prev_exp_version to current_exp_version.
+        added_state_names: list(str). Names of the states added to the
+            exploration from prev_exp_version to current_exp_version. It stores
+            the newest names of the added states.
+        deleted_state_names: list(str). Name sof the states deleted from the
+            exploration from prev_exp_version to current_exp_version. It stores
+            the initial names of the deleted states from pre_exp_version.
         new_to_old_state_names: dict. Dictionary mapping state names of
             current_exp_version to the state names of prev_exp_version.
+            It doesn't include the name changes of added/deleted states.
         old_to_new_state_names: dict. Dictionary mapping state names of
             prev_exp_version to the state names of current_exp_version.
+            It doesn't include the name changes of added/deleted states.
     """
 
     def __init__(self, change_list):
@@ -703,7 +746,11 @@ class Exploration(python_utils.OBJECT):
 
             state.next_content_id_index = sdict['next_content_id_index']
 
+            state.linked_skill_id = sdict['linked_skill_id']
+
             state.solicit_answer_details = sdict['solicit_answer_details']
+
+            state.card_is_checkpoint = sdict['card_is_checkpoint']
 
             exploration.states[state_name] = state
 
@@ -961,6 +1008,87 @@ class Exploration(python_utils.OBJECT):
 
         if strict:
             warnings_list = []
+
+            # Check if first state is a checkpoint or not.
+            if not self.states[self.init_state_name].card_is_checkpoint:
+                raise utils.ValidationError(
+                    'Expected card_is_checkpoint of first state to be True'
+                    ' but found it to be %s'
+                    % (self.states[self.init_state_name].card_is_checkpoint)
+                )
+
+            # Check if terminal states are checkpoints.
+            for state_name, state in self.states.items():
+                interaction = state.interaction
+                if interaction.is_terminal:
+                    if state_name != self.init_state_name:
+                        if self.states[state_name].card_is_checkpoint:
+                            raise utils.ValidationError(
+                                'Expected card_is_checkpoint of terminal state '
+                                'to be False but found it to be %s'
+                                % self.states[state_name].card_is_checkpoint
+                            )
+
+            # Check if checkpoint count is between 1 and 8, inclusive.
+            checkpoint_count = 0
+            for state_name, state in self.states.items():
+                if state.card_is_checkpoint:
+                    checkpoint_count = checkpoint_count + 1
+            if not 1 <= checkpoint_count <= 8:
+                raise utils.ValidationError(
+                    'Expected checkpoint count to be between 1 and 8 inclusive '
+                    'but found it to be %s'
+                    % checkpoint_count
+                )
+
+            # Check if a state marked as a checkpoint is bypassable.
+            non_initial_checkpoint_state_names = []
+            for state_name, state in self.states.items():
+                if (state_name != self.init_state_name
+                        and state.card_is_checkpoint):
+                    non_initial_checkpoint_state_names.append(state_name)
+
+            # For every non-initial checkpoint state we remove it from the
+            # states dict. Then we check if we can reach a terminal state after
+            # removing the state with checkpoint. As soon as we find a terminal
+            # state, we break out of the loop and raise a validation error.
+            # Since, we reached a terminal state, this implies that the user was
+            # not required to go through the checkpoint. Hence, the checkpoint
+            # is bypassable.
+            for state_name_to_exclude in non_initial_checkpoint_state_names:
+                new_states = copy.deepcopy(self.states)
+                new_states.pop(state_name_to_exclude)
+                processed_state_names = set()
+                curr_queue = [self.init_state_name]
+                excluded_state_is_bypassable = False
+                while curr_queue:
+                    if curr_queue[0] == state_name_to_exclude:
+                        curr_queue.pop(0)
+                        continue
+                    curr_state_name = curr_queue[0]
+                    curr_queue = curr_queue[1:]
+                    if not curr_state_name in processed_state_names:
+                        processed_state_names.add(curr_state_name)
+                        curr_state = new_states[curr_state_name]
+
+                        # We do not need to check if the current state is
+                        # terminal or not before getting all outcomes, as when
+                        # we find a terminal state in an outcome, we break out
+                        # of the for loop and raise a validation error.
+                        all_outcomes = (
+                            curr_state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            dest_state = outcome.dest
+                            if self.states[dest_state].interaction.is_terminal:
+                                excluded_state_is_bypassable = True
+                                break
+                            if (dest_state not in curr_queue and
+                                    dest_state not in processed_state_names):
+                                curr_queue.append(dest_state)
+                    if excluded_state_is_bypassable:
+                        raise utils.ValidationError(
+                            'Cannot make %s a checkpoint as it is bypassable'
+                            % state_name_to_exclude)
 
             try:
                 self._verify_all_states_reachable()
@@ -1266,12 +1394,16 @@ class Exploration(python_utils.OBJECT):
         Args:
             init_state_name: str. The new name of the initial state.
         """
+        old_init_state_name = self.init_state_name
         if init_state_name not in self.states:
             raise Exception(
                 'Invalid new initial state name: %s; '
                 'it is not in the list of states %s for this '
                 'exploration.' % (init_state_name, list(self.states.keys())))
         self.init_state_name = init_state_name
+        if old_init_state_name in self.states:
+            self.states[old_init_state_name].card_is_checkpoint = False
+        self.init_state.card_is_checkpoint = True
 
     def update_auto_tts_enabled(self, auto_tts_enabled):
         """Update whether automatic text-to-speech is enabled.
@@ -1338,7 +1470,6 @@ class Exploration(python_utils.OBJECT):
 
         if self.init_state_name == old_state_name:
             self.update_init_state_name(new_state_name)
-
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
         for other_state_name in self.states:
@@ -1691,8 +1822,93 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, states_dict, init_state_name):
+        """Converts from version 43 to version 44. Version 44 adds
+        card_is_checkpoint boolean to the state, which allows creators to
+        mark a state as a checkpoint for the learners
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+            init_state_name: str. Name of the first state.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for (state_name, state_dict) in states_dict.items():
+            state_dict['card_is_checkpoint'] = bool(
+                state_name == init_state_name)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v44_dict_to_v45_dict(cls, states_dict):
+        """Converts from version 44 to 45. Version 45 contains
+        linked skill id.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_dict['linked_skill_id'] = None
+        return states_dict
+
+    @classmethod
+    def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
+        """Converts from version 45 to 46. Version 46 ensures that the written
+        translations in a state containing unicode content do not contain HTML
+        tags and the data_format is unicode.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            list_of_subtitled_unicode_content_ids = []
+            customisation_args = (
+                state_domain.InteractionInstance
+                .convert_customization_args_dict_to_customization_args(
+                    state_dict['interaction']['id'],
+                    state_dict['interaction']['customization_args']))
+            for ca_name in customisation_args:
+                list_of_subtitled_unicode_content_ids.extend(
+                    state_domain.InteractionCustomizationArg
+                    .traverse_by_schema_and_get(
+                        customisation_args[ca_name].schema,
+                        customisation_args[ca_name].value,
+                        [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+                        lambda subtitled_unicode: subtitled_unicode.content_id
+                    )
+                )
+            translations_mapping = (
+                state_dict['written_translations']['translations_mapping'])
+            for content_id in translations_mapping:
+                if content_id in list_of_subtitled_unicode_content_ids:
+                    for language_code in translations_mapping[content_id]:
+                        written_translation = (
+                            translations_mapping[content_id][language_code])
+                        written_translation['data_format'] = (
+                            schema_utils.SCHEMA_TYPE_UNICODE)
+                        written_translation['translation'] = (
+                            html_cleaner.strip_html_tags(
+                                written_translation['translation']))
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version):
+            cls, versioned_exploration_states,
+            current_states_schema_version, init_state_name):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -1708,20 +1924,25 @@ class Exploration(python_utils.OBJECT):
                     dicts used to initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
+            init_state_name: str. Name of initial state.
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
-        versioned_exploration_states['states'] = conversion_fn(
-            versioned_exploration_states['states'])
+        if current_states_schema_version == 43:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'], init_state_name)
+        else:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states'])
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 48
+    CURRENT_EXP_SCHEMA_VERSION = 51
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1772,6 +1993,72 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v48_dict_to_v49_dict(cls, exploration_dict):
+        """Converts a v48 exploration dict into a v49 exploration dict.
+        Adds card_is_checkpoint to mark a state as a checkpoint for the
+        learners.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v48.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v49.
+        """
+        exploration_dict['schema_version'] = 49
+        exploration_dict['states'] = cls._convert_states_v43_dict_to_v44_dict(
+            exploration_dict['states'], exploration_dict['init_state_name'])
+        exploration_dict['states_schema_version'] = 44
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v49_dict_to_v50_dict(cls, exploration_dict):
+        """Converts a v49 exploration dict into a v50 exploration dict.
+        Version 50 contains linked skill id to exploration state.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v49.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v50.
+        """
+
+        exploration_dict['schema_version'] = 50
+
+        exploration_dict['states'] = cls._convert_states_v44_dict_to_v45_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 45
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
+        """Converts a v50 exploration dict into a v51 exploration dict.
+        Version 51 ensures that unicode written_translations are stripped of
+        HTML tags and have data_format field set to unicode.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v50.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v51.
+        """
+
+        exploration_dict['schema_version'] = 51
+
+        exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 46
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -1816,6 +2103,21 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v47_dict_to_v48_dict(
                 exploration_dict)
             exploration_schema_version = 48
+
+        if exploration_schema_version == 48:
+            exploration_dict = cls._convert_v48_dict_to_v49_dict(
+                exploration_dict)
+            exploration_schema_version = 49
+
+        if exploration_schema_version == 49:
+            exploration_dict = cls._convert_v49_dict_to_v50_dict(
+                exploration_dict)
+            exploration_schema_version = 50
+
+        if exploration_schema_version == 50:
+            exploration_dict = cls._convert_v50_dict_to_v51_dict(
+                exploration_dict)
+            exploration_schema_version = 51
 
         return exploration_dict
 
@@ -2273,3 +2575,411 @@ class ExplorationSummary(python_utils.OBJECT):
                 self.contributors_summary.get(contributor_id, 0) + 1)
 
         self.contributor_ids = list(self.contributors_summary.keys())
+
+
+class ExplorationChangeMergeVerifier(python_utils.OBJECT):
+    """Class to check for mergeability.
+
+    Attributes:
+        added_state_names: list(str). Names of the states added to the
+            exploration from prev_exp_version to current_exp_version. It
+            stores the latest name of the added state.
+        deleted_state_names: list(str). Names of the states deleted from
+            the exploration from prev_exp_version to current_exp_version.
+            It stores the initial name of the deleted state from
+            pre_exp_version.
+        new_to_old_state_names: dict. Dictionary mapping state names of
+            current_exp_version to the state names of prev_exp_version.
+            It doesn't include the name changes of added/deleted states.
+        changed_properties: dict. List of all the properties changed
+            according to the state and property name.
+        changed_translations: dict. List of all the translations changed
+            according to the state and content_id name.
+    """
+
+    # PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGE: List of the properties
+    # in which if there are any changes then interaction id
+    # changes can not be merged. This list can be changed when any
+    # new property is added or deleted which affects or is affected
+    # by interaction id and whose changes directly conflicts with
+    # interaction id changes.
+    PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES = [
+        STATE_PROPERTY_INTERACTION_CUST_ARGS,
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]
+
+    # PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List of the properties
+    # in which if there are any changes then customization args
+    # changes can not be merged. This list can be changed when any
+    # new property is added or deleted which affects or is affected
+    # by customization args and whose changes directly conflicts with
+    # cust args changes.
+    PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES = [
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]
+
+    # PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List of the properties
+    # in which if there are any changes then answer groups
+    # changes can not be merged. This list can be changed when any
+    # new property is added or deleted which affects or is affected
+    # by answer groups and whose changes directly conflicts with
+    # answer groups changes.
+    PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES = [
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+
+    # PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List of the properties
+    # in which if there are any changes then solution
+    # changes can not be merged. This list can be changed when any
+    # new property is added or deleted which affects or is affected
+    # by solution and whose changes directly conflicts with
+    # solution changes.
+    PROPERTIES_CONFLICTING_SOLUTION_CHANGES = [
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+        STATE_PROPERTY_RECORDED_VOICEOVERS,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+
+    # PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES: List of the properties
+    # in which if there are any changes then voiceovers
+    # changes can not be merged. This list can be changed when any
+    # new property is added or deleted which affects or is affected
+    # by voiceovers and whose changes directly conflicts with
+    # voiceovers changes.
+    PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES = [
+        STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_INTERACTION_SOLUTION,
+        STATE_PROPERTY_INTERACTION_HINTS,
+        STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+        STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
+        STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS]
+
+    # NON_CONFLICTING_PROPERTIES: List of the properties
+    # in which if there are any changes then they are always mergeable.
+    NON_CONFLICTING_PROPERTIES = [
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+        STATE_PROPERTY_LINKED_SKILL_ID,
+        STATE_PROPERTY_CARD_IS_CHECKPOINT]
+
+    def __init__(self, composite_change_list):
+
+        self.added_state_names = []
+        self.deleted_state_names = []
+        self.new_to_old_state_names = collections.defaultdict(set)
+        self.changed_properties = collections.defaultdict(set)
+        self.changed_translations = collections.defaultdict(set)
+
+        for change in composite_change_list:
+            self._parse_exp_change(change)
+
+    def _get_property_name_from_content_id(self, content_id):
+        """Returns property name from content id.
+
+        Args:
+            content_id: string. Id of the content.
+
+        Returns:
+            string. Name of the property of which the
+            content is part of.
+        """
+        property_name_to_content_id_identifier = {
+            STATE_PROPERTY_CONTENT: (
+                lambda content_id: content_id == 'content'),
+            STATE_PROPERTY_INTERACTION_CUST_ARGS: (
+                lambda content_id: content_id[:3] == 'ca_'),
+            STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME: (
+                lambda content_id: content_id == 'default_outcome'),
+            STATE_PROPERTY_INTERACTION_SOLUTION: (
+                lambda content_id: content_id == 'solution'),
+            STATE_PROPERTY_INTERACTION_HINTS: (
+                lambda content_id: content_id[:4] == 'hint'),
+            STATE_PROPERTY_INTERACTION_ANSWER_GROUPS: (
+                lambda content_id: (
+                    content_id[:8] == 'feedback' or
+                    content_id[:10] == 'rule_input')),
+        }
+
+        for prop_name, identifier_function in (
+                property_name_to_content_id_identifier.items()):
+            if identifier_function(content_id):
+                return prop_name
+
+    def _parse_exp_change(self, change):
+        """This function take the change and according to the cmd
+        add the property name in the lists defined above.
+
+        Args:
+            change: ExplorationChange. A change from the
+                composite_change_list.
+        """
+        if change.cmd == CMD_ADD_STATE:
+            self.added_state_names.append(change.state_name)
+        elif change.cmd == CMD_DELETE_STATE:
+            state_name = change.state_name
+            if state_name in self.added_state_names:
+                self.added_state_names.remove(state_name)
+            else:
+                original_state_name = state_name
+                if original_state_name in self.new_to_old_state_names:
+                    original_state_name = self.new_to_old_state_names.pop(
+                        original_state_name)
+                self.deleted_state_names.append(original_state_name)
+        elif change.cmd == CMD_RENAME_STATE:
+            old_state_name = change.old_state_name
+            new_state_name = change.new_state_name
+            if old_state_name in self.added_state_names:
+                self.added_state_names.remove(old_state_name)
+                self.added_state_names.append(new_state_name)
+            elif old_state_name in self.new_to_old_state_names:
+                self.new_to_old_state_names[new_state_name] = (
+                    self.new_to_old_state_names.pop(old_state_name))
+            else:
+                self.new_to_old_state_names[new_state_name] = old_state_name
+
+        elif change.cmd == CMD_EDIT_STATE_PROPERTY:
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
+            state_name = change.state_name
+            if state_name in self.new_to_old_state_names:
+                state_name = self.new_to_old_state_names.get(change.state_name)
+            self.changed_properties[state_name].add(
+                change.property_name)
+        elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
+            changed_property = self._get_property_name_from_content_id(
+                change.content_id)
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
+            state_name = change.state_name
+            if state_name in self.new_to_old_state_names:
+                state_name = self.new_to_old_state_names.get(change.state_name)
+            self.changed_translations[state_name].add(
+                changed_property)
+            self.changed_properties[state_name].add(
+                STATE_PROPERTY_WRITTEN_TRANSLATIONS)
+
+    def is_change_list_mergeable(
+            self, change_list,
+            exp_at_change_list_version, current_exploration):
+        """Checks whether the change list from the old version of an
+        exploration can be merged on the latest version of an exploration.
+
+        Args:
+            change_list: list(ExplorationChange). List of the changes made
+                by the user on the frontend, which needs to be checked
+                for mergeability.
+            exp_at_change_list_version: obj. Old version of an exploration.
+            current_exploration: obj. Exploration on which the change list
+                is to be applied.
+
+        Returns:
+            tuple(boolean, boolean). A tuple consisting of two fields.
+            1. boolean. Whether the given change list is mergeable on
+            the current_exploration or not.
+            2. boolean. Whether we need to send the change list to the
+            admin to review for the future improvement of the cases
+            to merge the change list.
+        """
+        old_to_new_state_names = {
+            value: key for key, value in self.new_to_old_state_names.items()
+        }
+
+        if self.added_state_names or self.deleted_state_names:
+            # In case of the addition and the deletion of the state,
+            # we are rejecting the mergebility because these cases
+            # change the flow of the exploration and are quite complex
+            # for now to handle. So in such cases, we are sending the
+            # changelist, frontend_version, backend_version and
+            # exploration id to the admin, so that we can look into the
+            # situations and can figure out the way if it’s possible to
+            # handle these cases.
+
+            return False, True
+
+        changes_are_mergeable = False
+
+        # state_names_of_renamed_states: dict. Stores the changes in
+        # states names in change_list where the key is the state name in
+        # frontend version and the value is the renamed name from the
+        # change list if there is any rename state change.
+        state_names_of_renamed_states = {}
+        for change in change_list:
+            change_is_mergeable = False
+            if change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in state_names_of_renamed_states:
+                    state_names_of_renamed_states[new_state_name] = (
+                        state_names_of_renamed_states.pop(old_state_name))
+                else:
+                    state_names_of_renamed_states[new_state_name] = (
+                        old_state_name)
+                if (state_names_of_renamed_states[new_state_name] not in
+                        old_to_new_state_names):
+                    change_is_mergeable = True
+            elif change.cmd == CMD_EDIT_STATE_PROPERTY:
+                state_name = state_names_of_renamed_states.get(
+                    change.state_name) or change.state_name
+                if state_name in old_to_new_state_names:
+                    # Here we will send the changelist, frontend_version,
+                    # backend_version and exploration to the admin, so
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
+                    return False, True
+                old_exp_states = (
+                    exp_at_change_list_version.states[state_name])
+                current_exp_states = (
+                    current_exploration.states[state_name])
+                if (change.property_name ==
+                        STATE_PROPERTY_CONTENT):
+                    if (old_exp_states.content.html ==
+                            current_exp_states.content.html):
+                        if (STATE_PROPERTY_CONTENT not in
+                                self.changed_translations[state_name] and
+                                STATE_PROPERTY_RECORDED_VOICEOVERS not in
+                                self.changed_properties[state_name]):
+                            change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      STATE_PROPERTY_INTERACTION_ID):
+                    if (old_exp_states.interaction.id ==
+                            current_exp_states.interaction.id):
+                        if not self.changed_properties[state_name].intersection(
+                                (self
+                                 .PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES
+                                )):
+                            change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                # Customization args differ for every interaction, so in
+                # case of different interactions merging is simply not
+                # possible, but in case of same interaction, the values in
+                # the customization_args are often lists so if someone
+                # changes even one item of that list then determining which
+                # item is changed is not feasible, so suppose there is long
+                # list of values in item selection interaction and one user
+                # deletes one value and another one edits another value,
+                # so after deletion the indices of all the values will be
+                # changed and it will not be possible to compare and know
+                # that which value is changed by second user.
+                # So we will not be handling the merge on the basis of
+                # individual fields.
+                elif (change.property_name ==
+                      STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    if (old_exp_states.interaction.id ==
+                            current_exp_states.interaction.id):
+                        if not self.changed_properties[state_name].intersection(
+                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                                [STATE_PROPERTY_INTERACTION_CUST_ARGS]):
+                            if (change.property_name not in
+                                    self.changed_translations[state_name]):
+                                change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    if (old_exp_states.interaction.id ==
+                            current_exp_states.interaction.id):
+                        if not self.changed_properties[state_name].intersection(
+                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                                [STATE_PROPERTY_INTERACTION_ANSWER_GROUPS]):
+                            if (change.property_name not in
+                                    self.changed_translations[state_name]):
+                                change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                     ):
+                    if (change.property_name not in
+                            self.changed_properties[state_name] and
+                            change.property_name not in
+                            self.changed_translations[state_name]):
+                        change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif change.property_name in self.NON_CONFLICTING_PROPERTIES:
+                    change_is_mergeable = True
+                # We’ll not be able to handle the merge if changelists
+                # affect the different indices of the hint in the same
+                # state because whenever there is even a small change
+                # in one field of any hint, they treat the whole hints
+                # list as a new value.
+                # So it will not be possible to find out the exact change.
+                elif (change.property_name ==
+                      STATE_PROPERTY_INTERACTION_HINTS):
+                    if (change.property_name not in
+                            self.changed_properties[state_name] and
+                            change.property_name not in
+                            self.changed_translations[state_name]):
+                        change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      STATE_PROPERTY_INTERACTION_SOLUTION):
+                    if (old_exp_states.interaction.id ==
+                            current_exp_states.interaction.id):
+                        if not self.changed_properties[state_name].intersection(
+                                self.PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES +
+                                [STATE_PROPERTY_INTERACTION_SOLUTION]):
+                            if (change.property_name not in
+                                    self.changed_translations[state_name]):
+                                change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if (old_exp_states.interaction.id ==
+                            current_exp_states.interaction.id and
+                            old_exp_states.solicit_answer_details ==
+                            current_exp_states.solicit_answer_details):
+                        change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if not self.changed_properties[state_name].intersection(
+                            self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
+                            [STATE_PROPERTY_RECORDED_VOICEOVERS]):
+                        change_is_mergeable = True
+                    if not self.changed_properties[state_name]:
+                        change_is_mergeable = True
+            elif change.cmd == CMD_ADD_WRITTEN_TRANSLATION:
+                state_name = state_names_of_renamed_states.get(
+                    change.state_name) or change.state_name
+                if state_name in old_to_new_state_names:
+                    # Here we will send the changelist, frontend_version,
+                    # backend_version and exploration to the admin, so
+                    # that the changes related to state renames can be
+                    # reviewed and the proper conditions can be written
+                    # to handle those cases.
+                    return False, True
+                changed_property = self._get_property_name_from_content_id(
+                    change.content_id)
+                if (changed_property not in
+                        (self.changed_properties[state_name] |
+                         self.changed_translations[state_name])):
+                    change_is_mergeable = True
+                if not self.changed_properties[state_name]:
+                    change_is_mergeable = True
+            elif change.cmd == CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE:
+                change_is_mergeable = True
+            elif change.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
+                change_is_mergeable = (
+                    exp_at_change_list_version.__getattribute__(
+                        change.property_name) ==
+                    current_exploration.__getattribute__(
+                        change.property_name))
+
+            if change_is_mergeable:
+                changes_are_mergeable = True
+                continue
+            else:
+                changes_are_mergeable = False
+                break
+
+        return changes_are_mergeable, False

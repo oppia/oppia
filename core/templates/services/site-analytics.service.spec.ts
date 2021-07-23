@@ -21,9 +21,9 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Site Analytics Service', () => {
-  let sas = null;
-  let ws = null;
-  let gtagSpy: jasmine.Spy = null;
+  let sas: SiteAnalyticsService;
+  let ws: WindowRef;
+  let gtagSpy: jasmine.Spy;
 
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);
@@ -429,9 +429,18 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register finish curated lesson event', () => {
-    sas.registerCuratedLessonCompleted('123');
+    sas.registerCuratedLessonStarted('Fractions', '123');
 
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
+      event_category: 'CuratedLessonStarted',
+      event_label: '123'
+    });
+  });
+
+  it('should register finish curated lesson event', () => {
+    sas.registerCuratedLessonCompleted('Fractions', '123');
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
       event_category: 'CuratedLessonCompleted',
       event_label: '123'
     });
@@ -558,17 +567,26 @@ describe('Site Analytics Service', () => {
     });
   });
 
-  it('should register active classroom lesson usage', () => {
-    sas.registerClassroomLessonActiveUse();
+  it('should register classroom page viewed', () => {
+    spyOn(sas, '_sendEventToGoogleAnalytics');
 
-    expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
+    sas.registerClassroomPageViewed();
+    expect(sas._sendEventToGoogleAnalytics).toHaveBeenCalledWith(
+      'ClassroomEngagement', 'impression', 'ViewClassroom');
+  });
+
+  it('should register active classroom lesson usage', () => {
+    let explorationId = '123';
+    sas.registerClassroomLessonActiveUse('Fractions', explorationId);
+
+    expect(gtagSpy).toHaveBeenCalledWith('event', 'start Fractions', {
       event_category: 'ClassroomActiveUserStartAndSawCards',
-      event_label: ''
+      event_label: explorationId
     });
   });
 
   it('should register classroom header click event', () => {
-    sas.registerClassoomHeaderClickEvent();
+    sas.registerClassroomHeaderClickEvent();
 
     expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
       event_category: 'ClassroomEngagement',

@@ -27,7 +27,7 @@ from core.domain import image_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
-from proto import text_classifier_pb2
+from proto_files import text_classifier_pb2
 import python_utils
 import utils
 

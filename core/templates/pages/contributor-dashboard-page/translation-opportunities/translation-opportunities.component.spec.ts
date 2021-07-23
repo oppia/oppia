@@ -45,11 +45,11 @@ describe('Translation opportunities component', () => {
   let translationModal: NgbModalRef;
   let httpTestingController;
   let loggedInUserInfo = new UserInfo(
-    false, false, false, false, false,
+    'EXPLORATION_EDITOR', false, false, false, false, false,
     'en', 'username', 'test@example.com', true
   );
   const notLoggedInUserInfo = new UserInfo(
-    false, false, false, false, false,
+    'GUEST', false, false, false, false, false,
     'en', null, null, false
   );
 
@@ -131,7 +131,7 @@ describe('Translation opportunities component', () => {
         more: false
       });
 
-    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeFalse();
     });
@@ -144,7 +144,7 @@ describe('Translation opportunities component', () => {
         opportunities: opportunitiesArray,
         more: true
       });
-    component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+    component.loadOpportunitiesAsync().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBeTrue();
     });
@@ -156,10 +156,11 @@ describe('Translation opportunities component', () => {
       more: false
     });
 
-    component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
-      expect(opportunitiesDicts.length).toBe(2);
-      expect(more).toBeFalse();
-    });
+    component.loadMoreOpportunitiesAsync()
+      .then(({opportunitiesDicts, more}) => {
+        expect(opportunitiesDicts.length).toBe(2);
+        expect(more).toBeFalse();
+      });
   });
 
   it('should open translation modal when clicking button', fakeAsync(() => {

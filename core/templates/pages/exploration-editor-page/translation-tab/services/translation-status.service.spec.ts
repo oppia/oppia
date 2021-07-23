@@ -16,34 +16,13 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// translation-status.service.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -65,36 +44,6 @@ describe('Translation status service', function() {
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('LanguageUtilService', {
-      getAllVoiceoverLanguageCodes: function() {
-        return ['en', 'hi'];
-      }
-    });
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value('ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
     $provide.constant('INTERACTION_SPECS', {
       MultipleChoiceInput: {
         is_linear: false,
@@ -124,18 +73,21 @@ describe('Translation status service', function() {
     var FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
     var NO_ASSETS_AVAILABLE_COLOR = '#D14836';
     var statesWithAudioDict = null;
-    var mockExplorationData;
 
-    beforeEach(function() {
-      mockExplorationData = {
-        explorationId: 0,
-        autosaveChangeList: function() {},
-        discardDraft: function() {}
-      };
-      angular.mock.module(function($provide) {
-        $provide.value('ExplorationDataService', [mockExplorationData][0]);
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          {
+            provide: ExplorationDataService,
+            useValue: {
+              explorationId: 0,
+              autosaveChangeListAsync() {
+                return;
+              }
+            }
+          }
+        ]
       });
-      spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -250,6 +202,7 @@ describe('Translation status service', function() {
             },
             confirmed_unclassified_answers: []
           },
+          linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
@@ -315,6 +268,7 @@ describe('Translation status service', function() {
             },
             confirmed_unclassified_answers: []
           },
+          linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
@@ -354,6 +308,7 @@ describe('Translation status service', function() {
             default_outcome: null,
             confirmed_unclassified_answers: []
           },
+          linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
@@ -396,7 +351,8 @@ describe('Translation status service', function() {
       swts.init('First', ess.getWrittenTranslationsMemento('First'));
       swts.displayed.toggleNeedsUpdateAttribute('feedback_1', 'hi');
       swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
-      ess.saveWrittenTranslations('First', swts.displayed);
+      ess.markWrittenTranslationsAsNeedingUpdate('feedback_1', 'First');
+      ess.markWrittenTranslationsAsNeedingUpdate('feedback_2', 'First');
       tss.refresh();
 
       statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
@@ -461,7 +417,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationNotAvailableCount = (
         tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(explorationTranslationNotAvailableCount).toBe(6);
 
       ess.addState('Fourth');
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
@@ -502,7 +458,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Third).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
       swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
-      ess.saveWrittenTranslations('Second', swts.displayed);
+      ess.saveWrittenTranslation('content', 'html', 'hi', 'Second', 'content');
 
       tss.refresh();
       stateWiseStatusColor = tss.getAllStateStatusColors();

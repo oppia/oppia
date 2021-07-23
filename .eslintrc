@@ -23,6 +23,17 @@
       }
     },
     {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": [
+      "complete.spec.ts",
+      "student.spec.ts",
+      "teacher.spec.ts"
+      ],
+      "rules": {
+        "oppia/no-to-throw": "error"
+      }
+    },
+    {
       // We only run the e2e action checks on end-to-end test files, and
       // we exclude files that we haven't fixed yet.
       "files": [
@@ -95,7 +106,7 @@
         "excludedForTesting.js"
       ],
       "rules": {
-        "oppia/e2e-action": "error",
+        "oppia/e2e-action": "error"
       }
     },
     {
@@ -106,16 +117,59 @@
         "core/tests/protractor_desktop/*.js"
       ],
       "rules": {
-        "oppia/protractor-practices": "error",
+        "oppia/protractor-practices": "error"
+      }
+    },
+    {
+      // We exclude spec files to the no-testonly check
+      "files": ["*spec.js", "*spec.ts"],
+      "rules": {
+        "oppia/no-testonly": "off"
+      }
+    },
+     {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": [
+      "Polyfills.ts",
+      "ck-editor-copy-content.service.spec.ts",
+      "unit-test-utils.ajs.ts",
+      "mathjax.directive.ts",
+      "math-expression-content-editor.component.ts",
+      "core/tests/*"
+      ],
+      "rules": {
+        "oppia/no-inner-html": "error"
+      }
+    },
+    {
+      "files": ["*.js", "*.ts"],
+      "excludedFiles": [
+      "core/tests/**"
+      ],
+      "rules": {
+        "oppia/no-relative-import": "error"
       }
     }
   ],
   "rules": {
     "oppia/break-after-parens": "error",
+    "oppia/constant-declaration": "error",
+    "oppia/comment-style": "error",
+    "oppia/disallow-flags": "error",
+    "oppia/disallow-httpclient": "error",
+    "oppia/disallow-angularjs-properties": "error",
+    "oppia/import-lodash": "error",
+    "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
+    "oppia/directive-scope": "error",
+    "oppia/no-testonly": "error",
+    "oppia/sorted-dependencies": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
+    "oppia/match-line-break": "error",
     "oppia/no-test-blockers": "error",
+    "oppia/no-inject": "error",
+    "oppia/no-bypass-security-phrase": "error",
     "angular/di": [
       "error",
       "array"
@@ -169,7 +223,7 @@
     "dot-notation": [
       "error",
       {
-        "allowKeywords": false
+        "allowKeywords": true
       }
     ],
     "eol-last":[
@@ -267,6 +321,7 @@
     "no-undef": [
       "off"
     ],
+    "no-throw-literal": "error",
     "no-unused-vars": [
       "off"
     ],

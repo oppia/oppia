@@ -179,6 +179,7 @@ class ConfigProperty(python_utils.OBJECT):
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
     - carousel_slides_config.
+    - classroom_page_is_accessible.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
@@ -408,10 +409,6 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'Always ask learners for answer details. For testing -- do not use',
     False)
 
-CLASSROOM_PAGE_IS_ACCESSIBLE = ConfigProperty(
-    'classroom_page_is_accessible', BOOL_SCHEMA,
-    'Make classroom page accessible.', False)
-
 CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
     'classroom_promos_are_enabled', BOOL_SCHEMA,
     'Show classroom promos.', False)
@@ -454,6 +451,24 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
     'The maximum number of explorations that can be send in a batch of math '
     'rich text svgs.',
     2)
+
+MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
+    'max_number_of_tags_assigned_to_blog_post',
+    INT_SCHEMA,
+    'The maximum number of tags that can be selected to categorize the blog'
+    ' post',
+    10
+)
+
+LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST = ConfigProperty(
+    'list_of_default_tags_for_blog_post',
+    SET_OF_STRINGS_SCHEMA,
+    'The list of tags available to a blog post editor for categorizing the blog'
+    ' post.',
+    ['News', 'International', 'Educators', 'Learners', 'Community',
+     'Partnerships', 'Volunteer', 'Stories', 'Languages', 'New features',
+     'New lessons', 'Software development', 'Content']
+)
 
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
