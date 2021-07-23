@@ -39,37 +39,7 @@ var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 
 var ExplorationEditorPage = function() {
-  /*
-   * Components
-   */
-  this.getImprovementsTab = function() {
-    return (
-      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
-  };
-  this.getFeedbackTab = function() {
-    return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
-  };
-  this.getHistoryTab = function() {
-    return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
-  };
-  this.getMainTab = function() {
-    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
-  };
-  this.getSettingsTab = function() {
-    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
-  };
-  this.getStatsTab = function() {
-    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
-  };
-  this.getTranslationTab = function() {
-    return new ExplorationEditorTranslationTab
-      .ExplorationEditorTranslationTab();
-  };
-  this.getPreviewTab = function() {
-    return new ExplorationPlayerPage.ExplorationPlayerPage();
-  };
-
-  /*
+   /*
    * Interactive elements
    */
   var commitMessageInput = element(
@@ -147,9 +117,39 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
-  var saveChangesButton = element(by.css(
+  var prePublicationConfirmButton = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   var closeButton = element(by.css('.protractor-test-share-publish-close'));
+
+ /*
+   * Components
+   */
+  this.getImprovementsTab = function() {
+    return (
+      new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
+  };
+  this.getFeedbackTab = function() {
+    return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
+  };
+  this.getHistoryTab = function() {
+    return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
+  };
+  this.getMainTab = function() {
+    return new ExplorationEditorMainTab.ExplorationEditorMainTab();
+  };
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+  this.getStatsTab = function() {
+    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
+  };
+  this.getTranslationTab = function() {
+    return new ExplorationEditorTranslationTab
+      .ExplorationEditorTranslationTab();
+  };
+  this.getPreviewTab = function() {
+    return new ExplorationPlayerPage.ExplorationPlayerPage();
+  };
 
   /*
    * Workflows
@@ -198,9 +198,10 @@ var ExplorationEditorPage = function() {
       await action.waitForAutosave();
     }
 
-    await action.click('Save Changes', saveChangesButton);
+    await action.click(
+      'Publish confirmation button', prePublicationConfirmButton);
     await waitFor.invisibilityOf(
-      saveChangesButton,
+      prePublicationConfirmButton,
       'Exploration metadata modal takes too long to disappear.');
     await waitFor.visibilityOf(
       modalContentElement, 'Modal Content taking too long to appear');
