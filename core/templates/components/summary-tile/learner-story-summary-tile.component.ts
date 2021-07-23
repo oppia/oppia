@@ -60,7 +60,10 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
       if (node) {
-        let result = '/explore/' + node.getExplorationId();
+        let result = this.urlInterpolationService.interpolateUrl(
+          '/explore/<exp_id>', {
+            exp_id: node.getExplorationId()
+          });
         result = this.urlService.addField(
           result, 'topic_url_fragment',
           this.storySummary.getTopicUrlFragment());

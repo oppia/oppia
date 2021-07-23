@@ -131,7 +131,7 @@ describe('Learner Story Summary Tile Component', () => {
       acquired_skill_ids: ['skill_2'],
       destination_node_ids: ['node_2'],
       outline: 'Outline',
-      exploration_id: null,
+      exploration_id: 'test',
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40'
     };
@@ -154,7 +154,7 @@ describe('Learner Story Summary Tile Component', () => {
       sampleStorySummaryBackendDict);
     component.completedNodeCount = 0;
     expect(component.getStoryLink()).toBe(
-      '/explore/null?topic_url_fragment=topic&' +
+      '/explore/test?topic_url_fragment=topic&' +
       'classroom_url_fragment=math&story_url_fragment=story&' +
       'node_id=node_1');
   });
