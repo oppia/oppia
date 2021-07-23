@@ -167,6 +167,9 @@ def compile_protobuf_files(proto_files_paths):
             python_utils.PRINT(stderr)
             raise Exception('Error compiling proto files at %s' % path)
 
+    # Since there is no simple configuration for imports when using protobuf to
+    # generate Python files we need to manually fix the imports.
+    # See: https://github.com/protocolbuffers/protobuf/issues/1491
     compiled_protobuf_dir = (
         pathlib.Path(os.path.join(common.CURR_DIR, 'proto_files')))
     for p in compiled_protobuf_dir.iterdir():

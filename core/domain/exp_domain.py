@@ -1547,8 +1547,7 @@ class Exploration(python_utils.OBJECT):
         }
         new_states = self.states
 
-        for new_state_name in sorted(new_states):
-            new_state = new_states[new_state_name]
+        for new_state_name, new_state in new_states.items():
             if not new_state.can_undergo_classification():
                 continue
 

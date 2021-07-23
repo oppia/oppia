@@ -205,12 +205,12 @@ class FileCache(python_utils.OBJECT):
         return self._CACHE_DATA_DICT[key]
 
 
-def _get_linters_for_file_extension(file_extension_to_lint, name_space, files):
-    """Return linters for the file extension type.
+def _get_linters_for_file_extension(file_extension_to_lint, namespace, files):
+    """Return linters for the given file extension type.
 
     Args:
         file_extension_to_lint: str. The file extension to be linted.
-        name_space: multiprocessing.Namespace. Namespace in which to execute
+        namespace: multiprocessing.Namespace. Namespace in which to execute
             this function.
         files: dict(str, list(str)). The mapping of filetypes to list of files.
 
@@ -218,8 +218,8 @@ def _get_linters_for_file_extension(file_extension_to_lint, name_space, files):
         (CustomLintChecks, ThirdPartyLintChecks). A 2-tuple containing objects
         of lint check classes to run in parallel processing.
     """
-    name_space.files = FileCache()
-    file_cache = name_space.files
+    namespace.files = FileCache()
+    file_cache = namespace.files
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
     custom_linters = []
     third_party_linters = []
@@ -349,7 +349,7 @@ def _get_file_extensions(file_extensions_to_lint):
     return all_file_extensions_type
 
 
-def _get_filepaths_from_path(input_path, name_space=None):
+def _get_filepaths_from_path(input_path, namespace=None):
     """Get paths to all lintable files recursively under a path.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -357,14 +357,14 @@ def _get_filepaths_from_path(input_path, name_space=None):
 
     Args:
         input_path: str. Path to look for files under.
-        name_space: multiprocessing.Namespace. Namespace in which to execute
+        namespace: multiprocessing.Namespace. Namespace in which to execute
             this function.
 
     Returns:
         list. Paths to lintable files.
     """
-    name_space.files = FileCache()
-    file_cache = name_space.files
+    namespace.files = FileCache()
+    file_cache = namespace.files
     input_path = os.path.join(os.getcwd(), input_path)
     if not os.path.exists(input_path):
         python_utils.PRINT(
@@ -380,7 +380,7 @@ def _get_filepaths_from_path(input_path, name_space=None):
             input_path, excluded_glob_patterns)
 
 
-def _get_filepaths_from_non_other_shard(shard, name_space=None):
+def _get_filepaths_from_non_other_shard(shard, namespace=None):
     """Get paths to lintable files in a shard besides the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -388,7 +388,7 @@ def _get_filepaths_from_non_other_shard(shard, name_space=None):
 
     Args:
         shard: str. Shard name.
-        name_space: multiprocessing.Namespace. Namespace in which to execute
+        namespace: multiprocessing.Namespace. Namespace in which to execute
             this function.
 
     Returns:
@@ -398,7 +398,7 @@ def _get_filepaths_from_non_other_shard(shard, name_space=None):
     assert shard != OTHER_SHARD_NAME
     for filepath in SHARDS[shard]:
         filepaths.extend(
-            _get_filepaths_from_path(filepath, name_space=name_space))
+            _get_filepaths_from_path(filepath, namespace=namespace))
     if len(filepaths) != len(set(filepaths)):
         # Shards are invalid because of a duplicate file.
         for filepath in filepaths:
@@ -414,7 +414,7 @@ def _get_filepaths_from_non_other_shard(shard, name_space=None):
     return filepaths
 
 
-def _get_filepaths_from_other_shard(name_space=None):
+def _get_filepaths_from_other_shard(namespace=None):
     """Get paths to lintable files in the other shard.
 
     This function applies some ignore rules (from .eslintignore) but not
@@ -424,18 +424,18 @@ def _get_filepaths_from_other_shard(name_space=None):
         list(str). Paths to lintable files.
     """
     all_filepaths = set(
-        _get_filepaths_from_path(os.getcwd(), name_space=name_space))
+        _get_filepaths_from_path(os.getcwd(), namespace=namespace))
     filepaths_in_shards = set()
     for shard in SHARDS:
         if shard == OTHER_SHARD_NAME:
             continue
         filepaths_in_shards |= set(
-            _get_filepaths_from_non_other_shard(shard, name_space=name_space))
+            _get_filepaths_from_non_other_shard(shard, namespace=namespace))
     return list(all_filepaths - filepaths_in_shards)
 
 
 def _get_all_filepaths(
-        input_path, input_filenames, input_shard, name_space=None):
+        input_path, input_filenames, input_shard, namespace=None):
     """This function is used to return the filepaths which needs to be linted
     and checked.
 
@@ -445,7 +445,7 @@ def _get_all_filepaths(
             checked, ignored if input_path is specified.
         input_shard: str. Name of shard to lint. Ignored if either
             input_path or input_filenames are specified.
-        name_space: multiprocessing.Namespace. Namespace in which to execute
+        namespace: multiprocessing.Namespace. Namespace in which to execute
             this function.
 
     Returns:
@@ -453,7 +453,7 @@ def _get_all_filepaths(
     """
     if input_path:
         all_filepaths = _get_filepaths_from_path(
-            input_path, name_space=name_space)
+            input_path, namespace=namespace)
     elif input_filenames:
         valid_filepaths = []
         invalid_filepaths = []
@@ -471,10 +471,10 @@ def _get_all_filepaths(
     elif input_shard:
         if input_shard != OTHER_SHARD_NAME:
             all_filepaths = _get_filepaths_from_non_other_shard(
-                input_shard, name_space=name_space)
+                input_shard, namespace=namespace)
         else:
             all_filepaths = _get_filepaths_from_other_shard(
-                name_space=name_space)
+                namespace=namespace)
     else:
         all_filepaths = _get_changed_filepaths()
     all_matching_filepaths = [
@@ -487,12 +487,12 @@ def _get_all_filepaths(
     return all_matching_filepaths
 
 
-def read_files(file_paths, name_space=None):
+def read_files(file_paths, namespace=None):
     """Read all files to be checked and cache them. This will spin off multiple
     threads to increase the efficiency.
     """
-    name_space.files = FileCache()
-    file_cache = name_space.files
+    namespace.files = FileCache()
+    file_cache = namespace.files
     threads = []
     for file_path in file_paths:
         thread = threading.Thread(target=file_cache.read, args=(file_path,))
@@ -504,7 +504,13 @@ def read_files(file_paths, name_space=None):
 
 
 def categorize_files(file_paths, files):
-    """Categorize all the files and store them in shared variable files."""
+    """Categorize all the files and store them in shared variable files.
+
+    Args:
+        file_paths: list(str). Paths to files that should be categorized.
+        files: dict(str, list(str). Dictionary into which the files will
+            be categorized.
+    """
     all_filepaths_dict = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []
     }
@@ -591,7 +597,10 @@ def main(args=None):
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    name_space = multiprocessing.Manager().Namespace()
+    # Namespace is used to share values between multiple processes. This cannot
+    # be used as a global variable since then it leads to hanging of some
+    # processes.
+    namespace = multiprocessing.Manager().Namespace()
 
     parsed_args = _PARSER.parse_args(args=args)
     # File extension to be linted.
@@ -604,7 +613,7 @@ def main(args=None):
         parsed_args.path,
         parsed_args.files,
         parsed_args.shard,
-        name_space=name_space
+        namespace=namespace
     )
 
     install_third_party_libs.main()
@@ -618,7 +627,7 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
         return
 
-    read_files(all_filepaths, name_space=name_space)
+    read_files(all_filepaths, namespace=namespace)
     files = multiprocessing.Manager().dict()
     categorize_files(all_filepaths, files)
 
@@ -644,7 +653,7 @@ def main(args=None):
               len(files['.%s' % file_extension_type])):
             continue
         custom_linter, third_party_linter = _get_linters_for_file_extension(
-            file_extension_type, name_space, files)
+            file_extension_type, namespace, files)
         custom_linters += custom_linter
         third_party_linters += third_party_linter
 

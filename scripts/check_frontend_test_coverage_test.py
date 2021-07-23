@@ -26,9 +26,9 @@ import python_utils
 from . import check_frontend_test_coverage
 
 
-class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
+class CheckFrontendCoverageTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(CheckFrontEndCoverageTests, self).setUp()
+        super(CheckFrontendCoverageTests, self).setUp()
         self.lcov_items_list = None
         self.check_function_calls = {
             'open_file_is_called': False,
