@@ -30,7 +30,7 @@ import { RouterModule } from '@angular/router';
   selector: '[routerLink]'
 })
 export class MockRouterLink {
-  @Input() routerLink;
+  @Input() routerLink!: string;
 }
 
 @NgModule({
@@ -45,14 +45,17 @@ export class MockRouterModule {}
 
 export class HybridRouterModuleProvider {
   static provide(): ModuleWithProviders<MockRouterModule | RouterModule> {
-    // eslint-disable-next-line oppia/no-inner-html
-    let bodyContent = window.document.querySelector('body').innerHTML;
+    let bodyContent = window.document.querySelector('body');
 
     // Checks whether the page is using angular router.
-    if (bodyContent.indexOf('<router-outlet></router-outlet>') > -1) {
-      return {
-        ngModule: RouterModule
-      };
+    if (bodyContent) {
+      // eslint-disable-next-line oppia/no-inner-html
+      if (bodyContent.innerHTML.indexOf(
+        '<router-outlet></router-outlet>') > -1) {
+        return {
+          ngModule: RouterModule
+        };
+      }
     }
 
     return {
