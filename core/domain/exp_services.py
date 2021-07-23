@@ -1533,8 +1533,7 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-        assets_list)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id, assets_list)
 
     publish_exploration_and_update_user_profiles(
         user_services.get_system_user(), exploration_id)

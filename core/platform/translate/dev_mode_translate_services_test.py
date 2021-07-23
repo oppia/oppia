@@ -14,49 +14,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for cloud_translate_services."""
+"""Tests for dev_mode_cloud_translate_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform.cloud_translate import cloud_translate_services
+from core.platform.translate import dev_mode_translate_services
 from core.tests import test_utils
 
 
-class CloudTranslateServicesUnitTests(test_utils.TestBase):
-    """Tests for cloud_translate_services."""
+class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
+    """Tests for dev_mode_cloud_translate_services."""
 
     def test_translate_text_with_invalid_source_language_raises_error(self):
         with self.assertRaisesRegexp(
             # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid source language code: hi'):
-            cloud_translate_services.translate_text(
+            dev_mode_translate_services.translate_text(
                 'hello world', 'hi', 'es')
 
     def test_translate_text_with_invalid_target_language_raises_error(self):
         with self.assertRaisesRegexp(
             # Hindi (hi) is not a allowlisted language code.
             ValueError, 'Invalid target language code: hi'):
-            cloud_translate_services.translate_text(
+            dev_mode_translate_services.translate_text(
                 'hello world', 'en', 'hi')
 
-    def test_translate_text_with_same_source_target_language_doesnt_call_api(
+    def test_translate_text_same_source_target_language_doesnt_call_emulator(
             self):
         with self.swap_to_always_raise(
-            cloud_translate_services.CLIENT,
+            dev_mode_translate_services.CLIENT,
             'translate',
             error=AssertionError
         ):
-            translated_text = cloud_translate_services.translate_text(
+            translated_text = dev_mode_translate_services.translate_text(
                 'hello world', 'en', 'en')
             self.assertEqual(translated_text, 'hello world')
 
-    def test_translate_text_with_valid_input_calls_translate_api(self):
+    def test_translate_text_with_valid_input_calls_emulator_translate(self):
         with self.swap_to_always_return(
-            cloud_translate_services.CLIENT,
+            dev_mode_translate_services.CLIENT,
             'translate',
-            value={'translatedText': 'hola mundo'}
+            value='hola mundo'
         ):
-            translated_text = cloud_translate_services.translate_text(
+            translated_text = dev_mode_translate_services.translate_text(
                 'hello world', 'en', 'es')
             self.assertEqual(translated_text, 'hola mundo')

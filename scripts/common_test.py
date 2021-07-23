@@ -778,9 +778,7 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertNotIn('DEF', os.environ)
 
     def test_write_stdout_safe_with_repeat_oserror_repeats_call_to_write(self):
-
         raised_once = False
-
         def write_raise_oserror(unused_fileno, bytes_to_write):
             self.assertEqual(bytes_to_write, 'test'.encode('utf-8'))
 
@@ -796,12 +794,16 @@ class CommonTests(test_utils.GenericTestBase):
             'write',
             write_raise_oserror,
             expected_args=(
-                (sys.stdout.fileno(), 'test'),
-                (sys.stdout.fileno(), 'test')
+                (sys.stdout.fileno(), b'test'),
+                (sys.stdout.fileno(), b'test')
             )
         )
         with write_swap:
+            # This test makes sure that when write fails (with errno.EAGAIN)
+            # the call is repeated.
             common.write_stdout_safe('test')
+
+        self.assertTrue(raised_once)
 
     def test_write_stdout_safe_with_oserror(self):
         write_swap = self.swap_to_always_raise(os, 'write', OSError('OS error'))

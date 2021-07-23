@@ -407,8 +407,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             'Missing yield type documentation',
             'missing-yield-type-doc',
             'Please document the type yielded by this method.',
-            # We can't use the same old_name for two different warnings
-            # {'old_names': [('W9009', 'missing-yields-doc')]}.
         ),
         'W9015': (
             '"%s" missing in parameter documentation',
@@ -419,8 +417,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             '"%s" missing in parameter type documentation',
             'missing-type-doc',
             'Please add parameter type declarations for all parameters.'
-            # We can't use the same old_name for two different warnings
-            # {'old_names': [('W9004', 'old-missing-param-doc')]}.
         ),
         'W9017': (
             '"%s" differing in parameter documentation',

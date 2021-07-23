@@ -508,8 +508,10 @@ def categorize_files(file_paths, files):
 
     Args:
         file_paths: list(str). Paths to files that should be categorized.
-        files: dict(str, list(str). Dictionary into which the files will
-            be categorized.
+        files: dict(str, list(str)). Dictionary into which the files will
+            be categorized. Keys are file extensions ('.py', '.html', '.ts',
+            '.js', '.css') or 'other'. Values are lists of files with that file
+            extension.
     """
     all_filepaths_dict = {
         '.py': [], '.html': [], '.ts': [], '.js': [], 'other': [], '.css': []

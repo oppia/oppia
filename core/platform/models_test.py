@@ -149,7 +149,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_models_recommendations(self):
         """Tests import_models function with recommendations option."""
-        from core.storage.recommendations import gae_models as recommendations_models  # pylint: disable=line-too-long
+        from core.storage.recommendations import gae_models as recommendations_models    # pylint: disable=line-too-long
         expected_recommendations_models = (recommendations_models,)
         self.assertEqual(
             expected_recommendations_models,
@@ -351,14 +351,15 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_import_cloud_translate_services(self):
         """Tests import cloud translate services function."""
         with self.swap(constants, 'EMULATOR_MODE', False):
-            from core.platform.cloud_translate import cloud_translate_services
+            from core.platform.translate import cloud_translate_services
             self.assertEqual(
                 self.registry_instance.import_cloud_translate_services(),
                 cloud_translate_services)
-        from core.platform.cloud_translate import dev_mode_cloud_translate_services  # isort:skip pylint: disable=line-too-long
+
+        from core.platform.translate import dev_mode_translate_services
         self.assertEqual(
             self.registry_instance.import_cloud_translate_services(),
-            dev_mode_cloud_translate_services)
+            dev_mode_translate_services)
 
     def test_import_search_services(self):
         """Tests import search services function."""

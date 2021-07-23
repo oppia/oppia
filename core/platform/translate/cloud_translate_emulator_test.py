@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform.cloud_translate import cloud_translate_emulator
+from core.platform.translate import cloud_translate_emulator
 from core.tests import test_utils
 
 

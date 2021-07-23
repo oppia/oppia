@@ -82,7 +82,7 @@ def main(args=None):
     # library. The problem is that coverage library has a file named html.py,
     # then when bs4 library attempts to do 'from html.entities import ...',
     # it will fail with error "No module named 'html.entities';
-    # 'html' is not a package". This happens before Python resolves to
+    # 'html' is not a package". This happens because Python resolves to
     # the html.py file in coverage instead of the native html library.
     sys.path = [path for path in sys.path if 'coverage' not in path]
 

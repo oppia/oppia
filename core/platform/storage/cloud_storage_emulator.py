@@ -43,13 +43,16 @@ class Blob(python_utils.OBJECT):
             name: str. The name of the blob.
             data: str|bytes. The data of the blob. If the data are string,
                 they are encoded to bytes.
-            content_type: str. The content type of the blob, it should be in
-                the MIME format.
+            content_type: optional(str). The content type of the blob, it should
+                be in the MIME format.
         """
         self._name = name
         self._raw_bytes = (
             data.encode('utf-8') if isinstance(data, str) else data)
-        if mimetypes.guess_extension(content_type) is None:
+        if (
+                content_type is not None and
+                mimetypes.guess_extension(content_type) is None
+        ):
             raise Exception('Content type contains unknown MIME type.')
         self._content_type = content_type
 

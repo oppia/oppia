@@ -216,6 +216,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['opportunities'], [])
+        self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 

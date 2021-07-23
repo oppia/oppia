@@ -85,83 +85,83 @@ class _Gae(Platform):
         returned_models = []
         for name in model_names:
             if name == NAMES.activity:
-                from core.storage.activity import gae_models as activity_models
-                returned_models.append(activity_models)
+                from core.storage.activity import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.app_feedback_report:
-                from core.storage.app_feedback_report import gae_models as app_feedback_report_models  # pylint: disable=line-too-long
-                returned_models.append(app_feedback_report_models)
+                from core.storage.app_feedback_report import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.audit:
-                from core.storage.audit import gae_models as audit_models
-                returned_models.append(audit_models)
+                from core.storage.audit import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.auth:
-                from core.storage.auth import gae_models as auth_models
-                returned_models.append(auth_models)
+                from core.storage.auth import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.base_model:
-                from core.storage.base_model import gae_models as base_models
-                returned_models.append(base_models)
+                from core.storage.base_model import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.beam_job:
-                from core.storage.beam_job import gae_models as beam_job_models
-                returned_models.append(beam_job_models)
+                from core.storage.beam_job import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.blog:
-                from core.storage.blog import gae_models as blog_models # pylint: disable=line-too-long
-                returned_models.append(blog_models)
+                from core.storage.blog import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.classifier:
-                from core.storage.classifier import gae_models as classifier_data_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(classifier_data_models)
+                from core.storage.classifier import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.collection:
-                from core.storage.collection import gae_models as collection_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(collection_models)
+                from core.storage.collection import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.config:
-                from core.storage.config import gae_models as config_models
-                returned_models.append(config_models)
+                from core.storage.config import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.email:
-                from core.storage.email import gae_models as email_models
-                returned_models.append(email_models)
+                from core.storage.email import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.exploration:
-                from core.storage.exploration import gae_models as exp_models
-                returned_models.append(exp_models)
+                from core.storage.exploration import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.feedback:
-                from core.storage.feedback import gae_models as feedback_models
-                returned_models.append(feedback_models)
+                from core.storage.feedback import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.improvements:
-                from core.storage.improvements import gae_models as improvements_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(improvements_models)
+                from core.storage.improvements import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.job:
-                from core.storage.job import gae_models as job_models
-                returned_models.append(job_models)
+                from core.storage.job import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.opportunity:
-                from core.storage.opportunity import gae_models as opportunity_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(opportunity_models)
+                from core.storage.opportunity import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.question:
-                from core.storage.question import gae_models as question_models
-                returned_models.append(question_models)
+                from core.storage.question import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.recommendations:
-                from core.storage.recommendations import gae_models as recommendations_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(recommendations_models)
+                from core.storage.recommendations import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.skill:
-                from core.storage.skill import gae_models as skill_models
-                returned_models.append(skill_models)
+                from core.storage.skill import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.statistics:
-                from core.storage.statistics import gae_models as statistics_models   # isort:skip pylint: disable=line-too-long
-                returned_models.append(statistics_models)
+                from core.storage.statistics import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.story:
-                from core.storage.story import gae_models as story_models
-                returned_models.append(story_models)
+                from core.storage.story import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.subtopic:
-                from core.storage.subtopic import gae_models as subtopic_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(subtopic_models)
+                from core.storage.subtopic import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.suggestion:
-                from core.storage.suggestion import gae_models as suggestion_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(suggestion_models)
+                from core.storage.suggestion import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.topic:
-                from core.storage.topic import gae_models as topic_models
-                returned_models.append(topic_models)
+                from core.storage.topic import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.translation:
-                from core.storage.translation import gae_models as translation_models  # isort:skip pylint: disable=line-too-long
-                returned_models.append(translation_models)
+                from core.storage.translation import gae_models
+                returned_models.append(gae_models)
             elif name == NAMES.user:
-                from core.storage.user import gae_models as user_models
-                returned_models.append(user_models)
+                from core.storage.user import gae_models
+                returned_models.append(gae_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
@@ -338,10 +338,10 @@ class _Gae(Platform):
             module. The cloud_translate_services module.
         """
         if constants.EMULATOR_MODE:
-            from core.platform.cloud_translate import dev_mode_cloud_translate_services  # isort:skip pylint: disable=line-too-long
-            return dev_mode_cloud_translate_services
+            from core.platform.translate import dev_mode_translate_services
+            return dev_mode_translate_services
         else:
-            from core.platform.cloud_translate import cloud_translate_services
+            from core.platform.translate import cloud_translate_services
             return cloud_translate_services
 
     @classmethod
