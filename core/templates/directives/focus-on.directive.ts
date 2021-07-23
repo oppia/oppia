@@ -47,7 +47,7 @@ angular.module('oppia').directive('focusOn', [
       const directiveSubscriptions = new Subscription();
       directiveSubscriptions.add(
         FocusManagerService.onFocus.subscribe(
-          (name) => {
+          (name: string) => {
             if (name === attrs.focusOn) {
               elt[0].focus();
             }
@@ -71,7 +71,10 @@ angular.module('oppia').directive('focusOn', [
   selector: '[oppiaFocusOn]'
 })
 export class FocusOnDirective implements OnDestroy {
-  @Input('oppiaFocusOn') focusOn: string;
+  // This property is initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input('oppiaFocusOn') focusOn!: string;
   directiveSubscriptions = new Subscription();
   constructor(
     private el: ElementRef, private focusManagerService: FocusManagerService) {

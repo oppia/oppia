@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
 
 describe('AlgebraicExpressionEditor', () => {
@@ -85,15 +85,14 @@ describe('AlgebraicExpressionEditor', () => {
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
-    component.currentValue = undefined;
+      mockGuppyObject as GuppyObject);
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
@@ -101,8 +100,7 @@ describe('AlgebraicExpressionEditor', () => {
 
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
-    component.value = null;
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
@@ -136,7 +134,7 @@ describe('AlgebraicExpressionEditor', () => {
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject);
+      mockGuppyObject as GuppyObject);
     MockGuppy.focused = false;
     component.ngOnInit();
   });

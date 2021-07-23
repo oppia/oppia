@@ -55,6 +55,16 @@ describe('Event Bus Group', () => {
   it('should throw uncaught errors', waitForAsync(() => {
     spyOn(Subject.prototype, 'subscribe').and.callFake(
       (f) => {
+        // This throws "Argument of type '(f: PartialObserver<void> |
+        // ((value: string) => void)) => Subscription' is not assignable
+        // to parameter of type '{ (observer?: PartialObserver<any> |
+        // undefined): Subscription; (next: null | undefined, error: null |
+        // undefined, complete: () => void): Subscription; (next: null |
+        // undefined, error: (error: any) => void, complete?: (() => void) |
+        // undefined): Subscription; (next: (value: any) => void, error: null |
+        // undefined, complet...'.". We need to suppress this error because of
+        // strict type checking.
+        // @ts-ignore
         expect(() => f()).toThrowError('Error in event bus\nRandom Error');
         return new Subscription();
       }

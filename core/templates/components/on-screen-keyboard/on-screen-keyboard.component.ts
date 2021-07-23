@@ -29,8 +29,15 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
   templateUrl: './on-screen-keyboard.component.html'
 })
 export class OnScreenKeyboardComponent {
-  engine;
-  guppyInstance;
+  engine!: {
+    'insert_string': (arg0: string) => void;
+    'insert_symbol': (arg0: string) => void;
+    backspace: () => void;
+    left: () => void;
+    right: () => void;
+    end: () => void;
+  };
+  guppyInstance!: Guppy;
   functionsTab: string = constants.OSK_FUNCTIONS_TAB;
   lettersTab: string = constants.OSK_LETTERS_TAB;
   mainTab: string = constants.OSK_MAIN_TAB;
@@ -42,8 +49,8 @@ export class OnScreenKeyboardComponent {
   functions: string[] = [
     'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
     'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
-  interactionType: string;
-  customLetters: string[];
+  interactionType!: string;
+  customLetters!: string[];
 
   constructor(
     private deviceInfoService: DeviceInfoService,

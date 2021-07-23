@@ -35,13 +35,13 @@ class MockActiveModal {
 
 class MockExplorationCreationService {
   createNewExploration(): void {
-    return null;
+    return;
   }
 }
 
 class MockCollectionCreationService {
   createNewCollection(): void {
-    return null;
+    return;
   }
 }
 

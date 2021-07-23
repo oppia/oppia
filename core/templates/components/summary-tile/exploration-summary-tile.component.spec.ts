@@ -73,7 +73,6 @@ class MockWindowRef {
         if (this._hashChange === null) {
           return;
         }
-        this._hashChange();
       },
       get href() {
         return this._href;
@@ -81,7 +80,7 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      reload: (val) => val
+      reload: (val: string) => val
     },
     get onhashchange() {
       return this.location._hashChange;
@@ -223,7 +222,7 @@ describe('Exploration Summary Tile Component', () => {
       4: 0,
       5: 1
     };
-    component.getContributorsSummary = 'summary';
+    component.getContributorsSummary = {};
     component.getThumbnailIconUrl = '/subjects/Welcome';
     component.getThumbnailBgColor = 'blue';
     component.openInNewWindow = 'true';
@@ -270,7 +269,6 @@ describe('Exploration Summary Tile Component', () => {
     const windowWidthSpy = spyOn(
       windowDimensionsService, 'getWidth').and.callThrough();
 
-    component.mobileCutoffPx = null;
     component.ngOnInit();
     tick();
     fixture.detectChanges();
@@ -348,7 +346,6 @@ describe('Exploration Summary Tile Component', () => {
       ratingComputationService, 'computeAverageRating')
       .and.returnValue(3);
 
-    component.getRatings = null;
     let averageRatings = component.getAverageRating();
     tick();
     fixture.detectChanges();
@@ -374,11 +371,10 @@ describe('Exploration Summary Tile Component', () => {
       dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
       .and.returnValue('1:30 am');
 
-    component.getLastUpdatedMsec = null;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
-    expect(dateTime).toBe(null);
+    expect(dateTime).toBeNull();
     expect(dateTimeSpy).not.toHaveBeenCalled();
   });
 
@@ -394,8 +390,8 @@ describe('Exploration Summary Tile Component', () => {
     expect(urlSpy).toHaveBeenCalled();
   });
 
-  it('should return to the same page if ExplorationId is null', () => {
-    component.getExplorationId = null;
+  it('should return to the same page if ExplorationId is undefined' +
+     'not present', () => {
     const result = component.getExplorationLink();
     fixture.detectChanges();
 
@@ -452,7 +448,6 @@ describe('Exploration Summary Tile Component', () => {
       '/story/fhfhvhgvhvvh');
     const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
 
-    component.getStoryNodeId = null;
     const result = component.getExplorationLink();
 
     tick();

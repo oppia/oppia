@@ -16,14 +16,13 @@
  * @fileoverview A file that contains Event Bus Service and Event Bus Group.
  */
 
-
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Subject, Subscription } from 'rxjs';
+import { OperatorFunction, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseEvent } from './app-events';
 
-type NewableType<T> = new(...args) => T;
+type NewableType<T> = new(message: string) => T;
 
 @Injectable({
   providedIn: 'root'
@@ -50,10 +49,11 @@ export class EventBusService {
       eventType: NewableType<T>,
       action: (event: T) => void,
       callbackContext = null): Subscription {
-    return this._subject$.pipe(filter((event: T): boolean => {
-      return (event instanceof eventType);
-    }
-    )).subscribe(
+    return this._subject$.pipe(
+      <OperatorFunction<BaseEvent, T>>filter((event: T): boolean => {
+        return (event instanceof eventType);
+      }
+      )).subscribe(
       (event: T): void => {
         try {
           action.call(callbackContext, event);
