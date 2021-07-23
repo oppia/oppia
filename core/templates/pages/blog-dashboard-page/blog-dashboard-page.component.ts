@@ -42,17 +42,18 @@ export class BlogDashboardPageComponent implements OnInit {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-    .getStaticImageUrl('/general/no_profile_picture.png')
+      .getStaticImageUrl('/general/no_profile_picture.png');
     this.blogDashboardBackendService.fetchBlogDashboardDataAsync().then(
       (dashboardData) => {
-        console.log(dashboardData);
         this.blogDashboardData = dashboardData;
-        console.log(this.blogDashboardData);
         this.authorProfilePictureUrl = decodeURIComponent((
+          // eslint-disable-next-line max-len
           dashboardData.profilePictureDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
         this.loaderService.hideLoadingScreen();
       }, (errorResponse) => {
-        if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(
+            errorResponse.status) !== -1) {
           this.alertsService.addWarning('Failed to get dashboard data');
         }
       });

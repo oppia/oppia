@@ -2,7 +2,6 @@
   <mat-card-header class="blog-dashboard-header">
     <img mat-card-avatar
          [src]="authorProfilePictureUrl">
-    </img>
     <mat-card-title class="blog-dashboard-card-title">{{blogDashboardData.username}}</mat-card-title>
     <mat-card-subtitle>
       <button mat-button class="new-post-button">
@@ -12,28 +11,28 @@
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-      <mat-tab-group>
-        <mat-tab>
-          <ng-template mat-tab-label>
-           {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{blogDashboardData.numOfDraftBlogPosts}})
-          </ng-template>
-          <div class="blog-dashboard-card-tiles"
-               *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
-            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-            </oppia-blog-dashboard-tile>
-          </div>
-        </mat-tab>
-        <mat-tab>
-          <ng-template mat-tab-label>
-           {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{blogDashboardData.numOfPublishedBlogPosts}})
-          </ng-template>
-          <div class="blog-dashboard-card-tiles"
-               *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
-            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-            </oppia-blog-dashboard-tile>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+    <mat-tab-group>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{blogDashboardData.numOfDraftBlogPosts}})
+        </ng-template>
+        <div class="blog-dashboard-card-tiles"
+              *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
+          <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
+          </oppia-blog-dashboard-tile>
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{blogDashboardData.numOfPublishedBlogPosts}})
+        </ng-template>
+        <div class="blog-dashboard-card-tiles"
+              *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
+          <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
+          </oppia-blog-dashboard-tile>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </mat-card-content>
 </mat-card>
 <style>
@@ -51,50 +50,50 @@
 
   .blog-dashboard-card .mat-card-avatar {
     height: 7.5vw;
-    width: 7.5vw;
-    max-width: 100px;
     max-height: 100px;
-    min-width: 36px;
+    max-width: 100px;
     min-height: 36px;
+    min-width: 36px;
+    width: 7.5vw;
   }
 
   .blog-dashboard-card-title {
-    text-align: left;
-    font-family: "Roboto";
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 2.8rem;
     font-weight: 300;
-    color: #333333;
+    text-align: left;
   }
 
   .new-post-button {
-    border-radius: 4px;
     background-color: #00609C;
-    color: #FFFFFF;
+    border-radius: 4px;
+    color: #FFF;
     display: flex;
     font-size: 1.4rem;
-    justify-content: center;
     height: 36px;
+    justify-content: center;
     width: 114px;
   }
 
   .new-post-icon {
-    display: flex;
     align-items: center;
+    display: flex;
     margin-left: -8px;
   }
 
-  ::ng-deep .mat-tab-labels {
-    justify-content: space-evenly;
-    flex-grow: 1;
-  }
-
-  ::ng-deep .mat-tab-label:focus {
-    color: #00645C;
-  }
-
-  ::ng-deep .mat-tab-label {
+  :host /deep/ .mat-tab-label {
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.6rem;
-    font-family: "Roboto";
+  }
+
+  :host /deep/ .mat-tab-labels {
+    flex-grow: 1;
+    justify-content: space-evenly;
+  }
+
+  :host /deep/ .mat-tab-label:focus {
+    color: #00645C;
   }
 
   mat-card-header.blog-dashboard-header {
@@ -107,11 +106,11 @@
 
   @media(max-width: 870px) {
     .blog-dashboard-card {
-      width: unset;
       margin: 20px;
+      width: unset;
     }
 
-    ::ng-deep mat-card-header.blog-dashboard-header .mat-card-header-text{
+    :host /deep/ mat-card-header .mat-card-header-text {
       display: flex;
       flex-grow: 1;
       justify-content: space-between;
@@ -122,9 +121,9 @@
       margin-top: 15px;
     }
 
-    ::ng-deep .mat-tab-label {
+    :host /deep/ .mat-tab-label {
+      font-family: 'Roboto', Arial, sans-serif;
       font-size: 1.1rem;
-      font-family: "Roboto";
     }
   }
 

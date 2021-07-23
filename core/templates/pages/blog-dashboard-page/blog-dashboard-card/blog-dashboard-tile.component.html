@@ -1,13 +1,13 @@
 <mat-card class="blog-dashboard-tile">
   <div class="blog-dashboard-tile-content">
     <mat-card-content>
-    <div class="blog-dashboard-tile-header">
-      <mat-card-title class="blog-dashboard-tile-title">{{blogPostSummary.Title}}</mat-card-title>
-      <button mat-icon-button>
-        <mat-icon class="align-text-bottom pl-4">more_vert</mat-icon>
-      </button>
-    </div>
-    <mat-card-subtitle class="blog-dashboard-tile-subtitle">{{blogPostSummary.PublishedOn}}</mat-card-subtitle>
+      <div class="blog-dashboard-tile-header">
+        <mat-card-title class="blog-dashboard-tile-title">{{blogPostSummary.Title}}</mat-card-title>
+        <button mat-icon-button>
+          <mat-icon class="align-text-bottom pl-4">more_vert</mat-icon>
+        </button>
+      </div>
+      <mat-card-subtitle class="blog-dashboard-tile-subtitle">{{blogPostSummary.PublishedOn}}</mat-card-subtitle>
       <p class="blog-post-summary">
         {{blogPostSummary.Summary}}
       </p>
@@ -16,11 +16,11 @@
 </mat-card>
 <style>
   .blog-dashboard-tile {
-    width: 344px;
-    box-shadow: 0px 3px 3px #00000029;
+    border: 1px solid #CCC;
     border-radius: 4px;
-    border: 1px solid #CCCCCC;
+    box-shadow: 0 3px 3px #00000029;
     margin: 10px;
+    width: 344px;
   }
 
   .blog-dashboard-tile-header {
@@ -29,17 +29,17 @@
   }
 
   .blog-dashboard-tile-title {
-    color: #333333;
-    font-family: Roboto;
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
     font-size: 2rem;
     text-align: left;
   }
 
   @media(max-width: 420px) {
     .blog-dashboard-tile {
-      width: 280px;
       margin-left: auto;
       margin-right: auto;
+      width: 280px;
     }
 
     .blog-dashboard-tile-title {
@@ -50,5 +50,4 @@
       font-size: 1.2rem;
     }
   }
-  </style>
-    
+</style>

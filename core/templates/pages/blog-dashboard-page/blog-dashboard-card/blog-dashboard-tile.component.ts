@@ -16,20 +16,19 @@
  * @fileoverview Component for a blog dashboard card.
  */
 
- import { Component, Input } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
- 
- @Component({
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+
+@Component({
   selector: 'oppia-blog-dashboard-tile',
   templateUrl: './blog-dashboard-tile.component.html'
- })
- export class BlogDashboardTileComponent {
+})
+export class BlogDashboardTileComponent {
   @Input() blogPostSummary: BlogPostSummary;
- }
-  
- angular.module('oppia').directive('oppiaBlogDashboardTile',
-   downgradeComponent({
-     component: BlogDashboardTileComponent
-   }) as angular.IDirectiveFactory);
-  
+}
+
+angular.module('oppia').directive('oppiaBlogDashboardTile',
+  downgradeComponent({
+    component: BlogDashboardTileComponent
+  }) as angular.IDirectiveFactory);

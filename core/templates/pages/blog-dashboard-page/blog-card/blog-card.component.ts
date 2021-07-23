@@ -48,14 +48,13 @@ export class BlogCardComponent implements OnInit {
           this.blogPostSummary.thumbnailFilename);
     }
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
-    .getStaticImageUrl('/general/no_profile_picture.png')
+      .getStaticImageUrl('/general/no_profile_picture.png');
     this.authorProfilePictureUrl = decodeURIComponent((
       this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
   }
 }
- 
+
 angular.module('oppia').directive('oppiaBlogCard',
   downgradeComponent({
     component: BlogCardComponent
   }) as angular.IDirectiveFactory);
- 

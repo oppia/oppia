@@ -16,20 +16,20 @@
  * @fileoverview Module for the blog-dashboard page.
  */
 
- import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
- import { MatTabsModule } from '@angular/material/tabs'
- import { BrowserModule } from '@angular/platform-browser';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { HttpClientModule } from '@angular/common/http';
- import { HTTP_INTERCEPTORS } from '@angular/common/http';
- import { RequestInterceptor } from 'services/request-interceptor.service';
- import { SharedComponentsModule } from 'components/shared-component.module';
+import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
+import { MatTabsModule } from '@angular/material/tabs';
+import { BrowserModule } from '@angular/platform-browser';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { BlogDashboardTileComponent } from './blog-dashboard-card/blog-dashboard-tile.component';
-import { BlogDashboardNavbar } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar.component'
+import { BlogDashboardNavbar } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 
 declare var angular: ng.IAngularStatic;
