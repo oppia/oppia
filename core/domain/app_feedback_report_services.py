@@ -439,8 +439,8 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
     if report.platform == PLATFORM_ANDROID:
         report.app_context = cast(
             app_feedback_report_domain.AndroidAppContext, report.app_context)
-        report.app_context.event_logs = None
-        report.app_context.logcat_logs = None
+        report.app_context.event_logs = []
+        report.app_context.logcat_logs = []
     save_feedback_report_to_storage(report)
 
 
@@ -479,17 +479,19 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
             user_supplied_feedback.user_feedback_other_text_input),
         'event_logs': app_context.event_logs,
         'logcat_logs': app_context.logcat_logs,
-        'package_version_code': device_system_context.package_version_code,
+        'package_version_code': python_utils.UNICODE(
+            device_system_context.package_version_code),
         'android_device_language_locale_code': (
             device_system_context.device_language_locale_code),
         'build_fingerprint': device_system_context.build_fingerprint,
         'network_type': device_system_context.network_type.name,
         'text_size': app_context.text_size.name,
-        'only_allows_wifi_download_and_update': (
+        'only_allows_wifi_download_and_update': python_utils.UNICODE(
             app_context.only_allows_wifi_download_and_update),
-        'automatically_update_topics': (
+        'automatically_update_topics': python_utils.UNICODE(
             app_context.automatically_update_topics),
-        'account_is_profile_admin': app_context.account_is_profile_admin
+        'account_is_profile_admin': python_utils.UNICODE(
+            app_context.account_is_profile_admin)
     }
 
     if new_incoming_report:
@@ -569,7 +571,7 @@ def reassign_ticket(report, new_ticket):
         old_ticket_obj = get_ticket_from_model(old_ticket_model)
         if len(old_ticket_obj.reports) == 1:
             # We are removing the only report associated with this ticket.
-            old_ticket_obj.newest_report_creation_timestamp = None
+            old_ticket_obj.newest_report_creation_timestamp = None # type: ignore[assignment]
         else:
             old_ticket_obj.reports.remove(report.report_id)
             if old_ticket_obj.newest_report_creation_timestamp == (
