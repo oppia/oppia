@@ -557,42 +557,58 @@ def apply_change_list(exploration_id, change_list):
                             change.to_version))
 
         # Calculate the size of exp.
-        state_proto = exploration_pb2.State()
-        recorderd_voiceovers_proto = exploration_pb2.RecordedVoiceovers()
-        voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping()
-        voiceover_proto = exploration_pb2.Voiceover()
+        state_protos={}
+        voiceover_lang_protos={}
+        written_translation_protos={}
+        voiceover_language_mapping_list=[]
+        written_translation_mapping_list=[]
+        recorded_voiceover_proto=exploration_pb2.RecordedVoiceovers()
+        written_translations_proto=exploration_pb2.WrittenTranslations()
 
-        for (state_name, state_dict) in exploration.states.items():
-            subtitled_html_proto = exploration_pb2.SubtitledHtml(
-                content_id=state_dict.content.content_id,
-                html=state_dict.content.html
-            )
-            state_prot.content.CopyFrom(subtitled_html_proto)
-            for (content_id, language_code_to_voiceover) in (
-                state_dict.recorded_voiceovers.voiceovers_mapping.items()):
-                for (language_code, voiceover) in language_code_to_voiceover.items():
-                    voiceover_proto = exploration_pb2.Voiceover(
+        for (state_name, state) in exploration.states.items():
+            for (content_id, language_code_to_voiceover) in (state.recorded_voiceovers.voiceovers_mapping.items()):
+                for (language_code_, voiceover) in (language_code_to_voiceover.items()):
+                    voiceover_proto=exploration_pb2.Voiceover(
                         filename=voiceover.filename,
                         file_size_bytes=voiceover.file_size_bytes,
                         duration_secs=voiceover.duration_secs
                     )
-                    voiceover_mapping_proto = exploration_pb2.VoiceoverContentMapping(
-                        voiceover_content_mapping={
-                            language_code: voiceover_proto
-                        }
+                    voiceover_lang_protos[language_code_]=voiceover_proto
+                voiceover_content_mapping=exploration_pb2.VoiceoverContentMapping(
+                    voiceover_content_mapping=voiceover_lang_protos
+                )
+                voiceover_language_mapping_list.append(voiceover_content_mapping)
+            recorded_voiceover_proto.voiceover_language_mapping.extend(voiceover_language_mapping_list)
+            for (content_id, language_code) in state.written_translations.translations_mapping.items():
+                for (language_code, written_translation) in (language_code.items()):
+                    written_translation_proto = exploration_pb2.WrittenTranslation(
+                        data_format=written_translation.data_format,
+                        translation=written_translation.translation
                     )
-            state_proto.recorded_voiceovers.CopyFrom(recorderd_voiceovers_proto)
+                    written_translation_protos[language_code] = written_translation_proto
+                translation_mapping=exploration_pb2.WrittenTranslationContentMapping(
+                    translation_content_mapping=written_translation_protos
+                )
+                written_translation_mapping_list.append(translation_mapping)
+            written_translations_proto.translation_language_mapping.extend(written_translation_mapping_list)
+            state_proto=exploration_pb2.State(
+                content=exploration_pb2.SubtitledHtml(
+                    content_id=exploration.states[state_name].content.content_id,
+                    html=exploration.states[state_name].content.html
+                ),
+                recorded_voiceovers=recorded_voiceover_proto,
+                written_translations=written_translations_proto
+            )
+            state_protos[state_name] = state_proto
 
         exp_proto = exploration_pb2.Exploration(
             id=exploration.id,
             version=exploration.version,
             init_state_name=exploration.init_state_name,
             title=exploration.title,
-            states={
-                init_state_name: state_proto
-            }
+            states=state_protos
         )
-        proto_size_in_bytes = 0 
+        proto_size_in_bytes = exp_proto.ByteSize()
         exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 

@@ -51,8 +51,7 @@ message RecordedVoiceovers {
 }
 
 message VoiceoverContentMapping {
-  LanguageCode language_code = 1;
-  map<string, Voiceover> voiceover_content_mapping = 2;
+  map<string, Voiceover> voiceover_content_mapping = 1;
 }
 
 message Voiceover {
@@ -67,7 +66,6 @@ message WrittenTranslations {
 }
 
 message WrittenTranslationContentMapping {
-  LanguageCode language_code = 1;
   map<string, WrittenTranslation> translation_content_mapping = 2;
 }
 
