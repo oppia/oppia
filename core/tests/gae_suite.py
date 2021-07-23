@@ -78,9 +78,13 @@ def main(args=None):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
 
-    # Remove coverage from path since it causes conflicts with the standard
-    # Python html library.
-    # sys.path = [path for path in sys.path if 'coverage' not in path]
+    # Remove coverage from path since it causes conflicts with the Python html
+    # library. The problem is that coverage library has a file named html.py,
+    # then when bs4 library attempts to do 'from html.entities import ...',
+    # it will fail with error "No module named 'html.entities';
+    # 'html' is not a package". This happens before Python resolves to
+    # the html.py file in coverage instead of the native html library.
+    sys.path = [path for path in sys.path if 'coverage' not in path]
 
     # The devappserver function fixes the system path by adding certain google
     # appengine libraries that we need in oppia to the system path. The Google
