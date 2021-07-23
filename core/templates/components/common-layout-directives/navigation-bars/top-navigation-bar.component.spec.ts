@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -33,7 +32,6 @@ import { TopNavigationBarComponent } from './top-navigation-bar.component';
 import { DebouncerService } from 'services/debouncer.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserInfo } from 'domain/user/user-info.model';
 
 class MockWindowRef {
   _window = {
@@ -82,26 +80,26 @@ describe('TopNavigationBarComponent', () => {
 
   let mockResizeEmitter: EventEmitter<void>;
 
-  let userInfo = {
-    _isModerator: true,
-    _isAdmin: true,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  } as UserInfo;
+  // let userInfo = {
+  //   _isModerator: true,
+  //   _isAdmin: true,
+  //   _isTopicManager: false,
+  //   _isSuperAdmin: false,
+  //   _canCreateCollections: true,
+  //   _preferredSiteLanguageCode: 'en',
+  //   _username: 'username1',
+  //   _email: 'tester@example.org',
+  //   _isLoggedIn: true,
+  //   isModerator: () => true,
+  //   isAdmin: () => false,
+  //   isSuperAdmin: () => false,
+  //   isTopicManager: () => false,
+  //   canCreateCollections: () => true,
+  //   getPreferredSiteLanguageCode: () =>'en',
+  //   getUsername: () => 'username1',
+  //   getEmail: () => 'tester@example.org',
+  //   isLoggedIn: () => true
+  // } as UserInfo;
 
   beforeEach(waitForAsync(() => {
     mockResizeEmitter = new EventEmitter();
