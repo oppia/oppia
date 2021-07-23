@@ -20,10 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export type DataFormat =
-  'html' | 'unicode' | 'set_of_normalized_string' | 'set_of_unicode_string'
-  | 'invalid';
-
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
 export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING = (
@@ -37,7 +33,8 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
 
-type DataFormatToDefaultValuesKey = keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
+export type DataFormatToDefaultValuesKey =
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
 
 export interface TranslationBackendDict {
   'data_format': string;
@@ -47,7 +44,7 @@ export interface TranslationBackendDict {
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: DataFormat,
+      public dataFormat: DataFormatToDefaultValuesKey | 'invalid',
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
@@ -103,7 +100,9 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(dataFormat: DataFormat): WrittenTranslation {
+  createNew(
+      dataFormat: DataFormatToDefaultValuesKey | 'invalid'
+  ): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat) ||
         dataFormat === 'invalid') {
       throw new Error('Invalid translation data format: ' + dataFormat);
@@ -117,7 +116,8 @@ export class WrittenTranslationObjectFactory {
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.data_format as DataFormat,
+      translationBackendDict.data_format as
+        DataFormatToDefaultValuesKey | 'invalid',
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }

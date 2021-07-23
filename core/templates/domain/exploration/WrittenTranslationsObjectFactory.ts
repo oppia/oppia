@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import {
-  DataFormat,
+  DataFormatToDefaultValuesKey,
   TranslationBackendDict,
   WrittenTranslation,
   WrittenTranslationObjectFactory
@@ -112,7 +112,9 @@ export class WrittenTranslations {
 
   addWrittenTranslation(
       contentId: string, languageCode: string,
-      dataFormat: DataFormat, translation: string|string[]): void {
+      dataFormat: DataFormatToDefaultValuesKey | 'invalid',
+      translation: string|string[]
+  ): void {
     const writtenTranslations = this.translationsMapping[contentId];
     if (writtenTranslations.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');

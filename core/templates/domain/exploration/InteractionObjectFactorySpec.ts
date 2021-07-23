@@ -579,8 +579,8 @@ describe('Interaction object factory', () => {
       }
     };
     const newHint = hof.createFromBackendDict(newHintDict);
-    expect(testInteraction.hints)
-      .toEqual(hintsDict.map(function(hintDict: HintBackendDict) {
+    expect(testInteraction.hints).toEqual(hintsDict.map(
+      (hintDict: HintBackendDict) => {
         return hof.createFromBackendDict(hintDict);
       }));
     testInteraction.setHints([newHint]);

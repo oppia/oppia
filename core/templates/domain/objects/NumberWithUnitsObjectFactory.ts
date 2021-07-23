@@ -146,7 +146,6 @@ export class NumberWithUnitsObjectFactory {
     let units = '';
     let value = '';
 
-
     // Allow validation only when rawInput is not null or an empty string.
     if (rawInput !== '' && rawInput !== null) {
       // Start with digit when there is no currency unit.

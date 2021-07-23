@@ -90,12 +90,10 @@ export class ExtensionTagAssemblerService {
     const caBackendDict = <Record<string, {value: Object}>> (
       this._convertCustomizationArgsToBackendDict(customizationArgs));
     for (const caName in customizationArgs) {
-      if ('value' in caBackendDict[caName]) {
-        const caBackendDictValue = caBackendDict[caName].value;
-        element.attr(
-          this.camelCaseToHyphens.transform(caName) + '-with-value',
-          this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
-      }
+      const caBackendDictValue = caBackendDict[caName].value;
+      element.attr(
+        this.camelCaseToHyphens.transform(caName) + '-with-value',
+        this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
     }
     return element;
   }
