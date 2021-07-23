@@ -22,7 +22,9 @@ from core.controllers import base
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
+from core.domain import topic_fetchers
 import feconf
+import python_utils
 import utils
 
 
@@ -125,3 +127,47 @@ class SkillMasteryDataHandler(base.BaseHandler):
             self.user_id, new_degrees_of_mastery)
 
         self.render_json({})
+
+
+class SubtopicMasteryDataHandler(base.BaseHandler):
+    """A handler that handles fetching user subtopic mastery for a topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self, topic_id):
+        """Handles GET requests."""
+
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        if not topic:
+            raise self.InvalidInputException('Invalid topic ID %s' % topic_id)
+
+        subtopic_mastery_dict = {}
+        all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
+            self.user_id, topic.get_all_skill_ids())
+        for subtopic in topic.subtopics:
+            skill_mastery_dict = {
+                skill_id: mastery
+                for skill_id, mastery in all_skills_mastery_dict.items()
+                if mastery is not None and skill_id in subtopic.skill_ids
+            }
+            if skill_mastery_dict:
+                # Subtopic mastery is average of skill masteries.
+                subtopic_mastery_dict[subtopic.id] = python_utils.divide(
+                    sum(skill_mastery_dict.values()), len(skill_mastery_dict))
+
+        self.values.update({
+            'subtopic_mastery_dict': subtopic_mastery_dict
+        })
+        self.render_json(self.values)
