@@ -91,6 +91,7 @@ describe('Question update service', function() {
       $provide.value(key, value);
     }
   }));
+
   beforeEach(angular.mock.inject(function($injector) {
     QuestionUpdateService = $injector.get('QuestionUpdateService');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
