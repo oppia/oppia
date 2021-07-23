@@ -217,7 +217,7 @@ var StoryEditorPage = function() {
 
   this.navigateToStoryEditorTab = async function() {
     await waitFor.pageToFullyLoad();
-    await browser.executeScript('backToStoryEditorButton.scrollIntoView();');
+    await browser.actions().mouseMove(backToStoryEditorButton).perform();
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
 
