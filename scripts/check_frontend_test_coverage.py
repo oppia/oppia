@@ -196,6 +196,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'supplemental-card.directive.ts',
     'teacher.ts',
     'teacher2.ts',
+    'top-navigation-bar.component.ts',
     'topic-creation.service.ts',
     'topic-editor-navbar-breadcrumb.component.ts',
     'topic-editor-navbar.directive.ts',

@@ -152,74 +152,74 @@ describe('TopNavigationBarComponent', () => {
       .and.returnValue(new EventEmitter<string>());
   });
 
-  it('should set component properties on initialization', fakeAsync(() => {
-    spyOn(userService, 'getProfileImageDataUrlAsync').and.resolveTo(
-      '%2Fprofile%2Fpicture');
-    spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
-      .and.resolveTo(true);
-    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
-    spyOn(component, 'truncateNavbar').and.stub();
+  // it('should set component properties on initialization', fakeAsync(() => {
+  //   spyOn(userService, 'getProfileImageDataUrlAsync').and.resolveTo(
+  //     '%2Fprofile%2Fpicture');
+  //   spyOn(cbas, 'fetchClassroomPromosAreEnabledStatusAsync')
+  //     .and.resolveTo(true);
+  //   spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+  //   spyOn(component, 'truncateNavbar').and.stub();
 
-    expect(component.currentUrl).toBe(undefined);
-    expect(component.labelForClearingFocus).toBe(undefined);
-    expect(component.logoutUrl).toBe(undefined);
-    expect(component.userMenuIsShown).toBe(undefined);
-    expect(component.inClassroomPage).toBe(undefined);
-    expect(component.windowIsNarrow).toBe(false);
-    expect(component.navElementsVisibilityStatus).toEqual({});
-    expect(component.profilePictureDataUrl).toBe(undefined);
-    expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(false);
+  //   expect(component.currentUrl).toBe(undefined);
+  //   expect(component.labelForClearingFocus).toBe(undefined);
+  //   expect(component.logoutUrl).toBe(undefined);
+  //   expect(component.userMenuIsShown).toBe(undefined);
+  //   expect(component.inClassroomPage).toBe(undefined);
+  //   expect(component.windowIsNarrow).toBe(false);
+  //   expect(component.navElementsVisibilityStatus).toEqual({});
+  //   expect(component.profilePictureDataUrl).toBe(undefined);
+  //   expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(false);
 
-    component.ngOnInit();
-    tick(10);
+  //   component.ngOnInit();
+  //   tick(10);
 
-    fixture.whenStable().then(() => {
-      expect(component.currentUrl).toBe('learn');
-      expect(component.labelForClearingFocus)
-        .toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
-      expect(component.logoutUrl).toBe(AppConstants.LOGOUT_URL);
-      expect(component.userMenuIsShown).toBe(true);
-      expect(component.inClassroomPage).toBe(true);
-      expect(component.windowIsNarrow).toBe(true);
-      expect(component.navElementsVisibilityStatus).toEqual({
-        I18N_TOPNAV_DONATE: true,
-        I18N_TOPNAV_CLASSROOM: true,
-        I18N_TOPNAV_ABOUT: true,
-        I18N_CREATE_EXPLORATION_CREATE: true,
-        I18N_TOPNAV_LIBRARY: true
-      });
-      expect(component.profilePictureDataUrl).toBe('/profile/picture');
-      expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
-    });
-  }));
+  //   fixture.whenStable().then(() => {
+  //     expect(component.currentUrl).toBe('learn');
+  //     expect(component.labelForClearingFocus)
+  //       .toBe(AppConstants.LABEL_FOR_CLEARING_FOCUS);
+  //     expect(component.logoutUrl).toBe(AppConstants.LOGOUT_URL);
+  //     expect(component.userMenuIsShown).toBe(true);
+  //     expect(component.inClassroomPage).toBe(true);
+  //     expect(component.windowIsNarrow).toBe(true);
+  //     expect(component.navElementsVisibilityStatus).toEqual({
+  //       I18N_TOPNAV_DONATE: true,
+  //       I18N_TOPNAV_CLASSROOM: true,
+  //       I18N_TOPNAV_ABOUT: true,
+  //       I18N_CREATE_EXPLORATION_CREATE: true,
+  //       I18N_TOPNAV_LIBRARY: true
+  //     });
+  //     expect(component.profilePictureDataUrl).toBe('/profile/picture');
+  //     expect(component.CLASSROOM_PROMOS_ARE_ENABLED).toBe(true);
+  //   });
+  // }));
 
-  it('should get user info on initialization', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-    spyOn(urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('/profile/username1');
-    spyOn(component, 'truncateNavbar').and.stub();
+  // it('should get user info on initialization', fakeAsync(() => {
+  //   spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+  //   spyOn(urlInterpolationService, 'interpolateUrl')
+  //     .and.returnValue('/profile/username1');
+  //   spyOn(component, 'truncateNavbar').and.stub();
 
-    expect(component.isModerator).toBe(undefined);
-    expect(component.isAdmin).toBe(undefined);
-    expect(component.isTopicManager).toBe(undefined);
-    expect(component.isSuperAdmin).toBe(undefined);
-    expect(component.userIsLoggedIn).toBe(undefined);
-    expect(component.username).toBe(undefined);
-    expect(component.profilePageUrl).toBe(undefined);
+  //   expect(component.isModerator).toBe(undefined);
+  //   expect(component.isAdmin).toBe(undefined);
+  //   expect(component.isTopicManager).toBe(undefined);
+  //   expect(component.isSuperAdmin).toBe(undefined);
+  //   expect(component.userIsLoggedIn).toBe(undefined);
+  //   expect(component.username).toBe(undefined);
+  //   expect(component.profilePageUrl).toBe(undefined);
 
-    component.ngOnInit();
-    tick(10);
+  //   component.ngOnInit();
+  //   tick(10);
 
-    fixture.whenStable().then(() => {
-      expect(component.isModerator).toBe(true);
-      expect(component.isAdmin).toBe(false);
-      expect(component.isTopicManager).toBe(false);
-      expect(component.isSuperAdmin).toBe(false);
-      expect(component.userIsLoggedIn).toBe(true);
-      expect(component.username).toBe('username1');
-      expect(component.profilePageUrl).toBe('/profile/username1');
-    });
-  }));
+  //   fixture.whenStable().then(() => {
+  //     expect(component.isModerator).toBe(true);
+  //     expect(component.isAdmin).toBe(false);
+  //     expect(component.isTopicManager).toBe(false);
+  //     expect(component.isSuperAdmin).toBe(false);
+  //     expect(component.userIsLoggedIn).toBe(true);
+  //     expect(component.username).toBe('username1');
+  //     expect(component.profilePageUrl).toBe('/profile/username1');
+  //   });
+  // }));
 
   it('should truncate navbar after search bar is loaded', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
