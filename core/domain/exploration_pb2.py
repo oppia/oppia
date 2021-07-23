@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11\x65xploration.proto\x1a google/protobuf/descriptor.proto\"\xe9\x01\n\x0b\x45xploration\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x05\x12\x17\n\x0finit_state_name\x18\x08 \x01(\t\x12(\n\x06states\x18\x0b \x03(\x0b\x32\x18.Exploration.StatesEntry\x12\r\n\x05title\x18\x0c \x01(\t\x1a\x35\n\x0bStatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x15\n\x05value\x18\x02 \x01(\x0b\x32\x06.State:\x02\x38\x01J\x04\x08\x03\x10\x04J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07J\x04\x08\x07\x10\x08J\x04\x08\t\x10\nJ\x04\x08\n\x10\x0bJ\x04\x08\r\x10\x0eJ\x04\x08\x0e\x10\x0f\"\xcb\x01\n\x05State\x12\x1f\n\x07\x63ontent\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12)\n\x0binteraction\x18\x03 \x01(\x0b\x32\x14.InteractionInstance\x12\x30\n\x13recorded_voiceovers\x18\x05 \x01(\x0b\x32\x13.RecordedVoiceovers\x12\x32\n\x14written_translations\x18\x06 \x01(\x0b\x32\x14.WrittenTranslationsJ\x04\x08\x02\x10\x03J\x04\x08\x04\x10\x05J\x04\x08\x07\x10\x08\"1\n\rSubtitledHtml\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x0c\n\x04html\x18\x02 \x01(\t\"R\n\x12RecordedVoiceovers\x12<\n\x1avoiceover_language_mapping\x18\x01 \x03(\x0b\x32\x18.VoiceoverContentMapping\"\xbf\x01\n\x17VoiceoverContentMapping\x12X\n\x19voiceover_content_mapping\x18\x01 \x03(\x0b\x32\x35.VoiceoverContentMapping.VoiceoverContentMappingEntry\x1aJ\n\x1cVoiceoverContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x19\n\x05value\x18\x02 \x01(\x0b\x32\n.Voiceover:\x02\x38\x01\"S\n\tVoiceover\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x17\n\x0f\x66ile_size_bytes\x18\x02 \x01(\x05\x12\x15\n\rduration_secs\x18\x04 \x01(\x02J\x04\x08\x03\x10\x04\"^\n\x13WrittenTranslations\x12G\n\x1ctranslation_language_mapping\x18\x01 \x03(\x0b\x32!.WrittenTranslationContentMapping\"\x86\x02\n WrittenTranslationContentMapping\x12$\n\rlanguage_code\x18\x01 \x01(\x0e\x32\r.LanguageCode\x12\x65\n\x1btranslation_content_mapping\x18\x02 \x03(\x0b\x32@.WrittenTranslationContentMapping.TranslationContentMappingEntry\x1aU\n\x1eTranslationContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\"\n\x05value\x18\x02 \x01(\x0b\x32\x13.WrittenTranslation:\x02\x38\x01\"D\n\x12WrittenTranslation\x12\x13\n\x0b\x64\x61ta_format\x18\x01 \x01(\t\x12\x13\n\x0btranslation\x18\x02 \x01(\tJ\x04\x08\x03\x10\x04\"\x80\x05\n\x13InteractionInstance\x12%\n\x08\x63ontinue\x18\x01 \x01(\x0b\x32\x11.ContinueInstanceH\x00\x12\x30\n\x0e\x66raction_input\x18\x02 \x01(\x0b\x32\x16.FractionInputInstanceH\x00\x12;\n\x14item_selection_input\x18\x03 \x01(\x0b\x32\x1b.ItemSelectionInputInstanceH\x00\x12=\n\x15multiple_choice_input\x18\x04 \x01(\x0b\x32\x1c.MultipleChoiceInputInstanceH\x00\x12.\n\rnumeric_input\x18\x05 \x01(\x0b\x32\x15.NumericInputInstanceH\x00\x12(\n\ntext_input\x18\x06 \x01(\x0b\x32\x12.TextInputInstanceH\x00\x12\x41\n\x18\x64rag_and_drop_sort_input\x18\x07 \x01(\x0b\x32\x1d.DragAndDropSortInputInstanceH\x00\x12\x35\n\x11image_click_input\x18\x08 \x01(\x0b\x32\x18.ImageClickInputInstanceH\x00\x12?\n\x16ratio_expression_input\x18\t \x01(\x0b\x32\x1d.RatioExpressionInputInstanceH\x00\x12\x32\n\x0f\x65nd_exploration\x18\n \x01(\x0b\x32\x17.EndExplorationInstanceH\x00\x12!\n\x0f\x64\x65\x66\x61ult_outcome\x18\x0b \x01(\x0b\x32\x08.Outcome\x12\x14\n\x05hints\x18\x0c \x03(\x0b\x32\x05.HintB\x12\n\x10interaction_type\"u\n\x07Outcome\x12\x19\n\x11\x64\x65stination_state\x18\x01 \x01(\t\x12 \n\x08\x66\x65\x65\x64\x62\x61\x63k\x18\x02 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x1b\n\x13labelled_as_correct\x18\x03 \x01(\x08J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07\"\x8d\x01\n\x10\x43ontinueInstance\x12?\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32#.ContinueInstance.CustomizationArgs\x1a\x38\n\x11\x43ustomizationArgs\x12#\n\x0b\x62utton_text\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\"\xd1\x0f\n\x15\x46ractionInputInstance\x12\x44\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32(.FractionInputInstance.CustomizationArgs\x12\x39\n\ranswer_groups\x18\x02 \x03(\x0b\x32\".FractionInputInstance.AnswerGroup\x12\x31\n\x08solution\x18\x03 \x01(\x0b\x32\x1f.FractionInputInstance.Solution\x1a\xa5\x01\n\x11\x43ustomizationArgs\x12\x1e\n\x16requires_simplest_form\x18\x01 \x01(\x08\x12 \n\x18\x61llow_improper_fractions\x18\x02 \x01(\x08\x12\"\n\x1a\x61llow_nonzero_integer_part\x18\x03 \x01(\x08\x12*\n\x12\x63ustom_placeholder\x18\x04 \x01(\x0b\x32\x0e.SubtitledHtml\x1aS\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12!\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\t.Fraction\x1ao\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x33\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1f.FractionInputInstance.RuleSpec\x1a\x8e\x0b\n\x08RuleSpec\x12S\n\x13is_exactly_equal_to\x18\x01 \x01(\x0b\x32\x34.FractionInputInstance.RuleSpec.IsExactlyEqualToSpecH\x00\x12N\n\x10is_equivalent_to\x18\x02 \x01(\x0b\x32\x32.FractionInputInstance.RuleSpec.IsEquivalentToSpecH\x00\x12t\n%is_equivalent_to_and_in_simplest_form\x18\x03 \x01(\x0b\x32\x43.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpecH\x00\x12\x46\n\x0cis_less_than\x18\x04 \x01(\x0b\x32..FractionInputInstance.RuleSpec.IsLessThanSpecH\x00\x12L\n\x0fis_greater_than\x18\x05 \x01(\x0b\x32\x31.FractionInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12Y\n\x16has_numerator_equal_to\x18\x06 \x01(\x0b\x32\x37.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpecH\x00\x12]\n\x18has_denominator_equal_to\x18\x07 \x01(\x0b\x32\x39.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpecH\x00\x12^\n\x19has_integer_part_equal_to\x18\x08 \x01(\x0b\x32\x39.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpecH\x00\x12Y\n\x16has_no_fractional_part\x18\t \x01(\x0b\x32\x37.FractionInputInstance.RuleSpec.HasNoFractionalPartSpecH\x00\x12s\n$has_fractional_part_exactly_equal_to\x18\n \x01(\x0b\x32\x43.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpecH\x00\x1a\x30\n\x14IsExactlyEqualToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a.\n\x12IsEquivalentToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a?\n#IsEquivalentToAndInSimplestFormSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a*\n\x0eIsLessThanSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a-\n\x11IsGreaterThanSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a(\n\x17HasNumeratorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a*\n\x19HasDenominatorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\r\x1a*\n\x19HasIntegerPartEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a\x19\n\x17HasNoFractionalPartSpec\x1a?\n#HasFractionalPartExactlyEqualToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.FractionB\x0b\n\trule_type:\x05\xca>\x02\x10\x01\"\xd5\x08\n\x1aItemSelectionInputInstance\x12I\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32-.ItemSelectionInputInstance.CustomizationArgs\x12>\n\ranswer_groups\x18\x02 \x03(\x0b\x32\'.ItemSelectionInputInstance.AnswerGroup\x1a\x82\x01\n\x11\x43ustomizationArgs\x12%\n\x1dmin_allowable_selection_count\x18\x01 \x01(\x05\x12%\n\x1dmax_allowable_selection_count\x18\x02 \x01(\x05\x12\x1f\n\x07\x63hoices\x18\x03 \x03(\x0b\x32\x0e.SubtitledHtml\x1at\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x38\n\nrule_specs\x18\x02 \x03(\x0b\x32$.ItemSelectionInputInstance.RuleSpec\x1a\xb0\x05\n\x08RuleSpec\x12\x41\n\x06\x65quals\x18\x01 \x01(\x0b\x32/.ItemSelectionInputInstance.RuleSpec.EqualsSpecH\x00\x12\x61\n\x18\x63ontains_at_least_one_of\x18\x02 \x01(\x0b\x32=.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpecH\x00\x12o\n does_not_contain_at_least_one_of\x18\x03 \x01(\x0b\x32\x43.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpecH\x00\x12X\n\x13is_proper_subset_of\x18\x04 \x01(\x0b\x32\x39.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpecH\x00\x1a=\n\nEqualsSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aK\n\x18\x43ontainsAtLeastOneOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aQ\n\x1e\x44oesNotContainAtLeastOneOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aG\n\x14IsProperSubsetOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsB\x0b\n\trule_type\"\xd1\x03\n\x1bMultipleChoiceInputInstance\x12J\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32..MultipleChoiceInputInstance.CustomizationArgs\x12?\n\ranswer_groups\x18\x02 \x03(\x0b\x32(.MultipleChoiceInputInstance.AnswerGroup\x1a\x34\n\x11\x43ustomizationArgs\x12\x1f\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x0e.SubtitledHtml\x1au\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x39\n\nrule_specs\x18\x02 \x03(\x0b\x32%.MultipleChoiceInputInstance.RuleSpec\x1ax\n\x08RuleSpec\x12\x42\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x30.MultipleChoiceInputInstance.RuleSpec.EqualsSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\rB\x0b\n\trule_type\"\xf1\t\n\x14NumericInputInstance\x12\x38\n\ranswer_groups\x18\x01 \x03(\x0b\x32!.NumericInputInstance.AnswerGroup\x12\x30\n\x08solution\x18\x02 \x01(\x0b\x32\x1e.NumericInputInstance.Solution\x1aH\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\x01\x1an\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x32\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1e.NumericInputInstance.RuleSpec\x1a\xb2\x07\n\x08RuleSpec\x12;\n\x06\x65quals\x18\x01 \x01(\x0b\x32).NumericInputInstance.RuleSpec.EqualsSpecH\x00\x12\x45\n\x0cis_less_than\x18\x02 \x01(\x0b\x32-.NumericInputInstance.RuleSpec.IsLessThanSpecH\x00\x12K\n\x0fis_greater_than\x18\x03 \x01(\x0b\x32\x30.NumericInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12Z\n\x18is_less_than_or_equal_to\x18\x04 \x01(\x0b\x32\x36.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpecH\x00\x12`\n\x1bis_greater_than_or_equal_to\x18\x05 \x01(\x0b\x32\x39.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpecH\x00\x12Y\n\x16is_inclusively_between\x18\x06 \x01(\x0b\x32\x37.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpecH\x00\x12S\n\x13is_within_tolerance\x18\x07 \x01(\x0b\x32\x34.NumericInputInstance.RuleSpec.IsWithinToleranceSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\x1f\n\x0eIsLessThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\"\n\x11IsGreaterThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a(\n\x17IsLessThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a+\n\x1aIsGreaterThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1aT\n\x18IsInclusivelyBetweenSpec\x12\x1b\n\x13inputLowerInclusive\x18\x01 \x01(\x01\x12\x1b\n\x13inputUpperInclusive\x18\x02 \x01(\x01\x1aK\n\x15IsWithinToleranceSpec\x12\x16\n\x0einputTolerance\x18\x01 \x01(\x01\x12\x1a\n\x12inputComparedValue\x18\x02 \x01(\x01\x42\x0b\n\trule_type\"\xe3\x07\n\x11TextInputInstance\x12@\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32$.TextInputInstance.CustomizationArgs\x12\x35\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x1e.TextInputInstance.AnswerGroup\x12-\n\x08solution\x18\x03 \x01(\x0b\x32\x1b.TextInputInstance.Solution\x1a\x46\n\x11\x43ustomizationArgs\x12#\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x1aH\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\t\x1ak\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12/\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1b.TextInputInstance.RuleSpec\x1a\xa6\x04\n\x08RuleSpec\x12\x38\n\x06\x65quals\x18\x01 \x01(\x0b\x32&.TextInputInstance.RuleSpec.EqualsSpecH\x00\x12\x41\n\x0bstarts_with\x18\x02 \x01(\x0b\x32*.TextInputInstance.RuleSpec.StartsWithSpecH\x00\x12<\n\x08\x63ontains\x18\x03 \x01(\x0b\x32(.TextInputInstance.RuleSpec.ContainsSpecH\x00\x12\x43\n\x0c\x66uzzy_equals\x18\x04 \x01(\x0b\x32+.TextInputInstance.RuleSpec.FuzzyEqualsSpecH\x00\x1a?\n\nEqualsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x43\n\x0eStartsWithSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x41\n\x0c\x43ontainsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x44\n\x0f\x46uzzyEqualsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedStringB\x0b\n\trule_type\"\xd4\x0b\n\x1c\x44ragAndDropSortInputInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.DragAndDropSortInputInstance.CustomizationArgs\x12@\n\ranswer_groups\x18\x02 \x03(\x0b\x32).DragAndDropSortInputInstance.AnswerGroup\x12\x38\n\x08solution\x18\x03 \x01(\x0b\x32&.DragAndDropSortInputInstance.Solution\x1a^\n\x11\x43ustomizationArgs\x12\x1f\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x0e.SubtitledHtml\x12(\n allowMultipleItemsInSamePosition\x18\x02 \x01(\x08\x1aq\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12?\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1av\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12:\n\nrule_specs\x18\x02 \x03(\x0b\x32&.DragAndDropSortInputInstance.RuleSpec\x1a\x9a\x07\n\x08RuleSpec\x12\\\n\x14is_equal_to_ordering\x18\x01 \x01(\x0b\x32<.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpecH\x00\x12\x9e\x01\n8is_equal_to_ordering_with_one_item_at_incorrect_position\x18\x02 \x01(\x0b\x32Z.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecH\x00\x12h\n\x1bhas_element_x_at_position_y\x18\x03 \x01(\x0b\x32\x41.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpecH\x00\x12n\n\x1ehas_element_x_before_element_y\x18\x04 \x01(\x0b\x32\x44.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpecH\x00\x1aO\n\x15IsEqualToOrderingSpec\x12\x36\n\x05input\x18\x01 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1am\n3IsEqualToOrderingWithOneItemAtIncorrectPositionSpec\x12\x36\n\x05input\x18\x01 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1a[\n\x1aHasElementXAtPositionYSpec\x12+\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1a.TranslatableHtmlContentId\x12\x10\n\x08position\x18\x02 \x01(\r\x1a\x8a\x01\n\x1dHasElementXBeforeElementYSpec\x12\x36\n\x12\x63onsidered_element\x18\x01 \x01(\x0b\x32\x1a.TranslatableHtmlContentId\x12\x31\n\rlater_element\x18\x02 \x01(\x0b\x32\x1a.TranslatableHtmlContentIdB\x0b\n\trule_type:\x03\xc0>\x01\"\xeb\x03\n\x17ImageClickInputInstance\x12\x46\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32*.ImageClickInputInstance.CustomizationArgs\x12;\n\ranswer_groups\x18\x02 \x03(\x0b\x32$.ImageClickInputInstance.AnswerGroup\x1aG\n\x11\x43ustomizationArgs\x12,\n\x11image_and_regions\x18\x01 \x01(\x0b\x32\x11.ImageWithRegionsJ\x04\x08\x02\x10\x03\x1aq\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x35\n\nrule_specs\x18\x02 \x03(\x0b\x32!.ImageClickInputInstance.RuleSpec\x1a\x89\x01\n\x08RuleSpec\x12H\n\x0cis_in_region\x18\x01 \x01(\x0b\x32\x30.ImageClickInputInstance.RuleSpec.IsInRegionSpecH\x00\x1a&\n\x0eIsInRegionSpec\x12\x14\n\x0cinput_region\x18\x01 \x01(\tB\x0b\n\trule_type:\x03\xc0>\x01\"\xc8\x07\n\x1cRatioExpressionInputInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.RatioExpressionInputInstance.CustomizationArgs\x12@\n\ranswer_groups\x18\x02 \x03(\x0b\x32).RatioExpressionInputInstance.AnswerGroup\x12\x38\n\x08solution\x18\x03 \x01(\x0b\x32&.RatioExpressionInputInstance.Solution\x1aQ\n\x11\x43ustomizationArgs\x12#\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x17\n\x0fnumber_of_terms\x18\x02 \x01(\x05\x1aZ\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12(\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\x10.RatioExpression\x1av\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12:\n\nrule_specs\x18\x02 \x03(\x0b\x32&.RatioExpressionInputInstance.RuleSpec\x1a\xb7\x03\n\x08RuleSpec\x12\x43\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x31.RatioExpressionInputInstance.RuleSpec.EqualsSpecH\x00\x12P\n\ris_equivalent\x18\x02 \x01(\x0b\x32\x37.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpecH\x00\x12j\n\x1chas_number_of_terms_equal_to\x18\x03 \x01(\x0b\x32\x42.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpecH\x00\x1a-\n\nEqualsSpec\x12\x1f\n\x05input\x18\x01 \x01(\x0b\x32\x10.RatioExpression\x1a\x33\n\x10IsEquivalentSpec\x12\x1f\n\x05input\x18\x01 \x01(\x0b\x32\x10.RatioExpression\x1a\x37\n\x1bHasNumberOfTermsEqualToSpec\x12\x18\n\x10input_term_count\x18\x01 \x01(\rB\x0b\n\trule_type\"\x18\n\x16\x45ndExplorationInstance\",\n\x04Hint\x12$\n\x0chint_content\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\"9\n\x0c\x42\x61seSolution\x12#\n\x0b\x65xplanation\x18\x02 \x01(\x0b\x32\x0e.SubtitledHtmlJ\x04\x08\x01\x10\x02\"\xaf\x03\n\x08Solution\x12\x45\n\x1a\x66raction_instance_solution\x18\x01 \x01(\x0b\x32\x1f.FractionInputInstance.SolutionH\x00\x12I\n\x1fnumeric_input_instance_solution\x18\x02 \x01(\x0b\x32\x1e.NumericInputInstance.SolutionH\x00\x12\x43\n\x1ctext_input_instance_solution\x18\x03 \x01(\x0b\x32\x1b.TextInputInstance.SolutionH\x00\x12\\\n*drag_and_drop_sort_input_instance_solution\x18\x04 \x01(\x0b\x32&.DragAndDropSortInputInstance.SolutionH\x00\x12Z\n(ratio_expression_input_instance_solution\x18\x05 \x01(\x0b\x32&.RatioExpressionInputInstance.SolutionH\x00\x42\x12\n\x10interaction_type\"2\n\x0f\x42\x61seAnswerGroup\x12\x19\n\x07outcome\x18\x01 \x01(\x0b\x32\x08.OutcomeJ\x04\x08\x02\x10\x03\"\xf4\x05\n\x0b\x41nswerGroup\x12R\n$fraction_input_instance_answer_group\x18\x01 \x01(\x0b\x32\".FractionInputInstance.AnswerGroupH\x00\x12]\n*item_selection_input_instance_answer_group\x18\x02 \x01(\x0b\x32\'.ItemSelectionInputInstance.AnswerGroupH\x00\x12_\n+multiple_choice_input_instance_answer_group\x18\x03 \x01(\x0b\x32(.MultipleChoiceInputInstance.AnswerGroupH\x00\x12P\n#numeric_input_instance_answer_group\x18\x04 \x01(\x0b\x32!.NumericInputInstance.AnswerGroupH\x00\x12J\n text_input_instance_answer_group\x18\x05 \x01(\x0b\x32\x1e.TextInputInstance.AnswerGroupH\x00\x12\x63\n.drag_and_drop_sort_input_instance_answer_group\x18\x06 \x01(\x0b\x32).DragAndDropSortInputInstance.AnswerGroupH\x00\x12W\n\'image_click_input_instance_answer_group\x18\x07 \x01(\x0b\x32$.ImageClickInputInstance.AnswerGroupH\x00\x12\x61\n,ratio_expression_input_instance_answer_group\x18\x08 \x01(\x0b\x32).RatioExpressionInputInstance.AnswerGroupH\x00\x42\x12\n\x10interaction_type\"\xc1\x05\n\x08RuleSpec\x12L\n!fraction_input_instance_rule_spec\x18\x01 \x01(\x0b\x32\x1f.FractionInputInstance.RuleSpecH\x00\x12W\n\'item_selection_input_instance_rule_spec\x18\x02 \x01(\x0b\x32$.ItemSelectionInputInstance.RuleSpecH\x00\x12Y\n(multiple_choice_input_instance_rule_spec\x18\x03 \x01(\x0b\x32%.MultipleChoiceInputInstance.RuleSpecH\x00\x12J\n numeric_input_instance_rule_spec\x18\x04 \x01(\x0b\x32\x1e.NumericInputInstance.RuleSpecH\x00\x12\x44\n\x1dtext_input_instance_rule_spec\x18\x05 \x01(\x0b\x32\x1b.TextInputInstance.RuleSpecH\x00\x12]\n+drag_and_drop_sort_input_instance_rule_spec\x18\x06 \x01(\x0b\x32&.DragAndDropSortInputInstance.RuleSpecH\x00\x12Q\n$image_click_input_instance_rule_spec\x18\x07 \x01(\x0b\x32!.ImageClickInputInstance.RuleSpecH\x00\x12[\n)ratio_expression_input_instance_rule_spec\x18\x08 \x01(\x0b\x32&.RatioExpressionInputInstance.RuleSpecH\x00\x42\x12\n\x10interaction_type\"]\n\x08\x46raction\x12\x13\n\x0bis_negative\x18\x01 \x01(\x08\x12\x14\n\x0cwhole_number\x18\x02 \x01(\r\x12\x11\n\tnumerator\x18\x03 \x01(\r\x12\x13\n\x0b\x64\x65nominator\x18\x04 \x01(\x05\"/\n\x19TranslatableHtmlContentId\x12\x12\n\ncontent_id\x18\x01 \x01(\t\"R\n\x1fSetOfTranslatableHtmlContentIds\x12/\n\x0b\x63ontent_ids\x18\x01 \x03(\x0b\x32\x1a.TranslatableHtmlContentId\"d\n&ListOfSetsOfTranslatableHtmlContentIds\x12:\n\x10\x63ontent_id_lists\x18\x01 \x03(\x0b\x32 .SetOfTranslatableHtmlContentIds\"\x1f\n\x07Point2d\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"I\n\x0c\x43lickOnImage\x12 \n\x0e\x63lick_position\x18\x01 \x01(\x0b\x32\x08.Point2d\x12\x17\n\x0f\x63licked_regions\x18\x02 \x03(\t\"%\n\x0fRatioExpression\x12\x12\n\ncomponents\x18\x01 \x03(\r\"S\n!TranslatableSetOfNormalizedString\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x1a\n\x12normalized_strings\x18\x02 \x03(\t\"\xc5\x02\n\x10ImageWithRegions\x12\x17\n\x0fimage_file_path\x18\x01 \x01(\t\x12\x38\n\x0flabeled_regions\x18\x02 \x03(\x0b\x32\x1f.ImageWithRegions.LabeledRegion\x1a\xdd\x01\n\rLabeledRegion\x12\r\n\x05label\x18\x03 \x01(\t\x12X\n\x17normalized_rectangle_2d\x18\x01 \x01(\x0b\x32\x35.ImageWithRegions.LabeledRegion.NormalizedRectangle2dH\x00\x1aT\n\x15NormalizedRectangle2d\x12\x1c\n\nupper_left\x18\x01 \x01(\x0b\x32\x08.Point2d\x12\x1d\n\x0blower_right\x18\x02 \x01(\x0b\x32\x08.Point2dB\r\n\x0bregion_type\"\x8e\x03\n\nUserAnswer\x12\x1d\n\x08\x66raction\x18\x01 \x01(\x0b\x32\t.FractionH\x00\x12P\n$set_of_translatable_html_content_ids\x18\x02 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsH\x00\x12\x1a\n\x10non_negative_int\x18\x03 \x01(\rH\x00\x12\x0e\n\x04real\x18\x04 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x05 \x01(\tH\x00\x12`\n-list_of_sets_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\'\n\x0e\x63lick_on_image\x18\x07 \x01(\x0b\x32\r.ClickOnImageH\x00\x12,\n\x10ratio_expression\x18\x08 \x01(\x0b\x32\x10.RatioExpressionH\x00\x42\r\n\x0b\x61nswer_type\"\x8f\x04\n\rRuleInputType\x12\r\n\x03int\x18\x01 \x01(\x05H\x00\x12\x1a\n\x10non_negative_int\x18\x02 \x01(\rH\x00\x12\x0e\n\x04real\x18\x03 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x04 \x01(\tH\x00\x12\x1d\n\x08\x66raction\x18\x05 \x01(\x0b\x32\t.FractionH\x00\x12P\n$set_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsH\x00\x12S\n%translatable_set_of_normalized_string\x18\x07 \x01(\x0b\x32\".TranslatableSetOfNormalizedStringH\x00\x12`\n-list_of_sets_of_translatable_html_content_ids\x18\x08 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\x42\n\x1ctranslatable_html_content_id\x18\t \x01(\x0b\x32\x1a.TranslatableHtmlContentIdH\x00\x12,\n\x10ratio_expression\x18\n \x01(\x0b\x32\x10.RatioExpressionH\x00\x42\x0c\n\ninput_type*6\n\x0cLanguageCode\x12\x19\n\x15UNKNOWN_LANGUAGE_CODE\x10\x00\x12\x0b\n\x07\x45NGLISH\x10\x01:=\n\x13supports_split_view\x12\x1f.google.protobuf.MessageOptions\x18\xe8\x07 \x01(\x08:w\n#default_fraction_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xe9\x07 \x01(\x0b\x32(.FractionInputInstance.CustomizationArgs:\x82\x01\n)default_item_selection_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xea\x07 \x01(\x0b\x32-.ItemSelectionInputInstance.CustomizationArgs:u\n%default_text_input_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xeb\x07 \x01(\x0b\x32$.TextInputInstance.CustomizationArgs:\x88\x01\n-default_drag_and_drop_sort_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xec\x07 \x01(\x0b\x32/.DragAndDropSortInputInstance.CustomizationArgs:\x86\x01\n+default_ratio_expression_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xed\x07 \x01(\x0b\x32/.RatioExpressionInputInstance.CustomizationArgsb\x06proto3'
+  serialized_pb=b'\n\x11\x65xploration.proto\x1a google/protobuf/descriptor.proto\"\xe9\x01\n\x0b\x45xploration\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\x05\x12\x17\n\x0finit_state_name\x18\x08 \x01(\t\x12(\n\x06states\x18\x0b \x03(\x0b\x32\x18.Exploration.StatesEntry\x12\r\n\x05title\x18\x0c \x01(\t\x1a\x35\n\x0bStatesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x15\n\x05value\x18\x02 \x01(\x0b\x32\x06.State:\x02\x38\x01J\x04\x08\x03\x10\x04J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07J\x04\x08\x07\x10\x08J\x04\x08\t\x10\nJ\x04\x08\n\x10\x0bJ\x04\x08\r\x10\x0eJ\x04\x08\x0e\x10\x0f\"\xcb\x01\n\x05State\x12\x1f\n\x07\x63ontent\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12)\n\x0binteraction\x18\x03 \x01(\x0b\x32\x14.InteractionInstance\x12\x30\n\x13recorded_voiceovers\x18\x05 \x01(\x0b\x32\x13.RecordedVoiceovers\x12\x32\n\x14written_translations\x18\x06 \x01(\x0b\x32\x14.WrittenTranslationsJ\x04\x08\x02\x10\x03J\x04\x08\x04\x10\x05J\x04\x08\x07\x10\x08\"1\n\rSubtitledHtml\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x0c\n\x04html\x18\x02 \x01(\t\"R\n\x12RecordedVoiceovers\x12<\n\x1avoiceover_language_mapping\x18\x01 \x03(\x0b\x32\x18.VoiceoverContentMapping\"\xbf\x01\n\x17VoiceoverContentMapping\x12X\n\x19voiceover_content_mapping\x18\x01 \x03(\x0b\x32\x35.VoiceoverContentMapping.VoiceoverContentMappingEntry\x1aJ\n\x1cVoiceoverContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x19\n\x05value\x18\x02 \x01(\x0b\x32\n.Voiceover:\x02\x38\x01\"S\n\tVoiceover\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x17\n\x0f\x66ile_size_bytes\x18\x02 \x01(\x05\x12\x15\n\rduration_secs\x18\x04 \x01(\x02J\x04\x08\x03\x10\x04\"^\n\x13WrittenTranslations\x12G\n\x1ctranslation_language_mapping\x18\x01 \x03(\x0b\x32!.WrittenTranslationContentMapping\"\xe0\x01\n WrittenTranslationContentMapping\x12\x65\n\x1btranslation_content_mapping\x18\x02 \x03(\x0b\x32@.WrittenTranslationContentMapping.TranslationContentMappingEntry\x1aU\n\x1eTranslationContentMappingEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\"\n\x05value\x18\x02 \x01(\x0b\x32\x13.WrittenTranslation:\x02\x38\x01\"D\n\x12WrittenTranslation\x12\x13\n\x0b\x64\x61ta_format\x18\x01 \x01(\t\x12\x13\n\x0btranslation\x18\x02 \x01(\tJ\x04\x08\x03\x10\x04\"\x81\x05\n\x13InteractionInstance\x12&\n\tcontinue_\x18\x01 \x01(\x0b\x32\x11.ContinueInstanceH\x00\x12\x30\n\x0e\x66raction_input\x18\x02 \x01(\x0b\x32\x16.FractionInputInstanceH\x00\x12;\n\x14item_selection_input\x18\x03 \x01(\x0b\x32\x1b.ItemSelectionInputInstanceH\x00\x12=\n\x15multiple_choice_input\x18\x04 \x01(\x0b\x32\x1c.MultipleChoiceInputInstanceH\x00\x12.\n\rnumeric_input\x18\x05 \x01(\x0b\x32\x15.NumericInputInstanceH\x00\x12(\n\ntext_input\x18\x06 \x01(\x0b\x32\x12.TextInputInstanceH\x00\x12\x41\n\x18\x64rag_and_drop_sort_input\x18\x07 \x01(\x0b\x32\x1d.DragAndDropSortInputInstanceH\x00\x12\x35\n\x11image_click_input\x18\x08 \x01(\x0b\x32\x18.ImageClickInputInstanceH\x00\x12?\n\x16ratio_expression_input\x18\t \x01(\x0b\x32\x1d.RatioExpressionInputInstanceH\x00\x12\x32\n\x0f\x65nd_exploration\x18\n \x01(\x0b\x32\x17.EndExplorationInstanceH\x00\x12!\n\x0f\x64\x65\x66\x61ult_outcome\x18\x0b \x01(\x0b\x32\x08.Outcome\x12\x14\n\x05hints\x18\x0c \x03(\x0b\x32\x05.HintB\x12\n\x10interaction_type\"u\n\x07Outcome\x12\x19\n\x11\x64\x65stination_state\x18\x01 \x01(\t\x12 \n\x08\x66\x65\x65\x64\x62\x61\x63k\x18\x02 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x1b\n\x13labelled_as_correct\x18\x03 \x01(\x08J\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06J\x04\x08\x06\x10\x07\"\x8d\x01\n\x10\x43ontinueInstance\x12?\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32#.ContinueInstance.CustomizationArgs\x1a\x38\n\x11\x43ustomizationArgs\x12#\n\x0b\x62utton_text\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\"\xd1\x0f\n\x15\x46ractionInputInstance\x12\x44\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32(.FractionInputInstance.CustomizationArgs\x12\x39\n\ranswer_groups\x18\x02 \x03(\x0b\x32\".FractionInputInstance.AnswerGroup\x12\x31\n\x08solution\x18\x03 \x01(\x0b\x32\x1f.FractionInputInstance.Solution\x1a\xa5\x01\n\x11\x43ustomizationArgs\x12\x1e\n\x16requires_simplest_form\x18\x01 \x01(\x08\x12 \n\x18\x61llow_improper_fractions\x18\x02 \x01(\x08\x12\"\n\x1a\x61llow_nonzero_integer_part\x18\x03 \x01(\x08\x12*\n\x12\x63ustom_placeholder\x18\x04 \x01(\x0b\x32\x0e.SubtitledHtml\x1aS\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12!\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\t.Fraction\x1ao\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x33\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1f.FractionInputInstance.RuleSpec\x1a\x8e\x0b\n\x08RuleSpec\x12S\n\x13is_exactly_equal_to\x18\x01 \x01(\x0b\x32\x34.FractionInputInstance.RuleSpec.IsExactlyEqualToSpecH\x00\x12N\n\x10is_equivalent_to\x18\x02 \x01(\x0b\x32\x32.FractionInputInstance.RuleSpec.IsEquivalentToSpecH\x00\x12t\n%is_equivalent_to_and_in_simplest_form\x18\x03 \x01(\x0b\x32\x43.FractionInputInstance.RuleSpec.IsEquivalentToAndInSimplestFormSpecH\x00\x12\x46\n\x0cis_less_than\x18\x04 \x01(\x0b\x32..FractionInputInstance.RuleSpec.IsLessThanSpecH\x00\x12L\n\x0fis_greater_than\x18\x05 \x01(\x0b\x32\x31.FractionInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12Y\n\x16has_numerator_equal_to\x18\x06 \x01(\x0b\x32\x37.FractionInputInstance.RuleSpec.HasNumeratorEqualToSpecH\x00\x12]\n\x18has_denominator_equal_to\x18\x07 \x01(\x0b\x32\x39.FractionInputInstance.RuleSpec.HasDenominatorEqualToSpecH\x00\x12^\n\x19has_integer_part_equal_to\x18\x08 \x01(\x0b\x32\x39.FractionInputInstance.RuleSpec.HasIntegerPartEqualToSpecH\x00\x12Y\n\x16has_no_fractional_part\x18\t \x01(\x0b\x32\x37.FractionInputInstance.RuleSpec.HasNoFractionalPartSpecH\x00\x12s\n$has_fractional_part_exactly_equal_to\x18\n \x01(\x0b\x32\x43.FractionInputInstance.RuleSpec.HasFractionalPartExactlyEqualToSpecH\x00\x1a\x30\n\x14IsExactlyEqualToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a.\n\x12IsEquivalentToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a?\n#IsEquivalentToAndInSimplestFormSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a*\n\x0eIsLessThanSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a-\n\x11IsGreaterThanSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.Fraction\x1a(\n\x17HasNumeratorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a*\n\x19HasDenominatorEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\r\x1a*\n\x19HasIntegerPartEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x05\x1a\x19\n\x17HasNoFractionalPartSpec\x1a?\n#HasFractionalPartExactlyEqualToSpec\x12\x18\n\x05input\x18\x01 \x01(\x0b\x32\t.FractionB\x0b\n\trule_type:\x05\xca>\x02\x10\x01\"\xd5\x08\n\x1aItemSelectionInputInstance\x12I\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32-.ItemSelectionInputInstance.CustomizationArgs\x12>\n\ranswer_groups\x18\x02 \x03(\x0b\x32\'.ItemSelectionInputInstance.AnswerGroup\x1a\x82\x01\n\x11\x43ustomizationArgs\x12%\n\x1dmin_allowable_selection_count\x18\x01 \x01(\x05\x12%\n\x1dmax_allowable_selection_count\x18\x02 \x01(\x05\x12\x1f\n\x07\x63hoices\x18\x03 \x03(\x0b\x32\x0e.SubtitledHtml\x1at\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x38\n\nrule_specs\x18\x02 \x03(\x0b\x32$.ItemSelectionInputInstance.RuleSpec\x1a\xb0\x05\n\x08RuleSpec\x12\x41\n\x06\x65quals\x18\x01 \x01(\x0b\x32/.ItemSelectionInputInstance.RuleSpec.EqualsSpecH\x00\x12\x61\n\x18\x63ontains_at_least_one_of\x18\x02 \x01(\x0b\x32=.ItemSelectionInputInstance.RuleSpec.ContainsAtLeastOneOfSpecH\x00\x12o\n does_not_contain_at_least_one_of\x18\x03 \x01(\x0b\x32\x43.ItemSelectionInputInstance.RuleSpec.DoesNotContainAtLeastOneOfSpecH\x00\x12X\n\x13is_proper_subset_of\x18\x04 \x01(\x0b\x32\x39.ItemSelectionInputInstance.RuleSpec.IsProperSubsetOfSpecH\x00\x1a=\n\nEqualsSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aK\n\x18\x43ontainsAtLeastOneOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aQ\n\x1e\x44oesNotContainAtLeastOneOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIds\x1aG\n\x14IsProperSubsetOfSpec\x12/\n\x05input\x18\x01 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsB\x0b\n\trule_type\"\xd1\x03\n\x1bMultipleChoiceInputInstance\x12J\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32..MultipleChoiceInputInstance.CustomizationArgs\x12?\n\ranswer_groups\x18\x02 \x03(\x0b\x32(.MultipleChoiceInputInstance.AnswerGroup\x1a\x34\n\x11\x43ustomizationArgs\x12\x1f\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x0e.SubtitledHtml\x1au\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x39\n\nrule_specs\x18\x02 \x03(\x0b\x32%.MultipleChoiceInputInstance.RuleSpec\x1ax\n\x08RuleSpec\x12\x42\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x30.MultipleChoiceInputInstance.RuleSpec.EqualsSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\rB\x0b\n\trule_type\"\xf1\t\n\x14NumericInputInstance\x12\x38\n\ranswer_groups\x18\x01 \x03(\x0b\x32!.NumericInputInstance.AnswerGroup\x12\x30\n\x08solution\x18\x02 \x01(\x0b\x32\x1e.NumericInputInstance.Solution\x1aH\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\x01\x1an\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x32\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1e.NumericInputInstance.RuleSpec\x1a\xb2\x07\n\x08RuleSpec\x12;\n\x06\x65quals\x18\x01 \x01(\x0b\x32).NumericInputInstance.RuleSpec.EqualsSpecH\x00\x12\x45\n\x0cis_less_than\x18\x02 \x01(\x0b\x32-.NumericInputInstance.RuleSpec.IsLessThanSpecH\x00\x12K\n\x0fis_greater_than\x18\x03 \x01(\x0b\x32\x30.NumericInputInstance.RuleSpec.IsGreaterThanSpecH\x00\x12Z\n\x18is_less_than_or_equal_to\x18\x04 \x01(\x0b\x32\x36.NumericInputInstance.RuleSpec.IsLessThanOrEqualToSpecH\x00\x12`\n\x1bis_greater_than_or_equal_to\x18\x05 \x01(\x0b\x32\x39.NumericInputInstance.RuleSpec.IsGreaterThanOrEqualToSpecH\x00\x12Y\n\x16is_inclusively_between\x18\x06 \x01(\x0b\x32\x37.NumericInputInstance.RuleSpec.IsInclusivelyBetweenSpecH\x00\x12S\n\x13is_within_tolerance\x18\x07 \x01(\x0b\x32\x34.NumericInputInstance.RuleSpec.IsWithinToleranceSpecH\x00\x1a\x1b\n\nEqualsSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\x1f\n\x0eIsLessThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a\"\n\x11IsGreaterThanSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a(\n\x17IsLessThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1a+\n\x1aIsGreaterThanOrEqualToSpec\x12\r\n\x05input\x18\x01 \x01(\x01\x1aT\n\x18IsInclusivelyBetweenSpec\x12\x1b\n\x13inputLowerInclusive\x18\x01 \x01(\x01\x12\x1b\n\x13inputUpperInclusive\x18\x02 \x01(\x01\x1aK\n\x15IsWithinToleranceSpec\x12\x16\n\x0einputTolerance\x18\x01 \x01(\x01\x12\x1a\n\x12inputComparedValue\x18\x02 \x01(\x01\x42\x0b\n\trule_type\"\xe3\x07\n\x11TextInputInstance\x12@\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32$.TextInputInstance.CustomizationArgs\x12\x35\n\ranswer_groups\x18\x02 \x03(\x0b\x32\x1e.TextInputInstance.AnswerGroup\x12-\n\x08solution\x18\x03 \x01(\x0b\x32\x1b.TextInputInstance.Solution\x1a\x46\n\x11\x43ustomizationArgs\x12#\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x1aH\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12\x16\n\x0e\x63orrect_answer\x18\x02 \x01(\t\x1ak\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12/\n\nrule_specs\x18\x02 \x03(\x0b\x32\x1b.TextInputInstance.RuleSpec\x1a\xa6\x04\n\x08RuleSpec\x12\x38\n\x06\x65quals\x18\x01 \x01(\x0b\x32&.TextInputInstance.RuleSpec.EqualsSpecH\x00\x12\x41\n\x0bstarts_with\x18\x02 \x01(\x0b\x32*.TextInputInstance.RuleSpec.StartsWithSpecH\x00\x12<\n\x08\x63ontains\x18\x03 \x01(\x0b\x32(.TextInputInstance.RuleSpec.ContainsSpecH\x00\x12\x43\n\x0c\x66uzzy_equals\x18\x04 \x01(\x0b\x32+.TextInputInstance.RuleSpec.FuzzyEqualsSpecH\x00\x1a?\n\nEqualsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x43\n\x0eStartsWithSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x41\n\x0c\x43ontainsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedString\x1a\x44\n\x0f\x46uzzyEqualsSpec\x12\x31\n\x05input\x18\x01 \x01(\x0b\x32\".TranslatableSetOfNormalizedStringB\x0b\n\trule_type\"\xd4\x0b\n\x1c\x44ragAndDropSortInputInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.DragAndDropSortInputInstance.CustomizationArgs\x12@\n\ranswer_groups\x18\x02 \x03(\x0b\x32).DragAndDropSortInputInstance.AnswerGroup\x12\x38\n\x08solution\x18\x03 \x01(\x0b\x32&.DragAndDropSortInputInstance.Solution\x1a^\n\x11\x43ustomizationArgs\x12\x1f\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x0e.SubtitledHtml\x12(\n allowMultipleItemsInSamePosition\x18\x02 \x01(\x08\x1aq\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12?\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1av\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12:\n\nrule_specs\x18\x02 \x03(\x0b\x32&.DragAndDropSortInputInstance.RuleSpec\x1a\x9a\x07\n\x08RuleSpec\x12\\\n\x14is_equal_to_ordering\x18\x01 \x01(\x0b\x32<.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingSpecH\x00\x12\x9e\x01\n8is_equal_to_ordering_with_one_item_at_incorrect_position\x18\x02 \x01(\x0b\x32Z.DragAndDropSortInputInstance.RuleSpec.IsEqualToOrderingWithOneItemAtIncorrectPositionSpecH\x00\x12h\n\x1bhas_element_x_at_position_y\x18\x03 \x01(\x0b\x32\x41.DragAndDropSortInputInstance.RuleSpec.HasElementXAtPositionYSpecH\x00\x12n\n\x1ehas_element_x_before_element_y\x18\x04 \x01(\x0b\x32\x44.DragAndDropSortInputInstance.RuleSpec.HasElementXBeforeElementYSpecH\x00\x1aO\n\x15IsEqualToOrderingSpec\x12\x36\n\x05input\x18\x01 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1am\n3IsEqualToOrderingWithOneItemAtIncorrectPositionSpec\x12\x36\n\x05input\x18\x01 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIds\x1a[\n\x1aHasElementXAtPositionYSpec\x12+\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1a.TranslatableHtmlContentId\x12\x10\n\x08position\x18\x02 \x01(\r\x1a\x8a\x01\n\x1dHasElementXBeforeElementYSpec\x12\x36\n\x12\x63onsidered_element\x18\x01 \x01(\x0b\x32\x1a.TranslatableHtmlContentId\x12\x31\n\rlater_element\x18\x02 \x01(\x0b\x32\x1a.TranslatableHtmlContentIdB\x0b\n\trule_type:\x03\xc0>\x01\"\xeb\x03\n\x17ImageClickInputInstance\x12\x46\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32*.ImageClickInputInstance.CustomizationArgs\x12;\n\ranswer_groups\x18\x02 \x03(\x0b\x32$.ImageClickInputInstance.AnswerGroup\x1aG\n\x11\x43ustomizationArgs\x12,\n\x11image_and_regions\x18\x01 \x01(\x0b\x32\x11.ImageWithRegionsJ\x04\x08\x02\x10\x03\x1aq\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12\x35\n\nrule_specs\x18\x02 \x03(\x0b\x32!.ImageClickInputInstance.RuleSpec\x1a\x89\x01\n\x08RuleSpec\x12H\n\x0cis_in_region\x18\x01 \x01(\x0b\x32\x30.ImageClickInputInstance.RuleSpec.IsInRegionSpecH\x00\x1a&\n\x0eIsInRegionSpec\x12\x14\n\x0cinput_region\x18\x01 \x01(\tB\x0b\n\trule_type:\x03\xc0>\x01\"\xc8\x07\n\x1cRatioExpressionInputInstance\x12K\n\x12\x63ustomization_args\x18\x01 \x01(\x0b\x32/.RatioExpressionInputInstance.CustomizationArgs\x12@\n\ranswer_groups\x18\x02 \x03(\x0b\x32).RatioExpressionInputInstance.AnswerGroup\x12\x38\n\x08solution\x18\x03 \x01(\x0b\x32&.RatioExpressionInputInstance.Solution\x1aQ\n\x11\x43ustomizationArgs\x12#\n\x0bplaceholder\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\x12\x17\n\x0fnumber_of_terms\x18\x02 \x01(\x05\x1aZ\n\x08Solution\x12$\n\rbase_solution\x18\x01 \x01(\x0b\x32\r.BaseSolution\x12(\n\x0e\x63orrect_answer\x18\x02 \x01(\x0b\x32\x10.RatioExpression\x1av\n\x0b\x41nswerGroup\x12+\n\x11\x62\x61se_answer_group\x18\x01 \x01(\x0b\x32\x10.BaseAnswerGroup\x12:\n\nrule_specs\x18\x02 \x03(\x0b\x32&.RatioExpressionInputInstance.RuleSpec\x1a\xb7\x03\n\x08RuleSpec\x12\x43\n\x06\x65quals\x18\x01 \x01(\x0b\x32\x31.RatioExpressionInputInstance.RuleSpec.EqualsSpecH\x00\x12P\n\ris_equivalent\x18\x02 \x01(\x0b\x32\x37.RatioExpressionInputInstance.RuleSpec.IsEquivalentSpecH\x00\x12j\n\x1chas_number_of_terms_equal_to\x18\x03 \x01(\x0b\x32\x42.RatioExpressionInputInstance.RuleSpec.HasNumberOfTermsEqualToSpecH\x00\x1a-\n\nEqualsSpec\x12\x1f\n\x05input\x18\x01 \x01(\x0b\x32\x10.RatioExpression\x1a\x33\n\x10IsEquivalentSpec\x12\x1f\n\x05input\x18\x01 \x01(\x0b\x32\x10.RatioExpression\x1a\x37\n\x1bHasNumberOfTermsEqualToSpec\x12\x18\n\x10input_term_count\x18\x01 \x01(\rB\x0b\n\trule_type\"\x18\n\x16\x45ndExplorationInstance\",\n\x04Hint\x12$\n\x0chint_content\x18\x01 \x01(\x0b\x32\x0e.SubtitledHtml\"9\n\x0c\x42\x61seSolution\x12#\n\x0b\x65xplanation\x18\x02 \x01(\x0b\x32\x0e.SubtitledHtmlJ\x04\x08\x01\x10\x02\"\xaf\x03\n\x08Solution\x12\x45\n\x1a\x66raction_instance_solution\x18\x01 \x01(\x0b\x32\x1f.FractionInputInstance.SolutionH\x00\x12I\n\x1fnumeric_input_instance_solution\x18\x02 \x01(\x0b\x32\x1e.NumericInputInstance.SolutionH\x00\x12\x43\n\x1ctext_input_instance_solution\x18\x03 \x01(\x0b\x32\x1b.TextInputInstance.SolutionH\x00\x12\\\n*drag_and_drop_sort_input_instance_solution\x18\x04 \x01(\x0b\x32&.DragAndDropSortInputInstance.SolutionH\x00\x12Z\n(ratio_expression_input_instance_solution\x18\x05 \x01(\x0b\x32&.RatioExpressionInputInstance.SolutionH\x00\x42\x12\n\x10interaction_type\"2\n\x0f\x42\x61seAnswerGroup\x12\x19\n\x07outcome\x18\x01 \x01(\x0b\x32\x08.OutcomeJ\x04\x08\x02\x10\x03\"\xf4\x05\n\x0b\x41nswerGroup\x12R\n$fraction_input_instance_answer_group\x18\x01 \x01(\x0b\x32\".FractionInputInstance.AnswerGroupH\x00\x12]\n*item_selection_input_instance_answer_group\x18\x02 \x01(\x0b\x32\'.ItemSelectionInputInstance.AnswerGroupH\x00\x12_\n+multiple_choice_input_instance_answer_group\x18\x03 \x01(\x0b\x32(.MultipleChoiceInputInstance.AnswerGroupH\x00\x12P\n#numeric_input_instance_answer_group\x18\x04 \x01(\x0b\x32!.NumericInputInstance.AnswerGroupH\x00\x12J\n text_input_instance_answer_group\x18\x05 \x01(\x0b\x32\x1e.TextInputInstance.AnswerGroupH\x00\x12\x63\n.drag_and_drop_sort_input_instance_answer_group\x18\x06 \x01(\x0b\x32).DragAndDropSortInputInstance.AnswerGroupH\x00\x12W\n\'image_click_input_instance_answer_group\x18\x07 \x01(\x0b\x32$.ImageClickInputInstance.AnswerGroupH\x00\x12\x61\n,ratio_expression_input_instance_answer_group\x18\x08 \x01(\x0b\x32).RatioExpressionInputInstance.AnswerGroupH\x00\x42\x12\n\x10interaction_type\"\xc1\x05\n\x08RuleSpec\x12L\n!fraction_input_instance_rule_spec\x18\x01 \x01(\x0b\x32\x1f.FractionInputInstance.RuleSpecH\x00\x12W\n\'item_selection_input_instance_rule_spec\x18\x02 \x01(\x0b\x32$.ItemSelectionInputInstance.RuleSpecH\x00\x12Y\n(multiple_choice_input_instance_rule_spec\x18\x03 \x01(\x0b\x32%.MultipleChoiceInputInstance.RuleSpecH\x00\x12J\n numeric_input_instance_rule_spec\x18\x04 \x01(\x0b\x32\x1e.NumericInputInstance.RuleSpecH\x00\x12\x44\n\x1dtext_input_instance_rule_spec\x18\x05 \x01(\x0b\x32\x1b.TextInputInstance.RuleSpecH\x00\x12]\n+drag_and_drop_sort_input_instance_rule_spec\x18\x06 \x01(\x0b\x32&.DragAndDropSortInputInstance.RuleSpecH\x00\x12Q\n$image_click_input_instance_rule_spec\x18\x07 \x01(\x0b\x32!.ImageClickInputInstance.RuleSpecH\x00\x12[\n)ratio_expression_input_instance_rule_spec\x18\x08 \x01(\x0b\x32&.RatioExpressionInputInstance.RuleSpecH\x00\x42\x12\n\x10interaction_type\"]\n\x08\x46raction\x12\x13\n\x0bis_negative\x18\x01 \x01(\x08\x12\x14\n\x0cwhole_number\x18\x02 \x01(\r\x12\x11\n\tnumerator\x18\x03 \x01(\r\x12\x13\n\x0b\x64\x65nominator\x18\x04 \x01(\x05\"/\n\x19TranslatableHtmlContentId\x12\x12\n\ncontent_id\x18\x01 \x01(\t\"R\n\x1fSetOfTranslatableHtmlContentIds\x12/\n\x0b\x63ontent_ids\x18\x01 \x03(\x0b\x32\x1a.TranslatableHtmlContentId\"d\n&ListOfSetsOfTranslatableHtmlContentIds\x12:\n\x10\x63ontent_id_lists\x18\x01 \x03(\x0b\x32 .SetOfTranslatableHtmlContentIds\"\x1f\n\x07Point2d\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\"I\n\x0c\x43lickOnImage\x12 \n\x0e\x63lick_position\x18\x01 \x01(\x0b\x32\x08.Point2d\x12\x17\n\x0f\x63licked_regions\x18\x02 \x03(\t\"%\n\x0fRatioExpression\x12\x12\n\ncomponents\x18\x01 \x03(\r\"S\n!TranslatableSetOfNormalizedString\x12\x12\n\ncontent_id\x18\x01 \x01(\t\x12\x1a\n\x12normalized_strings\x18\x02 \x03(\t\"\xc5\x02\n\x10ImageWithRegions\x12\x17\n\x0fimage_file_path\x18\x01 \x01(\t\x12\x38\n\x0flabeled_regions\x18\x02 \x03(\x0b\x32\x1f.ImageWithRegions.LabeledRegion\x1a\xdd\x01\n\rLabeledRegion\x12\r\n\x05label\x18\x03 \x01(\t\x12X\n\x17normalized_rectangle_2d\x18\x01 \x01(\x0b\x32\x35.ImageWithRegions.LabeledRegion.NormalizedRectangle2dH\x00\x1aT\n\x15NormalizedRectangle2d\x12\x1c\n\nupper_left\x18\x01 \x01(\x0b\x32\x08.Point2d\x12\x1d\n\x0blower_right\x18\x02 \x01(\x0b\x32\x08.Point2dB\r\n\x0bregion_type\"\x8e\x03\n\nUserAnswer\x12\x1d\n\x08\x66raction\x18\x01 \x01(\x0b\x32\t.FractionH\x00\x12P\n$set_of_translatable_html_content_ids\x18\x02 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsH\x00\x12\x1a\n\x10non_negative_int\x18\x03 \x01(\rH\x00\x12\x0e\n\x04real\x18\x04 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x05 \x01(\tH\x00\x12`\n-list_of_sets_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\'\n\x0e\x63lick_on_image\x18\x07 \x01(\x0b\x32\r.ClickOnImageH\x00\x12,\n\x10ratio_expression\x18\x08 \x01(\x0b\x32\x10.RatioExpressionH\x00\x42\r\n\x0b\x61nswer_type\"\x8f\x04\n\rRuleInputType\x12\r\n\x03int\x18\x01 \x01(\x05H\x00\x12\x1a\n\x10non_negative_int\x18\x02 \x01(\rH\x00\x12\x0e\n\x04real\x18\x03 \x01(\x01H\x00\x12\x1b\n\x11normalized_string\x18\x04 \x01(\tH\x00\x12\x1d\n\x08\x66raction\x18\x05 \x01(\x0b\x32\t.FractionH\x00\x12P\n$set_of_translatable_html_content_ids\x18\x06 \x01(\x0b\x32 .SetOfTranslatableHtmlContentIdsH\x00\x12S\n%translatable_set_of_normalized_string\x18\x07 \x01(\x0b\x32\".TranslatableSetOfNormalizedStringH\x00\x12`\n-list_of_sets_of_translatable_html_content_ids\x18\x08 \x01(\x0b\x32\'.ListOfSetsOfTranslatableHtmlContentIdsH\x00\x12\x42\n\x1ctranslatable_html_content_id\x18\t \x01(\x0b\x32\x1a.TranslatableHtmlContentIdH\x00\x12,\n\x10ratio_expression\x18\n \x01(\x0b\x32\x10.RatioExpressionH\x00\x42\x0c\n\ninput_type*6\n\x0cLanguageCode\x12\x19\n\x15UNKNOWN_LANGUAGE_CODE\x10\x00\x12\x0b\n\x07\x45NGLISH\x10\x01:=\n\x13supports_split_view\x12\x1f.google.protobuf.MessageOptions\x18\xe8\x07 \x01(\x08:w\n#default_fraction_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xe9\x07 \x01(\x0b\x32(.FractionInputInstance.CustomizationArgs:\x82\x01\n)default_item_selection_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xea\x07 \x01(\x0b\x32-.ItemSelectionInputInstance.CustomizationArgs:u\n%default_text_input_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xeb\x07 \x01(\x0b\x32$.TextInputInstance.CustomizationArgs:\x88\x01\n-default_drag_and_drop_sort_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xec\x07 \x01(\x0b\x32/.DragAndDropSortInputInstance.CustomizationArgs:\x86\x01\n+default_ratio_expression_customization_args\x12\x1f.google.protobuf.MessageOptions\x18\xed\x07 \x01(\x0b\x32/.RatioExpressionInputInstance.CustomizationArgsb\x06proto3'
   ,
   dependencies=[google_dot_protobuf_dot_descriptor__pb2.DESCRIPTOR,])
 
@@ -45,8 +45,8 @@ _LANGUAGECODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=14963,
-  serialized_end=15017,
+  serialized_start=14926,
+  serialized_end=14980,
 )
 _sym_db.RegisterEnumDescriptor(_LANGUAGECODE)
 
@@ -508,8 +508,8 @@ _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY = _descriptor.D
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1185,
-  serialized_end=1270,
+  serialized_start=1147,
+  serialized_end=1232,
 )
 
 _WRITTENTRANSLATIONCONTENTMAPPING = _descriptor.Descriptor(
@@ -521,14 +521,7 @@ _WRITTENTRANSLATIONCONTENTMAPPING = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='language_code', full_name='WrittenTranslationContentMapping.language_code', index=0,
-      number=1, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='translation_content_mapping', full_name='WrittenTranslationContentMapping.translation_content_mapping', index=1,
+      name='translation_content_mapping', full_name='WrittenTranslationContentMapping.translation_content_mapping', index=0,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -547,7 +540,7 @@ _WRITTENTRANSLATIONCONTENTMAPPING = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1008,
-  serialized_end=1270,
+  serialized_end=1232,
 )
 
 
@@ -585,8 +578,8 @@ _WRITTENTRANSLATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1272,
-  serialized_end=1340,
+  serialized_start=1234,
+  serialized_end=1302,
 )
 
 
@@ -599,7 +592,7 @@ _INTERACTIONINSTANCE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='continue', full_name='InteractionInstance.continue', index=0,
+      name='continue_', full_name='InteractionInstance.continue_', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -699,8 +692,8 @@ _INTERACTIONINSTANCE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1343,
-  serialized_end=1983,
+  serialized_start=1305,
+  serialized_end=1946,
 )
 
 
@@ -745,8 +738,8 @@ _OUTCOME = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1985,
-  serialized_end=2102,
+  serialized_start=1948,
+  serialized_end=2065,
 )
 
 
@@ -777,8 +770,8 @@ _CONTINUEINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2190,
-  serialized_end=2246,
+  serialized_start=2153,
+  serialized_end=2209,
 )
 
 _CONTINUEINSTANCE = _descriptor.Descriptor(
@@ -808,8 +801,8 @@ _CONTINUEINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2105,
-  serialized_end=2246,
+  serialized_start=2068,
+  serialized_end=2209,
 )
 
 
@@ -861,8 +854,8 @@ _FRACTIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2455,
-  serialized_end=2620,
+  serialized_start=2418,
+  serialized_end=2583,
 )
 
 _FRACTIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
@@ -899,8 +892,8 @@ _FRACTIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2622,
-  serialized_end=2705,
+  serialized_start=2585,
+  serialized_end=2668,
 )
 
 _FRACTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -937,8 +930,8 @@ _FRACTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2707,
-  serialized_end=2818,
+  serialized_start=2670,
+  serialized_end=2781,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISEXACTLYEQUALTOSPEC = _descriptor.Descriptor(
@@ -968,8 +961,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISEXACTLYEQUALTOSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3756,
-  serialized_end=3804,
+  serialized_start=3719,
+  serialized_end=3767,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOSPEC = _descriptor.Descriptor(
@@ -999,8 +992,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3806,
-  serialized_end=3852,
+  serialized_start=3769,
+  serialized_end=3815,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOANDINSIMPLESTFORMSPEC = _descriptor.Descriptor(
@@ -1030,8 +1023,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTTOANDINSIMPLESTFORMSPEC = _descripto
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3854,
-  serialized_end=3917,
+  serialized_start=3817,
+  serialized_end=3880,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
@@ -1061,8 +1054,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3919,
-  serialized_end=3961,
+  serialized_start=3882,
+  serialized_end=3924,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
@@ -1092,8 +1085,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3963,
-  serialized_end=4008,
+  serialized_start=3926,
+  serialized_end=3971,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASNUMERATOREQUALTOSPEC = _descriptor.Descriptor(
@@ -1123,8 +1116,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASNUMERATOREQUALTOSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4010,
-  serialized_end=4050,
+  serialized_start=3973,
+  serialized_end=4013,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASDENOMINATOREQUALTOSPEC = _descriptor.Descriptor(
@@ -1154,8 +1147,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASDENOMINATOREQUALTOSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4052,
-  serialized_end=4094,
+  serialized_start=4015,
+  serialized_end=4057,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASINTEGERPARTEQUALTOSPEC = _descriptor.Descriptor(
@@ -1185,8 +1178,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASINTEGERPARTEQUALTOSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4096,
-  serialized_end=4138,
+  serialized_start=4059,
+  serialized_end=4101,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASNOFRACTIONALPARTSPEC = _descriptor.Descriptor(
@@ -1209,8 +1202,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASNOFRACTIONALPARTSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4140,
-  serialized_end=4165,
+  serialized_start=4103,
+  serialized_end=4128,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC_HASFRACTIONALPARTEXACTLYEQUALTOSPEC = _descriptor.Descriptor(
@@ -1240,8 +1233,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC_HASFRACTIONALPARTEXACTLYEQUALTOSPEC = _descripto
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4167,
-  serialized_end=4230,
+  serialized_start=4130,
+  serialized_end=4193,
 )
 
 _FRACTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -1339,8 +1332,8 @@ _FRACTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=2821,
-  serialized_end=4243,
+  serialized_start=2784,
+  serialized_end=4206,
 )
 
 _FRACTIONINPUTINSTANCE = _descriptor.Descriptor(
@@ -1384,8 +1377,8 @@ _FRACTIONINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2249,
-  serialized_end=4250,
+  serialized_start=2212,
+  serialized_end=4213,
 )
 
 
@@ -1430,8 +1423,8 @@ _ITEMSELECTIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4423,
-  serialized_end=4553,
+  serialized_start=4386,
+  serialized_end=4516,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -1468,8 +1461,8 @@ _ITEMSELECTIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4555,
-  serialized_end=4671,
+  serialized_start=4518,
+  serialized_end=4634,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
@@ -1499,8 +1492,8 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5055,
-  serialized_end=5116,
+  serialized_start=5018,
+  serialized_end=5079,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_CONTAINSATLEASTONEOFSPEC = _descriptor.Descriptor(
@@ -1530,8 +1523,8 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_CONTAINSATLEASTONEOFSPEC = _descriptor.Desc
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5118,
-  serialized_end=5193,
+  serialized_start=5081,
+  serialized_end=5156,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_DOESNOTCONTAINATLEASTONEOFSPEC = _descriptor.Descriptor(
@@ -1561,8 +1554,8 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_DOESNOTCONTAINATLEASTONEOFSPEC = _descripto
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5195,
-  serialized_end=5276,
+  serialized_start=5158,
+  serialized_end=5239,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC_ISPROPERSUBSETOFSPEC = _descriptor.Descriptor(
@@ -1592,8 +1585,8 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC_ISPROPERSUBSETOFSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5278,
-  serialized_end=5349,
+  serialized_start=5241,
+  serialized_end=5312,
 )
 
 _ITEMSELECTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -1649,8 +1642,8 @@ _ITEMSELECTIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=4674,
-  serialized_end=5362,
+  serialized_start=4637,
+  serialized_end=5325,
 )
 
 _ITEMSELECTIONINPUTINSTANCE = _descriptor.Descriptor(
@@ -1687,8 +1680,8 @@ _ITEMSELECTIONINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4253,
-  serialized_end=5362,
+  serialized_start=4216,
+  serialized_end=5325,
 )
 
 
@@ -1719,8 +1712,8 @@ _MULTIPLECHOICEINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5537,
-  serialized_end=5589,
+  serialized_start=5500,
+  serialized_end=5552,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -1757,8 +1750,8 @@ _MULTIPLECHOICEINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5591,
-  serialized_end=5708,
+  serialized_start=5554,
+  serialized_end=5671,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
@@ -1788,8 +1781,8 @@ _MULTIPLECHOICEINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5790,
-  serialized_end=5817,
+  serialized_start=5753,
+  serialized_end=5780,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -1824,8 +1817,8 @@ _MULTIPLECHOICEINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=5710,
-  serialized_end=5830,
+  serialized_start=5673,
+  serialized_end=5793,
 )
 
 _MULTIPLECHOICEINPUTINSTANCE = _descriptor.Descriptor(
@@ -1862,8 +1855,8 @@ _MULTIPLECHOICEINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5365,
-  serialized_end=5830,
+  serialized_start=5328,
+  serialized_end=5793,
 )
 
 
@@ -1901,8 +1894,8 @@ _NUMERICINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5965,
-  serialized_end=6037,
+  serialized_start=5928,
+  serialized_end=6000,
 )
 
 _NUMERICINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -1939,8 +1932,8 @@ _NUMERICINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6039,
-  serialized_end=6149,
+  serialized_start=6002,
+  serialized_end=6112,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
@@ -1970,8 +1963,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6739,
-  serialized_end=6766,
+  serialized_start=6702,
+  serialized_end=6729,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
@@ -2001,8 +1994,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6768,
-  serialized_end=6799,
+  serialized_start=6731,
+  serialized_end=6762,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
@@ -2032,8 +2025,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6801,
-  serialized_end=6835,
+  serialized_start=6764,
+  serialized_end=6798,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANOREQUALTOSPEC = _descriptor.Descriptor(
@@ -2063,8 +2056,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISLESSTHANOREQUALTOSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6837,
-  serialized_end=6877,
+  serialized_start=6800,
+  serialized_end=6840,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANOREQUALTOSPEC = _descriptor.Descriptor(
@@ -2094,8 +2087,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISGREATERTHANOREQUALTOSPEC = _descriptor.Descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6879,
-  serialized_end=6922,
+  serialized_start=6842,
+  serialized_end=6885,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISINCLUSIVELYBETWEENSPEC = _descriptor.Descriptor(
@@ -2132,8 +2125,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISINCLUSIVELYBETWEENSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=6924,
-  serialized_end=7008,
+  serialized_start=6887,
+  serialized_end=6971,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC_ISWITHINTOLERANCESPEC = _descriptor.Descriptor(
@@ -2170,8 +2163,8 @@ _NUMERICINPUTINSTANCE_RULESPEC_ISWITHINTOLERANCESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7010,
-  serialized_end=7085,
+  serialized_start=6973,
+  serialized_end=7048,
 )
 
 _NUMERICINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -2248,8 +2241,8 @@ _NUMERICINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=6152,
-  serialized_end=7098,
+  serialized_start=6115,
+  serialized_end=7061,
 )
 
 _NUMERICINPUTINSTANCE = _descriptor.Descriptor(
@@ -2286,8 +2279,8 @@ _NUMERICINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=5833,
-  serialized_end=7098,
+  serialized_start=5796,
+  serialized_end=7061,
 )
 
 
@@ -2325,8 +2318,8 @@ _TEXTINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7290,
-  serialized_end=7360,
+  serialized_start=7253,
+  serialized_end=7323,
 )
 
 _TEXTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
@@ -2363,8 +2356,8 @@ _TEXTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7362,
-  serialized_end=7434,
+  serialized_start=7325,
+  serialized_end=7397,
 )
 
 _TEXTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -2401,8 +2394,8 @@ _TEXTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7436,
-  serialized_end=7543,
+  serialized_start=7399,
+  serialized_end=7506,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
@@ -2432,8 +2425,8 @@ _TEXTINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7814,
-  serialized_end=7877,
+  serialized_start=7777,
+  serialized_end=7840,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_STARTSWITHSPEC = _descriptor.Descriptor(
@@ -2463,8 +2456,8 @@ _TEXTINPUTINSTANCE_RULESPEC_STARTSWITHSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7879,
-  serialized_end=7946,
+  serialized_start=7842,
+  serialized_end=7909,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_CONTAINSSPEC = _descriptor.Descriptor(
@@ -2494,8 +2487,8 @@ _TEXTINPUTINSTANCE_RULESPEC_CONTAINSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7948,
-  serialized_end=8013,
+  serialized_start=7911,
+  serialized_end=7976,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC_FUZZYEQUALSSPEC = _descriptor.Descriptor(
@@ -2525,8 +2518,8 @@ _TEXTINPUTINSTANCE_RULESPEC_FUZZYEQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8015,
-  serialized_end=8083,
+  serialized_start=7978,
+  serialized_end=8046,
 )
 
 _TEXTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -2582,8 +2575,8 @@ _TEXTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=7546,
-  serialized_end=8096,
+  serialized_start=7509,
+  serialized_end=8059,
 )
 
 _TEXTINPUTINSTANCE = _descriptor.Descriptor(
@@ -2627,8 +2620,8 @@ _TEXTINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=7101,
-  serialized_end=8096,
+  serialized_start=7064,
+  serialized_end=8059,
 )
 
 
@@ -2666,8 +2659,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8332,
-  serialized_end=8426,
+  serialized_start=8295,
+  serialized_end=8389,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
@@ -2704,8 +2697,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8428,
-  serialized_end=8541,
+  serialized_start=8391,
+  serialized_end=8504,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -2742,8 +2735,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8543,
-  serialized_end=8661,
+  serialized_start=8506,
+  serialized_end=8624,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGSPEC = _descriptor.Descriptor(
@@ -2773,8 +2766,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGSPEC = _descriptor.Descr
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9149,
-  serialized_end=9228,
+  serialized_start=9112,
+  serialized_end=9191,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGWITHONEITEMATINCORRECTPOSITIONSPEC = _descriptor.Descriptor(
@@ -2804,8 +2797,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_ISEQUALTOORDERINGWITHONEITEMATINCORRECTPO
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9230,
-  serialized_end=9339,
+  serialized_start=9193,
+  serialized_end=9302,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXATPOSITIONYSPEC = _descriptor.Descriptor(
@@ -2842,8 +2835,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXATPOSITIONYSPEC = _descriptor.
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9341,
-  serialized_end=9432,
+  serialized_start=9304,
+  serialized_end=9395,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXBEFOREELEMENTYSPEC = _descriptor.Descriptor(
@@ -2880,8 +2873,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC_HASELEMENTXBEFOREELEMENTYSPEC = _descript
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9435,
-  serialized_end=9573,
+  serialized_start=9398,
+  serialized_end=9536,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -2937,8 +2930,8 @@ _DRAGANDDROPSORTINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=8664,
-  serialized_end=9586,
+  serialized_start=8627,
+  serialized_end=9549,
 )
 
 _DRAGANDDROPSORTINPUTINSTANCE = _descriptor.Descriptor(
@@ -2982,8 +2975,8 @@ _DRAGANDDROPSORTINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=8099,
-  serialized_end=9591,
+  serialized_start=8062,
+  serialized_end=9554,
 )
 
 
@@ -3014,8 +3007,8 @@ _IMAGECLICKINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9754,
-  serialized_end=9825,
+  serialized_start=9717,
+  serialized_end=9788,
 )
 
 _IMAGECLICKINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -3052,8 +3045,8 @@ _IMAGECLICKINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9827,
-  serialized_end=9940,
+  serialized_start=9790,
+  serialized_end=9903,
 )
 
 _IMAGECLICKINPUTINSTANCE_RULESPEC_ISINREGIONSPEC = _descriptor.Descriptor(
@@ -3083,8 +3076,8 @@ _IMAGECLICKINPUTINSTANCE_RULESPEC_ISINREGIONSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10029,
-  serialized_end=10067,
+  serialized_start=9992,
+  serialized_end=10030,
 )
 
 _IMAGECLICKINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -3119,8 +3112,8 @@ _IMAGECLICKINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=9943,
-  serialized_end=10080,
+  serialized_start=9906,
+  serialized_end=10043,
 )
 
 _IMAGECLICKINPUTINSTANCE = _descriptor.Descriptor(
@@ -3157,8 +3150,8 @@ _IMAGECLICKINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=9594,
-  serialized_end=10085,
+  serialized_start=9557,
+  serialized_end=10048,
 )
 
 
@@ -3196,8 +3189,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_CUSTOMIZATIONARGS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10321,
-  serialized_end=10402,
+  serialized_start=10284,
+  serialized_end=10365,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
@@ -3234,8 +3227,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_SOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10404,
-  serialized_end=10494,
+  serialized_start=10367,
+  serialized_end=10457,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
@@ -3272,8 +3265,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_ANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10496,
-  serialized_end=10614,
+  serialized_start=10459,
+  serialized_end=10577,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
@@ -3303,8 +3296,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_EQUALSSPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10888,
-  serialized_end=10933,
+  serialized_start=10851,
+  serialized_end=10896,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTSPEC = _descriptor.Descriptor(
@@ -3334,8 +3327,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_ISEQUIVALENTSPEC = _descriptor.Descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10935,
-  serialized_end=10986,
+  serialized_start=10898,
+  serialized_end=10949,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_HASNUMBEROFTERMSEQUALTOSPEC = _descriptor.Descriptor(
@@ -3365,8 +3358,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC_HASNUMBEROFTERMSEQUALTOSPEC = _descriptor
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10988,
-  serialized_end=11043,
+  serialized_start=10951,
+  serialized_end=11006,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
@@ -3415,8 +3408,8 @@ _RATIOEXPRESSIONINPUTINSTANCE_RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=10617,
-  serialized_end=11056,
+  serialized_start=10580,
+  serialized_end=11019,
 )
 
 _RATIOEXPRESSIONINPUTINSTANCE = _descriptor.Descriptor(
@@ -3460,8 +3453,8 @@ _RATIOEXPRESSIONINPUTINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=10088,
-  serialized_end=11056,
+  serialized_start=10051,
+  serialized_end=11019,
 )
 
 
@@ -3485,8 +3478,8 @@ _ENDEXPLORATIONINSTANCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11058,
-  serialized_end=11082,
+  serialized_start=11021,
+  serialized_end=11045,
 )
 
 
@@ -3517,8 +3510,8 @@ _HINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11084,
-  serialized_end=11128,
+  serialized_start=11047,
+  serialized_end=11091,
 )
 
 
@@ -3549,8 +3542,8 @@ _BASESOLUTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11130,
-  serialized_end=11187,
+  serialized_start=11093,
+  serialized_end=11150,
 )
 
 
@@ -3614,8 +3607,8 @@ _SOLUTION = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=11190,
-  serialized_end=11621,
+  serialized_start=11153,
+  serialized_end=11584,
 )
 
 
@@ -3646,8 +3639,8 @@ _BASEANSWERGROUP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=11623,
-  serialized_end=11673,
+  serialized_start=11586,
+  serialized_end=11636,
 )
 
 
@@ -3732,8 +3725,8 @@ _ANSWERGROUP = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=11676,
-  serialized_end=12432,
+  serialized_start=11639,
+  serialized_end=12395,
 )
 
 
@@ -3818,8 +3811,8 @@ _RULESPEC = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=12435,
-  serialized_end=13140,
+  serialized_start=12398,
+  serialized_end=13103,
 )
 
 
@@ -3871,8 +3864,8 @@ _FRACTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13142,
-  serialized_end=13235,
+  serialized_start=13105,
+  serialized_end=13198,
 )
 
 
@@ -3903,8 +3896,8 @@ _TRANSLATABLEHTMLCONTENTID = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13237,
-  serialized_end=13284,
+  serialized_start=13200,
+  serialized_end=13247,
 )
 
 
@@ -3935,8 +3928,8 @@ _SETOFTRANSLATABLEHTMLCONTENTIDS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13286,
-  serialized_end=13368,
+  serialized_start=13249,
+  serialized_end=13331,
 )
 
 
@@ -3967,8 +3960,8 @@ _LISTOFSETSOFTRANSLATABLEHTMLCONTENTIDS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13370,
-  serialized_end=13470,
+  serialized_start=13333,
+  serialized_end=13433,
 )
 
 
@@ -4006,8 +3999,8 @@ _POINT2D = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13472,
-  serialized_end=13503,
+  serialized_start=13435,
+  serialized_end=13466,
 )
 
 
@@ -4045,8 +4038,8 @@ _CLICKONIMAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13505,
-  serialized_end=13578,
+  serialized_start=13468,
+  serialized_end=13541,
 )
 
 
@@ -4077,8 +4070,8 @@ _RATIOEXPRESSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13580,
-  serialized_end=13617,
+  serialized_start=13543,
+  serialized_end=13580,
 )
 
 
@@ -4116,8 +4109,8 @@ _TRANSLATABLESETOFNORMALIZEDSTRING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13619,
-  serialized_end=13702,
+  serialized_start=13582,
+  serialized_end=13665,
 )
 
 
@@ -4155,8 +4148,8 @@ _IMAGEWITHREGIONS_LABELEDREGION_NORMALIZEDRECTANGLE2D = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13931,
-  serialized_end=14015,
+  serialized_start=13894,
+  serialized_end=13978,
 )
 
 _IMAGEWITHREGIONS_LABELEDREGION = _descriptor.Descriptor(
@@ -4198,8 +4191,8 @@ _IMAGEWITHREGIONS_LABELEDREGION = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=13809,
-  serialized_end=14030,
+  serialized_start=13772,
+  serialized_end=13993,
 )
 
 _IMAGEWITHREGIONS = _descriptor.Descriptor(
@@ -4236,8 +4229,8 @@ _IMAGEWITHREGIONS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=13705,
-  serialized_end=14030,
+  serialized_start=13668,
+  serialized_end=13993,
 )
 
 
@@ -4322,8 +4315,8 @@ _USERANSWER = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=14033,
-  serialized_end=14431,
+  serialized_start=13996,
+  serialized_end=14394,
 )
 
 
@@ -4422,8 +4415,8 @@ _RULEINPUTTYPE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=14434,
-  serialized_end=14961,
+  serialized_start=14397,
+  serialized_end=14924,
 )
 
 _EXPLORATION_STATESENTRY.fields_by_name['value'].message_type = _STATE
@@ -4440,9 +4433,8 @@ _VOICEOVERCONTENTMAPPING.fields_by_name['voiceover_content_mapping'].message_typ
 _WRITTENTRANSLATIONS.fields_by_name['translation_language_mapping'].message_type = _WRITTENTRANSLATIONCONTENTMAPPING
 _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY.fields_by_name['value'].message_type = _WRITTENTRANSLATION
 _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY.containing_type = _WRITTENTRANSLATIONCONTENTMAPPING
-_WRITTENTRANSLATIONCONTENTMAPPING.fields_by_name['language_code'].enum_type = _LANGUAGECODE
 _WRITTENTRANSLATIONCONTENTMAPPING.fields_by_name['translation_content_mapping'].message_type = _WRITTENTRANSLATIONCONTENTMAPPING_TRANSLATIONCONTENTMAPPINGENTRY
-_INTERACTIONINSTANCE.fields_by_name['continue'].message_type = _CONTINUEINSTANCE
+_INTERACTIONINSTANCE.fields_by_name['continue_'].message_type = _CONTINUEINSTANCE
 _INTERACTIONINSTANCE.fields_by_name['fraction_input'].message_type = _FRACTIONINPUTINSTANCE
 _INTERACTIONINSTANCE.fields_by_name['item_selection_input'].message_type = _ITEMSELECTIONINPUTINSTANCE
 _INTERACTIONINSTANCE.fields_by_name['multiple_choice_input'].message_type = _MULTIPLECHOICEINPUTINSTANCE
@@ -4455,8 +4447,8 @@ _INTERACTIONINSTANCE.fields_by_name['end_exploration'].message_type = _ENDEXPLOR
 _INTERACTIONINSTANCE.fields_by_name['default_outcome'].message_type = _OUTCOME
 _INTERACTIONINSTANCE.fields_by_name['hints'].message_type = _HINT
 _INTERACTIONINSTANCE.oneofs_by_name['interaction_type'].fields.append(
-  _INTERACTIONINSTANCE.fields_by_name['continue'])
-_INTERACTIONINSTANCE.fields_by_name['continue'].containing_oneof = _INTERACTIONINSTANCE.oneofs_by_name['interaction_type']
+  _INTERACTIONINSTANCE.fields_by_name['continue_'])
+_INTERACTIONINSTANCE.fields_by_name['continue_'].containing_oneof = _INTERACTIONINSTANCE.oneofs_by_name['interaction_type']
 _INTERACTIONINSTANCE.oneofs_by_name['interaction_type'].fields.append(
   _INTERACTIONINSTANCE.fields_by_name['fraction_input'])
 _INTERACTIONINSTANCE.fields_by_name['fraction_input'].containing_oneof = _INTERACTIONINSTANCE.oneofs_by_name['interaction_type']

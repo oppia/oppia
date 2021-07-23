@@ -77,7 +77,7 @@ message WrittenTranslation {
 
 message InteractionInstance {
   oneof interaction_type {
-    ContinueInstance continue = 1;
+    ContinueInstance continue_ = 1;
     FractionInputInstance fraction_input = 2;
     ItemSelectionInputInstance item_selection_input = 3;
     MultipleChoiceInputInstance multiple_choice_input = 4;

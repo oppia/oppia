@@ -564,6 +564,7 @@ def apply_change_list(exploration_id, change_list):
         written_translation_mapping_list=[]
         recorded_voiceover_proto=exploration_pb2.RecordedVoiceovers()
         written_translations_proto=exploration_pb2.WrittenTranslations()
+        customization_args=exploration_pb2.ContinueInstance.CustomizationArgs()
 
         for (state_name, state) in exploration.states.items():
             for (content_id, language_code_to_voiceover) in (state.recorded_voiceovers.voiceovers_mapping.items()):
@@ -591,13 +592,40 @@ def apply_change_list(exploration_id, change_list):
                 )
                 written_translation_mapping_list.append(translation_mapping)
             written_translations_proto.translation_language_mapping.extend(written_translation_mapping_list)
+
+            if state.interaction.id == 'Continue':
+                customization_args_proto=exploration_pb2.ContinueInstance.CustomizationArgs(
+                    button_text=exploration_pb2.SubtitledHtml(
+                        content_id = state.interaction.customization_args['buttonText'].value.content_id,
+                        html = state.interaction.customization_args['buttonText'].value.unicode_str
+                    )
+                )
+                customization_args=customization_args_proto
+            elif state.interaction.id == 'NumericInput':
+                customization_args_proto=exploration_pb2.NumericInputInstance.CustomizationArgs()
+                customization_args=customization_args_proto
+
+            interaction_proto=exploration_pb2.InteractionInstance(
+                continue_=exploration_pb2.ContinueInstance(
+                    customization_args=customization_args
+                ),
+                default_outcome=exploration_pb2.Outcome(
+                    destination_state=state.interaction.default_outcome.dest,
+                    feedback=exploration_pb2.SubtitledHtml(
+                        content_id=state.interaction.default_outcome.feedback.content_id,
+                        html=state.interaction.default_outcome.feedback.html,
+                    ),
+                    labelled_as_correct=state.interaction.default_outcome.labelled_as_correct
+                )
+            )
             state_proto=exploration_pb2.State(
                 content=exploration_pb2.SubtitledHtml(
                     content_id=exploration.states[state_name].content.content_id,
                     html=exploration.states[state_name].content.html
                 ),
                 recorded_voiceovers=recorded_voiceover_proto,
-                written_translations=written_translations_proto
+                written_translations=written_translations_proto,
+                interaction=interaction_proto
             )
             state_protos[state_name] = state_proto
 
