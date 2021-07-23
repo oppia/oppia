@@ -40,6 +40,9 @@ export class AdminRolesTabComponent implements OnInit {
   userRoles = [];
   possibleRolesToAdd = [];
   managedTopicIds = [];
+  // The roleCurrentlyBeingUpdatedInBackend holds the role which is either being
+  // removed or added to user roles. This value is used to present a progress
+  // spinner around the role which is currently being updated in the backend.
   roleCurrentlyBeingUpdatedInBackend = null;
   errorMessage = null;
   bannedStatusChangeInProgress = false;
@@ -76,8 +79,6 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   removeRole(roleToRemove: string): void {
-    // Updating roleCurrentlyBeingUpdatedInBackend as the given roleToRemove
-    // is being removed from the user roles.
     this.roleCurrentlyBeingUpdatedInBackend = roleToRemove;
 
     var roleIndex = this.userRoles.indexOf(roleToRemove);

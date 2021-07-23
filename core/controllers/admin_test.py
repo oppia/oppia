@@ -1158,22 +1158,89 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_removing_moderator_role_from_user_roles(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
+            csrf_token=csrf_token)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                'banned': False,
+                'managed_topic_ids': []
+            })
+
+        self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'role': feconf.ROLE_ID_MODERATOR, 'username': username},
+            expected_status_int=200)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': []
+            })
+        self.logout()
+
+    def test_general_role_handler_does_not_support_assigning_topic_manager(
+            self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            feconf.ADMIN_ROLE_HANDLER_URL, {
+                'role': feconf.ROLE_ID_TOPIC_MANAGER,
+                'username': username
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Unsupported role for this handler.')
+
+
+class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
+    """Tests for TopicManagerRoleHandler."""
+
+    def setUp(self):
+        super(TopicManagerRoleHandlerTest, self).setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
     def test_adding_topic_manager_role_to_user(self):
         user_email = 'user1@example.com'
         username = 'user1'
 
         self.signup(user_email, username)
-        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
-            topic_id, user_id, name='Name',
+            topic_id, self.admin_id, name='Name',
             abbreviated_name='abbrev', url_fragment='url-fragment',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
 
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -1210,9 +1277,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_adding_new_topic_manager_to_a_topic(self):
-        user_email = 'usernew@example.com'
-        username = 'usernew'
-
+        user_email = 'user1@example.com'
+        username = 'user1'
         self.signup(user_email, username)
 
         topic_id = topic_fetchers.get_new_topic_id()
@@ -1223,7 +1289,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
 
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
@@ -1274,47 +1340,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             response_dict['managed_topic_ids'], [new_topic_id, topic_id])
 
-        self.logout()
-
-    def test_removing_moderator_role_from_user_roles(self):
-        user_email = 'user1@example.com'
-        username = 'user1'
-
-        self.signup(user_email, username)
-        self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        response_dict = self.put_json(
-            feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
-            csrf_token=csrf_token)
-
-        response_dict = self.get_json(
-            feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'filter_criterion': 'username', 'username': username})
-
-        self.assertEqual(
-            response_dict, {
-                'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
-                'banned': False,
-                'managed_topic_ids': []
-            })
-
-        self.delete_json(
-            feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'role': feconf.ROLE_ID_MODERATOR, 'username': username},
-            expected_status_int=200)
-
-        response_dict = self.get_json(
-            feconf.ADMIN_ROLE_HANDLER_URL,
-            params={'filter_criterion': 'username', 'username': username})
-        self.assertEqual(
-            response_dict, {
-                'roles': [feconf.ROLE_ID_FULL_USER],
-                'banned': False,
-                'managed_topic_ids': []
-            })
         self.logout()
 
 
