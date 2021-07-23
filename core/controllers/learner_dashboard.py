@@ -205,7 +205,8 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
             'schema': {
                 'type': 'basestring',
                 'validators': [{
-                    'id': 'is_valid_thread_id'
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'\w[.]\w+[.]\w+'
                 }]
             }
         }

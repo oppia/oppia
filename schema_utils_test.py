@@ -783,15 +783,16 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(obj, normalized_obj)
 
-    def test_is_valid_thread_id(self):
+    def test_is_regex_matched(self):
         # type: () -> None
-        is_valid_thread_id = schema_utils.get_validator('is_valid_thread_id')
+        is_regex_matched = schema_utils.get_validator('is_regex_matched')
 
-        self.assertTrue(is_valid_thread_id(
-            'exploration.EXP_ID_1.WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd'))
+        self.assertTrue(is_regex_matched(
+            'exploration.EXP_ID_1.WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
+            r'\w[.]\w+[.]\w+'))
 
-        self.assertFalse(is_valid_thread_id(
-            'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd'))
+        self.assertFalse(is_regex_matched(
+            'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd', r'\w[.]\w+[.]\w+'))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

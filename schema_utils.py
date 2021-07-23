@@ -629,25 +629,19 @@ class _Validators(python_utils.OBJECT):
         return utils.is_valid_language_code(obj)
 
     @staticmethod
-    def is_valid_thread_id(obj):
-        # type: (Text) -> bool
-        """Checks if the given obj (a string) represents a valid thread id.
-        The id has the form [entity_type].[entity_id].[generated_string]
+    def is_regex_matched(obj, regex_pattern):
+        # type: (Text, Text) -> bool
+        """Checks if a given string is matched with the provided regular
+        experssion.
 
         Args:
-            obj: str. The thread id to verify.
+            obj: str. The string to verify.
+            regex_pattern: str. Provided regular expression.
 
         Returns:
-            bool. Whether the given object is a valid thread id.
+            bool. Whether the given object matched with the regex pattern.
         """
-        thread_id_must_starts_with = [
-            'exploration', 'collection', 'story', 'learntopic']
-        regex_pattern = r'[.]\w+[.]\w+'
-
-        for starting_chars in thread_id_must_starts_with:
-            regex_pattern_to_check = starting_chars + regex_pattern
-            regex_match = re.findall(regex_pattern_to_check, obj)
-
-            if regex_match:
-                return True
+        regex_match = re.findall(regex_pattern, obj)
+        if regex_match:
+            return True
         return False
