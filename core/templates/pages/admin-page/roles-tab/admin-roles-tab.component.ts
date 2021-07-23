@@ -118,8 +118,7 @@ export class AdminRolesTabComponent implements OnInit {
       this.openTopicManagerRoleEditor();
       return;
     }
-    // Updating roleCurrentlyBeingUpdatedInBackend as the given role is being
-    // added to the user roles.
+
     this.roleCurrentlyBeingUpdatedInBackend = role;
     this.userRoles.push(role);
     this.roleSelectorIsShown = false;
