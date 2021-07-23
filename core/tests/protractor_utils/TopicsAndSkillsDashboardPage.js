@@ -105,6 +105,13 @@ var TopicsAndSkillsDashboardPage = function() {
   var assignedTopicNamesInput = element.all(
     by.css('.protractor-test-unassign-topic'));
   var assignedTopicNameInputClass = by.css('.protractor-test-unassign-topic');
+  var topicNameFieldElement = element(
+    by.css('.protractor-test-topic-name-field'));
+  var searchFieldLocator = by.css('.select2-search__field');
+  var editor = element(by.css('.protractor-test-concept-card-text'));
+  var retLocator = by.css('.protractor-test-rte');
+  var skillDescriptionField = element(
+    by.css('.protractor-test-skill-description-field'));
 
   this.get = async function() {
     await browser.get('/');
@@ -219,8 +226,7 @@ var TopicsAndSkillsDashboardPage = function() {
     }
     await browser.switchTo().window(newHandle);
     await waitFor.visibilityOf(
-      element(by.css('.protractor-test-topic-name-field')),
-      'Topic Editor is taking too long to appear.');
+      topicNameFieldElement, 'Topic Editor is taking too long to appear.');
     if (shouldCloseTopicEditor) {
       await browser.driver.close();
       await browser.switchTo().window(parentHandle);
@@ -244,7 +250,7 @@ var TopicsAndSkillsDashboardPage = function() {
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.');
     var filterKeywordInput = topicFilterKeywordField.element(
-      by.css('.select2-search__field'));
+      searchFieldLocator);
 
     await action.sendKeys(
       'Topic Dashboard keyword filter', filterKeywordInput, keyword + '\n');
@@ -308,11 +314,9 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click(
       'Open Concept Card button', openConceptCardExplanationButton);
 
-    var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
-    var skillReviewMaterialInput = editor.element(
-      by.css('.protractor-test-rte'));
+    var skillReviewMaterialInput = editor.element(retLocator);
     await action.sendKeys(
       'Skill Review Material Field', skillReviewMaterialInput,
       reviewMaterial, true);
@@ -338,8 +342,7 @@ var TopicsAndSkillsDashboardPage = function() {
         'Create skill modal takes too long to be disappear.');
     } else {
       await waitFor.visibilityOf(
-        element(by.css('.protractor-test-skill-description-field')),
-        'Skill Editor is taking too long to appear.');
+        skillDescriptionField, 'Skill Editor is taking too long to appear.');
     }
     await waitFor.pageToFullyLoad();
   };

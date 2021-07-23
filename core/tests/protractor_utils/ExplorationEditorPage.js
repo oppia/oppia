@@ -76,6 +76,33 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-commit-message-input'));
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
     .first();
+  var expTitle = element(by.css(
+    '.protractor-test-exploration-title-input'));
+  var expObjective = element(by.css(
+    '.protractor-test-exploration-objective-input'));
+  var expTags = element(by.css('.protractor-test-tags'));
+  var expInput = expTags.element(by.tagName('input'));
+  var expCategory = element(
+    by.css('.protractor-test-exploration-category-dropdown'));
+  var expLanguage = element(
+    by.css('.protractor-test-exploration-language-select'));
+  var neutralElement = element(
+    by.css('.protractor-test-metadata-modal-header'));
+  var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
+  var explorationTitle = element(by.css(
+    '.protractor-test-exploration-title-input'));
+  var explorationObjective = element(by.css(
+    '.protractor-test-exploration-objective-input'));
+  var explorationTags = element.all(by.css('.select2-selection__choice'));
+  var modalContentElement = element(by.css('.modal-content'));
+  var sharePublishModalElement = element(
+    by.css('.protractor-test-share-publish-modal'));
+  var selectionRenderedElement = element(
+    by.css('.select2-selection__rendered'));
+  var promptModalElement = element(
+    by.css('.protractor-test-save-prompt-modal'));
+  var explorationSaveModalElement = element(
+    by.css('.protractor-test-exploration-save-modal'));
 
   /*
    * Non-Interactive elements
@@ -120,6 +147,9 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-publish-changes-message'));
   var publishExplorationButton = element(
     by.css('.protractor-test-publish-exploration'));
+  var saveChangesButton = element(by.css(
+    '.protractor-test-confirm-pre-publication'));
+  var closeButton = element(by.css('.protractor-test-share-publish-close'));
 
   /*
    * Workflows
@@ -130,19 +160,6 @@ var ExplorationEditorPage = function() {
       title, objective, category, language, tags) {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
-
-    var expTitle = element(by.css(
-      '.protractor-test-exploration-title-input'));
-    var expObjective = element(by.css(
-      '.protractor-test-exploration-objective-input'));
-    var expTags = element(by.css('.protractor-test-tags'));
-    var expInput = expTags.element(by.tagName('input'));
-    var expCategory = element(
-      by.css('.protractor-test-exploration-category-dropdown'));
-    var expLanguage = element(
-      by.css('.protractor-test-exploration-language-select'));
-    var neutralElement = element(
-      by.css('.protractor-test-metadata-modal-header'));
 
     await action.sendKeys('Exploration title', expTitle, title);
     await action.click('Neutral Element', neutralElement);
@@ -171,26 +188,20 @@ var ExplorationEditorPage = function() {
       await action.waitForAutosave();
     }
 
-    var saveChangesButton = element(by.css(
-      '.protractor-test-confirm-pre-publication'));
     await action.click('Save Changes', saveChangesButton);
     await waitFor.invisibilityOf(
       saveChangesButton,
       'Exploration metadata modal takes too long to disappear.');
     await waitFor.visibilityOf(
-      element(by.css('.modal-content')),
-      'Modal Content taking too long to appear');
+      modalContentElement, 'Modal Content taking too long to appear');
 
-    var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
     await action.click('Confirm Publish', confirmPublish);
     await waitFor.invisibilityOf(
       confirmPublish,
       'Confirm publish modal takes too long to disappear.');
-    await waitFor.visibilityOf(element(by.css(
-      '.protractor-test-share-publish-modal')),
-    'Awesome modal taking too long to appear');
+    await waitFor.visibilityOf(
+      sharePublishModalElement, 'Awesome modal taking too long to appear');
 
-    var closeButton = element(by.css('.protractor-test-share-publish-close'));
     await action.click('Share publish button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
@@ -198,19 +209,8 @@ var ExplorationEditorPage = function() {
 
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
-    var explorationTitle = element(by.css(
-      '.protractor-test-exploration-title-input'));
-    var explorationObjective = element(by.css(
-      '.protractor-test-exploration-objective-input'
-    ));
-    var explorationCategory = await element(by.css(
-      '.select2-selection__rendered')).getText();
-    var explorationLanguage = await element(by.css(
-      '.protractor-test-exploration-language-select'
-    )).$('option:checked').getText();
-    var explorationTags = element.all(by.css(
-      '.select2-selection__choice'
-    ));
+    var explorationCategory = await selectionRenderedElement.getText();
+    var explorationLanguage = await expLanguage.$('option:checked').getText();
     await waitFor.visibilityOf(
       explorationTitle, 'Exploration Goal taking too long to appear');
     expect(await explorationTitle.getAttribute('value')).toMatch(title);
@@ -306,10 +306,10 @@ var ExplorationEditorPage = function() {
     await action.click(
       'Recommendation prompt Save button', recommendationPromptSaveButton);
     await waitFor.invisibilityOf(
-      element(by.css('.protractor-test-save-prompt-modal')),
+      promptModalElement,
       'Save Recommendation Prompt modal does not disappear.');
     await waitFor.visibilityOf(
-      element(by.css('.protractor-test-exploration-save-modal')),
+      explorationSaveModalElement,
       'Exploration Save Modal taking too long to appear');
     if (commitMessage) {
       await action.sendKeys(
