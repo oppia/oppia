@@ -28,7 +28,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
-import { BlogDashboardTileComponent } from './blog-dashboard-card/blog-dashboard-tile.component';
+import { BlogDashboardTileComponent } from './blog-dashboard-tile/blog-dashboard-tile.component';
 import { BlogDashboardNavbar } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 

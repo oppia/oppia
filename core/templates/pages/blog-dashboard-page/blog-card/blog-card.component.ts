@@ -22,6 +22,7 @@ import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
 
 @Component({
   selector: 'oppia-blog-card',
@@ -29,7 +30,6 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 })
 export class BlogCardComponent implements OnInit {
   @Input() blogPostSummary: BlogPostSummary;
-  @Input() displayedOnBlogDasboard: boolean;
   @Input() authorProfilePicDataUrl: string;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
@@ -37,6 +37,7 @@ export class BlogCardComponent implements OnInit {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
+    private dateTimeFormatService: DateTimeFormatService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
@@ -51,6 +52,10 @@ export class BlogCardComponent implements OnInit {
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.authorProfilePictureUrl = decodeURIComponent((
       this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
+  }
+
+  getLocaleDateString(millisSinceEpoch: number): string {
+    return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
   }
 }
 
