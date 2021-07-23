@@ -62,10 +62,7 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  browser.manage().logs().get('browser').then( browserLog => {
-    browserLog.forEach(log => console.error(log.message));
-  })
-  .catch(() => console.log('Could not get browser log.'));
+  var browserLogs = await browser.manage().logs().get('browser');
   var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));

@@ -16,6 +16,8 @@
  * @fileoverview End-to-end tests of embedding explorations in other websites.
  */
 
+var _ = require('lodash');
+
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -103,6 +105,36 @@ describe('Embedding', function() {
     // Publish changes.
     await workflow.publishExploration();
   };
+
+  var EMBEDDING_ERRORS_TO_IGNORE = [
+    _.escapeRegExp(
+      'http://localhost:9001/assets/scripts/' +
+      'embedding_tests_dev_0.0.2.min.html- Refused to display ' +
+      'http://localhost:9001/embed/exploration/idToBeReplaced'),
+    _.escapeRegExp(
+      'http://localhost:9001/assets/scripts/' +
+      'embedding_tests_dev_0.0.2.min.html- Refused to display ' +
+      'http://localhost:9001/embed/exploration/idToBeReplaced?' +
+      'locale=en#version=0.0.2&secret='),
+    _.escapeRegExp(
+      'http://localhost:9001/assets/scripts/' +
+      'embedding_tests_dev_0.0.2.min.html- Refused to display ' +
+      'http://localhost:9001/embed/exploration/fake_id?locale=en#version=0.0.2&secret='),
+    _.escapeRegExp(
+      'http://localhost:9001/assets/scripts/' +
+      'embedding_tests_dev_0.0.1.min.html- Refused to display ' +
+      'http://localhost:9001/embed/exploration/idToBeReplaced'),
+    _.escapeRegExp(
+      'http://localhost:9001/assets/scripts/' +
+      'embedding_tests_dev_0.0.1.min.html- Refused to display ' +
+      'http://localhost:9001/embed/exploration/idToBeReplaced?' +
+      'iframed=true&locale=en#version=0.0.1&secret='),
+    _.escapeRegExp(
+      'http://localhost:9001/assets/scripts/' +
+      'embedding_tests_dev_0.0.1.min.html- Refused to display ' +
+      'http://localhost:9001/embed/exploration/fake_id?' +
+      'iframed=true&locale=en#version=0.0.1&secret='),
+  ]
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -239,7 +271,7 @@ describe('Embedding', function() {
     expect(embeddingLogs).toEqual(expectedLogs);
 
     await users.logout();
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
   });
 
   it('should use the exploration language as site language.',
@@ -331,13 +363,6 @@ describe('Embedding', function() {
       await checkPlaceholder('Ingresa un número');
 
       await users.logout();
-
-      // This error is to be ignored as 'idToBeReplaced' is not a valid
-      // exploration id. It appears just after the page loads.
-      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
-        'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-        'locale=en#version=0.0.1&secret=';
-      await general.checkForConsoleErrors([errorToIgnore]);
+      await general.checkForConsoleErrors([EMBEDDING_ERRORS_TO_IGNORE]);
     });
 });
