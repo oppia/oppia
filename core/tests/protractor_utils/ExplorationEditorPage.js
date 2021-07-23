@@ -39,9 +39,9 @@ var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 
 var ExplorationEditorPage = function() {
-   /*
-   * Interactive elements
-   */
+  /*
+  * Interactive elements
+  */
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
@@ -121,7 +121,7 @@ var ExplorationEditorPage = function() {
     '.protractor-test-confirm-pre-publication'));
   var closeButton = element(by.css('.protractor-test-share-publish-close'));
 
- /*
+  /*
    * Components
    */
   this.getImprovementsTab = function() {
