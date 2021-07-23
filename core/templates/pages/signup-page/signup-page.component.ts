@@ -91,7 +91,11 @@ export class SignupPageComponent {
       backdrop: true
     });
 
-    modalRef.result.then(() => {}, () => {
+    modalRef.result.then(() => {
+      // Note to developers:
+      // This callback is triggered when the Confirm button is clicked.
+      // No further action is needed.
+    }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
@@ -224,7 +228,11 @@ export class SignupPageComponent {
         keyboard: false
       });
 
-    modalRef.result.then(() => {}, () => {
+    modalRef.result.then(() => {
+      // Note to developers:
+      // This callback is triggered when the Confirm button is clicked.
+      // No further action is needed.
+    }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
