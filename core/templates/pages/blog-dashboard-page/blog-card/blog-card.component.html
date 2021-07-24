@@ -6,52 +6,50 @@
          alt="Thumbnail image of the blog card">
   </picture>
   <div class="blog-card-content">
-    <mat-card-title class="blog-card-title">{{blogPostSummary.Title}}</mat-card-title>
-    <mat-card-header>
+    <mat-card-title class="blog-card-title">{{blogPostSummary.title}}</mat-card-title>
+    <mat-card-header class="mt-2">
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"
            alt="Profile image of the author of the blog post">
-      <mat-card-subtitle>{{blogPostSummary.AuthorUsername}}</mat-card-subtitle>
-      <mat-card-subtitle class="blog-card-published-date">
-        {{getLocaleDateString(blogPostSummary.PublishedOn)}}
+      <mat-card-subtitle>{{blogPostSummary.authorUsername}}</mat-card-subtitle>
+      <mat-card-subtitle class="font-weight-light mobile-published-date">
+        {{getDateStringInWords(blogPostSummary.publishedOn)}}
       </mat-card-subtitle>
     </mat-card-header>
-    <mat-card-content>
+    <mat-card-content class="mt-4 blog-card-summary">
       <p>
-        {{blogPostSummary.Summary}}
+        {{blogPostSummary.summary}}
       </p>
     </mat-card-content>
   </div>
 </mat-card>
 <style>
   .blog-card {
-    height: 30vw;
-    max-height: 400px;
-    max-width: 600px;
-    min-height: 232px;
-    min-width: 278px;
-    width: 45vw;
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    box-shadow: 0px 3px 3px #00000029;
+    height: 384px;
+    margin: 10px;
+    width: 576px;
   }
 
   .mat-card-image.blog-card-thumbnail {
-    height: 11.250vw;
-    max-height: 150px;
-    max-width: fit-content;
-    min-height: 73px;
+    height: 144px;
     object-fit: cover;
     object-position: top;
+    max-width: unset;
   }
 
   .blog-card-content {
-    margin: 4px 3.75vw;
+    margin: 4px 46px;
   }
 
   .blog-card-title {
     color: #333;
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 2.4rem;
-    font-style: normal;
+    font-size: 2rem;
     font-weight: 100;
+    line-height: 28px;
     margin-bottom: 0;
     text-align: left;
   }
@@ -66,24 +64,54 @@
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 3px;
-    margin-left: -10px
+    margin-left: -10px;
+    line-height: 20px;
   }
 
-  .blog-card-content mat-card-subtitle.blog-card-published-date {
-    font-weight: 300
-  }
-
-  .blog-card-content mat-card-content p {
+  .blog-card-summary {
     color: #555;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 1.6rem;
-    line-height: 2.4rem;
+    line-height: 24px;
     text-align: left;
   }
 
-@media(min-width: 1320px) {
+@media(max-width: 680px) {
+  .blog-card {
+    height: 280px;
+    width: 222px;
+  }
+
+  .mat-card-image.blog-card-thumbnail {
+    height: 78px;
+  }
+
+  .blog-card-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 14px;
+  }
+
+  .blog-card-content .mat-card-avatar {
+    height: 27px;
+    width: 27px;
+  }
+
+  .mobile-published-date {
+    font-size: 9px;
+  }
+
+  .blog-card-summary {
+    font-size: 1rem;
+  }
+
   .blog-card-content {
-    margin: 4px 50px;
+    margin: 0;
+  }
+
+  .blog-card-content mat-card-subtitle {
+    font-size: 0.9rem;
+    line-height: 16px;
   }
 }
 </style>

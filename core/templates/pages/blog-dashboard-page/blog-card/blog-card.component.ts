@@ -22,8 +22,7 @@ import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-
+import dayjs from 'dayjs';
 @Component({
   selector: 'oppia-blog-card',
   templateUrl: './blog-card.component.html'
@@ -37,7 +36,6 @@ export class BlogCardComponent implements OnInit {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private dateTimeFormatService: DateTimeFormatService,
     private urlInterpolationService: UrlInterpolationService,
   ) {}
 
@@ -54,8 +52,9 @@ export class BlogCardComponent implements OnInit {
       this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
   }
 
-  getLocaleDateString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
+  getDateStringInWords(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    return dayjs(date).format('MMMM D, YYYY');
   }
 }
 

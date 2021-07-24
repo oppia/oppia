@@ -22,7 +22,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogDashboardTileComponent } from './blog-dashboard-tile.component';
-import { DateTimeFormatService } from 'services/date-time-format.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -33,7 +32,6 @@ class MockCapitalizePipe {
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogDashboardTileComponent;
   let fixture: ComponentFixture<BlogDashboardTileComponent>;
-  let dateTimeFormatService: DateTimeFormatService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -56,8 +54,6 @@ describe('Blog Dashboard Tile Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogDashboardTileComponent);
-    dateTimeFormatService = TestBed.inject(DateTimeFormatService) as
-      jasmine.SpyObj<DateTimeFormatService>;
     component = fixture.componentInstance;
   });
 
@@ -69,10 +65,8 @@ describe('Blog Dashboard Tile Component', () => {
     () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       let NOW_MILLIS = 1416563100000;
-      spyOn(dateTimeFormatService, 'getLocaleDateString').withArgs(NOW_MILLIS)
-        .and.returnValue('11/21/2014');
 
-      expect(component.getLocaleDateString(NOW_MILLIS))
-        .toBe('11/21/2014');
+      expect(component.getDateStringInWords(NOW_MILLIS))
+        .toBe('November 21, 2014');
     });
 });

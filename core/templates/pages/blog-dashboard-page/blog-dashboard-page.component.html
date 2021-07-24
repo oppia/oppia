@@ -16,20 +16,22 @@
         <ng-template mat-tab-label>
           {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase}} ({{blogDashboardData.numOfDraftBlogPosts}})
         </ng-template>
-        <div class="blog-dashboard-card-tiles"
-              *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
-          <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-          </oppia-blog-dashboard-tile>
+        <div class="blog-dashboard-tiles-container">
+          <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
+            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
+            </oppia-blog-dashboard-tile>
+          </div>
         </div>
       </mat-tab>
       <mat-tab>
         <ng-template mat-tab-label>
           {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase}} ({{blogDashboardData.numOfPublishedBlogPosts}})
         </ng-template>
-        <div class="blog-dashboard-card-tiles"
-              *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
-          <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
-          </oppia-blog-dashboard-tile>
+        <div class="blog-dashboard-tiles-container">
+          <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
+            <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary">
+            </oppia-blog-dashboard-tile>
+          </div>
         </div>
       </mat-tab>
     </mat-tab-group>
@@ -41,7 +43,7 @@
     padding-bottom: 100px;
   }
 
-  .blog-dashboard-card-tiles {
+  .blog-dashboard-tiles-container {
     display: flex;
     flex-flow: wrap;
     justify-content: center;
@@ -127,6 +129,17 @@
     .new-post-button {
       margin-bottom: unset;
       margin-top: 10px;
+    }
+
+    :host /deep/ .mat-card-header-text {
+      margin-right: 0;
+    }
+  }
+
+  @media(max-width: 880px) {
+    .mat-card.oppia-page-card {
+      padding-left: 10px;
+      padding-right: 10px;
     }
   }
 </style>

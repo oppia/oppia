@@ -19,8 +19,7 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-
+import dayjs from 'dayjs';
 @Component({
   selector: 'oppia-blog-dashboard-tile',
   templateUrl: './blog-dashboard-tile.component.html'
@@ -28,12 +27,9 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 export class BlogDashboardTileComponent {
   @Input() blogPostSummary: BlogPostSummary;
 
-  constructor(
-    private dateTimeFormatService: DateTimeFormatService,
-  ) {}
-
-  getLocaleDateString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
+  getDateStringInWords(millisSinceEpoch: number): string {
+    let date = new Date(millisSinceEpoch);
+    return dayjs(date).format('MMMM D, YYYY');
   }
 }
 
