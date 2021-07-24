@@ -30,7 +30,7 @@
       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" href="/community-library" [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="incomplete-section" *ngIf="!checkMobileView()">
+  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!checkMobileView()">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
       <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
       </p>
@@ -94,7 +94,7 @@
       </div>
     </div>
   </div>
-  <div class="completed-section" *ngIf="!checkMobileView()">
+  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!checkMobileView()">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
       <p class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
       </p>
@@ -246,7 +246,7 @@
     </div>
   </div>
 </div>
-<div class="playlist-section">
+<div class="playlist-section protractor-test-play-later-section">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
   </p>
   <div *ngIf="noPlaylistActivity">
@@ -346,7 +346,7 @@
     </div>
   </div>
 </div>
-<div class="subscriptions-section">
+<div class="subscriptions-section protractor-test-subscriptions-section">
   <p class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
   <div *ngIf="subscriptionsList.length === 0">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS' | translate" class="empty-section"></p>
@@ -362,7 +362,8 @@
              class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
-            <strong container="body"
+            <strong class="protractor-test-subscription-name"
+                    container="body"
                     triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
               {{ subscription.username| truncate:10 }}
             </strong>
@@ -395,7 +396,6 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: auto;
     margin-bottom: 25px;
     min-height: 215px;
     opacity: 1;
@@ -610,6 +610,8 @@
     .community-lessons-section,
     .playlist-section,
     .subscriptions-section {
+      margin: auto;
+      margin-bottom: 20px;
       width: 296px;
     }
     .community-lessons-section {
@@ -652,12 +654,19 @@
       top: 12px;
     }
   }
-  @media screen and (min-width: 768px) and (max-width: 1200px) {
+  @media screen and (min-width: 768px) and (max-width: 800px) {
     .community-lessons-section,
     .playlist-section,
     .subscriptions-section {
       position: relative;
       right: 117px;
+      width: 726px;
+    }
+  }
+  @media screen and (min-width: 768px) and (max-width: 1200px) {
+    .community-lessons-section,
+    .playlist-section,
+    .subscriptions-section {
       width: 726px;
     }
     .community-lessons-section {

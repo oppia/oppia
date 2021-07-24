@@ -3,25 +3,25 @@
   <div class="row oppia-row"
        [ngStyle]="checkMobileView() ? {'display': 'block'} : {'display': 'flex'}"
        [ngClass]="{'oppia-learner-dashboard-mobile-mode': checkMobileView()}">
-    <div class="col-md-2 oppia-learner-dashboard-side-content"
+    <div class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!checkMobileView()">
       <mat-card class="oppia-learner-dashboard-main-menu">
-        <h4 class="oppia-learner-dashboard-menu"
+        <h4 class="oppia-learner-dashboard-menu protractor-test-home-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu"
+        <h4 class="oppia-learner-dashboard-menu protractor-test-goals-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu"
+        <h4 class="oppia-learner-dashboard-menu protractor-test-progress-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate"></span>
         </h4>
-        <h4 class="oppia-learner-dashboard-menu"
+        <h4 class="oppia-learner-dashboard-menu protractor-test-community-lessons-section"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS}"
             (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS)">
           <span [innerHTML]="LEARNER_DASHBOARD_SECTION_I18N_IDS.COMMUNITY_LESSONS | translate"></span>
@@ -135,7 +135,7 @@
         </div>
 
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK"
-             class="oppia-learner-dashboard-feedback-section">
+             class="oppia-learner-dashboard-feedback-section" [ngStyle]="threadSummaries.length !== 0 && {'cursor': 'pointer'}">
           <mat-card class="oppia-learner-dashboard-no-activity-card layout-row"
                    *ngIf="threadSummaries.length === 0">
             <div>
@@ -471,7 +471,7 @@
 
   .oppia-learner-dashboard-side-content {
     min-width: 241px;
-    padding-left: 20px;
+    padding-left: 100px;
     width: 20%;
   }
 
@@ -511,7 +511,7 @@
   .oppia-learner-dashboard-main-menu {
     background-color: white;
     height: 480px;
-    margin: 64px -100px 0 100px;
+    margin: 64px 0px 0 0px;
     padding: 0;
   }
 
@@ -590,7 +590,7 @@
     display: inline-block;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 1.3em;
-    margin: 64px 0 0 108px;
+    margin: 64px 0 0 0;
     padding: 16px;
     padding-bottom: 8px;
   }
@@ -619,7 +619,7 @@
   }
 
   .oppia-learner-dashboard-feedback-section {
-    margin: 0 23px 0 108px;
+    margin: 0 23px 0 0px;
   }
 
   .oppia-learner-dashboard-feedback-section .table {

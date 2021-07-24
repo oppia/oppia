@@ -24,7 +24,7 @@
     </div>
   </div>
 </div>
-<div class="suggested-for-you">
+<div class="suggested-for-you protractor-test-suggested-for-you">
   <p class="suggested-for-you-heading"
     [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
   </p>
@@ -61,14 +61,13 @@
     color: #00645C;
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 32px;
-    margin-left: 108px;
     text-align: left;
   }
   .continue-where-you-left-off {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px 108px;
+    margin: 18px 0 25px 0px;
     min-height: 179px;
     padding: 32px 0 30px 40px;
     width: 736px;
@@ -142,7 +141,7 @@
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px #0000001a;
-    margin: 18px 0 25px 108px;
+    margin: 18px 0 25px 0px;
     min-height: 206px;
     padding: 32px 0 30px 40px;
     width: 736px;
@@ -158,7 +157,6 @@
   }
   @media screen and (max-width: 1200px) {
     .greeting {
-      margin-left: 0;
       padding-top: 30px;
     }
     .continue-where-you-left-off, .suggested-for-you {
