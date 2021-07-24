@@ -256,11 +256,11 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'category': 'missing-outer-parens',
             'language_code': '("en")'
         }, expected_status_int=400)
+
         error_msg = (
             'Schema validation for \'category\' failed: Validation '
             'failed: is_string_contained_within_parenthesis ({}) for '
             'object missing-outer-parens')
-
         self.assertEqual(response_1['error'], error_msg)
 
         response_2 = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL, params={
