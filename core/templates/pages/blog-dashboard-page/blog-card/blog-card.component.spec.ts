@@ -17,12 +17,12 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync, tick, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogCardComponent } from './blog-card.component';
-import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 class MockCapitalizePipe {
@@ -35,17 +35,8 @@ describe('Blog Dashboard Tile Component', () => {
   let component: BlogCardComponent;
   let fixture: ComponentFixture<BlogCardComponent>;
   let urlInterpolationService: UrlInterpolationService;
-  let sampleBlogPostSummary = {
-    id: 'sampleId',
-    author_username: 'test_user',
-    title: 'Title',
-    summary: 'Hello World',
-    tags: ['news'],
-    thumbnail_filename: 'image.png',
-    url_fragment: 'title',
-    last_updated: 3232323,
-    published_on: 3232323,
-  };
+  let sampleBlogPostSummary: BlogPostSummaryBackendDict;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -70,6 +61,18 @@ describe('Blog Dashboard Tile Component', () => {
     fixture = TestBed.createComponent(BlogCardComponent);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     component = fixture.componentInstance;
+
+    sampleBlogPostSummary = {
+      id: 'sampleId',
+      author_username: 'test_user',
+      title: 'Title',
+      summary: 'Hello World',
+      tags: ['news'],
+      thumbnail_filename: 'image.png',
+      url_fragment: 'title',
+      last_updated: 3232323,
+      published_on: 3232323,
+    };
   });
 
   it('should create', () => {
@@ -85,7 +88,7 @@ describe('Blog Dashboard Tile Component', () => {
         .toBe('November 21, 2014');
     });
 
-  it('should initialize', fakeAsync(() => {
+  it('should initialize', () => {
     component.authorProfilePicDataUrl = 'data_image_url';
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
       sampleBlogPostSummary);
@@ -93,13 +96,12 @@ describe('Blog Dashboard Tile Component', () => {
       .and.returnValue('sample_url');
 
     component.ngOnInit();
-    tick();
 
     expect(component.authorProfilePictureUrl).toEqual('data_image_url');
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample_url');
     expect(component.thumbnailUrl).toBe(
       '/assetsdevhandler/blog_post/sampleId/assets/thumbnail/image.png');
-  }));
+  });
 
   it('should not show thumbnail if thumbnail filename is not given', () => {
     sampleBlogPostSummary.thumbnail_filename = null;

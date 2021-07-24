@@ -40,6 +40,8 @@ export class BlogCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.error(this.blogPostSummary);
+    console.error(this.blogPostSummary.thumbnailFilename);
     if (this.blogPostSummary.thumbnailFilename) {
       this.thumbnailUrl = this.assetsBackendApiService
         .getThumbnailUrlForPreview(
