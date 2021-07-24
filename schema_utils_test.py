@@ -789,10 +789,11 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(is_regex_matched(
             'exploration.EXP_ID_1.WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
-            r'\w[.]\w+[.]\w+'))
+            r'(exploration|collection)\.\w+\.\w+'))
 
         self.assertFalse(is_regex_matched(
-            'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd', r'\w[.]\w+[.]\w+'))
+            'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
+            r'(exploration|collection)\.\w+\.\w+'))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
