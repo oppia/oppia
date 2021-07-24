@@ -173,7 +173,7 @@
 
     <li>
       <a href="/partnerships"
-         [routerLink]="'/' + ROUTES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
          target="_blank"
          rel="noopener">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE0Af;</i>
@@ -183,7 +183,7 @@
 
     <li [ngClass]="{'active': currentUrl === '/donate'}">
       <a href="/donate"
-         [routerLink]="'/' + ROUTES_REGISTERED_WITH_FRONTEND.DONATE"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
          class="protractor-mobile-test-donate-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE87D;</i>
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>

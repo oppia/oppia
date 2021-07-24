@@ -4433,3 +4433,7 @@ div.oppia-issues-learner-action {
 .forced-modal-stack {
   z-index: 1035 !important;
 }
+
+main {
+  position: relative;
+}
