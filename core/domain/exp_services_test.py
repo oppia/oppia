@@ -1247,7 +1247,7 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id0'
     DEMO_EXP_ID = '0'
-    TEST_ASSET_PATH = 'test_asset.file'
+    TEST_ASSET_PATH = 'test_asset.txt'
     TEST_ASSET_CONTENT = b'Hello Oppia'
 
     INTRO_AUDIO_FILE = 'introduction_state.mp3'

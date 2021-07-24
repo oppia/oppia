@@ -236,7 +236,9 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
         for env_variable in ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML:
             if env_variable not in content:
                 raise Exception(
-                    'Environment variable to be removed does not exist.')
+                    'Environment variable \'%s\' to be '
+                    'removed does not exist.' % env_variable
+                )
             content = re.sub('  %s: ".*"\n' % env_variable, '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)

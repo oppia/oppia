@@ -175,7 +175,6 @@ class CloudStorageEmulator(python_utils.OBJECT):
             Blob. The blob.
         """
         blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
-        print(blob_dict)
         return Blob.from_dict(blob_dict) if blob_dict else None
 
     def upload_blob(self, filepath, blob):
@@ -185,9 +184,8 @@ class CloudStorageEmulator(python_utils.OBJECT):
             filepath: str. Filepath to upload the blob to.
             blob: Blob. The blob to upload.
         """
-        if not REDIS_CLIENT.hset(
-                self._get_redis_key(filepath), mapping=blob.to_dict()):
-            raise Exception('Blob was not set.')
+        REDIS_CLIENT.hset(
+            self._get_redis_key(filepath), mapping=blob.to_dict())
 
     def delete_blob(self, filepath):
         """Delete the blob at the given filepath.

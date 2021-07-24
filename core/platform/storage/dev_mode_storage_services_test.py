@@ -31,7 +31,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_isfile(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'png')
+            'bucket', '/file/path.png', b'data', 'image/png')
         self.assertTrue(
             dev_mode_storage_services.isfile('bucket', '/file/path.png'))
         self.assertFalse(
@@ -39,19 +39,19 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_commit_and_get_with_bytes(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'png')
+            'bucket', '/file/path.png', b'data', 'image/png')
         self.assertEqual(
             dev_mode_storage_services.get('bucket', '/file/path.png'), b'data')
 
     def test_commit_and_get_with_str(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', 'data', 'png')
+            'bucket', '/file/path.png', 'data', 'image/png')
         self.assertEqual(
             dev_mode_storage_services.get('bucket', '/file/path.png'), b'data')
 
     def test_delete(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'png')
+            'bucket', '/file/path.png', b'data', 'image/png')
         self.assertTrue(
             dev_mode_storage_services.isfile('bucket', '/file/path.png'))
 
@@ -61,7 +61,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_copy_with_existing_source_blob_is_successful(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'png')
+            'bucket', '/file/path.png', b'data', 'image/png')
         dev_mode_storage_services.copy(
             'bucket', '/file/path.png', '/copy/path.png')
 
@@ -79,11 +79,11 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_listdir_with_slash_returns_all_blobs(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path1.png', b'data1', 'png')
+            'bucket', '/file/path1.png', b'data1', 'image/png')
         dev_mode_storage_services.commit(
-            'bucket', '/file/path2.png', b'data2', 'png')
+            'bucket', '/file/path2.png', b'data2', 'image/png')
         dev_mode_storage_services.commit(
-            'bucket', '/different/path1.png', b'data3', 'png')
+            'bucket', '/different/path1.png', b'data3', 'image/png')
 
         blob_data = [
             blob.download_as_bytes() for blob in
@@ -93,11 +93,11 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_listdir_with_specific_folder_returns_some_blobs(self):
         dev_mode_storage_services.commit(
-            'bucket', '/file/path1.png', b'data1', 'png')
+            'bucket', '/file/path1.png', b'data1', 'image/png')
         dev_mode_storage_services.commit(
-            'bucket', '/file/path2.png', b'data2', 'png')
+            'bucket', '/file/path2.png', b'data2', 'image/png')
         dev_mode_storage_services.commit(
-            'bucket', '/different/path1.png', b'data3', 'png')
+            'bucket', '/different/path1.png', b'data3', 'image/png')
 
         blob_data = [
             blob.download_as_bytes() for blob in
