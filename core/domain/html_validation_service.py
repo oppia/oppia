@@ -725,7 +725,12 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
+    # Handle conversion of oppia-noninteractive-svgdiagram tags that are not
+    # nested inside complex components.
     convert_svg_diagram_to_image_for_soup(soup)
+
+    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
+    # oppia-noninteractive-collapsible.
     for collapsible in soup.findAll(
             name='oppia-noninteractive-collapsible'):
         if 'content-with-value' in collapsible.attrs:
@@ -734,11 +739,13 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html.replace('<br>', '<br/>'), 'html.parser')
             convert_svg_diagram_to_image_for_soup(soup_for_collapsible)
-            collapsible['content-with-value'] = json.dumps(
-                escape_html(
+            collapsible['content-with-value'] = escape_html(
+                json.dumps(
                     python_utils.UNICODE(soup_for_collapsible).replace(
                         '<br/>', '<br>')))
 
+    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
+    # oppia-noninteractive-tabs.
     for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
         tab_content_json = unescape_html(tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
