@@ -115,9 +115,9 @@ class BlogAdminHandler(base.BaseHandler):
             new_config_property_values = self.normalized_payload.get(
                 'new_config_property_values')
             if new_config_property_values[
-                    'max_number_of_tags_assigned_to_blog_post'] == 0:
+                    'max_number_of_tags_assigned_to_blog_post'] <= 0:
                 raise self.InvalidInputException(
-                    'Value for max tags cannot be 0.')
+                    'Value for max tags cannot be less than or equal to 0.')
             for (name, value) in new_config_property_values.items():
                 config_services.set_property(self.user_id, name, value)
             logging.info(
