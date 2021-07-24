@@ -16,6 +16,8 @@
  * @fileoverview Root component for error page.
  */
 
+// This error page is used for status codes 400, 401 and 500.
+
 import { Component } from '@angular/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
