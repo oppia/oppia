@@ -16,8 +16,6 @@
  * @fileoverview End-to-end tests of embedding explorations in other websites.
  */
 
-var _ = require('lodash');
-
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -105,36 +103,31 @@ describe('Embedding', function() {
     // Publish changes.
     await workflow.publishExploration();
   };
-  // These errors occur when
+
   var EMBEDDING_ERRORS_TO_IGNORE = [
-    _.escapeRegExp(
-      'http://localhost:9001/assets/scripts/' +
-      'embedding_tests_dev_0.0.2.min.html- Refused to display ' +
-      'http://localhost:9001/embed/exploration/idToBeReplaced'),
-    _.escapeRegExp(
-      'http://localhost:9001/assets/scripts/' +
-      'embedding_tests_dev_0.0.2.min.html- Refused to display ' +
-      'http://localhost:9001/embed/exploration/idToBeReplaced?' +
-      'locale=en#version=0.0.2&secret='),
-    _.escapeRegExp(
-      'http://localhost:9001/assets/scripts/' +
-      'embedding_tests_dev_0.0.2.min.html- Refused to display ' +
-      'http://localhost:9001/embed/exploration/fake_id?locale=en#version=0.0.2&secret='),
-    _.escapeRegExp(
-      'http://localhost:9001/assets/scripts/' +
-      'embedding_tests_dev_0.0.1.min.html- Refused to display ' +
-      'http://localhost:9001/embed/exploration/idToBeReplaced'),
-    _.escapeRegExp(
-      'http://localhost:9001/assets/scripts/' +
-      'embedding_tests_dev_0.0.1.min.html- Refused to display ' +
-      'http://localhost:9001/embed/exploration/idToBeReplaced?' +
-      'iframed=true&locale=en#version=0.0.1&secret='),
-    _.escapeRegExp(
-      'http://localhost:9001/assets/scripts/' +
-      'embedding_tests_dev_0.0.1.min.html- Refused to display ' +
-      'http://localhost:9001/embed/exploration/fake_id?' +
-      'iframed=true&locale=en#version=0.0.1&secret='),
-  ]
+      'http:\/\/localhost:9001\/assets\/scripts\/' +
+      'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/embed/exploration\/idToBeReplaced',
+      'http:\/\/localhost:9001\/assets\/scripts\/' +
+      'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced\\?' +
+      'locale=en#version=0.0.2&secret=',
+      'http:\/\/localhost:9001\/assets\/scripts\/' +
+      'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id\\?' +
+      'locale=en#version=0.0.2&secret=',
+      'http:\/\/localhost:9001\/assets\/scripts\/' +
+      'embedding_tests_dev_0.0.1.min.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced',
+      'http:\/\/localhost:9001\/assets\/scripts\/' +
+      'embedding_tests_dev_0.0.1.min.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced\\?' +
+      'iframed=true&locale=en#version=0.0.1&secret=',
+      'http:\/\/localhost:9001\/assets\/scripts\/' +
+      'embedding_tests_dev_0.0.1.min.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id//?' +
+      'iframed=true&locale=en#version=0.0.1&secret='
+  ];
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
