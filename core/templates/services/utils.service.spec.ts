@@ -57,6 +57,7 @@ describe('Utils Service', () => {
     NotImplementedError.prototype = Error.prototype;
     expect(uts.isError(new Error())).toBeTrue();
     expect(uts.isError(new NotImplementedError('abc'))).toBeTrue();
+    expect(uts.isError(new TypeError())).toBeTrue();
     expect(uts.isError(new DOMException('abc'))).toBeTrue();
     expect(uts.isError(12)).toBeFalse();
     expect(uts.isError(undefined)).toBeFalse();
@@ -93,6 +94,62 @@ describe('Utils Service', () => {
     };
     expect(uts.isEquivalent(objA, objB)).toBe(true);
     expect(uts.isEquivalent(objA, objC)).toBe(false);
+  });
+
+  it('should return false if objects are not of the same type', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = 2;
+    expect(uts.isEquivalent(objA, objB)).toBe(false);
+  });
+
+  it('should return false if one of the objects are null', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = null;
+    expect(uts.isEquivalent(objA, objB)).toBe(false);
+  });
+
+  it('should return true if both of the objects are null', () => {
+    const objA = null;
+    const objB = null;
+    expect(uts.isEquivalent(objA, objB)).toBe(true);
+  });
+
+  it('should return false if values of the objects are not equal', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'c'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    expect(uts.isEquivalent(objA, objB)).toBe(false);
   });
 
   it('should check if an obj is defined or not', () => {
