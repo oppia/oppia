@@ -159,17 +159,17 @@ def _should_allocate_port(pid):
         bool. Whether or not to allocate a port to the process.
     """
     if pid <= 0:
-        logging.info('Not allocating a port to invalid pid')
+        print('Not allocating a port to invalid pid')
         return False
     if pid == 1:
         # The client probably meant to send us its parent pid but
         # had been reparented to init.
-        logging.info('Not allocating a port to init.')
+        print('Not allocating a port to init.')
         return False
     try:
         os.kill(pid, 0)
     except OSError:
-        logging.info('Not allocating a port to a non-existent process')
+        print('Not allocating a port to a non-existent process')
         return False
     return True
 
@@ -249,15 +249,15 @@ class _PortPool(python_utils.OBJECT):
                     candidate.pid = pid
                     candidate.start_time = _get_process_start_time(pid)
                     if not candidate.start_time:
-                        logging.info('Can\'t read start time for pid %d.', pid)
+                        print('Can\'t read start time for pid %d.', pid)
                     self.ports_checked_for_last_request = check_count
                     return candidate.port
                 else:
-                    logging.info(
+                    print(
                         'Port %d unexpectedly in use, last owning pid %d.',
                         candidate.port, candidate.pid)
 
-        logging.info('All ports in use.')
+        print('All ports in use.')
         self.ports_checked_for_last_request = check_count
         return 0
 
@@ -312,8 +312,8 @@ class _PortServerRequestHandler(python_utils.OBJECT):
             logging.warning('Could not parse request: %s', error)
             return
 
-        logging.info('Request on behalf of pid %d.', pid)
-        logging.info('cmdline: %s', _get_process_command_line(pid))
+        print('Request on behalf of pid %d.', pid)
+        print('cmdline: %s', _get_process_command_line(pid))
 
         if not _should_allocate_port(pid):
             self._denied_allocations += 1
@@ -326,12 +326,12 @@ class _PortServerRequestHandler(python_utils.OBJECT):
             return '{:d}\n'.format(port).encode(encoding='utf-8')
         else:
             self._denied_allocations += 1
-            logging.info('Denied allocation to pid %d', pid)
+            print('Denied allocation to pid %d', pid)
             return ''
 
     def dump_stats(self):
         """Logs statistics of our operation."""
-        logging.info('Dumping statistics:')
+        print('Dumping statistics:')
         stats = []
         stats.append(
             'client-request-errors {}'.format(self._client_request_errors))
@@ -341,7 +341,7 @@ class _PortServerRequestHandler(python_utils.OBJECT):
             self._port_pool.ports_checked_for_last_request))
         stats.append('total-allocations {}'.format(self._total_allocations))
         for stat in stats:
-            logging.info(stat)
+            print(stat)
 
 
 def _parse_command_line():
@@ -515,18 +515,18 @@ def main():
         request_handler.handle_port_request,
         config.portserver_unix_socket_address.replace('@', '\0', 1),
     )
-    logging.info(
-        'Serving portserver on %s',
+    print(
+        'Serving portserver on %s' %
         config.portserver_unix_socket_address
     )
     try:
         server.run()
     except KeyboardInterrupt:
-        logging.info('Stopping portserver due to ^C.')
+        print('Stopping portserver due to ^C.')
     finally:
         server.close()
         request_handler.dump_stats()
-        logging.info('Shutting down portserver.')
+        print('Shutting down portserver.')
 
 
 if __name__ == '__main__':
