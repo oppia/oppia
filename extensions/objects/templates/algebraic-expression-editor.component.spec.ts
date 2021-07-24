@@ -23,7 +23,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
 
-describe('AlgebraicExpressionEditor', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('AlgebraicExpressionEditor', () => {
   let component: AlgebraicExpressionEditorComponent;
   let fixture: ComponentFixture<AlgebraicExpressionEditorComponent>;
   let windowRef: WindowRef;

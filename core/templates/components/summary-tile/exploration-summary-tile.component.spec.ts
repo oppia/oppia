@@ -120,7 +120,8 @@ class MockUrlService {
   }
 }
 
-describe('Exploration Summary Tile Component', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Exploration Summary Tile Component', () => {
   let component: ExplorationSummaryTileComponent;
   let fixture: ComponentFixture<ExplorationSummaryTileComponent>;
   let dateTimeFormatService: DateTimeFormatService;
