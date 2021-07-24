@@ -30,8 +30,8 @@ require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
-angular.module('oppia').directive('hintEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+angular.module('oppia').directive('hintEditor',
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -41,8 +41,8 @@ angular.module('oppia').directive('hintEditor', [
         getOnSaveFn: '&onSave',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/hint-editor/hint-editor.directive.html'),
+      template: require(
+        'components/state-directives/hint-editor/hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'ContextService', 'EditabilityService',
@@ -109,4 +109,4 @@ angular.module('oppia').directive('hintEditor', [
         }
       ]
     };
-  }]);
+  });
