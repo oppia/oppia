@@ -329,7 +329,7 @@ export class LibraryPageComponent {
           // Check if actual and expected widths are the same.
           // If not produce an error that would be caught by e2e tests.
           setTimeout(() => {
-            let actualWidth = $('exploration-summary-tile').width();
+            let actualWidth = $('oppia-exploration-summary-tile').width();
             if (actualWidth &&
               actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX) {
               this.loggerService.error(

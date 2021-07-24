@@ -52,11 +52,6 @@ export interface SummaryDict {
   'protractor_id': string;
 }
 
-interface LibraryIndexDataBackendDict {
-  'activity_summary_dicts_by_category': SummaryDict[];
-  'preferred_language_codes': string[];
-}
-
 interface CreatorDashboardDataBackendDict {
   'explorations_list': CreatorExplorationSummaryBackendDict[];
   'collections_list': CollectionSummaryBackendDict[];
@@ -91,7 +86,7 @@ export class LibraryPageBackendApiService {
   ) {}
 
   async fetchLibraryIndexDataAsync(): Promise<LibraryIndexData> {
-    return this.http.get<LibraryIndexDataBackendDict>(
+    return this.http.get<LibraryIndexData>(
       this.LIBRARY_INDEX_HANDLER).toPromise();
   }
 

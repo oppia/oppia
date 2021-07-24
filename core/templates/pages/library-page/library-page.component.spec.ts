@@ -18,8 +18,10 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
@@ -34,12 +36,86 @@ import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LibraryPageComponent } from './library-page.component';
 import { LibraryPageBackendApiService } from './services/library-page-backend-api.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Library Page Component', () => {
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      pathname: '/community-library/top-rated',
+      href: ''
+    }
+  };
+}
+
+class MockWindowDimensionsService {
+  getResizeEvent() {
+    return {
+      subscribe: (callb) => {
+        callb();
+        return {
+          unsubscribe() {}
+        };
+      }
+    };
+  }
+
+  getWidth(): number {
+    return 700;
+  }
+}
+
+describe('Library Page Component', () => {
   let fixture: ComponentFixture<LibraryPageComponent>;
   let componentInstance: LibraryPageComponent;
+  let loaderService: LoaderService;
+  let urlInterpolationService: UrlInterpolationService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let pageTitleService: PageTitleService;
+  let libraryPageBackendApiService: LibraryPageBackendApiService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let windowDimensionsService: WindowDimensionsService;
+  let windowRef: MockWindowRef;
+  let userService: UserService;
+  let keyboardShortcutService: KeyboardShortcutService;
+  let loggerService: LoggerService;
+  let searchService: SearchService;
+
+  let explorationList = [{
+    category: '',
+    community_owned: true,
+    activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
+    last_updated_msec: 1,
+    ratings: null,
+    id: 'id1',
+    created_on_msec: 12,
+    human_readable_contributors_summary: null,
+    language_code: '',
+    num_views: 2,
+    objective: '',
+    status: '',
+    tags: [],
+    thumbnail_bg_color: '',
+    thumbnail_icon_url: '',
+    title: '',
+    num_total_threads: 3,
+    num_open_threads: 3
+  }];
+
+  let collectionList = [{
+    category: '',
+    community_owned: true,
+    last_updated_msec: 2,
+    id: '',
+    created_on: 2,
+    language_code: '',
+    objective: '',
+    status: '',
+    thumbnail_bg_color: '',
+    thumbnail_icon_url: '',
+    title: '',
+    node_count: 2
+  }];
 
   beforeEach(waitForAsync(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
@@ -50,7 +126,10 @@ fdescribe('Library Page Component', () => {
       ],
       providers: [
         LoggerService,
-        WindowRef,
+        {
+          provide: WindowRef,
+          useValue: windowRef
+        },
         I18nLanguageCodeService,
         KeyboardShortcutService,
         LibraryPageBackendApiService,
@@ -58,7 +137,10 @@ fdescribe('Library Page Component', () => {
         SearchService,
         UrlInterpolationService,
         UserService,
-        WindowDimensionsService,
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        },
         ClassroomBackendApiService,
         PageTitleService
       ],
@@ -69,6 +151,17 @@ fdescribe('Library Page Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LibraryPageComponent);
     componentInstance = fixture.componentInstance;
+    loaderService = TestBed.inject(LoaderService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    libraryPageBackendApiService = TestBed.inject(LibraryPageBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
+    keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
+    loggerService = TestBed.inject(LoggerService);
+    searchService = TestBed.inject(SearchService);
   });
 
   afterEach(() => {
@@ -77,6 +170,255 @@ fdescribe('Library Page Component', () => {
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(libraryPageBackendApiService, 'fetchLibraryGroupDataAsync')
+      .and.returnValue(Promise.resolve({
+        activity_list: [],
+        header_i18n_id: '',
+        preferred_language_codes: []
+      }));
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(900);
+    componentInstance.ngOnInit();
+    spyOn(componentInstance, 'initCarousels');
+    tick();
+    tick();
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
+      'I18N_LIBRARY_LOADING');
+    expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+      .toHaveBeenCalled();
+    expect(componentInstance.CLASSROOM_PROMOS_ARE_ENABLED).toBeTrue();
+    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(libraryPageBackendApiService.fetchLibraryGroupDataAsync)
+      .toHaveBeenCalled();
+    expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit)
+      .toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(windowDimensionsService.getWidth).toHaveBeenCalled();
+  }));
+
+  it('should initialize for non group pages', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(pageTitleService, 'setPageTitle');
+    windowRef.nativeWindow.location.pathname = '/community-library';
+    fixture.detectChanges();
+    spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
+      .and.returnValue(Promise.resolve({
+        activity_summary_dicts_by_category: [{
+          activity_summary_dicts: [{
+            activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
+            category: '',
+            community_owned: true,
+            id: 'id1',
+            language_code: '',
+            num_views: 5,
+            objective: '',
+            status: '',
+            tags: [],
+            thumbnail_bg_color: '',
+            thumbnail_icon_url: '',
+            title: ''
+          },
+          {
+            activity_type: AppConstants.ACTIVITY_TYPE_COLLECTION,
+            category: '',
+            community_owned: true,
+            id: 'id2',
+            language_code: '',
+            num_views: 5,
+            objective: '',
+            status: '',
+            tags: [],
+            thumbnail_bg_color: '',
+            thumbnail_icon_url: '',
+            title: ''
+          },
+          {
+            activity_type: '',
+            category: '',
+            community_owned: true,
+            id: 'id1',
+            language_code: '',
+            num_views: 5,
+            objective: '',
+            status: '',
+            tags: [],
+            thumbnail_bg_color: '',
+            thumbnail_icon_url: '',
+            title: ''
+          }],
+          categories: [],
+          header_i18n_id: 'id',
+          has_full_results_page: true,
+          full_results_url: '',
+          protractor_id: ''
+        }],
+        preferred_language_codes: []
+      }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      new UserInfo(
+        'role', true, true, true, true, true, 'en', 'user',
+        'user@user.com', true)));
+    spyOn(libraryPageBackendApiService, 'fetchCreatorDashboardDataAsync')
+      .and.returnValue(Promise.resolve({
+        explorations_list: explorationList,
+        collections_list: collectionList
+      }));
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+    spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
+    spyOn(componentInstance, 'initCarousels');
+    spyOn(loggerService, 'error');
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick(4000);
+  }));
+
+  it('should initialize for non group pages and user is not logged in',
+    fakeAsync(() => {
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(urlInterpolationService, 'getStaticImageUrl');
+      spyOn(
+        classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+        .and.returnValue(Promise.resolve(true));
+      spyOn(pageTitleService, 'setPageTitle');
+      windowRef.nativeWindow.location.pathname = '/community-library';
+      fixture.detectChanges();
+      spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
+        .and.returnValue(Promise.resolve({
+          activity_summary_dicts_by_category: [{
+            activity_summary_dicts: [{
+              activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
+              category: '',
+              community_owned: true,
+              id: 'id1',
+              language_code: '',
+              num_views: 5,
+              objective: '',
+              status: '',
+              tags: [],
+              thumbnail_bg_color: '',
+              thumbnail_icon_url: '',
+              title: ''
+            },
+            {
+              activity_type: AppConstants.ACTIVITY_TYPE_COLLECTION,
+              category: '',
+              community_owned: true,
+              id: 'id2',
+              language_code: '',
+              num_views: 5,
+              objective: '',
+              status: '',
+              tags: [],
+              thumbnail_bg_color: '',
+              thumbnail_icon_url: '',
+              title: ''
+            },
+            {
+              activity_type: '',
+              category: '',
+              community_owned: true,
+              id: 'id1',
+              language_code: '',
+              num_views: 5,
+              objective: '',
+              status: '',
+              tags: [],
+              thumbnail_bg_color: '',
+              thumbnail_icon_url: '',
+              title: ''
+            }],
+            categories: [],
+            header_i18n_id: 'id',
+            has_full_results_page: true,
+            full_results_url: '',
+            protractor_id: ''
+          }],
+          preferred_language_codes: []
+        }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({ isLoggedIn: () => false } as UserInfo));
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+      spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
+      spyOn(componentInstance, 'initCarousels');
+      spyOn(loggerService, 'error');
+      componentInstance.ngOnInit();
+      tick();
+      tick();
+      tick();
+      tick();
+      tick(4000);
+    }));
+
+  it('should show full results page when full results url is available',
+    () => {
+      let fullResultsUrl = 'full_results_url';
+      componentInstance.showFullResultsPage([], fullResultsUrl);
+      expect(windowRef.nativeWindow.location.href).toEqual(fullResultsUrl);
+    });
+
+  it('should show full results page when results url is not available',
+    () => {
+      let urlQueryString = 'urlQueryString';
+      spyOn(searchService, 'getSearchUrlQueryString').and.returnValue(
+        urlQueryString);
+      componentInstance.showFullResultsPage(['id'], '');
+      expect(windowRef.nativeWindow.location.href).toEqual(
+        '/search/find?q=' + urlQueryString);
+    });
+
+  it('should increment and decrement carousel', () => {
+    componentInstance.libraryGroups = [{
+      activity_summary_dicts: [{
+        activity_type: '',
+        category: '',
+        community_owned: true,
+        id: '',
+        language_code: '',
+        num_views: 2,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: '',
+      }],
+      categories: [],
+      header_i18n_id: '',
+      has_full_results_page: true,
+      full_results_url: '',
+      protractor_id: ''
+    }];
+    componentInstance.tileDisplayCount = 0;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.incrementLeftmostCardIndex(0);
+    expect(componentInstance.leftmostCardIndices).toEqual([1]);
+    componentInstance.decrementLeftmostCardIndex(0);
+    expect(componentInstance.leftmostCardIndices).toEqual([0]);
+  });
+
+  it('should get static image url', () => {
+    let url = 'url';
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(url);
+    expect(componentInstance.getStaticImageUrl('')).toEqual(url);
   });
 
   it('should set active group', () => {
