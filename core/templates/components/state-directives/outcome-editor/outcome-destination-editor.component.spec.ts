@@ -78,7 +78,7 @@ describe('OutcomeDestinationEditor', () => {
           source: 'State1',
           target: 'End'
         }
-      ] , 'Introduction', ['End']);
+      ], 'Introduction', ['End']);
     spyOn(StateEditorService, 'getStateNames')
       .and.returnValue(['Introduction', 'State1', 'NewState', 'End']);
     spyOn(StateGraphLayoutService, 'getLastComputedArrangement')
@@ -159,7 +159,7 @@ describe('OutcomeDestinationEditor', () => {
     let userInfo = {
       isAdmin: () => true,
       isModerator: () => false
-    }
+    };
     spyOn(UserService, 'getUserInfoAsync').and.returnValue(
       $q.resolve(userInfo));
 
@@ -187,12 +187,12 @@ describe('OutcomeDestinationEditor', () => {
           source: 'State1',
           target: 'End'
         }
-      ] , 'Introduction', ['End']);
+      ], 'Introduction', ['End']);
     spyOnProperty(StateEditorService, 'onStateNamesChanged')
       .and.returnValue(onStateNamesChangedEmitter);
     spyOn(StateEditorService, 'getStateNames')
       .and.returnValues(['Introduction', 'State1', 'End'],
-      ['Introduction', 'State2', 'End']);
+        ['Introduction', 'State2', 'End']);
     spyOn(StateGraphLayoutService, 'getLastComputedArrangement')
       .and.returnValue(computedLayout);
 
@@ -240,16 +240,16 @@ describe('OutcomeDestinationEditor', () => {
 
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
-      ctrl.outcome = {
-        dest: PLACEHOLDER_OUTCOME_DEST
-      };
-      spyOn(FocusManagerService, 'setFocus');
+    ctrl.outcome = {
+      dest: PLACEHOLDER_OUTCOME_DEST
+    };
+    spyOn(FocusManagerService, 'setFocus');
 
-      ctrl.onDestSelectorChange();
+    ctrl.onDestSelectorChange();
 
-      expect(FocusManagerService.setFocus).toHaveBeenCalledWith(
-        'newStateNameInputField'
-      );
+    expect(FocusManagerService.setFocus).toHaveBeenCalledWith(
+      'newStateNameInputField'
+    );
   });
 
   it('should check if new state is being created', () => {
