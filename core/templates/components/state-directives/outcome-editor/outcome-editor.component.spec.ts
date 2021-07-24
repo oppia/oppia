@@ -19,7 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('OutcomeEditorComponent', () => {
+fdescribe('OutcomeEditorComponent', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
@@ -120,21 +120,30 @@ describe('OutcomeEditorComponent', () => {
     spyOnProperty(ExternalSaveService, 'onExternalSave')
       .and.returnValue(onExternalSaveEmitter);
     spyOn(ctrl, 'invalidStateAfterFeedbackSave').and.returnValue(false);
-    spyOn(ctrl, 'cancelThisFeedbackEdit');
 
     ctrl.$onInit();
 
+    // Setup. No pre-check as we are setting up values below.
     ctrl.feedbackEditorIsOpen = true;
     ctrl.editOutcomeForm = {
       editFeedbackForm: {
         $valid: false
       }
     };
+    ctrl.savedOutcome = {
+      feedback: 'Saved Outcome'
+    };
+    ctrl.outcome = {
+      feedback: 'Outcome'
+    };
 
+    // Action.
     onExternalSaveEmitter.emit();
     $scope.$apply();
 
-    expect(ctrl.cancelThisFeedbackEdit).toHaveBeenCalled();
+    // Post-check.
+    expect(ctrl.feedbackEditorIsOpen).toBe(false);
+    expect(ctrl.outcome.feedback).toBe('Saved Outcome');
   });
 
   it('should save destination on interaction change when edit destination' +
@@ -167,21 +176,36 @@ describe('OutcomeEditorComponent', () => {
     spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
     spyOn(ctrl, 'invalidStateAfterDestinationSave').and.returnValue(false);
-    spyOn(ctrl, 'cancelThisDestinationEdit');
 
     ctrl.$onInit();
 
+    // Setup. No pre-check as we are setting up values below.
     ctrl.destinationEditorIsOpen = true;
     ctrl.editOutcomeForm = {
       editDestForm: {
         $valid: false
       }
     };
+    ctrl.savedOutcome = {
+      dest: 'Saved Dest',
+      refresherExplorationId: 'ExpId',
+      missingPrerequisiteSkillId: 'SkillId'
+    };
+    ctrl.outcome = {
+      dest: 'Dest',
+      refresherExplorationId: '',
+      missingPrerequisiteSkillId: ''
+    };
 
+    // Action.
     onInteractionIdChangedEmitter.emit();
     $scope.$apply();
 
-    expect(ctrl.cancelThisDestinationEdit).toHaveBeenCalled();
+    // Post-check.
+    expect(ctrl.destinationEditorIsOpen).toBe(false);
+    expect(ctrl.outcome.dest).toBe('Saved Dest');
+    expect(ctrl.outcome.refresherExplorationId).toBe('ExpId');
+    expect(ctrl.outcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
   it('should check if state is in question mode', () => {
@@ -278,44 +302,6 @@ describe('OutcomeEditorComponent', () => {
     ctrl.onChangeCorrectnessLabel();
 
     expect(ctrl.savedOutcome.labelledAsCorrect).toBe(true);
-  });
-
-  it('should cancel the feedback edit and set feedback editor' +
-    ' as closed', () => {
-    ctrl.savedOutcome = {
-      feedback: 'Saved Outcome'
-    };
-    ctrl.outcome = {
-      feedback: 'Outcome'
-    };
-    ctrl.feedbackEditorIsOpen = true;
-
-    ctrl.cancelThisFeedbackEdit();
-
-    expect(ctrl.feedbackEditorIsOpen).toBe(false);
-    expect(ctrl.outcome.feedback).toBe('Saved Outcome');
-  });
-
-  it('should cancel the destination edit and set destination editor' +
-    ' as closed', () => {
-    ctrl.savedOutcome = {
-      dest: 'Saved Dest',
-      refresherExplorationId: 'ExpId',
-      missingPrerequisiteSkillId: 'SkillId'
-    };
-    ctrl.outcome = {
-      dest: 'Dest',
-      refresherExplorationId: '',
-      missingPrerequisiteSkillId: ''
-    };
-    ctrl.destinationEditorIsOpen = true;
-
-    ctrl.cancelThisDestinationEdit();
-
-    expect(ctrl.destinationEditorIsOpen).toBe(false);
-    expect(ctrl.outcome.dest).toBe('Saved Dest');
-    expect(ctrl.outcome.refresherExplorationId).toBe('ExpId');
-    expect(ctrl.outcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
 
   it('should set destination as null when saving feedback in' +

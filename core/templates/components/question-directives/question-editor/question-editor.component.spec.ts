@@ -324,7 +324,7 @@ describe('QuestionEditorComponent', () => {
       .toHaveBeenCalledWith('New outcome');
   });
 
-  it('should save interaction ID when interaction is saved', () => {
+  it('should save customization args when interaction is saved', () => {
     spyOn(StateEditorService, 'setInteractionCustomizationArgs');
 
     ctrl.saveInteractionCustomizationArgs('Customization Args');
@@ -342,7 +342,7 @@ describe('QuestionEditorComponent', () => {
       .toHaveBeenCalledWith('Solution');
   });
 
-  it('should save interaction ID when interaction is saved', () => {
+  it('should save hints when interaction is saved', () => {
     spyOn(StateEditorService, 'setInteractionHints');
 
     ctrl.saveHints('Hints');
@@ -361,7 +361,7 @@ describe('QuestionEditorComponent', () => {
       .toHaveBeenCalledWith('InapplicableID');
   });
 
-  it('should save interaction ID when interaction is saved', () => {
+  it('should save next content ID index when interaction is saved', () => {
     expect(ctrl.questionStateData.nextContentIdIndex).toBe(null);
 
     ctrl.saveNextContentIdIndex('Next ID');
