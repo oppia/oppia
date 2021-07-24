@@ -476,10 +476,10 @@ def get_invalid_svg_tags_and_attrs(svg_string):
     invalid_elements = []
     invalid_attrs = []
     for element in soup.find_all():
-        if element.name.lower() in constants.SVG_ATTRS_WHITELIST:
+        if element.name.lower() in constants.SVG_ATTRS_ALLOWLIST:
             for attr in element.attrs:
                 if attr.lower() not in (
-                        constants.SVG_ATTRS_WHITELIST[element.name.lower()]):
+                        constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:
             invalid_elements.append(element.name)

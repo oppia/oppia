@@ -37,7 +37,10 @@ export class SuggestionThread {
   lastUpdatedMsecs: number;
   messageCount: number;
   threadId: string;
-  suggestion: Suggestion;
+  // A null suggestion refers that the suggestion_type is not
+  // 'edit_exploration_state_content' It can be any of the two
+  // other types i.e. 'translate_content' and 'add_question'.
+  suggestion: Suggestion | null;
   lastNonemptyMessageSummary: ThreadMessageSummary;
   messages: ThreadMessage[] = [];
 
@@ -46,7 +49,7 @@ export class SuggestionThread {
       originalAuthorName: string, lastUpdatedMsecs: number,
       messageCount: number, threadId: string,
       lastNonemptyMessageSummary: ThreadMessageSummary,
-      suggestion: Suggestion) {
+      suggestion: Suggestion | null) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -100,7 +103,7 @@ export class SuggestionThread {
     return true;
   }
 
-  getSuggestion(): Suggestion {
+  getSuggestion(): Suggestion | null {
     return this.suggestion;
   }
 }
@@ -108,7 +111,7 @@ export class SuggestionThread {
 @Injectable({providedIn: 'root'})
 export class SuggestionThreadObjectFactory {
   private createEditExplorationStateContentSuggestionFromBackendDict(
-      suggestionBackendDict: SuggestionBackendDict): Suggestion {
+      suggestionBackendDict: SuggestionBackendDict): Suggestion | null {
     if (suggestionBackendDict.suggestion_type !==
         'edit_exploration_state_content') {
       return null;

@@ -18,21 +18,21 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SuggestionThreadObjectFactory } from
-  'domain/suggestion/SuggestionThreadObjectFactory';
-import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessage.model';
+import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+import { FeedbackThreadBackendDict } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { SuggestionBackendDict } from './suggestion.model';
 
 describe('SuggestionThreadObjectFactory', () => {
   let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
 
   beforeEach(() => {
     suggestionThreadObjectFactory =
-      TestBed.get(SuggestionThreadObjectFactory);
+      TestBed.inject(SuggestionThreadObjectFactory);
   });
 
-  let suggestionThreadBackendDict;
-  let suggestionBackendDict;
+  let suggestionThreadBackendDict: FeedbackThreadBackendDict;
+  let suggestionBackendDict: SuggestionBackendDict;
 
   beforeEach(() => {
     suggestionThreadBackendDict = {
@@ -52,12 +52,9 @@ describe('SuggestionThreadObjectFactory', () => {
       suggestion_type: '',
       target_type: 'exploration',
       target_id: 'exp1',
-      target_version_at_submission: 1,
       status: 'accepted',
       author_name: 'author',
       change: {
-        cmd: 'edit_state_property',
-        property_name: 'content',
         state_name: 'state_1',
         new_value: { html: 'new suggestion content' },
         old_value: { html: 'old suggestion content' }
@@ -88,17 +85,17 @@ describe('SuggestionThreadObjectFactory', () => {
 
     let suggestion = suggestionThread.getSuggestion();
     expect(suggestion).not.toBeNull();
-    expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
-    expect(suggestion.suggestionType)
+    expect(suggestion?.suggestionId).toEqual('exploration.exp1.thread1');
+    expect(suggestion?.suggestionType)
       .toEqual('edit_exploration_state_content');
-    expect(suggestion.targetType).toEqual('exploration');
-    expect(suggestion.targetId).toEqual('exp1');
-    expect(suggestion.status).toEqual('accepted');
-    expect(suggestion.authorName).toEqual('author');
-    expect(suggestion.newValue.html).toEqual('new suggestion content');
-    expect(suggestion.oldValue.html).toEqual('old suggestion content');
-    expect(suggestion.lastUpdatedMsecs).toEqual(1000);
-    expect(suggestion.getThreadId()).toEqual('exploration.exp1.thread1');
+    expect(suggestion?.targetType).toEqual('exploration');
+    expect(suggestion?.targetId).toEqual('exp1');
+    expect(suggestion?.status).toEqual('accepted');
+    expect(suggestion?.authorName).toEqual('author');
+    expect(suggestion?.newValue.html).toEqual('new suggestion content');
+    expect(suggestion?.oldValue.html).toEqual('old suggestion content');
+    expect(suggestion?.lastUpdatedMsecs).toEqual(1000);
+    expect(suggestion?.getThreadId()).toEqual('exploration.exp1.thread1');
     expect(suggestionThread.isSuggestionThread()).toBeTrue();
     expect(suggestionThread.isSuggestionHandled()).toBeTrue();
 
@@ -123,13 +120,6 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
     expect(suggestionThread.getSuggestion()).toBeNull();
-
-    suggestionThread.setSuggestionStatus(null);
-
-    expect(suggestionThread.isSuggestionHandled()).toBeNull();
-    expect(suggestionThread.getSuggestionStatus()).toBeNull();
-    expect(suggestionThread.getSuggestionStateName()).toBeNull();
-    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toBeNull();
   });
 
   describe('.setMessages', () => {
