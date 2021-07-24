@@ -27,7 +27,8 @@ ruleTester.run('check-element-selector-at-top', rule, {
     {
       code:
       `var action = require('./action.js');
-      var forms = require('./forms.js');var waitFor = require('./waitFor.js');
+      var forms = require('./forms.js');
+      var waitFor = require('./waitFor.js');
 
       var LibraryPage = function() {
         var allCollectionSummaryTile = element.all(

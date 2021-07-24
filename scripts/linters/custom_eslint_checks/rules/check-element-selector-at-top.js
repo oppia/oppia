@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Lint check to ensure that element selectors
- * at the tops of the files.
+ * at the top of the file.
  */
 
 'use strict';
@@ -24,7 +24,7 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to ensure that element selectors at the tops of the files'),
+        'Lint check to ensure that element selectors at the top of the file'),
       category: 'Best Practices',
       recommended: true,
     },
