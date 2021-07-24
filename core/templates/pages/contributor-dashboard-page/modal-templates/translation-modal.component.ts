@@ -104,8 +104,7 @@ export class TranslationModalComponent {
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
-    'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-svgdiagram'
+    'oppia-noninteractive-skillreview'
   ];
 
   constructor(
