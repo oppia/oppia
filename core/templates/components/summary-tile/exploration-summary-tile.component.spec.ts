@@ -211,7 +211,6 @@ describe('Exploration Summary Tile Component', () => {
     component.getExplorationId = '1';
     component.getExplorationTitle = 'Title';
     component.getStoryNodeId = '1';
-    component.getLastUpdatedMsec = 1000;
     component.getNumViews = '100';
     component.getObjective = 'objective';
     component.getCategory = 'category';
@@ -228,7 +227,6 @@ describe('Exploration Summary Tile Component', () => {
     component.openInNewWindow = 'true';
     component.isCommunityOwned = true;
     component.isCollectionPreviewTile = true;
-    component.mobileCutoffPx = 500;
     component.isPlaylistTile = true;
     component.getParentExplorationIds = '123';
     component.showLearnerDashboardIconsIfPossible = 'true';
@@ -344,14 +342,14 @@ describe('Exploration Summary Tile Component', () => {
     ' if rating are undefined', fakeAsync(() => {
     const ratingsSpy = spyOn(
       ratingComputationService, 'computeAverageRating')
-      .and.returnValue(3);
+      .and.returnValue(undefined);
 
     let averageRatings = component.getAverageRating();
     tick();
     fixture.detectChanges();
 
-    expect(ratingsSpy).not.toHaveBeenCalled();
-    expect(averageRatings).toBe(null);
+    expect(ratingsSpy).toHaveBeenCalled();
+    expect(averageRatings).toBeUndefined();
   }));
 
   it('should get last updated Date & time', () => {
@@ -359,6 +357,7 @@ describe('Exploration Summary Tile Component', () => {
       dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
       .and.returnValue('1:30 am');
 
+    component.getLastUpdatedMsec = 1000;
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
@@ -367,15 +366,10 @@ describe('Exploration Summary Tile Component', () => {
   });
 
   it('should fail to get last updated Date & time', () => {
-    const dateTimeSpy = spyOn(
-      dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-      .and.returnValue('1:30 am');
-
     let dateTime = component.getLastUpdatedDatetime();
     fixture.detectChanges();
 
     expect(dateTime).toBeNull();
-    expect(dateTimeSpy).not.toHaveBeenCalled();
   });
 
   it('should get the thumbnail url', () => {
@@ -391,7 +385,8 @@ describe('Exploration Summary Tile Component', () => {
   });
 
   it('should return to the same page if ExplorationId is undefined' +
-     'not present', () => {
+     ' not present', () => {
+    component.getExplorationId = '';
     const result = component.getExplorationLink();
     fixture.detectChanges();
 
@@ -448,6 +443,7 @@ describe('Exploration Summary Tile Component', () => {
       '/story/fhfhvhgvhvvh');
     const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
 
+    component.getStoryNodeId = '';
     const result = component.getExplorationLink();
 
     tick();
