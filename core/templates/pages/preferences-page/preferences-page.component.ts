@@ -16,7 +16,7 @@
  * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -37,10 +37,10 @@ require('cropperjs/dist/cropper.min.css');
   templateUrl: './preferences-page.component.html'
 })
 export class PreferencesPageComponent {
-  @Input() subjectInterests: string;
-  @Input() preferredLanguageCodes;
-  @Input() preferredSiteLanguageCode: string;
-  @Input() preferredAudioLanguageCode: string;
+  subjectInterests: string;
+  preferredLanguageCodes;
+  preferredSiteLanguageCode: string;
+  preferredAudioLanguageCode: string;
   subjectInterestsChangeAtLeastOnce: boolean;
   exportingData = false;
   profilePictureDataUrl: string;
