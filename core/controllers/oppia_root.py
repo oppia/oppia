@@ -20,9 +20,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import acl_decorators
 from core.controllers import base
 
-from typing import Any
-from typing import Dict
-from typing import Text
+from typing import Any # pylint: disable=unused-import
+from typing import Dict # pylint: disable=unused-import
+from typing import Text # pylint: disable=unused-import
+
 
 class OppiaRootPage(base.BaseHandler):
     """Renders oppia root page (unified entry point) for all routes registered

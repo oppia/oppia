@@ -37,11 +37,10 @@ import python_utils
 import utils
 
 import backports.functools_lru_cache
+from typing import Any # pylint: disable=unused-import
+from typing import Dict # pylint: disable=unused-import
+from typing import Text # pylint: disable=unused-import
 import webapp2
-
-from typing import Any
-from typing import Dict
-from typing import Text
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
