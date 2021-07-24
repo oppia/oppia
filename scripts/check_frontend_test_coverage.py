@@ -193,7 +193,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'solution-explanation-editor.directive.ts',
     'state-card.model.ts',
     'state-content-editor.directive.ts',
-    'state-hints-editor.component.ts',
     'state-interaction-editor.directive.ts',
     'state-solution-editor.directive.ts',
     'state-top-answers-stats.service.ts',

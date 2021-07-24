@@ -124,7 +124,7 @@ angular.module('oppia').component('stateHintsEditor', {
       };
 
       $scope.openAddHintModal = function() {
-        if ($scope.StateHintsService.displayed.length === 5) {
+        if ($scope.StateHintsService.displayed.length >= 5) {
           return;
         }
         AlertsService.clearWarnings();
