@@ -19,7 +19,7 @@
 import { EventEmitter } from '@angular/core';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-fdescribe('OutcomeEditorComponent', () => {
+describe('OutcomeEditorComponent', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
