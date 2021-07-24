@@ -65,10 +65,6 @@ var suites = {
       'protractor_desktop/creatorDashboard.js'
     ],
 
-    emailDashboard: [
-      'protractor_desktop/emailDashboard.js'
-    ],
-
     embedding: [
       'protractor_desktop/embedding.js'
     ],

@@ -1044,7 +1044,6 @@ def compress_to_zlib(data):
     Returns:
         str. Compressed data string.
     """
-
     return zlib.compress(data)
 
 

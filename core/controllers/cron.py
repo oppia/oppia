@@ -26,9 +26,6 @@ from core.domain import suggestion_services
 from core.domain import user_services
 import feconf
 
-TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
-MAX_JOBS_TO_REPORT_ON = 50
-
 
 class CronModelsCleanupHandler(base.BaseHandler):
     """Handler for cleaning up models that are marked as deleted and marking

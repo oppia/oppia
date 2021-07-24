@@ -26,8 +26,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
     def test_redirect_forum(self):
         response = self.get_html_response(
             '/forum', expected_status_int=302)
-        self.assertIn(
-            feconf.GOOGLE_GROUP_URL, response.headers['location'])
+        self.assertIn(feconf.GOOGLE_GROUP_URL, response.headers['location'])
 
     def test_redirect_about(self):
         response = self.get_html_response(
@@ -37,8 +36,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
     def test_redirect_foundation(self):
         response = self.get_html_response(
             '/foundation', expected_status_int=302)
-        self.assertIn(
-            feconf.FOUNDATION_SITE_URL, response.headers['location'])
+        self.assertIn(feconf.FOUNDATION_SITE_URL, response.headers['location'])
 
     def test_redirect_teach(self):
         response = self.get_html_response(

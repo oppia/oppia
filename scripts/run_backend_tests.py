@@ -163,8 +163,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TestingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
-    def __init__(
-            self, test_target, generate_coverage_report):
+    def __init__(self, test_target, generate_coverage_report):
         self.test_target = test_target
         self.generate_coverage_report = generate_coverage_report
 
@@ -177,9 +176,7 @@ class TestingTaskSpec(python_utils.OBJECT):
                 TEST_RUNNER_PATH, test_target_flag
             ]
         else:
-            exc_list = [
-                sys.executable, TEST_RUNNER_PATH, test_target_flag
-            ]
+            exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
         result = run_shell_cmd(exc_list)
 

@@ -169,7 +169,7 @@ class ExplicitKeywordArgsCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_call(
                 node_with_no_error_message)
 
-    def test_skips_when_calling_not_callable(self):
+    def test_checker_skips_object_call_when_noncallable_object_is_called(self):
         node_with_no_error_message = astroid.extract_node(
             """
             1() #@

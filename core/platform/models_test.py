@@ -149,8 +149,8 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_models_recommendations(self):
         """Tests import_models function with recommendations option."""
-        from core.storage.recommendations import gae_models as recommendations_models    # pylint: disable=line-too-long
-        expected_recommendations_models = (recommendations_models,)
+        from core.storage.recommendations import gae_models
+        expected_recommendations_models = (gae_models,)
         self.assertEqual(
             expected_recommendations_models,
             self.registry_instance.import_models(
