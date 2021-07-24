@@ -71,7 +71,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
-        'user_feedback_selected_items': None,
+        'user_feedback_selected_items': [],
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
         'logcat_logs': ['logcat1', 'logcat2'],
@@ -131,7 +131,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'user_supplied_feedback': {
             'report_type': 'suggestion',
             'category': 'language_suggestion',
-            'user_feedback_selected_items': None,
+            'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'french'
         }
     }
@@ -268,7 +268,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             user_supplied_feedback.category.name,
             self.android_report_model.category)
         self.assertEqual(
-            user_supplied_feedback.user_feedback_selected_items, None)
+            user_supplied_feedback.user_feedback_selected_items, [])
         self.assertEqual(
             user_supplied_feedback.user_feedback_other_text_input,
             self.android_report_model.android_report_info[
@@ -1119,19 +1119,20 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 self.android_report_obj.report_id))
 
+        # Values from the model dict are read as strings in the assertion.
         expected_report_dict = {
-            'user_feedback_selected_items': None,
+            'user_feedback_selected_items': [],
             'user_feedback_other_text_input': None,
-            'event_logs': None,
-            'logcat_logs': None,
-            'package_version_code': 1,
+            'event_logs': [],
+            'logcat_logs': [],
+            'package_version_code': '1',
             'android_device_language_locale_code': 'en',
             'build_fingerprint': 'example_fingerprint_id',
             'network_type': 'wifi',
             'text_size': 'medium_text_size',
-            'only_allows_wifi_download_and_update': True,
-            'automatically_update_topics': False,
-            'account_is_profile_admin': False
+            'only_allows_wifi_download_and_update': 'True',
+            'automatically_update_topics': 'False',
+            'account_is_profile_admin': 'False'
         }
 
         self.assertEqual(scrubbed_report_model.scrubbed_by, self.user_id)
