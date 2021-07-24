@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ViewEncapsulation } from '@angular/core';
 
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from
@@ -27,10 +28,11 @@ import { UrlInterpolationService } from
 @Component({
   selector: 'volunteer-page',
   templateUrl: './volunteer-page.component.html',
-  styleUrls: []
+  styleUrls: [],
+  encapsulation: ViewEncapsulation.None
 })
 export class VolunteerPageComponent implements OnInit {
-  volunteerImgUrl: string = '';
+  mapImgUrl: string = '';
   formIconUrl: string = '';
   callIconUrl: string = '';
   changeIconUrl: string = '';
@@ -41,8 +43,8 @@ export class VolunteerPageComponent implements OnInit {
   ) {}
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Volunteer | Oppia');
-    this.volunteerImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/volunteer_hero_image.png');
+    this.mapImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/general/map.png');
     this.formIconUrl = this.urlInterpolationService.getStaticImageUrl(
       '/icons/icon_form.png');
     this.callIconUrl = this.urlInterpolationService.getStaticImageUrl(
