@@ -53,7 +53,9 @@ class ExplorationImprovementsHandler(base.BaseHandler):
                     'items': {
                         'type': 'object_dict',
                         'validation_method': (
-                            domain_objects_validator.validate_task_entriy_for_improvements) # pylint: disable=line-too-long
+                            domain_objects_validator
+                            .validate_task_entriy_for_improvements
+                        )
                     }
                 }
             }
@@ -74,8 +76,6 @@ class ExplorationImprovementsHandler(base.BaseHandler):
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         task_entries = self.normalized_payload.get('task_entries')
-        if task_entries is None:
-            raise self.InvalidInputException('No task_entries provided')
         task_entries_to_put = []
         for task_entry in task_entries:
             entity_version = task_entry.get('entity_version')
