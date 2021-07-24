@@ -32,7 +32,7 @@ export class BlogCardComponent implements OnInit {
   @Input() authorProfilePicDataUrl: string;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
-  thumbnailUrl: string;
+  thumbnailUrl: string = '';
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -45,8 +45,6 @@ export class BlogCardComponent implements OnInit {
         .getThumbnailUrlForPreview(
           AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
           this.blogPostSummary.thumbnailFilename);
-    } else {
-      this.thumbnailUrl = '';
     }
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
