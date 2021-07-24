@@ -68,7 +68,7 @@ require('services/contextual/window-dimensions.service');
 require('services/external-save.service.ts');
 
 angular.module('oppia').directive('stateSolutionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {
@@ -76,8 +76,8 @@ angular.module('oppia').directive('stateSolutionEditor', [
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-solution-editor/' +
+      template: require(
+        'components/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
       controller: [
         '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
@@ -85,7 +85,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
         'SolutionValidityService', 'SolutionVerificationService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
-        'StateSolutionService', 'UrlInterpolationService',
+        'StateSolutionService',
         'WindowDimensionsService',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
         'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
@@ -96,7 +96,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
             SolutionValidityService, SolutionVerificationService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
-            StateSolutionService, UrlInterpolationService,
+            StateSolutionService,
             WindowDimensionsService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
@@ -154,8 +154,8 @@ angular.module('oppia').directive('stateSolutionEditor', [
             ExternalSaveService.onExternalSave.emit();
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: 'AddOrUpdateSolutionModalController'
@@ -191,8 +191,8 @@ angular.module('oppia').directive('stateSolutionEditor', [
 
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-solution-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
