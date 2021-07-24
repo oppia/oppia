@@ -1287,7 +1287,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'about-page.mainpage.html',
+                'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
