@@ -26,7 +26,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { InteractiveInteractiveMapComponent } from './oppia-interactive-interactive-map.component';
 
-fdescribe('InteractiveInteractiveMapComponent', () => {
+describe('InteractiveInteractiveMapComponent', () => {
   let component: InteractiveInteractiveMapComponent;
   let fixture: ComponentFixture<InteractiveInteractiveMapComponent>;
   let playerPositionService: PlayerPositionService;

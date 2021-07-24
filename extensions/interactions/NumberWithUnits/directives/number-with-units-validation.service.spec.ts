@@ -30,7 +30,7 @@ import { Fraction, FractionDict } from 'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 
-fdescribe('NumberWithUnitsValidationService', () => {
+describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
   let currentState: string;

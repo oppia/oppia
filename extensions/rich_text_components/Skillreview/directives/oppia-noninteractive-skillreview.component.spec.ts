@@ -25,7 +25,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ContextService } from 'services/context.service';
 import { SimpleChanges } from '@angular/core';
 
-fdescribe('NoninteractiveSkillreview', () => {
+describe('NoninteractiveSkillreview', () => {
   let component: NoninteractiveSkillreview;
   let fixture: ComponentFixture<NoninteractiveSkillreview>;
   let ckEditorCopyContentService: CkEditorCopyContentService;

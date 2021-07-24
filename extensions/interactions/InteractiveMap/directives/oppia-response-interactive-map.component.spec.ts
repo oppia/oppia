@@ -23,7 +23,7 @@ import { icon, LatLng, tileLayer } from 'leaflet';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ResponseInteractiveMapComponent } from './oppia-response-interactive-map.component';
 
-fdescribe('ResponseInteractiveMapComponent', () => {
+describe('ResponseInteractiveMapComponent', () => {
   let component: ResponseInteractiveMapComponent;
   let fixture: ComponentFixture<ResponseInteractiveMapComponent>;
 

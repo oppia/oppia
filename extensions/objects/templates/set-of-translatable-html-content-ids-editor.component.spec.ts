@@ -21,7 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { SetOfTranslatableHtmlContentIdsEditorComponent } from './set-of-translatable-html-content-ids-editor.component';
 
-fdescribe('SetOfTranslatableHtmlContentIdsEditorComponent', () => {
+describe('SetOfTranslatableHtmlContentIdsEditorComponent', () => {
   let component: SetOfTranslatableHtmlContentIdsEditorComponent;
   let fixture: ComponentFixture<SetOfTranslatableHtmlContentIdsEditorComponent>;
 

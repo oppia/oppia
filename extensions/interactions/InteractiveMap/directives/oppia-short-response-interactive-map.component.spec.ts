@@ -21,7 +21,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ShortResponseInteractiveMapComponent } from './oppia-short-response-interactive-map.component';
 
-fdescribe('ShortResponseInteractiveMapComponent', () => {
+describe('ShortResponseInteractiveMapComponent', () => {
   let component: ShortResponseInteractiveMapComponent;
   let fixture: ComponentFixture<ShortResponseInteractiveMapComponent>;
 

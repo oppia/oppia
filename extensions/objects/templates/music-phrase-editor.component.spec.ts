@@ -22,7 +22,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { MusicPhraseEditorComponent } from './music-phrase-editor.component';
 
-fdescribe('MusicPhraseEditorComponent', () => {
+describe('MusicPhraseEditorComponent', () => {
   let component: MusicPhraseEditorComponent;
   let fixture: ComponentFixture<MusicPhraseEditorComponent>;
   let alertsService: AlertsService;

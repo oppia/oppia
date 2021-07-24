@@ -29,7 +29,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { NoninteractiveMath } from './oppia-noninteractive-math.component';
 
-fdescribe('NoninteractiveMath', () => {
+describe('NoninteractiveMath', () => {
   let assetsBackendApiService: AssetsBackendApiService;
   let htmlEscaperService: HtmlEscaperService;
   let component: NoninteractiveMath;

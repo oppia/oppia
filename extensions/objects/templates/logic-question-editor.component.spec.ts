@@ -21,7 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { LogicQuestionEditorComponent } from './logic-question-editor.component';
 
-fdescribe('LogicQuestionEditorComponent', () => {
+describe('LogicQuestionEditorComponent', () => {
   let component: LogicQuestionEditorComponent;
   let fixture: ComponentFixture<LogicQuestionEditorComponent>;
 
