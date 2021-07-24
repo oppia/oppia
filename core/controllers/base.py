@@ -39,7 +39,9 @@ import utils
 import backports.functools_lru_cache
 import webapp2
 
-from typing import Any, Dict, Text
+from typing import Any
+from typing import Dict
+from typing import Text
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
