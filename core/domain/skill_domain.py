@@ -935,6 +935,37 @@ class Skill(python_utils.OBJECT):
         return '%s-%d' % (self.id, misconception_id)
 
     @classmethod
+    def convert_html_fields_in_skill_contents(
+            cls, skill_contents_dict, conversion_fn):
+        """Applies a conversion function on all the html strings in a skill
+        to migrate them to a desired state.
+
+        Args:
+            skill_contents_dict: dict. The dict representation of skill
+                contents.
+            conversion_fn: function. The conversion function to be applied on
+                the skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        skill_contents_dict['explanation']['html'] = conversion_fn(
+                skill_contents_dict['explanation']['html'])
+        skill_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                skill_contents_dict['written_translations'], conversion_fn))
+
+        for value_index, value in enumerate(
+                skill_contents_dict['worked_examples']):
+            skill_contents_dict['worked_examples'][value_index][
+                'question']['html'] = conversion_fn(value['question']['html'])
+            skill_contents_dict['worked_examples'][value_index][
+                'explanation']['html'] = conversion_fn(
+                    value['explanation']['html'])
+        return skill_contents_dict
+
+    @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
         """Converts v1 skill contents to the v2 schema. In the v2 schema,
         the new Math components schema is introduced.
@@ -945,29 +976,9 @@ class Skill(python_utils.OBJECT):
         Returns:
             dict. The converted skill_contents_dict.
         """
-        skill_contents_dict['explanation']['html'] = (
-            html_validation_service.add_math_content_to_math_rte_components(
-                skill_contents_dict['explanation']['html']))
-        skill_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                skill_contents_dict['written_translations'],
-                html_validation_service.
-                add_math_content_to_math_rte_components))
-
-        for value_index, value in enumerate(
-                skill_contents_dict['worked_examples']):
-            skill_contents_dict['worked_examples'][value_index][
-                'question']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        value['question']['html']))
-            skill_contents_dict['worked_examples'][value_index][
-                'explanation']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        value['explanation']['html']))
-        return skill_contents_dict
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.add_math_content_to_math_rte_components)
 
     @classmethod
     def _convert_skill_contents_v2_dict_to_v3_dict(cls, skill_contents_dict):
@@ -981,29 +992,9 @@ class Skill(python_utils.OBJECT):
         Returns:
             dict. The converted skill_contents_dict.
         """
-        skill_contents_dict['explanation']['html'] = (
-            html_validation_service.convert_svg_diagram_tags_to_image_tags(
-                skill_contents_dict['explanation']['html']))
-        skill_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                skill_contents_dict['written_translations'],
-                html_validation_service.
-                convert_svg_diagram_tags_to_image_tags))
-
-        for value_index, value in enumerate(
-                skill_contents_dict['worked_examples']):
-            skill_contents_dict['worked_examples'][value_index][
-                'question']['html'] = (
-                    html_validation_service.
-                    convert_svg_diagram_tags_to_image_tags(
-                        value['question']['html']))
-            skill_contents_dict['worked_examples'][value_index][
-                'explanation']['html'] = (
-                    html_validation_service.
-                    convert_svg_diagram_tags_to_image_tags(
-                        value['explanation']['html']))
-        return skill_contents_dict
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
     def update_skill_contents_from_model(
