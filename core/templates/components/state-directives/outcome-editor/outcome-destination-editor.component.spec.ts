@@ -191,7 +191,8 @@ describe('OutcomeDestinationEditor', () => {
     spyOnProperty(StateEditorService, 'onStateNamesChanged')
       .and.returnValue(onStateNamesChangedEmitter);
     spyOn(StateEditorService, 'getStateNames')
-      .and.returnValues(['Introduction', 'State1', 'End'],
+      .and.returnValues(
+        ['Introduction', 'State1', 'End'],
         ['Introduction', 'State2', 'End']);
     spyOn(StateGraphLayoutService, 'getLastComputedArrangement')
       .and.returnValue(computedLayout);
