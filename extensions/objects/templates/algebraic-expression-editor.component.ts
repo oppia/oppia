@@ -111,9 +111,6 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   }
 
   isCurrentAnswerValid(): boolean {
-    if (this.currentValue === undefined) {
-      this.currentValue = '';
-    }
     // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
     // is not compatible with nerdamer or with the backend validations.
     this.currentValue = this.mathInteractionsService.replaceAbsSymbolWithText(

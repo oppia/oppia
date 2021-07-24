@@ -120,8 +120,7 @@ class MockUrlService {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Exploration Summary Tile Component', () => {
+describe('Exploration Summary Tile Component', () => {
   let component: ExplorationSummaryTileComponent;
   let fixture: ComponentFixture<ExplorationSummaryTileComponent>;
   let dateTimeFormatService: DateTimeFormatService;
@@ -215,14 +214,14 @@ fdescribe('Exploration Summary Tile Component', () => {
     component.getNumViews = '100';
     component.getObjective = 'objective';
     component.getCategory = 'category';
-    component.getRatings = {
-      1: 1,
-      2: 0,
-      3: 0,
-      4: 0,
-      5: 1
+    component.getContributorsSummary = {
+      username1: {
+        num_commits: 1,
+      },
+      username2: {
+        num_commits: 2,
+      }
     };
-    component.getContributorsSummary = {};
     component.getThumbnailIconUrl = '/subjects/Welcome';
     component.getThumbnailBgColor = 'blue';
     component.openInNewWindow = 'true';
@@ -327,6 +326,13 @@ fdescribe('Exploration Summary Tile Component', () => {
   }));
 
   it('should get the average ratings of the exploration', fakeAsync(() => {
+    component.getRatings = {
+      1: 1,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 1
+    };
     const ratingsSpy = spyOn(
       ratingComputationService, 'computeAverageRating')
       .and.returnValue(3);
@@ -349,7 +355,7 @@ fdescribe('Exploration Summary Tile Component', () => {
     tick();
     fixture.detectChanges();
 
-    expect(ratingsSpy).toHaveBeenCalled();
+    expect(ratingsSpy).not.toHaveBeenCalled();
     expect(averageRatings).toBeUndefined();
   }));
 

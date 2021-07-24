@@ -23,8 +23,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('AlgebraicExpressionEditor', () => {
+describe('AlgebraicExpressionEditor', () => {
   let component: AlgebraicExpressionEditorComponent;
   let fixture: ComponentFixture<AlgebraicExpressionEditorComponent>;
   let windowRef: WindowRef;
@@ -81,7 +80,6 @@ fdescribe('AlgebraicExpressionEditor', () => {
       AlgebraicExpressionEditorComponent);
     component = fixture.componentInstance;
     windowRef.nativeWindow.Guppy = MockGuppy;
-    component.currentValue = '';
   });
 
   it('should add the change handler to guppy', () => {
@@ -109,13 +107,11 @@ fdescribe('AlgebraicExpressionEditor', () => {
 
   it('should correctly validate current answer', () => {
     // This should not show warnings if the editor hasn't been touched.
-    component.currentValue = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
 
     component.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
-    component.currentValue = '';
     expect(component.isCurrentAnswerValid()).toBeFalse();
     expect(
       component.warningText).toBe('Please enter an answer before submitting.');
