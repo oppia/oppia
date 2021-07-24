@@ -346,6 +346,10 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        large_image_file = (
+            '<svg><path d="%s" /></svg>' % (
+                'M150 0 L75 200 L225 200 Z ' * 4000)
+        )
 
         # Upload an SVG image that exceeds the file size limit of 100 KB.
         response_dict = self.post_json(
@@ -356,12 +360,15 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=((
                 'image',
                 'unused_filename',
-                '<svg><path d="%s" /></svg>' % (
-                    'M150 0 L75 200 L225 200 Z ' * 4000)),)
+                large_image_file),)
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'], 'Image exceeds file size limit of 100 KB.')
+
+        error_msg = (
+            'Schema validation for \'image\' failed: Validation failed: '
+            'has_length_at_most ({u\'max_value\': 102400}) for object %s'
+            % large_image_file)
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
