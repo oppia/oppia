@@ -61,6 +61,11 @@ const routes: Route[] = [
       .then(m => m.PartnershipsPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE,
+    loadChildren: () => import('pages/participation-playbook/playbook.module')
+      .then(m => m.PlaybookPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE,
     loadChildren: () => import('pages/privacy-page/privacy-page.module')
       .then(m => m.PrivacyPageModule)

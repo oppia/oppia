@@ -6028,6 +6028,18 @@ export default {
       "TITLE": "Partnerships | Oppia",
       "META": []
     },
+    "PLAYBOOK": {
+      "ROUTE": "creator-guidelines",
+      "TITLE": "Creator Guidelines | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        }
+      ]
+    },
     "PRIVACY": {
       "ROUTE": "privacy-policy",
       "TITLE": "Privacy Policy | Oppia",

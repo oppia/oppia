@@ -119,7 +119,6 @@ FILEPATHS_NOT_TO_RENAME = (
 
 PAGES_IN_APP_YAML = (
     'webpack_bundles/logout-page.mainpage.html',
-    'webpack_bundles/playbook.mainpage.html',
 )
 
 # Hashes for files with these paths should be provided to the frontend in
