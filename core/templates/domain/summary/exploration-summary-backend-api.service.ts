@@ -60,8 +60,7 @@ export class ExplorationSummaryBackendApiService {
       explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (
-        value: ExplorationSummaryBackendDict |
-        Promise<ExplorationSummaryBackendDict>) => void,
+        value: ExplorationSummaryBackendDict) => void,
       errorCallback: (reason: string | null[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {

@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { GraphAnswer } from 'interactions/answer-defs';
 
-type AdjacencyMatrix = (number | null)[][];
+export type AdjacencyMatrix = (number | null)[][];
 
 @Injectable({
   providedIn: 'root'

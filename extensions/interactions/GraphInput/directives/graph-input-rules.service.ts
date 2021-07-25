@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { GraphUtilsService } from
+import { AdjacencyMatrix, GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { UtilsService } from 'services/utils.service';
 import { GraphAnswer } from 'interactions/answer-defs';
@@ -151,6 +151,16 @@ export class GraphInputRulesService {
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
 
+  private _getDegreesOfMatrix(adj: AdjacencyMatrix): number[] {
+    return adj.map((value) => {
+      return value.reduce((prev, cur) => {
+        prev = (prev === null) ? 0 : prev;
+        cur = (cur === null) ? 0 : cur;
+        return prev + cur;
+      });
+    }).sort();
+  }
+
   private isIsomorphic(graph1: GraphAnswer, graph2: GraphAnswer): boolean {
     if (graph1.vertices.length !== graph2.vertices.length) {
       return false;
@@ -161,35 +171,8 @@ export class GraphInputRulesService {
 
     // Check that for every vertex from the first graph there is a vertex in
     // the second graph with the same sum of weights of outgoing edges.
-    var degrees1 = adj1.map((value) => {
-      return value.reduce((prev, cur) => {
-        if (prev === null && cur === null) {
-          return 0;
-        }
-        if (prev === null) {
-          return cur;
-        }
-        if (cur === null) {
-          return prev;
-        }
-        return prev + cur;
-      });
-    }).sort();
-
-    var degrees2 = adj2.map((value) => {
-      return value.reduce((prev, cur) => {
-        if (prev === null && cur === null) {
-          return 0;
-        }
-        if (prev === null) {
-          return cur;
-        }
-        if (cur === null) {
-          return prev;
-        }
-        return prev + cur;
-      });
-    }).sort();
+    var degrees1 = this._getDegreesOfMatrix(adj1);
+    var degrees2 = this._getDegreesOfMatrix(adj2);
 
     if (!this.utilsService.isEquivalent(degrees1, degrees2)) {
       return false;

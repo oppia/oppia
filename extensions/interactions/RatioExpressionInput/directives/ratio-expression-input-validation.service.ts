@@ -151,7 +151,11 @@ export class RatioExpressionInputValidationService {
             }
           } else if (currentRuleType === 'HasSpecificTermEqualTo') {
             const _currentInput = <number[]> currentInput;
-            let termIndex = _currentInput[0]; // Note: termIndex is 1-indexed.
+            // Note: termIndex is 1-indexed, not 0-indexed. In other words,
+            // we don't want the lesson implementor to have a rule like
+            // "make sure the 0-th term of the ratio equals..." since the
+            // 0-th term doesn't exist.
+            let termIndex = _currentInput[0];
             if (termIndex > expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
