@@ -5968,6 +5968,15 @@ export default {
     }
   },
 
+  // A dict representing available landing pages, having subject as a key
+  // and list of topics as the value.
+  // Note: This dict needs to be keep in sync with frontend
+  // TOPIC_LANDING_PAGE_DATA oppia constant defined in
+  // core/templates/pages/landing-pages/TopicLandingPage.js file.
+  "AVAILABLE_LANDING_PAGES": {
+    "math": ["fractions", "negative-numbers", "ratios"]
+  },
+
   "DEV_MODE": true,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",

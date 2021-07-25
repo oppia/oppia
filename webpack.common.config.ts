@@ -100,9 +100,6 @@ module.exports = {
       'exploration-player-page.import.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.import.ts',
-    landing:
-      commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-      'topic-landing-page.import.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
@@ -416,16 +413,6 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['landing'],
-      filename: 'topic-landing-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-        'topic-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

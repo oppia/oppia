@@ -28,14 +28,27 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)
-  },
-  {
-    path: '**',
-    loadChildren: () => import(
-      'pages/error-pages/error-404/error-404-page.module').then(
-      m => m.Error404PageModule)
   }
 ];
+
+for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
+  for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
+    routes.push({
+      path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
+      loadChildren: () => import(
+        'pages/landing-pages/topic-landing-page/topic-landing-page.module')
+        .then(m => m.TopicLandingPageModule)
+    });
+  }
+}
+
+routes.push({
+  path: '**',
+  loadChildren: () => import(
+    'pages/error-pages/error-404/error-404-page.module').then(
+    m => m.Error404PageModule)
+});
+
 
 @NgModule({
   imports: [
