@@ -56,7 +56,7 @@ describe('Blog Post Object Factory', () => {
   });
 
   it('should raise correct validation issues for pre publish' +
-  'validation', () => {
+    ' validation', () => {
     sampleBlogPostData.title = '';
     sampleBlogPostData.content = '';
     sampleBlogPostData.removeTag('news');
@@ -72,7 +72,7 @@ describe('Blog Post Object Factory', () => {
   });
 
   it('should raise correct validation issues for' +
-  'exceeding property limits', () => {
+    ' exceeding property limits', () => {
     sampleBlogPostData.addTag('Learner');
     sampleBlogPostData.title = 'Title exceeding character limit of 40' +
       ' characters should raise error.';

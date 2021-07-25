@@ -88,7 +88,7 @@ describe('Blog Post Editor backend api service', () => {
   }));
 
   it('should use the rejection handler if the backend request for fetching' +
-      'data fails', fakeAsync(() => {
+    ' data fails', fakeAsync(() => {
     bpebas.fetchBlogPostEditorData('sampleBlogId').then(
       successHandler, failHandler);
 
@@ -172,7 +172,7 @@ describe('Blog Post Editor backend api service', () => {
     }));
 
   it('should use the rejection handler if the blog post to update doesn\'t' +
-      'exist', fakeAsync(() => {
+    ' exist', fakeAsync(() => {
     let changeDict = {
       title: 'title_sample',
       content: '<p>Hello Blog<P>',
