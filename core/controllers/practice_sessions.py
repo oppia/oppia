@@ -28,6 +28,11 @@ import python_utils
 class PracticeSessionsPage(base.BaseHandler):
     """Renders the practice sessions page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
         """Handles GET requests."""
@@ -39,6 +44,27 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
     """Fetches relevant data for the practice sessions page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'selected_subtopic_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
@@ -46,7 +72,8 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)
-        comma_separated_subtopic_ids = self.request.get('selected_subtopic_ids')
+        comma_separated_subtopic_ids = (
+            self.normalized_request.get('selected_subtopic_ids'))
         selected_subtopic_ids = comma_separated_subtopic_ids.split(',')
 
         selected_skill_ids = []
