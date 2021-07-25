@@ -33,14 +33,14 @@ angular.module('oppia').component('stateTranslationEditor', {
     'ExplorationStatesService', 'ExternalSaveService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
-    'TranslationTabActiveContentIdService', 'UrlInterpolationService',
+    'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
     function(
         $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
-        TranslationTabActiveContentIdService, UrlInterpolationService,
+        TranslationTabActiveContentIdService,
         WrittenTranslationObjectFactory) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -58,8 +58,8 @@ angular.module('oppia').component('stateTranslationEditor', {
             return;
           }
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/' +
+            template: require(
+              'components/forms/forms-templates/' +
               'mark-audio-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'

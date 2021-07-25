@@ -49,14 +49,8 @@ describe('Utils Service', () => {
   });
 
   it('should check if the input is an error', () => {
-    // A custom Error.
-    var NotImplementedError = function(message) {
-      this.name = 'NotImplementedError';
-      this.message = (message || '');
-    };
-    NotImplementedError.prototype = Error.prototype;
     expect(uts.isError(new Error())).toBeTrue();
-    expect(uts.isError(new NotImplementedError('abc'))).toBeTrue();
+    expect(uts.isError(new TypeError())).toBeTrue();
     expect(uts.isError(new DOMException('abc'))).toBeTrue();
     expect(uts.isError(12)).toBeFalse();
     expect(uts.isError(undefined)).toBeFalse();
@@ -95,6 +89,62 @@ describe('Utils Service', () => {
     expect(uts.isEquivalent(objA, objC)).toBe(false);
   });
 
+  it('should return false if objects are not of the same type', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = 2;
+    expect(uts.isEquivalent(objA, objB)).toBe(false);
+  });
+
+  it('should return false if one of the objects are null', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = null;
+    expect(uts.isEquivalent(objA, objB)).toBe(false);
+  });
+
+  it('should return true if both of the objects are null', () => {
+    const objA = null;
+    const objB = null;
+    expect(uts.isEquivalent(objA, objB)).toBe(true);
+  });
+
+  it('should return false if values of the objects are not equal', () => {
+    const objA = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'b'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    const objB = {
+      k1: 'Value1',
+      k2: 'Value2',
+      k3: [1, 2, 3, 4, {a: 'c'}],
+      k4: {
+        x: [1, 2, 3, {a: [1, 2, 3]}],
+        y: 'abc'
+      }
+    };
+    expect(uts.isEquivalent(objA, objB)).toBe(false);
+  });
+
   it('should check if an obj is defined or not', () => {
     const objA = {};
     const objB = {
@@ -109,19 +159,19 @@ describe('Utils Service', () => {
   });
 
   it('should determine when an element is overflowing', () => {
-    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', null, {
+    let elWithHorizontalOverflow = jasmine.createSpyObj('HTMLElement', [''], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 500, scrollHeight: 300,
     });
     expect(uts.isOverflowing(elWithHorizontalOverflow)).toBeTrue();
 
-    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', null, {
+    let elWithVerticalOverflow = jasmine.createSpyObj('HTMLElement', [''], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 600,
     });
     expect(uts.isOverflowing(elWithVerticalOverflow)).toBeTrue();
 
-    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', null, {
+    let elWithoutOverflow = jasmine.createSpyObj('HTMLElement', [''], {
       offsetWidth: 200, offsetHeight: 300,
       scrollWidth: 200, scrollHeight: 300,
     });
