@@ -52,13 +52,13 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         request header and stores the feedback report.
         """
         if not self._has_valid_android_request_headers(self.request.headers):
-            raise UnauthorizedRequestException(
+            raise self.UnauthorizedUserException(
                 'The incoming request does not have valid authentication for '
                 'Oppia Android.')
 
         report_dict = self.payload.get('report')
         if not report_dict:
-            raise utils.InvalidInputException(
+            raise self.InvalidInputException(
                 'A report must be sent in the request.')
 
         report_obj = (
@@ -93,9 +93,3 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
                 app_version_code != feconf.ANDROID_APP_VERSION_CODE):
             return False
         return True
-
-
-class UnauthorizedRequestException(Exception):
-    """Error class for an unauthorized request."""
-
-    pass

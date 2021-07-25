@@ -571,10 +571,6 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         Raises:
             ValidationError. The item is not a valid selection option.
         """
-        if selected_items is None:
-            raise utils.ValidationError(
-                'Category %s requires selection options in the report.' % (
-                    category))
         for item in selected_items:
             if not isinstance(item, python_utils.BASESTRING):
                 raise utils.ValidationError(

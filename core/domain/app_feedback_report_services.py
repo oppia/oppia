@@ -573,7 +573,6 @@ def reassign_ticket(report, new_ticket):
             # We are removing the only report associated with this ticket.
             old_ticket_obj.newest_report_creation_timestamp = None # type: ignore[assignment]
         else:
-            old_ticket_obj.reports.remove(report.report_id)
             if old_ticket_obj.newest_report_creation_timestamp == (
                     report.submitted_on_timestamp):
                 # Update the newest report timestamp.
@@ -586,6 +585,7 @@ def reassign_ticket(report, new_ticket):
                             report_models[index].submitted_on_datetime)
                 old_ticket_obj.newest_report_creation_timestamp = (
                     latest_timestamp)
+        old_ticket_obj.reports.remove(report.report_id)
         _save_ticket(old_ticket_obj)
         _update_report_stats_model_in_transaction(
             old_ticket_id, platform, stats_date, report, -1)

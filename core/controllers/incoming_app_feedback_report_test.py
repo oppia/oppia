@@ -113,11 +113,30 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def test_incoming_report_with_no_report_raises_error(self):
         # type: () -> None
-        self._post_json_with_test_headers({}, expected_status=400)
+        response = self._post_json_with_test_headers({}, expected_status=400)
+        self.assertEqual(
+            response['error'], 'Missing key in handler args: report.')
 
     def test_incoming_report_with_invalid_headers_raises_exception(self):
         # type: () -> None
-        # Send a request without headers to act as "incorrect headers".
+        token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
+        # Webtest requires explicit str-types headers.
+        invalid_headers = {
+            'api_key': str('bad_key'), # pylint: disable=disallowed-function-calls
+            'app_package_name': str('bad_package_name'), # pylint: disable=disallowed-function-calls
+            'app_version_name': str('bad_version_name'), # pylint: disable=disallowed-function-calls
+            'app_version_code': str('bad_version_code'), # pylint: disable=disallowed-function-calls
+        }
+        response = self.post_json( # type: ignore[no-untyped-call]
+            feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL, self.payload,
+            headers=invalid_headers, csrf_token=token, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'The incoming request does not have valid authentication for '
+            'Oppia Android.')
+
+    def test_incoming_report_with_no_headers_raises_exception(self):
+        # type: () -> None
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
         self.post_json( # type: ignore[no-untyped-call]
             feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL, self.payload,
@@ -132,6 +151,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             payload: dict. The request payload of a feedback report.
             expected_status: int. The expected response status of the
                 request.
+
+        Returns:
+            dict. The JSON response for the request in dict form.
         """
         # Webapp requires the header values to be str-types, so they must have
         # parity for the tests correctly check these fields.
@@ -146,7 +168,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                     with self.swap(
                         feconf, 'ANDROID_APP_VERSION_CODE',
                         ANDROID_APP_VERSION_CODE_STRING):
-                        self.post_json( # type: ignore[no-untyped-call]
+                        return self.post_json( # type: ignore[no-untyped-call]
                             feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
                             payload, headers=self.headers,
                             csrf_token=token,

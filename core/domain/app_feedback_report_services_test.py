@@ -1024,7 +1024,72 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             decremented_stats_model.daily_param_stats,
             expected_json)
 
-    def test_reassign_ticket_updates_newest_report_creation_timestamp(self):
+    def test_reassign_ticket_updates_old_ticket_model_to_none(self):
+        # type: () -> None
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
+        new_ticket_id = self._add_new_android_ticket(
+            'ticket_name', ['report_id'])
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_ticket_id))
+        new_ticket_obj = app_feedback_report_services.get_ticket_from_model(
+            new_ticket_model)
+        self.assertIn(self.android_report_id, self.android_ticket_obj.reports)
+
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
+        updated_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertNotIn(
+            self.android_report_id, updated_ticket_model.report_ids)
+        self.assertIsNone(
+            updated_ticket_model.newest_report_creation_timestamp)
+
+    def test_reassign_ticket_updates_old_ticket_existing_ticket(self):
+        # type: () -> None
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
+        older_timestamp = (
+            self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=2))
+        for i in python_utils.RANGE(1, len(3)):
+            report_id = self._add_current_report(submitted_on=older_timestamp)
+            report_model = (
+                app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                    report_id))
+            report_obj = app_feedback_report_services.get_report_from_model(
+                report_model)
+            app_feedback_report_services.store_incoming_report_stats(report_obj)
+            app_feedback_report_services.reassign_ticket(
+                report_obj, self.android_ticket_obj)
+        original_ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                'ticket_name'))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            original_ticket_id, ticket_name, self.PLATFORM_ANDROID,
+            None, None, self.REPORT_SUBMITTED_TIMESTAMP, report_ids)
+        original_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                original_ticket_id))
+        original_ticket_obj = (
+            app_feedback_report_services.get_ticket_from_model(
+                original_ticket_model))
+
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, original_ticket_obj)
+        updated_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                original_ticket_obj.ticket_id))
+
+        self.assertNotIn(
+            self.android_report_id, updated_ticket_model.report_ids)
+        self.assertEqual(
+            updated_ticket_model.newest_report_timestamp,
+            older_timestamp)
+
+    def test_reassign_updates_new_ticket_newest_report_creation_timestamp(self):
         # type: () -> None
         ticket_name = 'ticket_name'
         report_ids = ['report_id']
@@ -1291,7 +1356,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(model_entity)
         self.assertIsNone(model_entity.scrubbed_by)
 
-    def _add_current_report(self):
+    def _add_current_report(self, submitted_on=self.REPORT_SUBMITTED_TIMESTAMP):
         # type: () -> Text
         """Adds reports to the model that should not be scrubbed."""
         report_id = (
@@ -1304,7 +1369,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 id=report_id,
                 platform=self.PLATFORM_ANDROID,
                 ticket_id=ticket_id,
-                submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
+                submitted_on=submitted_on,
                 local_timezone_offset_hrs=0,
                 report_type=self.REPORT_TYPE_SUGGESTION.name,
                 category=self.CATEGORY_OTHER.name,
