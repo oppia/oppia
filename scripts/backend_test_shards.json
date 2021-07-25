@@ -54,6 +54,7 @@
     "2": [
         "core.platform.storage.cloud_storage_emulator_test",
         "core.platform.storage.dev_mode_storage_services_test",
+        "core.platform.storage.cloud_storage_services_test",
         "core.controllers.collection_viewer_test",
         "core.domain.rating_services_test",
         "core.domain.classifier_services_test",
