@@ -29,7 +29,7 @@ require(
 require('services/editability.service.ts');
 
 angular.module('oppia').directive('responseHeader', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -45,8 +45,8 @@ angular.module('oppia').directive('responseHeader', [
         showWarning: '&showWarning',
         navigateToState: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/response-header/' +
+      template: require(
+        'components/state-directives/response-header/' +
         'response-header.directive.html'),
       controllerAs: '$ctrl',
       controller: [

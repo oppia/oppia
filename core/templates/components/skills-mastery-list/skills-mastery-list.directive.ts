@@ -26,7 +26,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/user.service.ts');
 
 angular.module('oppia').directive('skillsMasteryList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -34,8 +34,8 @@ angular.module('oppia').directive('skillsMasteryList', [
         getDegreesOfMastery: '&degreesOfMastery',
         getSkillDescriptions: '&skillDescriptions'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skills-mastery-list/skills-mastery-list.directive.html'),
+      template: require(
+        'components/skills-mastery-list/skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$uibModal', 'UserService', 'MASTERY_COLORS',
@@ -70,8 +70,8 @@ angular.module('oppia').directive('skillsMasteryList', [
           ctrl.openConceptCardModal = function(skillId) {
             var skillDescription = ctrl.getSkillDescriptions()[skillId];
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/concept-card/concept-card-modal.template.html'
+              template: require(
+                'components/concept-card/concept-card-modal.template.html'
               ),
               backdrop: true,
               resolve: {
