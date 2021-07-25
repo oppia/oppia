@@ -24,7 +24,6 @@ import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 import { PageTitleService } from 'services/page-title.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 
 
 @Component({

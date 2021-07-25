@@ -21,13 +21,15 @@ import { TestBed } from '@angular/core/testing';
 import { VolunteerPageComponent } from './volunteer-page.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 
-describe('Volunteer page', () => {
+fdescribe('Volunteer page', () => {
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [VolunteerPageComponent],
       providers: [
         UrlInterpolationService,
+        NgbCarouselConfig,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -49,11 +51,7 @@ describe('Volunteer page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
 
-    expect(component.volunteerImgUrl).toBe(
-      '/assets/images/general/volunteer_hero_image.png');
-    expect(component.formIconUrl).toBe('/assets/images/icons/icon_form.png');
-    expect(component.callIconUrl).toBe('/assets/images/icons/icon_call.png');
-    expect(component.changeIconUrl).toBe(
-      '/assets/images/icons/icon_change.png');
+    expect(component.mapImgUrl).toBe(
+      '/assets/images/volunteer/map.png');
   });
 });
