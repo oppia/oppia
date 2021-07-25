@@ -67,7 +67,9 @@ ID_LENGTH = 12
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
-class DELETION_POLICY(enum.Enum):
+class DELETION_POLICY(enum.Enum): # pylint: disable=invalid-name
+    """Enum for Deletion Policy of a model."""
+
     # Models that should be kept.
     KEEP = 1
     # Models that should be deleted.
@@ -84,7 +86,9 @@ class DELETION_POLICY(enum.Enum):
     NOT_APPLICABLE = 6
 
 
-class EXPORT_POLICY(enum.Enum):
+class EXPORT_POLICY(enum.Enum): # pylint: disable=invalid-name
+    """Enum for Export Policy of a model."""
+
     # Indicates that a model's field is to be exported.
     EXPORTED = 1
     # Indicates that the value of the field is exported as the key in the
@@ -94,7 +98,9 @@ class EXPORT_POLICY(enum.Enum):
     NOT_APPLICABLE = 3
 
 
-class MODEL_ASSOCIATION_TO_USER(enum.Enum):
+class MODEL_ASSOCIATION_TO_USER(enum.Enum): # pylint: disable=invalid-name
+    """Enum for model's association to the user."""
+
     # Indicates that a model has a single instance per user.
     ONE_INSTANCE_PER_USER = 1
     # Indicates that a model can be shared by multiple users.
@@ -1563,4 +1569,3 @@ class BaseMapReduceBatchResultsModel(BaseModel):
 
     _use_cache = False
     _use_memcache = False
-

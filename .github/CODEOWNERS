@@ -505,6 +505,7 @@
 /mypy_requirements.txt @vojtechjelinek
 /python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
+/stubs/ @vojtechjelinek
 /utils*.py @aks681
 
 

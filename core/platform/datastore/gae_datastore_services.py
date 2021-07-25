@@ -57,6 +57,7 @@ UserProperty = ndb.UserProperty
 
 TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
 
+
 @functools.wraps(ndb.StringProperty)
 def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.StringProperty

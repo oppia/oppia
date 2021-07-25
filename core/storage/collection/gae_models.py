@@ -352,6 +352,7 @@ class CollectionRightsSnapshotMetadataModel(
 
     pass
 
+
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
