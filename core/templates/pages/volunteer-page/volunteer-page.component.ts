@@ -197,7 +197,7 @@ export class VolunteerPageComponent implements OnInit {
       ]
     };
 
-    this.ngbCarouselConfig.interval = 200000;
+    this.ngbCarouselConfig.interval = 10000;
     this.ngbCarouselConfig.keyboard = true;
     this.ngbCarouselConfig.pauseOnHover = true;
     this.ngbCarouselConfig.pauseOnFocus = true;

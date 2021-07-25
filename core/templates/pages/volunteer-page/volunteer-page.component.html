@@ -20,7 +20,7 @@
     <div class="hide-xs hide-sm hide-md col-4 flex-45 mt-5">
       <img alt="Volunteer page map image - Desktop view" [src]="mapImgUrl">
     </div>
-    <div class="hide-gt-md">
+    <div class="hide-gt-md px-5">
       <img alt="Volunteer page map image - Mobile view" [src]="mapImgUrl">
     </div>
 
@@ -295,6 +295,24 @@
     margin: 0 4em 0 4.5em;
   }
 
+  .oppia-volunteer-content p {
+    line-height: 1.5;
+  }
+
+  @media screen and (max-width: 400px) {
+    .oppia-volunteer-h1 {
+      font-size: 1.8em;
+    }
+
+    .oppia-volunteer-h3 {
+      padding: 0 1.3em;
+    }
+
+    .oppia-volunteer-content {
+      margin: 2em 2em 2em 3em;
+    }
+  }
+
   .volunteer-page button {
     background-color: #00645c;
     border-radius: 4px;
@@ -390,6 +408,20 @@
 
   li.oppia-volunteer-page-description-list-item {
     margin-bottom: 10px;
+  }
+
+  @media screen and (max-width: 400px) {
+    .oppia-volunteer-tabs {
+      width: 100%;
+    }
+
+    .oppia-volunteer-tab-description {
+      margin: 1em 2em 1em 2em;
+    }
+
+    .oppia-volunteer-tabs ngb-carousel {
+      margin: 2em auto;
+    }    
   }
 
   .oppia-volunteer-footer {
