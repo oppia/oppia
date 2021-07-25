@@ -20,6 +20,7 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 
 import { VolunteerPageComponent } from './volunteer-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -35,7 +36,8 @@ import { VolunteerPageRootComponent } from
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    NgbModule
   ],
   declarations: [
     VolunteerPageComponent,
