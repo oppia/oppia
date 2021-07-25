@@ -97,6 +97,6 @@ describe('Blog Dashboard Tile Component', () => {
 
       NOW_MILLIS = 1517563100000;
       expect(component.getDateStringInWords(NOW_MILLIS))
-        .toBe('Feburary 02, 2018');
+        .toBe('February 2, 2018');
     });
 });
