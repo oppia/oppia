@@ -60,6 +60,17 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
+class HelperFunctionTests(test_utils.GenericTestBase):
+
+    def test_load_template(self):
+        oppia_root_path = os.path.join(
+            'core', 'templates', 'pages', 'oppia-root')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
+            self.assertIn(
+                '"Loading | Oppia"',
+                base.load_template('oppia-root.mainpage.html'))
+
+
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
     core/templates/pages have unique filenames. This is required
