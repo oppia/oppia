@@ -212,7 +212,8 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
     excluded_dirs = [
-        '.git', 'third_party', 'node_modules', 'venv', 'core/tests/data']
+        '.git', 'third_party', 'node_modules', 'venv',
+        'core/tests/data', 'core/tests/build_sources']
     for root in os.listdir(base_path):
         if any([s in root for s in excluded_dirs]):
             continue
@@ -220,14 +221,10 @@ def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
             result = result + (
                 _get_test_target_classes(os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
-            if any([s in subroot for s in excluded_dirs]):
+            if any(s in subroot for s in excluded_dirs):
                 continue
-            if _LOAD_TESTS_DIR in subroot and include_load_tests:
-                for f in files:
-                    if f.endswith('_test.py'):
-                        result = result + (
-                            _get_test_target_classes(os.path.join(subroot, f)))
-
+            if _LOAD_TESTS_DIR in subroot and not include_load_tests:
+                continue
             for f in files:
                 if f.endswith('_test.py'):
                     result = result + (
