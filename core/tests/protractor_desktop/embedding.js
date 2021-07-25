@@ -125,7 +125,7 @@ describe('Embedding', function() {
     'iframed=true&locale=en#version=0.0.1&secret=',
     'http:\/\/localhost:9001\/assets\/scripts\/' +
     'embedding_tests_dev_i18n_0.0.1.min.html - Refused to display ' +
-    '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id//?' +
+    '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id\\?' +
     'iframed=true&locale=en#version=0.0.1&secret='
   ];
 
