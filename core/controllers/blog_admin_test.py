@@ -253,14 +253,15 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler', payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response_dict['error'],
-            'Value for max tags cannot be less than or equal to 0.'
+            response_dict['error'], 'Schema validation for \'new_config_'
+            'property_values\' failed: Validation failed: is_at_least'
+            ' ({u\'min_value\': 1}) for object 0'
         )
 
     def test_raise_error_for_updating_to_negative_value_for_max_tags(self):
         self.login(self.BLOG_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        new_config_value = -5
+        new_config_value = -2
 
         response_dict = self.get_json('/blogadminhandler')
         response_config_properties = response_dict['config_properties']
@@ -280,6 +281,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler', payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response_dict['error'],
-            'Value for max tags cannot be less than or equal to 0.'
+            response_dict['error'], 'Schema validation for \'new_config_'
+            'property_values\' failed: Validation failed: is_at_least'
+            ' ({u\'min_value\': 1}) for object -2'
         )
