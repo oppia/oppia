@@ -99,7 +99,8 @@
 /core/domain/blog*.py @iamprayush @aks681
 /core/controllers/blog_dashboard*.py @aks681
 /core/controllers/blog_homepage*.py @aks681
-
+/core/templates/domain/blog/ @kevintab95 @iamprayush
+/core/templates/pages/blog-dashboard-page/ @aks681 @iamprayush
 
 # Collection project.
 /core/controllers/collection*.py @aks681

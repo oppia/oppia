@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Blog Dashboard - Oppia"})
+    <script>
+    // This prevents angular pages to cause side effects to hybrid pages.
+    // TODO(#13080): Remove fake resumeBootstrap once angularjs is removed
+    // from this page (schema based editor is migrated to angular).
+    if (!window.angular.resumeBootstrap) {
+      window.angular.resumeBootstrap = function(extraModules) {};
+    }
+    </script>
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <oppia-blog-dashboard-navbar-breadcrumb>
+            </oppia-blog-dashboard-navbar-breadcrumb>
+          </navbar-breadcrumb>
+          <content>
+          </content>
+          <page-footer></page-footer>
+        </oppia-base-content>
+      </div>
+
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
+  </body>
+</html>
