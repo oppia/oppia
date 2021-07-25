@@ -34,8 +34,7 @@ describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
     ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;
-  let urlInterpolationService:
-    UrlInterpolationService;
+  let urlInterpolationService: UrlInterpolationService;
   const skillOpportunityResponse = {
     opportunities: [{
       id: 'skill_id',

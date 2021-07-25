@@ -54,9 +54,11 @@ export class ExplorationRecommendationsBackendApiService {
       includeSystemRecommendations: string,
       // 'collectionId', 'storyId' and 'currentNodeId' can be null
       // since they may not be present in the URL.
-      collectionId: string | null, storyId: string | null,
-      currentNodeId: string | null, explorationId: string):
-      Promise<LearnerExplorationSummary[]> {
+      collectionId: string | null,
+      storyId: string | null,
+      currentNodeId: string | null,
+      explorationId: string
+  ): Promise<LearnerExplorationSummary[]> {
     let recommendationsUrlParams: RecommendationsUrlParams = {
       stringified_author_recommended_ids: JSON.stringify(
         authorRecommendedExpIds),

@@ -30,6 +30,10 @@ interface TopicRightsBackendResponse {
   'topic_is_published': boolean,
   'manager_ids': string[]
 }
+
+type TopicRightsCache = (
+  Record<string, (TopicRightsBackendDict | TopicRightsBackendResponse)>);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,8 +43,7 @@ export class TopicRightsBackendApiService {
     private httpClient: HttpClient
   ) {}
 
-  topicRightsCache:
-    Record<string, (TopicRightsBackendDict | TopicRightsBackendResponse)> = {};
+  topicRightsCache: TopicRightsCache = {};
 
   private _fetchTopicRights(
       topicId: string,
@@ -74,13 +77,13 @@ export class TopicRightsBackendApiService {
     };
 
     this.httpClient.put<TopicRightsBackendResponse>(
-      changeTopicStatusUrl, putParams).toPromise().then(
-      (response) => {
-        this.topicRightsCache[topicId] = response;
-        successCallback(response);
-      }, (errorResponse) => {
-        errorCallback(errorResponse.error.error);
-      });
+      changeTopicStatusUrl, putParams
+    ).toPromise().then((response) => {
+      this.topicRightsCache[topicId] = response;
+      successCallback(response);
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
   }
 
   private _sendMail(
