@@ -356,7 +356,7 @@ def main(args=None):
             all_test_targets = [parsed_args.test_target + '_test']
     elif parsed_args.test_shard:
         validation_error = _check_shards_match_tests(
-            include_load_tests=False)
+            include_load_tests=True)
         if validation_error:
             raise Exception(validation_error)
         all_test_targets = _get_all_test_targets_from_shard(
