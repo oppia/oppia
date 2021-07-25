@@ -41,17 +41,11 @@ datastore_services = models.Registry.import_datastore_services()
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(CollectionSnapshotMetadataModel, self).__init__(*args, **kwargs)
+    pass
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(CollectionSnapshotContentModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -72,10 +66,6 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the collection being edited.
     collection_id = (
         datastore_services.StringProperty(indexed=True, required=True))
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(CollectionCommitLogEntryModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -198,10 +188,6 @@ class CollectionModel(base_models.VersionedModel):
     # whose structure might need to be changed in the future.
     collection_contents = (
         datastore_services.JsonProperty(default={}, indexed=False))
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(CollectionModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -364,22 +350,11 @@ class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(
-            CollectionRightsSnapshotMetadataModel,
-            self).__init__(*args, **kwargs)
-
+    pass
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(
-            CollectionRightsSnapshotContentModel,
-            self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -454,10 +429,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(CollectionRightsModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -783,10 +754,6 @@ class CollectionSummaryModel(base_models.BaseModel):
     version = datastore_services.IntegerProperty()
     # The number of nodes(explorations) that are within this collection.
     node_count = datastore_services.IntegerProperty()
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(CollectionSummaryModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():

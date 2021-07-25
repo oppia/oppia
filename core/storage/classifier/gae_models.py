@@ -75,10 +75,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     algorithm_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(ClassifierTrainingJobModel, self).__init__(*args, **kwargs)
-
     @staticmethod
     def get_deletion_policy():
         # type: () -> base_models.DELETION_POLICY
@@ -265,10 +261,6 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     # mapped to its unique job_id.
     algorithm_ids_to_job_ids = datastore_services.JsonProperty(
         required=True, indexed=True)
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(StateTrainingJobsMappingModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():

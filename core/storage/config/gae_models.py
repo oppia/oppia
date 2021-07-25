@@ -35,19 +35,11 @@ class ConfigPropertySnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a config property snapshot."""
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(
-            ConfigPropertySnapshotMetadataModel, self).__init__(*args, **kwargs)
+    pass
 
 
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(
-            ConfigPropertySnapshotContentModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -67,10 +59,6 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     # The property value.
     value = datastore_services.JsonProperty(indexed=False)
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(ConfigPropertyModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -101,22 +89,12 @@ class PlatformParameterSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a platform parameter snapshot."""
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(
-            PlatformParameterSnapshotMetadataModel,
-            self).__init__(*args, **kwargs)
+    pass
 
 
 class PlatformParameterSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content for a platform parameter snapshot."""
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(
-            PlatformParameterSnapshotContentModel,
-            self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():
@@ -138,10 +116,6 @@ class PlatformParameterModel(base_models.VersionedModel):
     rules = datastore_services.JsonProperty(repeated=True)
     rule_schema_version = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(PlatformParameterModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_deletion_policy():

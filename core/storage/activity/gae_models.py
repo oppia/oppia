@@ -43,10 +43,6 @@ class ActivityReferencesModel(base_models.BaseModel):
     # in this list is a dict with two keys: 'type' and 'id'.
     activity_references = datastore_services.JsonProperty(repeated=True)
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(ActivityReferencesModel, self).__init__(*args, **kwargs)
-
     @staticmethod
     def get_deletion_policy():
         # type: () -> base_models.DELETION_POLICY
