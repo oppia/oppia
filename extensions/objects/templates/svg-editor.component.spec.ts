@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the svg filename editor.
+ * @fileoverview Unit tests for the svg editor.
  */
 
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
-import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
-import { PolyPoint, SvgFilenameEditorComponent } from './svg-filename-editor.component';
+import { SvgEditorConstants } from './svg-editor.constants';
+import { PolyPoint, SvgEditorComponent } from './svg-editor.component';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -34,7 +34,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
 import { of } from 'rxjs';
 
-var initializeMockDocument = (svgFilenameCtrl: SvgFilenameEditorComponent) => {
+var initializeMockDocument = (svgFilenameCtrl: SvgEditorComponent) => {
   var mockDocument = document.createElement('div');
   var colors = ['stroke', 'fill', 'bg'];
   for (var i = 0; i < 3; i++) {
@@ -61,13 +61,13 @@ var initializeMockDocument = (svgFilenameCtrl: SvgFilenameEditorComponent) => {
   document.getElementsByTagName('body')[0].appendChild(mockDocument);
 };
 
-describe('SvgFilenameEditor', () => {
+describe('SvgEditor', () => {
   var alertSpy: jasmine.Spy<(warning: string) => void>;
   let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
   var contextService: ContextService;
   var csrfService: CsrfTokenService;
-  let fixture: ComponentFixture<SvgFilenameEditorComponent>;
-  var component: SvgFilenameEditorComponent;
+  let fixture: ComponentFixture<SvgEditorComponent>;
+  var component: SvgEditorComponent;
   let svgSanitizerService: SvgSanitizerService;
   // This sample SVG is generated using different tools present
   // in the SVG editor.
@@ -201,7 +201,7 @@ describe('SvgFilenameEditor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [SvgFilenameEditorComponent],
+      declarations: [SvgEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
@@ -253,7 +253,7 @@ describe('SvgFilenameEditor', () => {
     // We have only defined the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-    fixture = TestBed.createComponent(SvgFilenameEditorComponent);
+    fixture = TestBed.createComponent(SvgEditorComponent);
     component = fixture.componentInstance;
     initializeMockDocument(component);
     component.ngOnInit();
@@ -311,28 +311,28 @@ describe('SvgFilenameEditor', () => {
     component.diagramWidth = 600;
     component.onWidthInputBlur();
     expect(component.currentDiagramWidth).toBe(
-      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
+      SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
   });
 
   it('should reset to maximum height correctly', () => {
     component.diagramHeight = 600;
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
-      SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
+      SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
   });
 
   it('should reset to minimum width correctly', () => {
     component.diagramWidth = 0;
     component.onWidthInputBlur();
     expect(component.currentDiagramWidth).toBe(
-      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
+      SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
   });
 
   it('should reset to minimum height correctly', () => {
     component.diagramHeight = 0;
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
-      SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
+      SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
   });
 
   it('should fail svg validation', () => {
@@ -707,8 +707,8 @@ describe('SvgFilenameEditor', () => {
 });
 
 
-describe('SvgFilenameEditor initialized with value attribute', () => {
-  var component: SvgFilenameEditorComponent;
+describe('SvgEditor initialized with value attribute', () => {
+  var component: SvgEditorComponent;
   var contextService: ContextService;
   var samplesvg = (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
@@ -731,7 +731,7 @@ describe('SvgFilenameEditor initialized with value attribute', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [SvgFilenameEditorComponent],
+      declarations: [SvgEditorComponent],
       providers: [
         {
           provide: AssetsBackendApiService,
@@ -745,7 +745,7 @@ describe('SvgFilenameEditor initialized with value attribute', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     component = TestBed.createComponent(
-      SvgFilenameEditorComponent).componentInstance;
+      SvgEditorComponent).componentInstance;
     component.value = 'svgimageFilename1.svg';
     contextService = TestBed.inject(ContextService);
     const svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService = (
@@ -767,11 +767,11 @@ describe('SvgFilenameEditor initialized with value attribute', () => {
 );
 
 describe(
-  'SvgFilenameEditor with image save destination as local storage',
+  'SvgEditor with image save destination as local storage',
   () => {
     var contextService: ContextService;
-    let fixture: ComponentFixture<SvgFilenameEditorComponent>;
-    var component: SvgFilenameEditorComponent = null;
+    let fixture: ComponentFixture<SvgEditorComponent>;
+    var component: SvgEditorComponent = null;
     var samplesvg = (
       '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
     'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
@@ -851,7 +851,7 @@ describe(
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        declarations: [SvgFilenameEditorComponent],
+        declarations: [SvgEditorComponent],
         providers: [
           {
             provide: AssetsBackendApiService,
@@ -894,7 +894,7 @@ describe(
       // defined the properties we need in 'mockReaderObject'.
       // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-      fixture = TestBed.createComponent(SvgFilenameEditorComponent);
+      fixture = TestBed.createComponent(SvgEditorComponent);
       component = fixture.componentInstance;
       initializeMockDocument(component);
       component.ngOnInit();

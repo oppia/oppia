@@ -1,4 +1,4 @@
-<div class="fs-container svg-filename-editor">
+<div class="fs-container svg-editor">
   <div *ngIf="!isDiagramSaved()" class="diagram-editor-size-toolbar">
     <div class="input-box">
       Width:&nbsp;
@@ -304,18 +304,18 @@
   </div>
 </div>
 <style>
-  .svg-filename-editor .diagram-editor-size-toolbar .input-box {
+  .svg-editor .diagram-editor-size-toolbar .input-box {
     display: inline-block;
   }
-  .svg-filename-editor .diagram-editor-size-toolbar .dimension-note {
+  .svg-editor .diagram-editor-size-toolbar .dimension-note {
     font-size: 15px;
   }
 
-  .svg-filename-editor .diagram-editor-saved-image-container {
+  .svg-editor .diagram-editor-saved-image-container {
     position: relative;
   }
 
-  .svg-filename-editor .diagram-editor-saved-image-container .edit-icon {
+  .svg-editor .diagram-editor-saved-image-container .edit-icon {
     color: #000;
     cursor: pointer;
     position: absolute;
@@ -324,18 +324,18 @@
     top: 6px;
   }
 
-  .svg-filename-editor .svg-editor {
+  .svg-editor .svg-editor {
     background-color: #fff;
     min-height: 450px;
     position: relative;
   }
 
-  .svg-filename-editor .svg-editor>* {
+  .svg-editor .svg-editor>* {
     position: absolute
   }
 
-  .svg-filename-editor .svg-editor,
-  .svg-filename-editor .svg-editor * {
+  .svg-editor .svg-editor,
+  .svg-editor .svg-editor * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box
@@ -347,7 +347,7 @@
     width: 7px;
   }
 
-  .svg-filename-editor .svg-editor .fabric-canvas {
+  .svg-editor .svg-editor .fabric-canvas {
     border: 1px solid #555;
     bottom: 31px;
     cursor: default;
@@ -380,17 +380,17 @@
     width: 50%;
   }
 
-  .svg-filename-editor .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
+  .svg-editor .svg-editor .fabric-canvas::-webkit-scrollbar-thumb {
     background-color: #7c7c7c;
     border-radius: 4px;
   }
 
-  .svg-filename-editor .svg-editor .fabric-canvas .fabric-canvas-container {
+  .svg-editor .svg-editor .fabric-canvas .fabric-canvas-container {
     height: 368px;
     width: 494px;
   }
 
-  .svg-filename-editor .svg-editor .horizontal-toolbar {
+  .svg-editor .svg-editor .horizontal-toolbar {
     background-color: #fff;
     border: 1px solid #555;
     height: 31px;
@@ -398,15 +398,15 @@
     right: 0;
   }
 
-  .svg-filename-editor .svg-editor .horizontal-toolbar.bottom-toolbar {
+  .svg-editor .svg-editor .horizontal-toolbar.bottom-toolbar {
     bottom: 0;
   }
 
-  .svg-filename-editor .svg-editor .horizontal-toolbar.top-toolbar {
+  .svg-editor .svg-editor .horizontal-toolbar.top-toolbar {
     top: 0;
   }
 
-  .svg-filename-editor .svg-editor .horizontal-toolbar .input-tag {
+  .svg-editor .svg-editor .horizontal-toolbar .input-tag {
     border-radius: 3px;
     float: left;
     font-size: 13px;
@@ -417,7 +417,7 @@
     position: relative;
   }
 
-  .svg-filename-editor .svg-editor .horizontal-toolbar .info-tag {
+  .svg-editor .svg-editor .horizontal-toolbar .info-tag {
     padding-left: 3px;
     padding-top: 5px;
   }
@@ -434,11 +434,11 @@
     }
   }
 
-  .svg-filename-editor .svg-editor .horizontal-toolbar .layer-info {
+  .svg-editor .svg-editor .horizontal-toolbar .layer-info {
     font-size: 19px;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar {
+  .svg-editor .svg-editor .vertical-toolbar {
     background-color: #fff;
     border: 1px solid #555;
     bottom: 0;
@@ -447,31 +447,31 @@
     width: 62px;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .fat-button {
+  .svg-editor .svg-editor .vertical-toolbar .fat-button {
     clear: both;
     font-size: 13px;
     width: 57px
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .icon-tool {
+  .svg-editor .svg-editor .vertical-toolbar .icon-tool {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 100% auto;
     font-size: 24px;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .icon-tool.disabled {
+  .svg-editor .svg-editor .vertical-toolbar .icon-tool.disabled {
     filter: alpha(opacity=40);
     opacity: 0.4;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .thin-button {
+  .svg-editor .svg-editor .vertical-toolbar .thin-button {
     float: left;
     position: relative;
     width: 26px;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button {
+  .svg-editor .svg-editor .vertical-toolbar .toolbar-button {
     background-color: #fff;
     border: 2px solid transparent;
     border-radius: 3px;
@@ -482,11 +482,11 @@
     text-align: center;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
+  .svg-editor .svg-editor .vertical-toolbar .toolbar-button .bezier-curve {
     font-size: 21px;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button .pie-chart {
+  .svg-editor .svg-editor .vertical-toolbar .toolbar-button .pie-chart {
     font-size: 22px;
   }
 
@@ -498,14 +498,14 @@
     background-color: #555;
   }
 
-  .svg-filename-editor .svg-editor .vertical-toolbar .vert-bottom-toolbar {
+  .svg-editor .svg-editor .vertical-toolbar .vert-bottom-toolbar {
     bottom: 0;
     left: 0;
     position: absolute;
     right: 0
   }
 
-  .svg-filename-editor .svg-editor .color-well {
+  .svg-editor .svg-editor .color-well {
     float: left;
     font-size: 10px;
     padding-bottom: 3px;
@@ -513,7 +513,7 @@
     width: 60px
   }
 
-  .svg-filename-editor .svg-editor .color-well .colorPicker {
+  .svg-editor .svg-editor .color-well .colorPicker {
     background-color: #000;
     border: 1px solid #000;
     border-radius: 3px;
@@ -523,45 +523,45 @@
     width: 28px;
   }
 
-  .svg-filename-editor .svg-editor .color-well .alphaSquare {
+  .svg-editor .svg-editor .color-well .alphaSquare {
     background-color: #000;
     height: 13px;
     width: 13px;
   }
 
-  .svg-filename-editor .svg-editor .color-well .alphaSquare.bottom {
+  .svg-editor .svg-editor .color-well .alphaSquare.bottom {
     left: 50%;
     position: absolute;
   }
 
-  .svg-filename-editor .oppia-slash-icon {
+  .svg-editor .oppia-slash-icon {
     font-size: 19px;
   }
 
-  .svg-filename-editor .oppia-closed-polygon-icon {
+  .svg-editor .oppia-closed-polygon-icon {
     background-image: url(/assets/svg_diagram_editor/closed_polygon.svg);
   }
 
-  .svg-filename-editor .oppia-open-polygon-icon {
+  .svg-editor .oppia-open-polygon-icon {
     background-image: url(/assets/svg_diagram_editor/open_polygon.svg);
   }
 
-  .svg-filename-editor .oppia-bring-forward-icon {
+  .svg-editor .oppia-bring-forward-icon {
     background-image: url(/assets/svg_diagram_editor/bring_forward.svg);
   }
 
-  .svg-filename-editor .oppia-send-backward-icon {
+  .svg-editor .oppia-send-backward-icon {
     background-image: url(/assets/svg_diagram_editor/send_backward.svg);
   }
 
-  .svg-filename-editor .oppia-font-styles-text {
+  .svg-editor .oppia-font-styles-text {
     padding-left: 3px;
   }
 
-  .svg-filename-editor .oppia-diagram-spinning-button {
+  .svg-editor .oppia-diagram-spinning-button {
     margin-left: 30px;
     margin-right: 30px;
   }
 
-  .svg-filename-editor  .oppia-diagram-spinning-button svg path { stroke: #f8f6e1; }
+  .svg-editor  .oppia-diagram-spinning-button svg path { stroke: #f8f6e1; }
 </style>

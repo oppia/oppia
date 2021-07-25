@@ -614,8 +614,8 @@
     "extensions/objects/templates/set-of-translatable-html-content-ids-editor.component.ts",
     "extensions/objects/templates/set-of-unicode-string-editor.component.ts",
     "extensions/objects/templates/subtitled-html-editor.component.ts",
-    "extensions/objects/templates/svg-filename-editor.constants.ts",
-    "extensions/objects/templates/svg-filename-editor.constants.ajs.ts",
+    "extensions/objects/templates/svg-editor.constants.ts",
+    "extensions/objects/templates/svg-editor.constants.ajs.ts",
     "extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component.ts",
     "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts",
     "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts"

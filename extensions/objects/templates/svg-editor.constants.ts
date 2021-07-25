@@ -16,7 +16,7 @@
  * @fileoverview Constants for svg filename editor.
  */
 
-export const SvgFilenameEditorConstants = {
+export const SvgEditorConstants = {
   // These max width and height paramameters were determined by manual
   // testing and reference from OUTPUT_IMAGE_MAX_WIDTH_PX in
   // filepath-editor file so that the created diagram fits the card
