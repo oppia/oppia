@@ -1638,9 +1638,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'User does not have manager rights in topic.'):
-            topic_services.assign_role(
-                self.user_admin, self.user_b,
-                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+            topic_services.deassign_manager_role_from_topic(
+                self.user_admin, self.user_id_b, self.TOPIC_ID)
 
 
 # TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class
