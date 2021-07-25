@@ -70,8 +70,8 @@ describe('Blog Dashboard Tile Component', () => {
       tags: ['news'],
       thumbnail_filename: 'image.png',
       url_fragment: 'title',
-      last_updated: 3232323,
-      published_on: 3232323,
+      last_updated: 1416563100000,
+      published_on: 1416563100000,
     };
   });
 
@@ -83,9 +83,16 @@ describe('Blog Dashboard Tile Component', () => {
     () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       let NOW_MILLIS = 1416563100000;
-
       expect(component.getDateStringInWords(NOW_MILLIS))
         .toBe('November 21, 2014');
+
+      NOW_MILLIS = 1800063100000;
+      expect(component.getDateStringInWords(NOW_MILLIS))
+        .toBe('January 16, 2027');
+
+      NOW_MILLIS = 1517563100000;
+      expect(component.getDateStringInWords(NOW_MILLIS))
+        .toBe('Feburary 02, 2018');
     });
 
   it('should initialize', () => {
@@ -101,6 +108,7 @@ describe('Blog Dashboard Tile Component', () => {
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample_url');
     expect(component.thumbnailUrl).toBe(
       '/assetsdevhandler/blog_post/sampleId/assets/thumbnail/image.png');
+    expect(component.publishedDateString).toBe('November 21, 2014')
   });
 
   it('should not show thumbnail if thumbnail filename is not given', () => {

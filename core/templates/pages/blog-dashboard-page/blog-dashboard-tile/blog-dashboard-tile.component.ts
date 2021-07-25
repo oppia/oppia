@@ -16,7 +16,7 @@
  * @fileoverview Component for a blog dashboard card.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import dayjs from 'dayjs';
@@ -24,8 +24,14 @@ import dayjs from 'dayjs';
   selector: 'oppia-blog-dashboard-tile',
   templateUrl: './blog-dashboard-tile.component.html'
 })
-export class BlogDashboardTileComponent {
+export class BlogDashboardTileComponent implements OnInit {
   @Input() blogPostSummary: BlogPostSummary;
+  lastUpdatedDateString: string = '';
+
+  ngOnInit(): void {
+    this.lastUpdatedDateString = this.getDateStringInWords(
+      this.blogPostSummary.lastUpdated);
+  }
 
   getDateStringInWords(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);

@@ -22,6 +22,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BlogDashboardTileComponent } from './blog-dashboard-tile.component';
+import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -32,6 +33,7 @@ class MockCapitalizePipe {
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogDashboardTileComponent;
   let fixture: ComponentFixture<BlogDashboardTileComponent>;
+  let sampleBlogPostSummary: BlogPostSummaryBackendDict;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -55,18 +57,46 @@ describe('Blog Dashboard Tile Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BlogDashboardTileComponent);
     component = fixture.componentInstance;
+
+    sampleBlogPostSummary = {
+      id: 'sampleId',
+      author_username: 'test_user',
+      title: 'Title',
+      summary: 'Hello World',
+      tags: ['news'],
+      thumbnail_filename: 'image.png',
+      url_fragment: 'title',
+      last_updated: 1416563100000,
+      published_on: 1416563100000,
+    };
   });
 
   it('should create', () => {
     expect(component).toBeDefined();
   });
 
+  it('should initialize', () => {
+    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
+      sampleBlogPostSummary);
+
+    component.ngOnInit();
+
+    expect(component.lastUpdatedDateString).toEqual('November 21, 2014')
+  });
+
   it('should get formatted date string from the timestamp in milliseconds',
     () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
       let NOW_MILLIS = 1416563100000;
-
       expect(component.getDateStringInWords(NOW_MILLIS))
         .toBe('November 21, 2014');
+
+      NOW_MILLIS = 1800063100000;
+      expect(component.getDateStringInWords(NOW_MILLIS))
+        .toBe('January 16, 2027');
+
+      NOW_MILLIS = 1517563100000;
+      expect(component.getDateStringInWords(NOW_MILLIS))
+        .toBe('Feburary 02, 2018');
     });
 });

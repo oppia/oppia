@@ -33,6 +33,7 @@ export class BlogCardComponent implements OnInit {
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
+  publishedDateString: string = '';
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -40,8 +41,6 @@ export class BlogCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.error(this.blogPostSummary);
-    console.error(this.blogPostSummary.thumbnailFilename);
     if (this.blogPostSummary.thumbnailFilename) {
       this.thumbnailUrl = this.assetsBackendApiService
         .getThumbnailUrlForPreview(
@@ -52,6 +51,8 @@ export class BlogCardComponent implements OnInit {
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.authorProfilePictureUrl = decodeURIComponent((
       this.authorProfilePicDataUrl || this.DEFAULT_PROFILE_PICTURE_URL));
+    this.publishedDateString = this.getDateStringInWords(
+      this.blogPostSummary.publishedOn);
   }
 
   getDateStringInWords(millisSinceEpoch: number): string {
