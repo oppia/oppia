@@ -149,11 +149,8 @@ INT_SCHEMA = {
 }
 
 POSITIVE_INT_SCHEMA = {
-    'type': schema_utils.SCHEMA_TYPE_INT,
-    'validators': [{
-        'id': 'is_at_least',
-        'min_value': 1,
-    }]
+    'type': 'custom',
+    'obj_type': 'PositiveInt'
 }
 
 
