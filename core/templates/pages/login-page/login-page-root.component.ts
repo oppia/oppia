@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { MetaTagCustomizationService, MetaAttribute } from 'services/contextual/meta-tag-customization.service';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
