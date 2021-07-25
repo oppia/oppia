@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import site
 import subprocess
 import sys
 
@@ -740,6 +741,7 @@ MYPY_REQUIREMENTS_FILE_PATH = os.path.join('.', 'mypy_requirements.txt')
 MYPY_TOOLS_DIR = os.path.join(os.getcwd(), 'third_party', 'python3_libs')
 PYTHON3_CMD = 'python3'
 
+_PATHS_TO_INSERT = [MYPY_TOOLS_DIR, ]
 
 _PARSER = argparse.ArgumentParser(
     description='Python type checking using mypy script.'
@@ -835,6 +837,10 @@ def install_mypy_prerequisites(install_globally):
         process = subprocess.Popen(
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
+        process.communicate()
+        _PATHS_TO_INSERT.append(os.path.join(site.USER_BASE, 'bin'))
+    else:
+        _PATHS_TO_INSERT.append(os.path.join(MYPY_TOOLS_DIR, 'bin'))
 
     return process.returncode
 
@@ -866,12 +872,8 @@ def main(args=None):
     cmd = get_mypy_cmd(
         parsed_args.files, parsed_args.install_globally)
 
-    _paths_to_insert = [
-        MYPY_TOOLS_DIR,
-        os.path.join(MYPY_TOOLS_DIR, 'bin'),
-    ]
     env = os.environ.copy()
-    for path in _paths_to_insert:
+    for path in _PATHS_TO_INSERT:
         env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
     env['PYTHONPATH'] = MYPY_TOOLS_DIR
 
