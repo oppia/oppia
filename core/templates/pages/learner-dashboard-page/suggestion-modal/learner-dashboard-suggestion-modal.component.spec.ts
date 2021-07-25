@@ -24,6 +24,8 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
 
+// TODO(#9749): Call original AngularHtmlBindWrapperDirective
+// after migration of that directive.
 let MockAngularHtmlBindWrapperDirective = function(
     options: Component): Directive {
   const metadata: Directive = {
@@ -31,7 +33,7 @@ let MockAngularHtmlBindWrapperDirective = function(
     inputs: options.inputs,
     outputs: options.outputs
   };
-  return <undefined>Directive(metadata)(class _ { });
+  return Directive(metadata)(<never> class _ { });
 };
 
 class MockActiveModal {

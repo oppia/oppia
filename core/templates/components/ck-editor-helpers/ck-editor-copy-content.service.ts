@@ -64,7 +64,15 @@ export class CkEditorCopyContentService {
   private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
     let containedWidgetTagName;
     let currentElement = target;
+    let parentElement = currentElement.parentElement;
+    let descendants = Array.from(target.childNodes);
 
+    if (parentElement === null || descendants === undefined) {
+      throw new Error(
+        'The element target should contain or be a descendant' +
+        'of a widget, or be a plain HTML element/group'
+      );
+    }
     while (true) {
       const currentTagName = currentElement.tagName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
@@ -72,16 +80,19 @@ export class CkEditorCopyContentService {
         break;
       }
 
-      if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
+      if (parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
       }
 
-      currentElement = currentElement.parentElement;
+      currentElement = parentElement;
     }
 
-    let descendants = Array.from(target.childNodes);
     while (descendants.length !== 0) {
-      let currentDescendant = descendants.shift();
+      // 'shift()' returns 'undefined' only when 'descendants' array is empty,
+      // the while loop terminates before that condition is reached.
+      // non-null assertion (!) is used to make typescript typing happy.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      let currentDescendant = descendants.shift()!;
 
       const currentTagName = currentDescendant.nodeName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
@@ -113,7 +124,7 @@ export class CkEditorCopyContentService {
    *  in which element contains, if present.
    */
   private _handlePaste(
-      editor: CKEDITOR.editor | Partial<CKEDITOR.editor>,
+      editor: CKEDITOR.editor,
       element: HTMLElement,
       containedWidgetTagName: string | undefined
   ) {
@@ -174,9 +185,7 @@ export class CkEditorCopyContentService {
    * Binds ckeditor to subject.
    * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
-  bindPasteHandler(
-      editor: CKEDITOR.editor | Partial<CKEDITOR.editor>
-  ): void {
+  bindPasteHandler(editor: CKEDITOR.editor): void {
     this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
       ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
         if (!rootElement) {

@@ -41,13 +41,20 @@ describe('Ck editor copy content service', () => {
   let htmlEscaperService = new HtmlEscaperService(loggerService);
 
   let service: CkEditorCopyContentService;
-  let ckEditorStub: Partial<CKEDITOR.editor>;
+  let ckEditorStub: CKEDITOR.editor;
   let insertHtmlSpy: jasmine.Spy<(
     html: string, mode?: string,
     range?: CKEDITOR.dom.range) => void>;
-  let execCommandSpy;
+  let execCommandSpy: jasmine.Spy<(commandName: string) => boolean>;
 
   beforeEach(() => {
+    // This throws "Type Type '{ id: string; insertHtml: (html: string) => void;
+    // execCommand: (commandName: string) => boolean; }' is missing the
+    // following properties from type 'editor': activeEnterMode, activeFilter,
+    // activeShiftEnterMode, blockless, and 92 more." We need to suppress this
+    // error because only the specified properties of the editor are required
+    // to test validations.
+    // @ts-ignore.
     ckEditorStub = {
       id: 'editor1',
       insertHtml: (html: string) => {},
@@ -218,10 +225,34 @@ describe('Ck editor copy content service', () => {
 
     const pElement = generateContent('<p>Hello</p>');
 
+    // This throws "Type Type '{ id: string; insertHtml: (html: string) => void;
+    // execCommand: (commandName: string) => boolean; }' is missing the
+    // following properties from type 'editor': activeEnterMode, activeFilter,
+    // activeShiftEnterMode, blockless, and 92 more." We need to suppress this
+    // error because only the specified properties of the editor are required
+    // to test validations.
+    // @ts-ignore.
     ckEditorStub = { ...ckEditorStub, status: 'destroyed' };
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
     expect(insertHtmlSpy).not.toHaveBeenCalled();
     expect(execCommandSpy).not.toHaveBeenCalled();
+  });
+
+  it('should throw error on invalid target html element', () => {
+    expect(service.copyModeActive).toBe(false);
+    service.toggleCopyMode();
+    expect(service.copyModeActive).toBe(true);
+
+    const noParentElement = generateContent('<html></html>');
+    const noChildElement = generateContent('dummy');
+    expect(() => service.broadcastCopy(noParentElement)).toThrowError(
+      'The element target should contain or be a descendant' +
+      'of a widget, or be a plain HTML element/group'
+    );
+    expect(() => service.broadcastCopy(noChildElement)).toThrowError(
+      'The element target should contain or be a descendant' +
+      'of a widget, or be a plain HTML element/group'
+    );
   });
 });
