@@ -413,17 +413,28 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.degree_of_mastery_5 = 0.9
         self.degree_of_mastery_6 = 0.6
 
-    def test_get_with_valid_topic_id(self):
-        topic_id = topic_fetchers.get_new_topic_id()
+    def test_get_with_valid_topic_ids(self):
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+
         self.save_new_topic(
-            topic_id, self.user_id, name='Name',
+            topic_id_1, self.user_id, name='Name 1',
             abbreviated_name='topic-one', url_fragment='topic-one',
-            description='Description', canonical_story_ids=[],
+            description='Description 1', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[
-                self.skill_id_1, self.skill_id_2, self.skill_id_3,
-                self.skill_id_4, self.skill_id_5],
+                self.skill_id_1, self.skill_id_2, self.skill_id_3],
             subtopics=[], next_subtopic_id=1)
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='Name 2',
+            abbreviated_name='topic-two', url_fragment='topic-two',
+            description='Description 2', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[
+                self.skill_id_3, self.skill_id_4, self.skill_id_5],
+            subtopics=[], next_subtopic_id=1)
+
+        # Update Topic 1.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title 1',
@@ -433,7 +444,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             'property_name': (
                 topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT),
             'old_value': '',
-            'new_value': 'subtopic-one',
+            'new_value': 'subtopic-one-one',
             'subtopic_id': 1
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -454,21 +465,58 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
             'property_name': (
                 topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT),
             'old_value': '',
-            'new_value': 'subtopic-two',
+            'new_value': 'subtopic-one-two',
             'subtopic_id': 2
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
             'new_subtopic_id': 2,
             'skill_id': self.skill_id_3
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id_1, changelist, 'Added subtopics.')
+
+        # Update Topic 2.
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title 1',
+            'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT),
+            'old_value': '',
+            'new_value': 'subtopic-two-one',
+            'subtopic_id': 1
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_3
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': None,
+            'new_subtopic_id': 1,
+            'skill_id': self.skill_id_4
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title 2',
+            'subtopic_id': 2
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT),
+            'old_value': '',
+            'new_value': 'subtopic-two-two',
+            'subtopic_id': 2
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
             'new_subtopic_id': 2,
-            'skill_id': self.skill_id_4
+            'skill_id': self.skill_id_5
         })]
         topic_services.update_topic_and_subtopic_pages(
-            self.user_id, topic_id, changelist, 'Added subtopics.')
+            self.user_id, topic_id_2, changelist, 'Added subtopics.')
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
         skill_services.create_user_skill_mastery(
@@ -482,50 +530,89 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         # First case: One subtopic mastery doesn't exist.
         response_json = self.get_json(
-            '%s/%s' % (feconf.SUBTOPIC_MASTERY_DATA_URL, topic_id))
-        degrees_of_mastery = {
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
+                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            })
+        degrees_of_mastery_1 = {
             u'1': python_utils.divide(
                 self.degree_of_mastery_1 + self.degree_of_mastery_2, 2)
         }
+        degrees_of_mastery_2 = {
+            u'2': self.degree_of_mastery_5
+        }
         self.assertEqual(
-            response_json['subtopic_mastery_dict'], degrees_of_mastery)
+            response_json['subtopic_mastery_dict'], {
+                topic_id_1: degrees_of_mastery_1,
+                topic_id_2: degrees_of_mastery_2
+            })
 
         # Second case: One skill mastery doesn't exist.
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_3, self.degree_of_mastery_3)
         response_json = self.get_json(
-            '%s/%s' % (feconf.SUBTOPIC_MASTERY_DATA_URL, topic_id))
-        degrees_of_mastery = {
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
+                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            })
+        degrees_of_mastery_1 = {
             u'1': python_utils.divide(
                 self.degree_of_mastery_1 + self.degree_of_mastery_2, 2),
             u'2': self.degree_of_mastery_3
         }
+        degrees_of_mastery_2 = {
+            u'1': self.degree_of_mastery_3,
+            u'2': self.degree_of_mastery_5
+        }
         self.assertEqual(
-            response_json['subtopic_mastery_dict'], degrees_of_mastery)
+            response_json['subtopic_mastery_dict'], {
+                topic_id_1: degrees_of_mastery_1,
+                topic_id_2: degrees_of_mastery_2
+            })
 
         # Third case: All masteries exist.
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_4, self.degree_of_mastery_4)
         response_json = self.get_json(
-            '%s/%s' % (feconf.SUBTOPIC_MASTERY_DATA_URL, topic_id))
-        degrees_of_mastery = {
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
+                'comma_separated_topic_ids': ','.join([topic_id_1, topic_id_2])
+            })
+        degrees_of_mastery_1 = {
             u'1': python_utils.divide(
                 self.degree_of_mastery_1 + self.degree_of_mastery_2, 2),
-            u'2': python_utils.divide(
-                self.degree_of_mastery_3 + self.degree_of_mastery_4, 2)
+            u'2': self.degree_of_mastery_3
+        }
+        degrees_of_mastery_2 = {
+            u'1': python_utils.divide(
+                self.degree_of_mastery_3 + self.degree_of_mastery_4, 2),
+            u'2': self.degree_of_mastery_5
         }
         self.assertEqual(
-            response_json['subtopic_mastery_dict'], degrees_of_mastery)
+            response_json['subtopic_mastery_dict'], {
+                topic_id_1: degrees_of_mastery_1,
+                topic_id_2: degrees_of_mastery_2
+            })
         self.logout()
 
     def test_get_with_invalid_topic_id_returns_400(self):
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s/invalid_topic_id' % feconf.SUBTOPIC_MASTERY_DATA_URL,
-            expected_status_int=400)
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
+                'comma_separated_topic_ids': 'invalid_topic_id'
+            }, expected_status_int=400)
 
         self.assertEqual(
             response_json['error'],
             'Invalid topic ID invalid_topic_id')
+
+        self.logout()
+
+    def test_get_with_no_topic_ids_returns_400(self):
+        self.login(self.NEW_USER_EMAIL)
+        json_response = self.get_json(
+            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Missing key in handler args: comma_separated_topic_ids.')
 
         self.logout()
