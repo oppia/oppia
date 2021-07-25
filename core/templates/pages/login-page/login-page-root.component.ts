@@ -35,16 +35,5 @@ export class LoginPageRootComponent {
     let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN;
     // Update default title.
     this.pageTitleService.setPageTitle(pageData.TITLE);
-
-    let metaAttributes: MetaAttribute[] = [];
-    for (let i = 0; i < pageData.META.length; i++) {
-      metaAttributes.push({
-        propertyType: pageData.META[i].PROPERTY_TYPE,
-        propertyValue: pageData.META[i].PROPERTY_VALUE,
-        content: pageData.META[i].CONTENT
-      });
-    }
-    // Update meta tags.
-    this.metaTagCustomizationService.addOrReplaceMetaTags(metaAttributes);
   }
 }
