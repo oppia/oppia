@@ -41,7 +41,7 @@ describe('Blog post summary object factory', () => {
   });
 
   it('should create correct BlogPostSummary object from' +
-  ' backend dict', () => {
+    ' backend dict', () => {
     sampleSummary = BlogPostSummary.createFromBackendDict(
       sampleSummaryBackendObject);
 
