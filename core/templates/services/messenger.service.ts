@@ -167,7 +167,8 @@ export class MessengerService {
     let window = this.windowRef.nativeWindow;
     let rawHash = window.location.hash.substring(1);
     if (window.parent !== window && rawHash &&
-        this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
+        this.MESSAGE_VALIDATORS.hasOwnProperty(
+          ServicesConstants.MESSENGER_PAYLOAD[messageTitle])) {
       // Protractor tests may prepend a / to this hash, which we remove.
       let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
