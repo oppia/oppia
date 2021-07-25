@@ -6023,6 +6023,11 @@ export default {
         }
       ]
     },
+    "LOGOUT": {
+      "ROUTE": "logout",
+      "TITLE": "Logout | Oppia",
+      "META": []
+    },
     "PARTNERSHIPS": {
       "ROUTE": "partnerships",
       "TITLE": "Partnerships | Oppia",

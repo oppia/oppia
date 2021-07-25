@@ -133,7 +133,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
-    this.logoutUrl = AppConstants.LOGOUT_URL;
+    this.logoutUrl = (
+      '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
     this.inClassroomPage = false;
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(

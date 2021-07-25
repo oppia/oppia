@@ -37,7 +37,7 @@ export class AdminNavbarComponent implements OnInit {
   isSuperAdmin: boolean = null;
   profileUrl: string = '';
   ADMIN_TAB_URLS = AdminPageConstants.ADMIN_TAB_URLS;
-  logoutUrl = AppConstants.LOGOUT_URL;
+  logoutUrl = '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
   profileDropdownIsActive = false;
   dropdownMenuIsActive = false;
 

@@ -34,6 +34,8 @@ import { HybridRouterModuleProvider } from '../../../hybrid-router-module-provid
     CommonModule,
     MaterialModule,
     DynamicContentModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     NgbTooltipModule,
     NgbModalModule,

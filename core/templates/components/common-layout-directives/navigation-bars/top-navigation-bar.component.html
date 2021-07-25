@@ -344,6 +344,7 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
              [href]="logoutUrl"
+             [routerLink]="logoutUrl"
              class="dropdown-item nav-link protractor-test-logout-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {tab: ACTION_CLOSE})">
             <span [innerHTML]="'I18N_TOPNAV_LOGOUT' | translate"></span>

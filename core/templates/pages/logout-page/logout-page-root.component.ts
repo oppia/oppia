@@ -17,9 +17,23 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-logout-page-root',
   templateUrl: './logout-page-root.component.html'
 })
-export class LogoutPageRootComponent {}
+export class LogoutPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+  }
+}

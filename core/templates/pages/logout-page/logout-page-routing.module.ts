@@ -13,30 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the logout page.
+ * @fileoverview Routing module for logout page.
  */
 
 import { NgModule } from '@angular/core';
-
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
+import { Route, RouterModule } from '@angular/router';
 import { LogoutPageRootComponent } from './logout-page-root.component';
-import { CommonModule } from '@angular/common';
-import { LogoutPageRoutingModule } from './logout-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: LogoutPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    LogoutPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    LogoutPageComponent,
-    LogoutPageRootComponent
-  ],
-  entryComponents: [
-    LogoutPageComponent,
-    LogoutPageRootComponent,
+  exports: [
+    RouterModule
   ]
 })
-export class LogoutPageModule {}
+
+export class LogoutPageRoutingModule {}

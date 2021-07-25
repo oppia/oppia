@@ -55,6 +55,11 @@ const routes: Route[] = [
       .then(m => m.LoginPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE,
+    loadChildren: () => import('pages/logout-page/logout-page.module')
+      .then(m => m.LogoutPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE,
     loadChildren: () => import(
       'pages/partnerships-page/partnerships-page.module')
