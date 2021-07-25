@@ -151,7 +151,7 @@ export class GraphInputRulesService {
     return areIndegreeCountsEqual && areOutdegreeCountsEqual;
   }
 
-  private _getDegreesOfMatrix(adj: AdjacencyMatrix): number[] {
+  private _getDegreesOfMatrix(adj: AdjacencyMatrix): (number | null)[] {
     return adj.map((value) => {
       return value.reduce((prev, cur) => {
         prev = (prev === null) ? 0 : prev;
