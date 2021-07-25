@@ -13,29 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the license page.
+ * @fileoverview Routing module for license page.
  */
 
-import { LicensePageComponent } from './license-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { LicensePageRootComponent } from './license-page-root.component';
-import { CommonModule } from '@angular/common';
-import { LicensePageRoutingModule } from './license-page-routing.module';
 import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { LicensePageRootComponent } from './license-page-root.component';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: LicensePageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    LicensePageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    LicensePageComponent,
-    LicensePageRootComponent
-  ],
-  entryComponents: [
-    LicensePageComponent,
-    LicensePageRootComponent,
+  exports: [
+    RouterModule
   ]
 })
-export class LicensePageModule {}
+
+export class LicensePageRoutingModule {}

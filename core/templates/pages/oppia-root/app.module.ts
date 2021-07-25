@@ -31,6 +31,9 @@ import { OppiaRootComponent } from './oppia-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CookieModule } from 'ngx-cookie';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { AngularFireModule } from '@angular/fire';
+import { AuthService } from 'services/auth.service';
 
 @NgModule({
   imports: [
@@ -38,6 +41,8 @@ import { CookieModule } from 'ngx-cookie';
     BrowserAnimationsModule,
     CookieModule.forRoot(),
     HttpClientModule,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
     AppRoutingModule,
   ],
   declarations: [
@@ -57,7 +62,12 @@ import { CookieModule } from 'ngx-cookie';
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    }
+    },
+    AngularFireAuth,
+    {
+      provide: USE_EMULATOR,
+      useValue: AuthService.firebaseEmulatorConfig
+    },
   ],
   bootstrap: [OppiaRootComponent]
 })

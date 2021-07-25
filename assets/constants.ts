@@ -6001,6 +6001,28 @@ export default {
         }
       ]
     },
+    "LICENSE": {
+      "ROUTE": "license",
+      "TITLE": "License Page | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "License terms that Oppia is attributed under."
+        }
+      ]
+    },
+    "LOGIN": {
+      "ROUTE": "login",
+      "TITLE": "Sign in | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "License terms that Oppia is attributed under."
+        }
+      ]
+    },
     "PARTNERSHIPS": {
       "ROUTE": "partnerships",
       "TITLE": "Partnerships | Oppia",

@@ -45,6 +45,16 @@ const routes: Route[] = [
       .then(m => m.GetStartedPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE,
+    loadChildren: () => import('pages/license-page/license.module')
+      .then(m => m.LicensePageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE,
+    loadChildren: () => import('pages/login-page/login-page.module')
+      .then(m => m.LoginPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE,
     loadChildren: () => import(
       'pages/partnerships-page/partnerships-page.module')

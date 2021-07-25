@@ -18,6 +18,7 @@
 
 import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 
@@ -44,6 +45,8 @@ export class ImageUploaderComponent {
   // The errorMessage will be null if the uploaded file is valid .
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private idGenerationService: IdGenerationService,

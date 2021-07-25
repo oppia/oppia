@@ -27,12 +27,14 @@ import { MaterialModule } from 'modules/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ImageUploaderComponent } from './image-uploader.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { HybridRouterModuleProvider } from '../../../hybrid-router-module-provider';
 
 @NgModule({
   imports: [
     CommonModule,
     MaterialModule,
     DynamicContentModule,
+    HybridRouterModuleProvider.provide(),
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,

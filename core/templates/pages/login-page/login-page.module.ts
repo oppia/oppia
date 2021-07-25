@@ -16,23 +16,20 @@
  * @fileoverview Module for the login page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { BrowserModule } from '@angular/platform-browser';
 import firebase from 'firebase/app';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LoginPageComponent } from 'pages/login-page/login-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { LoginPageRootComponent } from './login-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
+import { LoginPageRoutingModule } from './login-page-routing.module';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -66,9 +63,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     MatAutocompleteModule,
     MatCardModule,
     MatButtonModule,
@@ -76,6 +71,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     MatFormFieldModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    LoginPageRoutingModule
   ],
   declarations: [
     LoginPageComponent,
@@ -87,21 +83,9 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   ],
   providers: [
     {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
       provide: ErrorHandler,
       useClass: FirebaseErrorFilterHandler,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-  ],
-  bootstrap: [LoginPageRootComponent]
+    }
+  ]
 })
 export class LoginPageModule {}

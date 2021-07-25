@@ -18,6 +18,7 @@
 
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-audio-file-uploader',
@@ -37,6 +38,8 @@ export class AudioFileUploaderComponent {
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
   // 'null' implies not displaying an error message.
   errorMessage: string | null = null;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   // Returns 'null' when the uploaded file is valid.
   validateUploadedFile(file: File): string | null {

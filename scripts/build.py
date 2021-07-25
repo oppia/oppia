@@ -118,19 +118,8 @@ FILEPATHS_NOT_TO_RENAME = (
 )
 
 PAGES_IN_APP_YAML = (
-    'webpack_bundles/license.mainpage.html',
-    'webpack_bundles/login-page.mainpage.html',
     'webpack_bundles/logout-page.mainpage.html',
-    'webpack_bundles/privacy-page.mainpage.html',
     'webpack_bundles/playbook.mainpage.html',
-)
-
-# NOTE: These pages manage user sessions. Thus, we should never reject or
-# replace them when running in maintenance mode; otherwise admins will be unable
-# to access the site.
-AUTH_PAGE_PATHS = (
-    'webpack_bundles/login-page.mainpage.html',
-    'webpack_bundles/logout-page.mainpage.html',
 )
 
 # Hashes for files with these paths should be provided to the frontend in
@@ -198,7 +187,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
     with python_utils.open_file(APP_DEV_YAML_FILEPATH, 'r') as yaml_file:
         content += yaml_file.read()
     for file_path in PAGES_IN_APP_YAML:
-        if maintenance_mode and file_path not in AUTH_PAGE_PATHS:
+        if maintenance_mode:
             content = content.replace(
                 file_path, prod_file_prefix + maintenance_page_path)
         else:
