@@ -23,7 +23,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 
-fdescribe('Volunteer page', () => {
+describe('Volunteer page', () => {
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [VolunteerPageComponent],
