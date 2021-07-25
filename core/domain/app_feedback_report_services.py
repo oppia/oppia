@@ -37,7 +37,7 @@ PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
 PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
 
 
-def get_report_models(report_ids):
+def get_report_models(report_ids): # type: ignore[name-defined]
     # type: (List[Text]) -> app_feedback_report_models.AppFeedbackReportModel
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
@@ -232,7 +232,7 @@ def calculate_new_stats_count_for_parameter(
     return current_stats_map
 
 
-def get_report_from_model(report_model):
+def get_report_from_model(report_model): # type: ignore[name-defined]
     # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the data.
@@ -256,7 +256,7 @@ def get_report_from_model(report_model):
             'Web app feedback report domain objects must be defined.')
 
 
-def get_ticket_from_model(ticket_model):
+def get_ticket_from_model(ticket_model): # type: ignore[name-defined]
     # type: (app_feedback_report_models.AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
     """Create and return a domain object AppFeedbackReportTicket given a model
     loaded from the the data.
@@ -276,7 +276,7 @@ def get_ticket_from_model(ticket_model):
         ticket_model.report_ids)
 
 
-def get_stats_from_model(stats_model):
+def get_stats_from_model(stats_model): # type: ignore[name-defined]
     # type: (app_feedback_report_models.AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the storage.
@@ -329,7 +329,7 @@ def create_app_daily_stats_from_model_json(daily_param_stats):
     return stats_dict
 
 
-def get_android_report_from_model(android_report_model):
+def get_android_report_from_model(android_report_model): # type: ignore[name-defined]
     # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Creates a domain object that represents an Android feedback report from
     the given model.

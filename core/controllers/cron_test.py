@@ -445,10 +445,10 @@ class CronJobTests(test_utils.GenericTestBase):
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
         self.assertIsNone(
             scrubbed_report_info['user_feedback_other_text_input'])
-        self.assertIsNone(
-            scrubbed_report_info['event_logs'])
-        self.assertIsNone(
-            scrubbed_report_info['logcat_logs'])
+        self.assertEqual(
+            scrubbed_report_info['event_logs'], [])
+        self.assertEqual(
+            scrubbed_report_info['logcat_logs'], [])
 
     def test_cron_translation_contribution_stats_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)

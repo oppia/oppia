@@ -1133,7 +1133,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'only_allows_wifi_download_and_update': 'True',
             'automatically_update_topics': 'False',
             'account_is_profile_admin': 'False'
-        }
+        } # type: Dict[Text, Any]
 
         self.assertEqual(scrubbed_report_model.scrubbed_by, self.user_id)
         self.assertEqual(
@@ -1278,14 +1278,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_services.calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
                 stats_map, 'value_2', delta)
 
-    def _verify_report_is_scrubbed(self, model_entity, scrubber):
+    def _verify_report_is_scrubbed(self, model_entity, scrubber): # type: ignore[name-defined]
         # type: (app_feedback_report_models.AppFeedbackReportModel, Text) -> None
         """Verifies the report model is scrubbed."""
         self.assertIsNotNone(model_entity)
         self.assertEqual(
             model_entity.scrubbed_by, scrubber)
 
-    def _verify_report_is_not_scrubbed(self, model_entity):
+    def _verify_report_is_not_scrubbed(self, model_entity): # type: ignore[name-defined]
         # type: (app_feedback_report_models.AppFeedbackReportModel) -> None
         """Verifies the report model is not scrubbed."""
         self.assertIsNotNone(model_entity)
