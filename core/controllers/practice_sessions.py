@@ -28,7 +28,18 @@ import python_utils
 class PracticeSessionsPage(base.BaseHandler):
     """Renders the practice sessions page."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
     }
