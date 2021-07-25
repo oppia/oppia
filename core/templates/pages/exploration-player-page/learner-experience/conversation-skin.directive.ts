@@ -18,7 +18,6 @@
 
 import { Subscription } from 'rxjs';
 import { StateCard } from 'domain/state_card/state-card.model';
-import { ServicesConstants } from 'services/services.constants';
 
 require(
   'components/question-directives/question-player/services/' +
@@ -507,11 +506,10 @@ angular.module('oppia').directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                MessengerService.sendMessage(
-                  ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
-                    height: newHeight,
-                    scroll: scroll
-                  });
+                MessengerService.sendMessage('HEIGHT_CHANGE', {
+                  height: newHeight,
+                  scroll: scroll
+                });
                 $scope.lastRequestedHeight = newHeight;
                 $scope.lastRequestedScroll = scroll;
               }

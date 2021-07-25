@@ -67,6 +67,7 @@ interface GetPayloadType {
     data: ExplorationCompletedData): ExplorationCompletedData;
   explorationReset(data: string): ExplorationResetData;
 }
+type MessengerPayloadKey = keyof typeof ServicesConstants.MESSENGER_PAYLOAD;
 
 type PayloadType = (
   HeightChangeData |
@@ -154,7 +155,7 @@ export class MessengerService {
    * @param messageData - The data of the message. It is of type
    *   Object since it can have different properties based on the messageTitle.
    */
-  sendMessage(messageTitle: string, messageData: Object): void {
+  sendMessage(messageTitle: MessengerPayloadKey, messageData: Object): void {
     // TODO(sll): For the stateTransition and explorationCompleted events,
     // we now send paramValues in the messageData. We should broadcast these
     // to the parent page as well.
@@ -198,8 +199,7 @@ export class MessengerService {
         this.loggerService.info('Posting message to parent: ' + messageTitle);
         let payload: PayloadType;
         let isValidMessage: boolean;
-        switch (
-          <keyof typeof ServicesConstants.MESSENGER_PAYLOAD> messageTitle) {
+        switch (messageTitle) {
           case 'EXPLORATION_COMPLETED':
             payload = this.getPayload.explorationCompleted(
               <ExplorationCompletedData> messageData);
