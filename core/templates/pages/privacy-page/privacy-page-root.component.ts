@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -29,7 +30,8 @@ export class PrivacyPageRootComponent {
   ) {}
 
   ngOnInit(): void {
-    // Update default title and meta tags.
-    this.pageTitleService.setPageTitle('Privacy Policy | Oppia');
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRIVACY;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
   }
 }

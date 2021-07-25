@@ -17,7 +17,8 @@
  */
 
 import { Component } from '@angular/core';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { AppConstants } from 'app.constants';
+import { MetaAttribute, MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -31,15 +32,19 @@ export class DonatePageRootComponent {
   ) {}
 
   ngOnInit(): void {
-    // Update default title and meta tags.
-    this.pageTitleService.setPageTitle('Donate | Oppia');
-    this.metaTagCustomizationService.addOrReplaceMetaTags([
-      {
-        propertyType: 'name',
-        propertyValue: 'description',
-        content: 'Donate to The Oppia Foundation to enable more ' +
-          'students to receive the quality education they deserve.'
-      }
-    ]);
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+
+    let metaAttributes: MetaAttribute[] = [];
+    for (let i = 0; i < pageData.META.length; i++) {
+      metaAttributes.push({
+        propertyType: pageData.META[i].PROPERTY_TYPE,
+        propertyValue: pageData.META[i].PROPERTY_VALUE,
+        content: pageData.META[i].CONTENT
+      });
+    }
+    // Update meta tags.
+    this.metaTagCustomizationService.addOrReplaceMetaTags(metaAttributes);
   }
 }

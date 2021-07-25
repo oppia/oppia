@@ -5967,28 +5967,84 @@ export default {
       ]
     },
     "CONTACT": {
-      "ROUTE": "contact"
+      "ROUTE": "contact",
+      "TITLE": "Contact | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
+        }
+      ]
     },
     "DONATE": {
-      "ROUTE": "donate"
+      "ROUTE": "donate",
+      "TITLE": "Donate | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+        }
+      ]
     },
     "GET_STARTED": {
-      "ROUTE": "get-started"
+      "ROUTE": "get-started",
+      "TITLE": "Get Started | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Learn how to get started using Oppia."
+        }
+      ]
     },
     "PARTNERSHIPS": {
-      "ROUTE": "partnerships"
+      "ROUTE": "partnerships",
+      "TITLE": "Partnerships | Oppia",
+      "META": []
     },
     "PRIVACY": {
-      "ROUTE": "privacy-policy"
+      "ROUTE": "privacy-policy",
+      "TITLE": "Privacy Policy | Oppia",
+      "META": []
     },
     "TEACH": {
-      "ROUTE": "teach"
+      "ROUTE": "teach",
+      "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        }
+      ]
     },
     "TERMS": {
-      "ROUTE": "terms"
+      "ROUTE": "terms",
+      "TITLE": "Terms of Use | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+        }
+      ]
     },
     "THANKS": {
-      "ROUTE": "thanks"
+      "ROUTE": "thanks",
+      "TITLE": "Thanks | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Thank you for donating to The Oppia Foundation!"
+        }
+      ]
     }
   },
 

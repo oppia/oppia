@@ -17,6 +17,8 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { MetaAttribute } from 'services/contextual/meta-tag-customization.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -29,7 +31,8 @@ export class PartnershipsPageRootComponent {
   ) {}
 
   ngOnInit(): void {
-    // Update default title and meta tags.
-    this.pageTitleService.setPageTitle('Partnerships | Oppia');
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
   }
 }
