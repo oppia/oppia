@@ -32,7 +32,7 @@ from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Callable, Iterator, List, Optional, Text, Tuple)
+    Any, Callable, Iterator, List, Optional, Text, Tuple, TypeVar)
 
 MYPY = False
 if MYPY:
@@ -41,20 +41,21 @@ if MYPY:
 transaction_services = models.Registry.import_transaction_services()
 
 
-Model = ndb.Model # type: Any
-Key = ndb.Key # type: Any
-Property = ndb.Property # type: Any
-Query = ndb.Query # type: Any
+Model = ndb.Model
+Key = ndb.Key
+Property = ndb.Property
+Query = ndb.Query
 
-BooleanProperty = ndb.BooleanProperty # type: Any
-DateProperty = ndb.DateProperty # type: Any
-ComputedProperty = ndb.ComputedProperty # type: Any
-DateTimeProperty = ndb.DateTimeProperty # type: Any
-FloatProperty = ndb.FloatProperty # type: Any
-IntegerProperty = ndb.IntegerProperty # type: Any
-JsonProperty = ndb.JsonProperty # type: Any
-UserProperty = ndb.UserProperty # type: Any
+BooleanProperty = ndb.BooleanProperty
+DateProperty = ndb.DateProperty
+ComputedProperty = ndb.ComputedProperty
+DateTimeProperty = ndb.DateTimeProperty
+FloatProperty = ndb.FloatProperty
+IntegerProperty = ndb.IntegerProperty
+JsonProperty = ndb.JsonProperty
+UserProperty = ndb.UserProperty
 
+TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
 
 @functools.wraps(ndb.StringProperty)
 def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
@@ -75,7 +76,7 @@ def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
 
 
 def get_multi(keys):
-    # type: (List[Text]) -> List[Optional[Model]]
+    # type: (List[Key]) -> List[Optional[TYPE_MODEL_SUBCLASS]]
     """Fetches models corresponding to a sequence of keys.
 
     Args:
@@ -85,11 +86,11 @@ def get_multi(keys):
         list(datastore_services.Model | None). List whose items are either a
         Model instance or None if the corresponding key wasn't found.
     """
-    return ndb.get_multi(keys) # type: ignore[no-any-return]
+    return ndb.get_multi(keys)
 
 
 def update_timestamps_multi(entities, update_last_updated_time=True):
-    # type: (List[Model], bool) -> None
+    # type: (List[TYPE_MODEL_SUBCLASS], bool) -> None
     """Update the created_on and last_updated fields of all given entities.
 
     Args:
@@ -99,12 +100,12 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
             last_updated field of the model.
     """
     for entity in entities:
-        entity.update_timestamps(
+        entity.update_timestamps( # type: ignore[attr-defined]
             update_last_updated_time=update_last_updated_time)
 
 
 def put_multi(entities):
-    # type: (List[Model]) -> List[Text]
+    # type: (List[TYPE_MODEL_SUBCLASS]) -> List[Text]
     """Stores a sequence of Model instances.
 
     Args:
@@ -113,12 +114,12 @@ def put_multi(entities):
     Returns:
         list(str). A list with the stored keys.
     """
-    return ndb.put_multi(entities) # type: ignore[no-any-return]
+    return ndb.put_multi(entities)
 
 
 @transaction_services.run_in_transaction_wrapper
 def delete_multi_transactional(keys):
-    # type: (List[Text]) -> List[None]
+    # type: (List[Key]) -> List[None]
     """Deletes models corresponding to a sequence of keys and runs it through
     a transaction. Either all models are deleted, or none of them in the case
     when the transaction fails.
@@ -129,11 +130,11 @@ def delete_multi_transactional(keys):
     Returns:
         list(None). A list of Nones, one per deleted model.
     """
-    return ndb.delete_multi(keys) # type: ignore[no-any-return]
+    return ndb.delete_multi(keys)
 
 
 def delete_multi(keys):
-    # type: (List[Text]) -> List[None]
+    # type: (List[Key]) -> List[None]
     """Deletes models corresponding to a sequence of keys.
 
     Args:
@@ -142,7 +143,7 @@ def delete_multi(keys):
     Returns:
         list(None). A list of Nones, one per deleted model.
     """
-    return ndb.delete_multi(keys) # type: ignore[no-any-return]
+    return ndb.delete_multi(keys)
 
 
 def transaction(callback):
@@ -175,7 +176,7 @@ def query_everything():
 
 
 def all_of(*nodes):
-    # type: (*Query.node) -> Query.node
+    # type: (*ndb.Node) -> ndb.Node
     """Returns a query node which performs a boolean AND on their conditions.
 
     Args:
@@ -189,7 +190,7 @@ def all_of(*nodes):
 
 
 def any_of(*nodes):
-    # type: (*Query.node) -> Query.node
+    # type: (*ndb.Node) -> ndb.Node
     """Returns a query node which performs a boolean OR on their conditions.
 
     Args:
@@ -229,7 +230,7 @@ def make_cursor(urlsafe_cursor=None):
 
 
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):
-    # type: (List[Tuple[Text, List[Text]]]) -> List[List[Model]]
+    # type: (List[Tuple[Text, List[Text]]]) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
 
@@ -249,8 +250,8 @@ def fetch_multiple_entities_by_ids_and_models(ids_and_models):
             entity_keys +
             [ndb.Key(model_name, entity_id) for entity_id in entity_ids])
 
-    all_models = ndb.get_multi(entity_keys)
-    all_models_grouped_by_model_type = []
+    all_models = ndb.get_multi(entity_keys) # type: List[Optional[TYPE_MODEL_SUBCLASS]]
+    all_models_grouped_by_model_type = [] # type: List[List[Optional[TYPE_MODEL_SUBCLASS]]]
 
     start_index = 0
     for (_, entity_ids) in ids_and_models:

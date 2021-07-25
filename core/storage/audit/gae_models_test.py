@@ -121,7 +121,7 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model(self):
         # type: () -> None
-        audit_model = audit_models.UsernameChangeAuditModel.get(self.ID) # type: audit_models.RoleQueryAuditModel # type: ignore[assignment]
+        audit_model = audit_models.UsernameChangeAuditModel.get(self.ID) # type: audit_models.UsernameChangeAuditModel # type: ignore[assignment]
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)

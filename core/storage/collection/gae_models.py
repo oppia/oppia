@@ -233,7 +233,7 @@ class CollectionModel(base_models.VersionedModel):
     def get_collection_count(cls):
         # type: () -> int
         """Returns the total number of collections."""
-        return cls.get_all().count() # type: ignore[no-any-return]
+        return cls.get_all().count()
 
     @staticmethod
     def convert_to_valid_dict(model_dict):
@@ -343,8 +343,8 @@ class CollectionModel(base_models.VersionedModel):
         if not force_deletion:
             commit_log_models = []
             collection_rights_models = CollectionRightsModel.get_multi(
-                entity_ids, include_deleted=True) # type: CollectionRightsModel # type: ignore[assignment]
-            versioned_models = cls.get_multi(entity_ids, include_deleted=True) # type: CollectionModel # type: ignore[assignment]
+                entity_ids, include_deleted=True) # type: List[CollectionRightsModel] # type: ignore[assignment]
+            versioned_models = cls.get_multi(entity_ids, include_deleted=True) # type: List[CollectionModel] # type: ignore[assignment]
             for model, rights_model in python_utils.ZIP(
                     versioned_models, collection_rights_models):
                 collection_commit_log = CollectionCommitLogEntryModel.create(
@@ -862,7 +862,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         Returns:
             iterable. An iterable with non-private collection summary models.
         """
-        return CollectionSummaryModel.query().filter( # type: ignore[no-any-return]
+        return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
@@ -881,7 +881,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with private collection summary models that
             are at least viewable by the given user.
         """
-        return CollectionSummaryModel.query().filter( # type: ignore[no-any-return]
+        return CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             datastore_services.any_of(
@@ -905,7 +905,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
-        return CollectionSummaryModel.query().filter( # type: ignore[no-any-return]
+        return CollectionSummaryModel.query().filter(
             datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
                 CollectionSummaryModel.editor_ids == user_id)

@@ -105,7 +105,7 @@ class MODEL_ASSOCIATION_TO_USER(enum.Enum):
     NOT_CORRESPONDING_TO_USER = 4
 
 
-class BaseModel(datastore_services.Model): # type: ignore[misc]
+class BaseModel(datastore_services.Model):
     """Base model for all persistent object storage classes."""
 
     # Specifies whether the model's id is used as a key in Takeout. By default,
@@ -154,7 +154,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
     def id(self):
         # type: () -> Text
         """A unique id for this model instance."""
-        return self.key.id() # type: ignore[no-any-return]
+        return self.key.id()
 
     class EntityNotFoundError(Exception):
         """Raised when no entity for a given id exists in the datastore."""
@@ -258,7 +258,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
                 True and no undeleted entity with the given id exists in the
                 datastore.
         """
-        entity = cls.get_by_id(entity_id)
+        entity = cls.get_by_id(entity_id) # type: Optional[SELF_BASE_MODEL]
         if entity and entity.deleted:
             entity = None
 
@@ -266,7 +266,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
             raise cls.EntityNotFoundError(
                 'Entity for class %s with id %s not found' %
                 (cls.__name__, entity_id))
-        return entity # type: ignore[no-any-return]
+        return entity
 
     @classmethod
     def get_multi(cls, entity_ids, include_deleted=False):
@@ -292,7 +292,7 @@ class BaseModel(datastore_services.Model): # type: ignore[misc]
             else:
                 none_argument_indices.append(index)
 
-        entities = datastore_services.get_multi(entity_keys)
+        entities = datastore_services.get_multi(entity_keys) # type: List[Optional[SELF_BASE_MODEL]]
         for index in none_argument_indices:
             entities.insert(index, None)
 
@@ -484,11 +484,7 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(BaseHumanMaintainedModel, self).__init__(*args, **kwargs)
-
-    def put(self):
+    def put(self): # type: ignore[override]
         # type: () -> None
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError('Use put_for_human or put_for_bot instead')
@@ -497,12 +493,12 @@ class BaseHumanMaintainedModel(BaseModel):
         # type: () -> None
         """Stores the model instance on behalf of a human."""
         self.last_updated_by_human = datetime.datetime.utcnow()
-        return super(BaseHumanMaintainedModel, self).put() # type: ignore[no-any-return]
+        return super(BaseHumanMaintainedModel, self).put()
 
     def put_for_bot(self):
         # type: () -> None
         """Stores the model instance on behalf of a non-human."""
-        return super(BaseHumanMaintainedModel, self).put() # type: ignore[no-any-return]
+        return super(BaseHumanMaintainedModel, self).put()
 
     @classmethod
     def put_multi(cls, unused_instances):
@@ -567,10 +563,6 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = datastore_services.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = datastore_services.IntegerProperty()
-
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(BaseCommitLogEntryModel, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_model_association_to_user():
@@ -730,7 +722,7 @@ class BaseCommitLogEntryModel(BaseModel):
             version number.
         """
         commit_id = cls.get_instance_id(target_entity_id, version)
-        return cls.get_by_id(commit_id) # type: ignore[no-any-return]
+        return cls.get_by_id(commit_id)
 
 
 class VersionedModel(BaseModel):
@@ -790,10 +782,6 @@ class VersionedModel(BaseModel):
     # previous versions is stored in the snapshot models.
     version = datastore_services.IntegerProperty(default=0)
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(VersionedModel, self).__init__(*args, **kwargs)
-
     def _require_not_marked_deleted(self):
         # type: () -> None
         """Checks whether the model instance is deleted."""
@@ -803,7 +791,7 @@ class VersionedModel(BaseModel):
     def compute_snapshot(self):
         # type: () -> Dict[Text, Any]
         """Generates a snapshot (dict) from the model property values."""
-        return self.to_dict(exclude=['created_on', 'last_updated']) # type: ignore[no-any-return]
+        return self.to_dict(exclude=['created_on', 'last_updated'])
 
     def _reconstitute(self, snapshot_dict):
         # type: (SELF_VERSIONED_MODEL, Dict[Text, Any]) -> SELF_VERSIONED_MODEL
@@ -905,7 +893,7 @@ class VersionedModel(BaseModel):
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)) # type: BaseSnapshotContentModel
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self] # type: List[BaseModel]
-        self.update_timestamps_multi(entities)
+        self.update_timestamps_multi(entities) # type: ignore[arg-type]
         BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False): # type: ignore[override]
@@ -1061,9 +1049,9 @@ class VersionedModel(BaseModel):
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
             entities = (
-                snapshot_metadata_models + snapshot_content_models +
-                versioned_models)
-            cls.update_timestamps_multi(entities)
+                snapshot_metadata_models + snapshot_content_models + # type: ignore[operator]
+                versioned_models) # type: ignore[operator]
+            cls.update_timestamps_multi(entities) # type: ignore[arg-type]
             BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
@@ -1390,10 +1378,6 @@ class BaseSnapshotMetadataModel(BaseModel):
     content_user_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(BaseSnapshotMetadataModel, self).__init__(*args, **kwargs)
-
     @staticmethod
     def get_deletion_policy():
         # type: () -> DELETION_POLICY
@@ -1513,10 +1497,6 @@ class BaseSnapshotContentModel(BaseModel):
     # The snapshot content, as a JSON blob.
     content = datastore_services.JsonProperty(indexed=False)
 
-    def __init__(self, *args, **kwargs): # pylint: disable=useless-super-delegation
-        # type: (*Any, **Any) -> None
-        super(BaseSnapshotContentModel, self).__init__(*args, **kwargs)
-
     @staticmethod
     def get_model_association_to_user():
         # type: () -> MODEL_ASSOCIATION_TO_USER
@@ -1583,3 +1563,4 @@ class BaseMapReduceBatchResultsModel(BaseModel):
 
     _use_cache = False
     _use_memcache = False
+

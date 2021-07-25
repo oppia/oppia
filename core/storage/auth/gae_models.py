@@ -233,7 +233,7 @@ class UserIdentifiersModel(base_models.BaseModel):
             UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
-        return cls.get_by_id(gae_id) # type: ignore[no-any-return]
+        return cls.get_by_id(gae_id)
 
     @classmethod
     def get_by_user_id(cls, user_id):

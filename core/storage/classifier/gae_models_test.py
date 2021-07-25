@@ -367,7 +367,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         mappings = (
             classifier_models.StateTrainingJobsMappingModel.get_models(  # type: ignore[assignment]
-                exp_id, exp_version, [state_name])) # type: classifier_models.StateTrainingJobsMappingModel
+                exp_id, exp_version, [state_name])) # type: List[classifier_models.StateTrainingJobsMappingModel]
 
         self.assertEqual(len(mappings), 1)
         self.assertEqual(mappings[0].exp_id, exp_id)

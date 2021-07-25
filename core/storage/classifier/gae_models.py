@@ -208,7 +208,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                         cls.next_scheduled_check_time, cls._key)
 
         job_models = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset) # type: List[ClassifierTrainingJobModel]
         offset = offset + len(job_models)
         return job_models, offset
 
@@ -333,7 +333,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         for state_name in state_names:
             mapping_id = cls._generate_id(exp_id, exp_version, state_name)
             mapping_ids.append(mapping_id)
-        mapping_instances = cls.get_multi(mapping_ids)
+        mapping_instances = cls.get_multi(mapping_ids) # type: List[Optional[ClassifierTrainingJobModel]] # type: ignore[assignment]
         return mapping_instances
 
     @classmethod
@@ -355,8 +355,8 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             entry for given <exp_id, exp_version, state_name> is found.
         """
         mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-        model = cls.get_by_id(mapping_id)
-        return model # type: ignore[no-any-return]
+        model = cls.get_by_id(mapping_id) # type: Optional[ClassifierTrainingJobModel] # type: ignore[assignment]
+        return model
 
     @classmethod
     def create(

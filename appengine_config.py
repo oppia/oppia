@@ -22,7 +22,7 @@ import sys
 
 import python_utils
 
-from google.appengine.ext import vendor
+from google.appengine.ext import vendor # type: ignore[attr-defined]
 import pkg_resources
 
 from typing import Any, Text # isort:skip # pylint: disable=unused-import

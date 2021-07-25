@@ -278,7 +278,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get( # type: ignore[assignment]
-                ticket_id)) # type: app_feedback_report_models.AppFeedbackReportModel
+                ticket_id)) # type: app_feedback_report_models.AppFeedbackReportTicketModel
 
         self.assertEqual(ticket_model.id, ticket_id)
         self.assertEqual(
@@ -349,7 +349,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
 
         stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get( # type: ignore[assignment]
-                entity_id)) # type: app_feedback_report_models.AppFeedbackReportModel
+                entity_id)) # type: app_feedback_report_models.AppFeedbackReportStatsModel
 
         self.assertEqual(stats_model.id, '%s:%s:%s' % (
             'android', self.TICKET_ID, self.STATS_DATE.isoformat()))

@@ -80,6 +80,10 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
             [collection_services.get_collection_summary_from_model(model) # type: ignore[no-untyped-call]
              if model else None for model in collection_summary_models])
 
+        assert exploration_summaries[0] is not None
+        assert exploration_summaries[1] is not None
+        assert collection_summaries[0] is not None
+        assert collection_summaries[1] is not None
         # Check that we have received the summaries of multiple entities of
         # different types correctly.
         self.assertEqual(exploration_summaries[0].title, 'Bridges in England')
@@ -110,7 +114,7 @@ class MockDatetimeForDatastoreTests(test_utils.GenericTestBase):
         # type: () -> None
         mocked_now = datetime.datetime(2000, 1, 1)
 
-        class TestModel(gae_datastore_services.Model): # type: ignore[misc]
+        class TestModel(gae_datastore_services.Model):
             """Simple model for testing."""
 
             datetime_property = gae_datastore_services.DateTimeProperty()

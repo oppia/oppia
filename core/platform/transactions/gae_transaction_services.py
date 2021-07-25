@@ -43,7 +43,7 @@ def run_in_transaction_wrapper(fn):
     """
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        # type: (*Any, **Any) -> ndb.transaction
+        # type: (*Any, **Any) -> Any
         """Wrapper for the transaction."""
         return ndb.transaction(
             lambda: fn(*args, **kwargs),
@@ -55,7 +55,7 @@ def run_in_transaction_wrapper(fn):
 
 
 def toplevel_wrapper(*args, **kwargs):
-    # type: (*Any, **Any) -> ndb.toplevel
+    # type: (*Any, **Any) -> Callable[..., Any]
     """Enables a WSGI application to not exit until all its asynchronous
     requests have finished.
 

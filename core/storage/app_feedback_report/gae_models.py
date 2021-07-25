@@ -610,7 +610,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             AppFeedbackReportStatsModel entities that record stats on the
             ticket.
         """
-        return cls.query(cls.ticket_id == ticket_id).fetch() # type: ignore[no-any-return]
+        return cls.query(cls.ticket_id == ticket_id).fetch()
 
     @staticmethod
     def get_deletion_policy():
