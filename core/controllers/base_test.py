@@ -463,8 +463,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 auth_domain.AuthClaims(
                     'auth_id', self.NEW_USER_EMAIL, role_is_super_admin=False)
             ))
-
-            response = self.get_html_response('/', expected_status_int=302)
+            response = self.get_html_response('/', expected_status_int=200)
+            self.assertIn(
+                b'<oppia-splash-page-root></oppia-splash-page-root>',
+                response.body
+            )
 
         self.assert_matches_regexps(
             logs,

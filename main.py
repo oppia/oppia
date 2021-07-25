@@ -118,7 +118,7 @@ class HomePageRedirectPage(base.BaseHandler):
     redirect them appropriately.
     """
 
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
         if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
                 self.user_id):
@@ -135,7 +135,7 @@ class HomePageRedirectPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    @acl_decorators.open_access # type: ignore[misc]
+    @acl_decorators.open_access  # type: ignore[misc]
     def get(self) -> None:
         self.redirect('/')
 

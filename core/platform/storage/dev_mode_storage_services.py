@@ -99,6 +99,6 @@ def listdir(unused_bucket_name, dir_name):
         dir_name: str. The directory whose files should be listed.
 
     Returns:
-        list(str). A lexicographically-sorted list of filenames.
+        list(Blob). A lexicographically-sorted list of filenames.
     """
     return CLIENT.list_blobs(dir_name)

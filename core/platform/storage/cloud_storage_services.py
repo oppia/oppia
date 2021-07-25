@@ -129,7 +129,7 @@ def listdir(bucket_name, dir_name):
             should not start with '/' or end with '/'.
 
     Returns:
-        list(str). A lexicographically-sorted list of filenames.
+        list(Blob). A lexicographically-sorted list of filenames.
     """
     return list(
         _get_client().list_blobs(_get_bucket(bucket_name), prefix=dir_name))

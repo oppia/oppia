@@ -270,7 +270,7 @@ def run_tests(args):
             clear_datastore=True,
             skip_sdk_update_check=True,
             env={
-                **os.environ,
+                # **os.environ,
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 

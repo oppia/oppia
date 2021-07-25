@@ -29,7 +29,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
         dev_mode_storage_services.CLIENT.reset()
         super().setUp()
 
-    def test_isfile(self):
+    def test_isfile_checks_if_file_exists(self):
         dev_mode_storage_services.commit(
             'bucket', '/file/path.png', b'data', 'image/png')
         self.assertTrue(
@@ -49,7 +49,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
         self.assertEqual(
             dev_mode_storage_services.get('bucket', '/file/path.png'), b'data')
 
-    def test_delete(self):
+    def test_delete_correctly_deletes_file(self):
         dev_mode_storage_services.commit(
             'bucket', '/file/path.png', b'data', 'image/png')
         self.assertTrue(

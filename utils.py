@@ -53,7 +53,7 @@ PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
-T = TypeVar('T') # pylint: disable=invalid-name
+T = TypeVar('T')
 
 # TODO(#13059): Every use of constants is followed by
 # 'type: ignore[attr-defined]' because mypy is not able to identify the
@@ -315,7 +315,8 @@ def convert_png_data_url_to_binary(image_data_url):
         raise Exception('The given string does not represent a PNG data URL.')
 
 
-def convert_png_binary_to_data_url(content: Union[str, bytes]) -> str:
+def convert_png_binary_to_data_url(content):
+    # type: (Union[str, bytes]) -> str
     """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
