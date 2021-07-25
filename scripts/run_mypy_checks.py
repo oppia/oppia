@@ -832,6 +832,7 @@ def install_mypy_prerequisites(install_globally):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
+    print(os.path.join(site.USER_BASE, 'bin'))
     if 'can\'t combine user with prefix' in output[1]:
         uextention_text = ['--user', '--prefix=', '--system']
         process = subprocess.Popen(
