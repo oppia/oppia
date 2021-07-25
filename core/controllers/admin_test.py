@@ -1087,6 +1087,19 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
 
+    def test_removing_role_with_invalid_username(self):
+        username = 'invaliduser'
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        response = self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'role': feconf.ROLE_ID_TOPIC_MANAGER, 'username': username},
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
+
     def test_cannot_view_role_with_invalid_view_filter_criterion(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
@@ -1203,11 +1216,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             self):
         user_email = 'user1@example.com'
         username = 'user1'
-
         self.signup(user_email, username)
-        self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             feconf.ADMIN_ROLE_HANDLER_URL, {
@@ -1218,6 +1229,56 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Unsupported role for this handler.')
 
+    def test_general_role_handler_supports_unassigning_topic_manager(
+            self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+
+        self.signup(user_email, username)
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', url_fragment='url-fragment',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/topicmanagerrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'topic_id': topic_id
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
+                'banned': False,
+                'managed_topic_ids': [topic_id]
+            })
+
+        self.delete_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'username': username, 'role': feconf.ROLE_ID_TOPIC_MANAGER})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': []
+            })
+
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicManagerRoleHandler."""
@@ -1225,6 +1286,28 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(TopicManagerRoleHandlerTest, self).setUp()
         self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_handler_with_invalid_username(self):
+        username = 'invaliduser'
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', url_fragment='url-fragment',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response = self.put_json(
+            '/topicmanagerrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'topic_id': topic_id
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
 
     def test_adding_topic_manager_role_to_user(self):
         user_email = 'user1@example.com'
@@ -1341,6 +1424,159 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
             response_dict['managed_topic_ids'], [new_topic_id, topic_id])
 
         self.logout()
+
+
+class BannedUsersHandlerTest(test_utils.GenericTestBase):
+    """Tests for BannedUsersHandler."""
+
+    def setUp(self):
+        super(BannedUsersHandlerTest, self).setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_mark_a_user_ban(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': []
+            })
+
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/bannedusershandler', {
+                'username': username
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [],
+                'banned': True,
+                'managed_topic_ids': []
+            })
+
+    def test_banning_a_topic_manger_should_remove_user_from_topics(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', url_fragment='url-fragment',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/topicmanagerrolehandler', {
+                'action': 'assign',
+                'username': username,
+                'topic_id': topic_id
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
+                'banned': False,
+                'managed_topic_ids': [topic_id]
+            })
+
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/bannedusershandler', {
+                'username': username
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [],
+                'banned': True,
+                'managed_topic_ids': []
+            })
+
+    def test_ban_user_with_invalid_username(self):
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/bannedusershandler', {
+                'username': 'invalidUsername'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'], 'User with given username does not exist.')
+
+    def test_unmark_a_banned_user(self):
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/bannedusershandler', {
+                'username': username
+            }, csrf_token=csrf_token)
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [],
+                'banned': True,
+                'managed_topic_ids': []
+            })
+
+        self.delete_json('/bannedusershandler', params={'username': username})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username})
+
+        self.assertEqual(
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': []
+            })
+
+    def test_unban_user_with_invalid_username(self):
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        response_dict = self.delete_json(
+            '/bannedusershandler',
+            params={'username': 'invalidUsername'},
+            expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'], 'User with given username does not exist.')
 
 
 class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):

@@ -685,8 +685,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
         self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_FULL_USER)
-        self.assertEqual(
             user_settings_model.roles, [feconf.ROLE_ID_FULL_USER])
         self.assertFalse(user_settings_model.banned)
 
@@ -813,6 +811,83 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, error_msg):
             user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
+
+    def test_removing_role_from_mobile_learner_user_raises_exception(self):
+        auth_id = 'test_id'
+        user_email = 'test@email.com'
+        user_pin = '12345'
+        profile_pin = '123'
+        display_alias = 'display_alias'
+        display_alias_2 = 'display_alias_2'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+
+        self.modifiable_user_data.user_id = user_id
+        self.modifiable_user_data.pin = user_pin
+        self.modifiable_user_data.display_alias = display_alias
+        user_services.update_multiple_users_data([self.modifiable_user_data])
+        self.modifiable_new_user_data.display_alias = display_alias_2
+        self.modifiable_new_user_data.pin = profile_pin
+
+        user_services.create_new_profiles(
+            auth_id, user_email, [self.modifiable_new_user_data])
+        profile_user_id = (
+            user_services.get_all_profiles_auth_details_by_parent_user_id(
+                user_id)[0].user_id
+        )
+        self.assertEqual(
+            user_services.get_user_roles_from_id(profile_user_id),
+            [feconf.ROLE_ID_MOBILE_LEARNER])
+        error_msg = 'The role of a Mobile Learner cannot be changed.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.remove_user_role(
+                profile_user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
+    def test_removing_default_user_role_raises_exception(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_FULL_USER])
+        self.assertFalse(user_settings_model.banned)
+
+        error_msg = 'Removing a default role is not allowed.'
+        with self.assertRaisesRegexp(Exception, error_msg):
+            user_services.remove_user_role(user_id, feconf.ROLE_ID_FULL_USER)
+
+    def test_mark_user_banned(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.mark_user_banned(user_id)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertTrue(user_settings_model.banned)
+
+    def test_unmark_banned_user(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_services.mark_user_banned(user_id)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertTrue(user_settings_model.banned)
+
+        user_services.unmark_user_banned(user_id)
+
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        self.assertFalse(user_settings_model.banned)
 
     def test_create_new_user_creates_a_new_user_auth_details_entry(self):
         new_auth_id = 'new_auth_id'

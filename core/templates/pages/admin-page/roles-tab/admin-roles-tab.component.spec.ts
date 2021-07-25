@@ -352,4 +352,32 @@ describe('Admin roles tab component ', function() {
         expect(component.userRoles).toEqual(['MODERATOR', 'TOPIC_MANAGER']);
       }));
   });
+
+  describe('on calling showNewRoleSelector', function() {
+    it('should enable roleSelectorIsShown', () => {
+      component.roleSelectorIsShown = false;
+      component.userRoles = ['FULL_USER', 'MODERATOR'];
+      component.UPDATABLE_ROLES = {
+        MODERATOR: 'moderator',
+        TOPIC_MANAGER: 'topic manager'
+      };
+
+      component.showNewRoleSelector();
+
+      expect(component.roleSelectorIsShown).toBeTrue();
+    });
+
+    it('should set correct value for possibleRolesToAdd', () => {
+      component.userRoles = ['FULL_USER', 'MODERATOR'];
+      component.UPDATABLE_ROLES = {
+        MODERATOR: 'moderator',
+        TOPIC_MANAGER: 'topic manager'
+      };
+      component.possibleRolesToAdd = [];
+
+      component.showNewRoleSelector();
+
+      expect(component.possibleRolesToAdd).toEqual(['TOPIC_MANAGER']);
+    });
+  });
 });

@@ -226,12 +226,13 @@ export class AdminBackendApiService {
     });
   }
 
-  async removeUserRoleAsync(newRole: string, username: string): Promise<void> {
+  async removeUserRoleAsync(
+      roleToRemove: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
-            role: newRole,
+            role: roleToRemove,
             username: username
           }
         }

@@ -180,11 +180,11 @@ class UserSettings(python_utils.OBJECT):
 
         if not isinstance(self.banned, bool):
             raise utils.ValidationError(
-                'Expected banned to be a bool, received %s' % self.role)
+                'Expected banned to be a bool, received %s' % self.banned)
 
         if not isinstance(self.roles, list):
             raise utils.ValidationError(
-                'Expected role to be a list, received %s' % self.role)
+                'Expected roles to be a list, received %s' % self.roles)
 
         if self.banned:
             if self.roles:

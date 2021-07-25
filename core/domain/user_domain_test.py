@@ -149,6 +149,52 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
+    def test_validate_invalid_banned_value_type_raises_exception(self):
+        self.user_settings.banned = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected banned to be a bool'):
+            self.user_settings.validate()
+
+        self.user_settings.banned = '123'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected banned to be a bool'):
+            self.user_settings.validate()
+
+    def test_validate_invalid_roles_value_type_raises_exception(self):
+        self.user_settings.roles = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected roles to be a list'):
+            self.user_settings.validate()
+
+        self.user_settings.roles = True
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected roles to be a list'):
+            self.user_settings.validate()
+
+    def test_validate_banned_user_with_roles_raises_exception(self):
+        self.user_settings.roles = ['FULL_USER']
+        self.user_settings.banned = True
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected roles for banned user to be empty'):
+            self.user_settings.validate()
+
+    def test_validate_roles_with_duplicate_value_raise_exception(self):
+        self.user_settings.roles = ['FULL_USER', 'FULL_USER', 'TOPIC_MANAGER']
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Roles contains duplicate values:'):
+            self.user_settings.validate()
+
+    def test_validate_roles_without_any_default_role_raise_exception(self):
+        self.user_settings.roles = ['TOPIC_MANAGER']
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected roles to contains one default role.'):
+            self.user_settings.validate()
+
     def test_validate_non_str_pin_id(self):
         self.user_settings.pin = 0
         with self.assertRaisesRegexp(

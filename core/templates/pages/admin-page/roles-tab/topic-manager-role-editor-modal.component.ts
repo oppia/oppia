@@ -56,13 +56,11 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
       this.username, this.topicIdInUpdate).then(()=> {
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
-    }, data => {
+    }, errorMessage => {
       let topicIdIndex = this.managedTopicIds.indexOf(this.newTopicId);
       this.managedTopicIds.splice(topicIdIndex, 1);
-      var transformedData = data.responseText.substring(5);
-      var parsedResponse = JSON.parse(transformedData);
       this.alertsService.addWarning(
-        parsedResponse.error || 'Error communicating with server.');
+        errorMessage || 'Error communicating with server.');
     });
   }
 
@@ -74,11 +72,9 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
       this.managedTopicIds.splice(topicIdIndex, 1);
       this.topicIdInUpdate = null;
       this.updateTopicIdsForSelection();
-    }, data => {
-      var transformedData = data.responseText.substring(5);
-      var parsedResponse = JSON.parse(transformedData);
+    }, errorMessage => {
       this.alertsService.addWarning(
-        parsedResponse.error || 'Error communicating with server.');
+        errorMessage || 'Error communicating with server.');
     });
   }
 

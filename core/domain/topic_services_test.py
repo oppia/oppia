@@ -1631,6 +1631,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
+    def test_deassigning_an_unassigned_user_from_topic_raise_exception(self):
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
+        with self.assertRaisesRegexp(
+            Exception, 'User does not have manager rights in topic.'):
+            topic_services.assign_role(
+                self.user_admin, self.user_b,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+
 
 # TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.

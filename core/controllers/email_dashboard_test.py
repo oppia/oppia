@@ -343,6 +343,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             response['error'],
             '%s is not an authorized user for this query.'
             % (self.submitter_id))
+
+        with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
+            self.get_html_response('/emaildashboardresult/%s' % user_query_2_id)
+
         self.logout()
 
     def test_cancel_email_handler_with_invalid_query_id_raises_400(self):
