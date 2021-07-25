@@ -17,13 +17,12 @@
  */
 
 require(
+  'interactions/interaction-attributes-extractor.service.ts');
+require(
   'interactions/DragAndDropSortInput/directives/' +
   'drag-and-drop-sort-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
-
-require(
-  'interactions/interaction-attributes-extractor.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
   bindings: {
@@ -105,7 +104,7 @@ angular.module('oppia').component('oppiaInteractiveDragAndDropSortInput', {
         }
 
         let savedSolution = (
-              ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
+          ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
         );
 
         if (savedSolution.length) {

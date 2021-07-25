@@ -37,7 +37,8 @@ angular.module('oppia').component('oppiaInteractiveNumberWithUnits', {
   controllerAs: '$ctrl',
   controller: [
     '$attrs', '$scope', '$uibModal', 'CurrentInteractionService',
-    'NumberWithUnitsObjectFactory', 'NumberWithUnitsRulesService', function(
+    'NumberWithUnitsObjectFactory', 'NumberWithUnitsRulesService',
+    function(
         $attrs, $scope, $uibModal, CurrentInteractionService,
         NumberWithUnitsObjectFactory, NumberWithUnitsRulesService) {
       var ctrl = this;
@@ -50,8 +51,8 @@ angular.module('oppia').component('oppiaInteractiveNumberWithUnits', {
 
       ctrl.submitAnswer = function(answer) {
         try {
-          var numberWithUnits =
-                NumberWithUnitsObjectFactory.fromRawInputString(answer);
+          var numberWithUnits = (
+            NumberWithUnitsObjectFactory.fromRawInputString(answer));
           CurrentInteractionService.onSubmit(
             numberWithUnits, NumberWithUnitsRulesService);
         } catch (parsingError) {

@@ -34,7 +34,7 @@ angular.module('oppia').component('oppiaResponseDragAndDropSortInput', {
       };
       ctrl.$onInit = function() {
         ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
+        ctrl.isAnswerLengthGreaterThanZero = ctrl.answer.length > 0;
       };
     }]
 });

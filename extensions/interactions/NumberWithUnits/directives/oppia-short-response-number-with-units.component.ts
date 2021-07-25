@@ -22,11 +22,10 @@ require('services/html-escaper.service.ts');
 angular.module('oppia').component('oppiaShortResponseNumberWithUnits', {
   template: require('./number-with-units-short-response.component.html'),
   controllerAs: '$ctrl',
-  controller: ['$attrs', 'HtmlEscaperService',
-    'NumberWithUnitsObjectFactory',
+  controller: [
+    '$attrs', 'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
     function(
-        $attrs, HtmlEscaperService,
-        NumberWithUnitsObjectFactory) {
+        $attrs, HtmlEscaperService, NumberWithUnitsObjectFactory) {
       var ctrl = this;
       ctrl.$onInit = function() {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
