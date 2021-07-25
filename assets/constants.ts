@@ -5959,8 +5959,14 @@ export default {
       "TITLE": "About | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
@@ -5971,8 +5977,14 @@ export default {
       "TITLE": "Contact | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Contact the Oppia team, submit feedback, and learn how to get involved with the Oppia project."
         }
@@ -5983,8 +5995,14 @@ export default {
       "TITLE": "Donate | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Donate to The Oppia Foundation to enable more students to receive the quality education they deserve."
         }
@@ -5995,8 +6013,13 @@ export default {
       "TITLE": "Get Started | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          "CONTENT": "Learn how to get started using Oppia."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           "CONTENT": "Learn how to get started using Oppia."
         }
       ]
@@ -6006,8 +6029,13 @@ export default {
       "TITLE": "License Page | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          "CONTENT": "License terms that Oppia is attributed under."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           "CONTENT": "License terms that Oppia is attributed under."
         }
       ]
@@ -6015,13 +6043,7 @@ export default {
     "LOGIN": {
       "ROUTE": "login",
       "TITLE": "Sign in | Oppia",
-      "META": [
-        {
-          "PROPERTY_TYPE": "name",
-          "PROPERTY_VALUE": "description",
-          "CONTENT": "License terms that Oppia is attributed under."
-        }
-      ]
+      "META": []
     },
     "LOGOUT": {
       "ROUTE": "logout",
@@ -6038,8 +6060,14 @@ export default {
       "TITLE": "Creator Guidelines | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
         }
@@ -6055,8 +6083,14 @@ export default {
       "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "The Oppia library is full of user-created lessons called 'explorations'. Read about how to participate in the community and begin creating explorations."
         }
@@ -6067,8 +6101,14 @@ export default {
       "TITLE": "Terms of Use | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           // eslint-disable-next-line max-len
           "CONTENT": "Oppia is a 501(c)(3) registered non-profit open-source e-learning platform. Learn about our terms and conditions for creating and distributing learning material."
         }
@@ -6079,8 +6119,13 @@ export default {
       "TITLE": "Thanks | Oppia",
       "META": [
         {
-          "PROPERTY_TYPE": "name",
+          "PROPERTY_TYPE": "itemprop",
           "PROPERTY_VALUE": "description",
+          "CONTENT": "Thank you for donating to The Oppia Foundation!"
+        },
+        {
+          "PROPERTY_TYPE": "property",
+          "PROPERTY_VALUE": "og:description",
           "CONTENT": "Thank you for donating to The Oppia Foundation!"
         }
       ]
