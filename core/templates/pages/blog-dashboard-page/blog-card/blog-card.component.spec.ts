@@ -108,7 +108,7 @@ describe('Blog Dashboard Tile Component', () => {
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual('sample_url');
     expect(component.thumbnailUrl).toBe(
       '/assetsdevhandler/blog_post/sampleId/assets/thumbnail/image.png');
-    expect(component.publishedDateString).toBe('November 21, 2014')
+    expect(component.publishedDateString).toBe('November 21, 2014');
   });
 
   it('should not show thumbnail if thumbnail filename is not given', () => {

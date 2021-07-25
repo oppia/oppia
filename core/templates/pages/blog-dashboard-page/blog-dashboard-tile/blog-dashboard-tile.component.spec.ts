@@ -81,7 +81,7 @@ describe('Blog Dashboard Tile Component', () => {
 
     component.ngOnInit();
 
-    expect(component.lastUpdatedDateString).toEqual('November 21, 2014')
+    expect(component.lastUpdatedDateString).toEqual('November 21, 2014');
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
