@@ -27,8 +27,7 @@ import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
 
 describe('PlaythroughIssuesBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let playthroughIssuesBackendApiService:
-    PlaythroughIssuesBackendApiService;
+  let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
 
   let backendIssues: PlaythroughIssueBackendDict[] = [{
