@@ -690,7 +690,7 @@ class BuildTests(test_utils.GenericTestBase):
             tmp.write(u'Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
-            build.generate_app_yaml(maintenance_mode=True)
+            build.generate_app_yaml()
 
         with python_utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
             content = yaml_file.read()
