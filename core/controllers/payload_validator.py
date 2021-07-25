@@ -282,7 +282,6 @@ HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'Error404Handler',
     'FrontendErrorHandler',
     'WarmupPage',
-    'HomePageRedirectPage',
     'SplashRedirectPage',
     'SeedFirebaseHandler'
 ]

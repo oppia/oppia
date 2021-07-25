@@ -60,8 +60,6 @@ module.exports = {
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
     blog_admin:
       commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
-    classroom:
-      commonPrefix + '/pages/classroom-page/classroom-page.import.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.import.ts',
@@ -136,7 +134,6 @@ module.exports = {
     signup: commonPrefix + '/pages/signup-page/signup-page.import.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
-    splash: commonPrefix + '/pages/splash-page/splash-page.import.ts',
     stewards:
       commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
       'stewards-landing-page.import.ts',
@@ -196,20 +193,6 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['classroom'],
-      filename: 'classroom-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Learn and practice all major math topics, functions, ' +
-        'equations, and formulas through problems, stories, and examples.'
-      },
-      template:
-        commonPrefix + '/pages/classroom-page/' +
-        'classroom-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -631,20 +614,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/skill-editor-page/' +
         'skill-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['splash'],
-      filename: 'splash-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on math, ' +
-        'physics, statistics, chemistry, music, history and more from ' +
-        'anywhere in the world. Oppia is a nonprofit with the mission ' +
-        'of providing high-quality education to those who lack access to it.'
-      },
-      template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

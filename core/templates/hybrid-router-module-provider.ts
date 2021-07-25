@@ -17,8 +17,9 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, Input, ModuleWithProviders, NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Directive, Injectable, Input, ModuleWithProviders, NgModule } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 // TODO(#13443): Remove hybrid router module provider once all pages are
 // migrated to angular router.
@@ -31,6 +32,14 @@ import { RouterModule } from '@angular/router';
 })
 export class MockRouterLink {
   @Input() routerLink!: string;
+}
+
+
+class MockRouter {
+  windowRef = new WindowRef();
+  navigateByUrl(url: string): void {
+    this.windowRef.nativeWindow.location.href = url;
+  }
 }
 
 @NgModule({
@@ -60,6 +69,12 @@ export class HybridRouterModuleProvider {
 
     return {
       ngModule: MockRouterModule,
+      providers: [
+        {
+          provide: Router,
+          useClass: MockRouter
+        }
+      ]
     };
   }
 }

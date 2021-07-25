@@ -17,9 +17,34 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { MetaTagCustomizationService, MetaAttribute } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-splash-page-root',
   templateUrl: './splash-page-root.component.html'
 })
-export class SplashPageRootComponent {}
+export class SplashPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+
+    let metaAttributes: MetaAttribute[] = [];
+    for (let i = 0; i < pageData.META.length; i++) {
+      metaAttributes.push({
+        propertyType: pageData.META[i].PROPERTY_TYPE,
+        propertyValue: pageData.META[i].PROPERTY_VALUE,
+        content: pageData.META[i].CONTENT
+      });
+    }
+    // Update meta tags.
+    this.metaTagCustomizationService.addOrReplaceMetaTags(metaAttributes);
+  }
+}

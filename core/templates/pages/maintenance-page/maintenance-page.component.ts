@@ -18,6 +18,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -31,6 +32,8 @@ import { DocumentAttributeCustomizationService } from
 })
 export class MaintenancePageComponent implements OnInit {
   currentLang: string = 'en';
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private documentAttributeCustomizationService:

@@ -114,7 +114,9 @@
         <span>{{ 'I18N_SIDEBAR_CLASSROOM' | translate }}</span>
       </a>
       <div [hidden]="!classroomSubmenuIsShown" class="classroom-submenu">
-        <a href="/learn/math" class="protractor-mobile-test-mathematics-link">
+        <a href="/learn/math"
+           routerLink="/learn/math"
+           class="protractor-mobile-test-mathematics-link">
           <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
         </a>
       </div>

@@ -37,6 +37,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { Router } from '@angular/router';
 
 interface LanguageInfo {
   id: string;
@@ -120,6 +121,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
+    private router: Router,
     private searchService: SearchService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
@@ -335,7 +337,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   navigateToClassroomPage(classroomUrl: string): void {
     this.siteAnalyticsService.registerClassroomHeaderClickEvent();
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
+      this.router.navigateByUrl(classroomUrl);
     }, 150);
   }
 

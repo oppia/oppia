@@ -40,11 +40,11 @@ class ClassroomPage(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.does_classroom_exist
+    @acl_decorators.open_access
     def get(self, _):
         """Handles GET requests."""
 
-        self.render_template('classroom-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class ClassroomDataHandler(base.BaseHandler):

@@ -21,6 +21,7 @@ import logging
 from constants import constants
 
 from core.controllers import acl_decorators
+from core.controllers import access_validators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
@@ -112,26 +113,6 @@ class WarmupPage(base.BaseHandler):
         pass
 
 
-class HomePageRedirectPage(base.BaseHandler):
-    """When a request is made to '/', check the user's login status, and
-    redirect them appropriately.
-    """
-
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
-        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
-                self.user_id):
-            user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
-            default_dashboard = user_settings.default_dashboard
-            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
-                self.redirect(feconf.CREATOR_DASHBOARD_URL)
-            else:
-                self.redirect(feconf.LEARNER_DASHBOARD_URL)
-        else:
-            self.render_template('splash-page.mainpage.html') # type: ignore[no-untyped-call]
-
-
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
@@ -221,7 +202,6 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
-    get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
 
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
@@ -231,6 +211,11 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
+
+    # Access Validators.
+    get_redirect_route(
+        r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.SplashPageAccessValidationHandler),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -926,10 +911,10 @@ if constants.DEV_MODE:
 
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-    URLS.append(
-        get_redirect_route(
-            r'/%s' % page['ROUTE'],
-            oppia_root.OppiaRootPage))
+    if not 'NOT_REGISTERED_WITH_BACKEND' in page:
+        URLS.append(
+            get_redirect_route(
+                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))

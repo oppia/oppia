@@ -20,6 +20,10 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { AclValidationService } from './access-validation-backend-api.service';
+import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
+import { RouteGuardModule } from './guards/route-guard.module';
 
 // All paths should be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -28,6 +32,20 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
     loadChildren: () => import('pages/about-page/about-page.module')
       .then(m => m.AboutPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE),
+    pathMatch: 'full',
+    loadChildren: () => import('pages/classroom-page/classroom-page.module')
+      .then(m => m.ClassroomPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
+    pathMatch: 'full',
+    canLoad: [CanAccessSplashPageGuard],
+    loadChildren: () => import('pages/splash-page/splash-page.module')
+      .then(m => m.SplashPageModule)
   },
   {
     path: '**',
@@ -39,7 +57,7 @@ const routes: Route[] = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
   ],
   exports: [
     RouterModule

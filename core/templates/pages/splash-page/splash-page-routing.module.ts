@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the splash page.
+ * @fileoverview Routing module for splash page.
  */
 
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { SplashPageComponent } from './splash-page.component';
+import { Route, RouterModule } from '@angular/router';
 import { SplashPageRootComponent } from './splash-page-root.component';
-import { CommonModule } from '@angular/common';
-import { SplashPageRoutingModule } from './splash-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: SplashPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    HttpClientModule,
-    SharedComponentsModule,
-    SplashPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    SplashPageComponent,
-    SplashPageRootComponent,
-  ],
-  entryComponents: [
-    SplashPageComponent,
-    SplashPageRootComponent,
+  exports: [
+    RouterModule
   ]
 })
-export class SplashPageModule {}
+
+export class SplashPageRoutingModule {}
