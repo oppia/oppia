@@ -454,8 +454,8 @@
 
 # Infrastructure.
 /jobs/ @brianrodri
-/jobs/transforms @rohitkatlaa
-/jobs/types @rohitkatlaa
+/jobs/transforms @rohitkatlaa @brianrodri
+/jobs/types @rohitkatlaa @brianrodri
 /core/templates/domain/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
