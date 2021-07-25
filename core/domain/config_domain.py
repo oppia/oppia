@@ -149,7 +149,7 @@ INT_SCHEMA = {
 }
 
 POSITIVE_INT_SCHEMA = {
-    'type': 'custom',
+    'type': schema_utils.SCHEMA_TYPE_CUSTOM,
     'obj_type': 'PositiveInt'
 }
 
