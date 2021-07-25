@@ -70,8 +70,8 @@ describe('BannerComponent', () => {
   });
 
   beforeEach(() => {
-    messengerService = TestBed.get(MessengerService);
-    loggerService = TestBed.get(LoggerService);
+    messengerService = TestBed.inject(MessengerService);
+    loggerService = TestBed.inject(LoggerService);
   });
 
   it('should post height change when the user changes the height of the' +
