@@ -37,6 +37,9 @@ import python_utils
 import utils
 
 import backports.functools_lru_cache
+from typing import Any # pylint: disable=unused-import
+from typing import Dict # pylint: disable=unused-import
+from typing import Text # pylint: disable=unused-import
 import webapp2
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
@@ -146,8 +149,8 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = None
-    HANDLER_ARGS_SCHEMAS = None
+    URL_PATH_ARGS_SCHEMAS = None # type: Dict[Text, Any]
+    HANDLER_ARGS_SCHEMAS = None # type: Dict[Text, Any]
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.

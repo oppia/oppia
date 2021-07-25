@@ -63,16 +63,12 @@ PADDING = 1
 class HelperFunctionTests(test_utils.GenericTestBase):
 
     def test_load_template(self):
-        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+        oppia_root_path = os.path.join(
+            'core', 'templates', 'pages', 'oppia-root')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
-                '"About | Oppia"',
-                base.load_template('about-page.mainpage.html'))
-        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
-            self.assertIn(
-                '"Donate - Oppia"',
-                base.load_template('donate-page.mainpage.html'))
+                '"Loading | Oppia"',
+                base.load_template('oppia-root.mainpage.html'))
 
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
@@ -1302,7 +1298,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'about-page.mainpage.html',
+                'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):

@@ -16,6 +16,8 @@
  * @fileoverview Root component for error page.
  */
 
+// This page is used as error page for 404 status code.
+
 import { Component } from '@angular/core';
 
 @Component({
