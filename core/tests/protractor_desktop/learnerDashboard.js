@@ -20,29 +20,45 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var TopicsAndSkillsDashboardPage =
+  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+const { browser } = require('protractor');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
+  var topicsAndSkillsDashboardPage = null;
+  var adminPage = null;
   var libraryPage = null;
+  var topicEditorPage = null;
+  var storyEditorPage = null;
   var learnerDashboardPage = null;
   var subscriptionDashboardPage = null;
 
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    topicsAndSkillsDashboardPage = (
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    adminPage = new AdminPage.AdminPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
   it('should display learners subscriptions', async function() {
+    var driver = browser.driver;
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
     var creator1Id = 'creatorName';
@@ -77,7 +93,9 @@ describe('Learner dashboard functionality', function() {
     // Both creators should be present in the subscriptions section of the
     // dashboard.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToSubscriptionsSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    await driver.findElement(
+      by.css('.protractor-test-subscriptions-section'));
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
     await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
@@ -119,6 +137,7 @@ describe('Learner dashboard functionality', function() {
   });
 
   it('should add exploration to play later list', async function() {
+    var driver = browser.driver;
     var EXPLORATION_FRACTION = 'fraction';
     var EXPLORATION_SINGING = 'singing';
     var CATEGORY_MATHEMATICS = 'Mathematics';
@@ -153,16 +172,101 @@ describe('Learner dashboard functionality', function() {
     await libraryPage.findExploration(EXPLORATION_FRACTION);
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    await driver.findElement(
+      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_FRACTION);
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_SINGING);
     await libraryPage.addSelectedExplorationToPlaylist();
     await learnerDashboardPage.get();
-    await learnerDashboardPage.navigateToPlayLaterExplorationSection();
+    await learnerDashboardPage.navigateToCommunityLessonsSection();
+    await driver.findElement(
+      by.css('.protractor-test-play-later-section'));
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING);
+    await users.logout();
+  });
+
+  it('should display all the topics on server in edit goals and ' +
+    'selected topic in current goals', async function() {
+    var driver = browser.driver;
+    var TOPIC_NAME = 'Topic 1';
+    var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
+    var TOPIC_DESCRIPTION = 'Topic description';
+    await users.createAndLoginAdminUser(
+      'creator@learnerDashboard1.com', 'learnerDashboard1');
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
+    await topicEditorPage.expectNumberOfStoriesToBe(0);
+    await topicEditorPage.createStory(
+      'Story Title', 'story-one', 'Story description',
+      '../data/test_svg.svg');
+    await storyEditorPage.returnToTopic();
+
+    await topicEditorPage.expectNumberOfStoriesToBe(1);
+    await topicEditorPage.expectStoryPublicationStatusToBe('No', 0);
+    await topicEditorPage.navigateToStoryWithIndex(0);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    await storyEditorPage.saveStory('Added thumbnail.');
+    await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
+    await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
+
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+    await topicsAndSkillsDashboardPage.get();
+    (
+      await
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill 1', 'Concept card explanation', false));
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill 1', 'Topic 1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+
+    await topicEditorPage.dragSkillToSubtopic('Skill 1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+
+    await topicEditorPage.updateMetaTagContent('meta tag content');
+    await topicEditorPage.updatePageTitleFragment('fragment');
+    await topicEditorPage.saveTopic('Added meta tag.');
+
+    await topicEditorPage.publishTopic();
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToGoalsSection();
+    await driver.findElement(
+      by.css('.protractor-test-edit-goals-section'));
+    await learnerDashboardPage.expectNameOfTopicInEditGoalsToMatch(
+      TOPIC_NAME);
+    await driver.findElement(By.css(
+      '.protractor-test-add-topic-to-current-goals-button')).click();
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
+      `Learn ${TOPIC_NAME}`);
     await users.logout();
   });
 

@@ -51,6 +51,12 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
     'relyingparty/verifyPassword?key=fake-api-key'),
+  // These "pencilcodeembed" erros occurs when the pencil code site tries to
+  // uses an invalid certificate that is when it gets expired, so we just
+  // ignore them.
+  _.escapeRegExp(
+    'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
+    'load resource: net::ERR_CERT_DATE_INVALID'),
 ];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {

@@ -231,11 +231,11 @@ describe('Learner dashboard functionality', function() {
     await waitFor.pageToFullyLoad();
     // Learner Dashboard should display 'Dummy Exploration'
     // as incomplete.
-    await learnerDashboardPage.checkIncompleteExplorationSection(
+    await learnerDashboardPage.checkIncompleteExplorationInCommunityLessonsTab(
       'Dummy Exploration');
     // Learner Dashboard should display 'Test Exploration'
     // exploration as complete.
-    await learnerDashboardPage.checkCompleteExplorationSection(
+    await learnerDashboardPage.checkCompleteExplorationInCommunityLessonsTab(
       'Test Exploration');
 
     await libraryPage.get();
@@ -256,9 +256,9 @@ describe('Learner dashboard functionality', function() {
     }
     // Both should be added to the completed section.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteExplorationSection(
+    await learnerDashboardPage.checkCompleteExplorationInCommunityLessonsTab(
       'Dummy Exploration');
-    await learnerDashboardPage.checkCompleteExplorationSection(
+    await learnerDashboardPage.checkCompleteExplorationInCommunityLessonsTab(
       'Test Exploration');
     await users.logout();
 
@@ -283,7 +283,7 @@ describe('Learner dashboard functionality', function() {
       // from learner dashboard.
       await users.login('learner@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.navigateToCompletedSection();
+      await learnerDashboardPage.navigateToCommunityLessonsSection();
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
         'Test Exploration');
       await learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
@@ -361,7 +361,7 @@ describe('Learner dashboard functionality', function() {
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
-    await learnerDashboardPage.checkIncompleteCollectionSection(
+    await learnerDashboardPage.checkIncompleteCollectionInCommunityLessonsTab(
       'Test Collection');
     // Now find and play 'Test Collection' completely.
     await libraryPage.get();
@@ -395,7 +395,7 @@ describe('Learner dashboard functionality', function() {
     // Learner Dashboard should display
     // 'Test Collection' as complete.
     await learnerDashboardPage.get();
-    await learnerDashboardPage.checkCompleteCollectionSection(
+    await learnerDashboardPage.checkCompleteCollectionInCommunityLessonsTab(
       'Test Collection');
     await users.logout();
 
@@ -432,7 +432,7 @@ describe('Learner dashboard functionality', function() {
       // Verify 'Test Collection' is now in the incomplete section.
       await users.login('learner4@learnerDashboard.com');
       await learnerDashboardPage.get();
-      await learnerDashboardPage.checkIncompleteCollectionSection(
+      await learnerDashboardPage.checkIncompleteCollectionInCommunityLessonsTab(
         'Test Collection');
     }
   });
