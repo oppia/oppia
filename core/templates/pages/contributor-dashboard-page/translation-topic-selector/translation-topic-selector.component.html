@@ -9,9 +9,9 @@
   <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container protractor-test-topic-selector-dropdown">
     <div class="oppia-translation-topic-selector-dropdown-label">All Topics</div>
     <div class="oppia-translation-topic-selector-dropdown-option protractor-test-topic-selector-option"
-        *ngFor="let option of options"
-        (click)="selectOption(option)"
-        [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
+         *ngFor="let option of options"
+         (click)="selectOption(option)"
+         [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
       {{option}}
     </div>
   </div>

@@ -17,9 +17,11 @@
  */
 
 import { ContributionOpportunitiesService } from
+  // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslationTopicService } from
+  // eslint-disable-next-line max-len
   'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { fakeAsync, TestBed } from '@angular/core/testing';
 

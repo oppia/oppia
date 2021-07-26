@@ -22,6 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 
 import { ContributionOpportunitiesService } from
+  // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { LoggerService } from 'services/contextual/logger.service';
 
@@ -44,7 +45,8 @@ export class TranslationTopicService {
   setActiveTopicName(newActiveTopicName: string): void {
     this.ContributionOpportunitiesService.getAllTopicNamesAsync()
       .then((data) => {
-        if (newActiveTopicName !== 'All' && data.indexOf(newActiveTopicName) < 0) {
+        if (newActiveTopicName !== 'All' &&
+            data.indexOf(newActiveTopicName) < 0) {
           this.loggerService.error(
             'Invalid active topic name: ' + newActiveTopicName);
           return;
