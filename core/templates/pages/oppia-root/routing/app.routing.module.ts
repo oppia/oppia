@@ -20,10 +20,9 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AclValidationService } from './access-validation-backend-api.service';
+import { CanAccessClassroomPageGuard } from './guards/can-access-classroom-page.guard';
 import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
-import { RouteGuardModule } from './guards/route-guard.module';
+
 
 // All paths should be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -37,6 +36,7 @@ const routes: Route[] = [
     path: (
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE),
     pathMatch: 'full',
+    canLoad: [CanAccessClassroomPageGuard],
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
       .then(m => m.ClassroomPageModule)
   },

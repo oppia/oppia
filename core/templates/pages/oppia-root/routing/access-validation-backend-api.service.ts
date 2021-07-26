@@ -24,16 +24,33 @@ export interface SplashPageValidatorResponse {
   'default_dashboard': string;
 }
 
+interface ClassroomPageValidatorResponse {
+  valid: boolean;
+  'redirect_url': string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AccessValidationBackendApiService {
-  SPLASH_PAGE_ACL_VALIDATOR = '/acl_validator/can_access_splash_page';
+  SPLASH_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_splash_page';
+  CLASSROOM_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_classroom_page';
 
   constructor(private http: HttpClient) {}
 
   validateAccessToSplashPage(): Promise<SplashPageValidatorResponse> {
     return this.http.get<SplashPageValidatorResponse>(
-      this.SPLASH_PAGE_ACL_VALIDATOR).toPromise();
+      this.SPLASH_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+
+  validateAccessToClassroomPage(
+      classroomUrlFragment: string
+  ): Promise<ClassroomPageValidatorResponse> {
+    return this.http.get<ClassroomPageValidatorResponse>(
+      this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {
+        params: {
+          classroom_url_fragment: classroomUrlFragment
+        }
+      }).toPromise();
   }
 }

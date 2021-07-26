@@ -40,7 +40,7 @@ class ClassroomPage(base.BaseHandler):
         'GET': {}
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.does_classroom_exist
     def get(self, _):
         """Handles GET requests."""
 

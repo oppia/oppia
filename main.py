@@ -214,6 +214,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     # Access Validators.
     get_redirect_route(
+        r'%s/can_access_classroom_page' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ClassroomPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATORS_PREFIX,
         access_validators.SplashPageAccessValidationHandler),
 
@@ -887,6 +891,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/platform_feature_dummy_handler',
         platform_feature.PlatformFeatureDummyHandler),
 
+    # Usually all frontend pages are served using OppiaRootPage handler
+    # but this is a special case as this route contains a url fragment.
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
 
