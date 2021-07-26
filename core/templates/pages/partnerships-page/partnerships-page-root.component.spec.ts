@@ -18,7 +18,6 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { PageTitleService } from 'services/page-title.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -28,7 +27,6 @@ describe('Partnerships Page Root', () => {
   let fixture: ComponentFixture<PartnershipsPageRootComponent>;
   let component: PartnershipsPageRootComponent;
   let pageTitleService: PageTitleService;
-  let metaTagCustomizationService: MetaTagCustomizationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -37,8 +35,7 @@ describe('Partnerships Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService,
-        MetaTagCustomizationService
+        PageTitleService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -48,7 +45,6 @@ describe('Partnerships Page Root', () => {
     fixture = TestBed.createComponent(PartnershipsPageRootComponent);
     component = fixture.componentInstance;
     pageTitleService = TestBed.inject(PageTitleService);
-    metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
   });
 
   it('should successfully instantiate the component',
@@ -58,9 +54,7 @@ describe('Partnerships Page Root', () => {
 
   it('should initialize', () => {
     spyOn(pageTitleService, 'setPageTitle');
-    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
     component.ngOnInit();
     expect(pageTitleService.setPageTitle).toHaveBeenCalled();
-    expect(metaTagCustomizationService.addOrReplaceMetaTags).toHaveBeenCalled();
   });
 });
