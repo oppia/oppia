@@ -36,7 +36,7 @@ describe('TopicManagerRoleEditorModalComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports:[
+      imports: [
         FormsModule,
         MaterialModule,
         HttpClientTestingModule
@@ -84,7 +84,7 @@ describe('TopicManagerRoleEditorModalComponent', () => {
         adminBackendApiService, 'assignManagerToTopicAsync').and.resolveTo();
       component.newTopicId = 'topic000';
 
-      component.addTopic()
+      component.addTopic();
       expect(component.topicIdInUpdate).toEqual('topic000');
       tick();
 
@@ -95,17 +95,16 @@ describe('TopicManagerRoleEditorModalComponent', () => {
     it('should alert warning if request fails', fakeAsync(() => {
       spyOn(
         adminBackendApiService, 'assignManagerToTopicAsync').and.returnValue(
-          Promise.reject());
+        Promise.reject());
       spyOn(alertsService, 'addWarning').and.returnValue();
 
       component.newTopicId = 'topic000';
 
-      component.addTopic()
+      component.addTopic();
       tick();
 
       expect(alertsService.addWarning).toHaveBeenCalled();
     }));
-
   });
 
   describe('on calling removeTopicId', () => {
@@ -118,13 +117,13 @@ describe('TopicManagerRoleEditorModalComponent', () => {
         adminBackendApiService,
         'deassignManagerFromTopicAsync').and.resolveTo();
 
-      component.removeTopicId('topic123')
+      component.removeTopicId('topic123');
       expect(component.topicIdInUpdate).toEqual('topic123');
       tick();
 
       expect(
         adminBackendApiService
-        .deassignManagerFromTopicAsync).toHaveBeenCalled();
+          .deassignManagerFromTopicAsync).toHaveBeenCalled();
     }));
 
     it('should alert warning if request fails', fakeAsync(() => {
@@ -133,17 +132,16 @@ describe('TopicManagerRoleEditorModalComponent', () => {
         'deassignManagerFromTopicAsync').and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning').and.returnValue();
 
-      component.removeTopicId('topic123')
+      component.removeTopicId('topic123');
       tick();
 
       expect(alertsService.addWarning).toHaveBeenCalled();
     }));
-
   });
 
   it('should close with correct managed topic ids', () => {
     const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.returnValue();
-    component.managedTopicIds = ['topic000']
+    component.managedTopicIds = ['topic000'];
 
     component.close();
 
