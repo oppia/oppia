@@ -583,7 +583,7 @@ def reassign_ticket(report, new_ticket):
                     if report_models[index].submitted_on > (
                             latest_timestamp):
                         latest_timestamp = (
-                            report_models[index].submitted_on_datetime)
+                            report_models[index].submitted_on)
                 old_ticket_obj.newest_report_creation_timestamp = (
                     latest_timestamp)
         _save_ticket(old_ticket_obj)

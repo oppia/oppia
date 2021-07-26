@@ -1063,12 +1063,24 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_obj)
         app_feedback_report_services.reassign_ticket(
             self.android_report_obj, self.android_ticket_obj)
-        older_timestamp = (
-            self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=2))
-
-        for _ in python_utils.RANGE(3):
+        oldest_timestamp = (
+            self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=10))
+        report_id = self._add_current_report(
+            submitted_on=oldest_timestamp, assign_ticket=False)
+        report_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                report_id))
+        report_obj = app_feedback_report_services.get_report_from_model(
+            report_model)
+        app_feedback_report_services.store_incoming_report_stats(report_obj)
+        app_feedback_report_services.reassign_ticket(
+            report_obj, self.android_ticket_obj)
+        for i in python_utils.RANGE(3):
+            temp_timestamp = (
+                self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(
+                    days=i + 2))
             report_id = self._add_current_report(
-                submitted_on=older_timestamp, assign_ticket=False)
+                submitted_on=temp_timestamp, assign_ticket=False)
             report_model = (
                 app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                     report_id))
@@ -1100,8 +1112,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 self.android_ticket_id))
 
         self.assertEqual(
-            original_ticket_model.newest_report_timestamp,
-            older_timestamp)
+            original_ticket_model.newest_report_timestamp, oldest_timestamp)
         self.assertNotIn(
             self.android_report_id, original_ticket_model.report_ids)
 

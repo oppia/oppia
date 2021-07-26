@@ -173,6 +173,5 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                         return ( # type: ignore[no-any-return]
                             self.post_json( # type: ignore[no-untyped-call]
                                 feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
-                                payload, headers=self.headers,
-                                csrf_token=token,
+                                payload, headers=self.headers, csrf_token=token,
                                 expected_status_int=expected_status))
