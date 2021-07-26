@@ -46,11 +46,11 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         super(BaseStoryViewerControllerTests, self).setUp()
         self.VIEWER_EMAIL = 'viewer@example.com'
         self.VIEWER_USERNAME = 'viewer'
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.TOPIC_ID = 'topic_id'
         self.STORY_ID = 'story_id'
         self.STORY_URL_FRAGMENT = 'title-one'
@@ -181,7 +181,7 @@ class StoryPageTests(BaseStoryViewerControllerTests):
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
         self.logout()
@@ -191,7 +191,7 @@ class StoryPageTests(BaseStoryViewerControllerTests):
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
         self.logout()
@@ -281,7 +281,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 response.headers['location'])
 
     def test_redirect_for_single_node_story(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.STORY_URL_FRAGMENT = 'story-two'
         self.NEW_USER_EMAIL = 'newUser@newUser.com'
         self.NEW_USER_USERNAME = 'newUser'

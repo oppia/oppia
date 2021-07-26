@@ -489,7 +489,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         super(MaintenanceModeTests, self).setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
         with python_utils.ExitStack() as context_stack:
@@ -509,7 +509,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             '/community-library', expected_status_int=503)
 
         self.assertIn(b'<oppia-maintenance-page>', response.body)
-        self.assertNotIn(b'<library-page>', response.body)
+        self.assertNotIn(b'<oppia-library-page-root>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -519,7 +519,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<library-page>', response.body)
+        self.assertIn(b'<oppia-library-page-root>', response.body)
         self.assertNotIn(b'<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -532,7 +532,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<library-page>', response.body)
+        self.assertIn(b'<oppia-library-page-root>', response.body)
         self.assertNotIn(b'<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -594,7 +594,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_user_is_super_admin(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME, is_super_admin=True)
 
     def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self):
         # TODO(#12692): Use stateful login sessions to assert the behavior of
@@ -695,8 +695,8 @@ class EscapingTests(test_utils.GenericTestBase):
         super(EscapingTests, self).setUp()
 
         # Update a config property that shows in all pages.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Modify the testapp to use the fake handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(

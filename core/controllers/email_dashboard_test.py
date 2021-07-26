@@ -47,11 +47,11 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
-        self.set_admins([self.SUBMITTER_USERNAME])
+        self.set_curriculum_admins([self.SUBMITTER_USERNAME])
 
     def test_query_status_check_handler_with_invalid_query_id_raises_400(
             self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         response = self.get_json(
             '/querystatuscheck', params={'query_id': 'invalid_query_id'},
@@ -61,7 +61,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_query_status_check_handler(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, self.SAMPLE_QUERY_PARAM)
@@ -88,7 +88,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_that_exception_is_raised_for_invalid_input(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
@@ -123,7 +123,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_email_dashboard_page(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         response = self.get_html_response('/emaildashboard')
         self.assertIn(b'{"title": "Email Dashboard - Oppia"})', response.body)
@@ -154,6 +154,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         super(EmailDashboardResultTests, self).setUp()
         # User A has one created exploration.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, 'systemUser')
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
         user_services.update_email_preferences(
@@ -176,11 +177,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.signup(self.NEW_SUBMITTER_EMAIL, self.NEW_SUBMITTER_USERNAME)
         self.new_submitter_id = self.get_user_id_from_email(
             self.NEW_SUBMITTER_EMAIL)
-        self.set_admins(
+        self.set_curriculum_admins(
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
     def test_email_dashboard_result_page(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -201,7 +202,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_email_dashboard_result_page_with_invalid_query_id_raises_400(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         response = self.get_html_response(
             '/emaildashboardresult/aaa', expected_status_int=400)
@@ -250,7 +251,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             # Send email from email dashboard result page.
-            self.login(self.SUBMITTER_EMAIL)
+            self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_id, {
@@ -258,7 +259,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                         'email_subject': 'subject',
                         'email_body': 'body',
                         'max_recipients': None,
-                        'email_intent': 'bulk_email_marketing'
+                        'email_intent': 'bulk_email_create_exploration'
                     }}, csrf_token=csrf_token)
             self.logout()
 
@@ -297,7 +298,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 '%s <%s>' % (self.SUBMITTER_USERNAME, self.SUBMITTER_EMAIL))
             self.assertEqual(
                 sent_email_model.intent,
-                feconf.BULK_EMAIL_INTENT_MARKETING)
+                feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION)
 
             # Check that BulkEmailModel id is stored in UsetBulkEmailModel of
             # recipients.
