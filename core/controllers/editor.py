@@ -175,7 +175,7 @@ class ExplorationHandler(EditorHandler):
         """Deletes the given exploration."""
 
         log_debug_string = '(%s) %s tried to delete exploration %s' % (
-            self.role, self.user_id, exploration_id)
+            self.roles, self.user_id, exploration_id)
         logging.debug(log_debug_string)
 
         is_exploration_cloned = rights_manager.is_exploration_cloned(
@@ -184,7 +184,7 @@ class ExplorationHandler(EditorHandler):
             self.user_id, exploration_id, force_deletion=is_exploration_cloned)
 
         log_info_string = '(%s) %s deleted exploration %s' % (
-            self.role, self.user_id, exploration_id)
+            self.roles, self.user_id, exploration_id)
         logging.info(log_info_string)
         self.render_json(self.values)
 
