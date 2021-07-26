@@ -439,9 +439,10 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # Whether this ticket has been archived.
     archived = datastore_services.BooleanProperty(required=True, indexed=True)
     # The datetime in UTC that the newest report in this ticket was created on,
-    # to help with sorting tickets.
+    # to help with sorting tickets. If the last report was removed from this
+    # ticket then the timestamp is None.
     newest_report_timestamp = datastore_services.DateTimeProperty(
-        required=True, indexed=True)
+        required=False, indexed=True)
     # A list of report IDs associated with this ticket.
     report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 

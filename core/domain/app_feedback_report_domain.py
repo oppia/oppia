@@ -527,8 +527,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
             assert selected_items is not None
-            cls.require_valid_selected_items_for_category(
-                category, selected_items)
+            cls.require_valid_selected_items_for_category(selected_items)
             if cls._selected_items_include_other(selected_items):
                 # If the user selects an 'other' option in their list of
                 # selection options, validate the input text.
@@ -557,8 +556,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 category, other_text_input)
 
     @classmethod
-    def require_valid_selected_items_for_category(
-            cls, category, selected_items):
+    def require_valid_selected_items_for_category(cls, selected_items):
         # type: (Text, List[Text]) -> None
         """Checks whether the user_feedback_selected_items are valid.
 

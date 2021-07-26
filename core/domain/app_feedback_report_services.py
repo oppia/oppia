@@ -93,7 +93,7 @@ def store_incoming_report_stats(report_obj):
 def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         ticket_id, platform, date, report_obj, delta):
     """Adds a new report's stats to the stats model for a specific ticket's
-    stats. Note that this currently only works for Android reports.
+    stats. Note that this currently only supports Android reports.
 
     Args:
         ticket_id: str. The id of the ticket that we want to update stats for.
@@ -512,7 +512,7 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
     model_entity = app_feedback_report_models.AppFeedbackReportModel.get_by_id(
         report.report_id)
     model_entity.android_report_info = report_info_json
-
+    model_entity.ticket_id = report.ticket_id
     model_entity.scrubbed_by = report.scrubbed_by
     model_entity.update_timestamps()
     model_entity.put()
@@ -569,7 +569,8 @@ def reassign_ticket(report, new_ticket):
                 'The report is being removed from an invalid ticket id: %s.'
                 % old_ticket_id)
         old_ticket_obj = get_ticket_from_model(old_ticket_model)
-        if len(old_ticket_obj.reports) == 1:
+        old_ticket_obj.reports.remove(report.report_id)
+        if len(old_ticket_obj.reports) == 0:
             # We are removing the only report associated with this ticket.
             old_ticket_obj.newest_report_creation_timestamp = None # type: ignore[assignment]
         else:
@@ -579,13 +580,12 @@ def reassign_ticket(report, new_ticket):
                 report_models = get_report_models(old_ticket_obj.reports)
                 latest_timestamp = report_models[0].submitted_on
                 for index in python_utils.RANGE(1, len(report_models)):
-                    if report_models[index].submitted_on_datetime > (
+                    if report_models[index].submitted_on > (
                             latest_timestamp):
                         latest_timestamp = (
                             report_models[index].submitted_on_datetime)
                 old_ticket_obj.newest_report_creation_timestamp = (
                     latest_timestamp)
-        old_ticket_obj.reports.remove(report.report_id)
         _save_ticket(old_ticket_obj)
         _update_report_stats_model_in_transaction(
             old_ticket_id, platform, stats_date, report, -1)

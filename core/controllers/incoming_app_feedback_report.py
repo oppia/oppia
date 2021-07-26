@@ -23,7 +23,6 @@ from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
 
 import feconf
-import utils
 
 from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
