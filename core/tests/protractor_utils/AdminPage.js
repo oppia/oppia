@@ -17,6 +17,7 @@
  * tests.
  */
 
+const { element } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
@@ -268,6 +269,11 @@ var AdminPage = function() {
 
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
+    var removeButtonElement = element(by.css(
+      '.protractor-test-' + newRole.split(' ').join('-') +
+      '-remove-button-container'));
+    await waitFor.visibilityOf(
+      removeButtonElement, 'Role removal button takes too long to appear.');
   };
 
   this.getUsersAsssignedToRole = async function(role) {
