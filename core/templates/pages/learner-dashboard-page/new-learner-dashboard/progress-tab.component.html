@@ -10,7 +10,8 @@
   <div class="scroll-content">
     <div class="completed-stories-content" [ngStyle]="checkMobileView() && {'width': width + 'px'}">
       <div *ngFor="let tile of completedStoriesList" class="story-tile">
-        <oppia-learner-story-summary-tile [storySummary]="tile">
+        <oppia-learner-story-summary-tile [storySummary]="tile"
+                                          [displayArea]="progressTab">
         </oppia-learner-story-summary-tile>
       </div>
     </div>

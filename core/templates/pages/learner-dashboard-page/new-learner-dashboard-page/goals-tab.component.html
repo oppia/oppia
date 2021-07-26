@@ -8,7 +8,7 @@
           <i class="fa fa-caret-right" aria-hidden="true" *ngIf="!currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
           <i class="fa fa-caret-down" aria-hidden="true" *ngIf="currentGoalsStoryIsShown[i]" (click)="toggleStory(i)"></i>
         </div>
-        <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic.id, topic.name, i)">
+        <div class="oppia-trash-button" (click)="removeFromLearnerGoals(topic, topic.id, topic.name, i)">
           <i class="fa fa-trash"></i>
         </div>
         <p class="oppia-current-goals-topic-name">
@@ -20,6 +20,7 @@
         <div *ngIf="currentGoalsStoryIsShown[i]">
           <div *ngFor="let story of topic.canonicalStorySummaryDicts" class="oppia-story-summary-card">
             <oppia-learner-story-summary-tile [storySummary]="story"
+                                              [displayArea]="'goalsTab'"
                                               [topicName]="topic.name">
             </oppia-learner-story-summary-tile>
           </div>

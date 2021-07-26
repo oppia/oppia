@@ -54,6 +54,7 @@ describe('Learner Topic summary model', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -93,6 +94,7 @@ describe('Learner Topic summary model', () => {
     expect(_sampleLearnerTopicSummary.getDescription()).toEqual('description');
     expect(_sampleLearnerTopicSummary.getVersion()).toEqual(1);
     expect(_sampleLearnerTopicSummary.getStoryTitles()).toEqual(['Story 1']);
+    expect(_sampleLearnerTopicSummary.getTotalPublishedNodeCount()).toEqual(2);
     expect(_sampleLearnerTopicSummary.getPracticeTabIsDisplayed()).toEqual(
       false);
     expect(_sampleLearnerTopicSummary.getClassroom()).toEqual('math');

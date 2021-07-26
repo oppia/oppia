@@ -63,7 +63,7 @@ interface LearnerDashboardDataBackendDict {
   'partially_learnt_topics_list': LearnerTopicSummaryBackendDict[];
   'topics_to_learn_list': LearnerTopicSummaryBackendDict[];
   'all_topics_list': LearnerTopicSummaryBackendDict[];
-  'untracked_topics_list': LearnerTopicSummaryBackendDict[];
+  'untracked_topics': Record<string, LearnerTopicSummaryBackendDict[]>;
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];
@@ -85,7 +85,7 @@ interface LearnerDashboardData {
   partiallyLearntTopicsList: LearnerTopicSummary[];
   topicsToLearnList: LearnerTopicSummary[];
   allTopicsList: LearnerTopicSummary[];
-  untrackedTopicsList: LearnerTopicSummary[];
+  untrackedTopics: Record<string, LearnerTopicSummary[]>;
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
   completedToIncompleteCollections: string[];
@@ -161,10 +161,8 @@ export class LearnerDashboardBackendApiService {
             dashboardData.all_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
-          untrackedTopicsList: (
-            dashboardData.untracked_topics_list.map(
-              topicSummary => LearnerTopicSummary
-                .createFromBackendDict(topicSummary))),
+          untrackedTopics: this.getUntrackedTopics(
+            dashboardData.untracked_topics),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
@@ -188,6 +186,19 @@ export class LearnerDashboardBackendApiService {
         reject(errorResponse.status);
       });
     });
+  }
+
+  getUntrackedTopics(
+      untrackedTopics: Record<string,
+      LearnerTopicSummaryBackendDict[]>): Record<string,
+      LearnerTopicSummary[]> {
+    var topics = {};
+    for (var i in untrackedTopics) {
+      topics[i] = untrackedTopics[i].map(
+        topicSummary => LearnerTopicSummary.createFromBackendDict(
+          topicSummary));
+    }
+    return topics;
   }
 
   async fetchLearnerDashboardDataAsync(): Promise<LearnerDashboardData> {

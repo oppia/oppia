@@ -85,6 +85,80 @@ describe('Learner Story Summary Tile Component', () => {
     expect(urlSpy).toHaveBeenCalled();
   });
 
+  it('should get the next incomplete node title on init', () => {
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Chapter 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+    const sampleStorySummaryBackendDict = {
+      id: '0',
+      title: 'Story Title',
+      description: 'Story Description',
+      node_titles: ['Chapter 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: [],
+      url_fragment: 'story-title',
+      all_node_dicts: [nodeDict],
+      topic_name: 'Topic',
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'topic'
+    };
+    component.storySummary = StorySummary.createFromBackendDict(
+      sampleStorySummaryBackendDict);
+    component.ngOnInit();
+    expect(component.nextIncompleteNodeTitle).toEqual('Chapter 1: Chapter 1');
+  });
+
+  it('should get story link url for exploration page on homeTab', () => {
+    component.displayArea = 'homeTab';
+    let nodeDict = {
+      id: 'node_1',
+      thumbnail_filename: 'image.png',
+      title: 'Title 1',
+      description: 'Description 1',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: 'test',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40'
+    };
+    const sampleStorySummaryBackendDict = {
+      id: '0',
+      title: 'Story Title',
+      description: 'Story Description',
+      node_titles: ['Chapter 1'],
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      story_is_published: true,
+      completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story',
+      all_node_dicts: [nodeDict],
+      topic_name: 'Topic',
+      classroom_url_fragment: 'math',
+      topic_url_fragment: 'topic'
+    };
+    component.storySummary = StorySummary.createFromBackendDict(
+      sampleStorySummaryBackendDict);
+    component.completedNodeCount = 0;
+    expect(component.getStoryLink()).toBe(
+      '/explore/test?topic_url_fragment=topic&' +
+      'classroom_url_fragment=math&story_url_fragment=story&' +
+      'node_id=node_1');
+  });
+
   it('should get # as story link url for story page', () => {
     const sampleStorySummaryBackendDict = {
       id: '0',

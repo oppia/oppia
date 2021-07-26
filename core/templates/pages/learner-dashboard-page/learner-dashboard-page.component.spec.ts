@@ -235,7 +235,7 @@ describe('Learner dashboard page', () => {
     partially_learnt_topics_list: [],
     topics_to_learn_list: [],
     all_topics_list: [],
-    untracked_topics_list: [],
+    untracked_topics: {},
     subscription_list: subscriptionsList,
     completed_to_incomplete_collections: [],
     completed_to_incomplete_stories: [],
@@ -447,10 +447,7 @@ describe('Learner dashboard page', () => {
             learnerDashboardData.all_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
-          untrackedTopicsList: (
-            learnerDashboardData.untracked_topics_list.map(
-              topicSummary => LearnerTopicSummary
-                .createFromBackendDict(topicSummary))),
+          untrackedTopics: learnerDashboardData.untracked_topics,
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary
