@@ -129,6 +129,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   await browser.switchTo().window(await handles.pop());
   // This will wait for the page to load completely and then it will fetch
   // the url.
+  /* eslint-disable-next-line oppia/protractor-practices */
   await browser.sleep(10000);
   await browser.waitForAngularEnabled(true);
   await browser.wait(async function() {
