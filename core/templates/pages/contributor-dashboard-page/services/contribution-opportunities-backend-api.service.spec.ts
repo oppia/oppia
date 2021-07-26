@@ -334,7 +334,7 @@ describe('Contribution Opportunities backend API service', function() {
 
     const req = httpTestingController.expectOne('/getalltopicnames');
     expect(req.request.method).toEqual('GET');
-    req.flush(['Topic 1', 'Topic 2']);
+    req.flush({ topic_names: ['Topic 1', 'Topic 2'] });
 
     flushMicrotasks();
 
