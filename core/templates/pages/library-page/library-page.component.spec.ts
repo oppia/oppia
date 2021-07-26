@@ -321,6 +321,12 @@ describe('Library Page Component', () => {
       spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
       spyOn(componentInstance, 'initCarousels');
       spyOn(loggerService, 'error');
+      let actualWidth = 200;
+      spyOn(window, '$').and.returnValue({
+        width: () => {
+          return actualWidth;
+        }
+      } as JQLite);
       componentInstance.ngOnInit();
       tick();
       tick();
@@ -334,6 +340,11 @@ describe('Library Page Component', () => {
         .toHaveBeenCalled();
       expect(pageTitleService.setPageTitle).toHaveBeenCalled();
       expect(userService.getUserInfoAsync).toHaveBeenCalled();
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'The actual width of tile is different than the ' +
+        'expected width. Actual size: ' + actualWidth +
+        ', Expected size: ' + AppConstants.LIBRARY_TILE_WIDTH_PX
+      );
     }));
 
   it('should log when invalid path is used', fakeAsync(() => {
