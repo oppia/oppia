@@ -678,9 +678,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_version_numbers = [
-            python_utils.UNICODE(num + 1) for num in
-            python_utils.RANGE(model.version)]
+        model_version_numbers = python_utils.RANGE(1, model.version + 1)
         model_snapshot_ids = [
             model.get_snapshot_id(model.id, version_number)
             for version_number in model_version_numbers]
@@ -702,9 +700,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_1.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_1_version_numbers = [
-            python_utils.UNICODE(num + 1) for num in
-            python_utils.RANGE(model_1.version)]
+        model_1_version_numbers = python_utils.RANGE(1, model_1.version + 1)
         model_1_snapshot_ids = [
             model_1.get_snapshot_id(model_1.id, version_number)
             for version_number in model_1_version_numbers]
@@ -713,9 +709,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model_2 = TestVersionedModel(id=model_2_id)
         model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
         model_2.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
-        model_2_version_numbers = [
-            python_utils.UNICODE(num + 1) for num in
-            python_utils.RANGE(model_2.version)]
+        model_2_version_numbers = python_utils.RANGE(1, model_2.version + 1)
         model_2_snapshot_ids = [
             model_2.get_snapshot_id(model_2.id, version_number)
             for version_number in model_2_version_numbers]
