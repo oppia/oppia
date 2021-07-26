@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file is using templateUrl which is not allowed.
+ * @fileoverview Constants for the Oppia blog dashboard page.
  */
 
-import { Component } from '@angular/core';
+export const BlogDashboardPageConstants = {
+  BLOG_DASHBOARD_DATA_URL_TEMPLATE: '/blogdashboardhandler/data',
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html', // Use of templateUrl is not allowed.
-  styleUrls: ['./app.component.css']
-})
+  BLOG_EDITOR_DATA_URL_TEMPLATE: '/blogeditorhandler/data/<blog_post_id>',
 
-export class AppComponent {
-  name='Name';
-  title = 'angular programming.';
-}
+  BLOG_DASHBOARD_TAB_URLS: {
+    PUBLISHED: '#/published',
+    DRAFTS: '#/drafts',
+  },
+} as const;

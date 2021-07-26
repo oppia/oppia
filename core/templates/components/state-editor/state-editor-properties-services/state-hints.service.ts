@@ -15,31 +15,31 @@
 /**
  * @fileoverview A data service that stores the current interaction hints.
  */
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { Hint } from 'domain/exploration/HintObjectFactory';
-import { StatePropertyService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
+import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateHintsService extends StatePropertyService<Hint[]> {
-  private activeHintIndex: number;
+  // 'activeHintIndex' is initialized with null when no hints exist.
+  private activeHintIndex!: number | null;
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveHints';
   }
 
-  getActiveHintIndex(): number {
+  getActiveHintIndex(): number | null {
     return this.activeHintIndex;
   }
 
-  setActiveHintIndex(index: number): void {
+  setActiveHintIndex(index: number | null): void {
     this.activeHintIndex = index;
   }
 

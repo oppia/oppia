@@ -64,7 +64,7 @@ angular.module('oppia').component('translationTab', {
     'LoaderService', 'RouterService', 'SiteAnalyticsService',
     'StateEditorService', 'StateRecordedVoiceoversService',
     'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
-    'TranslationTabActiveModeService', 'UrlInterpolationService',
+    'TranslationTabActiveModeService',
     'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $uibModal,
@@ -72,7 +72,7 @@ angular.module('oppia').component('translationTab', {
         LoaderService, RouterService, SiteAnalyticsService,
         StateEditorService, StateRecordedVoiceoversService,
         StateTutorialFirstTimeService, StateWrittenTranslationsService,
-        TranslationTabActiveModeService, UrlInterpolationService,
+        TranslationTabActiveModeService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -134,8 +134,8 @@ angular.module('oppia').component('translationTab', {
 
       $scope.showWelcomeTranslationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/translation-tab/' +
+          template: require(
+            'pages/exploration-editor-page/translation-tab/' +
             'modal-templates/welcome-translation-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeTranslationModalController',
