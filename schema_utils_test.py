@@ -783,6 +783,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(obj, normalized_obj)
 
+    def test_is_regex_matched(self):
+        # type: () -> None
+        is_regex_matched = schema_utils.get_validator('is_regex_matched')
+
+        self.assertTrue(is_regex_matched(
+            'exploration.EXP_ID_1.WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
+            r'(exploration|collection)\.\w+\.\w+'))
+
+        self.assertFalse(is_regex_matched(
+            'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
+            r'(exploration|collection)\.\w+\.\w+'))
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
