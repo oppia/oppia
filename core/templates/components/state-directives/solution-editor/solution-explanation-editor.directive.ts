@@ -30,8 +30,7 @@ require(
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('solutionExplanationEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -39,8 +38,8 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/solution-editor/' +
+      template: require(
+        'components/state-directives/solution-editor/' +
         'solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [

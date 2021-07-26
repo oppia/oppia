@@ -39,7 +39,8 @@ class RoleQueryAuditModel(base_models.BaseModel):
     # The intent of making query (viewing (by role or username)
     # or updating role).
     intent = datastore_services.StringProperty(required=True, choices=[
-        feconf.ROLE_ACTION_UPDATE,
+        feconf.ROLE_ACTION_ADD,
+        feconf.ROLE_ACTION_REMOVE,
         feconf.ROLE_ACTION_VIEW_BY_ROLE,
         feconf.ROLE_ACTION_VIEW_BY_USERNAME
     ], indexed=True)
