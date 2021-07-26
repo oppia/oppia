@@ -66,13 +66,11 @@ describe('oppiaResponseDragAndDropSortInput', () => {
 
   it('should display item below another item when user drags item to' +
   ' new position', () => {
-    expect(ctrl.chooseItemType(0)).toBeTrue();
-    expect(ctrl.itemtype).toBe('drag-and-drop-response-item');
+    expect(ctrl.chooseItemType(0)).toBe('drag-and-drop-response-item');
   });
 
   it('should display item right below another item when user puts' +
   ' 2 or more items in the same position', () => {
-    expect(ctrl.chooseItemType(1)).toBeTrue();
-    expect(ctrl.itemtype).toBe('drag-and-drop-response-subitem');
+    expect(ctrl.chooseItemType(1)).toBe('drag-and-drop-response-subitem');
   });
 });
