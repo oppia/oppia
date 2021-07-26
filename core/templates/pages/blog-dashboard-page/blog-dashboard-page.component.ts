@@ -23,6 +23,8 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogDashboardData, BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { LoaderService } from 'services/loader.service';
+import { Subscription } from 'rxjs';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 
 @Component({
   selector: 'oppia-blog-dashboard-page',
@@ -32,14 +34,32 @@ export class BlogDashboardPageComponent implements OnInit {
   blogDashboardData: BlogDashboardData;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
+  activeTab: string;
+  directiveSubscriptions = new Subscription();
   constructor(
     private blogDashboardBackendService: BlogDashboardBackendApiService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
     private alertsService: AlertsService,
+    private blogDashboardPageService: BlogDashboardPageService,
   ) {}
 
   ngOnInit(): void {
+    this.activeTab = this.blogDashboardPageService.activeTab;
+    if (this.activeTab === 'main') {
+      this.initMainTab();
+    }
+
+    this.directiveSubscriptions.add(
+      this.blogDashboardPageService.updateViewEventEmitter.subscribe(
+        () => {
+          this.activeTab = this.blogDashboardPageService.activeTab;
+        }
+      )
+    );
+  }
+
+  initMainTab(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
@@ -57,6 +77,14 @@ export class BlogDashboardPageComponent implements OnInit {
           this.alertsService.addWarning('Failed to get blog dashboard data');
         }
       });
+  }
+
+  createNewBlogPost(): void {
+    this.blogDashboardBackendService.createBlogPostAsync().then(
+      (blogPostId) => {
+        this.blogDashboardPageService.navigateToEditorTabWithId(blogPostId);
+      }
+    )
   }
 }
 

@@ -18,6 +18,7 @@
 
 import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatMenuModule } from '@angular/material/menu';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -31,6 +32,7 @@ import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card
 import { BlogDashboardTileComponent } from './blog-dashboard-tile/blog-dashboard-tile.component';
 import { BlogDashboardNavbar } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
+import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
 
 declare var angular: ng.IAngularStatic;
 
@@ -39,7 +41,8 @@ declare var angular: ng.IAngularStatic;
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
-    MatTabsModule
+    MatTabsModule,
+    MatMenuModule
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -47,6 +50,7 @@ declare var angular: ng.IAngularStatic;
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
+    BlogPostEditorComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -54,6 +58,7 @@ declare var angular: ng.IAngularStatic;
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
+    BlogPostEditorComponent,
   ],
   providers: [
     {

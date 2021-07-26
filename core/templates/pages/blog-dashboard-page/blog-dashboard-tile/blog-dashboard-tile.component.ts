@@ -26,6 +26,7 @@ import dayjs from 'dayjs';
 })
 export class BlogDashboardTileComponent implements OnInit {
   @Input() blogPostSummary: BlogPostSummary;
+  @Input() blogPostIsPublished: boolean;
   lastUpdatedDateString: string = '';
 
   ngOnInit(): void {
@@ -33,9 +34,9 @@ export class BlogDashboardTileComponent implements OnInit {
       this.blogPostSummary.lastUpdated);
   }
 
-  getDateStringInWords(millisSinceEpoch: number): string {
-    let date = new Date(millisSinceEpoch);
-    return dayjs(date).format('MMMM D, YYYY');
+  getDateStringInWords(naiveDate: string): string {
+    return dayjs(
+      naiveDate.split(',')[0], "MM-DD-YYYY").format('MMMM D, YYYY');
   }
 }
 
