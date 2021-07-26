@@ -173,14 +173,6 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
             exp_id
         )
-        story.update_node_thumbnail_filename(
-            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
-            'test_svg.svg')
-        story.update_node_thumbnail_bg_color(
-            '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
-
-        # Update and validate the story.
-        story.update_meta_tag_content('tag')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
         with python_utils.open_file(
@@ -194,6 +186,14 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             '%s/test_svg.svg' % (constants.ASSET_TYPE_THUMBNAIL), raw_image,
             mimetype='image/svg+xml')
 
+        story.update_node_thumbnail_filename(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1),
+            'test_svg.svg')
+        story.update_node_thumbnail_bg_color(
+            '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '#F8BF74')
+
+        # Update and validate the story.
+        story.update_meta_tag_content('tag')
         story.update_thumbnail_filename('test_svg.svg')
         story.update_thumbnail_bg_color(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0])

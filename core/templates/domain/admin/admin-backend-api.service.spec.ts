@@ -30,9 +30,9 @@ import { Schema } from 'services/schema-default-value.service';
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
   let adminBackendResponse = {
     role_to_actions: {
       guest: ['action for guest']
@@ -52,7 +52,11 @@ describe('Admin backend api service', () => {
         topic_model_last_updated: 1591196558882.2,
         language_code: 'en',
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#C6DCDA'
+        thumbnail_bg_color: '#C6DCDA',
+        total_published_node_count: 0,
+        can_edit_topic: true,
+        is_published: false,
+        url_fragment: ''
       }
     ],
     updatable_roles: {
@@ -158,7 +162,7 @@ describe('Admin backend api service', () => {
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        CreatorTopicSummary.createFromBackendDict),
+        dict => CreatorTopicSummary.createFromBackendDict(dict)),
       featureFlags: adminBackendResponse.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict)
       )
@@ -209,7 +213,7 @@ describe('Admin backend api service', () => {
   it('should get the data of user given the username' +
     'when calling viewUsersRoleAsync', fakeAsync(() => {
     let filterCriterion = 'username';
-    let role = null;
+    let role = 'admin';
     let username = 'validUser';
     let result = {
       validUser: 'ADMIN'
@@ -219,7 +223,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=null&username=validUser');
+      '?filter_criterion=username&role=admin&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -236,7 +240,7 @@ describe('Admin backend api service', () => {
     'when calling viewUsersRoleAsync', fakeAsync(() => {
     let filterCriterion = 'role';
     let role = 'ADMIN';
-    let username = null;
+    let username = 'validUser';
     let result = {
       validUser: 'ADMIN'
     };
@@ -245,7 +249,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=role&role=ADMIN&username=null');
+      '?filter_criterion=role&role=ADMIN&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -261,14 +265,14 @@ describe('Admin backend api service', () => {
   it('should fail to get the data of user when user does' +
     'not exists when calling viewUsersRoleAsync', fakeAsync(() => {
     let filterCriterion = 'username';
-    let role = null;
+    let role = 'admin';
     let username = 'InvalidUser';
     abas.viewUsersRoleAsync(filterCriterion, role, username)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=null&username=InvalidUser');
+      '?filter_criterion=username&role=admin&username=InvalidUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush({
@@ -286,7 +290,7 @@ describe('Admin backend api service', () => {
 
   it('should update the role of the user given the name' +
     'when calling updateUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
+    let topicId = '12345';
     let newRole = 'ADMIN';
     let username = 'validUser';
     let payload = {
@@ -312,7 +316,7 @@ describe('Admin backend api service', () => {
 
   it('should fail to update the role of user when user does' +
     'not exists when calling updateUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
+    let topicId = '12345';
     let newRole = 'ADMIN';
     let username = 'InvalidUser';
     let payload = {
@@ -335,314 +339,6 @@ describe('Admin backend api service', () => {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'User with given username does not exist');
-  }
-  ));
-
-  it('should add contribution rights to the user given the' +
-    'name when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'validUser';
-    let payload = {
-      category: category,
-      username: username,
-      language_code: languageCode
-    };
-    abas.addContributionReviewerAsync(
-      category, username, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to add contribution rights to the user when user does' +
-    'not exists when calling addContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'InvalidUser';
-    let payload = {
-      category: category,
-      username: username,
-      language_code: languageCode
-    };
-    abas.addContributionReviewerAsync(
-      category, username, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { error: 'User with given username does not exist'},
-      { status: 500, statusText: 'Internal Server Error'});
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist');
-  }
-  ));
-
-  it('should get the data of contribution rights given the role' +
-    'when calling viewContributionReviewersAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let result = ['validUsername'];
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=voiceover&language_code=en');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(
-      ['validUsername'],
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-
-    category = 'question';
-    languageCode = null;
-
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=question');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(
-      ['validUsername'],
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to get the data of contribution rights when category does' +
-  'not exists when calling viewContributionReviewersAsync', fakeAsync(() => {
-    let category = 'InvalidCategory';
-    let languageCode = 'en';
-    abas.viewContributionReviewersAsync(
-      category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/getcontributorusershandler' +
-      '?category=InvalidCategory&language_code=en');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      error: 'Invalid Category'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Invalid Category');
-  }
-  ));
-
-  it('should get the data of contribution rights given the' +
-    'username when calling contributionReviewerRightsAsync', fakeAsync(() => {
-    let username = 'validUsername';
-    let result = {
-      can_review_questions: false,
-      can_review_translation_for_language_codes: ['en'],
-      can_review_voiceover_for_language_codes: [],
-      can_submit_questions: false
-    };
-    abas.contributionReviewerRightsAsync(username)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
-      '?username=validUsername');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      can_review_questions: false,
-      can_review_translation_for_language_codes: ['en'],
-      can_review_voiceover_for_language_codes: [],
-      can_submit_questions: false
-    }, {
-      status: 200, statusText: 'Success.'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to get the data of contribution rights when username does' +
-  'not exists when calling contributionReviewerRightsAsync', fakeAsync(() => {
-    let username = 'InvalidUsername';
-    abas.contributionReviewerRightsAsync(username)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/contributionrightsdatahandler' +
-      '?username=InvalidUsername');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
-  }
-  ));
-
-  it('should remove all contribution rights given the username' +
-    'when calling emoveContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = null;
-    let username = 'validUser';
-    let method = 'all';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to remove all contribution rights when user does' +
-    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = null;
-    let username = 'InvalidUser';
-    let method = 'all';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
-  }
-  ));
-
-  it('should remove specific contribution rights given the' +
-    'username when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'validUser';
-    let method = 'specific';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to remove specific contribution rights when username does' +
-    'not exists when calling removeContributionReviewerAsync', fakeAsync(() => {
-    let category = 'voiceover';
-    let languageCode = 'en';
-    let username = 'InvalidUser';
-    let method = 'specific';
-    let payload = {
-      username: username,
-      removal_type: method,
-      category: category,
-      language_code: languageCode
-    };
-    abas.removeContributionReviewerAsync(
-      username, method, category, languageCode
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist.');
   }
   ));
 

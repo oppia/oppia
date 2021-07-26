@@ -1728,6 +1728,31 @@ class GenericTestBase(AppEngineTestBase):
         'next_node_id': 'node_2',
     }
 
+    VERSION_5_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': (
+                '<p>Value</p>'
+                '<oppia-noninteractive-math math_content-with-value="{'
+                '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, '
+                '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                '}">'
+                '</oppia-noninteractive-math>'),
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': None,
+            'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
+        }],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2',
+    }
+
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': ['skill_1'],
         'id': 1,
@@ -2807,6 +2832,83 @@ title: Title
         story_model.commit(
             owner_id, commit_message,
             [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+
+    def save_new_story_with_story_contents_schema_v5(
+            self, story_id, thumbnail_filename, thumbnail_bg_color,
+            thumbnail_size_in_bytes, owner_id, title, description,
+            notes, corresponding_topic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            url_fragment='story-frag',
+            meta_tag_content='story meta tag content'):
+        """Saves a new story with a default version 1 story contents data dict.
+
+        This function should only be used for creating stories in tests
+        involving migration of datastore stories that use an old story contents
+        schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating stories. This is because
+        the latter approach would result in a story with the *current* story
+        contents schema version.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            thumbnail_filename: str|None. Thumbnail filename for the story.
+            thumbnail_bg_color: str|None. Thumbnail background color for the
+                story.
+            thumbnail_size_in_bytes: int|None. The thumbnail size in bytes of
+                the story.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level description of the story.
+            notes: str. A set of notes, that describe the characters, main
+                storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
+            language_code: str. The ISO 639-1 code for the language this story
+                is written in.
+            url_fragment: str. The URL fragment for the story.
+            meta_tag_content: str. The meta tag content of the story.
+        """
+        story_content_v5 = {
+            'nodes': [{
+                'outline': (
+                    '<p>Value</p>'
+                    '<oppia-noninteractive-math math_content-with-value="{'
+                    '&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, ' #pylint: disable=line-too-long
+                    '&amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;'
+                    '}">'
+                    '</oppia-noninteractive-math>'),
+                'exploration_id': None,
+                'destination_node_ids': [],
+                'outline_is_finalized': False,
+                'acquired_skill_ids': [],
+                'id': 'node_1',
+                'title': 'Chapter 1',
+                'description': '',
+                'prerequisite_skill_ids': [],
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': None,
+                'thumbnail_size_in_bytes': 21131,
+            }],
+            'initial_node_id': 'node_1',
+            'next_node_id': 'node_2',
+        }
+        story_model = story_models.StoryModel(
+            id=story_id, thumbnail_filename=thumbnail_filename,
+            thumbnail_bg_color=thumbnail_bg_color,
+            thumbnail_size_in_bytes=thumbnail_size_in_bytes,
+            description=description, title=title,
+            language_code=language_code,
+            story_contents_schema_version=5, notes=notes,
+            corresponding_topic_id=corresponding_topic_id,
+            story_contents=story_content_v5,
+            url_fragment=url_fragment, meta_tag_content=meta_tag_content)
+        commit_message = 'New story created with title \'%s\'.' % title
+        story_model.commit(
+            owner_id, commit_message,
+            [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
+        story_services.create_story_summary(story_id)
 
     def save_new_subtopic(self, subtopic_id, owner_id, topic_id):
         """Creates an Oppia subtopic and saves it.
