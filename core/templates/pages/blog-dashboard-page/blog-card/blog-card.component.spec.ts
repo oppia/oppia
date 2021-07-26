@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { MockTranslatePipe, MockCapitalizePipe} from 'tests/unit-test-utils';
+import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
 import { BlogCardComponent } from './blog-card.component';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';

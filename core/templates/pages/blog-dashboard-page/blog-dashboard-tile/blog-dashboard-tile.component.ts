@@ -25,7 +25,7 @@ import dayjs from 'dayjs';
   templateUrl: './blog-dashboard-tile.component.html'
 })
 export class BlogDashboardTileComponent implements OnInit {
-  @Input() blogPostSummary: BlogPostSummary;
+  @Input() blogPostSummary!: BlogPostSummary;
   lastUpdatedDateString: string = '';
 
   ngOnInit(): void {
