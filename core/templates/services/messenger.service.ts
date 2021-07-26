@@ -166,9 +166,9 @@ export class MessengerService {
     // a hash is passed in.
     let window = this.windowRef.nativeWindow;
     let rawHash = window.location.hash.substring(1);
-    const _messageTitleText = ServicesConstants.MESSENGER_PAYLOAD[messageTitle];
+    const messageTitleText = ServicesConstants.MESSENGER_PAYLOAD[messageTitle];
     if (window.parent !== window && rawHash &&
-        this.MESSAGE_VALIDATORS.hasOwnProperty(_messageTitleText)) {
+        this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitleText)) {
       // Protractor tests may prepend a / to this hash, which we remove.
       let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
@@ -198,7 +198,7 @@ export class MessengerService {
 
       if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
         this.loggerService.info(
-          'Posting message to parent: ' + _messageTitleText);
+          'Posting message to parent: ' + messageTitleText);
         let payload: PayloadType;
         let isValidMessage: boolean;
         switch (messageTitle) {
@@ -248,7 +248,7 @@ export class MessengerService {
           sourceTagId: string | null,
           secret: string | null
         } = {
-          title: _messageTitleText,
+          title: messageTitleText,
           payload: payload,
           sourceTagId: null,
           secret: null

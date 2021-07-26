@@ -100,13 +100,13 @@ export class SharingLinksComponent implements OnInit {
 
   getUrl(network: SharingPlatform): string {
     let queryString: string;
-    const _url = (
+    const url = (
       `${this.serverName}/${this.activityUrlFragment}/${this.activityId}`);
     switch (network) {
       case 'facebook':
         queryString = (
           'sdk=joey&' +
-          `u=${_url}&` +
+          `u=${url}&` +
           'display=popup&' +
           'ref=plugin&' +
           'src=share_button'
@@ -116,13 +116,13 @@ export class SharingLinksComponent implements OnInit {
       case 'twitter':
         queryString = (
           `text=${this.escapedTwitterText}&` +
-          `url=${_url}`
+          `url=${url}`
         );
         return `https://twitter.com/share?${queryString}`;
 
       case 'classroom':
         queryString = (
-          `url=${_url}`
+          `url=${url}`
         );
         return `https://classroom.google.com/share?${queryString}`;
     }
