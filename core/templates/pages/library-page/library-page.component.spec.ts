@@ -34,7 +34,7 @@ import { SearchService } from 'services/search.service';
 import { UserService } from 'services/user.service';
 import { MockTranslateModule } from 'tests/unit-test-utils';
 import { LibraryPageComponent } from './library-page.component';
-import { LibraryPageBackendApiService } from './services/library-page-backend-api.service';
+import { LibraryIndexData, LibraryPageBackendApiService } from './services/library-page-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -113,6 +113,59 @@ describe('Library Page Component', () => {
     title: '',
     node_count: 2
   }];
+
+  let libraryIndexData = {
+    activity_summary_dicts_by_category: [{
+      activity_summary_dicts: [{
+        activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
+        category: '',
+        community_owned: true,
+        id: 'id1',
+        language_code: '',
+        num_views: 5,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      },
+      {
+        activity_type: AppConstants.ACTIVITY_TYPE_COLLECTION,
+        category: '',
+        community_owned: true,
+        id: 'id2',
+        language_code: '',
+        num_views: 5,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      },
+      {
+        activity_type: '',
+        category: '',
+        community_owned: true,
+        id: 'id1',
+        language_code: '',
+        num_views: 5,
+        objective: '',
+        status: '',
+        tags: [],
+        thumbnail_bg_color: '',
+        thumbnail_icon_url: '',
+        title: ''
+      }],
+      categories: [],
+      header_i18n_id: 'id',
+      has_full_results_page: true,
+      full_results_url: '',
+      protractor_id: ''
+    }],
+    preferred_language_codes: []
+  };
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
@@ -216,58 +269,7 @@ describe('Library Page Component', () => {
     windowRef.nativeWindow.location.pathname = '/community-library';
     fixture.detectChanges();
     spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-      .and.returnValue(Promise.resolve({
-        activity_summary_dicts_by_category: [{
-          activity_summary_dicts: [{
-            activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
-            category: '',
-            community_owned: true,
-            id: 'id1',
-            language_code: '',
-            num_views: 5,
-            objective: '',
-            status: '',
-            tags: [],
-            thumbnail_bg_color: '',
-            thumbnail_icon_url: '',
-            title: ''
-          },
-          {
-            activity_type: AppConstants.ACTIVITY_TYPE_COLLECTION,
-            category: '',
-            community_owned: true,
-            id: 'id2',
-            language_code: '',
-            num_views: 5,
-            objective: '',
-            status: '',
-            tags: [],
-            thumbnail_bg_color: '',
-            thumbnail_icon_url: '',
-            title: ''
-          },
-          {
-            activity_type: '',
-            category: '',
-            community_owned: true,
-            id: 'id1',
-            language_code: '',
-            num_views: 5,
-            objective: '',
-            status: '',
-            tags: [],
-            thumbnail_bg_color: '',
-            thumbnail_icon_url: '',
-            title: ''
-          }],
-          categories: [],
-          header_i18n_id: 'id',
-          has_full_results_page: true,
-          full_results_url: '',
-          protractor_id: ''
-        }],
-        preferred_language_codes: []
-      }));
+      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       new UserInfo(
         'role', true, true, true, true, true, 'en', 'user',
@@ -288,6 +290,16 @@ describe('Library Page Component', () => {
     tick();
     tick();
     tick(4000);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+    expect(classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+      .toHaveBeenCalled();
+    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(libraryPageBackendApiService.fetchLibraryIndexDataAsync)
+      .toHaveBeenCalled();
+    expect(userService.getUserInfoAsync).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(componentInstance.initCarousels).toHaveBeenCalled();
   }));
 
   it('should initialize for non group pages and user is not logged in',
@@ -301,58 +313,7 @@ describe('Library Page Component', () => {
       windowRef.nativeWindow.location.pathname = '/community-library';
       fixture.detectChanges();
       spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
-        .and.returnValue(Promise.resolve({
-          activity_summary_dicts_by_category: [{
-            activity_summary_dicts: [{
-              activity_type: AppConstants.ACTIVITY_TYPE_EXPLORATION,
-              category: '',
-              community_owned: true,
-              id: 'id1',
-              language_code: '',
-              num_views: 5,
-              objective: '',
-              status: '',
-              tags: [],
-              thumbnail_bg_color: '',
-              thumbnail_icon_url: '',
-              title: ''
-            },
-            {
-              activity_type: AppConstants.ACTIVITY_TYPE_COLLECTION,
-              category: '',
-              community_owned: true,
-              id: 'id2',
-              language_code: '',
-              num_views: 5,
-              objective: '',
-              status: '',
-              tags: [],
-              thumbnail_bg_color: '',
-              thumbnail_icon_url: '',
-              title: ''
-            },
-            {
-              activity_type: '',
-              category: '',
-              community_owned: true,
-              id: 'id1',
-              language_code: '',
-              num_views: 5,
-              objective: '',
-              status: '',
-              tags: [],
-              thumbnail_bg_color: '',
-              thumbnail_icon_url: '',
-              title: ''
-            }],
-            categories: [],
-            header_i18n_id: 'id',
-            has_full_results_page: true,
-            full_results_url: '',
-            protractor_id: ''
-          }],
-          preferred_language_codes: []
-        }));
+        .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({ isLoggedIn: () => false } as UserInfo));
       spyOn(loaderService, 'hideLoadingScreen');
@@ -366,7 +327,48 @@ describe('Library Page Component', () => {
       tick();
       tick();
       tick(4000);
+      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+      expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+      expect(
+        classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+        .toHaveBeenCalled();
+      expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+      expect(userService.getUserInfoAsync).toHaveBeenCalled();
     }));
+
+  it('should log when invalid path is used', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl');
+    spyOn(
+      classroomBackendApiService, 'fetchClassroomPromosAreEnabledStatusAsync')
+      .and.returnValue(Promise.resolve(true));
+    spyOn(pageTitleService, 'setPageTitle');
+    windowRef.nativeWindow.location.pathname = '/not-valid';
+    fixture.detectChanges();
+    spyOn(libraryPageBackendApiService, 'fetchLibraryIndexDataAsync')
+      .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({ isLoggedIn: () => false } as UserInfo));
+    spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(loggerService, 'error');
+    spyOn(i18nLanguageCodeService.onPreferredLanguageCodesLoaded, 'emit');
+    spyOn(keyboardShortcutService, 'bindLibraryPageShortcuts');
+    spyOn(componentInstance, 'initCarousels');
+    componentInstance.ngOnInit();
+    tick();
+    tick();
+    tick();
+    tick();
+    tick(4000);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+    expect(
+      classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync)
+      .toHaveBeenCalled();
+    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(userService.getUserInfoAsync).toHaveBeenCalled();
+    expect(loggerService.error).toHaveBeenCalled();
+  }));
 
   it('should show full results page when full results url is available',
     () => {
@@ -483,13 +485,30 @@ describe('Library Page Component', () => {
         protractor_id: ''
       });
     }
+
+    spyOn(window, '$').and.returnValue({
+      animate: (options, arg2: {
+        duration: number,
+        queue: boolean,
+        start: () => void,
+        complete: () => void
+      }) => {
+        arg2.start();
+        arg2.complete();
+      },
+      scrollLeft: () => {}
+    } as JQLite);
+
     componentInstance.scroll(3, false);
     componentInstance.scroll(3, true);
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toEqual(false);
   });
 
   it('should not scroll if other carousel is currently scrolling', () => {
     componentInstance.isAnyCarouselCurrentlyScrolling = true;
+    componentInstance.leftmostCardIndices = [];
     componentInstance.scroll(0, true);
+    expect(componentInstance.leftmostCardIndices).toEqual([]);
   });
 
   it('should not scroll if all tiles are already showing', () => {
@@ -524,7 +543,21 @@ describe('Library Page Component', () => {
       });
     }
 
+    spyOn(window, '$').and.returnValue({
+      animate: (options, arg2: {
+        duration: number,
+        queue: boolean,
+        start: () => void,
+        complete: () => void
+      }) => {
+        arg2.start();
+        arg2.complete();
+      },
+      scrollLeft: () => {}
+    } as JQLite);
+
     componentInstance.tileDisplayCount = 5;
     componentInstance.scroll(1, false);
+    expect(componentInstance.leftmostCardIndices).toEqual([]);
   });
 });
