@@ -46,8 +46,6 @@ import { SearchResultsComponent } from './search-results/search-results.componen
   ],
   declarations: [
     LearnerPlaylistModalComponent,
-    OppiaAngularRootComponent,
-    LearnerPlaylistModalComponent,
     LibraryFooterComponent,
     SearchResultsComponent,
     ActivityTilesInfinityGridComponent,
@@ -55,8 +53,6 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     LibraryPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
-    LearnerPlaylistModalComponent,
     LibraryFooterComponent,
     SearchResultsComponent,
     ActivityTilesInfinityGridComponent,
