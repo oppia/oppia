@@ -32,11 +32,12 @@ export class BlogDashboardPageComponent implements OnInit {
   blogDashboardData: BlogDashboardData;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
+
   constructor(
+    private alertsService: AlertsService,
     private blogDashboardBackendService: BlogDashboardBackendApiService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
-    private alertsService: AlertsService,
   ) {}
 
   ngOnInit(): void {
@@ -63,4 +64,4 @@ export class BlogDashboardPageComponent implements OnInit {
 angular.module('oppia').directive('oppiaBlogDashboardPage',
   downgradeComponent({
     component: BlogDashboardPageComponent
-  }));
+  }) as angular.IDirectiveFactory);

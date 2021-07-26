@@ -6,19 +6,19 @@
          alt="Thumbnail image of the blog card">
   </picture>
   <div class="blog-card-content">
-    <mat-card-title class="blog-card-title">{{blogPostSummary.title}}</mat-card-title>
+    <mat-card-title class="blog-card-title">{{ blogPostSummary.title }}</mat-card-title>
     <mat-card-header class="mt-2">
       <img mat-card-avatar
            [src]="authorProfilePictureUrl"
            alt="Profile image of the author of the blog post">
-      <mat-card-subtitle>{{blogPostSummary.authorUsername}}</mat-card-subtitle>
+      <mat-card-subtitle>{{ blogPostSummary.authorUsername }}</mat-card-subtitle>
       <mat-card-subtitle class="font-weight-light mobile-published-date">
-        {{publishedDateString}}
+        {{ publishedDateString }}
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="mt-4 blog-card-summary">
       <p>
-        {{blogPostSummary.summary}}
+        {{ blogPostSummary.summary }}
       </p>
     </mat-card-content>
   </div>

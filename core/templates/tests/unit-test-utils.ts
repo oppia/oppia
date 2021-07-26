@@ -21,7 +21,6 @@ import { NgModule } from '@angular/core';
 import { ElementRef } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Pipe } from '@angular/core';
-
 @Pipe({name: 'translate'})
 export class MockTranslatePipe {
   transform(value: string): string {
@@ -29,6 +28,11 @@ export class MockTranslatePipe {
   }
 }
 
+export class MockCapitalizePipe {
+  transform(input: string): string {
+    return input;
+  }
+}
 @Directive({
   selector: '[translate],[ngx-translate]'
 })

@@ -17,19 +17,19 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import dayjs from 'dayjs';
+
 @Component({
   selector: 'oppia-blog-card',
   templateUrl: './blog-card.component.html'
 })
 export class BlogCardComponent implements OnInit {
-  @Input() blogPostSummary: BlogPostSummary;
-  @Input() authorProfilePicDataUrl: string;
+  @Input() blogPostSummary!: BlogPostSummary;
+  @Input() authorProfilePicDataUrl!: string;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   thumbnailUrl: string = '';
@@ -55,13 +55,8 @@ export class BlogCardComponent implements OnInit {
       this.blogPostSummary.publishedOn);
   }
 
-  getDateStringInWords(millisSinceEpoch: number): string {
-    let date = new Date(millisSinceEpoch);
-    return dayjs(date).format('MMMM D, YYYY');
+  getDateStringInWords(naiveDate: string): string {
+    return dayjs(
+      naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
   }
 }
-
-angular.module('oppia').directive('oppiaBlogCard',
-  downgradeComponent({
-    component: BlogCardComponent
-  }) as angular.IDirectiveFactory);

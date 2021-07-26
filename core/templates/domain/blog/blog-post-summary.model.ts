@@ -25,8 +25,8 @@ export interface BlogPostSummaryBackendDict {
   'tags': string[];
   'url_fragment': string;
   'thumbnail_filename': string | null;
-  'published_on'?: number;
-  'last_updated': number;
+  'published_on'?: string;
+  'last_updated': string;
 }
 
 export class BlogPostSummary {
@@ -37,8 +37,8 @@ export class BlogPostSummary {
   _tags: string[];
   _thumbnailFilename: string | null;
   _urlFragment: string;
-  _lastUpdated?: number;
-  _publishedOn?: number;
+  _lastUpdated?: string;
+  _publishedOn?: string;
   constructor(
       id: string,
       authorUsername: string,
@@ -47,8 +47,8 @@ export class BlogPostSummary {
       tags: string[],
       thumbnailFilename: string | null,
       urlFragment: string,
-      lastUpdated?: number,
-      publishedOn?: number) {
+      lastUpdated?: string,
+      publishedOn?: string) {
     this._id = id;
     this._authorUsername = authorUsername;
     this._title = title;
@@ -68,11 +68,11 @@ export class BlogPostSummary {
     return this._authorUsername;
   }
 
-  get lastUpdated(): number | undefined {
+  get lastUpdated(): string | undefined {
     return this._lastUpdated;
   }
 
-  get publishedOn(): number | undefined {
+  get publishedOn(): string | undefined {
     return this._publishedOn;
   }
 
