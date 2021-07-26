@@ -34,12 +34,12 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.query_everything = (
+        self.all_items_query = (
             datastore_services.query_everything(namespace=self.namespace))
 
     def tearDown(self):
         datastore_services.delete_multi(
-            self.query_everything.iter(keys_only=True))
+            self.all_items_query.iter(keys_only=True))
         super(NdbIoTests, self).tearDown()
 
     def get_everything(self):
@@ -48,7 +48,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         Returns:
             list(Model). All of the models in the datastore.
         """
-        return list(self.query_everything.iter())
+        return list(self.all_items_query.iter())
 
     def put_multi(self, model_list, update_last_updated_time=False):
         """Puts the given models into the datastore.
@@ -72,7 +72,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_everything(), model_list)
 
-        model_pcoll = self.pipeline | ndb_io.GetModels(self.query_everything)
+        model_pcoll = self.pipeline | ndb_io.GetModels(self.all_items_query)
 
         self.assert_pcoll_equal(model_pcoll, model_list)
 

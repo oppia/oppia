@@ -33,7 +33,7 @@ REDIS_CLIENT = redis.StrictRedis(
 )
 
 
-class Blob(python_utils.OBJECT):
+class EmulatorBlob(python_utils.OBJECT):
     """Object for storing the file data."""
 
     def __init__(self, name, data, content_type):
@@ -47,6 +47,8 @@ class Blob(python_utils.OBJECT):
                 be in the MIME format.
         """
         self._name = name
+        # TODO(#13500): Refactor this method that only bytes are passed
+        # into data.
         self._raw_bytes = (
             data.encode('utf-8') if isinstance(data, str) else data)
         if content_type is None:
@@ -64,14 +66,14 @@ class Blob(python_utils.OBJECT):
 
     @classmethod
     def create_copy(cls, original_blob, new_name):
-        """Create new instance of Blob with the same values.
+        """Create new instance of EmulatorBlob with the same values.
 
         Args:
-            original_blob: Blob. Original blob to copy.
+            original_blob: EmulatorBlob. Original blob to copy.
             new_name: str. New name of the blob.
 
         Returns:
-            Blob. New instance with the same values as original_blob.
+            EmulatorBlob. New instance with the same values as original_blob.
         """
         return cls(
             new_name,
@@ -80,10 +82,12 @@ class Blob(python_utils.OBJECT):
         )
 
     def to_dict(self):
-        """Transform the Blob into dictionary that can be saved into Redis.
+        """Transform the EmulatorBlob into dictionary that can be saved
+        into Redis.
 
         Returns:
-            dict(bytes, bytes). Dictionary containing all values of Blob.
+            dict(bytes, bytes). Dictionary containing all values of
+            EmulatorBlob.
         """
         # Since Redis saves all values in bytes, we do an encode on values and
         # also use byte keys.
@@ -96,14 +100,14 @@ class Blob(python_utils.OBJECT):
 
     @classmethod
     def from_dict(cls, blob_dict):
-        """Transform dictionary from Redis into Blob.
+        """Transform dictionary from Redis into EmulatorBlob.
 
         Args:
             blob_dict: dict(bytes, bytes). Dictionary containing all values
-                of Blob.
+                of EmulatorBlob.
 
         Returns:
-            Blob. Blob created from the dictionary.
+            EmulatorBlob. EmulatorBlob created from the dictionary.
         """
         # Since Redis saves all values in bytes, we do a decode on values and
         # also use byte keys.
@@ -149,7 +153,9 @@ class Blob(python_utils.OBJECT):
         return hash(self.name)
 
     def __repr__(self):
-        return 'Blob(name=%s, content_type=%s)' % (self.name, self.content_type)
+        return (
+            'EmulatorBlob(name=%s, content_type=%s)' % (
+                self.name, self.content_type))
 
 
 class CloudStorageEmulator(python_utils.OBJECT):
@@ -178,17 +184,17 @@ class CloudStorageEmulator(python_utils.OBJECT):
             filepath: str. Filepath to the blob.
 
         Returns:
-            Blob. The blob.
+            EmulatorBlob. The blob.
         """
         blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
-        return Blob.from_dict(blob_dict) if blob_dict else None
+        return EmulatorBlob.from_dict(blob_dict) if blob_dict else None
 
     def upload_blob(self, filepath, blob):
         """Upload the given blob to the filepath.
 
         Args:
             filepath: str. Filepath to upload the blob to.
-            blob: Blob. The blob to upload.
+            blob: EmulatorBlob. The blob to upload.
         """
         REDIS_CLIENT.hset(
             self._get_redis_key(filepath), mapping=blob.to_dict())
@@ -205,12 +211,12 @@ class CloudStorageEmulator(python_utils.OBJECT):
         """Copy existing blob to new filepath.
 
         Args:
-            blob: Blob. The blob to copy.
+            blob: EmulatorBlob. The blob to copy.
             filepath: str. The filepath to copy the blob to.
         """
         REDIS_CLIENT.hset(
             self._get_redis_key(filepath),
-            mapping=Blob.create_copy(blob, filepath).to_dict())
+            mapping=EmulatorBlob.create_copy(blob, filepath).to_dict())
 
     def list_blobs(self, prefix):
         """Get blobs whose filepaths start with the given prefix.
@@ -219,7 +225,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
             prefix: str. The prefix to match.
 
         Returns:
-            list(Blob). The list of blobs whose filepaths start with
+            list(EmulatorBlob). The list of blobs whose filepaths start with
             the given prefix.
         """
         matching_filepaths = (
@@ -232,7 +238,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
         blob_dicts = pipeline.execute()
 
         return [
-            Blob.from_dict(blob_dict) for blob_dict in blob_dicts
+            EmulatorBlob.from_dict(blob_dict) for blob_dict in blob_dicts
         ]
 
     def reset(self):

@@ -86,8 +86,10 @@ def commit(bucket_name, filepath, raw_bytes, mimetype):
         filepath: str. The path to the relevant file within the entity's
             assets folder.
         raw_bytes: str. The content to be stored in the file.
-        mimetype: str. The content-type of the cloud file.
+        mimetype: str|None. The content-type of the cloud file.
     """
+    # TODO(#13500): Refactor this method that only bytes are passed
+    # into raw_bytes.
     blob = _get_bucket(bucket_name).blob(filepath)
     blob.upload_from_string(raw_bytes, content_type=mimetype)
 
@@ -126,10 +128,10 @@ def listdir(bucket_name, dir_name):
     Args:
         bucket_name: str. The name of the GCS bucket.
         dir_name: str. The directory whose files should be listed. This
-            should not start with '/' or end with '/'.
+            should not start with '/'.
 
     Returns:
-        list(Blob). A lexicographically-sorted list of filenames.
+        list(Blob). A list of blobs.
     """
     return list(
         _get_client().list_blobs(_get_bucket(bucket_name), prefix=dir_name))
