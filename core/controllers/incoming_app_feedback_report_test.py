@@ -111,14 +111,6 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             report_model.submitted_on,
             datetime.datetime.fromtimestamp(1615519337))
 
-    def test_incoming_report_with_no_report_raises_error(self):
-        # type: () -> None
-        empty_report = {'report': None}
-        response = self._post_json_with_test_headers(
-            empty_report, expected_status=400)
-        self.assertEqual(
-            response['error'], 'A report must be sent in the request.')
-
     def test_incoming_report_with_invalid_headers_raises_exception(self):
         # type: () -> None
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]

@@ -56,10 +56,6 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
                 'Oppia Android.')
 
         report_dict = self.payload.get('report')
-        if not report_dict:
-            raise self.InvalidInputException(
-                'A report must be sent in the request.')
-
         report_obj = (
             app_feedback_report_services.create_report_from_json(
                 report_dict))
