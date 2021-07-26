@@ -30,6 +30,12 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
 (base_models, exp_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
 
@@ -37,6 +43,7 @@ import feconf
 class ExplorationSnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExplorationSnapshotContentModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -46,15 +53,17 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationModel class."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExplorationModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_exploration_count(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
+        # type: () -> None
+        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration)
+        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
@@ -65,10 +74,11 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
     def test_reconstitute(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
+        # type: () -> None
+        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
             'id', title='A Title',
             category='A Category', objective='An Objective')
-        exp_services.save_new_exploration('id', exploration)
+        exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
         exp_model = exp_models.ExplorationModel.get_by_id('id')
         snapshot_dict = exp_model.compute_snapshot()
         snapshot_dict['skill_tags'] = ['tag1', 'tag2']
@@ -86,6 +96,7 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
     """Tests the ExplorationContextModel class."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExplorationContextModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -99,12 +110,14 @@ class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
     USER_ID_COMMITTER = 'id_committer'
 
     def test_get_deletion_policy_is_locally_pseudonymize(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExplorationRightsSnapshotContentModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         exp_models.ExplorationRightsModel(
             id=self.EXP_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -153,7 +166,8 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     USER_ID_6_NEW = 'id_6_new'
 
     def setUp(self):
-        super(ExplorationRightsModelUnitTest, self).setUp()
+        # type: () -> None
+        super(ExplorationRightsModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
@@ -222,12 +236,14 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
                 self.EXPLORATION_ID_1).to_dict())
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExplorationRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
                 exp_models.ExplorationRightsModel
@@ -243,6 +259,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
                 .has_reference_to_user_id(self.USER_ID_3))
 
     def test_save(self):
+        # type: () -> None
         exp_models.ExplorationRightsModel(
             id='id_0',
             owner_ids=['owner_id'],
@@ -257,6 +274,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
+        assert saved_model is not None
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
@@ -268,6 +286,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_highly_involved_user(self):
+        # type: () -> None
         """Test export data on user involved in all datastore explorations."""
         exploration_ids = (
             exp_models.ExplorationRightsModel.export_data(
@@ -288,6 +307,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
     def test_export_data_on_partially_involved_user(self):
+        # type: () -> None
         """Test export data on user involved in some datastore explorations."""
         exploration_ids = (
             exp_models.ExplorationRightsModel.export_data(
@@ -302,6 +322,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
     def test_export_data_on_uninvolved_user(self):
+        # type: () -> None
         """Test for empty lists when user has no exploration involvement."""
         exploration_ids = (
             exp_models.ExplorationRightsModel.export_data(
@@ -311,10 +332,11 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'editable_exploration_ids': [],
             'voiced_exploration_ids': [],
             'viewable_exploration_ids': []
-        }
+        } # type: Dict[Text, List[Text]]
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test for empty lists when user has no exploration involvement."""
         exploration_ids = (
             exp_models.ExplorationRightsModel.export_data(
@@ -324,10 +346,11 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'editable_exploration_ids': [],
             'voiced_exploration_ids': [],
             'viewable_exploration_ids': []
-        }
+        } # type: Dict[Text, List[Text]]
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
     def test_reconstitute_excludes_deprecated_properties(self):
+        # type: () -> None
         exp_models.ExplorationRightsModel(
             id='id_0',
             owner_ids=['owner_id'],
@@ -342,6 +365,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
+        assert saved_model is not None
 
         snapshot_dict = saved_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['owner_id']
@@ -367,7 +391,8 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     USER_ID_COMMITTER = 'id_4'  # User id used in commits
 
     def setUp(self):
-        super(ExplorationRightsModelRevertUnitTest, self).setUp()
+        # type: () -> None
+        super(ExplorationRightsModelRevertUnitTest, self).setUp() # type: ignore[no-untyped-call]
         self.exploration_model = exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1],
@@ -416,6 +441,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_valid_version_is_successful(self):
+        # type: () -> None
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
@@ -428,7 +454,8 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_all_viewer_ids_field_successful(self):
-        broken_dict = dict(**self.original_dict)
+        # type: () -> None
+        broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['all_viewer_ids'] = [
             self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
 
@@ -454,7 +481,8 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_invalid_status_is_successful(self):
-        broken_dict = dict(**self.original_dict)
+        # type: () -> None
+        broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (
@@ -479,6 +507,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_check_deprecated_fields_are_absent(self):
+        # type: () -> None
         with self.allow_revert_swap, self.allowed_commands_swap:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1)
@@ -497,6 +526,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExplorationCommitLogEntryModel
             .get_deletion_policy(),
@@ -504,6 +534,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         commit = exp_models.ExplorationCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
@@ -518,6 +549,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id('x_id'))
 
     def test_get_all_non_private_commits(self):
+        # type: () -> None
         private_commit = (
             exp_models.ExplorationCommitLogEntryModel.create(
                 'a', 1, 'committer_id', 'msg', 'create', [{}],
@@ -538,12 +570,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
             results, _, more = (
                 exp_models.ExplorationCommitLogEntryModel
-                .get_all_non_private_commits(2, None, max_age=1))
+                .get_all_non_private_commits(2, None, max_age=1)) # type: ignore[arg-type]
 
         max_age = datetime.timedelta(hours=1)
         results, _, more = (
@@ -553,6 +585,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
 
     def test_get_multi(self):
+        # type: () -> None
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             'a', 1, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
@@ -570,6 +603,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_multi(
                 'a', [1, 2, 3]))
 
+        assert actual_models[0] is not None
+        assert actual_models[1] is not None
         self.assertEqual(len(actual_models), 3)
         self.assertEqual(actual_models[0].id, 'exploration-a-1')
         self.assertEqual(actual_models[1].id, 'exploration-a-2')
@@ -590,7 +625,8 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
     USER_ID_3_NEW = 'id_3_new'
 
     def setUp(self):
-        super(ExpSummaryModelUnitTest, self).setUp()
+        # type: () -> None
+        super(ExpSummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',
@@ -603,12 +639,14 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             exp_models.ExpSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
         )
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         exp_models.ExpSummaryModel(
             id='id0',
             title='title',
@@ -638,6 +676,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             .has_reference_to_user_id('x_id'))
 
     def test_get_non_private(self):
+        # type: () -> None
         public_exploration_summary_model = (
             exp_models.ExpSummaryModel(
                 id='id0',
@@ -688,6 +727,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             [public_exploration_summary_model])
 
     def test_get_top_rated(self):
+        # type: () -> None
         good_rating_exploration_summary_model = (
             exp_models.ExpSummaryModel(
                 id='id0',
@@ -756,6 +796,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             [bad_rating_exploration_summary_model])
 
     def test_get_private_at_least_viewable(self):
+        # type: () -> None
         viewable_exploration_summary_model = (
             exp_models.ExpSummaryModel(
                 id='id0',
@@ -806,6 +847,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual('id0', exploration_summary_models[0].id)
 
     def test_get_at_least_editable(self):
+        # type: () -> None
         editable_collection_summary_model = (
             exp_models.ExpSummaryModel(
                 id='id0',

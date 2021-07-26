@@ -665,7 +665,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_instance_id(cls, target_entity_id, version):
-        # type: (Text, Union[int, Text]) -> Text
+        # type: (Text, int) -> Text
         """This method should be implemented in the inherited classes.
 
         Args:
@@ -841,7 +841,7 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_snapshot_id(cls, instance_id, version_number):
-        # type: (Text, Union[Text, int]) -> Text
+        # type: (Text, int) -> Text
         """Gets a unique snapshot id for this instance and version.
 
         Args:
@@ -919,9 +919,7 @@ class VersionedModel(BaseModel):
         if force_deletion:
             current_version = self.version
 
-            version_numbers = [
-                python_utils.UNICODE(num + 1) for num in python_utils.RANGE(
-                    current_version)]
+            version_numbers = python_utils.RANGE(1, current_version + 1)
             snapshot_ids = [
                 self.get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
@@ -992,9 +990,7 @@ class VersionedModel(BaseModel):
             all_models_content_keys = []
             all_models_commit_keys = [] # type: List[datastore_services.Key]
             for model in versioned_models:
-                model_version_numbers = [
-                    python_utils.UNICODE(num + 1) for num in
-                    python_utils.RANGE(model.version)]
+                model_version_numbers = python_utils.RANGE(1, model.version+1)
                 model_snapshot_ids = [
                     model.get_snapshot_id(model.id, version_number)
                     for version_number in model_version_numbers]
