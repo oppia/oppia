@@ -23,9 +23,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   selector: 'oppia-blog-dashboard-navbar-breadcrumb',
   templateUrl: './blog-dashboard-navbar-breadcrumb.component.html'
 })
-export class BlogDashboardNavbar {}
+export class BlogDashboardNavbarBreadcrumbComponent {}
 
 angular.module('oppia').directive('oppiaBlogDashboardNavbarBreadcrumb',
   downgradeComponent({
-    component: BlogDashboardNavbar
+    component: BlogDashboardNavbarBreadcrumbComponent
   }));

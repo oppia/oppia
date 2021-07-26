@@ -17,7 +17,6 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import dayjs from 'dayjs';
 @Component({
@@ -38,8 +37,3 @@ export class BlogDashboardTileComponent implements OnInit {
       naiveDate.split(',')[0], 'MM-DD-YYYY').format('MMMM D, YYYY');
   }
 }
-
-angular.module('oppia').directive('oppiaBlogDashboardTile',
-  downgradeComponent({
-    component: BlogDashboardTileComponent
-  }) as angular.IDirectiveFactory);
