@@ -105,6 +105,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -139,6 +140,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -173,6 +175,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -201,7 +204,9 @@ describe('Goals tab Component', () => {
       }
     };
     component.currentGoals = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1)];
+      learnerTopicSummaryBackendDict1),
+    LearnerTopicSummary.createFromBackendDict(
+      learnerTopicSummaryBackendDict2)];
     component.editGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1),
     LearnerTopicSummary.createFromBackendDict(
@@ -210,6 +215,10 @@ describe('Goals tab Component', () => {
       learnerTopicSummaryBackendDict3)];
     component.completedGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict3)];
+    component.partiallyLearntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1)];
+    component.untrackedTopics = {};
     component.learntToPartiallyLearntTopics = [];
     component.currentGoalsStoryIsShown = [];
     component.topicBelongToCurrentGoals = [];
@@ -270,7 +279,8 @@ describe('Goals tab Component', () => {
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
       .and.returnValue(Promise.resolve(true));
-    component.addToLearnerGoals(component.editGoals[0], '3', 1);
+    component.untrackedTopics = {math: [component.editGoals[0]]};
+    component.addToLearnerGoals(component.editGoals[0], 'sample_topic_id', 1);
     fixture.detectChanges();
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
@@ -289,8 +299,10 @@ describe('Goals tab Component', () => {
         });
     });
 
-    component.removeFromLearnerGoals('2', 'topicName', 1);
-    fixture.detectChanges();
+    component.removeFromLearnerGoals(
+      component.editGoals[0], '1', 'topicName', 0);
+    component.removeFromLearnerGoals(
+      component.editGoals[1], '2', 'topicName', 0);
 
     expect(modalSpy).toHaveBeenCalled();
   });

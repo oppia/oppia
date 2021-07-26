@@ -39,6 +39,7 @@ import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
 import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
 import { AdminPageComponent } from './admin-page.component';
+import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
@@ -64,7 +65,8 @@ import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider'
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    TopicManagerRoleEditorModalComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -75,7 +77,8 @@ import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider'
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    TopicManagerRoleEditorModalComponent
   ],
   providers: [
     {

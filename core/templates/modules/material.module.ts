@@ -46,6 +46,8 @@ import { MatSelectModule } from '@angular/material/select';
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatIconModule,
+    MatListModule,
     MatChipsModule,
     MatExpansionModule,
     MatGridListModule,
@@ -62,6 +64,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatDividerModule
   ],
   exports: [
+    CommonModule,
     NgxMatSelectSearchModule,
     MatAutocompleteModule,
     MatButtonModule,

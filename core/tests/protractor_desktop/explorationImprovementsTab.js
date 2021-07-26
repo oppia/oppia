@@ -33,7 +33,7 @@ describe('Improvements tab', function() {
     explorationEditorPage.getImprovementsTab());
 
   beforeAll(async() => {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'superUser@improvementsTab.com', 'superUser');
     await adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',

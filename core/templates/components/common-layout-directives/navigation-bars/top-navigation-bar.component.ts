@@ -54,7 +54,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   currentLanguageCode: string;
   currentLanguageText: string;
   isModerator: boolean;
-  isAdmin: boolean;
+  isCurriculumAdmin: boolean;
   isTopicManager: boolean;
   isSuperAdmin: boolean;
   userIsLoggedIn: boolean;
@@ -184,7 +184,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         }
       });
       this.isModerator = userInfo.isModerator();
-      this.isAdmin = userInfo.isAdmin();
+      this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
       this.userIsLoggedIn = userInfo.isLoggedIn();
