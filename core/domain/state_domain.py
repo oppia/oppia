@@ -2336,6 +2336,36 @@ class SubtitledUnicode(python_utils.OBJECT):
         return cls(content_id, '')
 
 
+class TranslatableItem(python_utils.OBJECT):
+    """Value object representing item that can be translated."""
+
+    DATA_FORMAT_HTML = 'html'
+    DATA_FORMAT_UNICODE_STRING = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+    def __init__(self, content, data_format):
+        """Initializes a TranslatableItem domain object.
+
+        Args:
+            content: str|list(str). The translatable content text.
+            data_format: str. The data format of the translatable content.
+        """
+        self.content = content
+        self.data_format = data_format
+
+    def to_dict(self):
+        """Returns a dict representing this TranslatableItem domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of TranslatableItem instance.
+        """
+        return {
+            'content': self.content,
+            'data_format': self.data_format
+        }
+
+
 class State(python_utils.OBJECT):
     """Domain object for a state."""
 
@@ -2531,11 +2561,11 @@ class State(python_utils.OBJECT):
         Raises:
             ValueError. The given content_id does not exist.
         """
-        content_id_to_html = self._get_all_translatable_content()
-        if content_id not in content_id_to_html:
+        content_id_to_translatable_item = self._get_all_translatable_content()
+        if content_id not in content_id_to_translatable_item:
             raise ValueError('Content ID %s does not exist' % content_id)
 
-        return content_id_to_html[content_id]
+        return content_id_to_translatable_item[content_id].content
 
     def is_rte_content_supported_on_android(self):
         """Checks whether the RTE components used in the state are supported by
@@ -3076,35 +3106,49 @@ class State(python_utils.OBJECT):
         translatable through the contributor dashboard.
 
         Returns:
-            dict(str, str). Returns a dict with key as content id and content
-            html/unicode as the value.
+            dict(str, TranslatableItem). Returns a dict with key as content
+            id and TranslatableItem as value with the appropriate data
+            format.
         """
-        content_id_to_string = {}
+        content_id_to_translatable_item = {}
 
-        content_id_to_string[self.content.content_id] = self.content.html
+        content_id_to_translatable_item[self.content.content_id] = (
+            TranslatableItem(
+                self.content.html, TranslatableItem.DATA_FORMAT_HTML))
 
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
         if default_outcome is not None and default_outcome.feedback.html != '':
-            content_id_to_string[default_outcome.feedback.content_id] = (
-                default_outcome.feedback.html)
+            content_id_to_translatable_item[
+                default_outcome.feedback.content_id
+            ] = TranslatableItem(
+                default_outcome.feedback.html,
+                TranslatableItem.DATA_FORMAT_HTML)
 
         for answer_group in self.interaction.answer_groups:
             if answer_group.outcome.feedback.html != '':
-                content_id_to_string[
+                content_id_to_translatable_item[
                     answer_group.outcome.feedback.content_id
-                ] = (answer_group.outcome.feedback.html)
+                ] = TranslatableItem(
+                    answer_group.outcome.feedback.html,
+                    TranslatableItem.DATA_FORMAT_HTML)
 
         for hint in self.interaction.hints:
             if hint.hint_content.html != '':
-                content_id_to_string[hint.hint_content.content_id] = (
-                    hint.hint_content.html)
+                content_id_to_translatable_item[
+                    hint.hint_content.content_id
+                ] = TranslatableItem(
+                    hint.hint_content.html,
+                    TranslatableItem.DATA_FORMAT_HTML)
 
         solution = self.interaction.solution
         if solution is not None and solution.explanation.html != '':
-            content_id_to_string[solution.explanation.content_id] = (
-                solution.explanation.html)
+            content_id_to_translatable_item[
+                solution.explanation.content_id
+            ] = TranslatableItem(
+                solution.explanation.html,
+                TranslatableItem.DATA_FORMAT_HTML)
 
         for ca_dict in self.interaction.customization_args.values():
             subtitled_htmls = ca_dict.get_subtitled_html()
@@ -3113,16 +3157,22 @@ class State(python_utils.OBJECT):
                 # Make sure we don't include content that only consists of
                 # numbers. See issue #13055.
                 if html_string != '' and not html_string.isnumeric():
-                    content_id_to_string[subtitled_html.content_id] = (
-                        html_string)
+                    content_id_to_translatable_item[
+                        subtitled_html.content_id
+                    ] = TranslatableItem(
+                        html_string,
+                        TranslatableItem.DATA_FORMAT_HTML)
 
             subtitled_unicodes = ca_dict.get_subtitled_unicode()
             for subtitled_unicode in subtitled_unicodes:
                 if subtitled_unicode.unicode_str != '':
-                    content_id_to_string[subtitled_unicode.content_id] = (
-                        subtitled_unicode.unicode_str)
+                    content_id_to_translatable_item[
+                        subtitled_unicode.content_id
+                    ] = TranslatableItem(
+                        subtitled_unicode.unicode_str,
+                        TranslatableItem.DATA_FORMAT_UNICODE_STRING)
 
-        return content_id_to_string
+        return content_id_to_translatable_item
 
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
@@ -3131,20 +3181,21 @@ class State(python_utils.OBJECT):
             language_code: str. The abbreviated code of the language.
 
         Returns:
-            dict(str, str). A dict with key as content id and value as the
-            content html.
+            dict(str, TranslatableItem). A dict with key as content id and
+            value as TranslatableItem containing the content and the data
+            format.
         """
-        content_id_to_html = self._get_all_translatable_content()
+        content_id_to_translatable_item = self._get_all_translatable_content()
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
         for content_id in available_translation_content_ids:
-            content_id_to_html.pop(content_id, None)
+            content_id_to_translatable_item.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.
 
-        return content_id_to_html
+        return content_id_to_translatable_item
 
     def to_dict(self):
         """Returns a dict representing this State domain object.

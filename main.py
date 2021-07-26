@@ -240,11 +240,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
     get_redirect_route(
-        r'/addcontributionrightshandler/<category>',
-        contributor_dashboard_admin.AddContributionRightsHandler),
-    get_redirect_route(
-        r'/removecontributionrightshandler/<category>',
-        contributor_dashboard_admin.RemoveContributionRightsHandler),
+        r'/contributionrightshandler/<category>',
+        contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(
         r'/getcontributorusershandler/<category>',
         contributor_dashboard_admin.ContributorUsersListHandler),
@@ -881,6 +878,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),

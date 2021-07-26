@@ -2913,6 +2913,11 @@ div#ng-curtain {
   padding: 30px 55px 30px 45px;
   position: relative;
 }
+
+.mat-card.oppia-page-card {
+  padding: 30px 55px 30px 45px;
+}
+
 .oppia-page-card li {
   margin-bottom: 10px;
 }
@@ -3319,10 +3324,6 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-bottom: 10px;
   text-align: right;
   width: 100%;
-}
-
-oppia-noninteractive-skillreview {
-  margin-right: -4px;
 }
 
 oppia-noninteractive-link {

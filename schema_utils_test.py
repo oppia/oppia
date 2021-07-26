@@ -79,7 +79,7 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
     'ListOfTabs', 'SkillSelector', 'SubtitledHtml', 'SubtitledUnicode',
-    'SvgFilename', 'CustomOskLetters']
+    'SvgFilename', 'CustomOskLetters', 'PositiveInt']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
