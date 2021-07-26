@@ -16,49 +16,40 @@
  * @fileoverview Unit tests for libraryFooter.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LibraryFooterComponent } from './library-footer.component';
+describe('Library Footer Component', function() {
+  var ctrl = null;
+  var $window = null;
 
-class MockWindowRef {
-  nativeWindow = {
+  var mockWindow = {
     location: {
-      pathname: '/search/find'
+      pathname: ''
     }
   };
-}
 
-describe('Library footer component', () => {
-  let componentInstance: LibraryFooterComponent;
-  let fixture: ComponentFixture<LibraryFooterComponent>;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        LibraryFooterComponent
-      ],
-      providers: [
-        {
-          provide: WindowRef,
-          useClass: MockWindowRef
-        }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LibraryFooterComponent);
-    componentInstance = fixture.componentInstance;
-  });
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $window = $injector.get('$window');
 
-  it('should create', () => {
-    expect(componentInstance).toBeDefined();
-  });
+    ctrl = $componentController('libraryFooter', {
+      $window: $window
+    });
+  }));
 
-  it('should initialize', () => {
-    componentInstance.ngOnInit();
-    expect(componentInstance.footerIsDisplayed).toBeFalse();
+  it('should show library footer when not searching for explorations',
+    function() {
+      mockWindow.location.pathname = '/community-library';
+      ctrl.$onInit();
+
+      expect(ctrl.footerIsDisplayed).toBe(true);
+    });
+
+  it('should hide library footer when searching for explorations', function() {
+    mockWindow.location.pathname = '/search/find';
+    ctrl.$onInit();
+
+    expect(ctrl.footerIsDisplayed).toBe(false);
   });
 });
