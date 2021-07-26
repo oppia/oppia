@@ -27,6 +27,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import { ServicesConstants } from 'services/services.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -191,10 +192,11 @@ export class StatsReportingService {
       // Required for the post operation to deliver data to backend.
     });
 
-    this.messengerService.sendMessage('EXPLORATION_LOADED', {
-      explorationVersion: this.explorationVersion,
-      explorationTitle: this.explorationTitle
-    });
+    this.messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED, {
+        explorationVersion: this.explorationVersion,
+        explorationTitle: this.explorationTitle
+      });
 
     this.statesVisited.add(stateName);
     this.siteAnalyticsService.registerNewCard(1);
@@ -299,13 +301,14 @@ export class StatsReportingService {
     });
 
     // Broadcast information about the state transition to listeners.
-    this.messengerService.sendMessage('STATE_TRANSITION', {
-      explorationVersion: this.explorationVersion,
-      jsonAnswer: JSON.stringify(answer),
-      newStateName: newStateName,
-      oldStateName: oldStateName,
-      paramValues: oldParams
-    });
+    this.messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION, {
+        explorationVersion: this.explorationVersion,
+        jsonAnswer: JSON.stringify(answer),
+        newStateName: newStateName,
+        oldStateName: oldStateName,
+        paramValues: oldParams
+      });
 
     if (!this.statesVisited.has(newStateName)) {
       this.statesVisited.add(newStateName);
@@ -367,10 +370,11 @@ export class StatsReportingService {
       // Required for the post operation to deliver data to backend.
     });
 
-    this.messengerService.sendMessage('EXPLORATION_COMPLETED', {
-      explorationVersion: this.explorationVersion,
-      paramValues: params
-    });
+    this.messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED, {
+        explorationVersion: this.explorationVersion,
+        paramValues: params
+      });
 
     this.siteAnalyticsService.registerFinishExploration(
       this.explorationId);

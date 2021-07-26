@@ -67,7 +67,14 @@ interface GetPayloadType {
     data: ExplorationCompletedData): ExplorationCompletedData;
   explorationReset(data: string): ExplorationResetData;
 }
-type MessengerPayloadKey = keyof typeof ServicesConstants.MESSENGER_PAYLOAD;
+
+type MessageTitles = (
+  'heightChange'|
+  'explorationLoaded'|
+  'stateTransition'|
+  'explorationReset'|
+  'explorationCompleted'
+);
 
 type PayloadType = (
   HeightChangeData |
@@ -155,7 +162,7 @@ export class MessengerService {
    * @param messageData - The data of the message. It is of type
    *   Object since it can have different properties based on the messageTitle.
    */
-  sendMessage(messageTitle: MessengerPayloadKey, messageData: Object): void {
+  sendMessage(messageTitle: MessageTitles, messageData: Object): void {
     // TODO(sll): For the stateTransition and explorationCompleted events,
     // we now send paramValues in the messageData. We should broadcast these
     // to the parent page as well.
@@ -166,9 +173,8 @@ export class MessengerService {
     // a hash is passed in.
     let window = this.windowRef.nativeWindow;
     let rawHash = window.location.hash.substring(1);
-    const messageTitleText = ServicesConstants.MESSENGER_PAYLOAD[messageTitle];
     if (window.parent !== window && rawHash &&
-        this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitleText)) {
+        this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
       // Protractor tests may prepend a / to this hash, which we remove.
       let hash =
         (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
@@ -198,35 +204,35 @@ export class MessengerService {
 
       if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
         this.loggerService.info(
-          'Posting message to parent: ' + messageTitleText);
+          'Posting message to parent: ' + messageTitle);
         let payload: PayloadType;
         let isValidMessage: boolean;
         switch (messageTitle) {
-          case 'EXPLORATION_COMPLETED':
+          case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED:
             payload = this.getPayload.explorationCompleted(
               <ExplorationCompletedData> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationCompleted());
             break;
-          case 'EXPLORATION_LOADED':
+          case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED:
             payload = this.getPayload.explorationLoaded(
               <ExplorationLoadedData> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationLoaded());
             break;
-          case 'EXPLORATION_RESET':
+          case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_RESET:
             payload = this.getPayload.explorationReset(
               <string> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.explorationReset(payload));
             break;
-          case 'HEIGHT_CHANGE':
+          case ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE:
             payload = this.getPayload.heightChange(
               <HeightChangeData> messageData);
             isValidMessage = (
               this.MESSAGE_VALIDATORS.heightChange(payload));
             break;
-          case 'STATE_TRANSITION':
+          case ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION:
             payload = this.getPayload.stateTransition(
               <StateTransitionData> messageData);
             isValidMessage = (
@@ -248,7 +254,7 @@ export class MessengerService {
           sourceTagId: string | null,
           secret: string | null
         } = {
-          title: messageTitleText,
+          title: messageTitle,
           payload: payload,
           sourceTagId: null,
           secret: null
