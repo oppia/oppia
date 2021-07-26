@@ -627,3 +627,18 @@ class _Validators(python_utils.OBJECT):
             bool. Whether the given object is a valid audio language code.
         """
         return utils.is_valid_language_code(obj)
+
+    @staticmethod
+    def is_regex_matched(obj, regex_pattern):
+        # type: (Text, Text) -> bool
+        """Checks if a given string is matched with the provided regular
+        experssion.
+
+        Args:
+            obj: str. The string to verify.
+            regex_pattern: str. Provided regular expression.
+
+        Returns:
+            bool. Whether the given object matched with the regex pattern.
+        """
+        return bool(re.match(regex_pattern, obj))

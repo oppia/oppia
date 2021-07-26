@@ -34,6 +34,9 @@ import utils
 class OldLearnerDashboardRedirectPage(base.BaseHandler):
     """Redirects the old learner dashboard URL to the new one."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -42,6 +45,9 @@ class OldLearnerDashboardRedirectPage(base.BaseHandler):
 
 class LearnerDashboardPage(base.BaseHandler):
     """Page showing the user's learner dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
@@ -53,6 +59,8 @@ class LearnerDashboardHandler(base.BaseHandler):
     """Provides data for the user's learner dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
@@ -169,13 +177,16 @@ class LearnerDashboardIdsHandler(base.BaseHandler):
     the playlist.
     """
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
         learner_dashboard_activities = (
-            learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
+            learner_progress_services.get_learner_dashboard_activities(
                 self.user_id))
 
         self.values.update({
@@ -189,6 +200,18 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'thread_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'(exploration|collection)\.\w+\.\w+'
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_learner_dashboard
     def get(self, thread_id):
