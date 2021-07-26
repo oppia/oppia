@@ -71,7 +71,7 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
   var browserLogs = await browser.manage().logs().get('browser');
   var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
-    errorsToIgnore.every(e => logEntry.message.match(e) === null)));
+    errorsToIgnore.every((e) => {console.log(e);console.log(logEntry.message);})
   expect(browserErrors).toEqual([]);
 };
 
