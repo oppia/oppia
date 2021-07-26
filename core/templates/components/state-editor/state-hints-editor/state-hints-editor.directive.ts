@@ -53,7 +53,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 
 angular.module('oppia').directive('stateHintsEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {
@@ -62,8 +62,8 @@ angular.module('oppia').directive('stateHintsEditor', [
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-hints-editor/' +
+      template: require(
+        'components/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
         '$filter', '$scope', '$uibModal', 'AlertsService',
@@ -136,8 +136,8 @@ angular.module('oppia').directive('stateHintsEditor', [
             ExternalSaveService.onExternalSave.emit();
 
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               resolve: {},
@@ -159,8 +159,8 @@ angular.module('oppia').directive('stateHintsEditor', [
             AlertsService.clearWarnings();
 
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-last-hint-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
@@ -184,8 +184,8 @@ angular.module('oppia').directive('stateHintsEditor', [
 
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+              template: require(
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-hint-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'

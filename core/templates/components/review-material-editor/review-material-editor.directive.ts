@@ -33,7 +33,7 @@ require('objects/objectComponentsRequires.ts');
 require('directives/angular-html-bind.directive.ts');
 
 angular.module('oppia').directive('reviewMaterialEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -41,8 +41,8 @@ angular.module('oppia').directive('reviewMaterialEditor', [
         getBindableDict: '&bindableDict',
         onSaveExplanation: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/review-material-editor/' +
+      template: require(
+        'components/review-material-editor/' +
         'review-material-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [

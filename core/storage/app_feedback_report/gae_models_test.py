@@ -71,7 +71,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         'text_size': 'MEDIUM_TEXT_SIZE',
         'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     WEB_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin'

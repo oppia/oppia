@@ -28,6 +28,8 @@ import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learne
 import { ProgressTabComponent } from './new-learner-dashboard/progress-tab.component';
 import { GoalsTabComponent } from './new-learner-dashboard-page/goals-tab.component';
 import { CommunityLessonsTabComponent } from './new-learner-dashboard/community-lessons-tab.component';
+import { LearnerTopicSummaryTileComponent } from 'components/summary-tile/learner-topic-summary-tile.component';
+import { HomeTabComponent } from './new-learner-dashboard-page/home-tab.component';
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
@@ -46,6 +48,8 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
     GoalsTabComponent,
+    HomeTabComponent,
+    LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent
@@ -56,6 +60,8 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
     GoalsTabComponent,
+    HomeTabComponent,
+    LearnerTopicSummaryTileComponent,
     CommunityLessonsTabComponent,
     RemoveActivityModalComponent,
     LearnerDashboardSuggestionModalComponent

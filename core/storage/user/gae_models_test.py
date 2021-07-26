@@ -40,17 +40,16 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_EMAIL = 'user@example.com'
-    USER_1_ROLE = feconf.ROLE_ID_ADMIN
+    USER_1_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     USER_2_ID = 'user2_id'
     USER_2_EMAIL = 'user2@example.com'
-    USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
     USER_3_EMAIL = 'user3@example.com'
-    USER_3_ROLE = feconf.ROLE_ID_ADMIN
+    USER_3_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     GENERIC_PIN = '12345'
     PROFILE_1_ID = 'profile_id'
     PROFILE_1_EMAIL = 'user@example.com'
-    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
+    PROFILE_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
@@ -65,23 +64,27 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE
+            roles=[self.USER_1_ROLE],
+            banned=False
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_1_ID,
             email=self.PROFILE_1_EMAIL,
-            role=self.PROFILE_1_ROLE
+            roles=[self.PROFILE_1_ROLE],
+            banned=False
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
             email=self.USER_2_EMAIL,
-            role=self.USER_2_ROLE,
+            roles=[],
+            banned=True,
             deleted=True
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             email=self.USER_3_EMAIL,
-            role=self.USER_3_ROLE,
+            roles=[self.USER_3_ROLE],
+            banned=False,
             username=self.GENERIC_USERNAME,
             normalized_username=self.GENERIC_USERNAME,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -167,9 +170,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
         self.assertItemsEqual(
-            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_ADMIN),
-            actual_users
-        )
+            user_models.UserSettingsModel.get_by_role(
+                feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
     def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -182,7 +184,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': 'user@example.com',
-            'role': feconf.ROLE_ID_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
@@ -209,7 +212,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': self.USER_3_EMAIL,
-            'role': feconf.ROLE_ID_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
             'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
@@ -2441,7 +2445,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
-    USER_1_ROLE = feconf.ROLE_ID_LEARNER
+    USER_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2450,7 +2454,6 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE,
         ).put()
 
     def test_get_deletion_policy(self):
