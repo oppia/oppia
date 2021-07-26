@@ -1066,6 +1066,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         older_timestamp = (
             self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=1))
         for i in python_utils.RANGE(1, 4):
+            # Set timestamps in increasing timestamp order so that the test will
+            # iterate through them all and reassign the latest timestamp.
             temp_timestamp = (
                 self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(
                     days=4 - i))
