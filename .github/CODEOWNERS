@@ -99,7 +99,8 @@
 /core/domain/blog*.py @iamprayush @aks681
 /core/controllers/blog_dashboard*.py @aks681
 /core/controllers/blog_homepage*.py @aks681
-
+/core/templates/domain/blog/ @kevintab95 @iamprayush
+/core/templates/pages/blog-dashboard-page/ @aks681 @iamprayush
 
 # Collection project.
 /core/controllers/collection*.py @aks681
@@ -453,8 +454,10 @@
 
 
 # Infrastructure.
-/jobs/ @brianrodri @rohitkatlaa
-/core/templates/domain/jobs/ @brianrodri @rohitkatlaa
+/jobs/ @brianrodri
+/jobs/transforms @rohitkatlaa @brianrodri
+/jobs/types @rohitkatlaa @brianrodri
+/core/templates/domain/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21

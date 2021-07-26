@@ -44,7 +44,7 @@ describe('Feature Gating Flow', function() {
   });
 
   afterAll(async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'admin1@featureGatingFlow.com', 'featuregating1');
 
     await adminPage.getFeaturesTab();
@@ -58,7 +58,7 @@ describe('Feature Gating Flow', function() {
 
   it('should not show indicators gated by dummy feature when disabled',
     async() => {
-      await users.createAndLoginAdminUser(
+      await users.createAndLoginCurriculumAdminUser(
         'admin2@featureGatingFlow.com', 'featuregating2');
 
       await adminPage.getFeaturesTab();
@@ -70,7 +70,7 @@ describe('Feature Gating Flow', function() {
   );
 
   it('should show dummy feature in the features tab', async() => {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'admin3@featureGatingFlow.com', 'featuregating3');
 
     await adminPage.getFeaturesTab();

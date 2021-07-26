@@ -22,8 +22,8 @@ import { StoryValidationService } from
 import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 
 describe('Story Validation Service', () => {
-  let svs: StoryValidationService = null;
-  let storyContentsObjectFactory: StoryContentsObjectFactory = null;
+  let svs: StoryValidationService;
+  let storyContentsObjectFactory: StoryContentsObjectFactory;
   beforeEach(() => {
     svs = TestBed.get(StoryValidationService);
     storyContentsObjectFactory = TestBed.get(StoryContentsObjectFactory);

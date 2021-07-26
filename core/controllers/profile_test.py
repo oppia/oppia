@@ -940,7 +940,7 @@ class DeleteAccountTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DeleteAccountTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
@@ -967,7 +967,7 @@ class DeleteAccountTests(test_utils.GenericTestBase):
             self.assertEqual(data, {'success': True})
 
         self.logout()
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.testapp_swap_1:
             self.get_html_response('/cron/users/user_deletion')
 
@@ -1043,7 +1043,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
-            role=user_settings.role,
+            roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
@@ -1107,7 +1107,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
-            role=user_settings.role,
+            roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
@@ -1278,9 +1278,9 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
-            'role': 'EXPLORATION_EDITOR',
+            'roles': ['EXPLORATION_EDITOR'],
             'is_moderator': False,
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_topic_manager': False,
             'is_super_admin': False,
             'can_create_collections': False,
