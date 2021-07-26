@@ -80,7 +80,7 @@ export class VolunteerPageComponent implements OnInit {
     this.development = {
       images: [
         this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/akshay.jpeg'),
+          '/volunteer/profile_images/akshay.jpg'),
         this.urlInterpolationService.getStaticImageUrl(
           '/volunteer/profile_images/diana.jpg'),
         this.urlInterpolationService.getStaticImageUrl(
