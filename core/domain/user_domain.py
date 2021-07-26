@@ -440,9 +440,9 @@ class UserActionsInfo(python_utils.OBJECT):
         actions: list(str). A list of actions accessible to the role.
     """
 
-    def __init__(self, user_id, role, actions):
+    def __init__(self, user_id, roles, actions):
         self._user_id = user_id
-        self._roles = role
+        self._roles = roles
         self._actions = actions
 
     @property

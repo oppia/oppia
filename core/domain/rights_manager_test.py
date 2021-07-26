@@ -24,6 +24,8 @@ from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import role_services
+from core.domain import user_domain
 from core.domain import user_services
 from core.tests import test_utils
 
@@ -302,6 +304,46 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
+
+    def test_user_with_rights_to_edit_any_public_activity(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        user_with_public_activity_rights = user_domain.UserActionsInfo(
+            self.user_id_b, ['FULL_USER'], [
+                role_services.ACTION_EDIT_OWNED_ACTIVITY,
+                role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY])
+
+        self.assertTrue(rights_manager.check_can_edit_activity(
+            user_with_public_activity_rights, exp_rights))
+        self.assertTrue(rights_manager.check_can_voiceover_activity(
+            user_with_public_activity_rights, exp_rights))
+        self.assertTrue(rights_manager.check_can_save_activity(
+            user_with_public_activity_rights, exp_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            user_with_public_activity_rights, exp_rights))
+
+    def test_user_with_rights_to_delete_any_public_activity(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        rights_manager.publish_exploration(self.user_a, self.EXP_ID)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        user_with_public_activity_rights = user_domain.UserActionsInfo(
+            self.user_id_b, ['FULL_USER'], [
+                role_services.ACTION_EDIT_OWNED_ACTIVITY,
+                role_services.ACTION_DELETE_ANY_PUBLIC_ACTIVITY])
+
+        self.assertFalse(rights_manager.check_can_edit_activity(
+            user_with_public_activity_rights, exp_rights))
+        self.assertFalse(rights_manager.check_can_voiceover_activity(
+            user_with_public_activity_rights, exp_rights))
+        self.assertFalse(rights_manager.check_can_save_activity(
+            user_with_public_activity_rights, exp_rights))
+        self.assertTrue(rights_manager.check_can_delete_activity(
+            user_with_public_activity_rights, exp_rights))
 
     def test_setting_rights_of_exploration(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)

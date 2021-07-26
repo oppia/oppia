@@ -1606,6 +1606,23 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
+    def test_assigning_none_role_to_manager(self):
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+
+        self.assertTrue(topic_services.check_can_edit_topic(
+            self.user_a, topic_rights))
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
+        topic_services.assign_role(
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
+
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_a, topic_rights))
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
     def test_deassigning_manager_role(self):
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
@@ -1616,15 +1633,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         topic_services.deassign_manager_role_from_topic(
             self.user_admin, self.user_id_a, self.TOPIC_ID)
-
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
-
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_NONE, self.TOPIC_ID)
 
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
