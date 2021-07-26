@@ -1132,6 +1132,7 @@ class PopulateTranslationContributionStatsOneOffJobTests(
     def _run_job_and_verify_output(self, expected_output):
         """Runs the PopulateTranslationContributionStatsOneOffJob and verifies
         that the output matches the expected output.
+
         Args:
             expected_output: list(str). The expected output from the one off
                 job.
