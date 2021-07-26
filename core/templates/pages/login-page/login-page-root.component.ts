@@ -18,7 +18,6 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -27,8 +26,7 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class LoginPageRootComponent {
   constructor(
-    private pageTitleService: PageTitleService,
-    private metaTagCustomizationService: MetaTagCustomizationService
+    private pageTitleService: PageTitleService
   ) {}
 
   ngOnInit(): void {
