@@ -195,45 +195,6 @@ def add_new_exploration_opportunities(story_id, exp_ids):
     _create_exploration_opportunities(story, topic, exp_ids)
 
 
-def create_exploration_opportunities_for_story(story_id, topic_id):
-    """Creates exploration opportunities corresponding to the supplied published
-    story ID iff the topic linked to the story is published.
-
-    Args:
-        story_id: str. The ID of the story domain object.
-        topic_id: str. The ID of the topic domain object corresponding to the
-            supplied story.
-
-    Raises:
-        Exception. A topic with the given ID doesn't exist.
-        Exception. The topic rights could not be found.
-    """
-    story = story_fetchers.get_story_by_id(story_id)
-    topic = topic_fetchers.get_topic_by_id(topic_id)
-    topic_rights = topic_fetchers.get_topic_rights(topic.id)
-    if topic_rights.topic_is_published:
-        exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-        _create_exploration_opportunities(story, topic, exp_ids_in_story)
-
-
-def create_exploration_opportunities_for_topic(topic_id):
-    """Creates exploration opportunities corresponding to each of the supplied
-    published topic's published stories.
-
-    Args:
-        topic_id: str. The ID of the topic domain object.
-    """
-    topic = topic_fetchers.get_topic_by_id(topic_id)
-    for story_reference in topic.get_all_story_references():
-        if not story_reference.story_is_published:
-            continue
-        story = story_fetchers.get_story_by_id(
-            story_reference.story_id, strict=False)
-        if story is not None:
-            exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
-            _create_exploration_opportunities(story, topic, exp_ids_in_story)
-
-
 def _create_exploration_opportunities(story, topic, exp_ids):
     """Creates new exploration opportunities corresponding to the supplied
     story, topic, and exploration IDs.
@@ -812,7 +773,8 @@ def _get_skill_opportunities_with_updated_question_counts(skill_ids, delta):
 
 def regenerate_opportunities_related_to_topic(
         topic_id, delete_existing_opportunities=False):
-    """Regenerates opportunity models which belongs to a given topic.
+    """Regenerates opportunity models which belongs to a given topic if the
+    corresponding story is published.
 
     Args:
         topic_id: str. The ID of the topic.
@@ -830,7 +792,15 @@ def regenerate_opportunities_related_to_topic(
             exp_opportunity_models)
 
     topic = topic_fetchers.get_topic_by_id(topic_id)
-    story_ids = topic.get_canonical_story_ids()
+    story_id_to_reference = {
+        story_reference.story_id : story_reference
+        for story_reference in topic.get_all_story_references()
+        # Only create opportunities if the corresponding story is published.
+        if story_reference is not None and story_reference.story_is_published
+    }
+    story_ids = story_id_to_reference.keys()
+    # We have to use get_stories_by_ids() so as to not fetch cached stories in
+    # case stories were recently deleted.
     stories = story_fetchers.get_stories_by_ids(story_ids)
     exp_ids = []
     non_existing_story_ids = []
@@ -852,11 +822,10 @@ def regenerate_opportunities_related_to_topic(
                 topic_id, list(non_existing_exp_ids), non_existing_story_ids))
 
     exploration_opportunity_summary_list = []
-    for story in stories:
-        for exp_id in story.story_contents.get_all_linked_exp_ids():
-            exploration_opportunity_summary_list.append(
-                _create_exploration_opportunity_summary(
-                    topic, story, exp_ids_to_exp[exp_id]))
+    for exp_id in exp_ids:
+        exploration_opportunity_summary_list.append(
+            _create_exploration_opportunity_summary(
+                topic, story, exp_ids_to_exp[exp_id]))
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)

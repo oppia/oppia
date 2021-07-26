@@ -62,7 +62,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'
 
-        story_id_1 = 'story1'
+        self.story_id_1 = 'story1'
         story_id_2 = 'story2'
 
         explorations = [self.save_new_valid_exploration(
@@ -125,7 +125,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
-            story_id_1, 'A story', 'description', self.topic_id_1,
+            self.story_id_1, 'A story', 'description', self.topic_id_1,
             'story-one')
         story_2 = story_domain.Story.create_default_story(
             story_id_2, 'A story', 'description', self.topic_id_2,
@@ -134,13 +134,14 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         story_services.save_new_story(self.owner_id, story_1)
         story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
-            self.owner_id, self.topic_id_1, story_id_1)
-        topic_services.publish_story(self.topic_id_1, story_id_1, self.admin_id)
+            self.owner_id, self.topic_id_1, self.story_id_1)
+        topic_services.publish_story(
+            self.topic_id_1, self.story_id_1, self.admin_id)
         topic_services.add_canonical_story(
             self.owner_id, self.topic_id_2, story_id_2)
         topic_services.publish_story(self.topic_id_2, story_id_2, self.admin_id)
         story_services.update_story(
-            self.owner_id, story_id_1, [story_domain.StoryChange({
+            self.owner_id, self.story_id_1, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
                 'title': 'Node1',
@@ -409,6 +410,35 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])
+
+    def test_regeneration_job_creates_models_for_published_stories_only(self):
+        # Pre-validation. Check the existing opportunity models.
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        # Unpublish one of the stories.
+        topic_services.unpublish_story(
+            self.topic_id_1, self.story_id_1, self.admin_id)
+
+        # Run the job.
+        exp_opp_summary_model_regen_job_class = (
+            opportunity_jobs_one_off
+            .ExplorationOpportunitySummaryModelRegenerationJob)
+        job_id = exp_opp_summary_model_regen_job_class.create_new()
+        exp_opp_summary_model_regen_job_class.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        # Assert that only the model with a published story was created.
+        output = exp_opp_summary_model_regen_job_class.get_output(job_id)
+        expected = [['SUCCESS', 1]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+        all_opportunity_models = list(
+            opportunity_models.ExplorationOpportunitySummaryModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 1)
 
 
 class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
