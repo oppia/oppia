@@ -3,12 +3,12 @@ auto_tts_enabled: true
 blurb: ''
 category: Welcome
 correctness_feedback_enabled: false
-proto_size_in_bytes: 0
 init_state_name: Welcome!
 language_code: en
 objective: become familiar with Oppia's capabilities
 param_changes: []
 param_specs: {}
+proto_size_in_bytes: 0
 schema_version: 47
 states:
   END:

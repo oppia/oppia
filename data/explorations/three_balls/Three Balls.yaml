@@ -3,7 +3,6 @@ auto_tts_enabled: true
 blurb: ''
 category: Combinatorics
 correctness_feedback_enabled: false
-proto_size_in_bytes: 0
 init_state_name: Intro
 language_code: en
 objective: learn how to count permutations accurately and systematically
@@ -16,6 +15,7 @@ param_changes:
 param_specs:
   guess:
     obj_type: UnicodeString
+proto_size_in_bytes: 0
 schema_version: 47
 states:
   Continue Option:

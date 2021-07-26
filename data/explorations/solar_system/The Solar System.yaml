@@ -3,12 +3,12 @@ auto_tts_enabled: true
 blurb: ''
 category: Astronomy
 correctness_feedback_enabled: false
-proto_size_in_bytes: 0
 init_state_name: First State
 language_code: en
 objective: Learn about the planets of the solar system
 param_changes: []
 param_specs: {}
+proto_size_in_bytes: 0
 schema_version: 47
 states:
   END:
