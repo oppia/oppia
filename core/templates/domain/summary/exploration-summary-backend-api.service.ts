@@ -26,23 +26,21 @@ import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
 
 export interface ExplorationSummaryBackendDict {
-  'summaries': ExplorationSummaryDict[];
-}
-
-export interface ExplorationSummaryDict {
-  'category': string;
-  'community_owned': boolean;
-  'human_readable_contributors_summary': (
-    HumanReadableContributorSummaryBackendDict);
-  'id': string;
-  'language_code': string;
-  'num_views': number;
-  'objective': string;
-  'status': string;
-  'tags': [];
-  'thumbnail_bg_color': string;
-  'thumbnail_icon_url': string;
-  'title': string;
+  'summaries': [{
+    'category': string,
+    'community_owned': boolean,
+    'human_readable_contributors_summary': (
+      HumanReadableContributorSummaryBackendDict)
+    'id': string,
+    'language_code': string,
+    'num_views': number,
+    'objective': string,
+    'status': string,
+    'tags': [],
+    'thumbnail_bg_color': string,
+    'thumbnail_icon_url': string,
+    'title': string
+  }]
 }
 
 interface HumanReadableContributorSummaryBackendDict {
