@@ -58,6 +58,7 @@ export class ExplorationFooterComponent {
     // does not exist and the URL does not contain a valid explorationId.
     // Try-catch is for catching the error thrown from context-service so
     // that the component behaves properly at both the places.
+    // TODO(#13494): Implement a different footer for practice-session-page.
     try {
       this.explorationId = this.contextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
