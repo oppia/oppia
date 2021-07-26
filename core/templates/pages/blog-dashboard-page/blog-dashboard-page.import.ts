@@ -41,4 +41,5 @@ require(
   'blog-dashboard-page.component.ts'
 );
 require(
-  'pages/blog-dashboard-page/navbar/' + 'blog-dashboard-navbar.component.ts');
+  'pages/blog-dashboard-page/navbar/' +
+  'blog-dashboard-navbar-breadcrumb.component.ts');

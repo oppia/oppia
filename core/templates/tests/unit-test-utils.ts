@@ -29,6 +29,12 @@ export class MockTranslatePipe {
   }
 }
 
+export class MockCapitalizePipe {
+  transform(input: string): string {
+    return input;
+  }
+}
+
 @Directive({
   selector: '[translate],[ngx-translate]'
 })

@@ -37,10 +37,10 @@ export class BlogDashboardPageComponent implements OnInit {
   activeTab: string;
   directiveSubscriptions = new Subscription();
   constructor(
+    private alertsService: AlertsService,
     private blogDashboardBackendService: BlogDashboardBackendApiService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
-    private alertsService: AlertsService,
     private blogDashboardPageService: BlogDashboardPageService,
   ) {}
 
@@ -91,4 +91,4 @@ export class BlogDashboardPageComponent implements OnInit {
 angular.module('oppia').directive('oppiaBlogDashboardPage',
   downgradeComponent({
     component: BlogDashboardPageComponent
-  }));
+  }) as angular.IDirectiveFactory);

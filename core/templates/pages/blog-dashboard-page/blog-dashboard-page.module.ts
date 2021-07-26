@@ -30,7 +30,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { BlogDashboardTileComponent } from './blog-dashboard-tile/blog-dashboard-tile.component';
-import { BlogDashboardNavbar } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar.component';
+import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
 
@@ -46,7 +46,7 @@ declare var angular: ng.IAngularStatic;
   ],
   declarations: [
     OppiaAngularRootComponent,
-    BlogDashboardNavbar,
+    BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
@@ -54,7 +54,7 @@ declare var angular: ng.IAngularStatic;
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    BlogDashboardNavbar,
+    BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,

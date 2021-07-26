@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,19 +20,13 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
 import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { MatTabsModule } from '@angular/material/tabs';
-
-class MockCapitalizePipe {
-  transform(input: string): string {
-    return input;
-  }
-}
 
 describe('Blog Dashboard Page Component', () => {
   let component: BlogDashboardPageComponent;

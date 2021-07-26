@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,16 +20,10 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
 import { BlogCardComponent } from './blog-card.component';
 import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-class MockCapitalizePipe {
-  transform(input: string): string {
-    return input;
-  }
-}
 
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogCardComponent;
@@ -44,7 +38,7 @@ describe('Blog Dashboard Tile Component', () => {
       ],
       declarations: [
         BlogCardComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
       ],
       providers: [
         {
@@ -70,8 +64,8 @@ describe('Blog Dashboard Tile Component', () => {
       tags: ['news'],
       thumbnail_filename: 'image.png',
       url_fragment: 'title',
-      last_updated: 1416563100000,
-      published_on: 1416563100000,
+      last_updated: '11/21/2014',
+      published_on: '11/21/2014',
     };
   });
 
@@ -82,16 +76,16 @@ describe('Blog Dashboard Tile Component', () => {
   it('should get formatted date string from the timestamp in milliseconds',
     () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      let NOW_MILLIS = 1416563100000;
-      expect(component.getDateStringInWords(NOW_MILLIS))
+      let DATE = '11/21/2014';
+      expect(component.getDateStringInWords(DATE))
         .toBe('November 21, 2014');
 
-      NOW_MILLIS = 1800063100000;
-      expect(component.getDateStringInWords(NOW_MILLIS))
+      DATE = '01/16/2027';
+      expect(component.getDateStringInWords(DATE))
         .toBe('January 16, 2027');
 
-      NOW_MILLIS = 1517563100000;
-      expect(component.getDateStringInWords(NOW_MILLIS))
+      DATE = '02/02/2018';
+      expect(component.getDateStringInWords(DATE))
         .toBe('February 2, 2018');
     });
 
