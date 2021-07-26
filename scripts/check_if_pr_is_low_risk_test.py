@@ -14,8 +14,8 @@
 
 """Unit tests for scripts/check_if_pr_is_low_risk.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.tests import test_utils
 import python_utils
@@ -27,9 +27,9 @@ from scripts import common
 # because we need to inherit from StringIO, so we need the StringIO
 # class. python_utils.string_io returns a StringIO object.
 try:
-    from StringIO import StringIO  # pylint: disable=import-only-modules
+    from StringIO import StringIO
 except ImportError:
-    from io import StringIO  # pylint: disable=import-only-modules
+    from io import StringIO
 
 
 class MockResponse(StringIO):

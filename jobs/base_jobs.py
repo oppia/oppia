@@ -54,8 +54,8 @@ Oppia, we use DataflowRunner() to have our Pipelines run on the Google Cloud
 Dataflow service: https://cloud.google.com/dataflow.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from jobs.io import stub_io
 import python_utils

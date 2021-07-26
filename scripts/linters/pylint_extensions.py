@@ -18,8 +18,8 @@
 presubmit checks. Next message id would be C0039.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import linecache
 import os
@@ -1862,7 +1862,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                 line = line.lstrip()
                 # Ignore line that is enabling this check.
                 # Example:
-                # # pylint: disable=import-only-modules, single-line-pragma
+                #, single-line-pragma
                 # def func(a, b):
                 # # pylint: enable=import-only-modules, single-line-pragma
                 # Now if do not ignore the line with 'enable' statement
