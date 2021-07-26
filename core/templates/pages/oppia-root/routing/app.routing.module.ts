@@ -22,6 +22,7 @@ import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
 import { CanAccessClassroomPageGuard } from './guards/can-access-classroom-page.guard';
 import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
+import { CanManageOwnAccountGuard } from './guards/can-manage-own-account.guard';
 
 
 // All paths should be defined in constants.ts file.
@@ -33,12 +34,18 @@ const routes: Route[] = [
       .then(m => m.AboutPageModule)
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     canLoad: [CanAccessClassroomPageGuard],
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
       .then(m => m.ClassroomPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE,
+    pathMatch: 'full',
+    canLoad: [CanManageOwnAccountGuard],
+    loadChildren: () => import('pages/preferences-page/preferences-page.module')
+      .then(m => m.PreferencesPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,

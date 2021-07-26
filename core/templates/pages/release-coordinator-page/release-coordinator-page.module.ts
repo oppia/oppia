@@ -46,7 +46,23 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
+import { ToastrModule } from 'ngx-toastr';
 
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
@@ -69,6 +85,7 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     BeamJobsTabComponent,

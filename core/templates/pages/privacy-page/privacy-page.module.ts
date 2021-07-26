@@ -27,13 +27,32 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { PrivacyPageComponent } from './privacy-page.component';
 import { PrivacyPageRootComponent } from './privacy-page-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
+
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     PrivacyPageRootComponent,

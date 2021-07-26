@@ -28,6 +28,23 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ThanksPageRootComponent } from './thanks-page-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
@@ -35,6 +52,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     ThanksPageComponent,

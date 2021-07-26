@@ -221,6 +221,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATORS_PREFIX,
         access_validators.SplashPageAccessValidationHandler),
 
+    get_redirect_route(
+        r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ManageOwnAccountValidationHandler),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -480,7 +484,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -917,7 +920,7 @@ if constants.DEV_MODE:
 
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-    if not 'NOT_REGISTERED_WITH_BACKEND' in page:
+    if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
         URLS.append(
             get_redirect_route(
                 r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))

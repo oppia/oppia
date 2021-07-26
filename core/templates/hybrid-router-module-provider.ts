@@ -17,7 +17,7 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, Injectable, Input, ModuleWithProviders, NgModule } from '@angular/core';
+import { Directive, Input, ModuleWithProviders, NgModule } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -32,14 +32,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class MockRouterLink {
   @Input() routerLink!: string;
-}
-
-
-class MockRouter {
-  windowRef = new WindowRef();
-  navigateByUrl(url: string): void {
-    this.windowRef.nativeWindow.location.href = url;
-  }
 }
 
 @NgModule({
@@ -69,12 +61,6 @@ export class HybridRouterModuleProvider {
 
     return {
       ngModule: MockRouterModule,
-      providers: [
-        {
-          provide: Router,
-          useClass: MockRouter
-        }
-      ]
     };
   }
 }

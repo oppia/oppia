@@ -124,8 +124,6 @@ module.exports = {
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.import.ts',
-    preferences:
-      commonPrefix + '/pages/preferences-page/preferences-page.import.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.import.ts',
     release_coordinator: commonPrefix + (
       '/pages/release-coordinator-page/release-coordinator-page.import.ts'),
@@ -536,18 +534,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['preferences'],
-      filename: 'preferences-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Change your Oppia profile settings and preferences'
-      },
-      template:
-        commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

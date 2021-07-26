@@ -31,14 +31,32 @@ import { OppiaRootComponent } from './oppia-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CookieModule } from 'ngx-cookie';
+import { ToastrModule } from 'ngx-toastr';
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
+    AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
     CookieModule.forRoot(),
     HttpClientModule,
-    AppRoutingModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     OppiaRootComponent,

@@ -29,13 +29,31 @@ import { StoryViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-actio
 import { StoryViewerPageComponent } from './story-viewer-page.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
+import { ToastrModule } from 'ngx-toastr';
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     StoryViewerNavbarBreadcrumbComponent,

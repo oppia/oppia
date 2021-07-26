@@ -177,7 +177,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PracticeSessionsPageDataHandler',
     'PreferenceHandler',
     'PreferencesHandler',
-    'PreferencesPage',
     'PretestHandler',
     'ProfileHandler',
     'ProfilePage',

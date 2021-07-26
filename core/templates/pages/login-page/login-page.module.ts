@@ -33,6 +33,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { LoginPageRootComponent } from './login-page-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -64,6 +65,23 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   }
 }
 
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -76,6 +94,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
     MatFormFieldModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     LoginPageComponent,

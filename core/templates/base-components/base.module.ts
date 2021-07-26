@@ -67,22 +67,6 @@ export class MyHammerConfig extends HammerGestureConfig {
   };
 }
 
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
-
 @NgModule({
   imports: [
     CommonModule,
@@ -93,7 +77,7 @@ const toastrConfig = {
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),
     SharedPipesModule,
-    ToastrModule.forRoot(toastrConfig),
+    ToastrModule
   ],
 
   providers: [

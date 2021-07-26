@@ -26,6 +26,25 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LogoutPageRootComponent } from './logout-page-root.component';
+import { ToastrModule } from 'ngx-toastr';
+
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
+
 
 @NgModule({
   imports: [
@@ -33,6 +52,7 @@ import { LogoutPageRootComponent } from './logout-page-root.component';
     BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     LogoutPageComponent,

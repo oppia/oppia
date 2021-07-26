@@ -18,6 +18,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { boolean } from 'mathjs';
 
 export interface SplashPageValidatorResponse {
   valid: boolean;
@@ -29,12 +30,17 @@ interface ClassroomPageValidatorResponse {
   'redirect_url': string;
 }
 
+interface ValidatorResponse {
+  valid: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AccessValidationBackendApiService {
   SPLASH_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_splash_page';
   CLASSROOM_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_classroom_page';
+  CAN_MANAGE_OWN_ACCOUNT_VALIDATOR = '/acl_validator/can_manage_own_account';
 
   constructor(private http: HttpClient) {}
 
@@ -52,5 +58,10 @@ export class AccessValidationBackendApiService {
           classroom_url_fragment: classroomUrlFragment
         }
       }).toPromise();
+  }
+
+  validateCanManageOwnAccount(): Promise<ValidatorResponse> {
+    return this.http.get<ValidatorResponse>(
+      this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();
   }
 }

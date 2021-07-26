@@ -104,15 +104,6 @@ class ProfileHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class PreferencesPage(base.BaseHandler):
-    """The preferences page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('preferences-page.mainpage.html')
-
-
 class BulkEmailWebhookEndpoint(base.BaseHandler):
     """The endpoint for the webhook that is triggered when a user
     subscribes/unsubscribes to the bulk email service provider externally.

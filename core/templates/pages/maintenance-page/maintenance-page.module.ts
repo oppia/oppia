@@ -29,6 +29,25 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
+import { ToastrModule } from 'ngx-toastr';
+
+
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
+
 
 @NgModule({
   imports: [
@@ -38,7 +57,8 @@ import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider'
     // TODO(#13443): Remove hybrid router module provider once all pages are
     // migrated to angular router.
     HybridRouterModuleProvider.provide(),
-    SharedComponentsModule
+    SharedComponentsModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     MaintenancePageComponent

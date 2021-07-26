@@ -121,7 +121,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private deviceInfoService: DeviceInfoService,
     private windowDimensionsService: WindowDimensionsService,
-    private router: Router,
     private searchService: SearchService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
@@ -337,7 +336,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   navigateToClassroomPage(classroomUrl: string): void {
     this.siteAnalyticsService.registerClassroomHeaderClickEvent();
     setTimeout(() => {
-      this.router.navigateByUrl(classroomUrl);
+      this.windowRef.nativeWindow.location.href = classroomUrl;
     }, 150);
   }
 

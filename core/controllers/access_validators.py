@@ -72,3 +72,17 @@ class ClassroomPageAccessValidationHandler(base.BaseHandler):
             return
 
         self.render_json({ 'valid': True, 'redirect_url': None })
+
+class ManageOwnAccountValidationHandler(base.BaseHandler):
+    """Validates access to preferences page.
+    """
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        # type: () -> None
+        self.render_json({ 'valid': True })
