@@ -26,6 +26,36 @@ import python_utils
 import utils
 
 
+class BlogDashboardPageTests(test_utils.GenericTestBase):
+    """Checks the access to the blog dashboard page and its rendering."""
+
+    def test_blog_dashboard_page_access_without_logging_in(self):
+        """Tests access to the Blog Dashboard page."""
+        self.get_html_response('/blog-dashboard', expected_status_int=302)
+
+    def test_blog_dashboard_page_access_without_having_rights(self):
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response('/blog-dashboard', expected_status_int=401)
+        self.logout()
+
+    def test_blog_dashboard_page_access_as_blog_admin(self):
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.set_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.login(self.BLOG_ADMIN_EMAIL)
+        self.get_html_response('/blog-dashboard', expected_status_int=200)
+        self.logout()
+
+    def test_blog_dashboard_page_access_as_blog_post_editor(self):
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.set_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login(self.BLOG_EDITOR_EMAIL)
+        self.get_html_response('/blog-dashboard', expected_status_int=200)
+        self.logout()
+
+
 class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
     username = 'user'
@@ -56,8 +86,8 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
             )
         self.assertEqual(self.BLOG_EDITOR_USERNAME, json_response['username'])
-        self.assertIsNone(json_response['published_blog_post_summary_dicts'])
-        self.assertIsNone(json_response['draft_blog_post_summary_dicts'])
+        self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
+        self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
         self.logout()
 
         # Checks blog admin can access blog dashboard.
@@ -66,8 +96,8 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
             )
         self.assertEqual(self.BLOG_ADMIN_USERNAME, json_response['username'])
-        self.assertIsNone(json_response['published_blog_post_summary_dicts'])
-        self.assertIsNone(json_response['draft_blog_post_summary_dicts'])
+        self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
+        self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
         self.logout()
 
         # Checks non blog-admins and non-editors can not access blog dashboard.
@@ -103,7 +133,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             change_dict['title'],
             json_response['published_blog_post_summary_dicts'][0]['title'])
-        self.assertIsNone(json_response['draft_blog_post_summary_dicts'])
+        self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
 
     def test_create_new_blog_post(self):
         # Checks blog editor can create a new blog post.
