@@ -639,7 +639,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             '/community-library', expected_status_int=503)
 
         self.assertIn('<oppia-maintenance-page>', response.body)
-        self.assertNotIn('<oppia-library-page-root>', response.body)
+        self.assertNotIn('<library-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -649,7 +649,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<oppia-library-page-root>', response.body)
+        self.assertIn('<library-page>', response.body)
         self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -662,7 +662,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<oppia-library-page-root>', response.body)
+        self.assertIn('<library-page>', response.body)
         self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
