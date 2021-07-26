@@ -33,6 +33,7 @@ from core.storage.classifier import gae_models as classifier_models
 from core.storage.collection import gae_models as collection_models
 from core.storage.config import gae_models as config_models
 from core.storage.exploration import gae_models as exp_models
+from core.storage.subtopic import gae_models as subtopic_models
 from core.storage.user import gae_models as user_models
 
 __all__ = [
@@ -47,6 +48,7 @@ __all__ = [
     b'config_models',
     b'datastore_services',
     b'exp_models',
+    b'subtopic_models',
     b'transaction_services',
     b'user_models'
 ]
