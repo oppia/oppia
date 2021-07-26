@@ -113,7 +113,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
         super(CloudStorageEmulatorUnitTests, self).tearDown()
         self.emulator.reset()
 
-    def test_get_blob_retrives_correct_blob_from_redis(self):
+    def test_get_blob_retrieves_correct_blob_from_redis(self):
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/file/path.png', mapping=self.blob1.to_dict())
 

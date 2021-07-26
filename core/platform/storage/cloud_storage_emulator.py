@@ -42,8 +42,9 @@ class EmulatorBlob(python_utils.OBJECT):
         Args:
             name: str. The name of the blob.
             data: str|bytes. The data of the blob. If the data are string,
-                they are encoded to bytes.
-            content_type: optional(str). The content type of the blob, it should
+                they are encoded to bytes. Note that data is always retrieved
+                from Cloud Storage as bytes.
+            content_type: str|None. The content type of the blob. It should
                 be in the MIME format.
         """
         self._name = name

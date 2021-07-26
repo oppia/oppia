@@ -148,7 +148,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.get_bucket_swap = self.swap(
             cloud_storage_services,
             '_get_bucket',
-            lambda bucket_name: self.client.get_bucket(bucket_name)
+            self.client.get_bucket
         )
 
     def test_isfile_when_file_exists_returns_true(self):
