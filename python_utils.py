@@ -84,14 +84,14 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         SimpleXMLRPCServer. The SimpleXMLRPCServer object.
     """
     try:
-        from xmlrpc.server import SimpleXMLRPCServer as impl
+        from xmlrpc.server import SimpleXMLRPCServer as impl # pylint: disable=import-only-modules
     except ImportError:
-        from SimpleXMLRPCServer import SimpleXMLRPCServer as impl
+        from SimpleXMLRPCServer import SimpleXMLRPCServer as impl # pylint: disable=import-only-modules
     if requestHandler is None:
         try:
-            from xmlrpc.server import SimpleXMLRPCRequestHandler
+            from xmlrpc.server import SimpleXMLRPCRequestHandler # pylint: disable=import-only-modules
         except ImportError:
-            from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+            from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler # pylint: disable=import-only-modules
         requestHandler = SimpleXMLRPCRequestHandler
     return impl(
         addr, requestHandler=requestHandler, logRequests=logRequests,
@@ -112,9 +112,9 @@ def redirect_stdout(new_target):
         redirect_stdout object.
     """
     try:
-        from contextlib import redirect_stdout as impl
+        from contextlib import redirect_stdout as impl # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import redirect_stdout as impl
+        from contextlib2 import redirect_stdout as impl # pylint: disable=import-only-modules
     return impl(new_target)
 
 
@@ -130,9 +130,9 @@ def nullcontext(enter_result=None):
         object.
     """
     try:
-        from contextlib import nullcontext as impl
+        from contextlib import nullcontext as impl # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import nullcontext as impl
+        from contextlib2 import nullcontext as impl # pylint: disable=import-only-modules
     return impl(enter_result=enter_result)
 
 
@@ -144,9 +144,9 @@ def ExitStack(): # pylint: disable=invalid-name
         contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
     """
     try:
-        from contextlib import ExitStack as impl
+        from contextlib import ExitStack as impl # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import ExitStack as impl
+        from contextlib2 import ExitStack as impl # pylint: disable=import-only-modules
     return impl()
 
 
@@ -162,9 +162,9 @@ def string_io(buffer_value=b''):
         StringIO.StringIO or io.StringIO. The StringIO object.
     """
     try:
-        from StringIO import StringIO
+        from StringIO import StringIO  # pylint: disable=import-only-modules
     except ImportError:
-        from io import StringIO
+        from io import StringIO  # pylint: disable=import-only-modules
     return StringIO(buffer_value) # pylint: disable=disallowed-function-calls
 
 
@@ -601,7 +601,7 @@ def create_enum(*sequential):
     """
     enum_values = dict(ZIP(sequential, sequential))
     try:
-        from enum import Enum
+        from enum import Enum # pylint: disable=import-only-modules
         # The type() of argument 1 in Enum must be str, not unicode.
         return Enum(str('Enum'), enum_values) # pylint: disable=disallowed-function-calls
     except ImportError:
