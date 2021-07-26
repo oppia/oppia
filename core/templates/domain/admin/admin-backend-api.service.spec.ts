@@ -30,9 +30,9 @@ import { Schema } from 'services/schema-default-value.service';
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
   let adminBackendResponse = {
     role_to_actions: {
       guest: ['action for guest']
@@ -52,7 +52,11 @@ describe('Admin backend api service', () => {
         topic_model_last_updated: 1591196558882.2,
         language_code: 'en',
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#C6DCDA'
+        thumbnail_bg_color: '#C6DCDA',
+        total_published_node_count: 0,
+        can_edit_topic: true,
+        is_published: false,
+        url_fragment: ''
       }
     ],
     updatable_roles: {
@@ -158,7 +162,7 @@ describe('Admin backend api service', () => {
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
-        CreatorTopicSummary.createFromBackendDict),
+        dict => CreatorTopicSummary.createFromBackendDict(dict)),
       featureFlags: adminBackendResponse.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict)
       )
@@ -209,7 +213,7 @@ describe('Admin backend api service', () => {
   it('should get the data of user given the username' +
     'when calling viewUsersRoleAsync', fakeAsync(() => {
     let filterCriterion = 'username';
-    let role = null;
+    let role = 'admin';
     let username = 'validUser';
     let result = {
       validUser: 'ADMIN'
@@ -219,7 +223,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=null&username=validUser');
+      '?filter_criterion=username&role=admin&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -236,7 +240,7 @@ describe('Admin backend api service', () => {
     'when calling viewUsersRoleAsync', fakeAsync(() => {
     let filterCriterion = 'role';
     let role = 'ADMIN';
-    let username = null;
+    let username = 'validUser';
     let result = {
       validUser: 'ADMIN'
     };
@@ -245,7 +249,7 @@ describe('Admin backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=role&role=ADMIN&username=null');
+      '?filter_criterion=role&role=ADMIN&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -261,14 +265,14 @@ describe('Admin backend api service', () => {
   it('should fail to get the data of user when user does' +
     'not exists when calling viewUsersRoleAsync', fakeAsync(() => {
     let filterCriterion = 'username';
-    let role = null;
+    let role = 'admin';
     let username = 'InvalidUser';
     abas.viewUsersRoleAsync(filterCriterion, role, username)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=null&username=InvalidUser');
+      '?filter_criterion=username&role=admin&username=InvalidUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush({
@@ -286,7 +290,7 @@ describe('Admin backend api service', () => {
 
   it('should update the role of the user given the name' +
     'when calling updateUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
+    let topicId = '12345';
     let newRole = 'ADMIN';
     let username = 'validUser';
     let payload = {
@@ -312,7 +316,7 @@ describe('Admin backend api service', () => {
 
   it('should fail to update the role of user when user does' +
     'not exists when calling updateUserRoleAsync', fakeAsync(() => {
-    let topicId = null;
+    let topicId = '12345';
     let newRole = 'ADMIN';
     let username = 'InvalidUser';
     let payload = {

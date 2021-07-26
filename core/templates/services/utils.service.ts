@@ -42,7 +42,7 @@ export class UtilsService {
    * @param {Object} obj - the object to be checked.
    * @return {boolean} - true if object is empty, false otherwise.
    */
-  isEmpty(obj: Object): boolean {
+  isEmpty(obj: Object | undefined | null): boolean {
     for (var property in obj) {
       if (obj.hasOwnProperty(property)) {
         return false;
@@ -58,7 +58,7 @@ export class UtilsService {
    * @param {Object} input - the object to be checked.
    * @return {boolean} - true if input is string, false otherwise.
    */
-  isString(input: Object): boolean {
+  isString(input: Object | undefined | null): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
 
@@ -70,7 +70,7 @@ export class UtilsService {
    * @param {Object} b - the second object to be compared.
    * @return {boolean} - true if a is equivalent to b, false otherwise.
    */
-  isEquivalent(a: Object, b: Object): boolean {
+  isEquivalent(a: Object | null, b: Object | null): boolean {
     if (a === null || b === null) {
       return a === b;
     }
@@ -111,7 +111,7 @@ export class UtilsService {
    * @param {Object} value - the object to be checked.
    * @return {boolean} - true if value is an Error object, false otherwise.
    */
-  isError(value: Object): boolean {
+  isError(value: Object | undefined | null): boolean {
     switch (Object.prototype.toString.call(value)) {
       case '[object Error]': return true;
       case '[object DOMException]': return true;
@@ -119,7 +119,7 @@ export class UtilsService {
     }
   }
 
-  isOverflowing(element: HTMLElement): boolean {
+  isOverflowing(element: HTMLElement | null): boolean {
     if (!element) {
       return false;
     } else {
