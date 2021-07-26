@@ -32,7 +32,6 @@ from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_services
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -1029,6 +1028,8 @@ class PopulateContributionStatsOneOffJobTests(
     REVIEWER_1_EMAIL = 'reviewer1@community.org'
     REVIEWER_2_EMAIL = 'reviewer2@community.org'
     COMMIT_MESSAGE = 'commit message'
+
+
 class PopulateTranslationContributionStatsOneOffJobTests(
         test_utils.GenericTestBase):
 

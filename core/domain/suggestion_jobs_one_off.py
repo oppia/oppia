@@ -24,8 +24,8 @@ import datetime
 
 from constants import constants
 from core import jobs
-from core.domain import html_validation_service
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import suggestion_services
 from core.platform import models
@@ -367,8 +367,10 @@ class PopulateTranslationContributionStatsOneOffJob(
     def map(item):
         """Implements the map function (generator). Computes word counts of
         translations suggestions and outputs suggestion metadata.
+
         Args:
             item: GeneralSuggestionModel. An instance of GeneralSuggestionModel.
+
         Yields:
             tuple(key, recent_activity_commits). Where:
                 key: str. The entity ID of the corresponding
@@ -418,6 +420,7 @@ class PopulateTranslationContributionStatsOneOffJob(
     def reduce(key, stringified_values):
         """Updates the TranslationContributionStatsModel for the given key
         and stringified_values.
+
         Args:
             key: str. Entity ID for a TranslationContributionStatsModel.
             stringified_values: list(dict(str, str)). A list of stringified
@@ -429,6 +432,7 @@ class PopulateTranslationContributionStatsOneOffJob(
                         suggestion content HTML.
                     last_updated_date: date. The last updated date of the
                         translation suggestion.
+
         Yields:
             tuple(key, count). Where:
                 key: str. TranslationContributionStatsModel entity ID.

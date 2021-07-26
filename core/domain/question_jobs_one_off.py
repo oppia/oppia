@@ -198,6 +198,8 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         if key.startswith('SUCCESS'):
             yield (key, len(values))
+
+
 class FixQuestionImagesStorageOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to ensure that all question related images are present
     in the correct storage path.

@@ -462,6 +462,7 @@ class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
             [[u'question_deleted', [u'Encountered 1 deleted questions.']]],
             [ast.literal_eval(x) for x in output])
 
+
 class QuestionSnapshotsMigrationJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'

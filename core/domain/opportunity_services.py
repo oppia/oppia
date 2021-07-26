@@ -832,7 +832,7 @@ def regenerate_opportunities_related_to_topic(
 
     topic = topic_fetchers.get_topic_by_id(topic_id)
     story_id_to_reference = {
-        story_reference.story_id : story_reference
+        story_reference.story_id: story_reference
         for story_reference in topic.get_all_story_references()
         # Only create opportunities if the corresponding story is published.
         if story_reference is not None and story_reference.story_is_published
@@ -861,10 +861,11 @@ def regenerate_opportunities_related_to_topic(
                 topic_id, list(non_existing_exp_ids), non_existing_story_ids))
 
     exploration_opportunity_summary_list = []
-    for exp_id in exp_ids:
-        exploration_opportunity_summary_list.append(
-            _create_exploration_opportunity_summary(
-                topic, story, exp_ids_to_exp[exp_id]))
+    for story in stories:
+        for exp_id in story.story_contents.get_all_linked_exp_ids():
+            exploration_opportunity_summary_list.append(
+                _create_exploration_opportunity_summary(
+                    topic, story, exp_ids_to_exp[exp_id]))
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
