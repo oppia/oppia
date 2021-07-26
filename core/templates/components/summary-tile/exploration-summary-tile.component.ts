@@ -76,6 +76,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   userIsLoggedIn: boolean = false;
   isRefresherExploration: boolean = false;
   contributors!: object;
+  // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
+  // received after component interactions is empty or does not exist.
   lastUpdatedDateTime: string | null = '';
   // 'avgRating' will be undefined if the exploration has no ratings.
   avgRating!: number | undefined;
