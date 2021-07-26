@@ -329,10 +329,12 @@ class CollectionModel(base_models.VersionedModel):
         if not force_deletion:
             commit_log_models = []
             collection_rights_models = CollectionRightsModel.get_multi(
-                entity_ids, include_deleted=True) # type: List[CollectionRightsModel] # type: ignore[assignment]
-            versioned_models = cls.get_multi(entity_ids, include_deleted=True) # type: List[CollectionModel] # type: ignore[assignment]
+                entity_ids, include_deleted=True)
+            versioned_models = cls.get_multi(entity_ids, include_deleted=True)
             for model, rights_model in python_utils.ZIP(
                     versioned_models, collection_rights_models):
+                assert model is not None
+                assert rights_model is not None
                 collection_commit_log = CollectionCommitLogEntryModel.create(
                     model.id, model.version, committer_id,
                     cls._COMMIT_TYPE_DELETE,
@@ -620,7 +622,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version)) # type: CollectionRightsSnapshotMetadataModel # type: ignore[assignment]
+            self.get_snapshot_id(self.id, self.version))
+        assert snapshot_metadata_model is not None
 
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |

@@ -825,7 +825,8 @@ class VersionedModel(BaseModel):
         Returns:
             VersionedModel. Reconstituted instance.
         """
-        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id) # type: BaseSnapshotContentModel # type: ignore[assignment]
+        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
+        assert snapshot_model is not None
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be

@@ -580,7 +580,8 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
         model1.update_timestamps()
         model1.put()
 
-        test_model = TestCommitLogEntryModel.get_commit('id', 1) # type: TestCommitLogEntryModel # type: ignore[assignment]
+        test_model = TestCommitLogEntryModel.get_commit('id', 1)
+        assert test_model is not None
         self.assertEqual(test_model.version, 1)
         self.assertEqual(test_model.user_id, 'user')
         self.assertEqual(test_model.commit_type, 'create')
@@ -775,11 +776,12 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
-        version_model = TestVersionedModel.get_version('model_id1', 2) # type: TestVersionedModel # type: ignore[assignment]
+        version_model = TestVersionedModel.get_version('model_id1', 2)
+        assert version_model is not None
         self.assertEqual(version_model.version, 2)
 
         version_model = (
-            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False)) # type: ignore[assignment]
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -789,7 +791,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
 
         version_model = (
-            TestVersionedModel.get_version('model_id1', 4, strict=False)) # type: ignore[assignment]
+            TestVersionedModel.get_version('model_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]

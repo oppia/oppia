@@ -306,7 +306,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def get_models(cls, exp_id, exp_version, state_names):
-        # type: (Text, int, List[Text]) -> List[Optional[ClassifierTrainingJobModel]]
+        # type: (Text, int, List[Text]) -> List[Optional[StateTrainingJobsMappingModel]]
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
@@ -325,12 +325,12 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         for state_name in state_names:
             mapping_id = cls._generate_id(exp_id, exp_version, state_name)
             mapping_ids.append(mapping_id)
-        mapping_instances = cls.get_multi(mapping_ids) # type: List[Optional[ClassifierTrainingJobModel]] # type: ignore[assignment]
+        mapping_instances = cls.get_multi(mapping_ids)
         return mapping_instances
 
     @classmethod
     def get_model(cls, exp_id, exp_version, state_name):
-        # type: (Text, int, Text) -> Optional[ClassifierTrainingJobModel]
+        # type: (Text, int, Text) -> Optional[StateTrainingJobsMappingModel]
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -347,7 +347,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             entry for given <exp_id, exp_version, state_name> is found.
         """
         mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-        model = cls.get_by_id(mapping_id) # type: Optional[ClassifierTrainingJobModel] # type: ignore[assignment]
+        model = cls.get_by_id(mapping_id)
         return model
 
     @classmethod

@@ -134,7 +134,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 None))
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
-            report_id) # type: app_feedback_report_models.AppFeedbackReportModel # type: ignore[assignment]
+            report_id)
+        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
@@ -156,7 +157,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 self.AUDIO_LANGUAGE_CODE_ENGLISH, None, self.WEB_REPORT_INFO))
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
-            report_id) # type: app_feedback_report_models.AppFeedbackReportModel # type: ignore[assignment]
+            report_id)
+        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_WEB)
         self.assertEqual(
@@ -234,7 +236,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             self.PLATFORM_ANDROID,
             int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
             'randomInteger123')
-        model_entity = model_class.get(report_id) # type: app_feedback_report_models.AppFeedbackReportModel # type: ignore[assignment]
+        model_entity = model_class.get(report_id)
+        assert model_entity is not None
         model_entity.scrubbed_by = 'scrubber_user'
         model_entity.update_timestamps()
         model_entity.put()
@@ -277,8 +280,9 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                 report_ids=self.REPORT_IDS))
 
         ticket_model = (
-            app_feedback_report_models.AppFeedbackReportTicketModel.get( # type: ignore[assignment]
-                ticket_id)) # type: app_feedback_report_models.AppFeedbackReportTicketModel
+            app_feedback_report_models.AppFeedbackReportTicketModel.get(
+                ticket_id))
+        assert ticket_model is not None
 
         self.assertEqual(ticket_model.id, ticket_id)
         self.assertEqual(
@@ -315,7 +319,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
 
     def test_get_lowest_supported_role(self):
         # type: () -> None
-        model = app_feedback_report_models.AppFeedbackReportTicketModel # type: app_feedback_report_models.AppFeedbackReportModel # type: ignore[assignment]
+        model = app_feedback_report_models.AppFeedbackReportTicketModel
         self.assertEqual(
             model.get_lowest_supported_role(), feconf.ROLE_ID_MODERATOR)
 
@@ -348,8 +352,9 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
                 daily_param_stats=self.DAILY_STATS))
 
         stats_model = (
-            app_feedback_report_models.AppFeedbackReportStatsModel.get( # type: ignore[assignment]
-                entity_id)) # type: app_feedback_report_models.AppFeedbackReportStatsModel
+            app_feedback_report_models.AppFeedbackReportStatsModel.get(
+                entity_id))
+        assert stats_model is not None
 
         self.assertEqual(stats_model.id, '%s:%s:%s' % (
             'android', self.TICKET_ID, self.STATS_DATE.isoformat()))
