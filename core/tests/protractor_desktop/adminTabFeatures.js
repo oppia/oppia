@@ -32,27 +32,24 @@ describe('Admin Page', function() {
     await users.createUser('moderator2@adminTab.com', 'moderator2');
     await users.createUser(
       'collectionEdtior1@adminTab.com', 'collectionEditor1');
-    await users.createUser(
-      'newQuestionReviewer@adminTab.com', 'newQuestionReviewer');
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginSuperAdminUser(
       'management@adminTab.com', 'management');
-    await adminPage.get();
-    await adminPage.updateRole('moderator1', 'moderator');
-    await adminPage.viewRolesByUsername('moderator1', true);
-    await adminPage.expectUsernamesToMatch(['moderator1']);
 
-    await adminPage.get();
-    await adminPage.updateRole('moderator2', 'moderator');
-    await adminPage.viewRolesByUsername('moderator2', true);
-    await adminPage.expectUsernamesToMatch(['moderator2']);
+    await adminPage.expectUserRolesToMatch('moderator1', ['full user']);
+    await adminPage.addRole('moderator1', 'moderator');
+    await adminPage.expectUserRolesToMatch(
+      'moderator1', ['full user', 'moderator']);
 
-    await adminPage.getUsersAsssignedToRole('moderator');
-    await adminPage.expectUsernamesToMatch(['moderator1', 'moderator2']);
+    await adminPage.expectUserRolesToMatch('moderator2', ['full user']);
+    await adminPage.addRole('moderator2', 'moderator');
+    await adminPage.expectUserRolesToMatch(
+      'moderator2', ['full user', 'moderator']);
 
-    await adminPage.get();
-    await adminPage.updateRole('collectionEditor1', 'collection editor');
-    await adminPage.getUsersAsssignedToRole('collection editor');
-    await adminPage.expectUsernamesToMatch(['collectionEditor1']);
+    await adminPage.expectUserRolesToMatch(
+      'collectionEditor1', ['full user']);
+    await adminPage.addRole('collectionEditor1', 'collection editor');
+    await adminPage.expectUserRolesToMatch(
+      'collectionEditor1', ['full user', 'collection editor']);
 
     await users.logout();
   });

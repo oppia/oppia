@@ -532,10 +532,11 @@ class UserInfoHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
             self.render_json({
-                'role': self.role,
+                'roles': self.roles,
                 'is_moderator': (
-                    user_services.is_at_least_moderator(self.user_id)),
-                'is_admin': user_services.is_admin(self.user_id),
+                    user_services.is_moderator(self.user_id)),
+                'is_curriculum_admin': user_services.is_curriculum_admin(
+                    self.user_id),
                 'is_super_admin': self.current_user_is_super_admin,
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),
