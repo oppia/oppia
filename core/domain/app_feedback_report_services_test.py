@@ -1375,7 +1375,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def _add_current_report(
             self, submitted_on=datetime.datetime.fromtimestamp(1615519337),
             assign_ticket=True):
-        # type: () -> Text
+        # type: (datetime.datetime, bool) -> Text
         """Adds reports to the model that should not be scrubbed."""
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(

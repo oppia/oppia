@@ -557,12 +557,10 @@ class UserSuppliedFeedback(python_utils.OBJECT):
 
     @classmethod
     def require_valid_selected_items_for_category(cls, selected_items):
-        # type: (Text, List[Text]) -> None
+        # type: (List[Text]) -> None
         """Checks whether the user_feedback_selected_items are valid.
 
         Args:
-            category: str. The report's category that allows for selection
-                items.
             selected_items: list(str). The items selected by the user to
                 validate.
 

@@ -113,9 +113,11 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def test_incoming_report_with_no_report_raises_error(self):
         # type: () -> None
-        response = self._post_json_with_test_headers({}, expected_status=400)
+        empty_report = {'report': None}
+        response = self._post_json_with_test_headers(
+            empty_report, expected_status=400)
         self.assertEqual(
-            response['error'], 'Missing key in handler args: report.')
+            response['error'], 'A report must be sent in the request.')
 
     def test_incoming_report_with_invalid_headers_raises_exception(self):
         # type: () -> None
@@ -143,7 +145,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             csrf_token=token, expected_status_int=500)
 
     def _post_json_with_test_headers(self, payload, expected_status=200):
-        # type: (Dict[Text, Any], int) -> None
+        # type: (Dict[Text, Any], int) -> Dict[Text, Any]
         """Sends a post request usint str-type representations of the header
         values so that header validation is successful.
 
@@ -168,8 +170,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                     with self.swap(
                         feconf, 'ANDROID_APP_VERSION_CODE',
                         ANDROID_APP_VERSION_CODE_STRING):
-                        return self.post_json( # type: ignore[no-untyped-call]
-                            feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
-                            payload, headers=self.headers,
-                            csrf_token=token,
-                            expected_status_int=expected_status)
+                        return ( # type: ignore[no-any-return]
+                            self.post_json( # type: ignore[no-untyped-call]
+                                feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
+                                payload, headers=self.headers,
+                                csrf_token=token,
+                                expected_status_int=expected_status))
