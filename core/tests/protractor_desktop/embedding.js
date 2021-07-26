@@ -104,6 +104,32 @@ describe('Embedding', function() {
     await workflow.publishExploration();
   };
 
+  var EMBEDDING_ERRORS_TO_IGNORE = [
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/embed/exploration\/idToBeReplaced',
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced\\?' +
+    'locale=en#version=0.0.2&secret=',
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_0.0.2.min.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id\\?' +
+    'locale=en#version=0.0.2&secret=',
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced',
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced\\?' +
+    'iframed=true&locale=en#version=0.0.1&secret=',
+    'http:\/\/localhost:9001\/assets\/scripts\/' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+    '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id\\?' +
+    'iframed=true&locale=en#version=0.0.1&secret='
+  ];
+
+
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
@@ -239,7 +265,7 @@ describe('Embedding', function() {
     expect(embeddingLogs).toEqual(expectedLogs);
 
     await users.logout();
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
   });
 
   it('should use the exploration language as site language.',
@@ -338,6 +364,6 @@ describe('Embedding', function() {
         'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
         '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
         'locale=en#version=0.0.1&secret=';
-      await general.checkForConsoleErrors([errorToIgnore]);
+      await general.checkForConsoleErrors(EMBEDDING_ERRORS_TO_IGNORE);
     });
 });
