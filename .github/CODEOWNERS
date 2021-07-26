@@ -85,9 +85,8 @@
 
 
 # App Feedback Reporting project
-# TODO(#12736): Restore code ownership for @BenHenning after 2021-05-24, next 2 lines.
-/core/domain/app_feedback_report_*.py @vinitamurthi
-/core/controllers/incoming_app_feedback_report*.py @vinitamurthi
+/core/domain/app_feedback_report_*.py @BenHenning @vinitamurthi
+/core/controllers/incoming_app_feedback_report*.py @BenHenning @vinitamurthi
 
 
 # Audio and Translation team.

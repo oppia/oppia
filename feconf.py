@@ -671,6 +671,7 @@ MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 # User id for scrubber bot. This bot is used to represent the cron job that
 # scrubs expired app feedback reports.
 APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID = 'AppFeedbackReportScrubberBot'
+APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME = 'AppFeedbackReportScrubberBot'
 
 # User id and username for suggestion bot. This bot will be used to accept
 # suggestions automatically after a threshold time.
@@ -684,7 +685,9 @@ SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 SYSTEM_USERS = {
     SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
     MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
-    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME
+    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME,
+    APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID: (
+        APP_FEEDBACK_REPORT_SCRUBBER_BOT_USERNAME)
 }
 
 # Ids and locations of the permitted extensions.
