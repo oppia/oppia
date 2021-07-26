@@ -246,7 +246,7 @@ export class ContextService {
     }
     throw new Error(
       'ContextService should not be used outside the ' +
-        'context of an exploration or a question.'
+      'context of an exploration or a question.'
     );
   }
 
