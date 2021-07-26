@@ -49,6 +49,7 @@ module.exports = {
         'http://127.0.0.1:8181/topics-and-skills-dashboard',
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
+        'http://127.0.0.1:8181/volunteer',
         'http://127.0.0.1:8181/volunteers',
         `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
         `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_id}`,
@@ -207,6 +208,12 @@ module.exports = {
           'matchingUrlPattern': '^http://127.0.0.1:8181/thanks$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/volunteer$',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.91}]
           }
         },
         {

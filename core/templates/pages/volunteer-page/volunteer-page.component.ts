@@ -61,16 +61,16 @@ export class VolunteerPageComponent implements OnInit {
       caption: [
         {
           content: (
-            '"I contribute to Oppia because of its remarkable goal:' +
+            '“I contribute to Oppia because of its remarkable goal:' +
             ' to make a quality education available to those who may not' +
-            ' have easy access to it."'),
+            ' have easy access to it.“'),
           name: '- Mark Halpin',
           type: 'Artist'
         },
         {
           content: (
-            '"Oppia turns my drawings into little seeds' +
-            ' for the better world."'),
+            '“Oppia turns my drawings into little seeds' +
+            ' for the better world.“'),
           name: '- Tuna R. Terzi',
           type: 'Artist'
         }
@@ -91,34 +91,34 @@ export class VolunteerPageComponent implements OnInit {
       caption: [
         {
           content: (
-            '"As I got involved with Oppia, I became more and more ' +
+            '“As I got involved with Oppia, I became more and more ' +
             'invested in the ideals of it, which is to provide an ' +
             'easy to use learning platform in which anyone can share ' +
-            'their knowledge about a subject to the world."'),
+            'their knowledge about a subject to the world.“'),
           name: '- Akshay Anand',
           type: 'Full-Stack Developer'
         },
         {
           content: (
-            '"I contribute to Oppia because seeing the community ' +
+            '“I contribute to Oppia because seeing the community ' +
             'and the impact it creates makes me hopeful for the future of ' +
-            'education, and I want to be a part of that change."'),
+            'education, and I want to be a part of that change.“'),
           name: '- Diana Chen',
           type: 'Product Manager'
         },
         {
           content: (
-            '"Making quality education accessible and fun to ' +
+            '“Making quality education accessible and fun to ' +
             'experience is something that is important to me. ' +
-            'I enjoy contributing to Oppia because it does exactly this."'),
+            'I enjoy contributing to Oppia because it does exactly this.“'),
           name: '- Kevin Thomas',
           type: 'Full-Stack Developer'
         },
         {
           content: (
-            '"The lessons are interesting, informative and ' +
+            '“The lessons are interesting, informative and ' +
             'gripping for students. Being able to build tools to efficiently ' +
-            'create such lessons is what I enjoy."'),
+            'create such lessons is what I enjoy.“'),
           name: '- Nithesh Hariharan',
           type: 'Full-Stack Developer and QA Lead'
         }
@@ -135,22 +135,22 @@ export class VolunteerPageComponent implements OnInit {
       caption: [
         {
           content: (
-            '"Oppia has given me the opportunity to profoundly ' +
+            '“Oppia has given me the opportunity to profoundly ' +
             'impact the lives of many underprivileged children by ' +
             'providing them with free quality education. ' +
-            'I am grateful to be a part of this venture."'),
+            'I am grateful to be a part of this venture.“'),
           name: '- Riya Sogani',
           type: 'Learner Feedback Program Volunteer, India'
         },
         {
           content: (
-            '"Oppia has given me the chance to feel that I am ' +
+            '“Oppia has given me the chance to feel that I am ' +
             'causing a positive ripple effect around me. ' +
             'It is delightful to see underprivileged children\'s lives ' +
             'improving because of Oppia\'s lessons. ' +
             'These lessons taught them more than just mathematics in joyful ' +
             'ways: they enhanced their confidence, technical skills, and ' +
-            'reading and writing skills!"'),
+            'reading and writing skills!“'),
           name: '- Wala Awad',
           type: 'Learner Feedback Program Volunteer, Palestine'
         }
@@ -169,27 +169,27 @@ export class VolunteerPageComponent implements OnInit {
       caption: [
         {
           content: (
-            '"Volunteering with Oppia gives me immense ' +
+            '“Volunteering with Oppia gives me immense ' +
             'satisfaction because it aligns with a tenet ' +
             'I firmly believe in: everyone should have access to basic ' +
-            'education. I\'m glad to be a part of the organization!"'),
+            'education. I\'m glad to be a part of the organization!“'),
           name: '- Anubhuti Varshney',
           type: 'Translations/Voiceovers Coordinator'
         },
         {
           content: (
-            '"I strongly identify with Oppia\'s objective of ' +
-            'providing free, enjoyable and accessible education to all."'),
+            '“I strongly identify with Oppia\'s objective of ' +
+            'providing free, enjoyable and accessible education to all.“'),
           name: '- Anmol Shukla',
           type: 'Developer and Lesson Creator'
         },
         {
           content: (
-            '"I love to write, and volunteering with Oppia as a ' +
+            '“I love to write, and volunteering with Oppia as a ' +
             'lesson creator has enabled me to apply my writing ' +
             'skills towards a good cause. Every child should have access ' +
             'to quality educational topics and, with Oppia, ' +
-            'I have the opportunity to make a difference."'),
+            'I have the opportunity to make a difference.“'),
           name: '- Nitya Sunkad',
           type: 'Math Lesson Creator'
         }

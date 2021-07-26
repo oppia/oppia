@@ -17,10 +17,14 @@
     </div>
 
     <div class="hide-xs hide-sm hide-md col-4 flex-45 mt-5">
-      <img alt="Volunteer page map image - Desktop view" [src]="mapImgUrl">
+      <picture>
+        <img alt="Volunteer page map image - Desktop view" [src]="mapImgUrl">
+      </picture>
     </div>
     <div class="hide-gt-md px-5">
-      <img alt="Volunteer page map image - Mobile view" [src]="mapImgUrl">
+      <picture>
+        <img alt="Volunteer page map image - Mobile view" [src]="mapImgUrl">
+      </picture>
     </div>
 
     <button class="btn" (click)="fillOutInterestForm()">
@@ -44,7 +48,9 @@
               <ngb-carousel *ngIf="art.images.length > 0">
                 <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
-                    <img [src]="image" alt="Volunteer profile image">
+                    <picture>
+                      <img [src]="image" alt="Volunteer profile image">
+                    </picture>
                   </div>
                   <div class="carousel-caption">
                     <p> {{ art.caption[index].content }} </p>
@@ -97,7 +103,9 @@
               <ngb-carousel *ngIf="development.images.length > 0">
                 <ng-template *ngFor="let image of development.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
-                    <img [src]="image" alt="Volunteer profile image">
+                    <picture>
+                      <img [src]="image" alt="Volunteer profile image">
+                    </picture>
                   </div>
                   <div class="carousel-caption">
                     <p> {{ development.caption[index].content }} </p>
@@ -146,7 +154,9 @@
               <ngb-carousel *ngIf="learnerFeedback.images.length > 0">
                 <ng-template *ngFor="let image of learnerFeedback.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
-                    <img [src]="image" alt="Volunteer profile image">
+                    <picture>
+                      <img [src]="image" alt="Volunteer profile image">
+                    </picture>
                   </div>
                   <div class="carousel-caption">
                     <p> {{ learnerFeedback.caption[index].content }} </p>
@@ -204,7 +214,9 @@
               <ngb-carousel *ngIf="lessonCreation.images.length > 0">
                 <ng-template *ngFor="let image of lessonCreation.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
-                    <img [src]="image" alt="Volunteer profile image">
+                    <picture>
+                      <img [src]="image" alt="Volunteer profile image">
+                    </picture>
                   </div>
                   <div class="carousel-caption">
                     <p> {{ lessonCreation.caption[index].content }} </p>

@@ -807,8 +807,8 @@ module.exports = {
       filename: 'volunteer-page.mainpage.html',
       meta: defaultMeta,
       template:
-          commonPrefix + '/pages/volunteer-page/' +
-          'volunteer-page.mainpage.html',
+        commonPrefix + '/pages/volunteer-page/' +
+        'volunteer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
