@@ -19,24 +19,25 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
-import 'pages/mock-ajs';
-import 'Polyfills.ts';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppConstants } from 'app.constants';
-import { enableProdMode } from '@angular/core';
-import { LibraryPageModule } from './library-page.module';
+import 'angular-ui-sortable';
+import uiValidate from 'angular-ui-validate';
+import ngInfiniteScroll from 'ng-infinite-scroll';
 
-if (!AppConstants.DEV_MODE) {
-  enableProdMode();
-}
+angular.module('oppia', [
+  require('angular-cookies'), 'ngAnimate', ngInfiniteScroll,
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'ui.bootstrap', 'ui.sortable', uiValidate
+]);
 
-platformBrowserDynamic().bootstrapModule(LibraryPageModule).catch(
-  // eslint-disable-next-line no-console
-  (err) => console.error(err)
-);
+require('Polyfills.ts');
 
-// This prevents angular pages to cause side effects to hybrid pages.
-// TODO(#13080): Remove window.name statement from import.ts files
-// after migration is complete.
-window.name = '';
+// The module needs to be loaded directly after jquery since it defines the
+// main module the elements are attached to.
+require('pages/library-page/library-page.module.ts');
+require('App.ts');
+require('base-components/oppia-root.directive.ts');
+
+require('base-components/base-content.component.ts');
+require('pages/library-page/library-page.component.ts');
+require('pages/library-page/library-footer/library-footer.component.ts');
+require('pages/library-page/search-bar/search-bar.component.ts');
