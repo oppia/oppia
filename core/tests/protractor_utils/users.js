@@ -119,7 +119,7 @@ var createAndLoginCurriculumAdminUser = async function(email, username) {
   await login(email);
   await _completeSignup(username);
   await adminPage.get();
-  await adminPage.addRole(username, ' curriculum admin ');
+  await adminPage.addRole(username, 'curriculum admin');
 };
 
 var createAndLoginSuperAdminUser = async function(email, username) {
