@@ -19,9 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 
-import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { SearchBackendApiService } from './search-backend-api.service';
-import cloneDeep from 'lodash/cloneDeep';
 
 export class SelectionList {
   [key: string]: boolean;
@@ -55,7 +54,7 @@ export class SearchService {
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
-    new EventEmitter<ExplorationSummaryDict[]>();
+    new EventEmitter<ExplorationSummaryBackendDict>();
   public numSearchesInProgress = 0;
 
   constructor(
@@ -158,8 +157,8 @@ export class SearchService {
     this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
       .then((response) => {
         this._lastQuery = searchQuery;
-        this._lastSelectedCategories = cloneDeep(selectedCategories);
-        this._lastSelectedLanguageCodes = cloneDeep(selectedLanguageCodes);
+        this._lastSelectedCategories = angular.copy(selectedCategories);
+        this._lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
         this._searchCursor = response.search_cursor;
         this.numSearchesInProgress--;
 
@@ -230,7 +229,7 @@ export class SearchService {
 
   loadMoreData(
       successCallback: (SearchResponseData, boolean) => void,
-      failureCallback?: (boolean) => void): void {
+      failureCallback?: (any) => void): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
@@ -261,7 +260,7 @@ export class SearchService {
   }
 
   get onInitialSearchResultsLoaded():
-    EventEmitter<ExplorationSummaryDict[]> {
+    EventEmitter<ExplorationSummaryBackendDict> {
     return this._initialSearchResultsLoadedEventEmitter;
   }
 }
