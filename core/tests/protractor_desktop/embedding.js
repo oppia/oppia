@@ -117,14 +117,14 @@ describe('Embedding', function() {
     '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id\\?' +
     'locale=en#version=0.0.2&secret=',
     'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_i18n_0.0.1.min.html - Refused to display ' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
     '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced',
     'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_i18n_0.0.1.min.html - Refused to display ' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
     '\'http:\/\/localhost:9001\/embed\/exploration\/idToBeReplaced\\?' +
     'iframed=true&locale=en#version=0.0.1&secret=',
     'http:\/\/localhost:9001\/assets\/scripts\/' +
-    'embedding_tests_dev_i18n_0.0.1.min.html - Refused to display ' +
+    'embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
     '\'http:\/\/localhost:9001\/embed\/exploration\/fake_id//?' +
     'iframed=true&locale=en#version=0.0.1&secret='
   ];
