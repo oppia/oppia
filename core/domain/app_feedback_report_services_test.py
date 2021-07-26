@@ -1067,7 +1067,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=1))
         for i in python_utils.RANGE(1, 4):
             temp_timestamp = (
-                self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(days=i))
+                self.REPORT_SUBMITTED_TIMESTAMP - datetime.timedelta(
+                    days=4 - i))
             report_id = self._add_current_report(
                 submitted_on=temp_timestamp, assign_ticket=False)
             report_model = (
