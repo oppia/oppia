@@ -56,6 +56,8 @@ import { StateSolutionService } from 'components/state-editor/state-editor-prope
 import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
+import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
+import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
@@ -369,6 +371,7 @@ import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -399,6 +402,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['BackgroundMaskService', BackgroundMaskService],
   ['BlogAdminBackendApiService', BlogAdminBackendApiService],
   ['BlogAdminDataService', BlogAdminDataService],
+  ['BlogDashboardBackendApiService', BlogDashboardBackendApiService],
+  ['BlogPostEditorBackendApiService', BlogPostEditorBackendApiService],
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
@@ -651,6 +656,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
   ['SidebarStatusService', SidebarStatusService],
+  ['SignupPageBackendApiService', SignupPageBackendApiService],
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
