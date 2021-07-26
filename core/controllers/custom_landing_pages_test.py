@@ -61,8 +61,7 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
 
     def test_valid_subject_and_topic_loads_correctly(self):
         response = self.get_html_response('/math/fractions')
-        response.mustcontain(
-            '<oppia-topic-landing-page-root></oppia-topic-landing-page-root>')
+        response.mustcontain('<oppia-root></oppia-root>')
 
 
 class StewardsLandingPageTest(test_utils.GenericTestBase):
