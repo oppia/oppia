@@ -157,7 +157,7 @@ describe('OutcomeDestinationEditor', () => {
   it('should allow admin and moderators to edit refresher' +
     ' exploration id', () => {
     let userInfo = {
-      isAdmin: () => true,
+      isCurriculumAdmin: () => true,
       isModerator: () => false
     };
     spyOn(UserService, 'getUserInfoAsync').and.returnValue(

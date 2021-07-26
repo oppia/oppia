@@ -28,6 +28,8 @@ from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -45,9 +47,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
@@ -55,14 +57,26 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
-
-        self.topic_manager = user_services.get_user_actions_info(
-            self.topic_manager_id)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.new_user = user_services.get_user_actions_info(self.new_user_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+
+        self.topic_manager = user_services.get_user_actions_info(
+            self.topic_manager_id)
 
         self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')
