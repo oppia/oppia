@@ -41,7 +41,7 @@ class BlogDashboardPageTests(test_utils.GenericTestBase):
 
     def test_blog_dashboard_page_access_as_blog_admin(self):
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.login(self.BLOG_ADMIN_EMAIL)
         self.get_html_response('/blog-dashboard', expected_status_int=200)
@@ -49,7 +49,7 @@ class BlogDashboardPageTests(test_utils.GenericTestBase):
 
     def test_blog_dashboard_page_access_as_blog_post_editor(self):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
         self.login(self.BLOG_EDITOR_EMAIL)
         self.get_html_response('/blog-dashboard', expected_status_int=200)
