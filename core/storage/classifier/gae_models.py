@@ -29,9 +29,9 @@ from typing import Any, Dict, List, Optional, Text, Tuple, Union # isort:skip # 
 MYPY = False
 if MYPY:
     from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
-else:
-    (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-    datastore_services = models.Registry.import_datastore_services()
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 
 NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
 
