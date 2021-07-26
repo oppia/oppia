@@ -564,7 +564,6 @@ def apply_change_list(exploration_id, change_list):
         written_translation_mapping_list=[]
         recorded_voiceover_proto=exploration_pb2.RecordedVoiceovers()
         written_translations_proto=exploration_pb2.WrittenTranslations()
-        customization_args=exploration_pb2.ContinueInstance.CustomizationArgs()
 
         for (state_name, state) in exploration.states.items():
             for (content_id, language_code_to_voiceover) in (state.recorded_voiceovers.voiceovers_mapping.items()):
@@ -580,6 +579,7 @@ def apply_change_list(exploration_id, change_list):
                 )
                 voiceover_language_mapping_list.append(voiceover_content_mapping)
             recorded_voiceover_proto.voiceover_language_mapping.extend(voiceover_language_mapping_list)
+            
             for (content_id, language_code) in state.written_translations.translations_mapping.items():
                 for (language_code, written_translation) in (language_code.items()):
                     written_translation_proto = exploration_pb2.WrittenTranslation(
@@ -593,22 +593,21 @@ def apply_change_list(exploration_id, change_list):
                 written_translation_mapping_list.append(translation_mapping)
             written_translations_proto.translation_language_mapping.extend(written_translation_mapping_list)
 
+            customization_args_proto=exploration_pb2.ContinueInstance.CustomizationArgs()
+            numeric_input_proto=exploration_pb2.NumericInputInstance()
             if state.interaction.id == 'Continue':
-                customization_args_proto=exploration_pb2.ContinueInstance.CustomizationArgs(
-                    button_text=exploration_pb2.SubtitledHtml(
-                        content_id = state.interaction.customization_args['buttonText'].value.content_id,
-                        html = state.interaction.customization_args['buttonText'].value.unicode_str
-                    )
+                customization_args_proto=set_continue_interaction(
+                    state.interaction.customization_args['buttonText'].value.content_id,
+                    state.interaction.customization_args['buttonText'].value.unicode_str
                 )
-                customization_args=customization_args_proto
             elif state.interaction.id == 'NumericInput':
-                customization_args_proto=exploration_pb2.NumericInputInstance.CustomizationArgs()
-                customization_args=customization_args_proto
+                numeric_input_proto=set_numeric_input_interaction(
+                    state.interaction.answer_groups,
+                    state.interaction.solution
+                )
 
-            interaction_proto=exploration_pb2.InteractionInstance(
-                continue_=exploration_pb2.ContinueInstance(
-                    customization_args=customization_args
-                ),
+            default_outcome_proto=exploration_pb2.Outcome()
+            if state.interaction.default_outcome != None:
                 default_outcome=exploration_pb2.Outcome(
                     destination_state=state.interaction.default_outcome.dest,
                     feedback=exploration_pb2.SubtitledHtml(
@@ -617,6 +616,15 @@ def apply_change_list(exploration_id, change_list):
                     ),
                     labelled_as_correct=state.interaction.default_outcome.labelled_as_correct
                 )
+            else:
+                default_outcome_proto=None
+
+            interaction_proto=exploration_pb2.InteractionInstance(
+                continue_=exploration_pb2.ContinueInstance(
+                    customization_args=customization_args_proto
+                ),
+                default_outcome=default_outcome,
+                numeric_input=numeric_input_proto
             )
             state_proto=exploration_pb2.State(
                 content=exploration_pb2.SubtitledHtml(
@@ -636,7 +644,8 @@ def apply_change_list(exploration_id, change_list):
             title=exploration.title,
             states=state_protos
         )
-        proto_size_in_bytes = exp_proto.ByteSize()
+        print(exp_proto)
+        proto_size_in_bytes = int(exp_proto.ByteSize())
         exploration.update_proto_size_in_bytes(proto_size_in_bytes)
         return exploration
 
@@ -647,6 +656,73 @@ def apply_change_list(exploration_id, change_list):
                 pprint.pprint(change_list))
         )
         python_utils.reraise_exception()
+
+
+def set_continue_interaction(content_id, html):
+    """Set ContinueInstance of Interaction Message in exploration.proto.
+
+    Args:
+        content_id: str. Button text id.
+        html: str. Button text value.
+
+    Returns:
+        customization_args_proto. Instance of CustomizationArgs.
+    """
+    customization_args_proto=exploration_pb2.ContinueInstance.CustomizationArgs(
+        button_text=exploration_pb2.SubtitledHtml(
+            content_id = content_id,
+            html = html
+        )
+    )
+    return customization_args_proto
+
+
+def set_numeric_input_interaction(answer_groups, solution):
+    """Set NumericInputInstance of Interaction Message in exploration.proto.
+
+    Args:
+        exploration_id: str. The id of the exploration to which the change list
+            is to be applied.
+        change_list: list(ExplorationChange). The list of changes to apply.
+
+    Returns:
+        numeric_input_proto. Proto Instance of NumericInputInstance.
+    """
+    answer_groups_list=[]
+    for answer_group in answer_groups:
+        answer_group_proto=exploration_pb2.NumericInputInstance.AnswerGroup(
+            base_answer_group=exploration_pb2.BaseAnswerGroup(
+                outcome=exploration_pb2.Outcome(
+                    destination_state=answer_group.outcome.dest,
+                    feedback=exploration_pb2.SubtitledHtml(
+                        content_id=answer_group.outcome.feedback.content_id,
+                        html=answer_group.outcome.feedback.html,
+                    ),
+                    labelled_as_correct=answer_group.outcome.labelled_as_correct
+                )
+            )
+        )
+        answer_groups_list.append(answer_group_proto)
+    
+    numeric_input=exploration_pb2.NumericInputInstance()
+    numeric_input.answer_groups.extend(answer_groups_list)
+
+    solution_proto=exploration_pb2.NumericInputInstance.Solution()
+    if solution != None:
+        solution_proto=exploration_pb2.NumericInputInstance.Solution(
+            base_solution=exploration_pb2.BaseSolution(
+                explanation=exploration_pb2.SubtitledHtml(
+                    content_id=solution.explanation.content_id,
+                    html=solution.explanation.html,
+                )
+            ),
+            correct_answer=solution.correct_answer,
+        )
+        numeric_input.solution=solution_proto
+    else:
+        solution_proto=None
+
+    return numeric_input   
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
