@@ -148,6 +148,11 @@ INT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_INT
 }
 
+POSITIVE_INT_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_CUSTOM,
+    'obj_type': 'PositiveInt'
+}
+
 
 class ConfigPropertyChange(change_domain.BaseChange):
     """Domain object for changes made to a config property object.
@@ -454,7 +459,7 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 
 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'max_number_of_tags_assigned_to_blog_post',
-    INT_SCHEMA,
+    POSITIVE_INT_SCHEMA,
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10
