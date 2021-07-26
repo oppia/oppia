@@ -30,6 +30,8 @@ import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-ed
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
+import { TranslationTopicSelectorComponent } from
+  './translation-topic-selector/translation-topic-selector.component';
 import { LoginRequiredMessageComponent } from './login-required-message/login-required-message.component';
 import { LoginRequiredModalContent } from './modal-templates/login-required-modal.component';
 
@@ -60,6 +62,7 @@ import { TranslationOpportunitiesComponent } from './translation-opportunities/t
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
+    TranslationTopicSelectorComponent,
     TranslationModalComponent
   ],
   entryComponents: [
@@ -71,6 +74,7 @@ import { TranslationOpportunitiesComponent } from './translation-opportunities/t
     OpportunitiesListComponent,
     TranslationLanguageSelectorComponent,
     TranslationOpportunitiesComponent,
+    TranslationTopicSelectorComponent,
     TranslationModalComponent
   ],
   providers: [

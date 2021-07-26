@@ -67,6 +67,12 @@
                                            (set-active-language-code)="$ctrl.onChangeLanguage($event)">
             </translation-language-selector>
           </div>
+          <div class="oppia-dashboard-topic-container" ng-if="$ctrl.showTopicSelector()">
+            <span class="oppia-dashboard-topic-container-label">Filter by Topics</span>
+            <translation-topic-selector class="oppia-topic-selector" [active-topic-name]="$ctrl.topicName"
+                                        (set-active-topic-name)="$ctrl.onChangeTopic($event)">
+            </translation-topic-selector>
+          </div>
         </div>
       </div>
     </div>
@@ -353,6 +359,12 @@
   }
   .oppia-language-selector {
     padding-bottom: 10px;
+  }
+  .oppia-topic-selector {
+    padding-bottom: 10px;
+  }
+  .oppia-dashboard-topic-container {
+    margin-left: 10px;
   }
   .oppia-collapsed-language-selector {
     padding-bottom: 15px;

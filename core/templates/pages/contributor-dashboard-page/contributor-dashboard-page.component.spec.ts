@@ -32,6 +32,7 @@ describe('Contributor dashboard page', function() {
   var $timeout = null;
   var UserService = null;
   var TranslationLanguageService = null;
+  var TranslationTopicService = null;
   var userProfileImage = 'profile-data-url';
   var userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
@@ -56,6 +57,7 @@ describe('Contributor dashboard page', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
+    TranslationTopicService = $injector.get('TranslationTopicService');
     UserService = $injector.get('UserService');
     $q = $injector.get('$q');
     $timeout = $injector.get('$timeout');
@@ -67,6 +69,7 @@ describe('Contributor dashboard page', function() {
       .returnValue('');
     spyOn(TranslationLanguageService, 'setActiveLanguageCode').and
       .callThrough();
+    spyOn(TranslationTopicService, 'setActiveTopicName').and.callThrough();
   }));
 
   it('should set focus on select lang field', function() {
@@ -145,6 +148,30 @@ describe('Contributor dashboard page', function() {
       ctrl.onTabClick(changedTab);
       expect(ctrl.activeTabName).toBe(changedTab);
       expect(ctrl.showLanguageSelector()).toBe(true);
+    });
+
+    it('should change active topic when clicking on topic selector',
+      function() {
+        spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
+          .and.callThrough();
+
+        ctrl.onChangeTopic('Topic 1');
+
+        expect(TranslationTopicService.setActiveTopicName)
+          .toHaveBeenCalledWith('Topic 1');
+        expect(LocalStorageService.updateLastSelectedTranslationTopicName)
+          .toHaveBeenCalledWith('Topic 1');
+      });
+
+    it('should show topic selector based on active tab', function() {
+      var changedTab = 'translateTextTab';
+
+      expect(ctrl.activeTabName).toBe('myContributionTab');
+      expect(ctrl.showLanguageSelector()).toBe(false);
+
+      ctrl.onTabClick(changedTab);
+      expect(ctrl.activeTabName).toBe(changedTab);
+      expect(ctrl.showTopicSelector()).toBe(true);
     });
 
     it('should call scrollFunction on scroll', function() {

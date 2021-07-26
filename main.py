@@ -299,6 +299,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/retrivefeaturedtranslationlanguages',
         contributor_dashboard.FeaturedTranslationLanguagesHandler),
     get_redirect_route(
+        r'/getalltopicnames',
+        contributor_dashboard.AllTopicNamesHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(

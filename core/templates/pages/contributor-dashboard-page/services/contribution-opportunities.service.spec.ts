@@ -182,7 +182,8 @@ describe('Contribution Opportunities Service', function() {
         }
       ));
 
-    contributionOpportunitiesService.getTranslationOpportunitiesAsync('en')
+    contributionOpportunitiesService
+      .getTranslationOpportunitiesAsync('en', 'Topic')
       .then(successHandler, failHandler);
     tick();
 
@@ -211,7 +212,8 @@ describe('Contribution Opportunities Service', function() {
         }
       ));
 
-    contributionOpportunitiesService.getMoreTranslationOpportunitiesAsync('en')
+    contributionOpportunitiesService
+      .getMoreTranslationOpportunitiesAsync('en', 'Topic')
       .then(successHandler, failHandler);
     tick();
 
@@ -276,4 +278,24 @@ describe('Contribution Opportunities Service', function() {
     expect(getVoiceoverOpportunitiesSpy).toHaveBeenCalled();
     expect(successHandler).toHaveBeenCalledWith(voiceoverOpportunitiesDict);
   }));
+
+  it('should return all topic names when calling \'getAllTopicNamesAsync\'',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      let topicNamesDict = ['Topic 1', 'Topic 2'];
+
+      let getAllTopicNamesSpy = spyOn(
+        contributionOpportunitiesBackendApiService,
+        'fetchAllTopicNamesAsync')
+        .and.returnValue(Promise.resolve(topicNamesDict));
+
+      contributionOpportunitiesService.getAllTopicNamesAsync()
+        .then(successHandler, failHandler);
+      tick();
+
+      expect(getAllTopicNamesSpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(topicNamesDict);
+    }));
 });

@@ -51,6 +51,8 @@ export class LocalStorageService {
 
   LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = ('last_selected_translation_lang');
 
+  LAST_SELECTED_TRANSLATION_TOPIC_NAME = ('last_selected_translation_topic');
+
   /**
    * Create the key to access the changeList in localStorage
    * @param {String} explorationId - The exploration id of the changeList
@@ -134,6 +136,21 @@ export class LocalStorageService {
     if (this.isStorageAvailable()) {
       return (
         this.storage.getItem(this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+    }
+    return null;
+  }
+
+  updateLastSelectedTranslationTopicName(topicName: string): void {
+    if (this.isStorageAvailable()) {
+      this.storage.setItem(
+        this.LAST_SELECTED_TRANSLATION_TOPIC_NAME, topicName);
+    }
+  }
+
+  getLastSelectedTranslationTopicName(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        this.storage.getItem(this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
     }
     return null;
   }

@@ -30,6 +30,9 @@ require(
   'pages/contributor-dashboard-page/translation-language-selector/' +
   'translation-language-selector.component.ts');
 require(
+  'pages/contributor-dashboard-page/translation-topic-selector/' +
+  'translation-topic-selector.component.ts');
+require(
   'pages/contributor-dashboard-page/question-opportunities/' +
   'question-opportunities.component.ts');
 require(
@@ -51,23 +54,28 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$timeout', 'FocusManagerService',
-    'LanguageUtilService', 'LocalStorageService',
-    'TranslationLanguageService', 'UrlInterpolationService',
-    'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
-    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
+    '$rootScope', '$timeout', 'ContributionOpportunitiesService',
+    'FocusManagerService', 'LanguageUtilService', 'LocalStorageService',
+    'TranslationLanguageService', 'TranslationTopicService',
+    'UrlInterpolationService', 'UserService', 'WindowRef',
+    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
+    'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, $timeout, FocusManagerService,
-        LanguageUtilService, LocalStorageService,
-        TranslationLanguageService, UrlInterpolationService,
-        UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
-        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
+        $rootScope, $timeout, ContributionOpportunitiesService,
+        FocusManagerService, LanguageUtilService, LocalStorageService,
+        TranslationLanguageService, TranslationTopicService,
+        UrlInterpolationService, UserService, WindowRef,
+        CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_LANGUAGE_CODE,
+        DEFAULT_OPPORTUNITY_TOPIC_NAME, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
       var prevSelectedLanguageCode = (
         LocalStorageService.getLastSelectedTranslationLanguageCode());
       var allAudioLanguageCodes = (
         LanguageUtilService.getAllVoiceoverLanguageCodes());
+
+      var prevSelectedTopicName = (
+        LocalStorageService.getLastSelectedTranslationTopicName());
 
       var getLanguageDescriptions = function(languageCodes) {
         var languageDescriptions = [];
@@ -91,6 +99,20 @@ angular.module('oppia').component('contributorDashboardPage', {
         var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
         return (
           activeTabDetail.customizationOptions.indexOf('language') !== -1);
+      };
+
+      ctrl.onChangeTopic = function(topicName: string) {
+        ctrl.topicName = topicName;
+        TranslationTopicService.setActiveTopicName(ctrl.topicName);
+        LocalStorageService.updateLastSelectedTranslationTopicName(
+          ctrl.topicName);
+        $rootScope.$applyAsync();
+      };
+
+      ctrl.showTopicSelector = function() {
+        var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
+        return (
+          activeTabDetail.customizationOptions.indexOf('topic') !== -1);
       };
 
       ctrl.onTabClick = function(activeTabName) {
@@ -187,6 +209,17 @@ angular.module('oppia').component('contributorDashboardPage', {
 
         TranslationLanguageService.setActiveLanguageCode(
           ctrl.languageCode);
+
+        ctrl.topicName = DEFAULT_OPPORTUNITY_TOPIC_NAME;
+        TranslationTopicService.setActiveTopicName(ctrl.topicName);
+
+        ContributionOpportunitiesService.getAllTopicNamesAsync()
+          .then((data) => {
+            if (data.indexOf(prevSelectedTopicName) !== -1) {
+              ctrl.topicName = prevSelectedTopicName;
+              TranslationTopicService.setActiveTopicName(ctrl.topicName);
+            }
+          });
 
         ctrl.activeTabName = 'myContributionTab';
         ctrl.tabsDetails = CONTRIBUTOR_DASHBOARD_TABS_DETAILS;

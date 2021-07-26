@@ -69,7 +69,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(5, None, 'hi'))
+            .get_all_translation_opportunities(5, None, 'hi', ''))
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
@@ -79,7 +79,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_all_translation_opportunities_pagination(self):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, None, 'hi'))
+            .get_all_translation_opportunities(1, None, 'hi', ''))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
@@ -87,11 +87,20 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
 
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, cursor, 'hi'))
+            .get_all_translation_opportunities(1, cursor, 'hi', ''))
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
+
+    def test_get_translation_opportunities_by_topic(self):
+        results, cursor, more = (
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_all_translation_opportunities(5, None, 'hi', 'A topic'))
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].id, 'opportunity_id1')
+        self.assertFalse(more)
+        self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities(self):
         results, cursor, more = (
@@ -142,7 +151,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     def test_delete_all(self):
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, None, 'hi'))
+            .get_all_translation_opportunities(1, None, 'hi', ''))
         self.assertEqual(len(results), 1)
         self.assertTrue(more)
 
@@ -150,7 +159,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
 
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
-            .get_all_translation_opportunities(1, None, 'hi'))
+            .get_all_translation_opportunities(1, None, 'hi', ''))
         self.assertEqual(len(results), 0)
         self.assertFalse(more)
 

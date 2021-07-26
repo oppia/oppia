@@ -156,14 +156,14 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunitiesAsync('hi', '',).then(
+        .fetchTranslationOpportunitiesAsync('hi', 'Topic', '').then(
           successHandler, failHandler
         );
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
           '/opportunitiessummaryhandler/<opportunityType>',
           { opportunityType: 'translation' }
-        ) + '?language_code=hi&cursor='
+        ) + '?language_code=hi&topic_name=Topic&cursor='
       );
       expect(req.request.method).toEqual('GET');
       req.flush(skillOpportunity);
@@ -186,14 +186,15 @@ describe('Contribution Opportunities backend API service', function() {
     const failHandler = jasmine.createSpy('fail');
 
     contributionOpportunitiesBackendApiService
-      .fetchTranslationOpportunitiesAsync('invlaidCode', 'invalidCursor',).then(
+      .fetchTranslationOpportunitiesAsync(
+        'invlaidCode', 'Topic', 'invalidCursor').then(
         successHandler, failHandler
       );
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
         '/opportunitiessummaryhandler/<opportunityType>',
         { opportunityType: 'translation' }
-      ) + '?language_code=invlaidCode&cursor=invalidCursor'
+      ) + '?language_code=invlaidCode&topic_name=Topic&cursor=invalidCursor'
     );
 
     expect(req.request.method).toEqual('GET');
@@ -322,4 +323,50 @@ describe('Contribution Opportunities backend API service', function() {
     expect(successHandler).toHaveBeenCalledWith(emptyList);
     expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it('should successfully fetch all topic names', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchAllTopicNamesAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne('/getalltopicnames');
+    expect(req.request.method).toEqual('GET');
+    req.flush(['Topic 1', 'Topic 2']);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      ['All', 'Topic 1', 'Topic 2']
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to fetch all topic names when calling \'getalltopicnames',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      let emptyResponse = [];
+
+      contributionOpportunitiesBackendApiService
+        .fetchAllTopicNamesAsync()
+        .then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        '/getalltopicnames'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Failed to fetch all topic names.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(emptyResponse);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
 });

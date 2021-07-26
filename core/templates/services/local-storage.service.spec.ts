@@ -104,5 +104,22 @@ describe('LocalStorageService', () => {
       expect(localStorageService.getLastSelectedTranslationLanguageCode())
         .toBeNull();
     });
+
+    it('should correctly save a topic name', () => {
+      localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
+      expect(localStorageService.getLastSelectedTranslationTopicName())
+        .toBe('Topic 1');
+
+      localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
+      expect(localStorageService.getLastSelectedTranslationTopicName())
+        .toBe('Topic 1');
+    });
+
+    it('should not save a topic name when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+      localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
+      expect(localStorageService.getLastSelectedTranslationTopicName())
+        .toBeNull();
+    });
   });
 });
