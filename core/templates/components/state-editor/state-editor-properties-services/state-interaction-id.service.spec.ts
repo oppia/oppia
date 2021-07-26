@@ -24,7 +24,7 @@ import { StateInteractionIdService } from
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 describe('State Interaction Id Service', () => {
-  let stateInteractionIdService: StateInteractionIdService = null;
+  let stateInteractionIdService: StateInteractionIdService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

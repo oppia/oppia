@@ -30,7 +30,7 @@ describe('NoninteractiveLink', () => {
   let htmlEscaperService: HtmlEscaperService;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: (answer: string) => {
       return answer;
     }
   };
@@ -86,8 +86,8 @@ describe('NoninteractiveLink', () => {
   });
 
   it('should not update url when url or text is not input', () => {
-    component.urlWithValue = null;
-    component.textWithValue = null;
+    component.urlWithValue = '';
+    component.textWithValue = '';
 
     component.ngOnInit();
 

@@ -18,11 +18,11 @@
 
 import { ClassroomData} from
   'domain/classroom/classroom-data.model';
-import { CreatorTopicSummary } from
+import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from
   'domain/topic/creator-topic-summary.model';
 
 describe('Classroom data model', () => {
-  let topicSummaryDicts;
+  let topicSummaryDicts: CreatorTopicSummaryBackendDict[];
 
   beforeEach(() => {
     topicSummaryDicts = [{
@@ -34,7 +34,17 @@ describe('Classroom data model', () => {
       total_skill_count: 20,
       uncategorized_skill_count: 5,
       thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA'
+      thumbnail_bg_color: '#C6DCDA',
+      language_code: 'en',
+      version: 1,
+      additional_story_count: 0,
+      total_published_node_count: 4,
+      topic_model_created_on: 20160101,
+      topic_model_last_updated: 20160110,
+      can_edit_topic: true,
+      is_published: true,
+      url_fragment: 'some-url-fragment',
+      classroom: 'math'
     }];
   });
 
