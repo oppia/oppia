@@ -141,14 +141,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, platform, submitted_on, report_type, category,
-            platform_version, android_device_country_locale_code,
-            android_sdk_version, android_device_model, entry_point,
-            entry_point_topic_id, entry_point_story_id,
-            entry_point_exploration_id, entry_point_subtopic_id,
-            text_language_code, audio_language_code, android_report_info,
-            web_report_info):
-        # type: (Text, datetime.datetime, Text, Text, Text, Optional[Text], Optional[int], Optional[Text], Text, Optional[Text], Optional[Text], Optional[Text], Optional[Text], Text, Text, Optional[Dict[Text, Any]], Optional[Dict[Text, Any]]) -> Text
+            cls,
+            platform, # type: Text
+            submitted_on, # type: datetime.datetime
+            report_type, # type: Text
+            category, # type: Text
+            platform_version, # type: Text
+            android_device_country_locale_code, # type: Optional[Text]
+            android_sdk_version, # type: Optional[int]
+            android_device_model, # type: Optional[Text]
+            entry_point, # type: Text
+            entry_point_topic_id, # type: Optional[Text]
+            entry_point_story_id, # type: Optional[Text]
+            entry_point_exploration_id, # type: Optional[Text]
+            entry_point_subtopic_id, # type: Optional[Text]
+            text_language_code, # type: Text
+            audio_language_code, # type: Text
+            android_report_info, # type: Optional[Dict[Text, Any]]
+            web_report_info # type: Optional[Dict[Text, Any]]
+            ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
