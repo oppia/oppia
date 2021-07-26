@@ -27,9 +27,9 @@ from scripts import common
 # because we need to inherit from StringIO, so we need the StringIO
 # class. python_utils.string_io returns a StringIO object.
 try:
-    from StringIO import StringIO
+    from StringIO import StringIO  # pylint: disable=import-only-modules
 except ImportError:
-    from io import StringIO
+    from io import StringIO  # pylint: disable=import-only-modules
 
 
 class MockResponse(StringIO):

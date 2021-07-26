@@ -1862,7 +1862,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                 line = line.lstrip()
                 # Ignore line that is enabling this check.
                 # Example:
-                #, single-line-pragma
+                # # pylint: disable=import-only-modules, single-line-pragma
                 # def func(a, b):
                 # # pylint: enable=import-only-modules, single-line-pragma
                 # Now if do not ignore the line with 'enable' statement
