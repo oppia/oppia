@@ -130,7 +130,7 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/playbook.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
-    'webpack_bundles/thanks-page.mainpage.html'
+    'webpack_bundles/thanks-page.mainpage.html',
     'webpack_bundles/volunteer-page.mainpage.html',
 )
 
