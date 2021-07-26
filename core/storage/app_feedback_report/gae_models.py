@@ -159,7 +159,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             audio_language_code, # type: Text
             android_report_info, # type: Optional[Dict[Text, Any]]
             web_report_info # type: Optional[Dict[Text, Any]]
-            ):
+    ):
         # type: (...) -> Text
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
