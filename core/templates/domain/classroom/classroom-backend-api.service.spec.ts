@@ -26,8 +26,7 @@ import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
 
 describe('Classroom backend API service', function() {
-  let classroomBackendApiService:
-    ClassroomBackendApiService = null;
+  let classroomBackendApiService: ClassroomBackendApiService;
   let httpTestingController: HttpTestingController;
   let firstTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic1',
@@ -77,14 +76,14 @@ describe('Classroom backend API service', function() {
     topic_list_intro: 'Topics Covered'
   };
 
-  let sampleClassroomDataObject = null;
+  let sampleClassroomDataObject: ClassroomData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     // Sample topic object returnable from the backend.
     sampleClassroomDataObject = (

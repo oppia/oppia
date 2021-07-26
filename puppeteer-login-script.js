@@ -42,6 +42,8 @@ module.exports = async(browser, context) => {
   // Sign into Oppia.
   if (context.url.includes('admin')) {
     await login(context, page);
+  } else if (context.url.includes('moderator')) {
+    await setRole(page, 'MODERATOR');
   } else if (context.url.includes('emaildashboard')) {
     await setRole(page, 'ADMIN');
   } else if (context.url.includes('collection/0')) {
