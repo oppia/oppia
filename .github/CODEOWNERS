@@ -45,8 +45,7 @@
 
 # Android team
 /android_validation_constants*.py @BenHenning
-/core/domain/exploration.proto @anandwana001
-/core/domain/exploration_pb2.py @anandwana001
+/core/proto/ @BenHenning
 
 
 # Angular Migration team
