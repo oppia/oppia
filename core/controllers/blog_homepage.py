@@ -143,7 +143,8 @@ class AuthorsPageHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception(
                     'User with given username does not exist'))
-        if user_settings.role not in [BLOG_ADMIN, BLOG_POST_EDITOR]:
+        if not any(role in user_settings.roles for role in [
+                BLOG_ADMIN, BLOG_POST_EDITOR]):
             raise self.PageNotFoundException(
                 Exception(
                     'The given user is not a blog post author.'))

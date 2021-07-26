@@ -1538,10 +1538,10 @@ class GenericTestBase(AppEngineTestBase):
 
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
-    ADMIN_EMAIL = 'admin@example.com'
+    CURRICULUM_ADMIN_EMAIL = 'admin@example.com'
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
-    ADMIN_USERNAME = 'adm'
+    CURRICULUM_ADMIN_USERNAME = 'adm'
     BLOG_ADMIN_EMAIL = 'blogadmin@example.com'
     BLOG_ADMIN_USERNAME = 'blogadm'
     BLOG_EDITOR_EMAIL = 'blogeditor@example.com'
@@ -2031,36 +2031,42 @@ title: Title
                 },
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_user_role(self, username, user_role):
-        """Sets the given role for this user.
+    def add_user_role(self, username, user_role):
+        """Adds the given role to the user account with the given username.
 
         Args:
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
         with self.super_admin_context():
-            self.post_json('/adminrolehandler', {
+            self.put_json('/adminrolehandler', {
                 'username': username,
-                'role': user_role,
+                'role': user_role
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_admins(self, admin_usernames):
-        """Sets role of given users as ADMIN.
+    def set_curriculum_admins(self, curriculum_admin_usernames):
+        """Sets role of given users as CURRICULUM_ADMIN.
 
         Args:
-            admin_usernames: list(str). List of usernames.
+            curriculum_admin_usernames: list(str). List of usernames.
         """
-        for name in admin_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_ADMIN)
+        for name in curriculum_admin_usernames:
+            self.add_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-    def set_topic_managers(self, topic_manager_usernames):
+    def set_topic_managers(self, topic_manager_usernames, topic_id):
         """Sets role of given users as TOPIC_MANAGER.
 
         Args:
             topic_manager_usernames: list(str). List of usernames.
+            topic_id: str. The topic Id.
         """
-        for name in topic_manager_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
+        with self.super_admin_context():
+            for username in topic_manager_usernames:
+                self.put_json('/topicmanagerrolehandler', {
+                    'username': username,
+                    'action': 'assign',
+                    'topic_id': topic_id
+                }, csrf_token=self.get_new_csrf_token())
 
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
@@ -2069,7 +2075,7 @@ title: Title
             moderator_usernames: list(str). List of usernames.
         """
         for name in moderator_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
+            self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
     def set_voiceover_admin(self, voiceover_admin_username):
         """Sets role of given users as VOICEOVER ADMIN.
@@ -2078,16 +2084,18 @@ title: Title
             voiceover_admin_username: list(str). List of usernames.
         """
         for name in voiceover_admin_username:
-            self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
+            self.add_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
-    def set_banned_users(self, banned_usernames):
-        """Sets role of given users as BANNED_USER.
+    def mark_user_banned(self, username):
+        """Marks a user banned.
 
         Args:
-            banned_usernames: list(str). List of usernames.
+            username: str. The username of the user to ban.
         """
-        for name in banned_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_BANNED_USER)
+        with self.super_admin_context():
+            self.put_json('/bannedusershandler', {
+                'username': username
+            }, csrf_token=self.get_new_csrf_token())
 
     def set_collection_editors(self, collection_editor_usernames):
         """Sets role of given users as COLLECTION_EDITOR.
@@ -2096,7 +2104,7 @@ title: Title
             collection_editor_usernames: list(str). List of usernames.
         """
         for name in collection_editor_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
+            self.add_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
         """Gets the user ID corresponding to the given email.

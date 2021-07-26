@@ -94,7 +94,7 @@ require(
 
 angular.module('oppia').component('settingsTab', {
   bindings: {
-    currentUserIsAdmin: '=',
+    currentUserIsCurriculumAdmin: '=',
     currentUserIsModerator: '='
   },
   template: require('./settings-tab.component.html'),

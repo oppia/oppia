@@ -52,7 +52,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -62,16 +62,16 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
         self.voiceover_admin_id = self.get_user_id_from_email(
             'voiceoveradmin@app.com')
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.system_user = user_services.get_system_user()
@@ -248,7 +248,7 @@ class EditorTests(BaseEditorControllerTests):
         self.logout()
 
     def test_publish_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(
@@ -1071,7 +1071,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % published_exp_id,
             expected_status_int=200)
@@ -1104,28 +1104,10 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id),
+                ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id)
+                ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id)
             ])
-            self.logout()
-
-            # Checking for admin.
-            observed_log_messages = []
-            exp_id = 'unpublished_eid2'
-            exploration = exp_domain.Exploration.create_default_exploration(
-                exp_id)
-            exp_services.save_new_exploration(self.admin_id, exploration)
-
-            self.login(self.ADMIN_EMAIL)
-            self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(observed_log_messages, [
-                '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id),
-                '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id)
-            ])
-
             self.logout()
 
             # Checking for moderator.
@@ -1138,10 +1120,12 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.login(self.MODERATOR_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(observed_log_messages, [
-                '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id),
-                '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id)
+                '(%s) %s tried to delete exploration %s' % (
+                    [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                    self.moderator_id, exp_id),
+                '(%s) %s deleted exploration %s' % (
+                    [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                    self.moderator_id, exp_id)
             ])
             self.logout()
 
@@ -1308,7 +1292,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
         self.assert_can_edit(exp_id)
 
         # Ban joe.
-        self.set_banned_users(['joe'])
+        self.mark_user_banned('joe')
 
         # Test that Joe is banned (He can still access the library page).
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
@@ -1990,8 +1974,8 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
@@ -2885,7 +2869,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,

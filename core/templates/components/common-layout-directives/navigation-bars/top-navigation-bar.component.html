@@ -248,17 +248,17 @@
             </span>
           </span>
           <div class="oppia-navbar-role-indicator"
-               *ngIf="isAdmin || isModerator">
+               *ngIf="isCurriculumAdmin || isModerator">
             <!--
              "right: 4px;" is necessary here but not in moderator to prevent 'A'
              from appearing off-center because 'A' is slightly thinner than 'M' in
              this font.
             -->
-            <span *ngIf="isAdmin"
+            <span *ngIf="isCurriculumAdmin"
                   class="oppia-navbar-role-text oppia-admin-text protractor-test-admin-text">
                   A
             </span>
-            <span *ngIf="isModerator && !isAdmin"
+            <span *ngIf="isModerator && !isCurriculumAdmin"
                   class="oppia-navbar-role-text protract-test-moderator-text">
                   M
             </span>
@@ -303,7 +303,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a *ngIf="(isAdmin || isTopicManager)"
+          <a *ngIf="(isCurriculumAdmin || isTopicManager)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/topics-and-skills-dashboard"
              class="dropdown-item nav-link protractor-test-topics-and-skills-dashboard-link">

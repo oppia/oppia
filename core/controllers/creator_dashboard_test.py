@@ -556,7 +556,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_managers_can_see_explorations(self):
         self.save_new_default_exploration(
             self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -580,7 +580,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_ID, self.collaborator_id,
             rights_domain.ROLE_EDITOR)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.login(self.COLLABORATOR_EMAIL)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -604,7 +604,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
@@ -702,7 +702,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_create_collections(self):
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         collection_id = self.post_json(
@@ -720,7 +720,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_collections_list(self):
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         collection_list = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']
@@ -825,7 +825,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CreationButtonsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""
@@ -840,7 +840,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_non_admins_can_not_upload_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
@@ -854,8 +854,8 @@ class CreationButtonsTests(test_utils.GenericTestBase):
 
     def test_can_upload_exploration(self):
         with self.swap(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
-            self.set_admins([self.ADMIN_USERNAME])
-            self.login(self.ADMIN_EMAIL, is_super_admin=True)
+            self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+            self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
             csrf_token = self.get_new_csrf_token()
             explorations_list = self.get_json(
@@ -875,8 +875,8 @@ class CreationButtonsTests(test_utils.GenericTestBase):
 
     def test_can_not_upload_exploration_when_server_does_not_allow_file_upload(
             self):
-        self.set_admins([self.ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '%s?yaml_file=%s' % (

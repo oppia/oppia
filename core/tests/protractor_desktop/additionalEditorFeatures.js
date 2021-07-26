@@ -54,7 +54,7 @@ describe('Full exploration editor', function() {
       await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
-      await workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial(false);
       await explorationEditorMainTab.startTutorial();
       await explorationEditorMainTab.playTutorial();
       await explorationEditorMainTab.finishTutorial();

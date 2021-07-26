@@ -85,7 +85,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             email=self.EMAIL_ID,
             created_on=self.NOW,
             last_updated=self.NOW,
-            role=self.ROLE,
             pseudonymizable_entity_mappings={
                 models.NAMES.audit.value: {'key': 'value'}
             }
@@ -109,7 +108,6 @@ class ValidateActivityMappingOnlyAllowedKeysTests(
             email=self.EMAIL_ID,
             created_on=self.NOW,
             last_updated=self.NOW,
-            role=self.ROLE,
             pseudonymizable_entity_mappings={
                 models.NAMES.collection.value: {'key': 'value'}
             }

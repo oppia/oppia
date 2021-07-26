@@ -59,8 +59,8 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
     def test_library_page(self):
@@ -72,7 +72,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_topic_manager': False,
             'is_moderator': False,
             'is_super_admin': False,
@@ -96,7 +96,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Change title and category.
         exp_services.update_exploration(
@@ -126,17 +126,17 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
     def test_library_handler_for_created_explorations(self):
         """Test the library data handler for manually created explorations."""
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertDictContainsSubset({
-            'is_admin': True,
-            'is_moderator': True,
+            'is_curriculum_admin': True,
+            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
-            'user_email': self.ADMIN_EMAIL,
-            'username': self.ADMIN_USERNAME,
+            'user_email': self.CURRICULUM_ADMIN_EMAIL,
+            'username': self.CURRICULUM_ADMIN_USERNAME,
             'search_cursor': None,
         }, response_dict)
 
@@ -202,7 +202,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_handler_with_exceeding_query_limit_logs_error(self):
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_topic_manager': False,
             'is_moderator': False,
             'is_super_admin': False,
@@ -232,7 +232,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'You may be running up against the default query limits.')
 
     def test_library_handler_with_given_category_and_language_code(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(exp_id, self.admin_id)
@@ -444,7 +444,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
         self.assertDictContainsSubset({
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
@@ -481,7 +481,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
         self.assertDictContainsSubset({
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],

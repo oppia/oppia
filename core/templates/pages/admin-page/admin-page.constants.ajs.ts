@@ -30,6 +30,9 @@ angular.module('oppia').constant(
   AdminPageConstants.ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL);
 
 angular.module('oppia').constant(
+  'ADMIN_BANNED_USERS_HANDLER', AdminPageConstants.ADMIN_BANNED_USERS_HANDLER);
+
+angular.module('oppia').constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE);
 

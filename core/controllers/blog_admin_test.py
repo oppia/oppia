@@ -40,7 +40,7 @@ class BlogAdminPageTests(test_utils.GenericTestBase):
 
     def test_blog_admin_page_acess_as_blog_admin(self):
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
         self.login(self.BLOG_ADMIN_EMAIL)
         self.get_html_response('/blog-admin')
@@ -56,7 +56,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
 
@@ -72,7 +72,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.BLOG_ADMIN_ROLE_HANDLER_URL,
             {
-                'role': feconf.ROLE_ID_BLOG_ADMIN,
+                'role': feconf.ROLE_ID_BLOG_POST_EDITOR,
                 'username': username
             },
             csrf_token=csrf_token,
@@ -132,7 +132,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.BLOG_ADMIN_USERNAME,
             feconf.ROLE_ID_BLOG_ADMIN)
 

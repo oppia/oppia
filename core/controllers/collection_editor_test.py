@@ -36,19 +36,20 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseCollectionEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
-        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.moderator = user_services.get_user_actions_info(self.moderator_id)
 
         self.json_dict = {
             'version': 1,
@@ -131,7 +132,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.editor_id,
+            self.moderator, self.COLLECTION_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
@@ -182,7 +183,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.viewer_id,
+            self.moderator, self.COLLECTION_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
@@ -209,7 +210,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.create_new_collection_rights(
             self.COLLECTION_ID, self.owner_id)
         rights_manager.assign_role_for_collection(
-            self.admin, self.COLLECTION_ID, self.editor_id,
+            self.moderator, self.COLLECTION_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
@@ -269,7 +270,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             rights_domain.ROLE_EDITOR)
         rights_manager.publish_collection(self.owner, collection_id)
 
-        # Check that collection cannot be unpublished by non admin.
+        # Check that collection cannot be unpublished by non moderator.
         with self.assertRaisesRegexp(
             Exception, 'This collection cannot be unpublished.'):
             rights_manager.unpublish_collection(self.owner, collection_id)
@@ -278,8 +279,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             collection_rights.status,
             rights_domain.ACTIVITY_STATUS_PUBLIC)
 
-        # Check that collection can be unpublished by admin.
-        rights_manager.unpublish_collection(self.admin, collection_id)
+        # Check that collection can be unpublished by moderator.
+        rights_manager.unpublish_collection(self.moderator, collection_id)
         collection_rights = rights_manager.get_collection_rights(collection_id)
         self.assertEqual(
             collection_rights.status,
@@ -365,8 +366,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertFalse(response_dict['is_private'])
         self.logout()
 
-        # Login as admin and try to unpublish the collection.
-        self.login(self.ADMIN_EMAIL)
+        # Login as moderator and try to unpublish the collection.
+        self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
@@ -393,7 +394,6 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_publish_unpublish_collection(self):
         self.set_collection_editors([self.OWNER_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
 
         # Login as owner and publish a collection with a public exploration.
         self.login(self.OWNER_EMAIL)
@@ -412,8 +412,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertFalse(response_dict['is_private'])
         self.logout()
 
-        # Login as admin and unpublish the collection.
-        self.login(self.ADMIN_EMAIL)
+        # Login as moderator and unpublish the collection.
+        self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
             '/collection_editor_handler/unpublish/%s' % collection_id,

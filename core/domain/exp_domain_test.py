@@ -9877,7 +9877,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self.login(self.OWNER_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
-                self.ADMIN_EMAIL)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             self.save_new_valid_exploration(
                 self.EXP_0_ID, self.owner_id, end_state_name='End')
@@ -10184,7 +10184,7 @@ class ExplorationChangesMergeabilityUnitTests(
         self.login(self.OWNER_EMAIL)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             messages = self._get_sent_email_messages(
-                self.ADMIN_EMAIL)
+                feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
             self.save_new_valid_exploration(
                 self.EXP_0_ID, self.owner_id, end_state_name='End')

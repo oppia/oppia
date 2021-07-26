@@ -453,7 +453,7 @@ def can_manage_email_dashboard(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_MANAGE_EMAIL_DASHBOARD in self.user.actions:
+        if self.current_user_is_super_admin:
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -2295,7 +2295,8 @@ def can_view_question_editor(handler):
             question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException
-        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in self.user.actions:
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
+                self.user.actions):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2488,7 +2489,7 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_EDIT_SKILLS in self.user.actions:
+        if role_services.ACTION_EDIT_SKILL in self.user.actions:
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -2799,7 +2800,7 @@ def can_view_any_topic_editor(handler):
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, topic_id, **kwargs)
         else:
@@ -2966,7 +2967,7 @@ def can_access_topic_viewer_page(handler):
 
         if (
                 topic_rights.topic_is_published or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, topic.name, **kwargs)
         else:
@@ -3063,7 +3064,7 @@ def can_access_story_viewer_page(handler):
 
         if (
                 (story_is_published and topic_is_published) or
-                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE in
                 user_actions_info.actions):
             return handler(self, story_id, *args, **kwargs)
         else:
@@ -3125,7 +3126,7 @@ def can_access_subtopic_viewer_page(handler):
 
         if (
                 (topic_rights is None or not topic_rights.topic_is_published)
-                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
+                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE not in
                 user_actions_info.actions):
             _redirect_based_on_return_type(
                 self, '/learn/%s' % classroom_url_fragment,

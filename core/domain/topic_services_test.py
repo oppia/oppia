@@ -91,17 +91,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(
@@ -591,6 +593,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
+        self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_admin = user_services.get_user_actions_info(
+            self.user_id_admin)
         rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegexp(
             Exception, 'Exploration with ID exp_id is not public. Please '
@@ -608,10 +613,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
     def test_update_topic(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
-            self.TOPIC_ID)
-
         # Save a dummy image on filesystem, to be used as thumbnail.
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
@@ -1268,10 +1269,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.publish_topic(self.TOPIC_ID, self.user_id_a)
 
     def test_create_new_topic_rights(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
@@ -1280,18 +1277,25 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
     def test_non_admin_cannot_assign_roles(self):
+        self.signup('x@example.com', 'X')
+        self.signup('y@example.com', 'Y')
+
+        user_id_x = self.get_user_id_from_email('x@example.com')
+        user_id_y = self.get_user_id_from_email('y@example.com')
+
+        user_x = user_services.get_user_actions_info(user_id_x)
+        user_y = user_services.get_user_actions_info(user_id_y)
         with self.assertRaisesRegexp(
             Exception,
             'UnauthorizedUserException: Could not assign new role.'):
             topic_services.assign_role(
-                self.user_b, self.user_a,
-                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+                user_y, user_x, topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
+            user_x, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_b, topic_rights))
+            user_y, topic_rights))
 
     def test_role_cannot_be_assigned_to_non_topic_manager(self):
         with self.assertRaisesRegexp(
@@ -1302,10 +1306,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
     def test_manager_cannot_assign_roles(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
         with self.assertRaisesRegexp(
             Exception,
             'UnauthorizedUserException: Could not assign new role.'):
@@ -1584,9 +1584,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         topic_services.assign_role(
             self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
             topic_domain.ROLE_MANAGER, 'topic_2')
         topic_rights = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
         self.assertEqual(len(topic_rights), 2)
@@ -1597,9 +1594,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic_rights), 0)
 
     def test_reassigning_manager_role_to_same_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
         with self.assertRaisesRegexp(
             Exception, 'This user already is a manager for this topic'):
             topic_services.assign_role(
@@ -1612,11 +1606,32 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-    def test_deassigning_manager_role(self):
+    def test_assigning_none_role(self):
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
+
+        self.assertTrue(topic_services.check_can_edit_topic(
+            self.user_a, topic_rights))
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+        # Assigning None role to manager.
         topic_services.assign_role(
             self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
 
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_a, topic_rights))
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
+        # Assigning None role to another role.
+        topic_services.assign_role(
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
+
+        self.assertFalse(topic_services.check_can_edit_topic(
+            self.user_b, topic_rights))
+
+    def test_deassigning_manager_role(self):
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
@@ -1624,23 +1639,23 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_NONE, self.TOPIC_ID)
+        topic_services.deassign_manager_role_from_topic(
+            self.user_admin, self.user_id_a, self.TOPIC_ID)
 
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_NONE, self.TOPIC_ID)
-
-        self.assertFalse(topic_services.check_can_edit_topic(
-            self.user_a, topic_rights))
+    def test_deassigning_an_unassigned_user_from_topic_raise_exception(self):
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
+
+        with self.assertRaisesRegexp(
+            Exception, 'User does not have manager rights in topic.'):
+            topic_services.deassign_manager_role_from_topic(
+                self.user_admin, self.user_id_b, self.TOPIC_ID)
 
 
 # TODO(lilithxxx): Remove this mock class and the SubtopicMigrationTests class

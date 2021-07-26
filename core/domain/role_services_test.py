@@ -43,10 +43,10 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
     def test_get_all_actions(self):
         with self.assertRaisesRegexp(
             Exception, 'Role TEST_ROLE does not exist.'):
-            role_services.get_all_actions('TEST_ROLE')
+            role_services.get_all_actions(['TEST_ROLE'])
 
         self.assertEqual(
-            role_services.get_all_actions(feconf.ROLE_ID_GUEST),
+            role_services.get_all_actions([feconf.ROLE_ID_GUEST]),
             [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
 
     def test_action_allocated_to_all_allowed_roles(self):

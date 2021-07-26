@@ -30,7 +30,7 @@ class ModeratorPageTests(test_utils.GenericTestBase):
         # Try accessing the moderator page without logging in.
         self.get_html_response('/moderator', expected_status_int=302)
 
-        # Try accessing the moderator page without being a moderator or admin.
+        # Try accessing the moderator page without being a moderator.
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.get_html_response('/moderator', expected_status_int=401)
@@ -40,13 +40,6 @@ class ModeratorPageTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.login(self.MODERATOR_EMAIL)
-        self.get_html_response('/moderator')
-        self.logout()
-
-        # Try accessing the moderator page after logging in as an admin.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL)
         self.get_html_response('/moderator')
         self.logout()
 

@@ -265,19 +265,26 @@ angular.module('oppia').directive('contributorDashboardAdminPage', [
         };
 
         ctrl.$onInit = function() {
-          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {};
           UserService.getUserInfoAsync().then((userInfo) => {
+            let translationCategories = {};
+            let questionCategories = {};
             if (userInfo.isTranslationAdmin()) {
-              ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+              translationCategories = {
                 REVIEW_TRANSLATION: (
                   CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION)
               };
-            } else if (userInfo.isQuestionAdmin()) {
-              ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+            }
+            if (userInfo.isQuestionAdmin()) {
+              questionCategories = {
                 REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
                 SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
               };
             }
+            ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
+              ...translationCategories,
+              ...questionCategories
+            };
+            $rootScope.$apply();
           });
 
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;

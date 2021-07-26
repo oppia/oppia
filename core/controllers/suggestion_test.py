@@ -64,7 +64,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SuggestionUnitTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -82,7 +82,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.normal_useer_id = self.get_user_id_from_email(
             self.NORMAL_USER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')
         user_services.allow_user_to_review_question(self.reviewer_id)
@@ -544,7 +544,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         # Testing admins can accept suggestions.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -783,7 +783,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             [('author_id', self.translator_id), ('target_id', self.EXP_ID)])[0]
         self.logout()
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json('%s/%s' % (
@@ -799,7 +799,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_update_already_handled_translation(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -830,7 +830,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_update_translations_without_translation_html(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -858,7 +858,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_update_translation_with_invalid_translation_html(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         change_dict = {
             'cmd': 'add_translation',
             'content_id': 'content',
@@ -927,7 +927,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json('%s/%s' % (
@@ -992,7 +992,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json('%s/%s' % (
@@ -1047,7 +1047,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json('%s/%s' % (
@@ -1101,7 +1101,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json('%s/%s' % (
@@ -1158,7 +1158,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         response = self.put_json('%s/%s' % (
@@ -1201,7 +1201,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         invalid_question_state_data = {}
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json('%s/%s' % (
@@ -1224,11 +1224,11 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(QuestionSuggestionTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_skill(
             self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION)
         self.question_dict = {
@@ -1296,7 +1296,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_TYPE_ADD_QUESTION)
             )['suggestions'][0]
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.put_json('%s/skill/%s/%s' % (
@@ -1526,14 +1526,14 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillSuggestionTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         user_services.allow_user_to_review_question(self.reviewer_id)
 
         self.skill_id = skill_services.get_new_skill_id()
@@ -1574,7 +1574,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_access_suggestion_to_skill_handler(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         thread_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_QUESTION, self.skill_id,
@@ -1593,7 +1593,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_skill_handler_with_invalid_target_type(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = 'new_exp_id'
         self.save_new_default_exploration(exp_id, self.admin_id)
@@ -1633,7 +1633,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_skill_handler_with_invalid_target_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1663,7 +1663,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_skill_handler_with_invalid_action(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -1685,7 +1685,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reject_suggestion_to_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
@@ -1714,7 +1714,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_accept_suggestion_to_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         suggestion_to_accept = self.get_json(
             '%s?author_id=%s' % (
@@ -1784,13 +1784,13 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserSubmittedSuggestionsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -1846,7 +1846,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
-        self.set_admins([self.ADMIN_USERNAME])
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
@@ -1992,17 +1991,17 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         super(ReviewableSuggestionsHandlerTest, self).setUp()
         self.AUTHOR_EMAIL = 'author@example.com'
         self.REVIEWER_EMAIL = 'reviewer@example.com'
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)

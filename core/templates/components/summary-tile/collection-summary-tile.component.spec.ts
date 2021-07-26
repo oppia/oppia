@@ -27,7 +27,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CollectionSummaryTileComponent } from './collection-summary-tile.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
+
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
 class LearnerDashboardIconsComponentStub {
@@ -47,29 +49,10 @@ describe('Collection Summary Tile Component', () => {
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
 
-  let userInfo = {
-    _role: 'USER_ROLE',
-    _isModerator: true,
-    _isAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: true,
-    isModerator: () => true,
-    isAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    isTranslationAdmin: () => false,
-    isQuestionAdmin: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
-  };
+  let userInfo: UserInfo = new UserInfo(
+    ['USER_ROLE'], true, false, false, false, true,
+    'en', 'username1', 'tester@example.com', true
+  );
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

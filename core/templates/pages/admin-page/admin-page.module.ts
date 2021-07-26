@@ -39,6 +39,7 @@ import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
 import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
 import { AdminPageComponent } from './admin-page.component';
+import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 @NgModule({
@@ -59,7 +60,8 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    TopicManagerRoleEditorModalComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -71,7 +73,8 @@ import { SharedFormsModule } from 'components/forms/shared-forms.module';
     AdminPageComponent,
     AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    TopicManagerRoleEditorModalComponent
   ],
   providers: [
     {

@@ -279,7 +279,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
+          ctrl.currentUserIsCurriculumAdmin = (
+            explorationData.is_curriculum_admin);
           ctrl.currentUserIsModerator = explorationData.is_moderator;
 
           ctrl.currentUser = explorationData.user;

@@ -57,9 +57,9 @@ describe('User Backend Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
-      role: 'USER_ROLE',
+      roles: ['USER_ROLE'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -72,7 +72,8 @@ describe('User Backend Api Service', () => {
       sampleUserInfoBackendObject);
 
     userBackendApiService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
+      expect(userInfo.isCurriculumAdmin()).toBe(
+        sampleUserInfo.isCurriculumAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
       expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());
@@ -98,7 +99,7 @@ describe('User Backend Api Service', () => {
     const sampleUserInfoBackendObject = {
       role: 'GUEST',
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,

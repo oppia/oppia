@@ -169,9 +169,9 @@ class BlogAdminRolesHandler(base.BaseHandler):
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
-        user_services.update_user_role(user_id, role)
+        user_services.add_user_role(user_id, role)
         role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
+            self.user_id, feconf.ROLE_ACTION_ADD, role=role,
             username=username)
         self.render_json({})
 
@@ -185,6 +185,6 @@ class BlogAdminRolesHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        user_services.remove_blog_editor(user_id)
+        user_services.remove_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
         blog_services.deassign_user_from_all_blog_posts(user_id)
         self.render_json({})

@@ -323,8 +323,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-        user_services.is_at_least_moderator),
+    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
@@ -337,9 +336,9 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_MARKETING: user_services.is_admin,
-    feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-        user_services.is_at_least_moderator),
+    feconf.EMAIL_INTENT_MARKETING: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (
@@ -358,14 +357,20 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_MARKETING: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
+        user_services.is_curriculum_admin),
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
+        user_services.is_curriculum_admin),
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_admin,
-    feconf.BULK_EMAIL_INTENT_TEST: user_services.is_admin
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.BULK_EMAIL_INTENT_TEST: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
 
@@ -1175,7 +1180,7 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
     _send_email(
-        tester_id, tester_id, feconf.BULK_EMAIL_INTENT_TEST,
+        tester_id, feconf.SYSTEM_COMMITTER_ID, feconf.BULK_EMAIL_INTENT_TEST,
         email_subject, email_body, tester_email, sender_name=tester_name)
 
 
@@ -1383,7 +1388,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1396,7 +1401,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             continue
         else:
             email_body = email_body_template % (
-                admin_usernames[index], feconf.OPPIA_SITE_URL,
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL,
                 suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
@@ -1503,7 +1508,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1516,8 +1521,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             continue
         else:
             email_body = email_body_template % (
-                admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                suggestion_types_needing_reviewers_html)
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+                feconf.ADMIN_URL, suggestion_types_needing_reviewers_html)
 
             _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,
