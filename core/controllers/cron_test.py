@@ -382,7 +382,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertTrue(user_query_model.get_by_id('query_id').deleted)
 
     def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         report_timestamp = (
             datetime.datetime.utcnow() - self.FOURTEEN_WEEKS)
