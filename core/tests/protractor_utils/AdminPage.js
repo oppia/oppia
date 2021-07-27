@@ -63,7 +63,7 @@ var AdminPage = function() {
   var featureFlagElements = element.all(by.css(
     '.protractor-test-feature-flag'));
   var featureNameLocator = by.css('.protractor-test-feature-name');
-  var ruleIndicatorLocator = by.css('.protractor-test-no-rule-indicator');
+  var noRuleIndicatorLocator = by.css('.protractor-test-no-rule-indicator');
   var removeRuleButtonLocator = by.css(
     '.protractor-test-remove-rule-button');
   var saveButtonLocator = by.css('.protractor-test-save-button');
@@ -188,7 +188,7 @@ var AdminPage = function() {
   };
 
   this.removeAllRulesOfFeature = async function(featureElement) {
-    while (!await featureElement.isElementPresent(ruleIndicatorLocator)) {
+    while (!await featureElement.isElementPresent(noRuleIndicatorLocator)) {
       await action.click(
         'Remove feature rule button',
         featureElement

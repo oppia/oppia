@@ -32,9 +32,9 @@ ruleTester.run('check-element-selector-at-top', rule, {
 
       var LibraryPage = function() {
         var allCollectionSummaryTile = element.all(
-        by.css('.protractor-test-collection-summary-tile'));
+         by.css('.protractor-test-collection-summary-tile'));
         var allExplorationSummaryTile = element.all(
-        by.css('.protractor-test-exp-summary-tile'));
+         by.css('.protractor-test-exp-summary-tile'));
         var allCollectionsTitled = function(collectionName) {
           return element.all(by.cssContainingText(
           '.protractor-test-collection-summary-tile-title', collectionName));
@@ -42,7 +42,7 @@ ruleTester.run('check-element-selector-at-top', rule, {
 
         var allExplorationsTitled = function(explorationName) {
           var allCollectionSummaryTile = element.all(
-          by.css('.protractor-test-collection-summary-tile' + check));};
+           by.css('.protractor-test-collection-summary-tile' + check));};
         };`,
     }
   ],
@@ -51,13 +51,14 @@ ruleTester.run('check-element-selector-at-top', rule, {
     {
       code:
       `var action = require('./action.js');
-      var forms = require('./forms.js');var waitFor = require('./waitFor.js');
+      var forms = require('./forms.js');
+      var waitFor = require('./waitFor.js');
 
       var LibraryPage = function() {
         var allCollectionSummaryTile = element.all(
-        by.css('.protractor-test-collection-summary-tile'));
+         by.css('.protractor-test-collection-summary-tile'));
         var allExplorationSummaryTile = element.all(
-        by.css('.protractor-test-exp-summary-tile'));
+         by.css('.protractor-test-exp-summary-tile'));
         var allCollectionsTitled = function(collectionName) {
           return element.all(by.cssContainingText(
           '.protractor-test-collection-summary-tile-title', collectionName));
@@ -65,7 +66,7 @@ ruleTester.run('check-element-selector-at-top', rule, {
 
         var allExplorationsTitled = function(explorationName) {
           var allCollectionSummaryTile = element.all(
-          by.css('.protractor-test-collection-summary-tile'));};
+           by.css('.protractor-test-collection-summary-tile'));};
         };`,
       errors: [{
         message: (

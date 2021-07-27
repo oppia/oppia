@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure that element selectors
- * at the top of the file.
+ * @fileoverview Lint check to ensure that element in the topmost
+ * scope of the module function.
  */
 
 'use strict';
@@ -24,7 +24,8 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to ensure that element selectors at the top of the file'),
+        'Lint check to ensure that element in the topmost scope' +
+        ' of the module function.'),
       category: 'Best Practices',
       recommended: true,
     },

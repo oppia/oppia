@@ -55,8 +55,6 @@ var PreferencesPage = function() {
     by.css('.protractor-test-export-account-button'));
   var languageSelector = element(
     by.css('.protractor-test-site-language-selector'));
-  var selectedLanguageElement = element(
-    by.css('.protractor-test-site-language-selector'));
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
@@ -180,9 +178,9 @@ var PreferencesPage = function() {
 
   this.expectPreferredSiteLanguageToBe = async function(language) {
     await waitFor.visibilityOf(
-      selectedLanguageElement,
-      'selectedLanguageElement taking too long to appear.');
-    expect(await selectedLanguageElement.getText()).toEqual(language);
+      languageSelector,
+      'languageSelector taking too long to appear.');
+    expect(await languageSelector.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageToBe = async function(language) {
