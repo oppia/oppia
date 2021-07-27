@@ -357,7 +357,10 @@
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
       *ngFor="let subscription of subscriptionsList">
-      <a class="oppia-subscription-profile-link" href="/profile/{{ subscription.username }}" target="_blank" rel="noopener">
+      <a class="oppia-subscription-profile-link"
+         href="/profile/{{ subscription.username }}"
+         [routerLink]="'/profile/' + subscription.username"
+         target="_blank" rel="noopener">
         <img [src]="decodePngURIData(subscription.pictureDataUrl)"
              class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">

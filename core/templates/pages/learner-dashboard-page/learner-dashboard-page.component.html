@@ -597,6 +597,7 @@
                    *ngFor="let subscription of subscriptionsList | sortBy: isCurrentSubscriptionSortDescending: getValueOfSubscriptionSortKey()">
             <a class="oppia-subscription-profile-link"
                href="/profile/{{ subscription.username }}"
+               [routerLink]="'/profile/' + subscription.username "
                target="_blank"
                rel="noopener">
               <img [src]="decodePngURIData(subscription.pictureDataUrl)"

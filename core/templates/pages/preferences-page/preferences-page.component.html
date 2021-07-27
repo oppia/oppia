@@ -9,7 +9,11 @@
       <div class="form-group row">
         <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_PREFERENCES_USERNAME' | translate }}</label>
         <div class="col-lg-8 col-md-8 col-sm-8">
-          <a *ngIf="username" href="/profile/{{ username }}">{{ username }}</a>
+          <a *ngIf="username"
+             href="/profile/{{ username }}"
+             [routerLink]="'/profile/' + username">
+             { username }}
+          </a>
           <em *ngIf="!username">{{ 'I18N_PREFERENCES_USERNAME_NOT_SELECTED' | translate }}</em>
         </div>
       </div>
