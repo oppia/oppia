@@ -14,15 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Migration Jobs for subtopic page models"""
+"""Beam Jobs for exploration models"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_fetchers
+from core.platform import models
+from jobs import base_jobs
 from jobs import job_utils
+from jobs.io import ndb_io
 from jobs.types import job_run_result
-import feconf
 
 import apache_beam as beam
 
@@ -33,6 +35,8 @@ class PopulateExplorationWithProtoSize(base_jobs.JobBase):
     """Update the proto_size_in_bytes in exploration models."""
 
     def run(self):
+        """Update every exploration model in datastore."""
+
         exploration_model_query = exp_models.ExplorationModel.query()
         migrated_models = (
             self.pipeline
@@ -57,10 +61,14 @@ class PopulateExplorationWithProtoSize(base_jobs.JobBase):
 
         return (success_message, error_messages) | beam.Flatten()
 
+
 class UpdateProtoSizeInBytes(beam.DoFn):
+    """Calculate proto size and return updated model."""
 
     def process(self, input_model):
-        if (input_model.proto_size_in_bytes == 0:
+        """Update each exploration model."""
+
+        if input_model.proto_size_in_bytes == 0:
             model = job_utils.clone_model(input_model)
             try:
                 # Fetching corresponding domain object here to run the
@@ -71,8 +79,8 @@ class UpdateProtoSizeInBytes(beam.DoFn):
                 model.proto_size_in_bytes = 1
             except Exception as e:
                 error_message = (
-                    'Exploration Model %s failed to update proto_size_in_bytes: %s'
-                    % (model.id, e))
+                    'Exploration Model %s failed to update'
+                    'proto_size_in_bytes: %s' % (model.id, e))
                 yield beam.pvalue.TaggedOutput('error', error_message)
             else:
                 yield model
