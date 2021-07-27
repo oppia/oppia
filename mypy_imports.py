@@ -34,6 +34,8 @@ from core.storage.collection import gae_models as collection_models
 from core.storage.config import gae_models as config_models
 from core.storage.email import gae_models as email_models
 from core.storage.exploration import gae_models as exp_models
+from core.storage.feedback import gae_models as feedback_models
+from core.storage.improvements import gae_models as improvements_models
 from core.storage.user import gae_models as user_models
 
 __all__ = [
@@ -49,6 +51,8 @@ __all__ = [
     b'datastore_services',
     b'email_models',
     b'exp_models',
+    b'feedback_models',
+    b'improvements_models',
     b'transaction_services',
     b'user_models'
 ]

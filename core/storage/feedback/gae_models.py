@@ -214,7 +214,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         for _ in python_utils.RANGE(_MAX_RETRIES):
             thread_id = (
                 entity_type + '.' + entity_id + '.' +
-                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
+                utils.base64_from_int(
+                    int(utils.get_current_time_in_millisecs())) +
                 utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_id(thread_id):
                 return thread_id
@@ -610,6 +611,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_id field.
         """
@@ -617,6 +619,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since there are
         multiple feedback threads relevant to a user.
         """
@@ -624,6 +627,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -635,6 +639,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of GeneralFeedbackThreadUserModel for the user.
 
         Args:
@@ -645,6 +650,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether GeneralFeedbackThreadUserModel exists for user.
 
         Args:
@@ -657,6 +663,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
+        # type: (Text, Text) -> Text
         """Generates the full message id of the format:
             <user_id.thread_id>.
 
@@ -670,7 +677,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return '%s.%s' % (user_id, thread_id)
 
     @classmethod
-    def get(cls, user_id, thread_id):
+    def get(cls, user_id, thread_id): # type: ignore[override]
+        # type: (Text, Text) -> Optional[GeneralFeedbackThreadUserModel]
         """Gets the FeedbackThreadUserModel corresponding to the given user and
         the thread.
 
@@ -688,6 +696,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, thread_id):
+        # type: (Text, Text) -> GeneralFeedbackThreadUserModel
         """Creates a new FeedbackThreadUserModel instance and returns it.
 
         Args:
@@ -703,6 +712,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(cls, user_id, thread_ids):
+        # type: (Text, List[Text]) -> List[GeneralFeedbackThreadUserModel]
         """Creates new FeedbackThreadUserModel instances for user_id for each
         of the thread_ids.
 
@@ -726,7 +736,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return new_instances
 
     @classmethod
-    def get_multi(cls, user_id, thread_ids):
+    def get_multi(cls, user_id, thread_ids): # type: ignore[override]
+        # type: (Text, List[Text]) -> List[Optional[GeneralFeedbackThreadUserModel]]
         """Gets the ExplorationUserDataModel corresponding to the given user and
         the thread ids.
 
@@ -747,6 +758,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, List[Text]]]
         """Takeout: Export GeneralFeedbackThreadUserModel user-based properties.
 
         Args:
@@ -785,16 +797,19 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -826,6 +841,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data corresponding to a user: id field but it isn't
         deleted because it is needed for auditing purposes.
         """
@@ -833,11 +849,13 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+         # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'feedback_message_references':
@@ -847,6 +865,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UnsentFeedbackEmailModel exists for user.
 
         Args:
