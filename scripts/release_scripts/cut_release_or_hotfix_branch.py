@@ -36,8 +36,8 @@ d is number of the hotfix being created, e.g. 1. The generated branch
 name will be release-x.y.z-hotfix-d, e.g. release-2.5.3-hotfix-1.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import json

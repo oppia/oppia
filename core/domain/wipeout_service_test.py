@@ -14,8 +14,8 @@
 
 """Tests for wipeout service."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import logging
@@ -36,6 +36,7 @@ from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -76,16 +77,14 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         super(WipeoutServiceHelpersTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.user_1_role = user_services.get_user_settings(self.user_1_id).role
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_2_role = user_services.get_user_settings(self.user_2_id).role
 
     def test_gets_pending_deletion_request(self):
         wipeout_service.save_pending_deletion_requests(
             [
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_EMAIL, self.user_1_role)
+                    self.user_1_id, self.USER_1_EMAIL)
             ]
         )
 
@@ -106,9 +105,9 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
         wipeout_service.save_pending_deletion_requests(
             [
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_1_id, self.USER_1_EMAIL, self.user_1_role),
+                    self.user_1_id, self.USER_1_EMAIL),
                 wipeout_domain.PendingDeletionRequest.create_default(
-                    self.user_2_id, self.USER_2_EMAIL, self.user_2_role)
+                    self.user_2_id, self.USER_2_EMAIL)
             ]
         )
         number_of_pending_deletion_requests = (
@@ -118,7 +117,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     def test_saves_pending_deletion_request_when_new(self):
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.user_1_role))
+                self.user_1_id, self.USER_1_EMAIL))
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
@@ -138,7 +137,6 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel(
                 id=self.user_1_id,
                 email=self.USER_1_EMAIL,
-                role=self.user_1_role,
                 deletion_complete=False,
                 pseudonymizable_entity_mappings={}
             )
@@ -147,7 +145,7 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
 
         pending_deletion_request = (
             wipeout_domain.PendingDeletionRequest.create_default(
-                self.user_1_id, self.USER_1_EMAIL, self.user_1_role)
+                self.user_1_id, self.USER_1_EMAIL)
         )
         pending_deletion_request.deletion_complete = True
         pending_deletion_request.pseudonymizable_entity_mappings = {
@@ -186,7 +184,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         super(WipeoutServicePreDeleteTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.add_user_role(
+            self.USER_1_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -364,7 +363,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             self.USER_3_USERNAME)
 
     def test_pre_delete_user_with_activities_multiple_owners(self):
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
@@ -511,12 +510,28 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(WipeoutServiceRunFunctionsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
         date_10_days_ago = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+
+        self.save_new_topic(
+            self.topic_id, self.owner_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+
+        self.set_topic_managers([self.USER_1_USERNAME], self.topic_id)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -550,11 +565,24 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     def test_run_user_deletion_completion_with_user_properly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
-        self.assertEqual(
-            wipeout_service.run_user_deletion_completion(
-                self.pending_deletion_request),
-            wipeout_domain.USER_VERIFICATION_SUCCESS
+
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_account_deleted_email',
+            lambda x, y: None,
+            expected_args=[(
+                self.pending_deletion_request.user_id,
+                self.pending_deletion_request.email
+            )]
         )
+
+        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_SUCCESS
+            )
+
         self.assertIsNotNone(
             user_models.DeletedUserModel.get_by_id(self.user_1_id))
         self.assertTrue(user_services.is_username_taken(self.USER_1_USERNAME))
@@ -570,7 +598,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(
                 self.user_1_id))
 
-    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
+            self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
@@ -589,7 +618,36 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             expected_args=[('WIPEOUT: Account deletion failed', email_content)]
         )
 
-        with send_email_swap:
+        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.assertEqual(
+                wipeout_service.run_user_deletion_completion(
+                    self.pending_deletion_request),
+                wipeout_domain.USER_VERIFICATION_FAILURE)
+
+        self.assertIsNotNone(
+            user_models.UserSettingsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            auth_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+        self.assertIsNotNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+
+    def test_run_user_deletion_completion_user_wrongly_deleted_emails_disabled(
+            self):
+        wipeout_service.run_user_deletion(self.pending_deletion_request)
+
+        user_models.CompletedActivitiesModel(
+            id=self.user_1_id, exploration_ids=[], collection_ids=[],
+            story_ids=[], learnt_topic_ids=[]
+        ).put()
+
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            called=False  # Func shouldn't be called when emails are disabled.
+        )
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -653,7 +711,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
         'text_size': 'MEDIUM_TEXT_SIZE',
         'download_and_update_only_on_wifi': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -851,7 +909,7 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
         'text_size': 'MEDIUM_TEXT_SIZE',
         'download_and_update_only_on_wifi': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -2394,7 +2452,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceDeleteQuestionModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -2736,7 +2794,7 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceVerifyDeleteQuestionModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -2794,7 +2852,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceDeleteSkillModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -3040,7 +3098,7 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceVerifyDeleteSkillModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.set_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
+        self.set_curriculum_admins((self.USER_1_USERNAME, self.USER_2_USERNAME))
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         self.save_new_skill(self.SKILL_1_ID, self.user_1_id)
@@ -3891,9 +3949,9 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        user_services.update_user_role(
-            self.user_1_id, feconf.ROLE_ID_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
+            self.user_1_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
+        user_services.add_user_role(
             self.user_2_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -4935,9 +4993,13 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.can_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_repeated_deletion_is_successful(self):
-        with self.send_mail_to_admin_swap:
+    def test_repeated_deletion_is_successful_when_emails_enabled(self):
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertIn('SUCCESS', self.email_bodies[0])
             self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -4945,8 +5007,21 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn('ALREADY DONE', self.email_bodies[1])
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
+    def test_repeated_deletion_is_successful_when_emails_disabled(self):
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            called=False  # Func shouldn't be called when emails are disabled.
+        )
+        with send_mail_to_admin_swap, self.cannot_send_email_swap:
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+            wipeout_service.delete_users_pending_to_be_deleted()
+            self.assertEqual(len(self.email_bodies), 0)
+
     def test_regular_deletion_is_successful(self):
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5008,12 +5083,27 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.can_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', True)
+        self.cannot_send_email_swap = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
 
-    def test_verification_when_user_is_not_deleted(self):
-        with self.send_mail_to_admin_swap:
+    def test_verification_when_user_is_not_deleted_emails_enabled(self):
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('NOT DELETED', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
+
+    def test_verification_when_user_is_not_deleted_emails_disabled(self):
+        send_mail_to_admin_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            called=False  # Func shouldn't be called when emails are disabled.
+        )
+        with send_mail_to_admin_swap, self.cannot_send_email_swap:
+            wipeout_service.check_completion_of_user_deletion()
+        self.assertEqual(len(self.email_bodies), 0)
 
     def test_verification_when_user_is_deleted_is_successful(self):
         pending_deletion_request = (
@@ -5023,7 +5113,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5044,7 +5134,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             story_ids=[], learnt_topic_ids=[]
         ).put()
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_swap, self.can_send_email_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])

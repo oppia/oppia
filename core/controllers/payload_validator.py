@@ -18,8 +18,8 @@
 Also contains a list of handler class names which does not contain the schema.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import schema_utils
 
@@ -86,9 +86,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'BulkEmailWebhookEndpoint',
     'CollectionSummariesHandler',
     'ConsoleErrorPage',
-    'ContributorRightsDataHandler',
-    'CreatorDashboardHandler',
-    'CreatorDashboardPage',
     'DeferredTasksHandler',
     'DeleteAccountHandler',
     'DeleteAccountPage',
@@ -142,13 +139,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'JobsHandler',
     'LearnerAnswerDetailsSubmissionHandler',
     'LearnerAnswerInfoHandler',
-    'LearnerDashboardFeedbackThreadHandler',
-    'LearnerDashboardHandler',
-    'LearnerDashboardIdsHandler',
-    'LearnerDashboardPage',
     'LearnerGoalsHandler',
     'LearnerIncompleteActivityHandler',
-    'LearnerPlaylistHandler',
     'LeaveForRefresherExpEventHandler',
     'LibraryGroupIndexHandler',
     'LibraryGroupPage',
@@ -158,17 +150,12 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'MemoryCacheAdminHandler',
     'MemoryCacheHandler',
     'MergeSkillHandler',
-    'NewCollectionHandler',
-    'NewExplorationHandler',
     'NewSkillHandler',
     'NewTopicHandler',
     'NotificationHandler',
     'NotificationsDashboardHandler',
     'NotificationsDashboardPage',
     'NotificationsHandler',
-    'OldContributorDashboardRedirectPage',
-    'OldCreatorDashboardRedirectPage',
-    'OldLearnerDashboardRedirectPage',
     'OldLibraryRedirectPage',
     'OldNotificationsDashboardRedirectPage',
     'PendingAccountDeletionPage',
@@ -262,7 +249,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UnsubscribeHandler',
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
-    'UploadExplorationHandler',
     'UrlHandler',
     'UserExplorationEmailsHandler',
     'UserExplorationPermissionsHandler',

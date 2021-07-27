@@ -14,8 +14,8 @@
 
 """Service for handling the user deletion process."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import itertools
@@ -74,7 +74,6 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
-        pending_deletion_request_model.role,
         pending_deletion_request_model.normalized_long_term_username,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.pseudonymizable_entity_mappings
@@ -111,7 +110,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
             'email': deletion_request.email,
             'normalized_long_term_username': (
                 deletion_request.normalized_long_term_username),
-            'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
             'pseudonymizable_entity_mappings': (
                 deletion_request.pseudonymizable_entity_mappings)
@@ -160,11 +158,10 @@ def pre_delete_user(user_id):
         pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
-                profile_user_settings.email,
-                profile_user_settings.role
+                profile_user_settings.email
             )
         )
-    if user_settings.role != feconf.ROLE_ID_LEARNER:
+    if feconf.ROLE_ID_MOBILE_LEARNER not in user_settings.roles:
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
@@ -191,7 +188,6 @@ def pre_delete_user(user_id):
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
-            user_settings.role,
             normalized_long_term_username=normalized_long_term_username
         )
     )
@@ -213,20 +209,19 @@ def delete_users_pending_to_be_deleted():
             request_model.id)
         # The final status of the deletion. Either 'SUCCESS' or 'ALREADY DONE'.
         deletion_status = run_user_deletion(pending_deletion_request)
-        email_message += '\n'
-        email_message += '-----------------------------------'
-        email_message += '\n'
+        email_message += '\n-----------------------------------\n'
         email_message += (
-            'PendingDeletionRequestModel ID: %s'
-            'User ID: %s'
-            'Deletion status: %s'
+            'PendingDeletionRequestModel ID: %s\n'
+            'User ID: %s\n'
+            'Deletion status: %s\n'
         ) % (
             request_model.id, pending_deletion_request.user_id,
             deletion_status
         )
 
     email_subject = 'User Deletion job result'
-    email_manager.send_mail_to_admin(email_subject, email_message)
+    if feconf.CAN_SEND_EMAILS:
+        email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def check_completion_of_user_deletion():
@@ -250,20 +245,18 @@ def check_completion_of_user_deletion():
         # or 'FAILURE'.
         completion_status = run_user_deletion_completion(
             pending_deletion_request)
-        email_message += '\n'
-        email_message += '-----------------------------------'
-        email_message += '\n'
-        email_message += (
-            'PendingDeletionRequestModel ID: %s'
-            'User ID: %s'
-            'Completion status: %s'
-        ) % (
-            request_model.id, pending_deletion_request.user_id,
-            completion_status
-        )
-
-        email_subject = 'Completion of User Deletion job result'
-        email_manager.send_mail_to_admin(email_subject, email_message)
+        if feconf.CAN_SEND_EMAILS:
+            email_message += '\n-----------------------------------\n'
+            email_message += (
+                'PendingDeletionRequestModel ID: %s\n'
+                'User ID: %s\n'
+                'Completion status: %s\n'
+            ) % (
+                request_model.id, pending_deletion_request.user_id,
+                completion_status
+            )
+            email_subject = 'Completion of User Deletion job result'
+            email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def run_user_deletion(pending_deletion_request):
@@ -310,12 +303,18 @@ def run_user_deletion_completion(pending_deletion_request):
         if pending_deletion_request.normalized_long_term_username is not None:
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username)
-        email_manager.send_account_deleted_email(
-            pending_deletion_request.user_id, pending_deletion_request.email)
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_account_deleted_email(
+                pending_deletion_request.user_id,
+                pending_deletion_request.email
+            )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
-        email_manager.send_account_deletion_failed_email(
-            pending_deletion_request.user_id, pending_deletion_request.email)
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_account_deletion_failed_email(
+                pending_deletion_request.user_id,
+                pending_deletion_request.email
+            )
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE
@@ -336,14 +335,14 @@ def _delete_models_with_delete_at_end_policy(user_id):
 
 def delete_user(pending_deletion_request):
     """Delete all the models for user specified in pending_deletion_request
-    on the basis of the user role specified in the request.
+    on the basis of the user role.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_role = pending_deletion_request.role
+    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -352,7 +351,7 @@ def delete_user(pending_deletion_request):
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.feedback)
     _delete_models(user_id, models.NAMES.improvements)
-    if user_role != feconf.ROLE_ID_LEARNER:
+    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
         _pseudonymize_app_feedback_report_models(pending_deletion_request)
