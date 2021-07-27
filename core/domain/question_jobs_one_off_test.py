@@ -203,7 +203,7 @@ class FixQuestionImagesStorageOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test questions.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         self.process_and_flush_pending_mapreduce_tasks()
         self.skill_id_1 = 'skill_id_1'
         self.skill_id_2 = 'skill_id_2'

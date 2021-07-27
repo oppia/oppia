@@ -46,7 +46,7 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
 
         self.voiceover_admin_id = self.get_user_id_from_email(
             'voiceoveradmin@app.com')
-        self.set_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.voiceover_admin = user_services.get_user_actions_info(
             self.voiceover_admin_id)
 
@@ -346,7 +346,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             self.private_exp_id_2, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_owner_cannot_assign_voice_artist(self):
