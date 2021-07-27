@@ -113,14 +113,18 @@ export class SpeechSynthesisChunkerService {
         );
       }
     }
-    newUtterance.onend = () => {
-      if (this.cancelRequested) {
-        this.cancelRequested = false;
-        return;
+    Object.defineProperty(
+      newUtterance, 'onend', {
+        value: () => {
+          if (this.cancelRequested) {
+            this.cancelRequested = false;
+            return;
+          }
+          offset += chunk.length;
+          this._speechUtteranceChunker(utterance, offset, callback);
+        }
       }
-      offset += chunk.length;
-      this._speechUtteranceChunker(utterance, offset, callback);
-    };
+    );
 
     // IMPORTANT!! Do not remove: Logging the object out fixes some onend
     // firing issues. Placing the speak invocation inside a callback
@@ -188,12 +192,12 @@ export class SpeechSynthesisChunkerService {
         var element = <HTMLElement> this;
         const _newTextAttr = element.attributes[
           <keyof NamedNodeMap> 'text-with-value'] as Attr;
-        // 'Node.textContent' only returns 'null' if the Node is a
-        // 'document' or a 'DocType'. '_newTextAttr' is neither.
+          // 'Node.textContent' only returns 'null' if the Node is a
+          // 'document' or a 'DocType'. '_newTextAttr' is neither.
         const newTextContent = _newTextAttr.textContent?.replace(
           /&quot;/g, '');
-        // Variable newTextContent ends with a " character, so this is being
-        // ignored in the condition below.
+          // Variable newTextContent ends with a " character, so this is being
+          // ignored in the condition below.
         return (
           newTextContent && newTextContent !== '"' ?
           newTextContent + ' ' : ''

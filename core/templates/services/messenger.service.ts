@@ -68,13 +68,9 @@ interface GetPayloadType {
   explorationReset(data: string): ExplorationResetData;
 }
 
-type MessageTitles = (
-  'heightChange'|
-  'explorationLoaded'|
-  'stateTransition'|
-  'explorationReset'|
-  'explorationCompleted'
-);
+type MessageTitles = typeof ServicesConstants.MESSENGER_PAYLOAD[
+  keyof typeof ServicesConstants.MESSENGER_PAYLOAD
+];
 
 type PayloadType = (
   HeightChangeData |
