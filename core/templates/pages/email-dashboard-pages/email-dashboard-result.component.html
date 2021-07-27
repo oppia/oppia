@@ -32,7 +32,7 @@
   <form ng-class="{'disable-form': $ctrl.submitIsInProgress}" ng-submit="$ctrl.submitEmail()">
     Email subject: <textarea rows="2" cols="10" placeholder="Enter email subject here..." ng-model="$ctrl.emailSubject"></textarea>
     <br>
-    Email body: <textarea rows="15" cols="20" placeholder="Enter email body here..." ng-model="emailBody"></textarea>
+    Email body: <textarea rows="15" cols="20" placeholder="Enter email body here..." ng-model="$ctrl.emailBody"></textarea>
     <br>
     Email intent: <select ng-model="$ctrl.emailIntent" ng-options="intent for intent in $ctrl.POSSIBLE_EMAIL_INTENTS"></select><br><br>
     Email option: <input type="radio" name="email" ng-model="$ctrl.emailOption" value="all" checked> Send to all

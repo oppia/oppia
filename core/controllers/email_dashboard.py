@@ -183,31 +183,26 @@ class EmailDashboardResultPage(base.BaseHandler):
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
-            'data': {
+            'email_subject': {
                 'schema': {
-                    'type': 'dict',
-                    'properties': [{
-                        'name': 'email_subject',
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    }, {
-                        'name': 'email_body',
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    }, {
-                        'name': 'email_intent',
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    }, {
-                        'name': 'max_recipients',
-                        'schema': {
-                            'type': 'int'
-                        }
-                    }]
+                    'type': 'basestring'
                 }
+            },
+            'email_body': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'email_intent': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'max_recipients': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
             }
         }
     }
@@ -240,11 +235,10 @@ class EmailDashboardResultPage(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
-        data = self.normalized_payload.get('data')
-        email_subject = data['email_subject']
-        email_body = data['email_body']
-        max_recipients = data['max_recipients']
-        email_intent = data['email_intent']
+        email_subject = self.normalized_payload.get('email_subject')
+        email_body = self.normalized_payload.get('email_body')
+        max_recipients = self.normalized_payload.get('max_recipients')
+        email_intent = self.normalized_payload.get('email_intent')
         user_query_services.send_email_to_qualified_users(
             query_id, email_subject, email_body, email_intent, max_recipients)
         self.render_json({})
