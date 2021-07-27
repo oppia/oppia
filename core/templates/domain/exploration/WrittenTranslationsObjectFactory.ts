@@ -112,7 +112,7 @@ export class WrittenTranslations {
 
   addWrittenTranslation(
       contentId: string, languageCode: string,
-      dataFormat: DataFormatToDefaultValuesKey | 'invalid',
+      dataFormat: DataFormatToDefaultValuesKey,
       translation: string|string[]
   ): void {
     const writtenTranslations = this.translationsMapping[contentId];

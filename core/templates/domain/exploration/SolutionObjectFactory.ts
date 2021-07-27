@@ -47,6 +47,9 @@ import {
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 
 export interface ExplanationBackendDict {
+  // A null 'content_id' indicates that the 'Solution' has been created
+  // but not saved. Before the 'Solution' object is saved into a State,
+  // the 'content_id' should be set to a string.
   'content_id': string | null;
   'html': string;
 }

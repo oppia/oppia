@@ -44,7 +44,7 @@ export interface TranslationBackendDict {
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: DataFormatToDefaultValuesKey | 'invalid',
+      public dataFormat: DataFormatToDefaultValuesKey,
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
@@ -100,24 +100,22 @@ export class WrittenTranslation {
   providedIn: 'root'
 })
 export class WrittenTranslationObjectFactory {
-  createNew(
-      dataFormat: DataFormatToDefaultValuesKey | 'invalid'
-  ): WrittenTranslation {
-    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat) ||
-        dataFormat === 'invalid') {
+  createNew(dataFormat: string): WrittenTranslation {
+    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
 
     return new WrittenTranslation(
-      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[
-        <DataFormatToDefaultValuesKey> dataFormat], false);
+      <DataFormatToDefaultValuesKey> dataFormat,
+      DATA_FORMAT_TO_DEFAULT_VALUES[<DataFormatToDefaultValuesKey> dataFormat],
+      false
+    );
   }
 
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.data_format as
-        DataFormatToDefaultValuesKey | 'invalid',
+      <DataFormatToDefaultValuesKey> translationBackendDict.data_format,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }
