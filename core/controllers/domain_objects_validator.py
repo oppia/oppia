@@ -26,7 +26,6 @@ from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import state_domain
-from core.domain import stats_domain
 import python_utils
 
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
