@@ -704,13 +704,22 @@ def is_parsable_as_xml(xml_string):
     except xml.etree.ElementTree.ParseError:
         return False
 
+
 def convert_svg_diagram_to_image_for_soup(soup_context):
-        for svg_image in soup_context.findAll(name='oppia-noninteractive-svgdiagram'):
-            svg_filepath = svg_image['svg_filename-with-value']
-            del svg_image['svg_filename-with-value']
-            svg_image['filepath-with-value'] = svg_filepath
-            svg_image['caption-with-value'] = escape_html('""')
-            svg_image.name = 'oppia-noninteractive-image'
+    """"Renames oppia-noninteractive-svgdiagram tag to
+    oppia-noninteractive-image and changes corresponding attributes for a given
+    soup context
+
+    Args:
+        soup_context: soup. The bs4 soup context.
+    """
+    for svg_image in soup_context.findAll(
+            name='oppia-noninteractive-svgdiagram'):
+        svg_filepath = svg_image['svg_filename-with-value']
+        del svg_image['svg_filename-with-value']
+        svg_image['filepath-with-value'] = svg_filepath
+        svg_image['caption-with-value'] = escape_html('""')
+        svg_image.name = 'oppia-noninteractive-image'
 
 
 def convert_svg_diagram_tags_to_image_tags(html_string):

@@ -1247,9 +1247,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ),
             'expected_output': (
                 '<oppia-noninteractive-image '
-                'alt-with-value="&amp;quot;Image&amp;quot;" '
+                'alt-with-value=\'\"Image\"\' '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
+                'filepath-with-value=\'\"img1.svg\"\'>'
                 '</oppia-noninteractive-image>'
             )
         }, {
@@ -1269,20 +1269,92 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ),
             'expected_output': (
                 '<oppia-noninteractive-image '
-                'alt-with-value="&amp;quot;Image&amp;quot;" '
+                'alt-with-value=\'\"Image\"\' '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value="&amp;quot;img12.svg&amp;quot;">'
+                'filepath-with-value=\'\"img12.svg\"\'>'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
-                'alt-with-value="&amp;quot;Image123&amp;quot;" '
+                'alt-with-value=\'\"Image123\"\' '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value="&amp;quot;img2.svg&amp;quot;">'
+                'filepath-with-value=\'\"img2.svg\"\'>'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
-                'alt-with-value="&amp;quot;Image12345&amp;quot;" '
+                'alt-with-value=\'\"Image12345\"\' '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value="&amp;quot;igage.svg&amp;quot;">'
+                'filepath-with-value=\'\"igage.svg\"\'>'
                 '</oppia-noninteractive-image>'
+            )
+        }, {
+            'html_content': (
+                r'<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                r'quot;title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,'
+                r'&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-'
+                r'noninteractive-svgdiagram alt-with-value=\&amp;quot;'
+                r'&amp;amp;amp;quot;desc&amp;amp;amp;quot;\&amp;quot; '
+                r'svg_filename-with-value=\&amp;quot;&amp;amp;amp;quot;'
+                r'img_20210727_054514_9l3scri3mg_height_350_width_450.svg&amp;'
+                r'amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-svgdiagram&amp;gt;&amp;quot;},'
+                r'{&amp;quot;title&amp;quot;:'
+                r'&amp;quot;Hint 1&amp;quot;,&amp;quot;content&amp;quot;:&amp;'
+                r'quot;&amp;lt;oppia-noninteractive-svgdiagram alt-with-value='
+                r'\&amp;quot; \&amp;quot;&amp;amp;amp;quot;abc&amp;amp;'
+                r'amp;quot;ng-version=\&amp;quot;11.2.14\&amp;quot; svg_'
+                r'filename-with-value=\&amp;quot;&amp;amp;amp;quot;'
+                r'img_20210727_054530_g653s2p0af_height_350_width_450.svg'
+                r'&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-svgdiagram&amp;gt;&amp;quot;}]">'
+                r'</oppia-noninteractive-tabs>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;oppia-'
+                'noninteractive-image alt-with-value=\\&amp;quot;&amp;amp;'
+                'amp;quot;desc&amp;amp;amp;quot;\\&amp;quot; '
+                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;'
+                'amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;'
+                '&amp;amp;amp;quot;img_20210727_054514_9l3scri3mg_'
+                'height_350_width_450.svg&amp;amp;amp;quot;\\&amp;quot;'
+                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;'
+                '&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint '
+                'introduction&amp;quot;}, {&amp;quot;content&amp;quot;: '
+                '&amp;quot;&amp;lt;oppia-noninteractive-image &amp;amp;'
+                'amp;quot;abc&amp;amp;amp;quot;ng-version=\\&amp;quot;'
+                '11.2.14\\&amp;quot; alt-with-value=\\&amp;quot; '
+                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;'
+                'amp;quot;&amp;amp;amp;quot;\\&amp;quot; '
+                'filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                'img_20210727_054530_g653s2p0af_height_350_width_450.svg'
+                '&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
+                '/oppia-noninteractive-image&amp;gt;&amp;quot;, '
+                '&amp;quot;title&amp;quot;: &amp;quot;Hint 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }, {
+            'html_content': (
+                r'<oppia-noninteractive-collapsible content-with-value="&amp;'
+                r'quot;&amp;lt;oppia-noninteractive-svgdiagram alt-with-value='
+                r'\&amp;quot;&amp;amp;amp;quot;abc&amp;amp;amp;quot;\&amp;'
+                r'quot; ng-version=\&amp;quot;11.2.14\&amp;quot; '
+                r'svg_filename-with-value=\&amp;quot;&amp;amp;amp;quot;'
+                r'img_20210727_054955_a9it96co1j_height_350_width_450.svg'
+                r'&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-svgdiagram&amp;gt;&amp;quot;" '
+                r'heading-with-value="&amp;quot;Sample Header&amp;quot;">'
+                r'</oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\\'
+                '&amp;quot;&amp;amp;amp;quot;abc&amp;amp;amp;quot;\\&amp;'
+                'quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;'
+                'amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;'
+                '&amp;amp;amp;quot;img_20210727_054955_a9it96co1j_height_'
+                '350_width_450.svg&amp;amp;amp;quot;\\&amp;quot; '
+                'ng-version=\\&amp;quot;11.2.14\\&amp;quot;&amp;gt;&amp;'
+                'lt;/oppia-noninteractive-image&amp;gt;&amp;quot;" '
+                'heading-with-value="&amp;quot;Sample Header&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
             )
         }]
         for test_case in test_cases:
@@ -1324,9 +1396,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ),
             'expected_output': (
                 '<oppia-noninteractive-image '
-                'alt-with-value="&amp;quot;Image&amp;quot;" '
+                'alt-with-value=\'\"Image\"\' '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value="&amp;quot;img11.svg&amp;quot;">'
+                'filepath-with-value=\'\"img11.svg\"\'>'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image1&amp;quot;" '

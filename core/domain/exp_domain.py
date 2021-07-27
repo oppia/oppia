@@ -31,8 +31,9 @@ import re
 import string
 
 from constants import constants
-from core.domain import change_domain, html_validation_service
+from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -1964,7 +1965,7 @@ class Exploration(python_utils.OBJECT):
     # definitions, this version number must be changed and a migration process
     # put in place.
     CURRENT_EXP_SCHEMA_VERSION = 52
-    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 47
+    EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
     def _convert_v46_dict_to_v47_dict(cls, exploration_dict):

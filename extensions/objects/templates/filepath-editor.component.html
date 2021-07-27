@@ -1,7 +1,7 @@
 <svg-editor *ngIf="svgEditorIsShown"
-                     (validityChange)="validityHasChanged($event)"
-                     (valueChanged)="valueHasChanged($event)"
-                     [value]="value">
+            (validityChange)="validityHasChanged($event)"
+            (valueChanged)="valueHasChanged($event)"
+            [value]="value">
 </svg-editor>
 <image-editor *ngIf="imageEditorIsShown"
               (validityChange)="validityHasChanged($event)"
@@ -22,29 +22,29 @@
   </div>
 </div>
 <style>
-.create-or-upload-image-selector-container {
-  background-color: #DCDCDC;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 1fr;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
-  height: 200px;
-  justify-content: center;
-  outline: 1px solid;
-}
+  .create-or-upload-image-selector-container {
+    background-color: #DCDCDC;
+    display: grid;
+    grid-column-gap: 0;
+    grid-row-gap: 0;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr;
+    height: 200px;
+    justify-content: center;
+    outline: 1px solid;
+  }
 
-.upload-image-container, .create-image-container {
-  align-self: center;
-  font-family: "Roboto", Arial, sans-serif;
-  text-align: center;
-  padding: 45px;
-}
-.upload-image-container {
-  border-right: 1px solid #000;
-}
-.create-image-button {
-  background-color: #00645B;
-  color: #FFF;
-}
+  .upload-image-container, .create-image-container {
+    align-self: center;
+    font-family: "Roboto", Arial, sans-serif;
+    padding: 45px;
+    text-align: center;
+  }
+  .upload-image-container {
+    border-right: 1px solid #000;
+  }
+  .create-image-button {
+    background-color: #00645B;
+    color: #FFF;
+  }
 </style>

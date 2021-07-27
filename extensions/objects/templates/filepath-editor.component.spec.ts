@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { waitForAsync, TestBed } from "@angular/core/testing";
-import { FilepathEditorComponent } from "./filepath-editor.component";
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { waitForAsync, TestBed } from '@angular/core/testing';
+import { FilepathEditorComponent } from './filepath-editor.component';
 
 /**
  * @fileoverview Unit tests for the File path editor.
@@ -28,7 +28,7 @@ describe('File path editor', () => {
         declarations: [FilepathEditorComponent],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
-    }));
+  }));
   beforeEach(() => {
     component = TestBed.createComponent(
       FilepathEditorComponent).componentInstance;

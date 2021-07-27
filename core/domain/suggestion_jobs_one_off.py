@@ -26,6 +26,7 @@ from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import state_domain
 from core.domain import suggestion_services
@@ -185,6 +186,38 @@ class TranslationSuggestionUnicodeAuditOneOffJob(
             yield (key, len(value))
         else:
             yield (key, value)
+
+
+class TranslationSuggestionSvgDiagramOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-time job to update translation suggestions such that
+    oppia-noninteractive-svgdiagram tags are replaced with
+    oppia-noninteractive-image tags.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.suggestion_type != (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            return
+
+        suggestion = suggestion_services.get_suggestion_from_model(item)
+        suggestion.change.translation_html = (
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                suggestion.change.translation_html))
+        item.change_cmd = suggestion.change.to_dict()
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+        yield (
+            'UPDATED', '%s | %s' % (item.id, suggestion.change.content_id))
+
+    @staticmethod
+    def reduce(key, value):
+        yield (key, value)
 
 
 class PopulateTranslationContributionStatsOneOffJob(
