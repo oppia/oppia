@@ -48,7 +48,7 @@ angular.module('oppia').component('editorNavigation', {
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'ThreadDataBackendApiService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
@@ -58,7 +58,7 @@ angular.module('oppia').component('editorNavigation', {
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        ThreadDataBackendApiService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService) {
       this.directiveSubscriptions = new Subscription();
@@ -68,8 +68,8 @@ angular.module('oppia').component('editorNavigation', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',
