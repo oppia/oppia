@@ -255,7 +255,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal(
+        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
             output, [
                 base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                     invalid_commit_cmd_model,
