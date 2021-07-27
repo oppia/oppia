@@ -108,7 +108,6 @@ export class ChangeListService implements OnInit {
         }
       } else {
         this.status = 'OFFLINE';
-        console.error('OFFLIENE');
       }
     });
   }

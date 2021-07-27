@@ -16,12 +16,13 @@
  * @fileoverview Directive for CK Editor.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
+import { ConnectionService } from 'services/connection-service.service';
 
 interface UiConfig {
   (): UiConfig;
@@ -44,19 +45,43 @@ interface RteConfig extends CKEDITOR.config {
             '</div></div>',
   styleUrls: []
 })
-export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
+export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
   @Input() uiConfig: UiConfig;
   @Input() value;
   @Input() headersEnabled = false;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
+  hasNetworkConnection: boolean;
+  hasInternetAccess: boolean;
+  status: string = 'ONLINE';
+  disableOnOfflineNames: string[] = [
+    'image', 'skillreview', 'svgdiagram', 'video'];
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private connectionService: ConnectionService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+  }
+
+  ngOnInit(): void {
+    this.connectionService.monitor.subscribe(currentState => {
+      this.hasNetworkConnection = currentState.hasNetworkConnection;
+      this.hasInternetAccess = currentState.hasInternetAccess;
+      if (this.hasNetworkConnection && this.hasInternetAccess) {
+        if (this.status === 'OFFLINE') {
+          this.enableRTEicons();
+        }
+        this.status = 'ONLINE';
+      } else {
+        if (this.status === 'ONLINE') {
+          this.disableRTEicons();
+        }
+        this.status = 'OFFLINE';
+      }
+    });
   }
 
   /**
@@ -282,6 +307,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     };
 
     ck.on('instanceReady', () => {
+      if (this.status === 'OFFLINE') {
+        this.disableRTEicons();
+      }
       // Show the editor now that it is fully loaded.
       (
         <HTMLElement> this.elementRef.nativeElement
@@ -303,6 +331,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
           .css('height', '24px')
           .css('width', '24px')
           .css('padding', '0px 0px');
+        $('.cke_button__oppia' + name).wrap(
+          "<span class='cke_button_wrap" + name + "'></span>");
       });
 
       // TODO(#12882): Remove the use of jQuery.
@@ -345,7 +375,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
         $('.cke_combo_button')
           .css('display', 'none');
       }
-
       ck.setData(wrapComponents(this.value));
     });
 
@@ -396,6 +425,24 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     ck.setData(this.value);
     this.ck = ck;
     this.ckEditorCopyContentService.bindPasteHandler(ck);
+  }
+
+  disableRTEicons(): void {
+    // Add disabled cursor pointer to the icons.
+    // TODO(#12882): Remove the use of jQuery.
+    this.disableOnOfflineNames.forEach((name) => {
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_button__oppia' + name)
+        .css('display', 'none');
+    });
+  }
+  enableRTEicons(): void {
+    // TODO(#12882): Remove the use of jQuery.
+    this.disableOnOfflineNames.forEach((name) => {
+      // TODO(#12882): Remove the use of jQuery.
+      $('.cke_button__oppia' + name)
+        .css('display', '');
+    });
   }
 
   ngOnDestroy(): void {

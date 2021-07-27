@@ -386,17 +386,18 @@ angular.module('oppia').component('explorationEditorPage', {
             ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
             ctrl.hasInternetAccess = currentState.hasInternetAccess;
             if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
-              console.error('ONLINE');
               if (ctrl.status === 'OFFLINE') {
-                ctrl.alertsService.addWarning('You are Online');
+                ctrl.alertsService.addSuccessMessage(
+                  'Reconnected. Checking whether your changes are mergeable',
+                  2000);
               }
               ctrl.status = 'ONLINE';
-            } else {
-              if (ctrl.status === 'ONLINE') {
-                ctrl.alertsService.addWarning('You are OFFLINE');
-              }
+            } else if (ctrl.status === 'ONLINE') {
+              ctrl.alertsService.addInfoMessage(
+                'Looks like you are offline. ' +
+                // eslint-disable-next-line max-len
+                'You can continue working, and can save your changes once reconnected', 3000);
               ctrl.status = 'OFFLINE';
-              console.error('OFFLIENE');
             }
           });
           ExplorationWarningsService.updateWarnings();
