@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0039.
+presubmit checks. Next message id would be C0041.
 """
 
 from __future__ import absolute_import
@@ -46,6 +46,11 @@ EXCLUDED_PHRASES = [
     'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node',
     'type:', 'pragma:', 'isort:'
 ]
+
+# If a comment begins with a pragma, it is permitted to be inline.
+PRAGMAS = [
+    'pylint:', 'type:', 'pragma:', 'isort:'
+];
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1674,15 +1679,15 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'no-capital-letter-at-beginning',
             'Please use capital letter to begin the content of comment.'
         ),
-        'C0019': (
-            'Please use a single space at the beginning of pylint pragmas.',
+        'C0039': (
+            'Please use a single space before pragmas.',
             'no-space-before-pylint-pragma',
-            'Please use a single space at the beginning of pylint pragmas.'
+            'Ensures that there is a space before any pragmas.'
         ),
-        'C0020': (
+        'C0040': (
             'Please place comments on their own line.',
             'invalid-trailing-comment',
-            'Please place comments on their own line.',
+            'Prevents the usage of inline or trailing comments.',
         )
     }
     options = ((
@@ -1764,17 +1769,15 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line: str. The current line of comment.
             line_num: int. Line number of the current comment.
         """
-        # Extract comment from line.
         split_line = line.split('#')
         trail_comment = split_line[1]
         excluded_phrase_at_beginning_of_line = any(
             trail_comment[1:].startswith(word)
-            for word in EXCLUDED_PHRASES) or any(
-                trail_comment.startswith(word) for word in EXCLUDED_PHRASES)
-        # Check for pylint pragma.
+            for word in PRAGMAS) or any(
+                trail_comment.startswith(word) for word in PRAGMAS)
         if excluded_phrase_at_beginning_of_line:
             if not trail_comment[0].isspace():
-                self.add_message('no-space-before-pylint-pragma', line=line_num)
+                self.add_message('no-space-before-pragma', line=line_num)
             return
         else:
             self.add_message('invalid-trailing-comment', line=line_num)

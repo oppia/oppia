@@ -2546,7 +2546,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             utils.tokenize_module(node_no_space_before_pylint_pragma))
 
         message = testutils.Message(
-            msg_id='no-space-before-pylint-pragma',
+            msg_id='no-space-before-pragma',
             line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
