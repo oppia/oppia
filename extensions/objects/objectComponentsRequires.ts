@@ -42,7 +42,7 @@ require('objects/templates/nonnegative-int-editor.component.ts');
 require('objects/templates/normalized-string-editor.component.ts');
 require('objects/templates/number-with-units-editor.component.ts');
 require('objects/templates/numeric-expression-editor.component.ts');
-require('objects/templates/parameter-name-editor.directive.ts');
+require('objects/templates/parameter-name-editor.component.ts');
 require('objects/templates/position-of-terms-editor.component.ts');
 require('objects/templates/positive-int-editor.component.ts');
 require('objects/templates/ratio-expression-editor.component.ts');
