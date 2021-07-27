@@ -22,4 +22,8 @@ import { Component } from '@angular/core';
   selector: 'oppia-topic-landing-page-root',
   templateUrl: './topic-landing-page-root.component.html'
 })
-export class TopicLandingPageRootComponent {}
+export class TopicLandingPageRootComponent {
+  // Page title and meta tags are not required to be updated here
+  // as the page title is updated by topic landing page component
+  // and this pages uses default meta tags.
+}

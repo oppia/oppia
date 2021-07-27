@@ -15,7 +15,6 @@
 /**
  * @fileoverview Scripts for the error iframed page.
  */
-
 import 'core-js/es7/reflect';
 import 'zone.js';
 
