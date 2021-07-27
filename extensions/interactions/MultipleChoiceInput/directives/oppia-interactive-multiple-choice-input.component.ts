@@ -90,8 +90,8 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       return choices;
     };
     this.choices = (
-      showChoicesInShuffledOrder ? shuffleChoices(choicesWithIndex) :
-      choicesWithIndex);
+      showChoicesInShuffledOrder.value ? shuffleChoices(choicesWithIndex) :
+      choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex));
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(), () => this.validityCheckFn());
