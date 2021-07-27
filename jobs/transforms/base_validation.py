@@ -25,8 +25,8 @@ validation functions in the expand function, and then flatten the output
 with the result of the super function.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import re

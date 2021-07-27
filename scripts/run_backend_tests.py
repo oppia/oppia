@@ -46,8 +46,8 @@ imports module B, which imports module C, which imports module A). This needs
 to be fixed before the tests will run.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import importlib

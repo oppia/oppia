@@ -16,8 +16,8 @@
 
 """Audit jobs that validate all of the storage models in the datastore."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 
