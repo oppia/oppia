@@ -32,14 +32,10 @@ datastore_services = models.Registry.import_datastore_services()
 
 class NdbIoTests(job_test_utils.PipelinedTestBase):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.all_items_query = (
-            datastore_services.query_everything(namespace=self.namespace))
-
     def tearDown(self):
         datastore_services.delete_multi(
-            self.all_items_query.iter(keys_only=True))
+            datastore_services.query_everything(namespace=self.namespace).iter(
+                keys_only=True))
         super(NdbIoTests, self).tearDown()
 
     def get_everything(self):
@@ -48,7 +44,9 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         Returns:
             list(Model). All of the models in the datastore.
         """
-        return list(self.all_items_query.iter())
+        return list(
+            datastore_services.query_everything(namespace=self.namespace).iter()
+        )
 
     def put_multi(self, model_list, update_last_updated_time=False):
         """Puts the given models into the datastore.
@@ -72,7 +70,11 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_everything(), model_list)
 
-        model_pcoll = self.pipeline | ndb_io.GetModels(self.all_items_query)
+        model_pcoll = (
+            self.pipeline
+            | ndb_io.GetModels(
+                datastore_services.query_everything(namespace=self.namespace))
+        )
 
         self.assert_pcoll_equal(model_pcoll, model_list)
 
