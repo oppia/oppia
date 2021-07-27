@@ -117,7 +117,7 @@
   },
   "keywords": [],
   "dependencies": {
-    "@angular/animations": "^12.1.3",
+    "@angular/animations": "^11.2.10",
     "@angular/cdk": "^11.2.10",
     "@angular/common": "^11.2.10",
     "@angular/compiler": "^11.2.10",

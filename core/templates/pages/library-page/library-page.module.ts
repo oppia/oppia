@@ -37,6 +37,9 @@ import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/moda
   declarations: [
     LearnerPlaylistModalComponent
   ],
+  entryComponents: [
+    LearnerPlaylistModalComponent
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
