@@ -1241,47 +1241,47 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         test_cases = [{
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img1.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
+                'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
             ),
             'expected_output': (
                 '<oppia-noninteractive-image '
-                'alt-with-value=\'\"Image\"\' '
+                'alt-with-value="&amp;quot;Image&amp;quot;" '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value=\'\"img1.svg\"\'>'
+                'filepath-with-value="&amp;quot;img1.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
         }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img12.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
+                'svg_filename-with-value="&amp;quot;img12.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img2.svg&quot;"'
-                ' alt-with-value="&quot;Image123&quot;">'
+                'svg_filename-with-value="&amp;quot;img2.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image123&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-svgdiagram '
-                'alt-with-value="&quot;Image12345&quot;"'
-                ' svg_filename-with-value="&quot;igage.svg&quot;">'
+                'alt-with-value="&amp;quot;Image12345&amp;quot;"'
+                ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
             ),
             'expected_output': (
                 '<oppia-noninteractive-image '
-                'alt-with-value=\'\"Image\"\' '
+                'alt-with-value="&amp;quot;Image&amp;quot;" '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value=\'\"img12.svg\"\'>'
+                'filepath-with-value="&amp;quot;img12.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
-                'alt-with-value=\'\"Image123\"\' '
+                'alt-with-value="&amp;quot;Image123&amp;quot;" '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value=\'\"img2.svg\"\'>'
+                'filepath-with-value="&amp;quot;img2.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
-                'alt-with-value=\'\"Image12345\"\' '
+                'alt-with-value="&amp;quot;Image12345&amp;quot;" '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value=\'\"igage.svg\"\'>'
+                'filepath-with-value="&amp;quot;igage.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
         }, {
@@ -1396,9 +1396,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             ),
             'expected_output': (
                 '<oppia-noninteractive-image '
-                'alt-with-value=\'\"Image\"\' '
+                'alt-with-value="&amp;quot;Image&amp;quot;" '
                 'caption-with-value="&amp;quot;&amp;quot;" '
-                'filepath-with-value=\'\"img11.svg\"\'>'
+                'filepath-with-value="&amp;quot;img11.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image1&amp;quot;" '

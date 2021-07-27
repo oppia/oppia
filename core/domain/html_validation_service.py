@@ -708,10 +708,10 @@ def is_parsable_as_xml(xml_string):
 def convert_svg_diagram_to_image_for_soup(soup_context):
     """"Renames oppia-noninteractive-svgdiagram tag to
     oppia-noninteractive-image and changes corresponding attributes for a given
-    soup context
+    soup context.
 
     Args:
-        soup_context: soup. The bs4 soup context.
+        soup_context: bs4.BeautifulSoup. The bs4 soup context.
     """
     for svg_image in soup_context.findAll(
             name='oppia-noninteractive-svgdiagram'):
