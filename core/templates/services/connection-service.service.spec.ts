@@ -18,16 +18,15 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { ConnectionService } from 'services/connection-service.service';
+import { ConnectionService, ConnectionState } from 'services/connection-service.service';
 import { Subscription } from 'rxjs';
 
 
 describe('Connection Service', () => {
   let connectionService: ConnectionService;
   let subscriptions: Subscription;
-  let hasNetworkConnection: boolean;
-  let hasInternetAccess: boolean;
   let httpTestingController: HttpTestingController;
+  let connectionState: ConnectionState;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -40,12 +39,12 @@ describe('Connection Service', () => {
   });
 
   beforeEach(() => {
+    spyOnProperty(Navigator.prototype, 'onLine').and.returnValue(true);
+    connectionService.checkInternetState();
+    connectionService.checkNetworkState();
     subscriptions = new Subscription();
     subscriptions.add(connectionService.monitor.subscribe(
-      currentState => {
-        hasNetworkConnection = currentState.hasNetworkConnection;
-        hasInternetAccess = currentState.hasInternetAccess;
-      }
+      currentState => connectionState = currentState
     ));
   });
   afterEach(() => {
@@ -58,16 +57,14 @@ describe('Connection Service', () => {
 
   // Check whether the connection service is able to make a request.
   it('should be able to make a request', fakeAsync(() => {
-    connectionService.checkInternetState();
-    connectionService.checkNetworkState();
     let req = httpTestingController.expectOne(
       '/connectivity/check');
     expect(req.request.method).toEqual('GET');
     req.flush({
-      is_internet_connected: true
+      isInternetConnected: true
     });
     flushMicrotasks();
-    expect(hasInternetAccess).toBe(true);
-    expect(hasNetworkConnection).toBe(true);
+    expect(connectionState.hasInternetAccess).toBe(true);
+    expect(connectionState.hasNetworkConnection).toBe(true);
   }));
 });

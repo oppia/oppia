@@ -389,15 +389,15 @@ angular.module('oppia').component('explorationEditorPage', {
             if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
               if (ctrl.status === 'OFFLINE') {
                 ctrl.alertsService.addSuccessMessage(
-                  'Reconnected. Checking whether your changes are mergeable',
-                  2000);
+                  'Reconnected. Checking whether your changes are mergeable.',
+                  4000);
               }
               ctrl.status = 'ONLINE';
             } else if (ctrl.status === 'ONLINE') {
               ctrl.alertsService.addInfoMessage(
                 'Looks like you are offline. ' +
                 // eslint-disable-next-line max-len
-                'You can continue working, and can save your changes once reconnected', 3000);
+                'You can continue working, and can save your changes once reconnected.', 5000);
               ctrl.status = 'OFFLINE';
             }
           });

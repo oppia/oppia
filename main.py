@@ -98,7 +98,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.render_json({
-            'is_internet_connected': True
+            'isInternetConnected': True
         })
 
 

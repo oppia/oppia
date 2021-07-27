@@ -158,10 +158,10 @@ export class ChangeListService implements OnInit {
     if (this.loadingMessage) {
       return;
     }
-    this.explorationChangeList.push(changeDict);
     if (this.status === 'OFFLINE') {
       this.tempChanges.push(changeDict);
     } else {
+      this.explorationChangeList.push(changeDict);
       this.undoneChangeStack = [];
       this.autosaveInProgressEventEmitter.emit(true);
       if (this.changeListAddedTimeoutId) {

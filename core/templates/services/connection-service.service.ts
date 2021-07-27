@@ -22,7 +22,6 @@ import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import isNil from 'lodash/isNil';
 
 /**
  * Instance of this interface is used to report current connection status.
@@ -38,6 +37,10 @@ export interface ConnectionState {
    * which periodically makes request to heartbeat Url.
    */
   hasInternetAccess: boolean;
+}
+
+export interface ConnectionCheckResponse {
+  isInternetConnected: boolean;
 }
 
 @Injectable({
@@ -63,17 +66,13 @@ export class ConnectionService implements OnDestroy {
       private http: HttpClient) {}
 
   checkInternetState(): void {
-    if (!isNil(this.httpSubscription)) {
-      this.httpSubscription.unsubscribe();
-    }
-
     this.httpSubscription = timer(
       0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
       .pipe(
         switchMap(() => {
           if (this.currentState.hasNetworkConnection) {
-            return this.http.get(
-              this.checkConnectionUrl, {responseType: 'text'});
+            return this.http.get<ConnectionCheckResponse>(
+              this.checkConnectionUrl).toPromise();
           }
         }),
         retryWhen(errors => errors.pipe(
