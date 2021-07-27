@@ -58,20 +58,23 @@ let apiLoaded = false;
   styleUrls: []
 })
 export class NoninteractiveVideo implements OnInit, OnChanges {
-  @Input() autoplayWithValue: string;
-  @Input() endWithValue: string;
-  @Input() startWithValue: string;
-  @Input() videoIdWithValue: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() autoplayWithValue!: string;
+  @Input() endWithValue!: string;
+  @Input() startWithValue!: string;
+  @Input() videoIdWithValue!: string;
+  start!: number;
+  end!: number;
+  tabIndexVal!: number;
+  videoId!: string;
+  width!: number;
 
   playerVars = {
     autoplay: 0,
     origin: 'http://localhost:8181'
   };
-  start: number;
-  end: number;
-  tabIndexVal: number;
-  videoId: string;
-  width: number;
 
   constructor(
     private autoplayedVideosService: AutoplayedVideosService,

@@ -36,6 +36,12 @@ import { Schema } from 'services/schema-default-value.service';
 
 
 export interface UserRolesBackendResponse {
+  roles: string[];
+  'managed_topic_ids': string[];
+  banned: boolean;
+}
+
+export interface UpdatableRolesBackendResponse {
   [role: string]: string;
 }
 
@@ -114,10 +120,10 @@ export interface AdminPageDataBackendDict {
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
   'human_readable_current_time': string;
-  'updatable_roles': UserRolesBackendResponse;
+  'updatable_roles': UpdatableRolesBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': UserRolesBackendResponse;
+  'viewable_roles': UpdatableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
@@ -126,10 +132,10 @@ export interface AdminPageData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  updatableRoles: UserRolesBackendResponse;
+  updatableRoles: UpdatableRolesBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
-  viewableRoles: UserRolesBackendResponse;
+  viewableRoles: UpdatableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }
@@ -204,19 +210,63 @@ export class AdminBackendApiService {
     });
   }
 
-  async updateUserRoleAsync(
-      newRole: string, username: string, topicId: string
-  ): Promise<void> {
+  async addUserRoleAsync(
+      newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
+      this.http.put<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           role: newRole,
-          username: username,
-          topic_id: topicId
+          username: username
         }
       ).toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async removeUserRoleAsync(
+      roleToRemove: string, username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+          params: {
+            role: roleToRemove,
+            username: username
+          }
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async assignManagerToTopicAsync(
+      username: string, topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+          username: username,
+          topic_id: topicId,
+          action: 'assign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deassignManagerFromTopicAsync(
+      username: string, topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+          username: username,
+          topic_id: topicId,
+          action: 'deassign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
         reject(errorResponse.error.error);
       });
     });
@@ -393,6 +443,32 @@ export class AdminBackendApiService {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
+    });
+  }
+
+  async markUserBannedAsync(username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
+        { username }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async unmarkUserBannedAsync(username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
+        { params: { username } }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 }
