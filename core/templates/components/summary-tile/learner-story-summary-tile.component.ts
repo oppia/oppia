@@ -24,6 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { StorySummary } from 'domain/story/story-summary.model';
+import { UrlService } from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-learner-story-summary-tile',
@@ -31,6 +32,7 @@ import { StorySummary } from 'domain/story/story-summary.model';
 })
 export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() storySummary: StorySummary;
+  @Input() displayArea: string;
   @Input() topicName?: string;
   nodeCount: number;
   completedNodeCount: number;
@@ -38,19 +40,43 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   thumbnailUrl: string = null;
   storyLink: string;
   storyTitle: string;
+  nextIncompleteNodeTitle: string;
   storyCompleted: boolean = false;
   thumbnailBgColor: string;
   starImageUrl: string = '';
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private assetsBackendApiService: AssetsBackendApiService
+    private assetsBackendApiService: AssetsBackendApiService,
+    private urlService: UrlService,
   ) {}
 
   getStoryLink(): string {
     if (!this.storySummary.getClassroomUrlFragment() ||
       !this.storySummary.getTopicUrlFragment()) {
       return '#';
+    }
+    if (this.isDisplayAreaHome()) {
+      var allNodes = this.storySummary.getAllNodes();
+      var node = allNodes[this.completedNodeCount];
+      if (node) {
+        let result = this.urlInterpolationService.interpolateUrl(
+          '/explore/<exp_id>', {
+            exp_id: node.getExplorationId()
+          });
+        result = this.urlService.addField(
+          result, 'topic_url_fragment',
+          this.storySummary.getTopicUrlFragment());
+        result = this.urlService.addField(
+          result, 'classroom_url_fragment',
+          this.storySummary.getClassroomUrlFragment());
+        result = this.urlService.addField(
+          result, 'story_url_fragment',
+          this.storySummary.getUrlFragment());
+        result = this.urlService.addField(
+          result, 'node_id', node.getId());
+        return result;
+      }
     }
     return this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
@@ -78,10 +104,23 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
+    if (this.nodeCount !== this.completedNodeCount) {
+      let nextIncompleteNode = this.storySummary.getNodeTitles()[
+        this.completedNodeCount];
+      this.nextIncompleteNodeTitle = (
+        `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`);
+    }
     if (!this.topicName) {
       this.topicName = this.storySummary.getTopicName();
     }
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
+  }
+
+  isDisplayAreaHome(): boolean {
+    if (this.displayArea === 'homeTab') {
+      return true;
+    }
+    return false;
   }
 
   getStaticImageUrl(imagePath: string): string {

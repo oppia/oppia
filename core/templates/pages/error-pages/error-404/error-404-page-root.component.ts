@@ -13,20 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for license explanation modal.
+ * @fileoverview Root component for error page.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+// This page is used as error page for 404 status code.
 
-angular.module('oppia').controller('LicenseExplanationModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'SITE_NAME',
-  function($controller, $scope, $uibModalInstance, SITE_NAME) {
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance
-    });
-    $scope.siteName = SITE_NAME;
-  }
-]);
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'oppia-error-page-root',
+  templateUrl: './error-404-page-root.component.html'
+})
+export class Error404PageRootComponent {}
