@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -320,7 +320,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         user_data = dict()
         report_models = cls.get_all().filter(
             cls.scrubbed_by == user_id).fetch()
-
+        report_models = cast(List[AppFeedbackReportModel], report_models)
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
@@ -610,7 +610,9 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             AppFeedbackReportStatsModel entities that record stats on the
             ticket.
         """
-        return cls.query(cls.ticket_id == ticket_id).fetch()
+        models = cls.query(cls.ticket_id == ticket_id).fetch()
+        models = cast(List[AppFeedbackReportStatsModel], models)
+        return models
 
     @staticmethod
     def get_deletion_policy():

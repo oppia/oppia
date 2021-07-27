@@ -26,7 +26,7 @@ import feconf
 import python_utils
 
 from types import ModuleType # isort:skip # pylint: disable=import-only-modules,unused-import
-from typing import Text, List, Tuple, Any, Optional, Type # isort:skip # pylint: disable=unused-import
+from typing import Text, List, Tuple, Optional, Type # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:

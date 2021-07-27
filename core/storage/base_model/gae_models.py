@@ -28,7 +28,7 @@ import utils
 
 from typing import ( # isort:skip # pylint: disable=unused-import
     Any, Dict, Iterable, List, Optional, Sequence, Text, Tuple, Type, Union,
-    TypeVar)
+    TypeVar, cast)
 
 SELF_BASE_MODEL = TypeVar(
     'SELF_BASE_MODEL', bound='BaseModel')
@@ -468,8 +468,9 @@ class BaseModel(datastore_services.Model):
 
         result = query.order(-cls.last_updated).fetch_page(
             page_size, start_cursor=start_cursor)
+        models = cast(List[SELF_BASE_MODEL], result[0])
         return (
-            result[0],
+            models,
             (result[1].urlsafe() if result[1] else None),
             result[2])
 
@@ -1482,6 +1483,8 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.query(cls.committer_id == user_id).fetch(
                 projection=[cls.commit_type, cls.commit_message]))
 
+        metadata_models = cast(
+            List[BaseSnapshotMetadataModel], metadata_models)
         user_data = {}
         for metadata_model in metadata_models:
             user_data[metadata_model.id] = {

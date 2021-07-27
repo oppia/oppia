@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 
-from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -147,10 +147,11 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
 
         if provider_id == feconf.GAE_AUTH_PROVIDER_ID:
-            return cls.query(cls.gae_id == auth_id).get() # type: ignore[no-any-return]
+            model = cls.query(cls.gae_id == auth_id).get()
         elif provider_id == feconf.FIREBASE_AUTH_PROVIDER_ID:
-            return cls.query(cls.firebase_auth_id == auth_id).get() # type: ignore[no-any-return]
-        return None
+            model = cls.query(cls.firebase_auth_id == auth_id).get()
+        model = cast(Optional[UserAuthDetailsModel], model)
+        return model
 
 
 class UserIdentifiersModel(base_models.BaseModel):
@@ -197,8 +198,9 @@ class UserIdentifiersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        models = cls.query(cls.user_id == user_id).fetch(keys_only=True)
+        models_keys = cast(List[datastore_services.Key], models)
+        datastore_services.delete_multi(models_keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -239,7 +241,9 @@ class UserIdentifiersModel(base_models.BaseModel):
             UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
-        return cls.query(cls.user_id == user_id).get() # type: ignore[no-any-return]
+        model = cls.query(cls.user_id == user_id).get()
+        model = cast(Optional[UserIdentifiersModel], model)
+        return model
 
 
 class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
@@ -284,8 +288,9 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        models = cls.query(cls.user_id == user_id).fetch(keys_only=True)
+        models_keys = cast(List[datastore_services.Key], models)
+        datastore_services.delete_multi(models_keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -313,7 +318,9 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
             UserIdByFirebaseAuthIdModel. The model with user_id field equal
             to user_id argument.
         """
-        return cls.query(cls.user_id == user_id).get() # type: ignore[no-any-return]
+        model = cls.query(cls.user_id == user_id).get()
+        model = cast(Optional[UserIdByFirebaseAuthIdModel], model)
+        return model
 
 
 class FirebaseSeedModel(base_models.BaseModel):

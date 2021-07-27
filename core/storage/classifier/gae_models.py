@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, Union # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Text, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -204,7 +204,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                         cls.next_scheduled_check_time, cls._key)
 
         job_models = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset) # type: List[ClassifierTrainingJobModel]
+            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+        job_models = cast(List[ClassifierTrainingJobModel], job_models)
         offset = offset + len(job_models)
         return job_models, offset
 

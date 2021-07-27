@@ -23,7 +23,7 @@ from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-from typing import Any, Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
