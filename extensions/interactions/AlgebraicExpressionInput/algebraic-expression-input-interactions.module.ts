@@ -21,7 +21,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { AlgebraicExpressionInputInteractionComponent } from './directives/oppia-interactive-algebraic-expression-input.component';
 import { ResponseAlgebraicExpressionInputComponent } from './directives/oppia-response-algebraic-expression-input.component';
 import { ShortResponseAlgebraicExpressionInputComponent } from './directives/oppia-short-response-algebraic-expression-input.component';
@@ -30,7 +29,6 @@ import { ShortResponseAlgebraicExpressionInputComponent } from './directives/opp
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
   ],
   declarations: [
     AlgebraicExpressionInputInteractionComponent,
