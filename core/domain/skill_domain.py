@@ -1088,7 +1088,7 @@ class Skill(python_utils.OBJECT):
         occurences of it to oppia-noninteractive-image tag.
 
         Args:
-            misconception_dict: dict. The v2 misconception dict.
+            misconception_dict: dict. The v3 misconception dict.
 
         Returns:
             dict. The converted misconception_dict.
