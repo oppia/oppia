@@ -28,25 +28,28 @@ from jobs.types import job_run_result
 
 import apache_beam as beam
 
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+    [models.NAMES.exploration])
 
 
 class PopulateExplorationWithProtoSize(base_jobs.JobBase):
     """Update the proto_size_in_bytes in exploration models."""
 
-    def run(self):
+    def run(self): # type: ignore[no-untyped-def]
         """Update every exploration model in datastore."""
 
         exploration_model_query = exp_models.ExplorationModel.query()
         migrated_models = (
             self.pipeline
-            | 'Get every Exploration Model' >> ndb_io.GetModels(
-                exploration_model_query, self.datastoreio_stub)
+            | 'Get every Exploration Model' >> (
+                ndb_io.GetModels(  # type: ignore[no-untyped-call]
+                    exploration_model_query, self.datastoreio_stub
+                ))
             | 'Update Exploration Model' >>
             beam.ParDo(UpdateProtoSizeInBytes()))
 
         # Save the successfully migrated models.
-        _ = migrated_models | ndb_io.PutMulti()
+        _ = migrated_models | ndb_io.PutMulti() # type: ignore[attr-defined]
         success_message = (
             migrated_models
             | beam.combiners.Count.Globally()
@@ -62,18 +65,20 @@ class PopulateExplorationWithProtoSize(base_jobs.JobBase):
         return (success_message, error_messages) | beam.Flatten()
 
 
-class UpdateProtoSizeInBytes(beam.DoFn):
+class UpdateProtoSizeInBytes(beam.DoFn): # type: ignore[misc]
     """Calculate proto size and return updated model."""
 
-    def process(self, input_model):
+    def process(self, input_model): # type: ignore[no-untyped-def]
         """Update each exploration model."""
 
         if input_model.proto_size_in_bytes == 0:
-            model = job_utils.clone_model(input_model)
+            model = job_utils.clone_model( # type: ignore[no-untyped-call]
+                input_model)
             try:
                 # Fetching corresponding domain object here to run the
                 # validate() function on it.
-                old_exploration = exp_fetchers.get_exploration_from_model(model)
+                old_exploration = exp_fetchers.get_exploration_from_model( # type: ignore[no-untyped-call]
+                    model)
                 old_exploration.validate()
                 # Calculate the proto size.
                 model.proto_size_in_bytes = 1
