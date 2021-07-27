@@ -16,7 +16,7 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
-const baseConfig = require('.lighthouserc-base.js')
+const baseConfig = require('./.lighthouserc-base.js')
 
 module.exports = {
   'ci': {

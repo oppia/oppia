@@ -22,6 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform.storage import cloud_storage_services
 from core.tests import test_utils
 
+from google.cloud import storage
+
 
 class MockClient:
 
@@ -144,7 +146,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.client.buckets['bucket_1'] = self.bucket_1
         self.client.buckets['bucket_2'] = self.bucket_2
         self.get_client_swap = self.swap(
-            cloud_storage_services, '_get_client', lambda: self.client)
+            storage, 'Client', lambda: self.client)
         self.get_bucket_swap = self.swap(
             cloud_storage_services,
             '_get_bucket',
@@ -153,7 +155,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
 
     def test_isfile_when_file_exists_returns_true(self):
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
-        with self.get_bucket_swap:
+        with self.get_client_swap:
             self.assertTrue(
                 cloud_storage_services.isfile('bucket_1', 'path/to/file.txt'))
 
