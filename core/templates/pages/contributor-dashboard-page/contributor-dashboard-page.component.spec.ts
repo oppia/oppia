@@ -42,7 +42,6 @@ describe('Contributor dashboard page', function() {
   };
   var windowRef = new WindowRef();
   var focusManagerService = null;
-  var spy = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -57,7 +56,8 @@ describe('Contributor dashboard page', function() {
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
-    ContributionOpportunitiesService = $injector.get('ContributionOpportunitiesService');
+    ContributionOpportunitiesService =
+      $injector.get('ContributionOpportunitiesService');
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     TranslationTopicService = $injector.get('TranslationTopicService');
@@ -69,7 +69,7 @@ describe('Contributor dashboard page', function() {
     ctrl = $componentController('contributorDashboardPage');
 
     spyOn(ContributionOpportunitiesService, 'getAllTopicNamesAsync')
-        .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
+      .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
     spyOn(LocalStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
     spyOn(LocalStorageService, 'getLastSelectedTranslationTopicName').and
