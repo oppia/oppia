@@ -30,8 +30,8 @@ For more details of the usage of these two methods, please refer their
 docstrings in this file.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core import platform_feature_list

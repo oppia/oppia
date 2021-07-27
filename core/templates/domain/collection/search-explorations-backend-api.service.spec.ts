@@ -27,7 +27,7 @@ import { ExplorationMetadata } from
   'domain/exploration/exploration-metadata.model';
 
 describe('Exploration search backend API service', () => {
-  let SearchExplorationsService: SearchExplorationsBackendApiService = null;
+  let SearchExplorationsService: SearchExplorationsBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {

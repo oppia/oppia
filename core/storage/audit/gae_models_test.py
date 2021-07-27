@@ -16,8 +16,8 @@
 
 """Test for audit models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 from core.tests import test_utils
@@ -43,7 +43,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         audit_models.RoleQueryAuditModel(
             id=self.ID,
             user_id=self.USER_ID,
-            intent=feconf.ROLE_ACTION_UPDATE,
+            intent=feconf.ROLE_ACTION_ADD,
             role=self.ROLE,
             username=self.USERNAME
         ).put()
@@ -67,7 +67,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
 
         self.assertEqual(audit_model.id, self.ID)
-        self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
+        self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_ADD)
         self.assertEqual(audit_model.user_id, self.USER_ID)
         self.assertEqual(audit_model.role, self.ROLE)
         self.assertEqual(audit_model.username, self.USERNAME)
