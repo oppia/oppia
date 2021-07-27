@@ -16,11 +16,10 @@
  * @fileoverview Module for the license page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { LicensePageComponent } from './license-page.component';
 import { OppiaAngularRootComponent } from
@@ -29,6 +28,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { LicensePageRootComponent } from './license-page-root.component';
 
 @NgModule({
   imports: [
@@ -38,10 +38,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     LicensePageComponent,
+    LicensePageRootComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
     LicensePageComponent,
+    LicensePageRootComponent,
     OppiaAngularRootComponent
   ],
   providers: [
@@ -56,30 +58,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
       deps: [PlatformFeatureService],
       multi: true
     }
-  ]
+  ],
+  bootstrap: [LicensePageRootComponent]
 })
-class LicensePageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(LicensePageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class LicensePageModule {}
