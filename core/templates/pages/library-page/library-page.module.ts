@@ -27,6 +27,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 @NgModule({
   imports: [
@@ -62,8 +63,6 @@ class LibraryPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
