@@ -156,14 +156,14 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunitiesAsync('hi', 'Topic', '').then(
+        .fetchTranslationOpportunitiesAsync('hi', 'All', '').then(
           successHandler, failHandler
         );
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
           '/opportunitiessummaryhandler/<opportunityType>',
           { opportunityType: 'translation' }
-        ) + '?language_code=hi&topic_name=Topic&cursor='
+        ) + '?language_code=hi&topic_name=&cursor='
       );
       expect(req.request.method).toEqual('GET');
       req.flush(skillOpportunity);

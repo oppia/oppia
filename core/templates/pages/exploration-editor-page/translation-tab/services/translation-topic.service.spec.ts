@@ -19,7 +19,9 @@
 import { ContributionOpportunitiesService } from
   // eslint-disable-next-line max-len
   'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { LoggerService } from 'services/contextual/logger.service';
 import { TranslationTopicService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
@@ -30,6 +32,7 @@ describe('Translation topic service', () => {
   var $flushPendingTasks = null;
   let $q = null;
 
+  let loggerService: LoggerService = null;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
 
@@ -41,6 +44,7 @@ describe('Translation topic service', () => {
       imports: [HttpClientTestingModule]
     });
 
+    loggerService = TestBed.get(LoggerService);
     translationTopicService = TestBed.get(TranslationTopicService);
     contributionOpportunitiesService = TestBed.get(
       ContributionOpportunitiesService);
@@ -58,13 +62,26 @@ describe('Translation topic service', () => {
     }));
 
     it('should not allow invalid topic names to be set', () => {
+      const logErrorSpy = spyOn(loggerService, 'error').and.callThrough();
+
       translationTopicService.setActiveTopicName('Topic 3');
+      $flushPendingTasks();
       expect(
         translationTopicService.getActiveTopicName()).toBeNull();
+      expect(logErrorSpy).toHaveBeenCalledWith(
+        'Invalid active topic name: Topic 3'
+      );
 
       translationTopicService.setActiveTopicName(null);
+      $flushPendingTasks();
       expect(
         translationTopicService.getActiveTopicName()).toBeNull();
+    });
+
+    it('should emit the new topic name', () => {
+      let newTopicEventEmitter = new EventEmitter();
+      expect(translationTopicService.onActiveTopicChanged).toEqual(
+        newTopicEventEmitter);
     });
   });
 });

@@ -33,6 +33,7 @@ describe('Contributor dashboard page', function() {
   var UserService = null;
   var TranslationLanguageService = null;
   var TranslationTopicService = null;
+  var ContributionOpportunitiesService = null;
   var userProfileImage = 'profile-data-url';
   var userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
@@ -41,6 +42,7 @@ describe('Contributor dashboard page', function() {
   };
   var windowRef = new WindowRef();
   var focusManagerService = null;
+  var spy = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -55,6 +57,7 @@ describe('Contributor dashboard page', function() {
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
+    ContributionOpportunitiesService = $injector.get('ContributionOpportunitiesService');
     LocalStorageService = $injector.get('LocalStorageService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     TranslationTopicService = $injector.get('TranslationTopicService');
@@ -65,8 +68,12 @@ describe('Contributor dashboard page', function() {
     focusManagerService = $injector.get('FocusManagerService');
     ctrl = $componentController('contributorDashboardPage');
 
+    spyOn(ContributionOpportunitiesService, 'getAllTopicNamesAsync')
+        .and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
     spyOn(LocalStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
+    spyOn(LocalStorageService, 'getLastSelectedTranslationTopicName').and
+      .returnValue('Topic 1');
     spyOn(TranslationLanguageService, 'setActiveLanguageCode').and
       .callThrough();
     spyOn(TranslationTopicService, 'setActiveTopicName').and.callThrough();
@@ -100,6 +107,10 @@ describe('Contributor dashboard page', function() {
       expect(ctrl.languageCode).toBe('hi');
       expect(TranslationLanguageService.setActiveLanguageCode)
         .toHaveBeenCalledWith('hi');
+
+      expect(ctrl.topicName).toBe('Topic 1');
+      expect(TranslationTopicService.setActiveTopicName)
+        .toHaveBeenCalledWith('Topic 1');
       expect(ctrl.activeTabName).toBe('myContributionTab');
       expect(ctrl.OPPIA_AVATAR_IMAGE_URL).toBe(
         '/assets/images/avatar/oppia_avatar_100px.svg');
@@ -155,12 +166,12 @@ describe('Contributor dashboard page', function() {
         spyOn(LocalStorageService, 'updateLastSelectedTranslationTopicName')
           .and.callThrough();
 
-        ctrl.onChangeTopic('Topic 1');
+        ctrl.onChangeTopic('Topic 2');
 
         expect(TranslationTopicService.setActiveTopicName)
-          .toHaveBeenCalledWith('Topic 1');
+          .toHaveBeenCalledWith('Topic 2');
         expect(LocalStorageService.updateLastSelectedTranslationTopicName)
-          .toHaveBeenCalledWith('Topic 1');
+          .toHaveBeenCalledWith('Topic 2');
       });
 
     it('should show topic selector based on active tab', function() {

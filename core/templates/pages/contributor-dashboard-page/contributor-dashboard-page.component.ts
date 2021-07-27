@@ -74,9 +74,6 @@ angular.module('oppia').component('contributorDashboardPage', {
       var allAudioLanguageCodes = (
         LanguageUtilService.getAllVoiceoverLanguageCodes());
 
-      var prevSelectedTopicName = (
-        LocalStorageService.getLastSelectedTranslationTopicName());
-
       var getLanguageDescriptions = function(languageCodes) {
         var languageDescriptions = [];
         languageCodes.forEach(function(languageCode) {
@@ -136,6 +133,9 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
+
+        var prevSelectedTopicName = (
+          LocalStorageService.getLastSelectedTranslationTopicName());
 
         WindowRef.nativeWindow.addEventListener('scroll', function() {
           ctrl.scrollFunction();
@@ -214,11 +214,12 @@ angular.module('oppia').component('contributorDashboardPage', {
         TranslationTopicService.setActiveTopicName(ctrl.topicName);
 
         ContributionOpportunitiesService.getAllTopicNamesAsync()
-          .then((data) => {
-            if (data.indexOf(prevSelectedTopicName) !== -1) {
+          .then(function(topicNames) {
+            if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
               ctrl.topicName = prevSelectedTopicName;
               TranslationTopicService.setActiveTopicName(ctrl.topicName);
             }
+            $rootScope.$applyAsync();
           });
 
         ctrl.activeTabName = 'myContributionTab';
