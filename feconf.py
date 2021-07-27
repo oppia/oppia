@@ -1314,7 +1314,7 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
-}] # type: List[Dict[Text, Any]]
+}] # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Text]]]]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS) # type: List[Dict[Text, Any]]

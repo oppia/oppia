@@ -29,7 +29,8 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Text, Tuple, Union, cast)
 
 MYPY = False
 if MYPY:
@@ -833,14 +834,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         Returns:
             iterable. An iterable with non-private collection summary models.
         """
-        models = CollectionSummaryModel.query().filter(
+        summary_models = CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-        models = cast(List[CollectionSummaryModel], models)
-        return models
+        summary_models = cast(List[CollectionSummaryModel], summary_models)
+        return summary_models
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -855,7 +856,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with private collection summary models that
             are at least viewable by the given user.
         """
-        models =  CollectionSummaryModel.query().filter(
+        summary_models = CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             datastore_services.any_of(
@@ -866,8 +867,8 @@ class CollectionSummaryModel(base_models.BaseModel):
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-        models = cast(List[CollectionSummaryModel], models)
-        return models
+        summary_models = cast(List[CollectionSummaryModel], summary_models)
+        return summary_models
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -882,7 +883,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
-        models = CollectionSummaryModel.query().filter(
+        summary_models = CollectionSummaryModel.query().filter(
             datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
                 CollectionSummaryModel.editor_ids == user_id)
@@ -890,5 +891,5 @@ class CollectionSummaryModel(base_models.BaseModel):
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-        models = cast(List[CollectionSummaryModel], models)
-        return models
+        summary_models = cast(List[CollectionSummaryModel], summary_models)
+        return summary_models

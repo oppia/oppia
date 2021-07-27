@@ -198,8 +198,9 @@ class UserIdentifiersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        models = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        models_keys = cast(List[datastore_services.Key], models)
+        identifier_models = cls.query(
+            cls.user_id == user_id).fetch(keys_only=True)
+        models_keys = cast(List[datastore_services.Key], identifier_models)
         datastore_services.delete_multi(models_keys)
 
     @classmethod
@@ -288,8 +289,9 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        models = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        models_keys = cast(List[datastore_services.Key], models)
+        firebase_models = cls.query(
+            cls.user_id == user_id).fetch(keys_only=True)
+        models_keys = cast(List[datastore_services.Key], firebase_models)
         datastore_services.delete_multi(models_keys)
 
     @classmethod

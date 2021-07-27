@@ -30,7 +30,7 @@ from typing import Text, List, Tuple, Optional, Type # isort:skip # pylint: disa
 
 MYPY = False
 if MYPY:
-    from core.storage.base_model.gae_models import BaseModel # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import,unused-import
+    from core.storage.base_model.gae_models import BaseModel # pragma: no cover # pylint: disable=import-only-modules,unused-import
 
 # Valid model names.
 NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]

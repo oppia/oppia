@@ -24,7 +24,8 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Text, Tuple, Union, cast)
 
 MYPY = False
 if MYPY:
@@ -137,9 +138,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, interaction_id, exp_id, exp_version,
-            next_scheduled_check_time, training_data, state_name, status,
-            algorithm_version):
+            cls,
+            algorithm_id, # type: Text
+            interaction_id, # type: Text
+            exp_id, # type: Text
+            exp_version, # type: int
+            next_scheduled_check_time, # type: datetime.datetime
+            training_data, # type: Union[Dict[Text, Union[int, List[Text]]], List[Dict[Text, Union[int, List[Text]]]]]
+            state_name, # type: Text
+            status, # type: Text
+            algorithm_version # type: int
+    ):
         # type: (Text, Text, Text, int, datetime.datetime, Union[Dict[Text, Union[int, List[Text]]], List[Dict[Text, Union[int, List[Text]]]]], Text, Text, int) -> Text
         """Creates a new ClassifierTrainingJobModel entry.
 
