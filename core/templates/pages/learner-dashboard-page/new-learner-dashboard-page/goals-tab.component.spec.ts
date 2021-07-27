@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed } from
   '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
@@ -29,6 +29,7 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import { GoalsTabComponent } from './goals-tab.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
@@ -50,6 +51,7 @@ describe('Goals tab Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule
@@ -103,6 +105,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -137,6 +140,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -171,6 +175,7 @@ describe('Goals tab Component', () => {
       description: 'description',
       version: 1,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
@@ -199,7 +204,9 @@ describe('Goals tab Component', () => {
       }
     };
     component.currentGoals = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1)];
+      learnerTopicSummaryBackendDict1),
+    LearnerTopicSummary.createFromBackendDict(
+      learnerTopicSummaryBackendDict2)];
     component.editGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1),
     LearnerTopicSummary.createFromBackendDict(
@@ -208,6 +215,10 @@ describe('Goals tab Component', () => {
       learnerTopicSummaryBackendDict3)];
     component.completedGoals = [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict3)];
+    component.partiallyLearntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1)];
+    component.untrackedTopics = {};
     component.learntToPartiallyLearntTopics = [];
     component.currentGoalsStoryIsShown = [];
     component.topicBelongToCurrentGoals = [];
@@ -268,7 +279,8 @@ describe('Goals tab Component', () => {
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
       .and.returnValue(Promise.resolve(true));
-    component.addToLearnerGoals(component.editGoals[0], '3', 1);
+    component.untrackedTopics = {math: [component.editGoals[0]]};
+    component.addToLearnerGoals(component.editGoals[0], 'sample_topic_id', 1);
     fixture.detectChanges();
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
@@ -287,8 +299,10 @@ describe('Goals tab Component', () => {
         });
     });
 
-    component.removeFromLearnerGoals('2', 'topicName', 1);
-    fixture.detectChanges();
+    component.removeFromLearnerGoals(
+      component.editGoals[0], '1', 'topicName', 0);
+    component.removeFromLearnerGoals(
+      component.editGoals[1], '2', 'topicName', 0);
 
     expect(modalSpy).toHaveBeenCalled();
   });
