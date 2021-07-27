@@ -342,8 +342,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             average_ratings=3.1111
         ).put()
 
-        self.set_admins([self.OWNER_USERNAME])
-        self.login(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
         dashboard_stats = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['dashboard_stats']
         self.assertEqual(dashboard_stats, {
@@ -354,8 +353,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         })
 
     def test_last_week_stats_produce_exception(self):
-        self.set_admins([self.OWNER_USERNAME])
-        self.login(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         get_last_week_dashboard_stats_swap = self.swap(
             user_services,
@@ -382,8 +380,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         })
 
     def test_broken_last_week_stats_produce_exception(self):
-        self.set_admins([self.OWNER_USERNAME])
-        self.login(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         get_last_week_dashboard_stats_swap = self.swap(
             user_services,

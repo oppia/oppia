@@ -4088,10 +4088,9 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(PerformTasksInTaskqueueTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
@@ -4102,7 +4101,7 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
         ))
 
     def test_super_admin_can_perform_tasks_in_taskqueue(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_perform_tasks_in_taskqueue')
         self.logout()

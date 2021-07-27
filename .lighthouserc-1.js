@@ -16,45 +16,14 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
+const baseConfig = require('./.lighthouserc-base.js')
+
 module.exports = {
   'ci': {
     'collect': {
       'numberOfRuns': 3,
       'puppeteerScript': 'puppeteer-login-script.js',
-      'url': [
-        'http://127.0.0.1:8181/',
-        'http://127.0.0.1:8181/about',
-        'http://127.0.0.1:8181/admin',
-        'http://127.0.0.1:8181/community-library',
-        'http://127.0.0.1:8181/contact',
-        'http://127.0.0.1:8181/contributor-dashboard',
-        'http://127.0.0.1:8181/creator-dashboard',
-        'http://127.0.0.1:8181/creator-guidelines',
-        'http://127.0.0.1:8181/delete-account',
-        'http://127.0.0.1:8181/donate',
-        'http://127.0.0.1:8181/emaildashboard',
-        'http://127.0.0.1:8181/get-started',
-        'http://127.0.0.1:8181/learner-dashboard',
-        'http://127.0.0.1:8181/license',
-        'http://127.0.0.1:8181/nonprofits',
-        'http://127.0.0.1:8181/moderator',
-        'http://127.0.0.1:8181/parents',
-        'http://127.0.0.1:8181/partners',
-        'http://127.0.0.1:8181/preferences',
-        'http://127.0.0.1:8181/privacy-policy',
-        'http://127.0.0.1:8181/profile/username1',
-        'http://127.0.0.1:8181/signup?return_url=%2F',
-        'http://127.0.0.1:8181/teach',
-        'http://127.0.0.1:8181/teachers',
-        'http://127.0.0.1:8181/topics-and-skills-dashboard',
-        'http://127.0.0.1:8181/terms',
-        'http://127.0.0.1:8181/thanks',
-        'http://127.0.0.1:8181/volunteers',
-        `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_id}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_id}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_id}`,
-      ]
+      'url': baseConfig.urls['1']
     },
     'assert': {
       'assertMatrix': [
@@ -412,6 +381,16 @@ module.exports = {
         },
         {
           'matchingUrlPattern': 'http://[^/]+/skill_editor/.*$',
+          'assertions': {
+            'uses-webp-images': [
+              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
+            ],
+            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            'deprecations': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': '^http://[^/]+/story_editor/.*$',
           'assertions': {
             'uses-webp-images': [
               'error', {'maxLength': 0, 'strategy': 'pessimistic'}

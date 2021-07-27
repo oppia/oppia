@@ -106,7 +106,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_starting_job(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/emaildashboarddatahandler', {
@@ -211,7 +211,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_email_dashboard_result_page_with_invalid_user_raises_401(self):
-        self.login(self.NEW_SUBMITTER_EMAIL)
+        self.login(self.NEW_SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -233,7 +233,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_email_dashboard_result_post_passes(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         query_model = user_models.UserQueryModel(
@@ -312,7 +312,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
                 [query_model.sent_email_model_id])
 
     def test_email_dashboard_result_post_with_invalid_query_id_raises_400(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
@@ -322,7 +322,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_email_dashboard_result_post_with_invalid_user_raises_401(self):
-        self.login(self.NEW_SUBMITTER_EMAIL)
+        self.login(self.NEW_SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -348,7 +348,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_that_no_emails_are_sent_if_query_is_canceled(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -384,7 +384,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages_b), 0)
 
     def test_cancel_email_handler_with_invalid_query_id_raises_400(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
@@ -394,7 +394,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_cancel_email_handler_with_invalid_user_raises_401(self):
-        self.login(self.NEW_SUBMITTER_EMAIL)
+        self.login(self.NEW_SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -420,7 +420,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_that_test_email_for_bulk_emails_is_sent(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -474,12 +474,12 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self.assertEqual(
                 sent_email_model.recipient_id, query_model.submitter_id)
             self.assertEqual(
-                sent_email_model.sender_id, query_model.submitter_id)
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.intent, feconf.BULK_EMAIL_INTENT_TEST)
 
     def test_bulk_email_handler_with_invalid_query_id_raises_400(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
@@ -489,7 +489,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_bulk_email_handler_with_invalid_user_raises_401(self):
-        self.login(self.NEW_SUBMITTER_EMAIL)
+        self.login(self.NEW_SUBMITTER_EMAIL, is_super_admin=True)
 
         query_id = user_models.UserQueryModel.get_new_id('')
         user_models.UserQueryModel(
@@ -515,7 +515,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_handler_with_invalid_num_queries_to_fetch_raises_error_400(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         response = self.get_json(
             '/emaildashboarddatahandler',
@@ -527,7 +527,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     def test_email_dashboard_data_handler(self):
-        self.login(self.SUBMITTER_EMAIL)
+        self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
 
         response = self.get_json(
             '/emaildashboarddatahandler',

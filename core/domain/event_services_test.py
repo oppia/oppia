@@ -285,8 +285,8 @@ class UserStatsEventsFunctionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super().setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.exploration = (
             self.save_new_valid_exploration('exp_id', self.admin_id))
 

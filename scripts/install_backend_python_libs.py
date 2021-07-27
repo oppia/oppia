@@ -34,7 +34,7 @@ from . import common
 
 
 # This is the version that is set in install_prerequisites.sh.
-OPPIA_REQUIRED_PIP_VERSION = '21.1.3'
+OPPIA_REQUIRED_PIP_VERSION = '21.2.1'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.

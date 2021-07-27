@@ -465,6 +465,7 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/storage/cloud_storage_emulator.py',
     'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform/storage/cloud_storage_services.py',
+    'core/platform/storage/cloud_storage_services_test.py',
     'core/platform/storage/dev_mode_storage_services.py',
     'core/platform/storage/dev_mode_storage_services_test.py',
     'core/platform/taskqueue/cloud_taskqueue_services.py',

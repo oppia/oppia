@@ -36,18 +36,15 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserQueryServicesTests, self).setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_user_id = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.user_query_model_1 = user_models.UserQueryModel(
             id=self.USER_QUERY_1_ID,
             has_not_logged_in_for_n_days=20,
-            submitter_id=self.admin_user_id,
+            submitter_id=feconf.SYSTEM_COMMITTER_ID,
             query_status=feconf.USER_QUERY_STATUS_COMPLETED,
-            user_ids=[self.new_user_id, self.admin_user_id]
+            user_ids=[self.new_user_id, feconf.SYSTEM_COMMITTER_ID]
         )
         self.user_query_model_1.update_timestamps()
         self.user_query_model_1.put()
@@ -55,7 +52,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         self.user_query_model_2 = user_models.UserQueryModel(
             id=self.USER_QUERY_2_ID,
             inactive_in_last_n_days=20,
-            submitter_id=self.admin_user_id,
+            submitter_id=feconf.SYSTEM_COMMITTER_ID,
             query_status=feconf.USER_QUERY_STATUS_ARCHIVED,
             user_ids=[self.new_user_id]
         )
@@ -120,11 +117,11 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             'has_not_logged_in_for_n_days': 30
         }
         user_query_id = user_query_services.save_new_user_query(
-            self.admin_user_id, query_param)
+            feconf.SYSTEM_COMMITTER_ID, query_param)
 
         query_model = user_models.UserQueryModel.get(user_query_id)
 
-        self.assertEqual(query_model.submitter_id, self.admin_user_id)
+        self.assertEqual(query_model.submitter_id, feconf.SYSTEM_COMMITTER_ID)
         self.assertEqual(
             query_model.inactive_in_last_n_days,
             query_param['inactive_in_last_n_days'])
@@ -155,14 +152,16 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             user_models.UserBulkEmailsModel.get(self.new_user_id, strict=False))
         self.assertIsNone(
             user_models.UserBulkEmailsModel.get(
-                self.admin_user_id, strict=False))
+                feconf.SYSTEM_COMMITTER_ID, strict=False))
 
         send_bulk_email_swap = self.swap_with_checks(
             email_services,
             'send_bulk_mail',
             lambda *_: None,
             expected_args=[(
-                '%s <%s>' % (self.ADMIN_USERNAME, self.ADMIN_EMAIL),
+                '%s <%s>' % (
+                    self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_EMAIL
+                ),
                 [self.NEW_USER_EMAIL],
                 'subject',
                 'body',

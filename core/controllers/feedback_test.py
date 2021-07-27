@@ -658,12 +658,11 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'exp_id'
 
     def test_get_num_threads_after_creating_feedback_analytics(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id),
