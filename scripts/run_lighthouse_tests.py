@@ -37,12 +37,12 @@ SERVER_MODE_DEV = 'prod'
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_CONFIG_FILENAMES = {
     LIGHTHOUSE_MODE_PERFORMANCE: {
-        1: '.lighthouserc-1.js',
-        2: '.lighthouserc-2.js'
+        '1': '.lighthouserc-1.js',
+        '2': '.lighthouserc-2.js'
     },
     LIGHTHOUSE_MODE_ACCESSIBILITY: {
-        1: '.lighthouserc-accessibility-1.js',
-        2: '.lighthouserc-accessibility-2.js'
+        '1': '.lighthouserc-accessibility-1.js',
+        '2': '.lighthouserc-accessibility-2.js'
     }
 }
 APP_YAML_FILENAMES = {
@@ -63,7 +63,7 @@ _PARSER.add_argument(
 
 _PARSER.add_argument(
     '--shard', help='Sets the shard for the lighthouse tests',
-    required=True, choices=[1, 2])
+    required=True, choices=['1', '2'])
 
 
 def run_lighthouse_puppeteer_script():
@@ -144,7 +144,7 @@ def run_lighthouse_checks(lighthouse_mode, shard):
     Args:
         lighthouse_mode: str. Represents whether the lighthouse checks are in
             accessibility mode or performance mode.
-        shard: int. Specifies which shard of the tests should be run.
+        shard: str. Specifies which shard of the tests should be run.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     # The max-old-space-size is a quick fix for node running out of heap memory
