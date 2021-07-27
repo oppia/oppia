@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -78,7 +77,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     CommonElementsModule,
     FormsModule,
     LeafletModule,

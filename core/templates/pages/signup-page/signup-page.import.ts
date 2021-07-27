@@ -27,14 +27,16 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
 import { SignupPageModule } from './signup-page.module';
+import { LoggerService } from 'services/contextual/logger.service';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
 }
 
+const loggerService = new LoggerService();
+
 platformBrowserDynamic().bootstrapModule(SignupPageModule).catch(
-  // eslint-disable-next-line no-console
-  (err) => console.error(err)
+  (err) => loggerService.error(err)
 );
 
 // This prevents angular pages to cause side effects to hybrid pages.

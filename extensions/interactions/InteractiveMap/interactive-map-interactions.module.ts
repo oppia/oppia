@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { InteractiveInteractiveMapComponent } from './directives/oppia-interactive-interactive-map.component';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { ResponseInteractiveMapComponent } from './directives/oppia-response-interactive-map.component';
@@ -30,7 +29,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     LeafletModule,
     TranslateModule
   ],

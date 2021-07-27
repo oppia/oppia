@@ -19,7 +19,7 @@
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from
   '@angular/core/testing';
 import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -33,6 +33,7 @@ import { of } from 'rxjs';
 import { UrlParamsType, UrlService } from 'services/contextual/url.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { UserInfo } from 'domain/user/user-info.model';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
@@ -143,6 +144,7 @@ describe('Exploration Summary Tile Component', () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule

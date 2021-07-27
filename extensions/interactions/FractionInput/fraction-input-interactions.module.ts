@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { InteractiveFractionInputComponent } from './directives/oppia-interactive-fraction-input.component';
 import { ResponseFractionInput } from './directives/oppia-response-fraction-input.component';
@@ -30,7 +29,6 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     FormsModule,
     SharedComponentsModule
   ],

@@ -29,20 +29,20 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { ModeratorPageComponent } from './moderator-page.component';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
     NgbNavModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     ModeratorPageComponent,
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     ModeratorPageComponent
   ],
   providers: [

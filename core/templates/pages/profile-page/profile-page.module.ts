@@ -22,34 +22,32 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 import { ProfilePageComponent } from './profile-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EditProfilePictureModalComponent } from 'pages/preferences-page/modal-templates/edit-profile-picture-modal.component';
 import { ProfilePageRootComponent } from './profile-page-root.component';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     NgbPopoverModule,
     SharedComponentsModule
   ],
   declarations: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent
   ],
   entryComponents: [
     EditProfilePictureModalComponent,
-    OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent

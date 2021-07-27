@@ -22,27 +22,25 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { TermsPageComponent } from
   'pages/terms-page/terms-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TermsPageRootComponent } from './terms-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     TermsPageComponent,
     TermsPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     TermsPageComponent,
     TermsPageRootComponent
   ],

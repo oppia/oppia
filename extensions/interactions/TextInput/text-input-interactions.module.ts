@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { InteractiveTextInputComponent } from './directives/oppia-interactive-text-input.component';
@@ -30,7 +29,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule

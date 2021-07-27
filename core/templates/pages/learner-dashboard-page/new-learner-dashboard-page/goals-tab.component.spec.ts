@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed } from
   '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
@@ -29,6 +29,7 @@ import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import { LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import { GoalsTabComponent } from './goals-tab.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance: {
@@ -50,6 +51,7 @@ describe('Goals tab Component', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule

@@ -18,12 +18,11 @@
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { ClassroomPageComponent } from './classroom-page.component';
@@ -34,19 +33,18 @@ import { ClassroomPageRootComponent } from './classroom-page-root.component';
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
     ClassroomPageComponent,
     ClassroomPageRootComponent,
-    OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
   entryComponents: [
     ClassroomPageComponent,
     ClassroomPageRootComponent,
-    OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
   providers: [

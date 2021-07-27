@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -41,7 +40,6 @@ import { PortalModule } from '@angular/cdk/portal';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,

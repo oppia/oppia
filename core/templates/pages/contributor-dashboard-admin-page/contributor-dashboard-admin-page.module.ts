@@ -37,11 +37,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     ContributorDashboardAdminNavbarComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     ContributorDashboardAdminNavbarComponent
   ],
   providers: [

@@ -18,16 +18,18 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from 'components/material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from 'modules/material.module';
 import { PreferredSiteLanguageSelectorComponent } from './preferred-language-selector.component';
 
-describe('Preferred Site Language Component', () => {
+describe('Preferred Site Language Selector Component', () => {
   let componentInstance: PreferredSiteLanguageSelectorComponent;
   let fixture: ComponentFixture<PreferredSiteLanguageSelectorComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
       ],

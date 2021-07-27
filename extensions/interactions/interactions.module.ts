@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { AlgebraicExpressionInputExtensionsModule } from './AlgebraicExpressionInput/algebraic-expression-input-interactions.module';
 import { ContinueExtensionsModule } from './Continue/continue-interactions.module';
@@ -41,7 +40,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
     ContinueExtensionsModule,

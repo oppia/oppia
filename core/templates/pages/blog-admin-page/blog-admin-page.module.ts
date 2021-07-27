@@ -45,13 +45,11 @@ declare var angular: ng.IAngularStatic;
     SharedComponentsModule,
   ],
   declarations: [
-    OppiaAngularRootComponent,
     BlogAdminNavbarComponent,
     BlogAdminPageComponent,
     RolesAndActionsVisualizerComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     BlogAdminNavbarComponent,
     BlogAdminPageComponent,
     RolesAndActionsVisualizerComponent

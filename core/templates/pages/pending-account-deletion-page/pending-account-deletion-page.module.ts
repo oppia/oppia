@@ -22,18 +22,18 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
     SharedPipesModule,
@@ -42,12 +42,10 @@ import { PendingAccountDeletionPageRootComponent } from './pending-account-delet
   declarations: [
     PendingAccountDeletionPageComponent,
     PendingAccountDeletionPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     PendingAccountDeletionPageComponent,
     PendingAccountDeletionPageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {

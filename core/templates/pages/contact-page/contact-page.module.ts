@@ -22,24 +22,23 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { ContactPageComponent } from './contact-page.component';
 import { ContactPageRootComponent } from './contact-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     ContactPageComponent,
     ContactPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     ContactPageComponent,
     ContactPageRootComponent
   ],

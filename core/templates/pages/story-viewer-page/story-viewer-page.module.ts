@@ -22,30 +22,28 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { StoryViewerNavbarBreadcrumbComponent } from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
 import { StoryViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent,
     StoryViewerPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent,

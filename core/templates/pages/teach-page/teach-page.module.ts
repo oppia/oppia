@@ -22,29 +22,27 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { TeachPageComponent } from './teach-page.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TeachPageRootComponent } from './teach-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
     TeachPageComponent,
     TeachPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     TeachPageComponent,
     TeachPageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {
