@@ -32,7 +32,8 @@ from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Callable, Iterator, List, Optional, Text, Tuple, TypeVar)
+    Any, Callable, Iterator, List, Optional, Sequence,
+    Text, Tuple, TypeVar)
 
 MYPY = False
 if MYPY:
@@ -91,7 +92,7 @@ def get_multi(keys):
 
 
 def update_timestamps_multi(entities, update_last_updated_time=True):
-    # type: (List[TYPE_MODEL_SUBCLASS], bool) -> None
+    # type: (Sequence[base_models.BaseModel], bool) -> None
     """Update the created_on and last_updated fields of all given entities.
 
     Args:
@@ -101,7 +102,7 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
             last_updated field of the model.
     """
     for entity in entities:
-        entity.update_timestamps( # type: ignore[attr-defined]
+        entity.update_timestamps(
             update_last_updated_time=update_last_updated_time)
 
 
