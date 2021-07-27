@@ -371,6 +371,7 @@ import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-
 import { ExplorationTagsService } from 'pages/exploration-editor-page/services/exploration-tags.service';
 import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
 import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -559,6 +560,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
   ['LearnerViewRatingBackendApiService', LearnerViewRatingBackendApiService],
   ['LearnerViewRatingService', LearnerViewRatingService],
+  ['LibraryPageBackendApiService', LibraryPageBackendApiService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],

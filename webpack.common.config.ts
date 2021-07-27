@@ -456,7 +456,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['library'],
       filename: 'library-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Looking to learn something new? Learn any subject ' +
