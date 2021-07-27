@@ -21,6 +21,7 @@ import unittest
 
 from core.tests import gae_suite
 from core.tests import test_utils
+from scripts import common
 
 
 class GaeSuiteTests(test_utils.GenericTestBase):
@@ -38,7 +39,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
     def test_cannot_add_directory_with_invalid_path(self):
         dir_to_add_swap = self.swap(
-            gae_suite, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path'])
+            common, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path'])
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Directory invalid_path does not exist.')
         with assert_raises_regexp_context_manager, dir_to_add_swap:
