@@ -48,7 +48,7 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
-# NOTE: These handlers manage user sessions and serves auth pages. Thus, we
+# NOTE: These handlers manage user sessions and serve auth pages. Thus, we
 # should never reject or replace them when running in maintenance mode;
 # otherwise admins will be unable to access the site.
 AUTH_HANDLER_PATHS = (
