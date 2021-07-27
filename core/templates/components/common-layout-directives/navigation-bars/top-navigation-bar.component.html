@@ -122,6 +122,7 @@
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE})"
                  class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link"
                  href="/about"
+                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
                  [innerHTML]="'I18N_TOPNAV_ABOUT_OPPIA' | translate">
               </a>
             </li>
@@ -388,7 +389,6 @@
 <style>
   .dropdown-menu {
     border-radius: 3px;
-    left: 100 !important;
     right: 0 !important;
   }
   .language-icon {
