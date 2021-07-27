@@ -950,7 +950,7 @@ class Skill(python_utils.OBJECT):
             dict. The converted skill_contents_dict.
         """
         skill_contents_dict['explanation']['html'] = conversion_fn(
-                skill_contents_dict['explanation']['html'])
+            skill_contents_dict['explanation']['html'])
         skill_contents_dict['written_translations'] = (
             state_domain.WrittenTranslations.
             convert_html_in_written_translations(
