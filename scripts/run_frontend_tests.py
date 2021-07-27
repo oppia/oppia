@@ -139,6 +139,7 @@ def main(args=None):
         # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
+        # Suppressing the karma web-serevr logs.
         if line and not u'[web-server]:' in line.decode('utf-8'):
             python_utils.PRINT(line, end='')
             output_lines.append(line)

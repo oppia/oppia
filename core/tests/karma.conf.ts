@@ -1,4 +1,8 @@
-var argv = require('yargs').argv;
+var argv = require('yargs').positional('debugMode', {
+  type: 'boolean',
+  'default': false
+}).argv;
+
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
@@ -94,10 +98,7 @@ module.exports = function(config) {
     browserDisconnectTimeout: 60000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
-      // To print debugging information, use `console.error`. We don't
-      // output `log` level logs to avoid printing out success messages
-      // for every passing spec.
-      level: 'error',
+      level: 'log',
       format: '%b %T: %m',
       terminal: argv.debugMode
     },
