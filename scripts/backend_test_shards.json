@@ -133,6 +133,7 @@
     ],
     "5": [
         "core.controllers.contributor_dashboard_admin_test",
+        "core.controllers.oppia_root_test",
         "core.domain.subtopic_page_domain_test",
         "core.domain.subscription_services_test",
         "core.domain.draft_upgrade_services_test",
@@ -248,6 +249,7 @@
         "jobs.transforms.base_validation_registry_test",
         "jobs.transforms.exp_validation_test",
         "jobs.transforms.topic_validation_test",
+        "jobs.transforms.subtopic_validation_test",
         "jobs.transforms.auth_validation_test",
         "jobs.transforms.base_validation_test",
         "jobs.transforms.user_validation_test",
