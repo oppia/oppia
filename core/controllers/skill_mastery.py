@@ -22,7 +22,9 @@ from core.controllers import base
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
+from core.domain import topic_fetchers
 import feconf
+import python_utils
 import utils
 
 
@@ -125,3 +127,58 @@ class SkillMasteryDataHandler(base.BaseHandler):
             self.user_id, new_degrees_of_mastery)
 
         self.render_json({})
+
+
+class SubtopicMasteryDataHandler(base.BaseHandler):
+    """A handler that handles fetching user subtopic mastery for a topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_topic_ids': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+        comma_separated_topic_ids = (
+            self.request.get('comma_separated_topic_ids'))
+        topic_ids = comma_separated_topic_ids.split(',')
+        topics = topic_fetchers.get_topics_by_ids(topic_ids)
+        all_skill_ids = []
+        subtopic_mastery_dict = {}
+
+        for ind, topic in enumerate(topics):
+            if not topic:
+                raise self.InvalidInputException(
+                    'Invalid topic ID %s' % topic_ids[ind])
+            all_skill_ids.extend(topic.get_all_skill_ids())
+
+        all_skill_ids = list(set(all_skill_ids))
+        all_skills_mastery_dict = skill_services.get_multi_user_skill_mastery(
+            self.user_id, all_skill_ids)
+        for topic in topics:
+            subtopic_mastery_dict[topic.id] = {}
+            for subtopic in topic.subtopics:
+                skill_mastery_dict = {
+                    skill_id: mastery
+                    for skill_id, mastery in all_skills_mastery_dict.items()
+                    if mastery is not None and skill_id in subtopic.skill_ids
+                }
+                if skill_mastery_dict:
+                    # Subtopic mastery is average of skill masteries.
+                    subtopic_mastery_dict[topic.id][subtopic.id] = (
+                        python_utils.divide(
+                            sum(skill_mastery_dict.values()),
+                            len(skill_mastery_dict)))
+
+        self.values.update({
+            'subtopic_mastery_dict': subtopic_mastery_dict
+        })
+        self.render_json(self.values)
