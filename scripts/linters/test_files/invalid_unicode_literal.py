@@ -18,7 +18,7 @@
 python_linter_test. This file does not contain unicode literal future import.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import absolute_import
 
 import python_utils
 
