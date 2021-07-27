@@ -42,5 +42,5 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.component.ts');
-require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
+require('pages/topic-editor-page/navbar/topic-editor-navbar.component.ts');
 require('pages/topic-editor-page/topic-editor-page.component.ts');
