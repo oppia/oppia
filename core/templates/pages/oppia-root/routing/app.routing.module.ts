@@ -21,7 +21,7 @@ import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
 
-// All paths should be defined in constants.ts file.
+// All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
@@ -31,6 +31,7 @@ const routes: Route[] = [
   }
 ];
 
+// Register all routes for topic landing page.
 for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
   for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
     routes.push({
@@ -42,13 +43,14 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
   }
 }
 
+// '**' wildcard route must be kept at the end,as it can override all other
+// routes.
 routes.push({
   path: '**',
   loadChildren: () => import(
     'pages/error-pages/error-404/error-404-page.module').then(
     m => m.Error404PageModule)
 });
-
 
 @NgModule({
   imports: [
