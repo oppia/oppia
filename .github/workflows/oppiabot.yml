@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Github Actions from Oppiabot
-        uses: oppia/oppiabot@1.3.0
+        uses: oppia/oppiabot@1.4.0
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
         env:
