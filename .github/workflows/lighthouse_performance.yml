@@ -27,6 +27,9 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run lighthouse checks
+      - name: Run Lighthouse performance checks shard 1
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance
+        run: python -m scripts.run_lighthouse_tests --mode performance --shard 1
+      - name: Run Lighthouse performance checks shard 2
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: python -m scripts.run_lighthouse_tests --mode performance --shard 2

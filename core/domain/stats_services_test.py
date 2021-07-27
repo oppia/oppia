@@ -812,8 +812,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
     def test_update_exp_issues_for_new_exp_version(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         exp = self.save_new_valid_exploration('exp_id', admin_id)
 
         stats_models.ExplorationIssuesModel.delete_by_id(

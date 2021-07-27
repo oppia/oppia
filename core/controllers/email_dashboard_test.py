@@ -206,7 +206,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         response = self.get_html_response(
             '/emaildashboardresult/aaa', expected_status_int=400)
-        self.assertIn(b'<error-page status_code=', response.body)
+        self.assertIn(
+            b'<oppia-error-page-root></oppia-error-page-root>', response.body)
 
         self.logout()
 
@@ -228,7 +229,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         response = self.get_html_response(
             '/emaildashboardresult/%s' % query_id, expected_status_int=401)
-        self.assertIn(b'<error-page status_code=', response.body)
+        self.assertIn(
+            b'<oppia-error-page-root></oppia-error-page-root>', response.body)
 
         self.logout()
 

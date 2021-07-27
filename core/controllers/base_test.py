@@ -370,7 +370,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/mock_iframed', expected_status_int=500)
 
         self.assertIn(
-            'b<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
+            b'<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
             response.body
         )
 

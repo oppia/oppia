@@ -255,7 +255,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
             'property_values\' failed: Validation failed: is_at_least'
-            ' ({u\'min_value\': 1}) for object 0'
+            ' ({\'min_value\': 1}) for object 0'
         )
 
     def test_raise_error_for_updating_to_negative_value_for_max_tags(self):
@@ -283,5 +283,5 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'], 'Schema validation for \'new_config_'
             'property_values\' failed: Validation failed: is_at_least'
-            ' ({u\'min_value\': 1}) for object -2'
+            ' ({\'min_value\': 1}) for object -2'
         )

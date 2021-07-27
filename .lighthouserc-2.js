@@ -16,334 +16,61 @@
  * @fileoverview Configuration for lighthouse-ci.
  */
 
-const baseConfig = require('.ligthouserc-base.js')
+const baseConfig = require('.lighthouserc-base.js')
 
 module.exports = {
   'ci': {
     'collect': {
-      'numberOfRuns': 3,
-      'puppeteerScript': 'puppeteer-login-script.js',
-      'url': baseConfig.urls['2']
+      'numberOfRuns': baseConfig['numberOfRuns'],
+      'puppeteerScript': baseConfig['puppeteerScript'],
+      'url': baseConfig['urlShards'][2]
     },
     'assert': {
       'assertMatrix': [
-        {
-          'matchingUrlPattern': '.*',
-          'assertions': {
-            // Performance category.
-            'first-contentful-paint': [ 'warn', {'maxNumericValue': 1230000}],
-            'first-meaningful-paint': ['warn', {'maxNumericValue': 1280000}],
-            'first-cpu-idle': ['warn', {'maxNumericValue': 1460000}],
-            'speed-index': ['warn', {'maxNumericValue': 1230000}],
-            'interactive': ['warn', {'maxNumericValue': 1540000}],
-            'max-potential-fid': ['warn', {'maxNumericValue': 130000}],
-            'uses-responsive-images': ['error', {'minScore': 1}],
-            'uses-optimized-images': ['error', {'minScore': 1}],
-            'uses-rel-preconnect': ['error', {'minScore': 0.5}],
-            'redirects': ['error', {'minScore': 1}],
-            'uses-rel-preload': ['error', {'minScore': 1}],
-            'efficient-animated-content': ['error',{'minScore': 1}],
-            'offscreen-images': ['error', {'minScore': 0.45}],
-            'time-to-first-byte': ['off', {}],
-            // Best practices category.
-            'appcache-manifest': ['error', {'minScore': 1}],
-            'errors-in-console': ['error', {'minScore': 1}],
-            'no-document-write': ['error', {'minScore': 1}],
-            'external-anchors-use-rel-noopener': ['error', {'minScore': 1}],
-            'geolocation-on-start': ['error', {'minScore': 1}],
-            'doctype': ['error', {'minScore': 1}],
-            'no-vulnerable-libraries': ['off', {'minScore': 1}],
-            'js-libraries': ['error', {'minScore': 1}],
-            'notification-on-start': ['error', {'minScore': 1}],
-            'password-inputs-can-be-pasted-into': ['error', {'minScore': 1}],
-            'image-aspect-ratio': ['error', {'minScore': 1}],
-            'is-on-https': ['off', {}],
-            'uses-http2': ['off', {}],
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/admin$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/about$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/community-library$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/contact$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/contributor-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/creator-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/creator-guidelines$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/delete-account$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/donate$',
-          'assertions': {
-            // The YouTube embed on donate page loads images in jpg format, thus
-            // we need to allow one image.
-            'uses-webp-images': [
-              'error', {'maxLength': 1, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/emaildashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/get-started$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/learner-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            // We need to use passive event listeners on this page so that
-            // the page works correctly.
-            'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/license$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}      
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/nonprofits$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/moderator$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
-        {
-          'matchingUrlPattern': 'http://[^/]+/parents$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
-        },
+        baseConfig['basePerformanceAssertMatrix'],
         {
           'matchingUrlPattern': 'http://[^/]+/partners$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/preferences$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/privacy-policy$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/profile/username1$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/signup?return_url=%2F$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/teach$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/teachers$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/terms$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/thanks$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/volunteers$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/topics-and-skills-dashboard$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/create/.*$',
@@ -361,43 +88,19 @@ module.exports = {
         },
         {
           'matchingUrlPattern': 'http://[^/]+/collection_editor/create/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/topic_editor/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': 'http://[^/]+/skill_editor/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
         {
           'matchingUrlPattern': '^http://[^/]+/story_editor/.*$',
-          'assertions': {
-            'uses-webp-images': [
-              'error', {'maxLength': 0, 'strategy': 'pessimistic'}
-            ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
-            'deprecations': ['error', {'minScore': 1}]
-          }
+          'assertions': baseConfig['basePerformanceAssertions']
         },
       ]
     },

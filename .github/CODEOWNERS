@@ -597,8 +597,7 @@
 /core/templates/pages/header_js_libs.html @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @vojtechjelinek
 /core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
-/.lighthouserc.js @jimbyo @vojtechjelinek
-/.lighthouserc-accessibility.js @jimbyo @vojtechjelinek
+/.lighthouserc*.js @jimbyo @vojtechjelinek
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
 /scripts/run_lighthouse_tests.py @vojtechjelinek
 /webpack.*.ts @nithusha21 @vojtechjelinek

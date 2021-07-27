@@ -168,7 +168,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_backend_python_libs.verify_pip_is_installed()
 
         self.assertEqual(self.cmd_token_list, [
-            ['pip', 'install', 'pip==21.1.3'],
+            ['pip', 'install', 'pip==21.2.1'],
         ])
 
     def test_correct_pip_version_does_nothing(self):
