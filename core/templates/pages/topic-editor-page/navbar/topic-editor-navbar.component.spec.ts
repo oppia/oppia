@@ -486,9 +486,8 @@ describe('topicEditorNavbar', () => {
     expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  // Todo-gp.
   it('should toggle navigation option when user clicks the drop down' +
-  ' button', () => {
+  ' button next to navigation options in mobile', () => {
     $scope.showNavigationOptions = true;
 
     $scope.toggleNavigationOptions();
@@ -500,8 +499,8 @@ describe('topicEditorNavbar', () => {
     expect($scope.showNavigationOptions).toBeTrue();
   });
 
-  // Todo-gp.
-  it('should toggle topic edit options when called', () => {
+  it('should toggle topic edit option when user clicks the drop down' +
+  ' button next to topic edit options in mobile', () => {
     $scope.showTopicEditOptions = true;
 
     $scope.toggleTopicEditOptions();
@@ -513,8 +512,8 @@ describe('topicEditorNavbar', () => {
     expect($scope.showTopicEditOptions).toBeTrue();
   });
 
-  // Todo-gp.
-  it('should toggle warnings when called', () => {
+  it('should toggle warnings when user clicks the warning symbol in' +
+  ' mobile', () => {
     $scope.warningsAreShown = true;
 
     $scope.toggleWarningText();
