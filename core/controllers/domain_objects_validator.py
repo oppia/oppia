@@ -109,13 +109,3 @@ def validate_state_dict(state_dict):
     """
     validation_class = state_domain.State.from_dict(state_dict)
     validation_class.validate(None, True)
-
-
-def validate_exp_issue_dict(exp_issue_dict):
-    # type: (Dict[Any, Any]) -> None
-    """Validates exp_issue_dict.
-
-    Args:
-        exp_issue_dict: dict. Data that needs to be validated.
-    """
-    stats_domain.ExplorationIssue.from_dict(exp_issue_dict)

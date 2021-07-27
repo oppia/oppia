@@ -365,8 +365,8 @@ class ExplorationRightsHandler(EditorHandler):
         version = self.normalized_payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        make_community_owned = self.normalized_payload.get(
-            'make_community_owned')
+        make_community_owned = (
+            self.normalized_payload.get('make_community_owned'))
         new_member_username = self.normalized_payload.get('new_member_username')
         new_member_role = self.normalized_payload.get('new_member_role')
         viewable_if_private = self.normalized_payload.get('viewable_if_private')
@@ -1103,7 +1103,11 @@ class ImageUploadHandler(EditorHandler):
             },
             'filename': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'\w+[.]\w+'
+                    }]
                 }
             },
             'filename_prefix': {
