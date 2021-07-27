@@ -29,7 +29,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -41,7 +40,6 @@ import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   imports: [
-    BrowserAnimationsModule,
     CommonModule,
     NgxMatSelectSearchModule,
     MatAutocompleteModule,
@@ -66,13 +64,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatDividerModule
   ],
   exports: [
-    BrowserAnimationsModule,
     CommonModule,
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatListModule,
     NgxMatSelectSearchModule,
     MatAutocompleteModule,
     MatButtonModule,

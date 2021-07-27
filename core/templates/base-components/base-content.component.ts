@@ -16,7 +16,7 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { ChangeDetectorRef, Component, Directive } from '@angular/core';
+import { Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { CookieService } from 'ngx-cookie';
@@ -45,7 +45,6 @@ export class BaseContentComponent {
     private windowRef: WindowRef,
     private backgroundMaskService: BackgroundMaskService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
-    private changeDetectorRef: ChangeDetectorRef,
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
@@ -68,10 +67,7 @@ export class BaseContentComponent {
     }
     this.iframed = this.urlService.isIframed();
     this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => {
-        this.loadingMessage = message;
-        this.changeDetectorRef.detectChanges();
-      }
+      (message: string) => this.loadingMessage = message
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
 

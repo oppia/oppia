@@ -16,8 +16,8 @@
 
 """Tests for generic controller behavior."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import importlib
@@ -63,16 +63,12 @@ PADDING = 1
 class HelperFunctionTests(test_utils.GenericTestBase):
 
     def test_load_template(self):
-        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+        oppia_root_path = os.path.join(
+            'core', 'templates', 'pages', 'oppia-root')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
-                '"About | Oppia"',
-                base.load_template('about-page.mainpage.html'))
-        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
-            self.assertIn(
-                '"Donate - Oppia"',
-                base.load_template('donate-page.mainpage.html'))
+                '"Loading | Oppia"',
+                base.load_template('oppia-root.mainpage.html'))
 
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
@@ -377,8 +373,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/mock_iframed', expected_status_int=500)
 
         self.assertIn(
-            'Uh-oh! The Oppia exploration you requested may have been removed '
-            'or deleted.', response.body)
+            '<oppia-error-iframed-page-root></oppia-error-iframed-page-root>', response.body)
 
     def test_dev_mode_cannot_be_true_on_production(self):
         # We need to delete the existing module else the re-importing
@@ -639,7 +634,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             '/community-library', expected_status_int=503)
 
         self.assertIn('<oppia-maintenance-page>', response.body)
-        self.assertNotIn('<oppia-library-page-root>', response.body)
+        self.assertNotIn('<library-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -649,7 +644,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<oppia-library-page-root>', response.body)
+        self.assertIn('<library-page>', response.body)
         self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -662,7 +657,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<oppia-library-page-root>', response.body)
+        self.assertIn('<library-page>', response.body)
         self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -1303,7 +1298,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'about-page.mainpage.html',
+                'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
