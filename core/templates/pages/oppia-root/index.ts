@@ -33,6 +33,7 @@ if (!AppConstants.DEV_MODE) {
 }
 
 const loggerService = new LoggerService();
+
 platformBrowserDynamic().bootstrapModule(AppModule).catch(
   (err) => loggerService.error(err)
 );
