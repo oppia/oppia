@@ -16,50 +16,19 @@
  * @fileoverview Module for the login page.
  */
 
-import { ErrorHandler, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import firebase from 'firebase/app';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LoginPageComponent } from 'pages/login-page/login-page.component';
 import { LoginPageRootComponent } from './login-page-root.component';
 import { CommonModule } from '@angular/common';
 import { LoginPageRoutingModule } from './login-page-routing.module';
-
-class FirebaseErrorFilterHandler extends ErrorHandler {
-  // AngularFire throws duplicate errors because it uses setTimeout() to manage
-  // promises internally. Errors thrown from those setTimeout() calls are not
-  // accessible to our code. Because of this, even though LoginPageComponent
-  // catches errors thrown by AngularFire, their duplicates are treated as
-  // "Unhandled Promise Rejections" and result in top-level error messages.
-  //
-  // To prevent these errors from interfering with end-to-end tests and from
-  // polluting the server, we ignore the following list of EXPECTED error codes.
-  private static readonly EXPECTED_ERROR_CODES = [
-    // Users pending deletion have their Firebase accounts disabled. When they
-    // try to sign in anyway, we redirect them to the /pending-account-deletion
-    // page.
-    'auth/user-disabled',
-    // In emulator mode we use signInWithEmailAndPassword() and, if that throws
-    // an 'auth/user-not-found' error, createUserWithEmailAndPassword() for
-    // convenience. In production mode we use signInWithRedirect(), which
-    // doesn't throw 'auth/user-not-found' because it handles both signing in
-    // and creating users in the same way.
-    'auth/user-not-found',
-  ];
-
-  handleError(error: firebase.auth.Error): void {
-    if (FirebaseErrorFilterHandler.EXPECTED_ERROR_CODES.includes(error.code)) {
-      return;
-    }
-    super.handleError(error);
-  }
-}
 
 @NgModule({
   imports: [
@@ -80,12 +49,6 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   entryComponents: [
     LoginPageComponent,
     LoginPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: ErrorHandler,
-      useClass: FirebaseErrorFilterHandler,
-    }
   ]
 })
 export class LoginPageModule {}
