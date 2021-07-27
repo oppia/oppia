@@ -37,7 +37,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { Router } from '@angular/router';
 
 interface LanguageInfo {
   id: string;

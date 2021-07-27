@@ -5994,6 +5994,11 @@ export default {
         }
       ]
     },
+    "DELETE_ACCOUNT": {
+      "ROUTE": "delete-account",
+      "TITLE": "Delete Account | Oppia",
+      "META": []
+    },
     "PREFERENCES": {
       "ROUTE": "preferences",
       "TITLE": "Preferences | Oppia",

@@ -64,6 +64,8 @@ export class PreferencesPageComponent {
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   userCanExportAccount: boolean;
+  PAGES_REGISTERED_WITH_FRONTEND = (
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
   constructor(
     private ngbModal: NgbModal,

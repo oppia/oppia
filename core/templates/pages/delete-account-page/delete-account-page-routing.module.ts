@@ -13,25 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for delete account page.
+ * @fileoverview Routing module for delete page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageTitleService } from 'services/page-title.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
 
-@Component({
-  selector: 'oppia-delete-account-page-root',
-  templateUrl: './delete-account-page-root.component.html'
-})
-export class DeleteAccountPageRootComponent {
-  constructor(
-    private pageTitleService: PageTitleService
-  ) {}
-
-  ngOnInit(): void {
-    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
+const routes: Route[] = [
+  {
+    path: '',
+    component: DeleteAccountPageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class DeleteAccountPageRoutingModule {}

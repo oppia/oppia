@@ -77,9 +77,6 @@ module.exports = {
     contributor_dashboard_admin:
       commonPrefix + '/pages/contributor-dashboard-admin-page/' +
       'contributor-dashboard-admin-page.import.ts',
-    delete_account:
-      commonPrefix + '/pages/delete-account-page/' +
-        'delete-account-page.import.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.import.ts',
     email_dashboard:
       commonPrefix +
@@ -278,16 +275,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/contributor-dashboard-page/' +
         'contributor-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['delete_account'],
-      filename: 'delete-account-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/delete-account-page/' +
-          'delete-account-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

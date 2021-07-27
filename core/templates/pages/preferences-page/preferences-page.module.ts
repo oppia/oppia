@@ -28,11 +28,15 @@ import { EditProfilePictureModalComponent } from './modal-templates/edit-profile
 import { PreferencesPageRootComponent } from './preferences-page-root.component';
 import { CommonModule } from '@angular/common';
 import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
+import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
 
 @NgModule({
   imports: [
     CommonModule,
     NgbPopoverModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     ReactiveFormsModule,
     SharedComponentsModule,
     PreferencesPageRoutingModule

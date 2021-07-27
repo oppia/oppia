@@ -262,7 +262,8 @@
     <div *ngIf="userCanDeleteAccount" role="form" class="form-group row">
       <label class="col-lg-4 col-md-4 col-sm-4">{{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}</label>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <a href="/delete-account">
+        <a href="/delete-account"
+           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
           <button type="button" class="btn btn-danger protractor-test-delete-account-button">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
           </button>

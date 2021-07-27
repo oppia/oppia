@@ -390,17 +390,6 @@ class SignupHandler(base.BaseHandler):
         })
 
 
-class DeleteAccountPage(base.BaseHandler):
-    """The delete account page."""
-
-    @acl_decorators.can_manage_own_account
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('delete-account-page.mainpage.html')
-
-
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
 

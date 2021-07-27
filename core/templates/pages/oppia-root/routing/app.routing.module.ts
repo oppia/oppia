@@ -42,6 +42,14 @@ const routes: Route[] = [
       .then(m => m.ClassroomPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
+    pathMatch: 'full',
+    canLoad: [CanManageOwnAccountGuard],
+    loadChildren: () => import(
+      'pages/delete-account-page/delete-account-page.module')
+      .then(m => m.DeleteAccountPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE,
     pathMatch: 'full',
     canLoad: [CanManageOwnAccountGuard],
