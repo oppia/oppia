@@ -1385,8 +1385,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img11.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
+                'svg_filename-with-value="&amp;quot;img11.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image1&amp;quot;" '
