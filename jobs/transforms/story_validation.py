@@ -25,15 +25,18 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(story_models,) = models.Registry.import_models([models.NAMES.story])
+from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
+
+(story_models,) = models.Registry.import_models([models.NAMES.story]) # type: ignore[no-untyped-call]
 
 
-@validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel)
+@validation_decorators.AuditsExisting(story_models.StorySnapshotMetadataModel) # type: ignore[no-untyped-call]
 class ValidateStorySnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        # type: (Any) -> Type[story_domain.StoryChange]
         """Returns a change domain class.
 
         Args:
@@ -46,12 +49,13 @@ class ValidateStorySnapshotMetadataModel(
         return story_domain.StoryChange
 
 
-@validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel)
+@validation_decorators.AuditsExisting(story_models.StoryCommitLogEntryModel) # type: ignore[no-untyped-call]
 class ValidateStoryCommitLogEntryModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for StoryCommitLogEntryModel."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        # type: (Any) -> Optional[Type[story_domain.StoryChange]]
         """Returns a change domain class.
 
         Args:
@@ -61,7 +65,7 @@ class ValidateStoryCommitLogEntryModel(
             story_domain.StoryChange. A domain object class for the
             changes made by commit commands of the model.
         """
-        model = job_utils.clone_model(input_model)
+        model = job_utils.clone_model(input_model) # type: ignore[no-untyped-call]
 
         if model.id.startswith('story'):
             return story_domain.StoryChange
