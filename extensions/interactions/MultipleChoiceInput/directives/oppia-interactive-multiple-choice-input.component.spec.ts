@@ -23,7 +23,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { InteractiveMultipleChoiceInputComponent } from './oppia-interactive-multiple-choice-input.component';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 
-describe('InteractiveMultipleChoiceInputComponent', () => {
+fdescribe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
   let fixture: ComponentFixture<InteractiveMultipleChoiceInputComponent>;
   let currentInteractionService: CurrentInteractionService;
@@ -33,7 +33,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     getValuesFromAttributes(interactionId, attributes) {
       return {
         showChoicesInShuffledOrder:
-          JSON.parse(attributes.showChoicesInShuffledOrderWithValue),
+          {
+            value: JSON.parse(attributes.showChoicesInShuffledOrderWithValue)
+          },
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
         }
