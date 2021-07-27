@@ -210,10 +210,8 @@ export class Interaction {
 
     Object.values(customizationArgs).forEach(
       caValue => {
-        if ('value' in caValue) {
-          traverseValueAndRetrieveContentIdsFromSubtitled(
-            caValue.value);
-        }
+        traverseValueAndRetrieveContentIdsFromSubtitled(
+          caValue.value);
       }
     );
 
