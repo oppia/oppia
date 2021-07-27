@@ -28,7 +28,6 @@ from __future__ import unicode_literals
 
 from jobs import base_jobs
 from jobs import blog_validation_jobs  # pylint: disable=unused-import
-from jobs import exp_beam_job
 from jobs.batch_jobs import validation_jobs  # pylint: disable=unused-import
 
 
