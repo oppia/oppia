@@ -16,8 +16,8 @@
 
 """Base class for defining actions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from extensions import domain
 import python_utils

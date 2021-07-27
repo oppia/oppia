@@ -19,8 +19,8 @@ actions permitted to the roles and the functions needed to access roles
 and actions.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import math

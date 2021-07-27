@@ -14,8 +14,8 @@
 
 """Tests for the page that allows learners to play through a collection."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import collection_services
 from core.domain import rights_manager

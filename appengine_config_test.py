@@ -16,8 +16,8 @@
 
 """Unit tests for appengine_config.py."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import appengine_config
 from core.tests import test_utils

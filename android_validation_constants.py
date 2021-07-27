@@ -17,7 +17,7 @@ app. This file should only contain validations which affect UI display and
 general functionality on Android.
 """
 
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals
 
 # These are the valid interactions that are allowed in an exploration
 # that is to be viewed on the Android app. If, in the future, this is

@@ -16,8 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of exploration models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import exp_domain
 from core.domain import rights_domain

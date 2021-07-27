@@ -19,8 +19,8 @@ python_linter_test.py. This file contains just one newline between imports and
 class defintion but two newlines are required on line 26.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import python_utils
 
