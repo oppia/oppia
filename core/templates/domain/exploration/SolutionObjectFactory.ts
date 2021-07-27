@@ -67,7 +67,6 @@ export interface ShortAnswerResponse {
 
 export class Solution {
   ehfs: ExplorationHtmlFormatterService;
-  shof!: SubtitledHtml;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;

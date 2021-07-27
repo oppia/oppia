@@ -71,12 +71,17 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
 export interface InteractionBackendDict {
+  // A null 'defaultOutcome' indicated a that this interaction is
+  // an EndExploration interaction.
   'default_outcome': OutcomeBackendDict | null;
   'answer_groups': readonly AnswerGroupBackendDict[];
   'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
   'hints': readonly HintBackendDict[];
   'id': string;
+  // A null 'solution' indicates that this Interaction does not have a hint
+  // or there is a hint, but no solution. A new interaction is initialised with
+  // null 'solution' and stays null until the first hint with solution is added.
   'solution': SolutionBackendDict | null;
 }
 
@@ -84,9 +89,14 @@ export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
   customizationArgs: InteractionCustomizationArgs;
+  // A null 'defaultOutcome' indicated a that this interaction is
+  // an EndExploration interaction.
   defaultOutcome: Outcome | null;
   hints: Hint[];
   id: string;
+  // A null 'solution' indicates that this Interaction does not have a hint
+  // or there is a hint, but no solution. A new interaction is initialised with
+  // null 'solution' and stays null until the first hint with solution is added.
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
@@ -184,11 +194,15 @@ export class Interaction {
    * details.
    * @param {InteractionCustomizationArgs} customizationArgs The customization
    *  arguments to get content ids for.
-   * @returns {string[]} List of content ids in customization args.
+   * @returns {(string | null)[]} List of content ids in customization args.
    */
   static getCustomizationArgContentIds(
       customizationArgs: InteractionCustomizationArgs
   ): (string | null)[] {
+    // A null 'content_id' indicates that the 'SubtitledHtml' or
+    // 'SubtitledUnicode' has been created but not saved. Before the
+    // 'SubtitledHtml' or 'SubtitledUnicode' object is saved into a State,
+    // the 'content_id' should be set to a string.
     const contentIds: (string | null)[] = [];
 
     const traverseValueAndRetrieveContentIdsFromSubtitled = (
