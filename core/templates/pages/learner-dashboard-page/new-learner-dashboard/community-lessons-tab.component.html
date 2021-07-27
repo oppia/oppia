@@ -59,23 +59,23 @@
                                             [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
             </oppia-exploration-summary-tile>
           </div>
-          <div *ngIf="getTileType(summarytile) === 'collection'">
+          <div *ngIf="getTileType(summaryTile) === 'collection'">
             <i class="remove-icon fa fa-times"
-               *ngIf="summarytile.toggle || checkMobileView()"
+               *ngIf="summaryTile.toggle || checkMobileView()"
                aria-hidden="true"
-               (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summarytile)"
+               (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
                ngbTooltip="Remove"
                container="body"
                placement="top">
             </i>
-            <oppia-collection-summary-tile [getCollectionId]="summarytile.id"
-                                           [getCollectionTitle]="summarytile.title"
-                                           [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                           [getObjective]="summarytile.objective"
-                                           [getNodeCount]="summarytile.nodeCount"
-                                           [getCategory]="summarytile.category"
-                                           [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                           [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+            <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
+                                           [getCollectionTitle]="summaryTile.title"
+                                           [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                           [getObjective]="summaryTile.objective"
+                                           [getNodeCount]="summaryTile.nodeCount"
+                                           [getCategory]="summaryTile.category"
+                                           [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
             </oppia-collection-summary-tile>
           </div>
         </div>
@@ -109,43 +109,43 @@
             </ul>
           </span>
         </span>
-        <div *ngFor="let summarytile of displayCompletedLessonsList"
+        <div *ngFor="let summaryTile of displayCompletedLessonsList"
              class="oppia-summary-tile-container"
-             (mouseenter)="summarytile.toggle = !summarytile.toggle"
-             (mouseleave)="summarytile.toggle = !summarytile.toggle">
-          <div *ngIf="getTileType(summarytile) === 'exploration'">
+             (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
+             (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
+          <div *ngIf="getTileType(summaryTile) === 'exploration'">
             <i class="oppia-learner-dashboard-icon far fa-check-circle"
                aria-hidden="true"
                ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
                container="body"
                placement="left">
             </i>
-            <oppia-exploration-summary-tile [getExplorationId]="summarytile.id"
-                                            [getExplorationTitle]="summarytile.title"
-                                            [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                            [getObjective]="summarytile.objective"
-                                            [getCategory]="summarytile.category"
-                                            [getRatings]="summarytile.ratings"
-                                            [getNumViews]="summarytile.numViews"
-                                            [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                            [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+            <oppia-exploration-summary-tile [getExplorationId]="summaryTile.id"
+                                            [getExplorationTitle]="summaryTile.title"
+                                            [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                            [getObjective]="summaryTile.objective"
+                                            [getCategory]="summaryTile.category"
+                                            [getRatings]="summaryTile.ratings"
+                                            [getNumViews]="summaryTile.numViews"
+                                            [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                            [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
             </oppia-exploration-summary-tile>
           </div>
-          <div *ngIf="getTileType(summarytile) === 'collection'">
+          <div *ngIf="getTileType(summaryTile) === 'collection'">
             <i class="oppia-learner-dashboard-icon far fa-check-circle"
                aria-hidden="true"
                ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
                container="body"
                placement="left">
             </i>
-            <oppia-collection-summary-tile [getCollectionId]="summarytile.id"
-                                           [getCollectionTitle]="summarytile.title"
-                                           [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                           [getObjective]="summarytile.objective"
-                                           [getNodeCount]="summarytile.nodeCount"
-                                           [getCategory]="summarytile.category"
-                                           [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                           [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+            <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
+                                           [getCollectionTitle]="summaryTile.title"
+                                           [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                           [getObjective]="summaryTile.objective"
+                                           [getNodeCount]="summaryTile.nodeCount"
+                                           [getCategory]="summaryTile.category"
+                                           [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                           [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
             </oppia-collection-summary-tile>
           </div>
         </div>
@@ -175,59 +175,59 @@
         </ul>
       </span>
     </span>
-    <div *ngFor="let summarytile of displayInCommunityLessons.slice(startIndexInCommunityLessons, endIndexInCommunityLessons)"
+    <div *ngFor="let summaryTile of displayInCommunityLessons.slice(startIndexInCommunityLessons, endIndexInCommunityLessons)"
          class="oppia-mobile-summary-tile-container">
-      <div *ngIf="getTileType(summarytile) === 'exploration'">
+      <div *ngIf="getTileType(summaryTile) === 'exploration'">
         <i class="oppia-mobile-view-icon oppia-learner-dashboard-icon far fa-check-circle"
-           *ngIf="getLessonType(summarytile) === completed"
+           *ngIf="getLessonType(summaryTile) === completed"
            aria-hidden="true"
            ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
            container="body"
            placement="left">
         </i>
         <i class="oppia-mobile-view-icon remove-icon fa fa-times"
-           *ngIf="getLessonType(summarytile) === incomplete"
+           *ngIf="getLessonType(summaryTile) === incomplete"
            aria-hidden="true"
-           (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summarytile)"
+           (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
            ngbTooltip="Remove"
            container="body"
            placement="top">
         </i>
-        <oppia-exploration-summary-tile [getExplorationId]="summarytile.id"
-                                        [getExplorationTitle]="summarytile.title"
-                                        [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                        [getObjective]="summarytile.objective"
-                                        [getCategory]="summarytile.category"
-                                        [getRatings]="summarytile.ratings"
-                                        [getNumViews]="summarytile.numViews"
-                                        [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                        [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+        <oppia-exploration-summary-tile [getExplorationId]="summaryTile.id"
+                                        [getExplorationTitle]="summaryTile.title"
+                                        [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                        [getObjective]="summaryTile.objective"
+                                        [getCategory]="summaryTile.category"
+                                        [getRatings]="summaryTile.ratings"
+                                        [getNumViews]="summaryTile.numViews"
+                                        [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                        [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
         </oppia-exploration-summary-tile>
       </div>
-      <div *ngIf="getTileType(summarytile) === 'collection'">
+      <div *ngIf="getTileType(summaryTile) === 'collection'">
         <i class="oppia-learner-dashboard-icon far fa-check-circle"
-           *ngIf="getLessonType(summarytile) === completed"
+           *ngIf="getLessonType(summaryTile) === completed"
            aria-hidden="true"
            ngbTooltip="{{ 'I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate }}"
            container="body"
            placement="left">
         </i>
         <i class="remove-icon fa fa-times"
-           *ngIf="getLessonType(summarytile) === incomplete"
+           *ngIf="getLessonType(summaryTile) === incomplete"
            aria-hidden="true"
-           (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summarytile)"
+           (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
            ngbTooltip="Remove"
            container="body"
            placement="top">
         </i>
-        <oppia-collection-summary-tile [getCollectionId]="summarytile.id"
-                                       [getCollectionTitle]="summarytile.title"
-                                       [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                       [getObjective]="summarytile.objective"
-                                       [getNodeCount]="summarytile.nodeCount"
-                                       [getCategory]="summarytile.category"
-                                       [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                       [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+        <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
+                                       [getCollectionTitle]="summaryTile.title"
+                                       [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                       [getObjective]="summaryTile.objective"
+                                       [getNodeCount]="summaryTile.nodeCount"
+                                       [getCategory]="summaryTile.category"
+                                       [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                       [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
         </oppia-collection-summary-tile>
       </div>
     </div>
@@ -272,47 +272,47 @@
   </div>
   <div *ngIf="totalLessonsInPlaylist.length !== 0">
     <div class="summary-container">
-      <div *ngFor="let summarytile of displayLessonsInPlaylist.slice(startIndexInPlaylist, endIndexInPlaylist)"
+      <div *ngFor="let summaryTile of displayLessonsInPlaylist.slice(startIndexInPlaylist, endIndexInPlaylist)"
            class="oppia-summary-tile-container"
-           (mouseenter)="summarytile.toggle = !summarytile.toggle"
-           (mouseleave)="summarytile.toggle = !summarytile.toggle">
-        <div *ngIf="getTileType(summarytile) === 'exploration'">
+           (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
+           (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
+        <div *ngIf="getTileType(summaryTile) === 'exploration'">
           <i class="remove-icon fa fa-times"
-             *ngIf="summarytile.toggle || checkMobileView()"
+             *ngIf="summaryTile.toggle || checkMobileView()"
              aria-hidden="true"
-             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summarytile)"
+             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
              ngbTooltip="Remove"
              container="body"
              placement="top">
           </i>
-          <oppia-exploration-summary-tile [getExplorationId]="summarytile.id"
-                                          [getExplorationTitle]="summarytile.title"
-                                          [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                          [getObjective]="summarytile.objective"
-                                          [getCategory]="summarytile.category"
-                                          [getRatings]="summarytile.ratings"
-                                          [getNumViews]="summarytile.numViews"
-                                          [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                          [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+          <oppia-exploration-summary-tile [getExplorationId]="summaryTile.id"
+                                          [getExplorationTitle]="summaryTile.title"
+                                          [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                          [getObjective]="summaryTile.objective"
+                                          [getCategory]="summaryTile.category"
+                                          [getRatings]="summaryTile.ratings"
+                                          [getNumViews]="summaryTile.numViews"
+                                          [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                          [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
           </oppia-exploration-summary-tile>
         </div>
-        <div *ngIf="getTileType(summarytile) === 'collection'">
+        <div *ngIf="getTileType(summaryTile) === 'collection'">
           <i class="remove-icon fa fa-times"
-             *ngIf="summarytile.toggle || checkMobileView()"
+             *ngIf="summaryTile.toggle || checkMobileView()"
              aria-hidden="true"
-             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summarytile)"
+             (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_COLLECTIONS', summaryTile)"
              ngbTooltip="Remove"
              container="body"
              placement="top">
           </i>
-          <oppia-collection-summary-tile [getCollectionId]="summarytile.id"
-                                         [getCollectionTitle]="summarytile.title"
-                                         [getLastUpdatedMsec]="summarytile.lastUpdatedMsec"
-                                         [getObjective]="summarytile.objective"
-                                         [getNodeCount]="summarytile.nodeCount"
-                                         [getCategory]="summarytile.category"
-                                         [getThumbnailIconUrl]="summarytile.thumbnailIconUrl"
-                                         [getThumbnailBgColor]="summarytile.thumbnailBgColor">
+          <oppia-collection-summary-tile [getCollectionId]="summaryTile.id"
+                                         [getCollectionTitle]="summaryTile.title"
+                                         [getLastUpdatedMsec]="summaryTile.lastUpdatedMsec"
+                                         [getObjective]="summaryTile.objective"
+                                         [getNodeCount]="summaryTile.nodeCount"
+                                         [getCategory]="summaryTile.category"
+                                         [getThumbnailIconUrl]="summaryTile.thumbnailIconUrl"
+                                         [getThumbnailBgColor]="summaryTile.thumbnailBgColor">
           </oppia-collection-summary-tile>
         </div>
       </div>
