@@ -87,7 +87,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
     'learner-view-rating.service.ts',
-    'list-of-sets-of-translatable-html-content-ids-editor.component.ts',
     'logic-question-editor.component.ts',
     'mathjax-bind.directive.ts',
     'music-phrase-editor.component.ts',
