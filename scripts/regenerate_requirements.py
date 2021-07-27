@@ -22,8 +22,8 @@ Therefore, in order to allow continued execution after the requirements
 file is generated, we must call the CLI in a separate process.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import re
