@@ -21,8 +21,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
@@ -30,20 +28,20 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { TopicLandingPageRootComponent } from './topic-landing-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     TopicLandingPageComponent,
     TopicLandingPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     TopicLandingPageComponent,
     TopicLandingPageRootComponent
   ],

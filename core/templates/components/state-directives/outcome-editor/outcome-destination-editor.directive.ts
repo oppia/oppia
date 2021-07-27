@@ -32,8 +32,8 @@ require('constants.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
-  'UrlInterpolationService', 'MAX_STATE_NAME_LENGTH',
-  function(UrlInterpolationService, MAX_STATE_NAME_LENGTH,) {
+  'MAX_STATE_NAME_LENGTH',
+  function(MAX_STATE_NAME_LENGTH,) {
     return {
       restrict: 'E',
       scope: {},
@@ -42,8 +42,8 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         outcome: '=',
         addState: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
+      template: require(
+        'components/state-directives/outcome-editor/' +
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
@@ -187,7 +187,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               // admins/moderators for now, since the feature is still in
               // development.
               ctrl.canEditRefresherExplorationId = (
-                userInfo.isAdmin() || userInfo.isModerator());
+                userInfo.isCurriculumAdmin() || userInfo.isModerator());
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
               $rootScope.$applyAsync();

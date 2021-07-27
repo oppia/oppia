@@ -21,10 +21,9 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ImageUploaderComponent } from './image-uploader.component';
 import { TranslateModule } from '@ngx-translate/core';
@@ -32,7 +31,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     MaterialModule,
     DynamicContentModule,
     NgbTooltipModule,
