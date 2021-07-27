@@ -44,7 +44,7 @@ export class FilepathEditorComponent implements OnInit {
     }
   }
 
-  valueHasChanged(event: Record<'empty', boolean>): void {
+  valueHasChanged(event: string): void {
     this.valueChanged.emit(event);
   }
   validityHasChanged(event: Record<'empty', boolean>): void {
