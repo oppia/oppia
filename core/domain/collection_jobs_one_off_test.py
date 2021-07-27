@@ -40,12 +40,6 @@ class MockCollectionModel(collection_models.CollectionModel):
 
     nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
-    def __init__(self, *args, **kwargs):
-        # type: (*Any, **Any) -> None
-        # Not using super() here because this creates an infinite loop
-        # when mocked.
-        base_models.VersionedModel.__init__(self, *args, **kwargs)
-
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.

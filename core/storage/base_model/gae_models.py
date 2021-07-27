@@ -237,7 +237,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_field_names_for_takeout(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, Text]
         """Returns a dictionary containing a mapping from field names to
         export dictionary keys for fields whose export dictionary key does
         not match their field name.
@@ -901,7 +901,7 @@ class VersionedModel(BaseModel):
             self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)) # type: BaseSnapshotContentModel
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self] # type: List[BaseModel]
-        self.update_timestamps_multi(entities) # type: ignore[arg-type]
+        BaseModel.update_timestamps_multi(entities)
         BaseModel.put_multi_transactional(entities)
 
     def delete(self, committer_id, commit_message, force_deletion=False): # type: ignore[override]
@@ -1158,7 +1158,7 @@ class VersionedModel(BaseModel):
             commit_cmds)
 
     @classmethod
-    def get_version(cls, entity_id, version_number, strict=True): # type: ignore[return]
+    def get_version(cls, entity_id, version_number, strict=True):
         # type: (Type[SELF_VERSIONED_MODEL], Text, int, bool) -> Optional[SELF_VERSIONED_MODEL]
         """Gets model instance representing the given version.
 
@@ -1195,6 +1195,7 @@ class VersionedModel(BaseModel):
             if not strict:
                 return None
             python_utils.reraise_exception() # type: ignore[no-untyped-call]
+            return None
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):
@@ -1308,7 +1309,9 @@ class VersionedModel(BaseModel):
                 of the given version numbers.
         """
         if not allow_deleted:
-            cls.get(model_instance_id)._require_not_marked_deleted() # type: ignore[union-attr]  # pylint: disable=protected-access
+            model = cls.get(model_instance_id)
+            assert model is not None
+            model._require_not_marked_deleted()  # pylint: disable=protected-access
 
         snapshot_ids = [
             cls.get_snapshot_id(model_instance_id, version_number)
@@ -1324,7 +1327,8 @@ class VersionedModel(BaseModel):
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
 
-        returned_models_without_none = returned_models # type: List[BaseSnapshotMetadataModel] # type: ignore[assignment]
+        returned_models_without_none = cast(
+            List[BaseSnapshotMetadataModel], returned_models)
         return [{
             'committer_id': model.committer_id,
             'commit_message': model.commit_message,
@@ -1336,7 +1340,7 @@ class VersionedModel(BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        # type: () -> Any
+        # type: () -> MODEL_ASSOCIATION_TO_USER
         """The history of commits is not relevant for the purposes of
         Takeout, since commits do not contain any personal user data.
         """
@@ -1344,7 +1348,7 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        # type: () -> Dict[Text, Any]
+        # type: () -> Dict[Text, EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits is not relevant for the purposes of
         Takeout, since commits do not contain any personal user data.
