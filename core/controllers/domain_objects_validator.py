@@ -25,6 +25,8 @@ from core.domain import blog_domain
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import state_domain
+from core.domain import stats_domain
 import python_utils
 
 from typing import Any, Dict # isort:skip  pylint: disable=wrong-import-order, wrong-import-position, unused-import, import-only-modules
@@ -96,3 +98,24 @@ def validate_collection_change(obj):
     # No explicit call to validate_dict method is necessary, because
     # CollectionChange calls validate method while initialization.
     collection_domain.CollectionChange(obj)
+
+
+def validate_state_dict(state_dict):
+    # type: (Dict[Any, Any]) -> None
+    """Validates state dict.
+
+    Args:
+        state_dict: dict. Data that needs to be validated.
+    """
+    validation_class = state_domain.State.from_dict(state_dict)
+    validation_class.validate(None, True)
+
+
+def validate_exp_issue_dict(exp_issue_dict):
+    # type: (Dict[Any, Any]) -> None
+    """Validates exp_issue_dict.
+
+    Args:
+        exp_issue_dict: dict. Data that needs to be validated.
+    """
+    stats_domain.ExplorationIssue.from_dict(exp_issue_dict)

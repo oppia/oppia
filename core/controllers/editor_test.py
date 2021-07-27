@@ -203,7 +203,8 @@ class EditorTests(BaseEditorControllerTests):
 
         # A request with no version number is invalid.
         response_dict = _put_and_expect_400_error(_get_payload('New state'))
-        self.assertIn('a version must be specified', response_dict['error'])
+        self.assertIn(
+            'Missing key in handler args: version.', response_dict['error'])
 
         # A request with the wrong version number is invalid.
         response_dict = _put_and_expect_400_error(
@@ -623,7 +624,7 @@ written_translations:
         # Download to JSON string using download handler.
         self.maxDiff = None
         download_url = (
-            '/createhandler/download/%s?output_format=%s&width=50' %
+            '/createhandler/download/%s?output_format=%s' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
 
@@ -640,7 +641,7 @@ written_translations:
         # Check downloading an invalid version results in downloading the
         # latest version.
         download_url = (
-            '/createhandler/download/%s?output_format=%s&v=xxx' %
+            '/createhandler/download/%s?output_format=%s&v=123' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
@@ -743,7 +744,7 @@ written_translations:
 
         self.post_json(
             '/createhandler/state_yaml/%s' % exp_id, {},
-            csrf_token=csrf_token, expected_status_int=404)
+            csrf_token=csrf_token, expected_status_int=400)
 
         self.logout()
 
@@ -751,7 +752,7 @@ written_translations:
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/download/invalid_exploration_id',
+            '/createhandler/download/invalid_id',
             expected_status_int=404)
 
         self.logout()
@@ -771,9 +772,12 @@ written_translations:
             '/createhandler/download/%s?output_format=invalid_output_format'
             % (exp_id), expected_status_int=400)
 
+        error_msg = (
+            'Schema validation for \'output_format\' failed: Received '
+            'invalid_output_format which is not in the allowed range of '
+            'choices: [u\'zip\', u\'json\']')
         self.assertEqual(
-            response['error'],
-            'Unrecognized output format invalid_output_format')
+            response['error'], error_msg)
 
         self.logout()
 
@@ -788,7 +792,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/snapshots/invalid_exploration_id',
+            '/createhandler/snapshots/invalid_id',
             expected_status_int=404)
 
         self.logout()
@@ -844,7 +848,7 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         self.get_json(
-            '/createhandler/statistics/invalid_exploration_id',
+            '/createhandler/statistics/invalid_id',
             expected_status_int=404)
 
         self.logout()
@@ -949,7 +953,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
         self.get_json(
             '/createhandler/state_interaction_stats/%s/%s' % (
-                'invalid_exp_id', 'state_name'),
+                'invalid_id', 'state_name'),
             expected_status_int=404)
 
         self.logout()
@@ -1005,7 +1009,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
-        unpublished_exp_id = 'unpublished_eid'
+        unpublished_exp_id = 'unpub_eid' # Unpublished exploration id.
         exploration = exp_domain.Exploration.create_default_exploration(
             unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1034,7 +1038,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
     def test_deletion_rights_for_published_exploration(self):
         """Test rights management for deletion of published explorations."""
-        published_exp_id = 'published_eid'
+        published_exp_id = 'pub_eid' # Published exploration id.
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1093,7 +1097,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         with self.swap(logging, 'info', mock_logging_function), self.swap(
             logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
-            exp_id = 'unpublished_eid'
+            exp_id = 'unpub_eid' # Unpublished exploration id
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.owner_id, exploration)
@@ -1112,7 +1116,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             # Checking for moderator.
             observed_log_messages = []
-            exp_id = 'unpublished_eid3'
+            exp_id = 'unpub_eid3' # Unpublished exploration id.
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.moderator_id, exploration)
@@ -1175,19 +1179,14 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
 
         # May not revert to any version that's not 1.
-        for rev_version in (-1, 0, 2, 3, 4, '1', ()):
+        for rev_version in (2, 3, 4, '10'):
             response_dict = self.post_json(
                 '/createhandler/revert/%s' % self.EXP_ID, {
                     'current_version': 2,
                     'revert_to_version': rev_version
                 }, csrf_token=csrf_token, expected_status_int=400)
 
-            # Check error message.
-            if not isinstance(rev_version, int):
-                self.assertIn('Expected an integer', response_dict['error'])
-            else:
-                self.assertIn(
-                    'Cannot revert to version', response_dict['error'])
+            self.assertIn('Cannot revert to version', response_dict['error'])
 
             # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
@@ -1198,6 +1197,18 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             init_content = init_state_data['content']['html']
             self.assertIn('ABC', init_content)
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
+
+        # May not revert to any version that's not convertible to int.
+        for rev_version in ('abc', ()):
+            response_dict = self.post_json(
+                '/createhandler/revert/%s' % self.EXP_ID, {
+                    'current_version': 2,
+                    'revert_to_version': rev_version
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+            self.assertIn(
+                'Schema validation for \'revert_to_version\' '
+                'failed:', response_dict['error'])
 
         # Revert to version 1.
         rev_version = 1
@@ -1263,10 +1274,11 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 'current_version': 'invalid_version',
                 'revert_to_version': 1
             }, csrf_token=csrf_token, expected_status_int=400)
+        error_msg = (
+            'Schema validation for \'current_version\' failed: Could not '
+            'convert unicode to int: invalid_version')
 
-        self.assertEqual(
-            response['error'],
-            'Expected an integer current version; received invalid_version.')
+        self.assertEqual(response['error'], error_msg)
 
 
 class ExplorationEditRightsTest(BaseEditorControllerTests):
@@ -1503,7 +1515,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         self.delete_json(
             rights_url, params={
-                'member_role': rights_domain.ROLE_EDITOR,
                 'username': self.COLLABORATOR_USERNAME
             })
         self.logout()
@@ -1533,7 +1544,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         response = self.delete_json(
             rights_url, params={
-                'member_role': rights_domain.ROLE_OWNER,
                 'username': self.OWNER_USERNAME
             }, expected_status_int=400)
         self.assertEqual(
@@ -1604,7 +1614,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         self.delete_json(
             rights_url, params={
-                'member_role': rights_domain.ROLE_VIEWER,
                 'username': self.VIEWER_USERNAME
             })
         self.logout()
@@ -1621,7 +1630,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(exp_id, self.owner_id)
         response = self.delete_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-            expected_status_int=400)
+            params={'username': 'random_username'}, expected_status_int=400)
         self.assertEqual(
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
@@ -1713,7 +1722,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(exp_id, self.owner_id)
         self.get_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
-            params={'v': 'invalid_version'}, expected_status_int=404)
+            params={'v': '546'}, expected_status_int=404)
         self.logout()
 
     def test_put_with_long_commit_message_raises_error(self):
@@ -1729,6 +1738,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
+        long_commit_message = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
 
         csrf_token = self.get_new_csrf_token()
 
@@ -1736,8 +1746,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': exploration.version,
-                'commit_message':
-                    'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1),
+                'commit_message': long_commit_message,
                 'change_list': [{
                     'cmd': 'add_state',
                     'state_name': 'State 4'
@@ -1751,9 +1760,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=400
         )
+
+        error_msg = (
+            'Schema validation for \'commit_message\' failed: Validation '
+            'failed: has_length_at_most ({u\'max_value\': 375}) for object %s'
+            % long_commit_message)
         self.assertEqual(
-            response_dict['error'],
-            'Commit messages must be at most 375 characters long.')
+            response_dict['error'], error_msg)
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
@@ -1860,7 +1873,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
-            'Invalid POST request: a version must be specified.')
+            'Missing key in handler args: version.')
 
         # Raises error as version from payload does not match the exploration
         # version.
@@ -1892,7 +1905,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             exp_id, self.owner_id, title='Title for emails handler test!',
             category='Category')
 
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exp_fetchers.get_exploration_by_id(exp_id)
 
         csrf_token = self.get_new_csrf_token()
         exp_email_preferences = (
@@ -1905,7 +1918,6 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         emails_url = '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id)
         self.put_json(
             emails_url, {
-                'version': exploration.version,
                 'mute': True,
                 'message_type': 'feedback'
             }, csrf_token=csrf_token)
@@ -1918,13 +1930,11 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         self.put_json(
             emails_url, {
-                'version': exploration.version,
                 'mute': True,
                 'message_type': 'suggestion'
             }, csrf_token=csrf_token)
         self.put_json(
             emails_url, {
-                'version': exploration.version,
                 'mute': False,
                 'message_type': 'feedback'
             }, csrf_token=csrf_token)
@@ -1948,7 +1958,11 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             {'message_type': 'invalid_message_type'},
             csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(response['error'], 'Invalid message type.')
+        error_msg = (
+            'Schema validation for \'message_type\' failed: Received '
+            'invalid_message_type which is not in the allowed range '
+            'of choices: [u\'feedback\', u\'suggestion\']')
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -1999,7 +2013,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                     'version': 1,
                 }, csrf_token=csrf_token, expected_status_int=400)
             self.assertIn(
-                'Moderator actions should include an email',
+                'Missing key in handler args: email_body.',
                 response_dict['error'])
 
             response_dict = self.put_json(
@@ -2007,14 +2021,15 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                     'email_body': '',
                     'version': 1,
                 }, csrf_token=csrf_token, expected_status_int=400)
-            self.assertIn(
-                'Moderator actions should include an email',
-                response_dict['error'])
+
+            error_msg = (
+                'Schema validation for \'email_body\' failed: Validation '
+                'failed: is_nonempty ({}) for object ')
+            self.assertIn(error_msg, response_dict['error'])
 
             # Try to unpublish the exploration even if the relevant feconf
             # flags are not set. This should cause a system error.
             valid_payload = {
-                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                 'email_body': 'Your exploration is featured!',
                 'version': 1,
             }
@@ -2046,7 +2061,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             new_email_body = 'Your exploration is unpublished :('
 
             valid_payload = {
-                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                 'email_body': new_email_body,
                 'version': 1,
             }
@@ -2107,7 +2121,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             new_email_body = 'Your exploration is unpublished :('
 
             valid_payload = {
-                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                 'email_body': new_email_body,
                 'version': 1,
             }
@@ -2221,7 +2234,9 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
                 self.EXP_ID, 'invalid_playthrough_id'), expected_status_int=404)
 
     def test_fetch_issues_handler_with_disabled_exp_id(self):
-        self.get_json('/issuesdatahandler/5', expected_status_int=404)
+        self.get_json(
+            '/issuesdatahandler/5', params={'exp_version': 2},
+            expected_status_int=404)
 
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
@@ -2405,7 +2420,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                     'exp_issue_dict': self.exp_issue_dict,
                     'exp_version': 1
                 }, csrf_token=csrf_token,
-                expected_status_int=404)
+                expected_status_int=400)
 
     def test_error_on_passing_non_matching_exp_issue_dict(self):
         """Test that error is raised on passing an exploration issue dict that
@@ -2551,10 +2566,12 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         response = self.put_json(
             '/createhandler/data/%s' % self.EXP_ID3, payload,
             csrf_token=self.csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'Command edit_exploration_propert is not allowed'
+
+        error_msg = (
+            'Schema validation for \'change_list\' failed: Command '
+            'edit_exploration_propert is not allowed'
         )
+        self.assertEqual(response['error'], error_msg)
 
     def test_draft_not_updated_because_newer_draft_exists(self):
         payload = {
@@ -2582,10 +2599,11 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         response = self.put_json(
             '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
             csrf_token=self.csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'Command edit_exploration_propert is not allowed'
-        )
+
+        error_msg = (
+            'Schema validation for \'change_list\' failed: Command '
+            'edit_exploration_propert is not allowed')
+        self.assertEqual(response['error'], error_msg)
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(
@@ -2865,7 +2883,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 '%s/%s/%s?state_name=%s' % (
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
-                    self.state_name), expected_status_int=404)
+                    self.state_name), expected_status_int=400)
         self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
