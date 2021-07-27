@@ -50,7 +50,7 @@ EXCLUDED_PHRASES = [
 # If a comment begins with a pragma, it is permitted to be inline.
 PRAGMAS = [
     'pylint:', 'type:', 'pragma:', 'isort:'
-];
+]
 
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
