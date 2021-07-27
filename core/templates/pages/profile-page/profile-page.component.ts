@@ -17,7 +17,6 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { UserProfile } from 'domain/user/user-profile.model';
@@ -261,8 +260,3 @@ export class ProfilePageComponent {
     return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
   }
 }
-
-angular.module('oppia').directive('oppiaProfilePage',
-  downgradeComponent({
-    component: ProfilePageComponent
-  }) as angular.IDirectiveFactory);

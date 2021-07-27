@@ -50,7 +50,7 @@ class ProfilePage(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
-        self.render_template('profile-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):

@@ -225,6 +225,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATORS_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
+    get_redirect_route(
+        r'%s/does_profile_exist/<username>' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ProfileExistsValidationHandler),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -481,6 +485,8 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
+    # Usually all frontend pages are served using OppiaRootPage handler
+    # but this is a special case as this route contains a url fragment.
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),

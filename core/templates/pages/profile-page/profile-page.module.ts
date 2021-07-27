@@ -16,48 +16,23 @@
  * @fileoverview Module for the profile page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 import { ProfilePageComponent } from './profile-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EditProfilePictureModalComponent } from 'pages/preferences-page/modal-templates/edit-profile-picture-modal.component';
 import { ProfilePageRootComponent } from './profile-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { ProfilePageRoutingModule } from './profile-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     NgbPopoverModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ProfilePageRoutingModule
   ],
   declarations: [
     EditProfilePictureModalComponent,
@@ -70,20 +45,6 @@ const toastrConfig = {
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [ProfilePageRootComponent]
+  ]
 })
 export class ProfilePageModule {}

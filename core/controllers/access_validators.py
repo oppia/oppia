@@ -86,3 +86,30 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         self.render_json({ 'valid': True })
+
+class ProfileExistsValidationHandler(base.BaseHandler):
+    """The world-viewable profile page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+
+    @acl_decorators.open_access
+    def get(self, username):
+        """Validates access to profile page."""
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if not user_settings:
+            self.render_json({ 'valid': False })
+            return
+
+        self.render_json({ 'valid': True })

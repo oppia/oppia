@@ -6010,6 +6010,11 @@ export default {
         }
       ]
     },
+    "PROFILE": {
+      "ROUTE": "profile/:username_fragment",
+      "TITLE": "Profile | Oppia",
+      "META": []
+    },
     "SPLASH": {
       "ROUTE": "",
       "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",

@@ -112,7 +112,7 @@ class AdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { HybridRouterModuleProvider } from 'core/templates/hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
 import { ToastrModule } from 'ngx-toastr';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {

@@ -124,7 +124,6 @@ module.exports = {
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.import.ts',
-    profile: commonPrefix + '/pages/profile-page/profile-page.import.ts',
     release_coordinator: commonPrefix + (
       '/pages/release-coordinator-page/release-coordinator-page.import.ts'),
     review_test:
@@ -542,14 +541,6 @@ module.exports = {
       filename: 'privacy-page.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['profile'],
-      filename: 'profile-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/profile-page/profile-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

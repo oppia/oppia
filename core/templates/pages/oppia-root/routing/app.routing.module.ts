@@ -23,6 +23,7 @@ import { AppConstants } from 'app.constants';
 import { CanAccessClassroomPageGuard } from './guards/can-access-classroom-page.guard';
 import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
 import { CanManageOwnAccountGuard } from './guards/can-manage-own-account.guard';
+import { DoesProfileExistGuard } from './guards/does-profile-exist.guard';
 
 
 // All paths should be defined in constants.ts file.
@@ -46,6 +47,13 @@ const routes: Route[] = [
     canLoad: [CanManageOwnAccountGuard],
     loadChildren: () => import('pages/preferences-page/preferences-page.module')
       .then(m => m.PreferencesPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
+    pathMatch: 'full',
+    canLoad: [DoesProfileExistGuard],
+    loadChildren: () => import('pages/profile-page/profile-page.module')
+      .then(m => m.ProfilePageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,

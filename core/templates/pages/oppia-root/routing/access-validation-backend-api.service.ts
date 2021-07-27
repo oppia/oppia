@@ -18,6 +18,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { boolean } from 'mathjs';
 
 export interface SplashPageValidatorResponse {
@@ -41,8 +42,12 @@ export class AccessValidationBackendApiService {
   SPLASH_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_splash_page';
   CLASSROOM_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_classroom_page';
   CAN_MANAGE_OWN_ACCOUNT_VALIDATOR = '/acl_validator/can_manage_own_account';
+  DOES_PROFILE_EXIST = '/acl_validator/does_profile_exist/<username>';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   validateAccessToSplashPage(): Promise<SplashPageValidatorResponse> {
     return this.http.get<SplashPageValidatorResponse>(
@@ -63,5 +68,14 @@ export class AccessValidationBackendApiService {
   validateCanManageOwnAccount(): Promise<ValidatorResponse> {
     return this.http.get<ValidatorResponse>(
       this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();
+  }
+
+  doesProfileExist(username: string): Promise<ValidatorResponse> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.DOES_PROFILE_EXIST, {
+        username: username
+      });
+
+    return this.http.get<ValidatorResponse>(url).toPromise();
   }
 }

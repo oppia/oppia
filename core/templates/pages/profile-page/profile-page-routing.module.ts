@@ -13,25 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for Profile Page.
+ * @fileoverview Routing module for profile page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageTitleService } from 'services/page-title.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { ProfilePageRootComponent } from './profile-page-root.component';
 
-@Component({
-  selector: 'oppia-profile-page-root',
-  templateUrl: './profile-page-root.component.html'
-})
-export class ProfilePageRootComponent {
-  constructor(
-    private pageTitleService: PageTitleService
-  ) {}
-
-  ngOnInit(): void {
-    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
+const routes: Route[] = [
+  {
+    path: '',
+    component: ProfilePageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class ProfilePageRoutingModule {}
