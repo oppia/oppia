@@ -133,6 +133,7 @@
     ],
     "5": [
         "core.controllers.contributor_dashboard_admin_test",
+        "core.controllers.oppia_root_test",
         "core.domain.subtopic_page_domain_test",
         "core.domain.subscription_services_test",
         "core.domain.draft_upgrade_services_test",

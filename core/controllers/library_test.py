@@ -14,8 +14,8 @@
 
 """Tests for the library page and associated handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 import logging
@@ -66,8 +66,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_page(self):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain(
-            '<oppia-library-page-root></oppia-library-page-root>')
+        response.mustcontain('<library-page></library-page>')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""

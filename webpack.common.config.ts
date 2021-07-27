@@ -57,7 +57,6 @@ module.exports = {
     }
   },
   entry: {
-    about: commonPrefix + '/pages/about-page/about-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
     blog_admin:
       commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
@@ -93,6 +92,8 @@ module.exports = {
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
+    error_iframed: commonPrefix + '/pages/error-pages/error-iframed-page/' +
+                   'error-iframed-page.import.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
@@ -115,6 +116,8 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
+    oppia_root:
+      commonPrefix + '/pages/oppia-root/index.ts',
     partnerships:
       commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
@@ -167,21 +170,6 @@ module.exports = {
   * once angularjs is removed from corresponding pages.
   */
   plugins: [
-    new HtmlWebpackPlugin({
-      chunks: ['about'],
-      filename: 'about-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
@@ -373,18 +361,17 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['error'],
+      chunks: ['error_iframed'],
       filename: 'error-iframed.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
+      template: commonPrefix + '/pages/error-pages/error-iframed-page/' +
+                'error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-400.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -394,7 +381,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page-401.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -403,32 +389,12 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-404.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 404
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
       filename: 'error-page-500.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
       statusCode: 500
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-iframed.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
@@ -492,6 +458,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['library'],
       filename: 'library-page.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Looking to learn something new? Learn any subject ' +
@@ -547,6 +514,15 @@ module.exports = {
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['oppia_root'],
+      filename: 'oppia-root.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

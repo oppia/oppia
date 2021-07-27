@@ -13,13 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root component for library page.
+ * @fileoverview Routing module for error page.
  */
 
-import { Component } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { Error404PageRootComponent } from './error-404-page-root.component';
 
-@Component({
-  selector: 'oppia-library-page-root',
-  templateUrl: './library-page-root.component.html'
+const routes: Route[] = [
+  {
+    path: '',
+    component: Error404PageRootComponent
+  }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
 })
-export class LibraryPageRootComponent {}
+
+export class Error404PageRoutingModule {}
