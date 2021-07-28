@@ -56,9 +56,11 @@ export class ProgressTabComponent implements OnInit {
     for (topic of this.topicsInSkillProficiency) {
       this.topicIdsInSkillProficiency.push(topic.id);
     }
-    this.subtopicMastery = await (
-      this.learnerDashboardBackendApiService.getFetchSubtopicMastery(
-        this.topicIdsInSkillProficiency.join(',')));
+    if (this.topicsInSkillProficiency.length !== 0) {
+      this.subtopicMastery = await (
+        this.learnerDashboardBackendApiService.getFetchSubtopicMastery(
+          this.topicIdsInSkillProficiency.join(',')));
+    }
     this.displaySkills = new Array(
       this.topicsInSkillProficiency.length).fill(false);
     let atLeastOnetopicHasPracticeTabEnabled = false;
