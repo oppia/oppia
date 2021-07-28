@@ -1,4 +1,4 @@
-var argv = require('yargs').positional('debugMode', {
+var argv = require('yargs').positional('terminalEnabled', {
   type: 'boolean',
   'default': false
 }).argv;
@@ -100,7 +100,7 @@ module.exports = function(config) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
-      terminal: argv.debugMode
+      terminal: argv.terminalEnabled
     },
     // Continue running in the background after running tests.
     singleRun: true,

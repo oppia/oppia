@@ -54,8 +54,9 @@ _PARSER.add_argument(
     help='optional; if specified, skips installing dependencies',
     action='store_true')
 _PARSER.add_argument(
-    '--debug_mode',
-    help='optional; if specified, enables the terminal and prints the logs.',
+    '--verbose',
+    help='optional; if specified, enables the karma terminal and prints all the'
+    ' logs.',
     action='store_true')
 _PARSER.add_argument(
     '--run_minified_tests',
@@ -128,8 +129,8 @@ def main(args=None):
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
-    if parsed_args.debug_mode:
-        cmd.append('--debugMode')
+    if parsed_args.verbose:
+        cmd.append('--terminalEnabled')
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
