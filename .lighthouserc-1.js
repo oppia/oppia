@@ -72,7 +72,8 @@ module.exports = {
             'uses-webp-images': [
               'error', {'maxLength': 1, 'strategy': 'pessimistic'}
             ],
-            'uses-passive-event-listeners': ['error', {'minScore': 1}],
+            // The YouTube embed on donate page uses passive listeners.
+            'uses-passive-event-listeners': ['error', {'minScore': 0}],
             'deprecations': ['error', {'minScore': 1}]
           }
         },

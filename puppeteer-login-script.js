@@ -18,7 +18,7 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
-const ADMIN_URL = 'http://127.0.0.1:8181/admin';
+const LOGIN_URL = 'http://127.0.0.1:8181/login';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
@@ -57,7 +57,11 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
+    await page.goto(LOGIN_URL, {waitUntil: networkIdle});
+    // The user is already logged in.
+    if (!page.url().includes('login')) {
+      return;
+    }
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
