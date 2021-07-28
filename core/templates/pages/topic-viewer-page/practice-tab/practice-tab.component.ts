@@ -41,7 +41,7 @@ export class PracticeTabComponent implements OnInit {
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrl: string = '';
   @Input() classroomUrl: string = '';
-  @Input() subtopicMastery: Record<string, number>;
+  @Input() subtopicMastery: Record<string, number> = {};
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
