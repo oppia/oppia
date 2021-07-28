@@ -57,7 +57,7 @@ describe('RealEditorComponent', () => {
     });
   });
 
-  it('should update value when user enter a new value', () => {
+  it('should update value when user enters a new value', () => {
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
     const detectChangesSpy =
