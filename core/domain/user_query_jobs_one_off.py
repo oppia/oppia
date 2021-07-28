@@ -16,8 +16,8 @@
 
 """Jobs to execute and get result of a query."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -181,8 +181,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_model = user_models.UserQueryModel.get(query_id)
         job_class = UserQueryOneOffJob
 
-        if (user_id == query_model.submitter_id or
-                user_services.is_at_least_moderator(user_id)):
+        if user_id == query_model.submitter_id or (
+                user_services.is_moderator(user_id)):
             return
 
         query_criteria_satisfied = True
