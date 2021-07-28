@@ -71,7 +71,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 
 export interface InteractionBackendDict {
-  // A null 'defaultOutcome' indicated a that this interaction is
+  // A null 'default_outcome' indicates that this interaction is
   // an EndExploration interaction.
   'default_outcome': OutcomeBackendDict | null;
   'answer_groups': readonly AnswerGroupBackendDict[];
@@ -89,14 +89,9 @@ export class Interaction {
   answerGroups: AnswerGroup[];
   confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
   customizationArgs: InteractionCustomizationArgs;
-  // A null 'defaultOutcome' indicated a that this interaction is
-  // an EndExploration interaction.
   defaultOutcome: Outcome | null;
   hints: Hint[];
   id: string;
-  // A null 'solution' indicates that this Interaction does not have a hint
-  // or there is a hint, but no solution. A new interaction is initialised with
-  // null 'solution' and stays null until the first hint with solution is added.
   solution: Solution | null;
   constructor(
       answerGroups: AnswerGroup[],
