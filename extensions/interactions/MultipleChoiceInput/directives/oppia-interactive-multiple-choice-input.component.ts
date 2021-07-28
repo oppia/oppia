@@ -89,6 +89,8 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       }
       return choices;
     };
+    // If choices need not be shuffled, order the choices based on
+    // originalIndex property in choicesWithIndex.
     this.choices = (
       showChoicesInShuffledOrder.value ? shuffleChoices(choicesWithIndex) :
       choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex));
