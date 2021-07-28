@@ -70,7 +70,10 @@ export class BaseContentComponent {
     this.loaderService.onLoadingMessageChange.subscribe(
       (message: string) => {
         this.loadingMessage = message;
-        this.changeDetectorRef.detectChanges();
+        // eslint-disable-next-line dot-notation
+        if (!this.changeDetectorRef['destroyed']) {
+          this.changeDetectorRef.detectChanges();
+        }
       }
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
