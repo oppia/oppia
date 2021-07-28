@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -306,7 +306,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Any]
+        # type: (Text) -> Dict[Text, Dict[Text, Text]]
         """Exports the data from AppFeedbackReportModel into dict format for
         Takeout.
 
@@ -541,7 +541,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     def create(
             cls, platform, ticket_id, stats_tracking_date,
             total_reports_submitted, daily_param_stats):
-        # type: (Text, Text, datetime.date, int, Dict[Text, Any]) -> Text
+        # type: (Text, Text, datetime.date, int, Dict[Text, Dict[Text, int]]) -> Text
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 

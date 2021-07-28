@@ -63,6 +63,8 @@ TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
 def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.StringProperty
     """Enforces requirement for models to use StringProperty(indexed=True)."""
+    # We use ‘ignore[call-overload]’ because this method includes a boolean arg
+    # which is not part of the signature of the overridden method.
     if not kwargs.get('indexed', True): # type: ignore[call-overload]
         raise ValueError('StringProperty(indexed=False) is no longer supported')
     return ndb.StringProperty(*args, **kwargs)
@@ -72,6 +74,8 @@ def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
 def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.TextProperty
     """Enforces requirement for models to use TextProperty(indexed=False)."""
+    # We use ‘ignore[call-overload]’ because this method includes a boolean arg
+    # which is not part of the signature of the overridden method.
     if kwargs.get('indexed', False): # type: ignore[call-overload]
         raise ValueError('TextProperty(indexed=True) is no longer supported')
     return ndb.TextProperty(*args, **kwargs)
@@ -309,6 +313,8 @@ def mock_datetime_for_datastore(mocked_now):
             """Validates whether the given instance is a datetime instance."""
             return isinstance(other, old_datetime_type)
 
+    # We use ‘ignore[misc]’ because MockDatetime subclasses a class created
+    # dynamically. These dynamic classes are not supported by mypy.
     class MockDatetime( # pylint: disable=inherit-non-class
             python_utils.with_metaclass(MockDatetimeType, old_datetime_type)): # type: ignore[misc]
         """Always returns mocked_now as the current time."""

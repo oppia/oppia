@@ -387,7 +387,10 @@ class Registry(python_utils.OBJECT):
         Returns:
             class. The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING.get(GAE_PLATFORM) # type: ignore[return-value]
+        klass = cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
+        # Ruling out the possibility of None for mypy type checking.
+        assert klass is not None
+        return klass
 
     @classmethod
     def import_models(cls, model_names):

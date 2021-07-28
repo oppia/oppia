@@ -304,8 +304,12 @@ class BaseModel(datastore_services.Model):
 
         if not include_deleted:
             for i in python_utils.RANGE(len(entities)):
-                if entities[i] and entities[i].deleted: # type: ignore[union-attr]
-                    entities[i] = None
+                entity = entities[i]
+                if entity:
+                    # Ruling out the possibility of None for mypy type checking.
+                    assert entity is not None
+                    if entity.deleted:
+                        entities[i] = None
         return entities
 
     def update_timestamps(self, update_last_updated_time=True):
@@ -326,7 +330,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def update_timestamps_multi(cls, entities, update_last_updated_time=True):
-        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL], bool) -> None
+        # type: (List[SELF_BASE_MODEL], bool) -> None
         """Update the created_on and last_updated fields of all given entities.
 
         Args:
@@ -341,7 +345,7 @@ class BaseModel(datastore_services.Model):
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def put_multi_transactional(cls, entities):
-        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL]) -> None
+        # type: (List[SELF_BASE_MODEL]) -> None
         """Stores the given datastore_services.Model instances and runs it
         through a transaction. Either all models are stored, or none of them
         in the case when the transaction fails.
@@ -354,7 +358,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def put_multi(cls, entities):
-        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL]) -> None
+        # type: (List[SELF_BASE_MODEL]) -> None
         """Stores the given datastore_services.Model instances.
 
         Args:
@@ -365,7 +369,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def delete_multi(cls, entities):
-        # type: (Type[SELF_BASE_MODEL], List[SELF_BASE_MODEL]) -> None
+        # type: (List[SELF_BASE_MODEL]) -> None
         """Deletes the given datastore_services.Model instances.
 
         Args:
@@ -407,7 +411,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_new_id(cls, entity_name):
-        # type: (Any) -> Text
+        # type: (Text) -> Text
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this
@@ -509,14 +513,14 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi(cls, unused_instances):
-        # type: (Type[SELF_BASE_HUMAN_MAINTAINED_MODEL], List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
+        # type: (List[SELF_BASE_MODEL]) -> None
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError(
             'Use put_multi_for_human or put_multi_for_bot instead')
 
     @classmethod
     def put_multi_for_human(cls, instances):
-        # type: (Type[SELF_BASE_HUMAN_MAINTAINED_MODEL], List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
+        # type: (List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
         """Stores the given model instances on behalf of a human.
 
         Args:
@@ -532,7 +536,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi_for_bot(cls, instances):
-        # type: (Type[SELF_BASE_HUMAN_MAINTAINED_MODEL], List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
+        # type: (List[SELF_BASE_HUMAN_MAINTAINED_MODEL]) -> None
         """Stores the given model instances on behalf of a non-human.
 
         Args:
@@ -827,6 +831,7 @@ class VersionedModel(BaseModel):
             VersionedModel. Reconstituted instance.
         """
         snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
+        # Ruling out the possibility of None for mypy type checking.
         assert snapshot_model is not None
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
@@ -1053,9 +1058,11 @@ class VersionedModel(BaseModel):
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
             entities = (
-                snapshot_metadata_models + snapshot_content_models + # type: ignore[operator]
-                versioned_models) # type: ignore[operator]
-            cls.update_timestamps_multi(entities) # type: ignore[arg-type]
+                cast(List[BaseModel], snapshot_metadata_models) +
+                cast(List[BaseModel], snapshot_content_models) +
+                cast(List[BaseModel], versioned_models)
+            )
+            cls.update_timestamps_multi(entities)
             BaseModel.put_multi_transactional(entities)
 
     def put(self, *args, **kwargs):
@@ -1310,6 +1317,7 @@ class VersionedModel(BaseModel):
         """
         if not allow_deleted:
             model = cls.get(model_instance_id)
+            # Ruling out the possibility of None for mypy type checking.
             assert model is not None
             model._require_not_marked_deleted()  # pylint: disable=protected-access
 
@@ -1482,7 +1490,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Any]
+        # type: (Text) -> Dict[Text, Dict[Text, Text]]
         metadata_models = (
             cls.query(cls.committer_id == user_id).fetch(
                 projection=[cls.commit_type, cls.commit_message]))

@@ -58,6 +58,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         training_job = (
             classifier_models.ClassifierTrainingJobModel.get(job_id)
         )
+        # Ruling out the possibility of None for mypy type checking.
         assert training_job is not None
 
         self.assertEqual(training_job.algorithm_id, 'TextClassifier')
@@ -244,6 +245,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         training_job1 = (
             classifier_models.ClassifierTrainingJobModel.get(job_ids[0])
         )
+        # Ruling out the possibility of None for mypy type checking.
         assert training_job1 is not None
 
         self.assertEqual(
@@ -265,6 +267,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         training_job2 = (
             classifier_models.ClassifierTrainingJobModel.get(job_ids[1])
         )
+        # Ruling out the possibility of None for mypy type checking.
         assert training_job2 is not None
 
         self.assertEqual(
@@ -322,6 +325,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         mapping = classifier_models.StateTrainingJobsMappingModel.get(
             mapping_id)
+        # Ruling out the possibility of None for mypy type checking.
         assert mapping is not None
 
         self.assertEqual(mapping.exp_id, 'exp_id1')
@@ -345,6 +349,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         mapping = classifier_models.StateTrainingJobsMappingModel.get(
             mapping_id)
+        # Ruling out the possibility of None for mypy type checking.
         assert mapping is not None
 
         self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
@@ -357,6 +362,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         mapping = classifier_models.StateTrainingJobsMappingModel.get(
             mapping_id)
+        # Ruling out the possibility of None for mypy type checking.
         assert mapping is not None
 
         self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
@@ -374,6 +380,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         mappings = (
             classifier_models.StateTrainingJobsMappingModel.get_models(
                 exp_id, exp_version, [state_name]))
+        # Ruling out the possibility of None for mypy type checking.
         assert mappings[0] is not None
 
         self.assertEqual(len(mappings), 1)
@@ -401,6 +408,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         mapping1 = (
             classifier_models.StateTrainingJobsMappingModel.get(
                 mapping_ids[0]))
+        # Ruling out the possibility of None for mypy type checking.
         assert mapping1 is not None
 
         self.assertEqual(mapping1.exp_id, '1')
@@ -412,6 +420,7 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         mapping2 = (
             classifier_models.StateTrainingJobsMappingModel.get(
                 mapping_ids[1]))
+        # Ruling out the possibility of None for mypy type checking.
         assert mapping2 is not None
 
         self.assertEqual(mapping2.exp_id, '1')

@@ -149,7 +149,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             status, # type: Text
             algorithm_version # type: int
     ):
-        # type: (Text, Text, Text, int, datetime.datetime, Union[Dict[Text, Union[int, List[Text]]], List[Dict[Text, Union[int, List[Text]]]]], Text, Text, int) -> Text
+        # type: (...) -> Text
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:

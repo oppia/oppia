@@ -334,6 +334,7 @@ class CollectionModel(base_models.VersionedModel):
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
             for model, rights_model in python_utils.ZIP(
                     versioned_models, collection_rights_models):
+                # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
                 collection_commit_log = CollectionCommitLogEntryModel.create(
@@ -624,6 +625,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
+        # Ruling out the possibility of None for mypy type checking.
         assert snapshot_metadata_model is not None
 
         snapshot_metadata_model.content_user_ids = list(sorted(

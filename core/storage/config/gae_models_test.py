@@ -63,6 +63,7 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model1 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
 
         self.assertEqual(retrieved_model1.value, 'c')
@@ -70,6 +71,7 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
         retrieved_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model2 is not None
 
         self.assertEqual(retrieved_model2.value, 'd')
@@ -126,6 +128,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
             parameter_name, 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
 
         self.assertEqual(retrieved_model1.rules, rule_dicts)
@@ -145,6 +148,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model2 = config_models.PlatformParameterModel.get_version(
             parameter_name, 2)
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model2 is not None
 
         self.assertEqual(retrieved_model2.rules, new_rules)
@@ -165,6 +169,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
             parameter_name, 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
@@ -195,6 +200,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model = config_models.PlatformParameterModel.get_version(
             parameter_name, 2)
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model is not None
 
         self.assertEqual(retrieved_model.rules, new_rules)
