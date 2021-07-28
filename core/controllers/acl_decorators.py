@@ -3527,3 +3527,46 @@ def can_update_suggestion(handler):
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion
+
+
+def is_from_oppia_android(handler):
+    """Decorator to check whether the request was send from Oppia Android.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function.
+    """
+
+    def test_is_from_oppia_android(self, **kwargs):
+        """Checks whether the request was generated from Mailchimp.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia-ML VM instance.
+        """
+        headers = self.request.headers
+        api_key = headers['api_key']
+        app_package_name = headers['app_package_name']
+        app_version_name = headers['app_version_name']
+        app_version_code = headers['app_version_code']
+        if (
+                api_key != feconf.ANDROID_API_KEY or
+                app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or
+                app_version_name != feconf.ANDROID_APP_VERSION_NAME or
+                app_version_code != feconf.ANDROID_APP_VERSION_CODE):
+            raise self.UnauthorizedUserException(
+                'The incoming request does not have valid authentication for '
+                'Oppia Android.')
+        return handler(self, **kwargs)
+
+    test_is_from_oppia_android.__wrapped__ = True
+
+    return test_is_from_oppia_android

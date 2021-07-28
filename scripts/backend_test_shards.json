@@ -158,6 +158,8 @@
         "jobs.transforms.blog_validation_test"
     ],
     "6": [
+        "core.controllers.incoming_app_feedback_report_test",
+        "core.domain.app_feedback_report_domain_test",
         "core.domain.object_registry_test",
         "core.domain.translatable_object_registry_test",
         "core.domain.image_services_test",
@@ -191,8 +193,6 @@
         "scripts.linters.general_purpose_linter_test"
     ],
     "8": [
-        "core.controllers.incoming_app_feedback_report_test",
-        "core.domain.app_feedback_report_domain_test",
         "core.domain.taskqueue_services_test",
         "core.domain.collection_jobs_one_off_test",
         "core.domain.email_services_test",

@@ -23,6 +23,7 @@ import types
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
@@ -220,7 +221,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def test_get_all_unscrubbed_expiring_report_models(self):
         expired_timestamp = datetime.datetime.utcnow() - (
-            feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
+            feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN +
             datetime.timedelta(days=10))
         expired_model = app_feedback_report_models.AppFeedbackReportModel(
             id='%s.%s.%s' % (
@@ -277,6 +278,27 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         self.assertTrue(model_class.has_reference_to_user_id('scrubber_user'))
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
+
+    def test_get_filter_options_with_invalid_field_throws_exception(self):
+        model_class = app_feedback_report_models.AppFeedbackReportModel
+        invalid_filter = python_utils.create_enum('invalid_field')
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The field %s is not a valid field to filter reports on' % (
+                invalid_filter.invalid_field.name)
+        ):
+            with self.swap(
+                model_class, 'query',
+                self._mock_query_filters_returns_empy_list):
+                model_class.get_filter_options_for_field(
+                    invalid_filter.invalid_field)
+
+    def _mock_query_filters_returns_empy_list(self, projection, distinct): # pylint: disable=unused-argument
+        """Mock the model query to test for an invalid filter field. Named
+        parameters 'projection' and 'distinct' are required to mock the
+        query function.
+        """
+        return []
 
 
 class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):

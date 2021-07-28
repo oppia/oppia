@@ -16,8 +16,8 @@
 
 """Domain objects for app feedback reports."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -112,8 +112,12 @@ class AppFeedbackReport(python_utils.OBJECT):
             NotImplementedError. The full validation for web report domain
                 objects is not implemented yet.
         """
-        self.require_valid_schema_version(self.platform, self.schema_version)
+        if self.platform == constants.PLATFORM_CHOICE_WEB:
+            raise NotImplementedError(
+                'Domain objects for web reports have not been implemented yet.')
+
         self.require_valid_platform(self.platform)
+        self.require_valid_schema_version(self.platform, self.schema_version)
 
         if self.scrubbed_by is not None:
             self.require_valid_scrubber_id(self.scrubbed_by)
@@ -134,54 +138,16 @@ class AppFeedbackReport(python_utils.OBJECT):
 
         self.user_supplied_feedback.validate()
 
-        if (
-                self.platform ==
-                constants.PLATFORM_CHOICE_ANDROID) and (
-                    not isinstance(
-                        self.device_system_context,
-                        AndroidDeviceSystemContext)):
+        if not isinstance(
+                self.device_system_context, AndroidDeviceSystemContext):
             raise utils.ValidationError(
                 'Expected device and system context to be of type '
                 'AndroidDeviceSystemContext for platform %s, '
                 'received: %r' % (
                     self.platform, self.device_system_context.__class__))
-        elif self.platform == constants.PLATFORM_CHOICE_WEB:
-            raise NotImplementedError(
-                'Subclasses of DeviceSystemContext for web systems should '
-                'implement domain validation.')
+
         self.device_system_context.validate()
-
         self.app_context.validate()
-
-    @classmethod
-    def require_valid_schema_version(cls, platform, schema_version):
-        # type: (Text, int) -> None
-        """Checks whether the report schema version is valid for the given
-        platform.
-
-        Args:
-            platform: str. The platform to validate the schema version for.
-            schema_version: int. The schema version to validate.
-
-        Raises:
-            ValidationError. No schema version supplied.
-            ValidationError. The schema version is not supported.
-        """
-        minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
-        current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
-        if platform == constants.PLATFORM_CHOICE_WEB:
-            minimum_schema = feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION
-            current_schema = feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION
-        if not isinstance(schema_version, int) or schema_version <= 0:
-            raise utils.ValidationError(
-                'The report schema version %r is invalid, expected an integer '
-                'in [%d, %d].' % (
-                    schema_version, minimum_schema, current_schema))
-        if not minimum_schema <= schema_version <= current_schema:
-            raise utils.ValidationError(
-                'The supported report schema versions for %s reports are '
-                '[%d, %d], received: %d.' % (
-                    platform, minimum_schema, current_schema, schema_version))
 
     @classmethod
     def require_valid_platform(cls, platform):
@@ -203,6 +169,34 @@ class AppFeedbackReport(python_utils.OBJECT):
                     constants.PLATFORM_CHOICES, platform))
 
     @classmethod
+    def require_valid_schema_version(cls, platform, schema_version):
+        # type: (Text, int) -> None
+        """Checks whether the report schema version is valid for the given
+        platform.
+
+        Args:
+            platform: str. The platform to validate the schema version for.
+            schema_version: int. The schema version to validate.
+
+        Raises:
+            ValidationError. No schema version supplied.
+            ValidationError. The schema version is not supported.
+        """
+        assert platform == constants.PLATFORM_CHOICE_ANDROID
+        minimum_schema = feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION
+        current_schema = feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION
+        if not isinstance(schema_version, int) or schema_version <= 0:
+            raise utils.ValidationError(
+                'The report schema version %r is invalid, expected an integer '
+                'in [%d, %d].' % (
+                    schema_version, minimum_schema, current_schema))
+        if not minimum_schema <= schema_version <= current_schema:
+            raise utils.ValidationError(
+                'The supported report schema versions for %s reports are '
+                '[%d, %d], received: %d.' % (
+                    platform, minimum_schema, current_schema, schema_version))
+
+    @classmethod
     def require_valid_scrubber_id(cls, scrubber_id):
         # type: (Text) -> None
         """Checks whether the scrubbed_by user is valid.
@@ -218,7 +212,8 @@ class AppFeedbackReport(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The scrubbed_by user must be a string, but got %r' % (
                     scrubber_id))
-        if not utils.is_user_id_valid(scrubber_id):
+        if not utils.is_user_id_valid(scrubber_id) and (
+            scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID):
             raise utils.ValidationError(
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
@@ -415,7 +410,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             self, report_type, category, user_feedback_selected_items,
             user_feedback_other_text_input):
 
-            # type: (constants.REPORT_TYPE, constants.CATEGORY, Optional[List[Text]], Optional[Text]) -> None
+            # type: (constants.REPORT_TYPE, constants.CATEGORY, List[Text], Text) -> None
         """Constructs a UserSuppliedFeedback domain object.
 
         Args:
@@ -423,13 +418,11 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 as an enum.
             category: CATEGORY. The category enum that this specific report_type
                 is providing feedback on that correponds.
-            user_feedback_selected_items: list(str)|None. A list of strings that
+            user_feedback_selected_items: list(str). A list of strings that
                 represent any options selected by the user for the feedback
-                they are providing in this feedback report. None if the user did
-                not have the option to sleect checkbox options.
-            user_feedback_other_text_input: str|None. The open text inputted by
-                the user, or None if they did not select any options where they
-                could input text.
+                they are providing in this feedback report.
+            user_feedback_other_text_input: str. The open text inputted by
+                the user.
         """
         self.report_type = report_type
         self.category = category
@@ -461,6 +454,13 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         """
         self.require_valid_report_type(self.report_type)
         self.require_valid_category(self.category)
+
+        if self.user_feedback_selected_items is None:
+            raise utils.ValidationError(
+                'No user_feedback_selected_items supplied.')
+        if self.user_feedback_other_text_input is None:
+            raise utils.ValidationError(
+                'No user_feedback_other_text_input supplied.')
         self.require_valid_user_feedback_items_for_category(
             self.category, self.user_feedback_selected_items,
             self.user_feedback_other_text_input)
@@ -507,7 +507,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
     @classmethod
     def require_valid_user_feedback_items_for_category(
             cls, category, selected_items, other_text_input):
-        # type: (Text, Optional[List[Text]], Optional[Text]) -> None
+        # type: (Text, List[Text], Text) -> None
         """Checks whether the user_feedback_selected_items and
         user_feedback_selected_items are valid for the given cateory and
         selected items.
@@ -526,25 +526,13 @@ class UserSuppliedFeedback(python_utils.OBJECT):
         if category in constants.ALLOWED_SELECTION_ITEMS_CATEGORIES:
             # If the report category enables users to select checkbox options,
             # validate the options selected by the user.
-            assert selected_items is not None
             cls.require_valid_selected_items_for_category(selected_items)
-            if cls._selected_items_include_other(selected_items):
-                # If the user selects an 'other' option in their list of
-                # selection options, validate the input text.
-                cls.require_valid_other_text_input_for_category(
-                    category, other_text_input)
-            else:
-                # Report cannot have any input text in this report.
-                if other_text_input is not None:
-                    raise utils.ValidationError(
-                        'Report cannot have other input text %r for '
-                        'category %r.' % (other_text_input, category))
 
         # If the report category only allows users to provide input text,
         # validate that the user_feedback_selected_items is None and that
         # there is a user_feedback_other_text_input.
         if category in constants.ALLOWED_ONLY_INPUT_TEXT_CATEGORIES:
-            if selected_items is not None:
+            if len(selected_items) != 0:
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
                         category))
@@ -552,8 +540,10 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Category %r with \'other\' selected requires text input '
                     'provided by the user.' % category)
-            cls.require_valid_other_text_input_for_category(
-                category, other_text_input)
+            if not isinstance(other_text_input, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid input text, must be a string, received: %r.' % (
+                        other_text_input))
 
     @classmethod
     def require_valid_selected_items_for_category(cls, selected_items):
@@ -571,27 +561,6 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             if not isinstance(item, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Invalid option %s selected by user.' % item)
-
-    @classmethod
-    def require_valid_other_text_input_for_category(cls, category, other_input):
-        # type: (Text, Optional[Text]) -> None
-        """Checks whether the user_feedback_other_text_input is valid.
-
-        Args:
-            category: str. The category of the report.
-            other_input: str. The text inputted by the user.
-
-        Raises:
-            ValidationError. The item is not a string.
-        """
-        if other_input is None:
-            raise utils.ValidationError(
-                'Category %s requires text input in the report, received:'
-                ' %r.' % (category, other_input))
-        if not isinstance(other_input, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Invalid input text, must be a string, received: %r.' % (
-                    other_input))
 
     @classmethod
     def _selected_items_include_other(cls, selected_items):

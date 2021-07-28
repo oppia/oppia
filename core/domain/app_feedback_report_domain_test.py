@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Text # isort:skip # pylint: disable=unused-import
+from typing import Text, List # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
     [models.NAMES.app_feedback_report])
@@ -67,7 +67,7 @@ ANDROID_TEXT_SIZE = constants.ANDROID_TEXT_SIZE.medium_text_size
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
-USER_SELECTED_ITEMS = None
+USER_SELECTED_ITEMS = [] # type: List[Text]
 USER_TEXT_INPUT = 'add and admin'
 ANDROID_REPORT_INFO = {
     'user_feedback_selected_items': USER_SELECTED_ITEMS,
@@ -87,7 +87,7 @@ ANDROID_REPORT_INFO = {
     'account_is_profile_admin': False
 }
 WEB_REPORT_INFO = {
-    'user_feedback_selected_items': None,
+    'user_feedback_selected_items': [],
     'user_feedback_other_text_input': USER_TEXT_INPUT,
 }
 ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
@@ -199,32 +199,6 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             'The report schema version %r is invalid, expected an integer' % (
                 feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION - 1))
 
-    def test_android_schema_version_greater_than_current_validation_fails(self):
-        # type: () -> None
-        self.android_report_obj.schema_version = (
-            feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION + 1)
-        self._assert_validation_error(
-            self.android_report_obj,
-            'The supported report schema versions for android reports are ')
-
-    def test_report_web_schema_version_less_than_minimum_validation_fails(self):
-        # type: () -> None
-        self.web_report_obj.schema_version = (
-            feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION - 1)
-        self._assert_validation_error(
-            self.web_report_obj,
-            'The report schema version %r is invalid, expected an integer' % (
-                feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION - 1))
-
-    def test_report_web_schema_version_greater_than_current_validation_fails(
-            self):
-        # type: () -> None
-        self.web_report_obj.schema_version = (
-            feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION + 1)
-        self._assert_validation_error(
-            self.web_report_obj,
-            'The supported report schema versions for web reports are ')
-
     def test_report_platform_is_invalid_validation_fails(self):
         # type: () -> None
         self.android_report_obj.platform = 'invalid_platform'
@@ -255,20 +229,13 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_android_report_system_context_invalid_type_validation_fails(self):
         # type: () -> None
-        self.android_report_obj.device_system_context = None # type: ignore[assignment]
+        self.android_report_obj.device_system_context = {} # type: ignore[assignment]
         self._assert_validation_error(
             self.android_report_obj,
             'Expected device and system context to be of type '
             'AndroidDeviceSystemContext')
 
-    def test_web_report_system_context_raises_not_implemented_error(self):
-        # type: () -> None
-        self._assert_not_implemented_error(
-            self.web_report_obj,
-            'Subclasses of DeviceSystemContext for web systems should '
-            'implement domain validation.')
-
-    def test_report_invalid_platform_fails_validation(self):
+    def test_report_platform_is_none_fails_validation(self):
         # type: () -> None
         self.android_report_obj.platform = None # type: ignore[assignment]
         self._assert_validation_error(
@@ -486,45 +453,23 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             self.user_supplied_feedback,
             'Report cannot have selection options for category ')
 
-    def test_validation_has_text_input_without_other_selected_fails(self):
-        # type: () -> None
-        self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
-        self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
-        self.user_supplied_feedback.user_feedback_selected_items = (
-            ['invalid', 'list'])
-        self._assert_validation_error(
-            self.user_supplied_feedback,
-            'Report cannot have other input text ')
-
-    def test_validation_text_input_is_none_with_other_selected_fails(self):
-        # type: () -> None
-        self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
-        self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
-        self.user_supplied_feedback.user_feedback_selected_items = (
-            ['other'])
-        self.user_supplied_feedback.user_feedback_other_text_input = None
-        self._assert_validation_error(
-            self.user_supplied_feedback,
-            'requires text input in the report.')
-
-    def test_validation_text_input_is_none_with_only_text_input_allowed_fails(
-            self):
+    def test_validation_text_input_is_none_fails(self):
         # type: () -> None
         self.user_supplied_feedback.report_type = REPORT_TYPE_SUGGESTION
         self.user_supplied_feedback.category = CATEGORY_SUGGESTION_OTHER
-        self.user_supplied_feedback.user_feedback_selected_items = None
-        self.user_supplied_feedback.user_feedback_other_text_input = None
+        self.user_supplied_feedback.user_feedback_selected_items = []
+        self.user_supplied_feedback.user_feedback_other_text_input = None # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback,
-            'requires text input provided by the user.')
+            'No user_feedback_other_text_input supplied.')
 
-    def test_validation_invalid_selected_item_for_category_fails(self):
+    def test_validation_invalid_selected_item_list_fails(self):
         # type: () -> None
         self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
         self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
         self.user_supplied_feedback.user_feedback_selected_items = (
             [123]) # type: ignore[list-item]
-        self.user_supplied_feedback.user_feedback_other_text_input = None
+        self.user_supplied_feedback.user_feedback_other_text_input = ''
         self._assert_validation_error(
             self.user_supplied_feedback,
             'Invalid option 123 selected by user.')
@@ -534,7 +479,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         # type: () -> None
         self.user_supplied_feedback.report_type = REPORT_TYPE_SUGGESTION
         self.user_supplied_feedback.category = CATEGORY_SUGGESTION_OTHER
-        self.user_supplied_feedback.user_feedback_selected_items = None
+        self.user_supplied_feedback.user_feedback_selected_items = []
         self.user_supplied_feedback.user_feedback_other_text_input = 123 # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback,

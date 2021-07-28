@@ -389,7 +389,7 @@ class CronJobTests(test_utils.GenericTestBase):
         report_submitted_timestamp = report_timestamp
         ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)
         android_report_info = {
-            'user_feedback_selected_items': None,
+            'user_feedback_selected_items': [],
             'user_feedback_other_text_input': 'add an admin',
             'event_logs': ['event1', 'event2'],
             'logcat_logs': ['logcat1', 'logcat2'],
@@ -430,6 +430,7 @@ class CronJobTests(test_utils.GenericTestBase):
                 android_report_info=android_report_info,
                 android_report_info_schema_version=1))
         report_model.created_on = report_timestamp
+        report_model.update_timestamps(update_last_updated_time=False)
         report_model.put()
 
         with self.testapp_swap:
@@ -443,8 +444,8 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             scrubbed_model.scrubbed_by,
             feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
-        self.assertIsNone(
-            scrubbed_report_info['user_feedback_other_text_input'])
+        self.assertEqual(
+            scrubbed_report_info['user_feedback_other_text_input'], '')
         self.assertEqual(
             scrubbed_report_info['event_logs'], [])
         self.assertEqual(
