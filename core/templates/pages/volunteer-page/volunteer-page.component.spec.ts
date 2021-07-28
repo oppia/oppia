@@ -51,7 +51,18 @@ describe('Volunteer page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
 
-    expect(component.mapImgUrl).toBe(
-      '/assets/images/volunteer/map.png');
+    expect(component.mapImgPath).toBe(
+      '/volunteer/map.png');
+  });
+
+  it('should get static image url', () => {
+    expect(component.getStaticImageUrl('/test')).toEqual('/assets/images/test');
+  });
+
+  it('should get webp extended file name', () => {
+    expect(component.getWebpExtendedName('a.jpg')).toEqual('a.webp');
+    expect(component.getWebpExtendedName('a.png')).toEqual('a.webp');
+    expect(component.getWebpExtendedName('a.webp')).toEqual('a.webp');
+    expect(component.getWebpExtendedName('a.b.jpg')).toEqual('a.b.webp');
   });
 });
