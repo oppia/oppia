@@ -107,6 +107,7 @@ describe('Progress tab Component', () => {
       language_code: 'en',
       description: 'description',
       version: 1,
+      total_published_node_count: 0,
       story_titles: ['Story 1'],
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
