@@ -84,7 +84,7 @@ export class HomeTabComponent {
     }
     /**
      * If there less than 3 topics for each untrackedTopic, the total
-     * width of the section will be caluclated by multiplying the addition of
+     * width of the section will be calculated by multiplying the addition of
      * number of topics and one classroom card with 164px in mobile view to
      * enable scrolling.
     */

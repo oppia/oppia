@@ -14,8 +14,8 @@
 
 """Tests for the learner dashboard and the notifications dashboard."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import config_domain
@@ -100,12 +100,12 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         super(LearnerDashboardHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
     def test_can_see_completed_explorations(self):
         self.login(self.VIEWER_EMAIL)
@@ -290,7 +290,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_all_topics(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['all_topics_list']), 0)
@@ -334,7 +334,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_see_untracked_topics(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['untracked_topics']), 0)

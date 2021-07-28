@@ -29,7 +29,7 @@ import { FeedbackThreadSummary } from
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
@@ -48,6 +48,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -259,9 +260,9 @@ describe('Learner dashboard page', () => {
   };
 
   let userInfo = {
-    _role: 'USER_ROLE',
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -270,7 +271,7 @@ describe('Learner dashboard page', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     isTranslationAdmin: () => false,
@@ -286,6 +287,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule
@@ -938,6 +940,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule
