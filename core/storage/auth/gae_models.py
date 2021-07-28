@@ -150,6 +150,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
             model = cls.query(cls.gae_id == auth_id).get()
         elif provider_id == feconf.FIREBASE_AUTH_PROVIDER_ID:
             model = cls.query(cls.firebase_auth_id == auth_id).get()
+        else:
+            return
         model = cast(Optional[UserAuthDetailsModel], model)
         return model
 
