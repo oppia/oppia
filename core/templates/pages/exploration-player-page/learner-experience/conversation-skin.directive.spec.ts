@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for Conversation skin directive.
  */
@@ -20,15 +19,16 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+// ^^^ This block is to be removed.
+import { discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
 import { UrlService } from 'services/contextual/url.service';
 import { EventEmitter } from '@angular/core';
 import { CurrentInteractionService } from '../services/current-interaction.service';
 import { UserService } from 'services/user.service';
-import { UserInfo } from 'domain/user/user-info.model';
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { Collection } from 'domain/collection/collection.model';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
@@ -36,8 +36,7 @@ import { LearnerViewRatingService } from '../services/learner-view-rating.servic
 import { HintsAndSolutionManagerService } from '../services/hints-and-solution-manager.service';
 import { ContextService } from 'services/context.service';
 import { ImagePreloaderService } from '../services/image-preloader.service';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { AlertsService } from 'services/alerts.service';
@@ -49,14 +48,28 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { PlayerCorrectnessFeedbackEnabledService } from '../services/player-correctness-feedback-enabled.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { StoryNode } from 'domain/story/story-node.model';
-// ^^^ This block is to be removed.
+import { MessengerService } from 'services/messenger.service';
+import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { Voiceover } from 'domain/exploration/voiceover.model';
+import { ConceptCardBackendDict, ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
+import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
+import { FatigueDetectionService } from '../services/fatigue-detection.service';
+import { NumberAttemptsService } from '../services/number-attempts.service';
+import { RefresherExplorationConfirmationModalService } from '../services/refresher-exploration-confirmation-modal.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { StoryChapterCompletionResponse, StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ExplorationRecommendationsService } from '../services/exploration-recommendations.service';
+import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 
 fdescribe('Conversation skin directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
   let $timeout = null;
+  let $compile = null;
   let $window = null;
   let $http = null;
   let $httpBackend = null;
@@ -92,7 +105,22 @@ fdescribe('Conversation skin directive', function() {
   let interactionObjectFactory: InteractionObjectFactory = null;
   let playerCorrectnessFeedbackEnabledService:
     PlayerCorrectnessFeedbackEnabledService = null;
+  let explorationEngineService: ExplorationEngineService = null;
   let urlInterpolationService: UrlInterpolationService = null;
+  let messengerService: MessengerService = null;
+  let stateObjectFactory: StateObjectFactory = null;
+  let conceptCardObjectFactory: ConceptCardObjectFactory = null;
+  let conceptCardBackendApiService: ConceptCardBackendApiService = null;
+  let fatigueDetectionService: FatigueDetectionService = null;
+  let numberAttemptsService: NumberAttemptsService = null;
+  let refresherExplorationConfirmationModalService:
+    RefresherExplorationConfirmationModalService = null;
+  let storyViewerBackendApiService: StoryViewerBackendApiService = null;
+  let windowDimensionsService: WindowDimensionsService = null;
+  let i18nLanguageCodeService: I18nLanguageCodeService = null;
+  let explorationRecommendationsService:
+    ExplorationRecommendationsService = null;
+  let guestCollectionProgressService: GuestCollectionProgressService = null;
 
   let onAnswerChangedEventEmitter = new EventEmitter();
   let onHintConsumedEventEmitter = new EventEmitter();
@@ -102,17 +130,33 @@ fdescribe('Conversation skin directive', function() {
   let onStateCardContentUpdateEventEmitter = new EventEmitter();
   let alertSuccessSpy = null;
   let alertWarningSpy = null;
+  let questionPlayerSpy = null;
   let sampleCollection = null;
   let sampleCollectionBackendObject = null;
   let collectionNodeBackendObject = null;
   let sampleCard: StateCard = null;
-  let interactionDict = null;
+  let interactionDict1 = null;
+  let interactionDict2 = null;
+  let interactionDict3 = null;
+  let stateDict = null;
+  let sampleState: State = null;
+  let sampleConceptCard = null;
+  let conceptCardDict: ConceptCardBackendDict = null;
+  let audioTranslations: BindableVoiceovers = null;
+  let storyPlaythroughBackendObject = null;
+  let samplePlaythroughObject: StoryPlaythrough = null;
+  let firstSampleReadOnlyStoryNodeBackendDict = null;
+  let secondSampleReadOnlyStoryNodeBackendDict = null;
   let mockWindow = {
     location: {
       replace: jasmine.createSpy('replace'),
-      reload:() => {}
+      reload: function() {}
     },
     addEventListener:() => {},
+    scrollTo: function() {},
+    event: {
+      returnValue: ''
+    }
   };
 
   let userInfoForCollectionCreator = null;
@@ -139,6 +183,7 @@ fdescribe('Conversation skin directive', function() {
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $window = $injector.get('$window');
+    $compile = $injector.get('$compile');
     $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
     $uibModal = $injector.get('$uibModal');
@@ -162,6 +207,8 @@ fdescribe('Conversation skin directive', function() {
     QuestionPlayerStateService = $injector.get('QuestionPlayerStateService');
     contextService = $injector.get('ContextService');
     imagePreloaderService = $injector.get('ImagePreloaderService');
+    guestCollectionProgressService = $injector.get(
+      'GuestCollectionProgressService');
     writtenTranslationsObjectFactory = $injector.get(
       'WrittenTranslationsObjectFactory');
     audioTranslationLanguageService = $injector.get('AudioTranslationLanguageService');
@@ -178,8 +225,60 @@ fdescribe('Conversation skin directive', function() {
     playerCorrectnessFeedbackEnabledService = $injector.get(
       'PlayerCorrectnessFeedbackEnabledService');
     urlInterpolationService = $injector.get('UrlInterpolationService');
-    focusManagerService = $injector.get('FocusManagerService');
-    focusManagerService = $injector.get('FocusManagerService');
+    messengerService = $injector.get('MessengerService');
+    explorationEngineService = $injector.get('ExplorationEngineService');
+    stateObjectFactory = $injector.get('StateObjectFactory');
+    conceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
+    conceptCardBackendApiService = $injector.get(
+      'ConceptCardBackendApiService');
+    fatigueDetectionService = $injector.get('FatigueDetectionService');
+    numberAttemptsService = $injector.get('NumberAttemptsService');
+    refresherExplorationConfirmationModalService = $injector.get(
+      'RefresherExplorationConfirmationModalService');
+    storyViewerBackendApiService = $injector.get(
+      'StoryViewerBackendApiService');
+    windowDimensionsService = $injector.get('WindowDimensionsService');
+    i18nLanguageCodeService = $injector.get('I18nLanguageCodeService');
+    explorationRecommendationsService = $injector.get(
+      'ExplorationRecommendationsService');
+
+    conceptCardDict = {
+      explanation: {
+        html: 'test explanation 1',
+        content_id: 'explanation_1'
+      },
+      worked_examples: [
+        {
+          question: {
+            html: 'worked example question 1',
+            content_id: 'worked_example_q_1'
+          },
+          explanation: {
+            html: 'worked example explanation 1',
+            content_id: 'worked_example_e_1'
+          }
+        },
+        {
+          question: {
+            html: 'worked example question 1',
+            content_id: 'worked_example_q_1'
+          },
+          explanation: {
+            html: 'worked example explanation 1',
+            content_id: 'worked_example_e_1'
+          }
+        }
+      ],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_q_1: {},
+          worked_example_e_1: {},
+          worked_example_q_2: {},
+          worked_example_e_2: {}
+        }
+      }
+    };
 
     userInfoForCollectionCreator = {
       _role: 'USER_ROLE',
@@ -251,7 +350,108 @@ fdescribe('Conversation skin directive', function() {
       }
     };
 
-    interactionDict = {
+    stateDict = {
+      content: {
+        content_id: 'content',
+        html: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        }
+      },
+      interaction: {
+        id: 'TextInput',
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
+        answer_groups: [{
+          outcome: {
+            dest: 'outcome 1',
+            feedback: {
+              content_id: 'feedback_1',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_0',
+                normalizedStrSet: ['10']
+              }
+            }
+          }],
+        }, {
+          outcome: {
+            dest: 'outcome 2',
+            feedback: {
+              content_id: 'feedback_2',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          rule_input_translations: {},
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_1',
+                normalizedStrSet: ['5']
+              }
+            }
+          }, {
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_2',
+                normalizedStrSet: ['7']
+              }
+            }
+          }],
+        }],
+        default_outcome: {
+          dest: 'default',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: []
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        }
+      }
+    };
+
+    interactionDict1 = {
       id: 'Continue',
       default_outcome: {
         feedback: {
@@ -275,26 +475,187 @@ fdescribe('Conversation skin directive', function() {
       hints: []
     };
 
+    interactionDict2 = {
+      solution: null,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        allowMultipleItemsInSamePosition: {
+          value: false
+        },
+        choices: {
+          value: [
+            {
+              content_id: 'ca_choices_0',
+              html: '<p>test</p>'
+            },
+            {
+              content_id: 'ca_choices_1',
+              html: '<p>test3</p>'
+            }
+          ]
+        }
+      },
+      id: 'DragAndDropSortInput',
+      answer_groups: [],
+      hints: [],
+      default_outcome: {
+        refresher_exploration_id: null,
+        labelled_as_correct: false,
+        dest: 'Introduction',
+        param_changes: [],
+        feedback: {
+          content_id: 'default_outcome',
+          html: '<p>try again</p>'
+        },
+        missing_prerequisite_skill_id: null
+      }
+    };
+
+    interactionDict3 =  {
+      id: 'EndExploration',
+      answer_groups: [],
+      default_outcome: {
+        dest: 'default',
+        feedback: {
+          content_id: 'default_outcome',
+          html: ''
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null
+      },
+      hints: []
+    };
+
+    firstSampleReadOnlyStoryNodeBackendDict = {
+      id: 'node_1',
+      description: 'description',
+      title: 'Title 1',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: ['node_2'],
+      outline: 'Outline',
+      exploration_id: 'exp_id',
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
+      },
+      completed: true,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename'
+    };
+    secondSampleReadOnlyStoryNodeBackendDict = {
+      id: 'node_2',
+      description: 'description',
+      title: 'Title 2',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      destination_node_ids: ['node_3'],
+      outline: 'Outline',
+      exploration_id: 'exp_id',
+      outline_is_finalized: false,
+      exp_summary_dict: {
+        title: 'Title',
+        status: 'private',
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra'
+      },
+      completed: false,
+      thumbnail_bg_color: '#bb8b2f',
+      thumbnail_filename: 'filename',
+    };
+
+    storyPlaythroughBackendObject = {
+      story_id: 'qwerty',
+      story_nodes: [
+        firstSampleReadOnlyStoryNodeBackendDict,
+        secondSampleReadOnlyStoryNodeBackendDict],
+      story_title: 'Story',
+      story_description: 'Description',
+      topic_name: 'Topic 1',
+      meta_tag_content: 'Story meta tag content'
+    };
+
+    samplePlaythroughObject = StoryPlaythrough.createFromBackendDict(
+      storyPlaythroughBackendObject);
+
+    audioTranslations = {
+      en: Voiceover.createFromBackendDict({
+        filename: 'filename1.mp3',
+        file_size_bytes: 100000,
+        needs_update: false,
+        duration_secs: 10.0
+      }),
+      hi: Voiceover.createFromBackendDict({
+        filename: 'filename2.mp3',
+        file_size_bytes: 11000,
+        needs_update: false,
+        duration_secs: 0.11
+      })
+    };
+
+    sampleConceptCard = conceptCardObjectFactory.createFromBackendDict(
+      conceptCardDict);
+
     sampleCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(interactionDict), RecordedVoiceovers.createEmpty(),
+      interactionObjectFactory.createFromBackendDict(interactionDict2),
+      RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
+    
+    sampleState = stateObjectFactory.createFromBackendDict(
+      'stateName', stateDict);
 
     sampleCollection = Collection.create(
       sampleCollectionBackendObject);
 
-    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
-      .and.returnValue('collectionId');
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.resolveTo(sampleCollection);
-    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+    questionPlayerSpy = spyOn(
+      explorationPlayerStateService, 'isInQuestionPlayerMode')
       .and.returnValue(true);
-    spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
-      cb();
-    });
     spyOn(learnerViewRatingService, 'init').and.callFake((cb) => {
       cb('userRating');
     });
@@ -306,14 +667,22 @@ fdescribe('Conversation skin directive', function() {
     ctrl = $injector.instantiate(directive.controller, {
       $scope: $scope,
       $rootScope: $scope,
-      $window: $window,
       LearnerAnswerInfoService: learnerAnswerInfoService,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS: [],
-      CONTENT_FOCUS_LABEL_PREFIX: 'contentLabel'
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS:
+        ['whitelistedCollection'],
+      CONTENT_FOCUS_LABEL_PREFIX: 'contentLabel',
+      ENABLE_NEW_STRUCTURE_VIEWER_UPDATES: true,
+      TWO_CARD_THRESHOLD_PX: 960
     });
     $scope.getQuestionPlayerConfig = function() {
       return;
     };
+    let element = angular.element(
+      '<html><body><div class="conversation-skin-main-tutor-card">' +
+      '</div></body></html>');
+    angular.element(document.body).append(element)
+    $compile(element)($scope);
+    $rootScope.$digest();
   }));
 
   afterEach(() => {
@@ -337,7 +706,8 @@ fdescribe('Conversation skin directive', function() {
         .and.returnValue(onHintConsumedEventEmitter);
       let hintConsumedSpy = spyOn(
         QuestionPlayerStateService, 'hintUsed').and.returnValue(null);
-  
+      $scope.collectionId = 'collectionId';
+
       ctrl.$onInit();
       onHintConsumedEventEmitter.emit();
   
@@ -358,6 +728,17 @@ fdescribe('Conversation skin directive', function() {
       expect(hintConsumedSpy).toHaveBeenCalled();
     });
 
+    it('should set collection title to null if' +
+      'collection id is invalid', function() {
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+        .and.returnValue(null);
+      expect($scope.collectionTitle).toBe(undefined);
+
+      ctrl.$onInit();
+
+      expect($scope.collectionTitle).toBe(null);
+    });
+
     it('should call success alert message when ' +
       'rating is updated successfully', function() {
       spyOnProperty(learnerViewRatingService,
@@ -375,6 +756,8 @@ fdescribe('Conversation skin directive', function() {
 
     it('should send request to backend to fetch collection summary ' +
       'given collection id', fakeAsync(function() {
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+        .and.returnValue('collectionId');
       $httpBackend.expect(
         'GET', '/collectionsummarieshandler/data' +
         '?stringified_collection_ids=' +
@@ -394,6 +777,8 @@ fdescribe('Conversation skin directive', function() {
 
     it('should fail to fetch collection summary from backend' +
       'incase of backend error', fakeAsync(function() {
+      spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+        .and.returnValue('collectionId');
       $httpBackend.expect(
         'GET', '/collectionsummarieshandler/data' +
         '?stringified_collection_ids=' +
@@ -407,6 +792,119 @@ fdescribe('Conversation skin directive', function() {
       expect(alertWarningSpy).toHaveBeenCalledWith(
         'There was an error while fetching the collection summary.');
     }));
+
+    it('should call record \'maybeLeave\' event ' +
+      'when answer is not being processed and ' +
+      'window has been resized', function() {
+      spyOnProperty(currentInteractionService, 'onAnswerChanged$')
+        .and.returnValue(onAnswerChangedEventEmitter);
+      spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
+        $scope.displayedCard = sampleCard;
+        cb();
+      });
+
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict2),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, null,
+            'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('lastState');
+      let recordMaybeLeaveEvent = spyOn(
+        statsReportingService, 'recordMaybeLeaveEvent')
+        .and.returnValue(null);
+  
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+      $scope.submitAnswer();
+      $timeout.flush();
+      ctrl.$onInit();
+      $window.onresize();
+
+      expect(recordMaybeLeaveEvent).toHaveBeenCalled();
+    });
+
+    it('should not record event when user redirects ' +
+      'to refresher exploration', function() {
+      let callback = null;
+      spyOnProperty(currentInteractionService, 'onAnswerChanged$')
+        .and.returnValue(onAnswerChangedEventEmitter);
+      spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
+        $scope.displayedCard = sampleCard;
+        cb();
+      });
+
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict2),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, null,
+            'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('lastState');
+      let recordMaybeLeaveEvent = spyOn(
+        statsReportingService, 'recordMaybeLeaveEvent')
+        .and.returnValue(null);
+  
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+      $scope.submitAnswer();
+      $timeout.flush();
+      $scope.redirectToRefresherExplorationConfirmed = true;
+      ctrl.$onInit();
+  
+
+      expect(recordMaybeLeaveEvent).not.toHaveBeenCalled();
+    });
   });
 
   describe('on exploration player state change', function() {
@@ -439,6 +937,33 @@ fdescribe('Conversation skin directive', function() {
       onPlayerStateChangeEventEmitter.emit('State 1');
 
       expect(imagePreloaderSpy).toHaveBeenCalled();
+    });
+
+    it('should record guest user\'s collection progress', function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+        .and.returnValue(onPlayerStateChangeEventEmitter);
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(statsReportingService, 'recordExplorationCompleted')
+        .and.returnValue(null);
+      spyOn(imagePreloaderService, 'onStateChange')
+        .and.returnValue(null);
+      let guestUserSpy = spyOn(
+        guestCollectionProgressService,
+        'recordExplorationCompletedInCollection')
+        .and.returnValue(null);
+
+      ctrl.$onInit();
+      $scope.nextCard = sampleCard;
+      $scope.collectionId = 'whitelistedCollection';
+      onPlayerStateChangeEventEmitter.emit('State 1');
+
+      expect(guestUserSpy).toHaveBeenCalled();
     });
   });
 
@@ -566,6 +1091,8 @@ fdescribe('Conversation skin directive', function() {
     });
 
     it('should record if new card was added', function() {
+      spyOn(playerTranscriptService, 'getLastCard')
+        .and.returnValue(sampleCard);
       spyOn($scope, 'showPendingCard').and.returnValue(null);
       spyOn(explorationPlayerStateService, 'getLanguageCode')
         .and.returnValue('en');
@@ -583,13 +1110,14 @@ fdescribe('Conversation skin directive', function() {
         getExplanation: () => 'explanation'
       };
       $scope.displayedCard.markAsCompleted();
+
       $scope.showUpcomingCard();
 
       expect(recordNewCardSpy).toHaveBeenCalled();
     });
   });
 
-  describe('on verifying if learn again button is active ', function() {
+  describe('on verifying if the learn again button is active ', function() {
     it('should return false if concept card is being shown', function() {
       spyOn(explorationPlayerStateService, 'isInQuestionMode')
       .and.returnValue(false);
@@ -606,6 +1134,12 @@ fdescribe('Conversation skin directive', function() {
     });
 
     it('should return false if interaction is linear', function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict1),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
       $scope.displayedCard = sampleCard;
 
       let result = $scope.isLearnAgainButton();
@@ -682,12 +1216,36 @@ fdescribe('Conversation skin directive', function() {
     });
   });
 
-  describe('on getting exploration link ', function() {
-    it('should return' +
-      '', function() {
+  describe('on fetching exploration link ', function() {
+    it('should return corresponding link if url ' +
+      'parameters consist of collection id', function() {
       spyOn(urlService, 'getUrlParams').and.returnValue({
         collection_id: 'collectionId'
       });
+      let storyNode = {
+        id: 'nodeId',
+        parentExplorationIds: ['id1', 'id2'],
+        nextNodeId: 'nextNodeId'
+      };
+      $scope.recommendedExplorationSummaries = [
+        storyNode];
+
+      let result = $scope.getExplorationLink();
+
+      expect(result).toBe(
+        '/explore/nodeId?collection_id=collectionId&parent=id1');
+    });
+
+    it('should return corresponding link if url ' +
+      'parameters consist of \'story_url_fragment\'', function() {
+      $scope.storyNodeIdToAdd = true;
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        story_url_fragment: '/story/abcd',
+        node_id: 'nodeId',
+        topic_url_fragment: '/topic/abcd',
+        classroom_url_fragment: '/learn/classroom1'
+      });
+
       let storyNode = {
         id: 'nodeId',
         parentExplorationIds: [],
@@ -697,7 +1255,52 @@ fdescribe('Conversation skin directive', function() {
 
       let result = $scope.getExplorationLink();
 
-      expect(result).toBe('/explore/nodeId?collection_id=collectionId');
+      expect(result).toBe(
+        '/explore/nodeId?topic_url_fragment=%2Ftopic' +
+        '%2Fabcd&classroom_url_fragment=%2Flearn%2Fclassroom1&story' +
+        '_url_fragment=%2Fstory%2Fabcd&node_id=true');
+    });
+
+    it('should return \'#\' if recommended exploration id ' +
+      'is invalid', function() {
+      // Setting id to null.
+      let storyNode = {
+        id: null,
+        parentExplorationIds: ['id1', 'id2'],
+        nextNodeId: 'nextNodeId'
+      };
+      $scope.recommendedExplorationSummaries = [
+        storyNode];
+
+      let result = $scope.getExplorationLink();
+
+      expect(result).toBe('#');
+    });
+
+    it('should return corresponding link if url ' +
+      'parameters does not consist of collection id', function() {
+      $scope.storyNodeIdToAdd = true;
+      spyOn(urlService, 'getUrlParams').and.returnValue({});
+      spyOn(urlService, 'getPathname').and.returnValue('/story/hfdjkahfauda');
+      spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl')
+        .and.returnValue('/story/');
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
+        .and.returnValue('/topic/');
+      spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
+        .and.returnValue('/classroom/');
+      let storyNode = {
+        id: 'nodeId',
+        parentExplorationIds: [],
+        nextNodeId: 'nextNodeId'
+      };
+      $scope.recommendedExplorationSummaries = [storyNode];
+
+      let result = $scope.getExplorationLink();
+
+      expect(result).toBe(
+        '/explore/nodeId?topic_url_fragment=%2Ftopic%2' +
+        'F&classroom_url_fragment=%2Fclassroom%2F&story_url_fragment' +
+        '=%2Fstory%2F&node_id=true');
     });
   });
 
@@ -727,5 +1330,1126 @@ fdescribe('Conversation skin directive', function() {
     let result = $scope.getContentFocusLabel('2');
 
     expect(result).toBe('contentLabel2');
+  });
+
+  it('should get feedback popover url when' +
+    'calling \'getFeedbackPopoverUrl\' ', function() {
+    spyOn(urlInterpolationService, 'getDirectiveTemplateUrl')
+      .and.returnValue('/directiveTemplateUrl');
+
+    let result = $scope.getFeedbackPopoverUrl();
+
+    expect(result).toBe('/directiveTemplateUrl');
+  });
+
+  it('should check whether a learner can ask for answer info', function() {
+    spyOn(learnerAnswerInfoService, 'getCanAskLearnerForAnswerInfo')
+      .and.returnValue(true);
+
+    let result = $scope.getCanAskLearnerForAnswerInfo();
+
+    expect(result).toBe(true);
+  });
+
+  it('should check whether correctness footer is enabled', function() {
+    $scope.answerIsCorrect = false;
+
+    let result = $scope.isCorrectnessFooterEnabled();
+
+    expect(result).toBe(false);
+  });
+
+  it('should send message if height is adjusted when ' +
+    'calling \'adjustPageHeight\'', function() {
+    spyOnProperty(document.body, 'scrollHeight').and.returnValue(45);
+    let sendMessageSpy = spyOn(
+      messengerService, 'sendMessage').and.returnValue(null);
+    $scope.lastRequestedHeight = 100;
+    let callback = jasmine.createSpy('callback');
+
+    $scope.adjustPageHeight(true, callback);
+    $timeout.flush();
+
+    expect(sendMessageSpy).toHaveBeenCalled();
+  });
+
+  it('should check whether the card is terminal ' +
+    'when calling \'isOnTerminalCard\'', function() {
+    $scope.displayedCard = sampleCard;
+
+    let result = $scope.isOnTerminalCard();
+
+    expect(result).toBe(false);
+  });
+
+  it('should check whether the supplemental card is non empty ' +
+    'when calling \'isCurrentSupplementalCardNonempty\'', function() {
+    $scope.displayedCard = sampleCard;
+
+    let result = $scope.isCurrentSupplementalCardNonempty();
+
+    expect(result).toBe(true);
+  });
+
+  it('should check whether the supplemental navbar is being shown ' +
+    'when calling \'isSupplementalNavShown\'', function() {
+    $scope.displayedCard = sampleCard;
+
+    let result = $scope.isSupplementalNavShown();
+
+    expect(result).toBe(false);
+  });
+
+  it('should return false when calling \'isSupplementalNavShown\''  +
+    'if current state has invalid name', function() {
+    // Setting state name to null.
+    sampleCard = StateCard.createNewCard(
+      null, '<p>Content</p>', '<interaction></interaction>',
+      null, RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+    spyOn(explorationPlayerStateService, 'isInQuestionMode')
+      .and.returnValue(false);
+    $scope.displayedCard = sampleCard;
+
+    let result = $scope.isSupplementalNavShown();
+
+    expect(result).toBe(false);
+  });
+
+  it('should navigate to display card ' +
+    'when answer is submitted and new card is initialized' +
+    '', fakeAsync(function() {
+    sampleCard = StateCard.createNewCard(
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict(interactionDict3),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+    spyOn(playerPositionService, 'init').and.callFake(cb => {
+      cb();
+    });
+    spyOn(playerTranscriptService, 'getCard')
+      .and.returnValue(sampleCard);
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValue('en');
+    spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+      .and.returnValue(null);
+    spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+      .and.returnValue('en');
+    spyOn(playerPositionService, 'setDisplayedCardIndex')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'changeCurrentQuestion')
+      .and.returnValue(null);
+    spyOn(urlService, 'getQueryFieldValuesAsList')
+      .and.returnValue(['id1', 'id2']);
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(
+      storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(samplePlaythroughObject));
+    spyOn(playerTranscriptService, 'getNumCards')
+      .and.returnValue(2);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+    spyOn(contentTranslationManagerService, 'displayTranslations')
+      .and.returnValue(null);
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode')
+      .and.returnValue(null);
+    spyOn(imagePreloaderService, 'onStateChange')
+      .and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationCompleted')
+      .and.returnValue(null);
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      node_id: 'node_1'
+    });
+
+    $scope.getQuestionPlayerConfig = function() {
+      return {
+        resultActionButtons: [{
+          type: 'BOOST_SCORE',
+          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+        }, {
+          type: 'RETRY_SESSION',
+          i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
+          url: '/learn/classroom_1/topic_1/review-test/story_1'
+        }, {
+          type: 'DASHBOARD',
+          i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
+          url: '/learn/classroom_1/topic_1/story/story_1'
+        }],
+        skillList: ['0', '1'],
+        skillDescriptions: ['skill_1', 'skill_2'],
+        questionCount: 6,
+        questionPlayerMode: {
+          modeType: 'PASS_FAIL',
+          passCutoff: 0.75
+        },
+        questionsSortedByDifficulty: true
+      };
+    };
+    let initSpy = spyOn(
+      explorationPlayerStateService, 'initializeQuestionPlayer')
+      .and.callFake((config, cb1, cb2) => {
+        cb1(sampleCard, 'focusLabel');
+        cb2();
+      });
+
+    ctrl.$onInit();
+    $scope.answerIsBeingProcessed = false;
+    $scope.displayedCard = sampleCard;
+    $scope.submitAnswer();
+    $scope.isIframed = true;
+    $scope.initializePage();
+
+    $timeout.flush();
+    tick();
+
+    expect(initSpy).toHaveBeenCalled();
+  }));
+
+  it('should focus on the given focus label if user is on ' +
+    'desktop', fakeAsync(function() {
+    spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+    spyOn(playerTranscriptService, 'isLastCard')
+      .and.returnValue(true);
+    spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+      .and.returnValue(null);
+    spyOn(playerTranscriptService, 'addNewResponse')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'recordAnswerSubmission')
+      .and.returnValue(null);
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+      (answer, service, successCallback) => {
+        successCallback(
+          sampleCard, true, 'feedbackHtml', audioTranslations, 'refresherId',
+          'skillId', true, 'taggedSkillId', true, true, false, 'focusLabel');
+        return true;
+    });
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('currentState');
+    spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+    spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+      .and.returnValue(null);
+    spyOn(hintsAndSolutionManagerService, 'recordWrongAnswer')
+      .and.returnValue(null);
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.resolveTo(sampleConceptCard);
+    spyOn(playerPositionService, 'init')
+      .and.callFake(cb => {
+        cb();
+      });
+    let focusSpy = spyOn(focusManagerService, 'setFocusIfOnDesktop')
+      .and.returnValue(null);
+
+    $scope.answerIsBeingProcessed = false;
+    $scope.displayedCard = sampleCard;
+
+    $scope.submitAnswer();
+    $timeout.flush();
+    tick();
+    $timeout.flush();
+    $scope.initializePage();
+    discardPeriodicTasks();
+    flush();
+  
+    expect(focusSpy).toHaveBeenCalled();
+  }));
+
+  it('should check if the user is in question player ' +
+    'mode', fakeAsync(function() {
+    spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+    spyOn(playerTranscriptService, 'isLastCard')
+      .and.returnValue(true);
+    spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+      .and.returnValue(null);
+    spyOn(playerTranscriptService, 'addNewResponse')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'recordAnswerSubmission')
+      .and.returnValue(null);
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+      (answer, service, successCallback) => {
+        successCallback(
+          sampleCard, true, 'feedbackHtml', audioTranslations, null,
+          'skillId', false, 'taggedSkillId', true, true, true, 'focusLabel');
+        return true;
+    });
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('currentState');
+    spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+    spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+      .and.returnValue(null);
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.resolveTo(sampleConceptCard);
+    spyOn(playerTranscriptService, 'hasEncounteredStateBefore')
+      .and.returnValue(true);
+    spyOn(playerPositionService, 'init')
+      .and.callFake(cb => {
+        cb();
+      });
+    spyOn(QuestionPlayerStateService, 'answerSubmitted')
+      .and.returnValue(true);
+
+    $scope.answerIsBeingProcessed = false;
+    $scope.displayedCard = sampleCard;
+
+    $scope.submitAnswer();
+    $timeout.flush();
+    tick();
+
+    expect(questionPlayerSpy).toHaveBeenCalled();
+  }));
+
+  it('should check whether the user is in editor mode', fakeAsync(function() {
+    spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+    spyOn(playerTranscriptService, 'isLastCard')
+      .and.returnValue(true);
+    spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+      .and.returnValue(null);
+    spyOn(playerTranscriptService, 'addNewResponse')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'recordAnswerSubmission')
+      .and.returnValue(null);
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+      (answer, service, successCallback) => {
+        successCallback(
+          sampleCard, true, 'feedbackHtml', audioTranslations, null,
+          'skillId', false, 'taggedSkillId', true, true, false, 'focusLabel');
+        return true;
+    });
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('currentState');
+    spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+    spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+      .and.returnValue(null);
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.resolveTo(sampleConceptCard);
+    spyOn(playerTranscriptService, 'hasEncounteredStateBefore')
+      .and.returnValue(true);
+    spyOn(playerPositionService, 'init')
+      .and.callFake(cb => {
+        cb();
+      });
+    spyOn(QuestionPlayerStateService, 'answerSubmitted')
+      .and.returnValue(true);
+    spyOn(explorationPlayerStateService, 'isInQuestionMode')
+      .and.returnValue(true);
+    $scope.answerIsBeingProcessed = false;
+    $scope.displayedCard = sampleCard;
+
+    $scope.submitAnswer();
+    $timeout.flush();
+    tick();
+
+    expect(questionPlayerSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should add new repsonse if feedback content is ' +
+    'provided', fakeAsync(function() {
+    spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+    spyOn(playerTranscriptService, 'isLastCard')
+      .and.returnValue(true);
+    spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+      .and.returnValue(null);
+    let feedbackSpy = spyOn(playerTranscriptService, 'addNewResponse')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'recordAnswerSubmission')
+      .and.returnValue(null);
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+      (answer, service, successCallback) => {
+        successCallback(
+          sampleCard, true, 'feedbackHtml', audioTranslations, null,
+          'skillId', false, 'taggedSkillId', true, true, false, 'focusLabel');
+        return true;
+    });
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('currentState');
+    spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+    spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+      .and.returnValue(null);
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.resolveTo(sampleConceptCard);
+    spyOn(playerTranscriptService, 'hasEncounteredStateBefore')
+      .and.returnValue(true);
+    spyOn(playerPositionService, 'init')
+      .and.callFake(cb => {
+        cb();
+      });
+
+    $scope.answerIsBeingProcessed = false;
+    $scope.displayedCard = sampleCard;
+
+    $scope.submitAnswer();
+    $timeout.flush();
+    tick();
+
+    expect(feedbackSpy).toHaveBeenCalledWith('feedbackHtml');
+  }));
+
+  it('should add an empty response if feedback content ' +
+    'is not provided', fakeAsync(function() {
+    spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+    spyOn(playerTranscriptService, 'isLastCard')
+      .and.returnValue(true);
+    spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+      .and.returnValue(null);
+    let feedbackSpy = spyOn(playerTranscriptService, 'addNewResponse')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'recordAnswerSubmission')
+      .and.returnValue(null);
+    spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+      .and.returnValue(explorationEngineService);
+    spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+      (answer, service, successCallback) => {
+        successCallback(
+          sampleCard, true, null, audioTranslations, null,
+          'skillId', false, 'taggedSkillId', true, true, false, 'focusLabel');
+        return true;
+    });
+    spyOn(playerPositionService, 'getCurrentStateName')
+      .and.returnValue('currentState');
+    spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+    spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+      .and.returnValue(null);
+    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+      .and.resolveTo(sampleConceptCard);
+    spyOn(playerPositionService, 'init')
+      .and.callFake(cb => {
+        cb();
+      });
+
+    $scope.answerIsBeingProcessed = false;
+    $scope.displayedCard = sampleCard;
+
+    $scope.submitAnswer();
+    $timeout.flush();
+    tick();
+
+    expect(feedbackSpy).toHaveBeenCalledWith(null);
+  }));
+
+  it('should set I18n language code if given language code is' +
+    'valid', fakeAsync(function() {
+    sampleCard = StateCard.createNewCard(
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict(interactionDict3),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+    spyOn(playerPositionService, 'init').and.callFake(cb => {
+      cb();
+    });
+    spyOn(playerTranscriptService, 'getCard')
+      .and.returnValue(sampleCard);
+    spyOn(explorationPlayerStateService, 'getLanguageCode')
+      .and.returnValue('invalid');
+    spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+      .and.returnValue(null);
+    spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+      .and.returnValue('en');
+    spyOn(playerPositionService, 'setDisplayedCardIndex')
+      .and.returnValue(null);
+    spyOn(playerPositionService, 'changeCurrentQuestion')
+      .and.returnValue(null);
+    spyOn(urlService, 'getQueryFieldValuesAsList')
+      .and.returnValue(['id1', 'id2']);
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(
+      storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(samplePlaythroughObject));
+    spyOn(playerTranscriptService, 'getNumCards')
+      .and.returnValue(2);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+    spyOn(contentTranslationManagerService, 'displayTranslations')
+      .and.returnValue(null);
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+    let languageCodsSpy = spyOn(
+      i18nLanguageCodeService, 'setI18nLanguageCode')
+      .and.returnValue(null);
+    spyOn(imagePreloaderService, 'onStateChange')
+      .and.returnValue(null);
+    spyOn(statsReportingService, 'recordExplorationCompleted')
+      .and.returnValue(null);
+
+    $scope.getQuestionPlayerConfig = function() {
+      return {
+        resultActionButtons: [{
+          type: 'BOOST_SCORE',
+          i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+        }, {
+          type: 'RETRY_SESSION',
+          i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
+          url: '/learn/classroom_1/topic_1/review-test/story_1'
+        }, {
+          type: 'DASHBOARD',
+          i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
+          url: '/learn/classroom_1/topic_1/story/story_1'
+        }],
+        skillList: ['0', '1'],
+        skillDescriptions: ['skill_1', 'skill_2'],
+        questionCount: 6,
+        questionPlayerMode: {
+          modeType: 'PASS_FAIL',
+          passCutoff: 0.75
+        },
+        questionsSortedByDifficulty: true
+      };
+    };
+    spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
+      .and.callFake((config, cb1, cb2) => {
+        cb1(sampleCard, 'focusLabel');
+        cb2();
+      });
+
+    ctrl.$onInit();
+    $scope.isIframed = true;
+    $scope.initializePage();
+
+    $timeout.flush();
+    tick();
+
+    expect(languageCodsSpy).toHaveBeenCalled();
+  }));
+
+  it('should return to exploratin after completion of concept card ' +
+    'when calling \'returnToExplorationAfterConceptCard\'', function() {
+    spyOn(playerTranscriptService, 'addPreviousCard')
+      .and.returnValue(null);
+    spyOn(playerTranscriptService, 'getNumCards')
+      .and.returnValue(2);
+    let displayCardSpy = spyOn(playerPositionService, 'setDisplayedCardIndex')
+      .and.returnValue(null);
+
+    $scope.returnToExplorationAfterConceptCard();
+
+    expect(displayCardSpy).toHaveBeenCalled();
+  });
+
+  it('should submit user rating given rating value ' +
+    'when calling \'submitUserRating\'', function() {
+    let ratingSpy = spyOn(learnerViewRatingService, 'submitUserRating')
+      .and.returnValue(null);
+
+    $scope.submitUserRating(1);
+
+    expect(ratingSpy).toHaveBeenCalledWith(1);
+  });
+
+  describe('on submitting answer ', function() {
+    it('should submit answer successfully ' +
+      '', function() {
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      let submitAnswerSpy = spyOn(
+        explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, null,
+            'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+
+      $scope.submitAnswer();
+      $timeout.flush();
+
+      expect(submitAnswerSpy).toHaveBeenCalled();
+    });
+
+    it('should not submit answer again if answer is ' +
+      'still being processed in the queue', function() {
+      $scope.answerIsBeingProcessed = true;
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(false);
+      let submitAnswerSpy = spyOn(explorationEngineService, 'submitAnswer');
+      $scope.displayedCard = sampleCard;
+      $scope.displayedCard.markAsCompleted();
+
+      $scope.submitAnswer();
+      $timeout.flush();
+
+      expect(submitAnswerSpy).not.toHaveBeenCalled();
+    });
+
+    it('should display break messag if answer is ' +
+      'still being processed in the queue', function() {
+      spyOn(fatigueDetectionService, 'isSubmittingTooFast')
+        .and.returnValue(true);
+      spyOn(fatigueDetectionService, 'recordSubmissionTimestamp')
+        .and.returnValue(null);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      let displayBreakMessageSpy = spyOn(
+        fatigueDetectionService, 'displayTakeBreakMessage')
+        .and.returnValue(null);
+  
+      $scope.answerIsBeingProcessed = false;
+      $scope.isInPreviewMode = false;
+      $scope.displayedCard = sampleCard;
+
+      $scope.submitAnswer();
+      $timeout.flush();
+
+      expect(displayBreakMessageSpy).toHaveBeenCalled();
+    });
+
+    it('should check whether the helper card is available', function() {
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, null,
+            'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      spyOn(learnerAnswerInfoService, 'getCanAskLearnerForAnswerInfo')
+        .and.returnValue(true);
+      let helperCardSpy = spyOn(
+        playerPositionService.onHelpCardAvailable, 'emit').and.callThrough();
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+
+      $scope.submitAnswer();
+      $timeout.flush();
+
+      expect(helperCardSpy).toHaveBeenCalled();
+    });
+
+    it('should mark exploration as completed if the ' +
+      'current card is last card ', function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, null,
+            'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      let explorationCompletedSpy = spyOn(
+        statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+
+      $scope.submitAnswer();
+      $timeout.flush();
+
+      expect(explorationCompletedSpy).toHaveBeenCalled();
+    });
+
+    it('should stay on same card if anwer is incorrect', fakeAsync(function() {
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+        .and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, 'refresherId',
+            'skillId', true, 'taggedSkillId', true, true, false, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      let wrongAnswerSpy = spyOn(
+        hintsAndSolutionManagerService, 'recordWrongAnswer')
+        .and.returnValue(null);
+      spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+        .and.resolveTo(sampleConceptCard);
+
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+
+      $scope.submitAnswer();
+      $timeout.flush();
+      tick();
+      $timeout.flush();
+
+      expect(wrongAnswerSpy).toHaveBeenCalled();
+    }));
+
+    it('should open a modal to confirm redirection ' +
+      'to refresher exploration', fakeAsync(function() {
+      let requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(['refresherId']));
+      spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
+      spyOn(playerTranscriptService, 'isLastCard')
+        .and.returnValue(true);
+      spyOn(playerTranscriptService, 'addNewInput').and.returnValue(null);
+      spyOn(playerTranscriptService, 'updateLatestInteractionHtml')
+        .and.returnValue(null);
+      spyOn(playerTranscriptService, 'addNewResponse')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'recordAnswerSubmission')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'getCurrentEngineService')
+        .and.returnValue(explorationEngineService);
+      spyOn(explorationEngineService, 'submitAnswer').and.callFake(
+        (answer, service, successCallback) => {
+          successCallback(
+            sampleCard, true, 'feedbackHtml', audioTranslations, 'refresherId',
+            'skillId', true, 'taggedSkillId', true, true, false, 'focusLabel');
+          return true;
+      });
+      spyOn(playerPositionService, 'getCurrentStateName')
+        .and.returnValue('currentState');
+      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordExplorationActuallyStarted')
+        .and.returnValue(null);
+      spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
+        .and.resolveTo(sampleConceptCard);
+      let redirectionSpy = spyOn(
+        refresherExplorationConfirmationModalService,
+        'displayRedirectConfirmationModal').and.callFake((expId, cb) => {
+          cb();
+        });
+
+      $httpBackend.expect(
+        'GET', requestUrl).respond({
+          summaries: ['explorationSummary']
+        });
+      $scope.answerIsBeingProcessed = false;
+      $scope.displayedCard = sampleCard;
+
+      $scope.submitAnswer();
+      $timeout.flush();
+      $scope.$apply();
+      $httpBackend.flush();
+      tick();
+
+      expect(redirectionSpy).toHaveBeenCalled();
+    }));
+  });
+
+  describe('on showing a pending card ', function() {
+    it('should check whether the user is in story chapter ' +
+      'mode', fakeAsync(function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      $scope.nextCard = sampleCard;
+      $scope.displayedCard = sampleCard;
+      $scope.isLoggedIn = true;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      spyOn(playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue(['id1', 'id2']);
+      let storyChapterSpy = spyOn(
+        explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+      spyOn(storyViewerBackendApiService, 'recordChapterCompletionAsync')
+        .and.resolveTo({
+          readyForReviewTest: true
+        } as StoryChapterCompletionResponse);
+  
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+
+      expect(storyChapterSpy).toHaveBeenCalled();
+    }));
+
+     it('should set display card index when current card is ' +
+      'supplemental and next card is non empty ', fakeAsync(function() {
+      let samplePreviousCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      spyOn(playerTranscriptService, 'getLastCard')
+        .and.returnValue(samplePreviousCard);
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict2),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      $scope.nextCard = sampleCard;
+      $scope.displayedCard = samplePreviousCard;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      let displayCardIndexSpy = spyOn(
+        playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue(['id1', 'id2']);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+  
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+
+      expect(displayCardIndexSpy).toHaveBeenCalled();
+    }));
+
+    it('should set display card index when  ' +
+      'current card is not inline and previous ' +
+      'card is non empty', fakeAsync(function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict2),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+
+      let sampleNextCard = StateCard.createNewCard(
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict(interactionDict3),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+      spyOn(playerTranscriptService, 'getLastCard')
+        .and.returnValue(sampleCard);
+
+      $scope.nextCard = sampleNextCard;
+      $scope.displayedCard = sampleCard;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      let displayCardIndexSpy = spyOn(playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue(['id1', 'id2']);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+  
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+      $timeout.flush();
+
+      expect(displayCardIndexSpy).toHaveBeenCalled();
+    }));
+
+    it('should set display card index when  ' +
+      'current card is inline and previous ' +
+      'card is non empty', fakeAsync(function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict2),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+
+      let sampleNextCard = StateCard.createNewCard(
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict(interactionDict3),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
+      spyOn(playerTranscriptService, 'getLastCard')
+        .and.returnValue(sampleCard);
+
+      $scope.nextCard = sampleNextCard;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      let displayCardIndexSpy = spyOn(
+        playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue(['id1', 'id2']);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+      $timeout.flush();
+
+      expect(displayCardIndexSpy).toHaveBeenCalled();
+    }));
+
+    it('should throw error if current exploration has ' +
+      'no parent exploration', fakeAsync(function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      $scope.nextCard = sampleCard;
+      $scope.displayedCard = sampleCard;
+      $scope.isLoggedIn = true;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      spyOn(playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue([]);
+      spyOn(explorationEngineService, 'getAuthorRecommendedExpIds')
+        .and.returnValue(null);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+      spyOn(storyViewerBackendApiService, 'recordChapterCompletionAsync')
+        .and.resolveTo({
+          readyForReviewTest: true
+        } as StoryChapterCompletionResponse);
+  
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+
+      expect(() => {
+        $scope.recommendedExplorationSummaries[0].parentExplorationIds;
+      }).toThrowError(
+        'Cannot read property \'parentExplorationIds\' of undefined');
+    }));
+
+    it('should fetch recommeded summary dicts ' +
+      'when user is logged in and not in story mode', fakeAsync(function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      $scope.nextCard = sampleCard;
+      $scope.displayedCard = sampleCard;
+      $scope.isLoggedIn = true;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      spyOn(playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue(['id1', 'id2']);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(false);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+      let summaryDictsSpy = spyOn(
+        explorationRecommendationsService, 'getRecommendedSummaryDicts')
+        .and.callFake((id, dict, cb) => {
+          cb([]);
+        })
+      spyOn(storyViewerBackendApiService, 'recordChapterCompletionAsync')
+        .and.resolveTo({
+          readyForReviewTest: true
+        } as StoryChapterCompletionResponse);
+  
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+
+      expect(summaryDictsSpy).toHaveBeenCalled();
+    }));
+
+    it('should set return url when user is not ' +
+      'logged in', fakeAsync(function() {
+      sampleCard = StateCard.createNewCard(
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
+      $scope.nextCard = sampleCard;
+      $scope.displayedCard = sampleCard;
+      spyOn(explorationPlayerStateService, 'getLanguageCode')
+        .and.returnValue('af');
+      spyOn(explorationPlayerStateService, 'recordNewCardAdded')
+        .and.returnValue(null);
+      spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
+        .and.returnValue('en');
+      spyOn(playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
+      spyOn(urlService, 'getQueryFieldValuesAsList')
+        .and.returnValue(['id1', 'id2']);
+      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+        .and.returnValue(true);
+      spyOn(
+        storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+        Promise.resolve(samplePlaythroughObject));
+      spyOn(playerTranscriptService, 'getNumCards')
+        .and.returnValue(2);
+      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('url');
+      spyOn(contentTranslationManagerService, 'displayTranslations')
+        .and.returnValue(null);
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
+      let returnUrlSpy = spyOn(
+        userService, 'setReturnUrl').and.returnValue(null);
+  
+      $scope.showPendingCard();
+      $timeout.flush();
+      tick();
+
+      expect(returnUrlSpy).toHaveBeenCalled();
+    }));
   });
 });
