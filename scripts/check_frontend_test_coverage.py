@@ -177,7 +177,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'state-content-editor.directive.ts',
     'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
-    'state-solution-editor.directive.ts',
+    'state-solution-editor.component.ts',
     'story-creation.service.ts',
     'story-editor-navbar-breadcrumb.component.ts',
     'story-editor-state.service.ts',
