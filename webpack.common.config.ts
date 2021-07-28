@@ -113,9 +113,6 @@ module.exports = {
       commonPrefix + '/pages/oppia-root/index.ts',
     partnerships:
       commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
-    pending_account_deletion:
-      commonPrefix + '/pages/pending-account-deletion-page/' +
-      'pending-account-deletion-page.import.ts',
     playbook: commonPrefix + '/pages/participation-playbook/playbook.import.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
@@ -484,16 +481,6 @@ module.exports = {
       template:
           commonPrefix + '/pages/partnerships-page/' +
           'partnerships-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['pending_account_deletion'],
-      filename: 'pending-account-deletion-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-          commonPrefix + '/pages/pending-account-deletion-page/' +
-          'pending-account-deletion-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

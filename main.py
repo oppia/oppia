@@ -229,6 +229,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/does_profile_exist/<username>' % feconf.ACCESS_VALIDATORS_PREFIX,
         access_validators.ProfileExistsValidationHandler),
 
+    get_redirect_route(
+        r'%s/account_deletion_is_enabled' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.AccountDeletionIsEnabledValidationHandler),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -506,9 +510,6 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
     get_redirect_route(
         feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
-    get_redirect_route(
-        feconf.PENDING_ACCOUNT_DELETION_URL,
-        profile.PendingAccountDeletionPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(

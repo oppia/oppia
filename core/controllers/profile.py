@@ -447,20 +447,6 @@ class ExportAccountHandler(base.BaseHandler):
             temp_file.getvalue(), 'oppia_takeout_data.zip', 'text/plain')
 
 
-class PendingAccountDeletionPage(base.BaseHandler):
-    """The account pending deletion page. This page is accessible by all users
-    even if they are not scheduled for deletion. This is because users that are
-    scheduled for deletion are logged out instantly when they try to login.
-    """
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        if not constants.ENABLE_ACCOUNT_DELETION:
-            raise self.PageNotFoundException
-        self.render_template('pending-account-deletion-page.mainpage.html')
-
-
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 

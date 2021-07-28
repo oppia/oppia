@@ -19,7 +19,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { boolean } from 'mathjs';
 
 export interface SplashPageValidatorResponse {
   valid: boolean;
@@ -39,10 +38,12 @@ interface ValidatorResponse {
   providedIn: 'root'
 })
 export class AccessValidationBackendApiService {
-  SPLASH_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_splash_page';
-  CLASSROOM_PAGE_ACCESS_VALIDATOR = '/acl_validator/can_access_classroom_page';
-  CAN_MANAGE_OWN_ACCOUNT_VALIDATOR = '/acl_validator/can_manage_own_account';
-  DOES_PROFILE_EXIST = '/acl_validator/does_profile_exist/<username>';
+  SPLASH_PAGE_ACCESS_VALIDATOR = '/access_validator/can_access_splash_page';
+  CLASSROOM_PAGE_ACCESS_VALIDATOR = (
+    '/access_validator/can_access_classroom_page');
+  CAN_MANAGE_OWN_ACCOUNT_VALIDATOR = '/access_validator/can_manage_own_account';
+  DOES_PROFILE_EXIST = '/access_validator/does_profile_exist/<username>';
+  ACCOUNT_DELETION_IS_ENABLED = '/access_validator/account_deletion_is_enabled';
 
   constructor(
     private http: HttpClient,
@@ -77,5 +78,10 @@ export class AccessValidationBackendApiService {
       });
 
     return this.http.get<ValidatorResponse>(url).toPromise();
+  }
+
+  accountDeletionIsEnabled(): Promise<ValidatorResponse> {
+    return this.http.get<ValidatorResponse>(
+      this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
   }
 }

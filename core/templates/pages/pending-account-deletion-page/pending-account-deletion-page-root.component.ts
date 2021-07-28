@@ -17,9 +17,24 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-pending-account-deletion-page-root',
   templateUrl: './pending-account-deletion-page-root.component.html'
 })
-export class PendingAccountDeletionPageRootComponent {}
+export class PendingAccountDeletionPageRootComponent {
+  constructor(
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService
+  ) {}
+
+  ngOnInit(): void {
+    let pageData = (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION);
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+  }
+}

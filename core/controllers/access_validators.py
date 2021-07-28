@@ -113,3 +113,20 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             return
 
         self.render_json({ 'valid': True })
+
+class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
+
+    URL_PATH_ARGS_SCHEMAS = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            self.render_json({ 'valid': False })
+            return
+
+        self.render_json({ 'valid': True })

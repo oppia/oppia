@@ -1455,4 +1455,4 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
 ]
 
 # Prefix for all acl validation handlers.
-ACCESS_VALIDATORS_PREFIX = '/acl_validator'
+ACCESS_VALIDATORS_PREFIX = '/access_validator'

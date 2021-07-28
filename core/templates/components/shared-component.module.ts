@@ -95,6 +95,7 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 // Services.
 import { AuthService } from 'services/auth.service';
 import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
+import { EditProfilePictureModalComponent } from 'pages/preferences-page/modal-templates/edit-profile-picture-modal.component';
 
 @NgModule({
   imports: [
@@ -138,6 +139,7 @@ import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    EditProfilePictureModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
@@ -187,6 +189,7 @@ import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
+    EditProfilePictureModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
@@ -251,6 +254,7 @@ import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    EditProfilePictureModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,

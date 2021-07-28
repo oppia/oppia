@@ -24,7 +24,6 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { PreferredSiteLanguageSelectorComponent } from './form-fields/preferred-language-selector.component';
 import { PreferredLanguagesComponent } from './form-fields/preferred-languages.component';
 import { SubjectInterestsComponent } from './form-fields/subject-interests.component';
-import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 import { PreferencesPageRootComponent } from './preferences-page-root.component';
 import { CommonModule } from '@angular/common';
 import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
@@ -42,7 +41,6 @@ import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider'
     PreferencesPageRoutingModule
   ],
   declarations: [
-    EditProfilePictureModalComponent,
     PreferencesPageComponent,
     PreferencesPageRootComponent,
     PreferredLanguagesComponent,
@@ -50,7 +48,6 @@ import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider'
     SubjectInterestsComponent
   ],
   entryComponents: [
-    EditProfilePictureModalComponent,
     PreferencesPageComponent,
     PreferencesPageRootComponent,
     PreferredLanguagesComponent,

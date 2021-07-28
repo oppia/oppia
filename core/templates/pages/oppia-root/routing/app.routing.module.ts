@@ -20,6 +20,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
+import { AccountDeletionIsEnabledGuard } from './guards/account-deletion-is-enabled.guard';
 import { CanAccessClassroomPageGuard } from './guards/can-access-classroom-page.guard';
 import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
 import { CanManageOwnAccountGuard } from './guards/can-manage-own-account.guard';
@@ -50,6 +51,16 @@ const routes: Route[] = [
       .then(m => m.DeleteAccountPageModule)
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION
+        .ROUTE),
+    canLoad: [AccountDeletionIsEnabledGuard],
+    loadChildren: () => import(
+      'pages/pending-account-deletion-page/' +
+      'pending-account-deletion-page.module')
+      .then(m => m.PendingAccountDeletionPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE,
     pathMatch: 'full',
     canLoad: [CanManageOwnAccountGuard],
@@ -58,7 +69,6 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
-    pathMatch: 'full',
     canLoad: [DoesProfileExistGuard],
     loadChildren: () => import('pages/profile-page/profile-page.module')
       .then(m => m.ProfilePageModule)

@@ -22,7 +22,6 @@ import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 import { ProfilePageComponent } from './profile-page.component';
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { EditProfilePictureModalComponent } from 'pages/preferences-page/modal-templates/edit-profile-picture-modal.component';
 import { ProfilePageRootComponent } from './profile-page-root.component';
 import { CommonModule } from '@angular/common';
 import { ProfilePageRoutingModule } from './profile-page-routing.module';
@@ -35,13 +34,11 @@ import { ProfilePageRoutingModule } from './profile-page-routing.module';
     ProfilePageRoutingModule
   ],
   declarations: [
-    EditProfilePictureModalComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent
   ],
   entryComponents: [
-    EditProfilePictureModalComponent,
     ProfilePageNavbarComponent,
     ProfilePageComponent,
     ProfilePageRootComponent

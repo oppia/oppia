@@ -5999,6 +5999,11 @@ export default {
       "TITLE": "Delete Account | Oppia",
       "META": []
     },
+    "PENDING_ACCOUNT_DELETION": {
+      "ROUTE": "pending-account-deletion",
+      "TITLE": "Pending Account Deletion | Oppia",
+      "META": []
+    },
     "PREFERENCES": {
       "ROUTE": "preferences",
       "TITLE": "Preferences | Oppia",
