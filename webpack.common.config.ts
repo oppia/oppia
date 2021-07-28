@@ -57,6 +57,9 @@ module.exports = {
     }
   },
   entry: {
+    about_foundation:
+      commonPrefix + '/pages/about-foundation-page/' +
+      'about-foundation-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
     blog_admin:
       commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
@@ -168,6 +171,16 @@ module.exports = {
   * once angularjs is removed from corresponding pages.
   */
   plugins: [
+    new HtmlWebpackPlugin({
+      chunks: ['about_foundation'],
+      filename: 'about-foundation-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/about-foundation-page/' +
+          'about-foundation-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
