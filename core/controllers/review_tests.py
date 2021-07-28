@@ -27,6 +27,27 @@ import feconf
 class ReviewTestsPage(base.BaseHandler):
     """Renders the review tests page."""
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'story_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.can_access_story_viewer_page
     def get(self, _):
         """Handles GET requests."""
@@ -40,6 +61,26 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'story_url_fragment': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
