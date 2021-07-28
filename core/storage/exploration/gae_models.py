@@ -213,7 +213,7 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=False, indexed=True)
-    # Proto size of the exploration.
+    # Size in bytes of Android Proto representation.
     proto_size_in_bytes = datastore_services.IntegerProperty(
         default=0, indexed=True)
 
