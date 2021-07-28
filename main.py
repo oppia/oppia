@@ -14,8 +14,8 @@
 
 """URL routing definitions, and some basic error/warmup handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 from constants import constants
@@ -47,6 +47,7 @@ from core.controllers import learner_goals
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
+from core.controllers import oppia_root
 from core.controllers import pages
 from core.controllers import platform_feature
 from core.controllers import practice_sessions
@@ -797,6 +798,10 @@ URLS = MAPREDUCE_HANDLERS + [
         skill_editor.SkillRightsHandler),
 
     get_redirect_route(
+        r'%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+        skill_mastery.SubtopicMasteryDataHandler),
+
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         story_editor.StoryEditorPage),
     get_redirect_route(
@@ -931,6 +936,13 @@ if constants.DEV_MODE:
         get_redirect_route(
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
+
+# Redirect all routes handled using angular router to the oppia root page.
+for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+    URLS.append(
+        get_redirect_route(
+            r'/%s' % page['ROUTE'],
+            oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))

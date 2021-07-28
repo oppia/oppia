@@ -142,17 +142,6 @@ handlers:
   secure: always
 
 # STATIC PAGES.
-- url: /about
-  static_files: webpack_bundles/about-page.mainpage.html
-  upload: webpack_bundles/about-page.mainpage.html
-  http_headers:
-    Pragma: no-cache
-    Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-    X-Content-Type-Options: "nosniff"
-    X-Frame-Options: "DENY"
-    X-Xss-Protection: "1; mode=block"
-  secure: always
-  expiration: "0"
 - url: /contact
   static_files: webpack_bundles/contact-page.mainpage.html
   upload: webpack_bundles/contact-page.mainpage.html

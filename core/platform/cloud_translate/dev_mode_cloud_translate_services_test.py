@@ -16,8 +16,8 @@
 
 """Tests for dev_mode_cloud_translate_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform.cloud_translate import dev_mode_cloud_translate_services
 from core.tests import test_utils

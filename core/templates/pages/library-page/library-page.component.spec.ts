@@ -272,7 +272,7 @@ describe('Library Page Component', () => {
       .and.returnValue(Promise.resolve(libraryIndexData as LibraryIndexData));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       new UserInfo(
-        'role', true, true, true, true, true, 'en', 'user',
+        ['role'], true, true, true, true, true, 'en', 'user',
         'user@user.com', true)));
     spyOn(libraryPageBackendApiService, 'fetchCreatorDashboardDataAsync')
       .and.returnValue(Promise.resolve({

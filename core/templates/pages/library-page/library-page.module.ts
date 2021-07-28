@@ -22,8 +22,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
@@ -34,16 +32,17 @@ import { LibraryPageRootComponent } from './library-page-root.component';
 import { LibraryPageComponent } from './library-page.component';
 import { ActivityTilesInfinityGridComponent } from './search-results/activity-tiles-infinity-grid.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
     InfiniteScrollModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     LearnerPlaylistModalComponent,
     LibraryFooterComponent,
     SearchResultsComponent,
@@ -52,7 +51,6 @@ import { SearchResultsComponent } from './search-results/search-results.componen
     LibraryPageRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     LearnerPlaylistModalComponent,
     LibraryFooterComponent,
     SearchResultsComponent,

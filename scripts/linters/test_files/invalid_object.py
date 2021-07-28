@@ -18,8 +18,8 @@
 python_linter_test. This file is inheriting from object which is not allowed.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 
 class FakeClass(object): # Use of object is not allowed.
