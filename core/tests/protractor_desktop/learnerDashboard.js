@@ -195,7 +195,7 @@ describe('Learner dashboard functionality', function() {
     var TOPIC_NAME = 'Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
     var TOPIC_DESCRIPTION = 'Topic description';
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@learnerDashboard1.com', 'learnerDashboard1');
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
