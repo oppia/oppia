@@ -806,7 +806,6 @@ class PlatformParameter(python_utils.OBJECT):
             the object.
         """
         platform_parameter_dict = self.to_dict()
-
         return json.dumps(platform_parameter_dict)
 
     @classmethod
@@ -824,8 +823,5 @@ class PlatformParameter(python_utils.OBJECT):
             object.
         """
         platform_parameter_dict = json.loads(json_string)
-
-        platform_parameter = cls.from_dict(
-            platform_parameter_dict)
-
+        platform_parameter = cls.from_dict(platform_parameter_dict)
         return platform_parameter

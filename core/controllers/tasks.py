@@ -194,7 +194,7 @@ class DeferredTasksHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
-        payload = json.loads(self.request.body.decode())
+        payload = json.loads(self.request.body.decode('utf-8'))
         if 'fn_identifier' not in payload:
             raise Exception(
                 'This request cannot defer tasks because it does not contain a '
