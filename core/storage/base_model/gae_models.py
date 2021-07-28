@@ -472,9 +472,9 @@ class BaseModel(datastore_services.Model):
 
         result = query.order(-cls.last_updated).fetch_page(
             page_size, start_cursor=start_cursor)
-        base_models = cast(List[SELF_BASE_MODEL], result[0])
+        base_model_results = cast(List[SELF_BASE_MODEL], result[0])
         return (
-            base_models,
+            base_model_results,
             (result[1].urlsafe() if result[1] else None),
             result[2])
 
