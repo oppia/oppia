@@ -203,7 +203,8 @@ export class NumericInputValidationService {
   }
   // Returns 'undefined' when no error occurs.
   getErrorString(
-      value: number, customizationArgs: boolean): string | undefined {
+      value: number, customizationArgs: boolean | undefined
+  ): string | undefined {
     let stringValue = null;
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.

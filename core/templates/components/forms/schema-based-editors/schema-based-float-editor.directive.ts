@@ -55,14 +55,15 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
           ctrl.validate = function(localValue) {
+            let { checkinputGreaterThanOrEqualToZero } =
+             ctrl.uiConfig() || {};
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
                 NumericInputValidationService.getErrorString(
-                  localValue,
-                  ctrl.uiConfig().checkinputGreaterThanOrEqualToZero)));
+                  localValue, checkinputGreaterThanOrEqualToZero)));
           };
 
           ctrl.onFocus = function() {
@@ -97,10 +98,10 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
+            let { checkinputGreaterThanOrEqualToZero } = ctrl.uiConfig() || {};
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
-                ctrl.localValue,
-                ctrl.uiConfig().checkinputGreaterThanOrEqualToZero));
+                ctrl.localValue, checkinputGreaterThanOrEqualToZero));
           };
 
           ctrl.onKeypress = function(evt) {
