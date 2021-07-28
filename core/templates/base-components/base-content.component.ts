@@ -81,6 +81,10 @@ export class BaseContentComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.loaderService.onLoadingMessageChange.unsubscribe();
+  }
+
   getHeaderText(): string {
     return this.pageTitleService.getPageTitleForMobileView();
   }
