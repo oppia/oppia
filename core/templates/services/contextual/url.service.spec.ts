@@ -125,6 +125,23 @@ describe('Url Service', () => {
     }).toThrowError('Invalid topic id url');
   });
 
+  it('should correctly retrieve blog post id from url', () => {
+    mockLocation.pathname = '/blog-dashboard#/blog_post_editor/abcdefgijklm';
+    expect(
+      urlService.getBlogPostIdFromUrl()
+    ).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/blog-dashboard#/blog_post_editor/abcdefgij';
+    expect(function() {
+      urlService.getBlogPostIdFromUrl();
+    }).toThrowError('Invalid Blog Post Id.');
+
+    mockLocation.pathname = '/blog-dashboard';
+    expect(function() {
+      urlService.getBlogPostIdFromUrl();
+    }).toThrowError('Invalid Blog Post Id.');
+  });
+
   it('should correctly retrieve story url fragment from url', () => {
     mockLocation.pathname = '/learn/math/abcdefgijklm/story/bakery';
     expect(

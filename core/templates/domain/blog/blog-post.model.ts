@@ -85,7 +85,11 @@ export class BlogPostData {
   }
 
   get tags(): string[] {
-    return this._tags.slice();
+    return this._tags;
+  }
+
+  set tags(tags: string[]) {
+    this._tags = tags;
   }
 
   addTag(tag: string): void {
