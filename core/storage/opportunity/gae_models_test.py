@@ -23,6 +23,12 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
+from typing import Dict, List, Optional, Text, Tuple # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
 (base_models, opportunity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.opportunity])
 
@@ -31,6 +37,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummaryModel class."""
 
     def setUp(self):
+        # type: () -> None
         super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
 
         opportunity_models.ExplorationOpportunitySummaryModel(
@@ -61,12 +68,14 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_all_translation_opportunities(self):
+        # type: () -> None
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(5, None, 'hi'))
@@ -77,6 +86,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_translation_opportunities_pagination(self):
+        # type: () -> None
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
@@ -94,6 +104,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities(self):
+        # type: () -> None
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_voiceover_opportunities(5, None, 'en'))
@@ -104,6 +115,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_all_voiceover_opportunities_pagination(self):
+        # type: () -> None
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_voiceover_opportunities(1, None, 'en'))
@@ -121,6 +133,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(new_cursor, python_utils.BASESTRING))
 
     def test_get_by_topic(self):
+        # type: () -> None
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('topic_id1'))
@@ -134,12 +147,14 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(model_list[0].id, 'opportunity_id2')
 
     def test_get_by_topic_for_non_existing_topic(self):
+        # type: () -> None
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('non_existing_topic_id'))
         self.assertEqual(len(model_list), 0)
 
     def test_delete_all(self):
+        # type: () -> None
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
@@ -159,6 +174,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunityModel class."""
 
     def setUp(self):
+        # type: () -> None
         super(SkillOpportunityModelTest, self).setUp()
 
         opportunity_models.SkillOpportunityModel(
@@ -173,11 +189,13 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             opportunity_models.SkillOpportunityModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_skill_opportunities(self):
+        # type: () -> None
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
             .get_skill_opportunities(5, None))
@@ -188,6 +206,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_get_skill_opportunities_pagination(self):
+        # type: () -> None
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
             .get_skill_opportunities(1, None))
@@ -205,6 +224,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
 
     def test_delete_all_skill_opportunities(self):
+        # type: () -> None
         results, _, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
                 1, None))

@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # p
 MYPY = False
 if MYPY:
     from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
-    from core.domain import feedback_domain
+    from core.domain import feedback_domain  # pragma: no cover
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])

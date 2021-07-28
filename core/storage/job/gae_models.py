@@ -25,6 +25,12 @@ from core.platform import models
 import python_utils
 import utils
 
+from typing import Dict, List, Text # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -44,6 +50,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
+        # type: (Text) -> Text
         """Overwrites superclass method.
 
         Args:
@@ -95,16 +102,19 @@ class JobModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -121,6 +131,7 @@ class JobModel(base_models.BaseModel):
 
     @property
     def is_cancelable(self):
+        # type: () -> bool
         """Checks if the job is cancelable.
 
         Returns:
@@ -131,6 +142,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_recent_jobs(cls, limit, recency_msec):
+        # type: (int, int) -> List[JobModel]
         """Gets at most limit jobs with respect to a time after recency_msec.
 
         Args:
@@ -150,6 +162,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
+        # type: (int) -> List[JobModel]
         """Gets at most `limit` unfinished jobs.
 
         Args:
@@ -165,6 +178,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):
+        # type: (Text) -> datastore_services.Query
         """Gets jobs that are unfinished.
 
         Args:
@@ -179,6 +193,7 @@ class JobModel(base_models.BaseModel):
 
     @classmethod
     def do_unfinished_jobs_exist(cls, job_type):
+        # type: (Text) -> bool
         """Checks if unfinished jobs exist.
 
         Args:

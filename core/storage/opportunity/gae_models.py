@@ -21,6 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
+from typing import Dict, List, Optional, Text, Tuple # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -51,16 +57,19 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -81,6 +90,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     @classmethod
     def get_all_translation_opportunities(
             cls, page_size, urlsafe_start_cursor, language_code):
+        # type: (int, Optional[Text], Text) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -121,6 +131,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     @classmethod
     def get_all_voiceover_opportunities(
             cls, page_size, urlsafe_start_cursor, language_code):
+        # type: (int, Optional[Text], Text) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -159,6 +170,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_by_topic(cls, topic_id):
+        # type: (Text) -> Optional[List[ExplorationOpportunitySummaryModel]]
         """Returns all the models corresponding to the specific topic.
 
         Returns:
@@ -169,6 +181,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def delete_all(cls):
+        # type: () -> None
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
         datastore_services.delete_multi(keys)
@@ -193,16 +206,19 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -211,6 +227,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
+        # type: (int, Optional[Text]) -> Tuple[Optional[List[SkillOpportunityModel]], Optional[Text], bool]
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -245,6 +262,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def delete_all(cls):
+        # type: () -> None
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
         datastore_services.delete_multi(keys)
