@@ -920,12 +920,12 @@ URLS = MAPREDUCE_HANDLERS + [
 ]
 
 # Adding redirects for topic landing pages.
-for subject in feconf.AVAILABLE_LANDING_PAGES:
-    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+for subject in constants.AVAILABLE_LANDING_PAGES:
+    for topic in constants.AVAILABLE_LANDING_PAGES[subject]:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
-                custom_landing_pages.TopicLandingPage))
+                oppia_root.OppiaRootPage))
 
 if constants.DEV_MODE:
     URLS.append(

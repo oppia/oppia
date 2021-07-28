@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the topic landing page.
+ * @fileoverview Routing module for topic landing page.
  */
 
 import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TopicLandingPageComponent } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
+import { Route, RouterModule } from '@angular/router';
 import { TopicLandingPageRootComponent } from './topic-landing-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TopicLandingPageRoutingModule } from './topic-landing-page-routing.module';
+
+const routes: Route[] = [
+  {
+    path: '',
+    component: TopicLandingPageRootComponent
+  }
+];
 
 @NgModule({
   imports: [
-    CommonModule,
-    SharedComponentsModule,
-    TopicLandingPageRoutingModule
+    RouterModule.forChild(routes)
   ],
-  declarations: [
-    TopicLandingPageComponent,
-    TopicLandingPageRootComponent
-  ],
-  entryComponents: [
-    TopicLandingPageComponent,
-    TopicLandingPageRootComponent
+  exports: [
+    RouterModule
   ]
 })
-export class TopicLandingPageModule {}
+
+export class TopicLandingPageRoutingModule {}
