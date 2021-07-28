@@ -175,7 +175,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
@@ -198,7 +198,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
@@ -279,7 +279,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
+          ctrl.currentUserIsCurriculumAdmin = (
+            explorationData.is_curriculum_admin);
           ctrl.currentUserIsModerator = explorationData.is_moderator;
 
           ctrl.currentUser = explorationData.user;
@@ -418,8 +419,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeModalController',
@@ -470,8 +471,8 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',

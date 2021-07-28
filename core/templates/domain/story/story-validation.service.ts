@@ -32,7 +32,7 @@ export class StoryValidationService {
    */
   validatePrerequisiteSkillsInStoryContents(
       topicRelevantSkills: string[], storyContents: StoryContents): string[] {
-    let issues = [];
+    let issues: string[] = [];
     let nodeIds = storyContents.getNodeIds();
     let nodes = storyContents.getNodes();
     // Variable nodesQueue stores the pending nodes to visit in a queue form.
