@@ -28,9 +28,7 @@ import { OppiaAngularRootComponent } from
 
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
-import { CollectionDetailsEditor } from 'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
 import { CollectionNodeEditorComponent } from './editor-tab/collection-node-editor.component';
-import { CollectionPermissionsCard } from 'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
 import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
 import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
@@ -44,14 +42,21 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedComponentsModule
   ],
   declarations: [
-    CollectionDetailsEditor,
+    CollectionNodeCreatorComponent,
+    CollectionEditorNavbarBreadcrumbComponent,
+    CollectionEditorNavbarComponent,
+    CollectionDetailsEditorComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
-    CollectionPermissionsCard,
+    CollectionPermissionsCardComponent,
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent
   ],
   entryComponents: [
+    CollectionNodeCreatorComponent,
+    CollectionEditorNavbarBreadcrumbComponent,
+    CollectionEditorNavbarComponent,
+    CollectionDetailsEditorComponent,
     CollectionHistoryTabComponent,
     CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,
@@ -78,6 +83,11 @@ class CollectionEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { CollectionDetailsEditorComponent } from './settings-tab/collection-details-editor.component';
+import { CollectionPermissionsCardComponent } from './settings-tab/collection-permissions-card.component';
+import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-editor-navbar-breadcrumb.component';
+import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
+import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

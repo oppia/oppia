@@ -40,7 +40,7 @@ require('base-components/base-content.component.ts');
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
   'pages/collection-editor-page/navbar/' +
-  'collection-editor-navbar-breadcrumb.directive.ts');
+  'collection-editor-navbar-breadcrumb.component.ts');
 require(
   'pages/collection-editor-page/navbar/' +
-  'collection-editor-navbar.directive.ts');
+  'collection-editor-navbar.component.ts');

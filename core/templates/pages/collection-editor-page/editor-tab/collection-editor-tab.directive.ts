@@ -18,7 +18,7 @@
 
 require(
   'pages/collection-editor-page/editor-tab/' +
-  'collection-node-creator.directive.ts');
+  'collection-node-creator.component.ts');
 require(
   'pages/collection-editor-page/editor-tab/' +
   'collection-node-editor.component.ts');

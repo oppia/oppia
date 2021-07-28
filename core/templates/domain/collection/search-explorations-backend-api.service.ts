@@ -30,6 +30,7 @@ import {
   ExplorationMetaDataBackendDict,
   ExplorationMetadata
 } from 'domain/exploration/exploration-metadata.model';
+import { Observable } from 'rxjs';
 
 interface SearchExplorationBackendResponse {
   'collection_node_metadata_list': ExplorationMetaDataBackendDict[];
@@ -76,6 +77,18 @@ export class SearchExplorationsBackendApiService {
     return new Promise((resolve, reject) => {
       this._fetchExplorations(searchQuery, resolve, reject);
     });
+  }
+
+  fetchExplorationsAsObservable(
+      searchQuery: string
+  ): Observable<SearchExplorationBackendResponse> {
+    let queryUrl = this.urlInterpolationService.interpolateUrl(
+      LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
+        query: btoa(searchQuery)
+      }
+    );
+    return this.http.get<SearchExplorationBackendResponse>(
+      queryUrl);
   }
 }
 

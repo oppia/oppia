@@ -28,6 +28,8 @@ require('services/contextual/url.service.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require(
+  'pages/collection-editor-page/services/collection-editor-routing.service.ts');
 
 angular.module('oppia').directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -39,11 +41,11 @@ angular.module('oppia').directive('collectionEditorPage', [
         '/pages/collection-editor-page/collection-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', 'CollectionEditorStateService', 'PageTitleService',
-        'RouterService', 'UrlService',
+        '$rootScope', 'CollectionEditorRoutingService',
+        'CollectionEditorStateService', 'PageTitleService', 'UrlService',
         function(
-            $rootScope, CollectionEditorStateService, PageTitleService,
-            RouterService, UrlService) {
+            $rootScope, CollectionEditorRoutingService,
+            CollectionEditorStateService, PageTitleService, UrlService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var setTitle = function() {
@@ -58,12 +60,17 @@ angular.module('oppia').directive('collectionEditorPage', [
           };
 
           ctrl.getActiveTabName = function() {
-            return RouterService.getActiveTabName();
+            return CollectionEditorRoutingService.getActiveTabName();
           };
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
               CollectionEditorStateService.onCollectionInitialized.subscribe(
                 () => setTitle()
+              )
+            );
+            ctrl.directiveSubscriptions.add(
+              CollectionEditorRoutingService.updateViewEventEmitter.subscribe(
+                () => $rootScope.$applyAsync()
               )
             );
             // Load the collection to be edited.

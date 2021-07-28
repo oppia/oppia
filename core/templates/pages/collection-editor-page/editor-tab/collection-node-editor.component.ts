@@ -23,6 +23,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { CollectionNode } from 'domain/collection/collection-node.model';
 import { Collection } from 'domain/collection/collection.model';
 import { AlertsService } from 'services/alerts.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
 import { CollectionLinearizerService } from '../services/collection-linearizer.service';
 
@@ -40,7 +41,8 @@ export class CollectionNodeEditorComponent implements OnInit {
   constructor(
     private collectionLinearizerService: CollectionLinearizerService,
     private alertsService: AlertsService,
-    private collectionEditorStateService: CollectionEditorStateService
+    private collectionEditorStateService: CollectionEditorStateService,
+    private windowRef: WindowRef
   ) {}
 
   // Deletes this collection node from the frontend collection
