@@ -57,11 +57,11 @@ angular.module('oppia').component('skillConceptCardEditor', {
     'WindowDimensionsService', 'WorkedExampleObjectFactory',
     'COMPONENT_NAME_WORKED_EXAMPLE',
     function(
-      $filter, $scope, $uibModal,
-      GenerateContentIdService, PageTitleService, SkillEditorStateService,
-      SkillUpdateService, UrlInterpolationService,
-      WindowDimensionsService, WorkedExampleObjectFactory,
-      COMPONENT_NAME_WORKED_EXAMPLE) {
+        $filter, $scope, $uibModal,
+        GenerateContentIdService, PageTitleService, SkillEditorStateService,
+        SkillUpdateService, UrlInterpolationService,
+        WindowDimensionsService, WorkedExampleObjectFactory,
+        COMPONENT_NAME_WORKED_EXAMPLE) {
       var ctrl = this;
 
       $scope.getStaticImageUrl = function(imagePath) {
