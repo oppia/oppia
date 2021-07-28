@@ -1,0 +1,284 @@
+<div class="blog-post-editor row">
+  <mat-card class="editor-field-card col-sm-8 ml-auto">
+    <div class="blog-post-thumbnail d-flex"
+         (mouseover)="showAddImageIcon=true"
+         (mouseleave)="showAddImageIcon=false"
+         (click)="showuploadThumbnailModal()"
+         tabindex="0">
+      <img mat-card-image
+           class="position-absolute"
+           *ngIf="thumbnailDataUrl"
+           [src]="thumbnailDataUrl"
+           aria-label="Blog Post thumbnail">
+      <div *ngIf="showAddImageIcon" class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
+        <mat-icon class="mx-auto">panorama</mat-icon>
+        <span class="mat-card-title">{{ "'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate" }}</span>
+      </div>
+    </div>
+    <div class="blog-post-title d-flex">
+      <div class="title-heading col-sm-2 mr-2 mb-auto text-center">
+        <span class="vertical-sub-align">{{ "'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase" }}</span>
+      </div>
+      <div class="d-block flex-grow-1">
+        <input class="form-control required general-text-format"
+               [(ngModel)]="blogPostData.title"
+               [ngClass]="{'blog-title-input-field': blogPostData.title !== ''}"
+               maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
+               aria-label="Title"
+               (focusout)="updateLocalTitleValue()"               
+               autofocus>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            Blog Post title should be at most {{MAX_CHARS_IN_BLOG_POST_TITLE}} characters.
+          </em>
+        </span>
+      </div>
+    </div>
+    <div class="blog-post-content d-flex mt-2">
+      <div class="title-heading col-sm-2 mr-2 mb-auto text-center">
+        <span class="vertical-sub-align">{{ "'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase" }}</span>
+      </div>
+      <div class="d-block flex-grow-1">
+        <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="blog-post-content-button">
+          <div class="oppia-editable-section-mask">
+          <angular-html-bind-wrapper [htmlData]="this.blogPostData.content">
+          </angular-html-bind-wrapper>
+          </div>
+        </div>
+        <div *ngIf="contentEditorIsActive">
+          <schema-based-editor *ngIf="contentEditorIsActive"
+                               [schema]="getSchema.bind(this)"
+                               [headersEnabled]="headersAreEnabledCallBack.bind(this)"
+                               [localValue]="this.blogPostData.content"
+                               (localValueChange)="this.updateLocalEdittedContent($event)">
+          </schema-based-editor>
+          <div class="mt-2">
+            <button mat-button
+                    class="btn btn-success oppia-save-state-item-button float-right"
+                    (click)="updateContentValue()"
+                    aria-label="Button to save entered content.">
+              {{ "'I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT' | translate | uppercase" }}
+            </button>
+            <button mat-button class="btn delete-button float-right" (click)="cancelEdit()">
+              {{ "'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate | uppercase" }}
+            </button>
+            <div class="oppia-clear"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+  <mat-card class="editor-profile-card col-sm-2 mr-auto">
+    <mat-card-header class="d-block">
+      <div mat-card-avatar class="author-profile mx-auto">
+        <img mat-card-avatar
+             class="profile-image"
+             [src]="authorProfilePictureUrl"
+             alt="Profile image of the author of the blog post.">
+        <span class="author-username text-center general-text-format">
+          {{ authorUsername }}
+        </span>
+      </div>
+      <div class="mat-card-header-text d-block mx-0 mt-3">
+        <mat-card-title class="general-text-format">
+          {{ blogPostData.title }}
+        </mat-card-title>
+        <mat-card-subtitle class="sub-text general-text-format">
+          {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
+        </mat-card-subtitle>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="text-center">
+      <mat-card-actions>
+        <button mat-button class="mx-2 my-2"
+                [disabled]="blogPostData.validate().length > 0"
+                (click)="saveDraft()"
+                aria-label="Save blog post as draft.">
+          {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }}
+        </button>
+        <button mat-button class="mx-2 my-2"
+                [disabled]="blogPostData.prepublishValidate(maxAllowedTags).length > 0"
+                (click)="publishBlogPost()"
+                aria-label="Publish blog post.">
+          {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }}
+        </button>
+        <div class="mt-4 text-left">
+          <span class="tag-heading general-text-format">
+            {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
+          </span>
+          <span class="sub-text tag-limit-text general-text-format">
+            {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
+          </span>
+        </div>
+        <mat-button-toggle-group aria-label="Tags to classify blog post."
+                                 [value]="blogPostData.tags"
+                                 *ngFor="let tag of defaultTagsList"
+                                 multiple="true"
+                                 class="mx-2 my-2 tag">
+          <mat-button-toggle  class="text-wrap" (change)="onTagChange($event.value)">
+            {{ tag }}
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        <button mat-button 
+                class="d-block delete-button mx-auto my-0"
+                (click)="deleteBlogPost()"
+                aria-label="Delete blog post.">
+          {{ 'I18N_BLOG_POST_EDITOR_DELETE_BUTTON' | translate | uppercase }}
+        </button>
+      </mat-card-actions>
+    </mat-card-content>
+  </mat-card>
+</div>
+<style>
+  .blog-post-editor {
+    padding: 10px 50px;
+  }
+
+  .mat-card {
+    margin: 10px
+  }
+
+  .author-username {
+    color: #333;
+    display: block;
+    font: normal normal normal 1.8rem/2.1rem Roboto;
+  }
+
+  .mat-card-avatar.author-profile {
+    text-align: center;
+    height: unset;
+    width: unset;
+  }
+
+  .mat-card-avatar.profile-image {
+    height: 3.750vw;
+    min-height: 48px;
+    min-width: 48px;
+    width: 3.750vw;
+  }
+
+  .general-text-format {
+    font-family: 'Roboto', Arial, sans-serif;
+    text-align: left;
+  }
+
+  .mat-card-title {
+    color: #333;
+    font: normal normal bold 1.6rem/1.9rem Roboto;
+  }
+
+  .sub-text {
+    color: #555;
+    font: italic normal normal 1.2rem/1.4rem Roboto;
+    margin: 0
+  }
+
+  .tag-heading {
+    color: #333;
+    font: normal normal bold 2.0rem/2.4rem Roboto;
+  }
+
+  .tag-limit-text {
+    color: #555;
+  }
+
+  .tag {
+    color: #555555;
+    font: normal normal normal 1.6rem/1.9rem Roboto;
+    line-height: 0;
+    border: 1px solid #333333;
+    border-radius: 2px;
+  }
+
+  .mat-button {
+    background-color: #00609C;
+    height: 2.813vw;
+    width: 13.438vw;
+    color: white;
+    line-height: unset;
+  }
+
+  .mat-button:disabled {
+    letter-spacing: 0px;
+    color: #00000061;
+    background-color: #00000061;
+    opacity: 1;
+  }
+
+  .delete-button {
+    background-color: #FFF;
+    color: #333;
+  }
+
+  .tag /deep/ .mat-button-toggle-label-content {
+    line-height: 19px;
+  }
+
+  .tag /deep/ .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+    padding: 0 2px;
+  }
+
+  .blog-title-input-field {
+    font: normal normal bold 28px/33px Roboto;
+    color: #333;
+    border:#FFF;
+    height: unset;
+    padding: 0;
+  }
+
+  .blog-title-input-field:focus {
+    border:1px solid #ced4da;
+    height: calc(1.5em + 0.75rem + 2px);
+  }
+
+  .title-heading {
+    color: #555;
+    font: normal normal normal 1.6rem/1.9rem Roboto;
+    height: 28px;
+    border-right: 2px solid #999;
+  }
+
+  .vertical-sub-align {
+    vertical-align: sub;
+  }
+
+  .blog-post-thumbnail:first-child {
+    height: 15.625vw;
+    width: calc(100% + 32px);
+    background-color: #AAAAAA99;
+    margin: -16px -16px 16px -16px;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+  }
+
+  .mat-card-image:first-child {
+    margin: 0;
+    object-fit: cover;
+    height: 15.625vw;
+    width: calc(100%)
+  }
+
+  .mat-icon {
+    font-size: 4.4rem;
+    height: unset;
+    width: unset;
+  }
+
+  .mat-button-toggle-checked {
+    background-color: aqua;
+  }
+
+  @media(max-width: 920px) {
+    .editor-profile-card.col-sm-2 {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+
+    .mat-button {
+      width: 12vw;
+    }
+  }
+
+  @media(max-width: 768px) {}
+
+</style>

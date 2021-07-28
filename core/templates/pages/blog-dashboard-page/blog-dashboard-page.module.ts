@@ -19,6 +19,7 @@
 import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -28,12 +29,13 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
+import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
 import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
 import { BlogDashboardTileComponent } from './blog-dashboard-tile/blog-dashboard-tile.component';
 import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
-
+import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 declare var angular: ng.IAngularStatic;
 
 @NgModule({
@@ -42,23 +44,26 @@ declare var angular: ng.IAngularStatic;
     HttpClientModule,
     SharedComponentsModule,
     MatTabsModule,
-    MatMenuModule
+    MatMenuModule,
+    MatButtonToggleModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
+    BlogPostActionConfirmationModalComponent,
+    UploadBlogPostThumbnailComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
+    BlogPostActionConfirmationModalComponent,
+    UploadBlogPostThumbnailComponent
   ],
   providers: [
     {

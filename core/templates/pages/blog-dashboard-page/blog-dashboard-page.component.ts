@@ -54,6 +54,9 @@ export class BlogDashboardPageComponent implements OnInit {
       this.blogDashboardPageService.updateViewEventEmitter.subscribe(
         () => {
           this.activeTab = this.blogDashboardPageService.activeTab;
+          if (this.activeTab === 'main') {
+            this.initMainTab();
+          }
         }
       )
     );
@@ -84,7 +87,7 @@ export class BlogDashboardPageComponent implements OnInit {
       (blogPostId) => {
         this.blogDashboardPageService.navigateToEditorTabWithId(blogPostId);
       }
-    )
+    );
   }
 }
 
