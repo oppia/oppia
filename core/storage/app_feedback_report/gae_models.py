@@ -34,6 +34,8 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
+# The model field names that we will want to filter for when maintainers parse
+# the feedback reports.
 FILTER_FIELD_NAMES = python_utils.create_enum(
     'platform', 'report_type', 'entry_point', 'submitted_on',
     'android_device_model', 'android_sdk_version', 'text_language_code',
@@ -268,7 +270,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         datetime_now = datetime.datetime.utcnow()
         datetime_before_which_to_scrub = datetime_now - (
-            feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
+            feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN +
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
         # the latter throws "Cannot filter a non-Node argument; received False".
@@ -311,6 +313,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 FILTER_FIELD_NAMES.android_device_country_locale_code):
             filter_values = [
                 model.android_device_country_locale_code for model in query]
+        else:
+            raise utils.InvalidInputException(
+                'The field %s is not a valid field to filter reports on' % (
+                    filter_field.name))
         return filter_values
 
     @staticmethod
@@ -429,7 +435,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         required=True, indexed=True,
         choices=PLATFORM_CHOICES)
     # The Github repository that has the associated issue for this ticket. The
-    # possible values correspond to GITHUB_REPO_CHOICES.
+    # possible values correspond to GITHUB_REPO_CHOICES. If None then the
+    # ticket has not yet been assigned to a Github issue.
     github_issue_repo_name = datastore_services.StringProperty(
         required=False, indexed=True,
         choices=GITHUB_REPO_CHOICES)
@@ -439,8 +446,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # Whether this ticket has been archived.
     archived = datastore_services.BooleanProperty(required=True, indexed=True)
     # The datetime in UTC that the newest report in this ticket was created on,
-    # to help with sorting tickets. If the last report was removed from this
-    # ticket then the timestamp is None.
+    # to help with sorting tickets. If all reports for this ticket have been
+    # reassigned to a different ticketn then this timestamp is None.
     newest_report_timestamp = datastore_services.DateTimeProperty(
         required=False, indexed=True)
     # A list of report IDs associated with this ticket.

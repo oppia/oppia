@@ -42,7 +42,6 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
-    EXP_1_ID = 'exp_1_id'
 
     PLATFORM_ANDROID = 'android'
     PLATFORM_WEB = 'web'
@@ -50,9 +49,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615519337)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TIMESTAMP_AT_MAX_DAYS = datetime.datetime.utcnow() - (
-        feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS)
+        feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN)
     TIMESTAMP_OVER_MAX_DAYS = datetime.datetime.utcnow() - (
-        feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
+        feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN +
         datetime.timedelta(days=2))
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(
@@ -1206,7 +1205,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         # Values from the model dict are read as strings in the assertion.
         expected_report_dict = {
             'user_feedback_selected_items': [],
-            'user_feedback_other_text_input': None,
+            'user_feedback_other_text_input': '',
             'event_logs': [],
             'logcat_logs': [],
             'package_version_code': '1',
@@ -1308,16 +1307,18 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self._verify_report_is_scrubbed(
             scrubbed_android_model, self.user_id)
 
+        self.signup('user2@test.com', 'user2') # type: ignore[no-untyped-call]
+        different_user = self.get_user_id_from_email('user2@test.com') # type: ignore[no-untyped-call]
         to_scrub_report_id = (
             self._add_expiring_android_report_with_no_scrubber())
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
-            'different_user')
+            different_user)
 
         newly_scrubbed_model = (
             app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 to_scrub_report_id))
         self._verify_report_is_scrubbed(
-            newly_scrubbed_model, 'different_user')
+            newly_scrubbed_model, different_user)
         # Check that the originally-scrubbed model is still valid.
         self._verify_report_is_scrubbed(
             scrubbed_android_model, self.user_id)

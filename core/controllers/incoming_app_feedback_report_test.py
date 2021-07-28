@@ -16,8 +16,8 @@
 
 """Tests for the controller managing incoming feedback reports."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -68,7 +68,7 @@ REPORT_JSON = {
     'user_supplied_feedback': {
         'report_type': 'suggestion',
         'category': 'language_suggestion',
-        'user_feedback_selected_items': None,
+        'user_feedback_selected_items': [],
         'user_feedback_other_text_input': 'french'
     }
 }

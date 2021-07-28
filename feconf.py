@@ -221,7 +221,7 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
 # The maximum number of days a feedback report can be saved in storage before it
 # must be scrubbed.
-APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS = datetime.timedelta(days=90)
+APP_FEEDBACK_REPORT_MAX_LIFESPAN = datetime.timedelta(days=90)
 
 # The minimum version of the Android feedback report info blob schema.
 MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
@@ -857,7 +857,7 @@ IMPROVEMENTS_URL_PREFIX = '/improvements'
 IMPROVEMENTS_HISTORY_URL_PREFIX = '/improvements/history'
 IMPROVEMENTS_CONFIG_URL_PREFIX = '/improvements/config'
 INCOMING_ANDROID_FEEDBACK_REPORT_URL = (
-    '/app_feedback_report/incoming_android_report')
+    '/appfeedbackreporthandler/incoming_android_report')
 LEARNER_ANSWER_INFO_HANDLER_URL = (
     '/learneranswerinfohandler/learner_answer_details')
 LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'

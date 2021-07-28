@@ -435,7 +435,7 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
             job.
     """
     report.scrubbed_by = scrubbed_by
-    report.user_supplied_feedback.user_feedback_other_text_input = None
+    report.user_supplied_feedback.user_feedback_other_text_input = ''
     if report.platform == PLATFORM_ANDROID:
         report.app_context = cast(
             app_feedback_report_domain.AndroidAppContext, report.app_context)
@@ -457,6 +457,7 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
         raise utils.InvalidInputException(
             'Web report domain objects have not been defined.')
 
+    report.validate()
     user_supplied_feedback = report.user_supplied_feedback
     device_system_context = cast(
         app_feedback_report_domain.AndroidDeviceSystemContext,

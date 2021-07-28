@@ -14,15 +14,13 @@
 
 """Controllers for the incoming app feedback reports."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import app_feedback_report_domain
 from core.domain import app_feedback_report_services
-
-import feconf
 
 from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
@@ -43,48 +41,19 @@ class IncomingAndroidFeedbackReportHandler(base.BaseHandler):
         }
     }
 
-    @acl_decorators.open_access
+    @acl_decorators.is_from_oppia_android
     def post(self): # type: ignore[no-untyped-def]
         """Handles POST requests.
 
         Verifies that the incoming message is from Oppia Android based on the
         request header and stores the feedback report.
         """
-        if not self._has_valid_android_request_headers(self.request.headers):
-            raise self.UnauthorizedUserException(
-                'The incoming request does not have valid authentication for '
-                'Oppia Android.')
-
         report_dict = self.payload.get('report')
         report_obj = (
             app_feedback_report_services.create_report_from_json(
                 report_dict))
-        report_obj.validate()
         app_feedback_report_services.save_feedback_report_to_storage(
             report_obj, new_incoming_report=True)
         app_feedback_report_services.store_incoming_report_stats(report_obj)
 
         return self.render_json({}) # type: ignore[no-untyped-call]
-
-    def _has_valid_android_request_headers(self, headers):
-         # type: (Dict[Text, Text]) -> bool
-        """Verifies the headers from the incoming request.
-
-        Args:
-            headers: dict. The headers to validate from the request.
-
-        Returns:
-            bool. Whether the request headers are valid and correspond to the
-            expected header values for Android requests.
-        """
-        api_key = headers['api_key']
-        app_package_name = headers['app_package_name']
-        app_version_name = headers['app_version_name']
-        app_version_code = headers['app_version_code']
-        if (
-                api_key != feconf.ANDROID_API_KEY or
-                app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or
-                app_version_name != feconf.ANDROID_APP_VERSION_NAME or
-                app_version_code != feconf.ANDROID_APP_VERSION_CODE):
-            return False
-        return True
