@@ -40,9 +40,8 @@ module.exports = async(browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
-  if (context.url.includes('admin')) {
-    await login(context, page);
-  } else if (context.url.includes('moderator')) {
+  await login(context, page);
+  if (context.url.includes('moderator')) {
     await setRole(page, 'MODERATOR');
   } else if (context.url.includes('emaildashboard')) {
     await setRole(page, 'ADMIN');
