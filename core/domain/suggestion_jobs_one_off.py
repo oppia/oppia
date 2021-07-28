@@ -206,18 +206,28 @@ class TranslationSuggestionSvgDiagramOneOffJob(
             return
 
         suggestion = suggestion_services.get_suggestion_from_model(item)
-        suggestion.change.translation_html = (
-            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+        html_contains_svgdiagram = (
+            html_validation_service.check_for_svgdiagram_component_in_html(
                 suggestion.change.translation_html))
-        item.change_cmd = suggestion.change.to_dict()
-        item.update_timestamps(update_last_updated_time=False)
-        item.put()
-        yield (
-            'UPDATED', '%s | %s' % (item.id, suggestion.change.content_id))
+        if html_contains_svgdiagram:
+            suggestion.change.translation_html = (
+                html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                    suggestion.change.translation_html))
+            item.change_cmd = suggestion.change.to_dict()
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
+            yield (
+                'UPDATED', '%s | %s' % (item.id, suggestion.change.content_id))
+        else:
+            yield ('SKIPPED', item.id)
 
     @staticmethod
     def reduce(key, value):
-        yield (key, value)
+        if key == 'SKIPPED':
+            count_of_skipped_suggestions = len(value)
+            yield (key, count_of_skipped_suggestions)
+        else:
+            yield (key, value)
 
 
 class PopulateTranslationContributionStatsOneOffJob(

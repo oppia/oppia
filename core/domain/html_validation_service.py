@@ -486,20 +486,19 @@ def get_invalid_svg_tags_and_attrs(svg_string):
     return (invalid_elements, invalid_attrs)
 
 
-def check_for_math_component_in_html(html_string):
-    """Checks for existence of Math component tags inside an HTML string.
+def check_for_svgdiagram_component_in_html(html_string):
+    """Checks for existence of SvgDiagram component tags inside an HTML string.
 
     Args:
         html_string: str. HTML string to check.
 
     Returns:
-        str. Updated HTML string with all Math component tags having the new
-        attribute.
+        bool. Whether the given HTML string contains SvgDiagram component tag.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    math_tags = soup.findAll(name='oppia-noninteractive-math')
-    return bool(math_tags)
+    svgdiagram_tags = soup.findAll(name='oppia-noninteractive-svgdiagram')
+    return bool(svgdiagram_tags)
 
 
 def get_latex_strings_without_svg_from_html(html_string):

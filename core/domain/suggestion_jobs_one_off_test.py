@@ -602,6 +602,54 @@ class TranslationSuggestionSvgDiagramOneOffJobTests(
             'filepath-with-value=\'\"img1.svg\"\'>'
             '</oppia-noninteractive-image>')
 
+    def test_skips_modifying_suggestions_without_svgdiagram_tag(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'bn',
+            'content_html': '',
+            'translation_html': (
+                '<oppia-noninteractive-image '
+                'filename-with-value="&quot;img1.svg&quot;"'
+                ' alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>'
+            ),
+            'data_format': 'html'
+        }
+
+        valid_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        self.assertEqual(
+            valid_suggestion.change.translation_html,
+            '<oppia-noninteractive-image '
+            'filename-with-value="&quot;img1.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+
+        expected_output = [u'[u\'SKIPPED\', 1]']
+        self._run_job_and_verify_output(expected_output)
+
+        valid_suggestion = suggestion_services.get_suggestion_by_id(
+            valid_suggestion.suggestion_id)
+        self.assertEqual(
+            valid_suggestion.change.translation_html,
+            '<oppia-noninteractive-image '
+            'filename-with-value="&quot;img1.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+
 
 class PopulateTranslationContributionStatsOneOffJobTests(
         test_utils.GenericTestBase):
