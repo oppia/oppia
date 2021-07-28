@@ -60,7 +60,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
-                NumericInputValidationService.getErrorString(localValue)));
+                NumericInputValidationService.getErrorString(
+                  localValue, ctrl.uiConfig().checkInputGreaterThanZero)));
           };
 
           ctrl.onFocus = function() {
@@ -96,7 +97,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
 
           ctrl.generateErrors = function() {
             ctrl.errorString = (
-              NumericInputValidationService.getErrorString(ctrl.localValue));
+              NumericInputValidationService.getErrorString(
+                ctrl.localValue, ctrl.uiConfig().checkInputGreaterThanZero));
           };
 
           ctrl.onKeypress = function(evt) {

@@ -200,7 +200,8 @@ export class NumericInputValidationService {
     return warningsList;
   }
   // Returns 'undefined' when no error occurs.
-  getErrorString(value: number): string | undefined {
+  getErrorString(
+      value: number, customizationArgs: boolean): string | undefined {
     let stringValue = null;
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.
@@ -228,7 +229,11 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    if (stringValueRegExp === null || stringValueRegExp.length > 15) {
+    if (customizationArgs === true && customizationArgs !== undefined &&
+      (stringValueRegExp === null || stringValueRegExp.length > 15)) {
+      return 'The answer should be greater than or equal to zero and ' +
+      'can contain at most 15 digits (0-9) or symbols(.).';
+    } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
       return 'The answer can contain at most 15 digits (0-9) or symbols ' +
         '(. or -).';
     }

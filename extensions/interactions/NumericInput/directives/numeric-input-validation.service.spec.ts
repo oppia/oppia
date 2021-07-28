@@ -337,18 +337,31 @@ describe('NumericInputValidationService', () => {
 
 
   it('should generate errors in the given input', () => {
-    expect(validatorService.getErrorString(1200000000E+27)).toEqual(
+    expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
       'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(1200000000E-27)).toEqual(
+    expect(validatorService.getErrorString(1200000000E-27, false)).toEqual(
       'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
-    expect(validatorService.getErrorString(999999999999999)).toEqual(
+    expect(validatorService.getErrorString(999999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(99.9999999999999)).toEqual(
+    expect(validatorService.getErrorString(99.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(-9.9999999999999)).toEqual(
+    expect(validatorService.getErrorString(-9.9999999999999, false)).toEqual(
       undefined);
-    expect(validatorService.getErrorString(2.2)).toEqual(undefined);
-    expect(validatorService.getErrorString(-2.2)).toEqual(undefined);
-    expect(validatorService.getErrorString(34.56)).toEqual(undefined);
+    expect(validatorService.getErrorString(2.2, false)).toEqual(undefined);
+    expect(validatorService.getErrorString(-2.2, false)).toEqual(undefined);
+    expect(validatorService.getErrorString(34.56, false)).toEqual(undefined);
+    expect(validatorService.getErrorString(1200000000E+27, true)).toEqual(
+      'The answer should be greater than or equal to zero andcan contain' +
+      ' at most 15 digits (0-9) or symbols(.).');
+    expect(validatorService.getErrorString(1200000000E-27, true)).toEqual(
+      'The answer should be greater than or equal to zero andcan contain' +
+      ' at most 15 digits (0-9) or symbols(.).');
+    expect(validatorService.getErrorString(999999999999999, true)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(99.9999999999999, true)).toEqual(
+      undefined);
+    expect(validatorService.getErrorString(-9.9999999999999, true)).toEqual(
+      'The answer should be greater than or equal to zero andcan contain' +
+      ' at most 15 digits (0-9) or symbols(.).');
   });
 });

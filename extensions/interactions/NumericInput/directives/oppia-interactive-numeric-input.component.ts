@@ -58,7 +58,7 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== '' &&
       isUndefined(
         this.numericInputValidationService.getErrorString(
-          this.answer)));
+          this.answer, this.inputGreaterThanZero)));
   }
 
   submitAnswer(answer: number): void {
@@ -102,6 +102,7 @@ export class InteractiveNumericInput implements OnInit {
       this.savedSolution !== undefined ?
       this.savedSolution : ''
     );
+    this.inputGreaterThanZero = inputGreaterThanZero.value;
     this.labelForFocusTarget = this.labelForFocusTarget || null;
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
