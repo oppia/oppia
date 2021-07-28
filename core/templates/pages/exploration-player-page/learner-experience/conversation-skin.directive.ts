@@ -465,7 +465,6 @@ angular.module('oppia').directive('conversationSkin', [
               return false;
             }
             var interaction = $scope.displayedCard.getInteraction();
-
             if (INTERACTION_SPECS[interaction.id].is_linear) {
               return false;
             }
