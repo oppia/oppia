@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +55,6 @@ import { Voiceover } from 'domain/exploration/voiceover.model';
 import { ConceptCardBackendDict, ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { FatigueDetectionService } from '../services/fatigue-detection.service';
-import { NumberAttemptsService } from '../services/number-attempts.service';
 import { RefresherExplorationConfirmationModalService } from '../services/refresher-exploration-confirmation-modal.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryChapterCompletionResponse, StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
@@ -64,20 +63,15 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { ExplorationRecommendationsService } from '../services/exploration-recommendations.service';
 import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
 
-fdescribe('Conversation skin directive', function() {
+describe('Conversation skin directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
   let $timeout = null;
   let $compile = null;
   let $window = null;
-  let $http = null;
   let $httpBackend = null;
   let directive = null;
-  let UndoRedoService = null;
-  let $uibModal = null;
-  let SkillEditorRoutingService = null;
-  let SkillEditorStateService = null;
   let learnerAnswerInfoService: LearnerAnswerInfoService = null;
   let focusManagerService: FocusManagerService = null;
 
@@ -112,7 +106,6 @@ fdescribe('Conversation skin directive', function() {
   let conceptCardObjectFactory: ConceptCardObjectFactory = null;
   let conceptCardBackendApiService: ConceptCardBackendApiService = null;
   let fatigueDetectionService: FatigueDetectionService = null;
-  let numberAttemptsService: NumberAttemptsService = null;
   let refresherExplorationConfirmationModalService:
     RefresherExplorationConfirmationModalService = null;
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;
@@ -152,7 +145,7 @@ fdescribe('Conversation skin directive', function() {
       replace: jasmine.createSpy('replace'),
       reload: function() {}
     },
-    addEventListener:() => {},
+    addEventListener: () => {},
     scrollTo: function() {},
     event: {
       returnValue: ''
@@ -184,16 +177,10 @@ fdescribe('Conversation skin directive', function() {
     $scope = $rootScope.$new();
     $window = $injector.get('$window');
     $compile = $injector.get('$compile');
-    $http = $injector.get('$http');
     $httpBackend = $injector.get('$httpBackend');
-    $uibModal = $injector.get('$uibModal');
-    UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('conversationSkinDirective')[0];
-    SkillEditorStateService = $injector.get('SkillEditorStateService');
-    SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     focusManagerService = $injector.get('FocusManagerService');
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
-
     urlService = $injector.get('UrlService');
     userService = $injector.get('UserService');
     readOnlyCollectionBackendApiService = $injector.get(
@@ -211,7 +198,8 @@ fdescribe('Conversation skin directive', function() {
       'GuestCollectionProgressService');
     writtenTranslationsObjectFactory = $injector.get(
       'WrittenTranslationsObjectFactory');
-    audioTranslationLanguageService = $injector.get('AudioTranslationLanguageService');
+    audioTranslationLanguageService = $injector.get(
+      'AudioTranslationLanguageService');
     statsReportingService = $injector.get('StatsReportingService');
     alertsService = $injector.get('AlertsService');
     contentTranslationManagerService = $injector.get(
@@ -232,7 +220,6 @@ fdescribe('Conversation skin directive', function() {
     conceptCardBackendApiService = $injector.get(
       'ConceptCardBackendApiService');
     fatigueDetectionService = $injector.get('FatigueDetectionService');
-    numberAttemptsService = $injector.get('NumberAttemptsService');
     refresherExplorationConfirmationModalService = $injector.get(
       'RefresherExplorationConfirmationModalService');
     storyViewerBackendApiService = $injector.get(
@@ -511,7 +498,7 @@ fdescribe('Conversation skin directive', function() {
       }
     };
 
-    interactionDict3 =  {
+    interactionDict3 = {
       id: 'EndExploration',
       answer_groups: [],
       default_outcome: {
@@ -642,7 +629,7 @@ fdescribe('Conversation skin directive', function() {
       RecordedVoiceovers.createEmpty(),
       writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
-    
+
     sampleState = stateObjectFactory.createFromBackendDict(
       'stateName', stateDict);
 
@@ -680,7 +667,7 @@ fdescribe('Conversation skin directive', function() {
     let element = angular.element(
       '<html><body><div class="conversation-skin-main-tutor-card">' +
       '</div></body></html>');
-    angular.element(document.body).append(element)
+    angular.element(document.body).append(element);
     $compile(element)($scope);
     $rootScope.$digest();
   }));
@@ -693,10 +680,10 @@ fdescribe('Conversation skin directive', function() {
     it('should set properties successfully', function() {
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
-  
+
       ctrl.$onInit();
       onAnswerChangedEventEmitter.emit();
-  
+
       expect($scope.userRating).toBe('userRating');
     });
 
@@ -710,21 +697,21 @@ fdescribe('Conversation skin directive', function() {
 
       ctrl.$onInit();
       onHintConsumedEventEmitter.emit();
-  
+
       expect(hintConsumedSpy).toHaveBeenCalled();
     });
 
     it('should show user that solution has been shown ' +
       'when user has already requested for solution', function() {
-      spyOnProperty(hintsAndSolutionManagerService,
-        'onSolutionViewedEventEmitter')
+      spyOnProperty(
+        hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
         .and.returnValue(onSolutionViewedEventEmitter);
       let hintConsumedSpy = spyOn(
         QuestionPlayerStateService, 'solutionViewed').and.returnValue(null);
-  
+
       ctrl.$onInit();
       onSolutionViewedEventEmitter.emit();
-  
+
       expect(hintConsumedSpy).toHaveBeenCalled();
     });
 
@@ -741,10 +728,11 @@ fdescribe('Conversation skin directive', function() {
 
     it('should call success alert message when ' +
       'rating is updated successfully', function() {
-      spyOnProperty(learnerViewRatingService,
-        'onRatingUpdated').and.returnValue(onRatingUpdatedEventEmitter);
-      spyOnProperty(contentTranslationManagerService,
-        'onStateCardContentUpdate')
+      spyOnProperty(
+        learnerViewRatingService, 'onRatingUpdated')
+        .and.returnValue(onRatingUpdatedEventEmitter);
+      spyOnProperty(
+        contentTranslationManagerService, 'onStateCardContentUpdate')
         .and.returnValue(onStateCardContentUpdateEventEmitter);
 
       ctrl.$onInit();
@@ -762,8 +750,8 @@ fdescribe('Conversation skin directive', function() {
         'GET', '/collectionsummarieshandler/data' +
         '?stringified_collection_ids=' +
         encodeURI(JSON.stringify(['collectionId']))).respond({
-          summaries: ['collectionSummary']
-        });
+        summaries: ['collectionSummary']
+      });
 
       expect($scope.collectionSummary).toBe(undefined);
 
@@ -825,10 +813,11 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, null,
             'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       spyOn(statsReportingService, 'recordStateCompleted')
@@ -838,7 +827,7 @@ fdescribe('Conversation skin directive', function() {
       let recordMaybeLeaveEvent = spyOn(
         statsReportingService, 'recordMaybeLeaveEvent')
         .and.returnValue(null);
-  
+
       $scope.answerIsBeingProcessed = false;
       $scope.displayedCard = sampleCard;
       $scope.submitAnswer();
@@ -851,7 +840,6 @@ fdescribe('Conversation skin directive', function() {
 
     it('should not record event when user redirects ' +
       'to refresher exploration', function() {
-      let callback = null;
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
       spyOn($window, 'addEventListener').and.callFake((evt, cb) => {
@@ -881,10 +869,11 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, null,
             'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       spyOn(statsReportingService, 'recordStateCompleted')
@@ -894,14 +883,13 @@ fdescribe('Conversation skin directive', function() {
       let recordMaybeLeaveEvent = spyOn(
         statsReportingService, 'recordMaybeLeaveEvent')
         .and.returnValue(null);
-  
+
       $scope.answerIsBeingProcessed = false;
       $scope.displayedCard = sampleCard;
       $scope.submitAnswer();
       $timeout.flush();
       $scope.redirectToRefresherExplorationConfirmed = true;
       ctrl.$onInit();
-  
 
       expect(recordMaybeLeaveEvent).not.toHaveBeenCalled();
     });
@@ -918,7 +906,7 @@ fdescribe('Conversation skin directive', function() {
       ctrl.$onInit();
       $scope.nextCard = sampleCard;
       onPlayerStateChangeEventEmitter.emit(null);
-  
+
       expect(imagePreloaderSpy).not.toHaveBeenCalled();
     });
 
@@ -1068,10 +1056,10 @@ fdescribe('Conversation skin directive', function() {
       spyOn(QuestionPlayerStateService, 'getQuestionPlayerStateData')
         .and.returnValue('questionData');
       let moveToExplorationSpy = spyOn(
-        explorationPlayerStateService,'moveToExploration')
+        explorationPlayerStateService, 'moveToExploration')
         .and.returnValue(null);
 
-      $scope.moveToExploration= true;
+      $scope.moveToExploration = true;
       $scope.displayedCard = sampleCard;
       $scope.showUpcomingCard();
 
@@ -1098,10 +1086,12 @@ fdescribe('Conversation skin directive', function() {
         .and.returnValue('en');
       spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
         .and.returnValue('en');
-      spyOn(playerPositionService, 'setDisplayedCardIndex').and.returnValue(null);
-      spyOn(playerPositionService, 'changeCurrentQuestion').and.returnValue(null);
+      spyOn(playerPositionService, 'setDisplayedCardIndex')
+        .and.returnValue(null);
+      spyOn(playerPositionService, 'changeCurrentQuestion')
+        .and.returnValue(null);
       let recordNewCardSpy = spyOn(
-        explorationPlayerStateService,'recordNewCardAdded')
+        explorationPlayerStateService, 'recordNewCardAdded')
         .and.returnValue(null);
 
       $scope.displayedCard = sampleCard;
@@ -1120,7 +1110,7 @@ fdescribe('Conversation skin directive', function() {
   describe('on verifying if the learn again button is active ', function() {
     it('should return false if concept card is being shown', function() {
       spyOn(explorationPlayerStateService, 'isInQuestionMode')
-      .and.returnValue(false);
+        .and.returnValue(false);
       sampleCard = StateCard.createNewCard(
         null, '<p>Content</p>', '<interaction></interaction>',
         null, RecordedVoiceovers.createEmpty(),
@@ -1201,7 +1191,8 @@ fdescribe('Conversation skin directive', function() {
       };
       sampleCard = StateCard.createNewCard(
         'stateName', '<p>Content</p>', '<interaction></interaction>',
-        interactionObjectFactory.createFromBackendDict(interactionDict), RecordedVoiceovers.createEmpty(),
+        interactionObjectFactory.createFromBackendDict(interactionDict),
+        RecordedVoiceovers.createEmpty(),
         writtenTranslationsObjectFactory.createEmpty(),
         'content', audioTranslationLanguageService);
       spyOn(playerCorrectnessFeedbackEnabledService, 'isEnabled')
@@ -1305,7 +1296,7 @@ fdescribe('Conversation skin directive', function() {
   });
 
   it('should register an iframe event when' +
-    'calling \'onNavigateFromIframe\' ', function() {
+    'calling \'onNavigateFromIframe\'', function() {
     let iframeEventSpy = spyOn(
       siteAnalyticsService, 'registerVisitOppiaFromIframeEvent')
       .and.returnValue(null);
@@ -1316,7 +1307,7 @@ fdescribe('Conversation skin directive', function() {
   });
 
   it('should get static image url when' +
-    'calling \'getStaticImageUrl\' ', function() {
+    'calling \'getStaticImageUrl\'', function() {
     spyOn(urlInterpolationService, 'getStaticImageUrl')
       .and.returnValue('url');
 
@@ -1326,14 +1317,14 @@ fdescribe('Conversation skin directive', function() {
   });
 
   it('should get content focus label when' +
-    'calling \'getContentFocusLabel\' ', function() {
+    'calling \'getContentFocusLabel\'', function() {
     let result = $scope.getContentFocusLabel('2');
 
     expect(result).toBe('contentLabel2');
   });
 
   it('should get feedback popover url when' +
-    'calling \'getFeedbackPopoverUrl\' ', function() {
+    'calling \'getFeedbackPopoverUrl\'', function() {
     spyOn(urlInterpolationService, 'getDirectiveTemplateUrl')
       .and.returnValue('/directiveTemplateUrl');
 
@@ -1400,7 +1391,7 @@ fdescribe('Conversation skin directive', function() {
     expect(result).toBe(false);
   });
 
-  it('should return false when calling \'isSupplementalNavShown\''  +
+  it('should return false when calling \'isSupplementalNavShown\' ' +
     'if current state has invalid name', function() {
     // Setting state name to null.
     sampleCard = StateCard.createNewCard(
@@ -1528,7 +1519,7 @@ fdescribe('Conversation skin directive', function() {
           sampleCard, true, 'feedbackHtml', audioTranslations, 'refresherId',
           'skillId', true, 'taggedSkillId', true, true, false, 'focusLabel');
         return true;
-    });
+      });
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('currentState');
     spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
@@ -1556,7 +1547,7 @@ fdescribe('Conversation skin directive', function() {
     $scope.initializePage();
     discardPeriodicTasks();
     flush();
-  
+
     expect(focusSpy).toHaveBeenCalled();
   }));
 
@@ -1580,7 +1571,7 @@ fdescribe('Conversation skin directive', function() {
           sampleCard, true, 'feedbackHtml', audioTranslations, null,
           'skillId', false, 'taggedSkillId', true, true, true, 'focusLabel');
         return true;
-    });
+      });
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('currentState');
     spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
@@ -1627,7 +1618,7 @@ fdescribe('Conversation skin directive', function() {
           sampleCard, true, 'feedbackHtml', audioTranslations, null,
           'skillId', false, 'taggedSkillId', true, true, false, 'focusLabel');
         return true;
-    });
+      });
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('currentState');
     spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
@@ -1676,7 +1667,7 @@ fdescribe('Conversation skin directive', function() {
           sampleCard, true, 'feedbackHtml', audioTranslations, null,
           'skillId', false, 'taggedSkillId', true, true, false, 'focusLabel');
         return true;
-    });
+      });
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('currentState');
     spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
@@ -1722,7 +1713,7 @@ fdescribe('Conversation skin directive', function() {
           sampleCard, true, null, audioTranslations, null,
           'skillId', false, 'taggedSkillId', true, true, false, 'focusLabel');
         return true;
-    });
+      });
     spyOn(playerPositionService, 'getCurrentStateName')
       .and.returnValue('currentState');
     spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
@@ -1855,7 +1846,7 @@ fdescribe('Conversation skin directive', function() {
   });
 
   describe('on submitting answer ', function() {
-    it('should submit answer successfully ' +
+    it('should submit answer successfully' +
       '', function() {
       spyOn(explorationEngineService, 'getState').and.returnValue(sampleState);
       spyOn(playerTranscriptService, 'isLastCard')
@@ -1874,11 +1865,13 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, null,
             'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
-      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       $scope.answerIsBeingProcessed = false;
@@ -1916,7 +1909,7 @@ fdescribe('Conversation skin directive', function() {
       let displayBreakMessageSpy = spyOn(
         fatigueDetectionService, 'displayTakeBreakMessage')
         .and.returnValue(null);
-  
+
       $scope.answerIsBeingProcessed = false;
       $scope.isInPreviewMode = false;
       $scope.displayedCard = sampleCard;
@@ -1944,11 +1937,13 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, null,
             'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
-      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       spyOn(learnerAnswerInfoService, 'getCanAskLearnerForAnswerInfo')
@@ -1965,7 +1960,7 @@ fdescribe('Conversation skin directive', function() {
     });
 
     it('should mark exploration as completed if the ' +
-      'current card is last card ', function() {
+      'current card is last card', function() {
       sampleCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -1988,10 +1983,11 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, null,
             'skillId', false, 'taggedSkillId', true, false, true, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       let explorationCompletedSpy = spyOn(
@@ -2025,11 +2021,13 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, 'refresherId',
             'skillId', true, 'taggedSkillId', true, true, false, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
-      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       let wrongAnswerSpy = spyOn(
@@ -2071,11 +2069,13 @@ fdescribe('Conversation skin directive', function() {
             sampleCard, true, 'feedbackHtml', audioTranslations, 'refresherId',
             'skillId', true, 'taggedSkillId', true, true, false, 'focusLabel');
           return true;
-      });
+        });
       spyOn(playerPositionService, 'getCurrentStateName')
         .and.returnValue('currentState');
-      spyOn(statsReportingService, 'recordStateTransition').and.returnValue(null);
-      spyOn(statsReportingService, 'recordStateCompleted').and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateTransition')
+        .and.returnValue(null);
+      spyOn(statsReportingService, 'recordStateCompleted')
+        .and.returnValue(null);
       spyOn(statsReportingService, 'recordExplorationActuallyStarted')
         .and.returnValue(null);
       spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
@@ -2083,13 +2083,13 @@ fdescribe('Conversation skin directive', function() {
       let redirectionSpy = spyOn(
         refresherExplorationConfirmationModalService,
         'displayRedirectConfirmationModal').and.callFake((expId, cb) => {
-          cb();
-        });
+        cb();
+      });
 
       $httpBackend.expect(
         'GET', requestUrl).respond({
-          summaries: ['explorationSummary']
-        });
+        summaries: ['explorationSummary']
+      });
       $scope.answerIsBeingProcessed = false;
       $scope.displayedCard = sampleCard;
 
@@ -2143,7 +2143,7 @@ fdescribe('Conversation skin directive', function() {
         .and.resolveTo({
           readyForReviewTest: true
         } as StoryChapterCompletionResponse);
-  
+
       $scope.showPendingCard();
       $timeout.flush();
       tick();
@@ -2151,8 +2151,8 @@ fdescribe('Conversation skin directive', function() {
       expect(storyChapterSpy).toHaveBeenCalled();
     }));
 
-     it('should set display card index when current card is ' +
-      'supplemental and next card is non empty ', fakeAsync(function() {
+    it('should set display card index when current card is ' +
+      'supplemental and next card is non empty', fakeAsync(function() {
       let samplePreviousCard = StateCard.createNewCard(
         'State 1', '<p>Content</p>', '<interaction></interaction>',
         interactionObjectFactory.createFromBackendDict(interactionDict3),
@@ -2193,7 +2193,7 @@ fdescribe('Conversation skin directive', function() {
       spyOn(contentTranslationManagerService, 'displayTranslations')
         .and.returnValue(null);
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
-  
+
       $scope.showPendingCard();
       $timeout.flush();
       tick();
@@ -2201,7 +2201,7 @@ fdescribe('Conversation skin directive', function() {
       expect(displayCardIndexSpy).toHaveBeenCalled();
     }));
 
-    it('should set display card index when  ' +
+    it('should set display card index when ' +
       'current card is not inline and previous ' +
       'card is non empty', fakeAsync(function() {
       sampleCard = StateCard.createNewCard(
@@ -2212,11 +2212,11 @@ fdescribe('Conversation skin directive', function() {
         'content', audioTranslationLanguageService);
 
       let sampleNextCard = StateCard.createNewCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(interactionDict3),
-      RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
-      'content', audioTranslationLanguageService);
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
       spyOn(playerTranscriptService, 'getLastCard')
         .and.returnValue(sampleCard);
 
@@ -2228,7 +2228,8 @@ fdescribe('Conversation skin directive', function() {
         .and.returnValue(null);
       spyOn(contentTranslationLanguageService, 'getCurrentContentLanguageCode')
         .and.returnValue('en');
-      let displayCardIndexSpy = spyOn(playerPositionService, 'setDisplayedCardIndex')
+      let displayCardIndexSpy = spyOn(
+        playerPositionService, 'setDisplayedCardIndex')
         .and.returnValue(null);
       spyOn(playerPositionService, 'changeCurrentQuestion')
         .and.returnValue(null);
@@ -2245,7 +2246,7 @@ fdescribe('Conversation skin directive', function() {
       spyOn(contentTranslationManagerService, 'displayTranslations')
         .and.returnValue(null);
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
-  
+
       $scope.showPendingCard();
       $timeout.flush();
       tick();
@@ -2254,7 +2255,7 @@ fdescribe('Conversation skin directive', function() {
       expect(displayCardIndexSpy).toHaveBeenCalled();
     }));
 
-    it('should set display card index when  ' +
+    it('should set display card index when ' +
       'current card is inline and previous ' +
       'card is non empty', fakeAsync(function() {
       sampleCard = StateCard.createNewCard(
@@ -2265,11 +2266,11 @@ fdescribe('Conversation skin directive', function() {
         'content', audioTranslationLanguageService);
 
       let sampleNextCard = StateCard.createNewCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(interactionDict3),
-      RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
-      'content', audioTranslationLanguageService);
+        'State 1', '<p>Content</p>', '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict(interactionDict3),
+        RecordedVoiceovers.createEmpty(),
+        writtenTranslationsObjectFactory.createEmpty(),
+        'content', audioTranslationLanguageService);
       spyOn(playerTranscriptService, 'getLastCard')
         .and.returnValue(sampleCard);
 
@@ -2347,7 +2348,7 @@ fdescribe('Conversation skin directive', function() {
         .and.resolveTo({
           readyForReviewTest: true
         } as StoryChapterCompletionResponse);
-  
+
       $scope.showPendingCard();
       $timeout.flush();
       tick();
@@ -2396,12 +2397,12 @@ fdescribe('Conversation skin directive', function() {
         explorationRecommendationsService, 'getRecommendedSummaryDicts')
         .and.callFake((id, dict, cb) => {
           cb([]);
-        })
+        });
       spyOn(storyViewerBackendApiService, 'recordChapterCompletionAsync')
         .and.resolveTo({
           readyForReviewTest: true
         } as StoryChapterCompletionResponse);
-  
+
       $scope.showPendingCard();
       $timeout.flush();
       tick();
@@ -2444,7 +2445,7 @@ fdescribe('Conversation skin directive', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
       let returnUrlSpy = spyOn(
         userService, 'setReturnUrl').and.returnValue(null);
-  
+
       $scope.showPendingCard();
       $timeout.flush();
       tick();
