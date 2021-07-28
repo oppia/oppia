@@ -155,7 +155,10 @@
         "core.platform.email.dev_mode_email_services_test",
         "jobs.blog_validation_errors_test",
         "jobs.blog_validation_jobs_test",
-        "jobs.transforms.blog_validation_test"
+        "jobs.transforms.blog_validation_test",
+        "core.tests.load_tests.feedback_thread_summaries_test",
+        "core.tests.test_utils_test",
+        "core.tests.gae_suite_test"
     ],
     "6": [
         "core.domain.object_registry_test",
