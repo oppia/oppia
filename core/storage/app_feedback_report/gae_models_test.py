@@ -14,8 +14,8 @@
 
 """Tests for core.storage.app_feedback_report.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import types
@@ -75,7 +75,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         'text_size': 'MEDIUM_TEXT_SIZE',
         'download_and_update_only_on_wifi': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     WEB_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin'

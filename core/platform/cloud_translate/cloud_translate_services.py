@@ -16,8 +16,8 @@
 
 """Provides translate_text functionality from Google Cloud Translate."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 # To use cloud translate in a local dev environment, use
 # cloud_translate_emulator.
