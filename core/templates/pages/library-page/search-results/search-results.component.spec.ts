@@ -97,7 +97,7 @@ describe('Search Results component', () => {
     let userIsLoggedIn = true;
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(new UserInfo(
-        'admin', true, true,
+        ['admin'], true, true,
         true, true, true, 'en', 'test', null, userIsLoggedIn)));
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded')
       .and.returnValue(mockOnInitialSearchResultsLoaded);
