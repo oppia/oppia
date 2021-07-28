@@ -213,7 +213,7 @@ class AppFeedbackReport(python_utils.OBJECT):
                 'The scrubbed_by user must be a string, but got %r' % (
                     scrubber_id))
         if not utils.is_user_id_valid(scrubber_id) and (
-            scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID):
+                scrubber_id != feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID):
             raise utils.ValidationError(
                 'The scrubbed_by user id %r is invalid.' % scrubber_id)
 
