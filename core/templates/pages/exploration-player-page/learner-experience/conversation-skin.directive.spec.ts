@@ -677,9 +677,10 @@ describe('Conversation skin directive', function() {
   });
 
   describe('on initalization', function() {
-    it('should set properties successfully', function() {
+    it('should set user rating', function() {
       spyOnProperty(currentInteractionService, 'onAnswerChanged$')
         .and.returnValue(onAnswerChangedEventEmitter);
+      expect($scope.userRating).toBe(undefined);
 
       ctrl.$onInit();
       onAnswerChangedEventEmitter.emit();
@@ -688,7 +689,7 @@ describe('Conversation skin directive', function() {
     });
 
     it('should show user that hint has been used ' +
-      'when hint has already been used', function() {
+      'if it has already been used', function() {
       spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
         .and.returnValue(onHintConsumedEventEmitter);
       let hintConsumedSpy = spyOn(
@@ -2043,6 +2044,8 @@ describe('Conversation skin directive', function() {
       $timeout.flush();
       tick();
       $timeout.flush();
+      flush();
+      discardPeriodicTasks();
 
       expect(wrongAnswerSpy).toHaveBeenCalled();
     }));
