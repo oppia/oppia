@@ -72,7 +72,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
         create_test_suites_swap = self.swap(
             gae_suite, 'create_test_suites', _mock_create_test_suites)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'No module named invalid_test')
+            Exception, 'Test suite failed: 1 tests run, 1 errors, 0 failures.')
 
         with create_test_suites_swap, assert_raises_regexp_context_manager:
             gae_suite.main(args=[])

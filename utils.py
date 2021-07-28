@@ -146,7 +146,7 @@ def get_exploration_components_from_dir(dir_path):
 
     for root, directories, files in os.walk(dir_path):
         for directory in directories:
-            if root == dir_path and directory != 'assets':
+            if root == dir_path and directory not in ('assets', '__pycache__'):
                 raise Exception(
                     'The only directory in %s should be assets/' % dir_path)
 
