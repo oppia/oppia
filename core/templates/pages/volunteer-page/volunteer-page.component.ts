@@ -34,7 +34,7 @@ import { UrlInterpolationService } from
   providers: [NgbCarouselConfig]
 })
 export class VolunteerPageComponent implements OnInit {
-  mapImgUrl = '';
+  mapImgPath = '';
   art = {};
   development = {};
   learnerFeedback = {};
@@ -46,17 +46,22 @@ export class VolunteerPageComponent implements OnInit {
     private ngbCarouselConfig: NgbCarouselConfig
   ) {}
 
+  getWebpExtendedName(fileName: string): string {
+    return fileName.replace(/\.\w+$/g, '.webp');
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Volunteer | Oppia');
-    this.mapImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/volunteer/map.png');
+    this.mapImgPath = '/volunteer/map.png';
 
     this.art = {
       images: [
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/mark.jpg'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/tuna.jpg')
+        '/volunteer/profile_images/mark.jpg',
+        '/volunteer/profile_images/tuna.jpg',
       ],
       caption: [
         {
@@ -79,14 +84,10 @@ export class VolunteerPageComponent implements OnInit {
 
     this.development = {
       images: [
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/akshay.jpg'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/diana.jpg'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/kevin-thomas.jpg'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/nithesh.jpg'),
+        '/volunteer/profile_images/akshay.jpg',
+        '/volunteer/profile_images/diana.jpg',
+        '/volunteer/profile_images/kevin-thomas.jpg',
+        '/volunteer/profile_images/nithesh.jpg',
       ],
       caption: [
         {
@@ -127,10 +128,8 @@ export class VolunteerPageComponent implements OnInit {
 
     this.learnerFeedback = {
       images: [
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/riya.png'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/wala.jpg')
+        '/volunteer/profile_images/riya.png',
+        '/volunteer/profile_images/wala.jpg',
       ],
       caption: [
         {
@@ -159,12 +158,9 @@ export class VolunteerPageComponent implements OnInit {
 
     this.lessonCreation = {
       images: [
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/anubhuti.jpg'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/anmol.jpg'),
-        this.urlInterpolationService.getStaticImageUrl(
-          '/volunteer/profile_images/nitya.jpg')
+        '/volunteer/profile_images/anubhuti.jpg',
+        '/volunteer/profile_images/anmol.jpg',
+        '/volunteer/profile_images/nitya.jpg',
       ],
       caption: [
         {

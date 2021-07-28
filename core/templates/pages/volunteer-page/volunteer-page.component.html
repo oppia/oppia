@@ -18,12 +18,20 @@
 
     <div class="hide-xs hide-sm hide-md col-4 flex-45 mt-5">
       <picture>
-        <img alt="Volunteer page map image - Desktop view" [src]="mapImgUrl">
+        <source type="image/webp"
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(mapImgPath))">
+        <source type="image/png"
+                [srcset]="this.getStaticImageUrl(mapImgPath)">
+        <img alt="Volunteer page map image - Desktop view" [src]="this.getStaticImageUrl(mapImgPath)">
       </picture>
     </div>
     <div class="hide-gt-md px-5">
       <picture>
-        <img alt="Volunteer page map image - Mobile view" [src]="mapImgUrl">
+        <source type="image/webp"
+                [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(mapImgPath))">
+        <source type="image/png"
+                [srcset]="this.getStaticImageUrl(mapImgPath)">
+        <img alt="Volunteer page map image - Mobile view" [src]="this.getStaticImageUrl(mapImgPath)">
       </picture>
     </div>
 
@@ -49,7 +57,11 @@
                 <ng-template *ngFor="let image of art.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
                     <picture>
-                      <img [src]="image" alt="Volunteer profile image">
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
                     </picture>
                   </div>
                   <div class="carousel-caption">
@@ -104,7 +116,11 @@
                 <ng-template *ngFor="let image of development.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
                     <picture>
-                      <img [src]="image" alt="Volunteer profile image">
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
                     </picture>
                   </div>
                   <div class="carousel-caption">
@@ -155,7 +171,11 @@
                 <ng-template *ngFor="let image of learnerFeedback.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
                     <picture>
-                      <img [src]="image" alt="Volunteer profile image">
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
                     </picture>
                   </div>
                   <div class="carousel-caption">
@@ -215,7 +235,11 @@
                 <ng-template *ngFor="let image of lessonCreation.images; index as index" ngbSlide>
                   <div class="oppia-carousel-wrapper">
                     <picture>
-                      <img [src]="image" alt="Volunteer profile image">
+                      <source type="image/webp"
+                              [srcset]="this.getStaticImageUrl(this.getWebpExtendedName(image))">
+                      <source type="image/png"
+                              [srcset]="this.getStaticImageUrl(image)">
+                      <img [src]="this.getStaticImageUrl(image)" alt="Volunteer profile image">
                     </picture>
                   </div>
                   <div class="carousel-caption">
