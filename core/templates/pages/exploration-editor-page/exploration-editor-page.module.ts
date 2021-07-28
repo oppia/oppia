@@ -38,10 +38,12 @@ import { SaveVersionMismatchModalComponent } from './modal-templates/save-versio
 import { SaveValidationFailModalComponent } from './modal-templates/save-validation-fail-modal.component';
 import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
 import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule
@@ -50,7 +52,6 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
     DeleteStateSkillModalComponent,
-    OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -63,7 +64,6 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
     DeleteStateSkillModalComponent,
-    OppiaAngularRootComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     SaveVersionMismatchModalComponent,

@@ -14,8 +14,8 @@
 
 """Base constants and handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import datetime
@@ -37,6 +37,9 @@ import python_utils
 import utils
 
 import backports.functools_lru_cache
+from typing import Any # pylint: disable=unused-import
+from typing import Dict # pylint: disable=unused-import
+from typing import Text # pylint: disable=unused-import
 import webapp2
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
@@ -146,8 +149,8 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = None
-    HANDLER_ARGS_SCHEMAS = None
+    URL_PATH_ARGS_SCHEMAS = None # type: Dict[Text, Any]
+    HANDLER_ARGS_SCHEMAS = None # type: Dict[Text, Any]
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -229,18 +232,20 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.role = (
-            feconf.ROLE_ID_GUEST
-            if self.user_id is None else user_settings.role)
+        self.roles = (
+            [feconf.ROLE_ID_GUEST]
+            if self.user_id is None else user_settings.roles)
         self.user = user_services.get_user_actions_info(self.user_id)
 
         if not self._is_requested_path_currently_accessible_to_user():
             auth_services.destroy_auth_session(self.response)
             return
 
-        self.values['is_moderator'] = (
-            user_services.is_at_least_moderator(self.user_id))
-        self.values['is_admin'] = user_services.is_admin(self.user_id)
+        # TODO(#13447): Remove populating response values with `is_moderator`,
+        # `is_curriculum_admin` & `is_topic_manager`.
+        self.values['is_moderator'] = user_services.is_moderator(self.user_id)
+        self.values['is_curriculum_admin'] = (
+            user_services.is_curriculum_admin(self.user_id))
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.current_user_is_super_admin
@@ -440,7 +445,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         return (
             self.current_user_is_super_admin or
-            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+            feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
 
     def _is_requested_path_currently_accessible_to_user(self):
         """Checks whether the requested path is currently accessible to user.
@@ -571,6 +576,11 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html', iframe_restriction=None)
             elif values['status_code'] == 503:
                 self.render_template('maintenance-page.mainpage.html')
+            elif values['status_code'] == 404:
+                # Only 404 routes can be handled with angular router as it only
+                # has access to the path, not to the status code.
+                # That's why 404 status code is treated differently.
+                self.render_template('oppia-root.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
