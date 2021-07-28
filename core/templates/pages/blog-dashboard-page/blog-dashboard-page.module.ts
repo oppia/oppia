@@ -42,14 +42,12 @@ declare var angular: ng.IAngularStatic;
     MatTabsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
     BlogDashboardTileComponent,
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     BlogDashboardNavbarBreadcrumbComponent,
     BlogDashboardPageComponent,
     BlogCardComponent,
