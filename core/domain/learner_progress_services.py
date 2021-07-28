@@ -21,8 +21,6 @@ from __future__ import unicode_literals
 
 import collections
 
-import collections
-
 from constants import constants
 from core.domain import classroom_services
 from core.domain import collection_services
