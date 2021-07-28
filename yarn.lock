@@ -979,6 +979,11 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
+"@scarf/scarf@^1.1.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@scarf/scarf/-/scarf-1.1.1.tgz#d8b9f20037b3a37dbf8dcdc4b3b72f9285bfce35"
+  integrity sha512-VGbKDbk1RFIaSmdVb0cNjjWJoRWRI/Weo23AjRCC2nryO0iAS8pzsToJfPVPtVs74WHw4L1UTADNdIYRLkirZQ==
+
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
@@ -10043,6 +10048,11 @@ openapi3-ts@^2.0.1:
   integrity sha512-v6X3iwddhi276siej96jHGIqTx3wzVfMTmpGJEQDt7GPI7pI6sywItURLzpEci21SBRpPN/aOWSF5mVfFVNmcg==
   dependencies:
     yaml "^1.10.0"
+
+opencollective-postinstall@^2.0.2:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/opencollective-postinstall/-/opencollective-postinstall-2.0.3.tgz#7a0fff978f6dbfa4d006238fbac98ed4198c3259"
+  integrity sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==
 
 optionator@^0.8.1:
   version "0.8.3"
