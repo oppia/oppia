@@ -41,10 +41,13 @@ export class PracticeTabComponent implements OnInit {
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrl: string = '';
   @Input() classroomUrl: string = '';
+  @Input() subtopicMastery: Record<string, number>;
   selectedSubtopics: Subtopic[] = [];
   availableSubtopics: Subtopic[] = [];
   selectedSubtopicIndices: boolean[] = [];
   questionsAreAvailable: boolean = false;
+  subtopicIds: number[] = [];
+  subtopicMasteryArray: number[] = [];
   questionsStatusCallIsComplete: boolean = true;
 
   constructor(
@@ -61,6 +64,17 @@ export class PracticeTabComponent implements OnInit {
         return subtopic.getSkillSummaries().length > 0;
       }
     );
+    for (var subtopic of this.subtopicsList) {
+      this.subtopicIds.push(subtopic.getId());
+    }
+    for (let item of this.subtopicIds) {
+      if (this.subtopicMastery[item] !== undefined) {
+        this.subtopicMasteryArray.push(Math.floor(
+          this.subtopicMastery[item] * 100));
+      } else {
+        this.subtopicMasteryArray.push(0);
+      }
+    }
     this.selectedSubtopicIndices = Array(
       this.availableSubtopics.length).fill(false);
   }
@@ -129,6 +143,24 @@ export class PracticeTabComponent implements OnInit {
 
   isAtLeastOneSubtopicSelected(): boolean {
     return this.selectedSubtopicIndices.some(item => item);
+  }
+
+  getBackgroundForProgress(i: number): number {
+    return this.subtopicMasteryArray[i];
+  }
+
+  subtopicMasteryPosition(i: number): number {
+    if (this.subtopicMasteryArray[i] <= 89) {
+      return 225 - this.subtopicMasteryArray[i] * 2.5;
+    }
+    return 225 - (this.subtopicMasteryArray[i] * 2) - 15;
+  }
+
+  masteryTextColor(i: number): string {
+    if (this.subtopicMasteryArray[i] <= 89) {
+      return 'black';
+    }
+    return 'white';
   }
 }
 

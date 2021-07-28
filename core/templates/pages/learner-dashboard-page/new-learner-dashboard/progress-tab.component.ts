@@ -22,6 +22,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { LearnerDashboardBackendApiService, SubtopicMasterySummaryBackendDict } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 
  @Component({
@@ -36,20 +37,30 @@ export class ProgressTabComponent implements OnInit {
   emptySkillProficiency: boolean = true;
   displaySkills: boolean[];
   widthConst: number = 233;
+  subtopicMastery: Record<string, SubtopicMasterySummaryBackendDict> = {};
+  topicIdsInSkillProficiency: string[] = [];
+  topicMastery: number[] = [];
   width: number;
 
   constructor(
     private deviceInfoService: DeviceInfoService,
     private urlInterpolationService: UrlInterpolationService,
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.width = this.widthConst * (this.completedStoriesList.length);
     this.topicsInSkillProficiency.push(
       ...this.partiallyLearntTopicsList, ...this.learntTopicsList);
+    let topic: LearnerTopicSummary;
+    for (topic of this.topicsInSkillProficiency) {
+      this.topicIdsInSkillProficiency.push(topic.id);
+    }
+    this.subtopicMastery = await (
+      this.learnerDashboardBackendApiService.getFetchSubtopicMastery(
+        this.topicIdsInSkillProficiency.join(',')));
     this.displaySkills = new Array(
       this.topicsInSkillProficiency.length).fill(false);
-    let topic: LearnerTopicSummary;
     let atLeastOnetopicHasPracticeTabEnabled = false;
     for (topic of this.topicsInSkillProficiency) {
       if (topic.practiceTabIsDisplayed === true) {
@@ -61,6 +72,7 @@ export class ProgressTabComponent implements OnInit {
       this.topicsInSkillProficiency.length !== 0) {
       this.emptySkillProficiency = false;
     }
+    this.getTopicMastery();
   }
 
   showSkills(index: number): void {
@@ -74,5 +86,30 @@ export class ProgressTabComponent implements OnInit {
 
   checkMobileView(): boolean {
     return this.deviceInfoService.isMobileDevice();
+  }
+
+  getTopicMastery(): void {
+    let keyArr = Object.keys(this.subtopicMastery);
+    for (let i = 0; i < keyArr.length; i++) {
+      let valArr = Object.values(this.subtopicMastery[
+        this.topicsInSkillProficiency[i].id]);
+      let sum = valArr.reduce((a, b) => a + b, 0);
+      let arrLength = this.topicsInSkillProficiency[i].subtopics.length;
+      this.topicMastery.push(Math.floor(sum / arrLength * 100));
+    }
+  }
+
+  calculateCircularProgress(i: number): string {
+    let degree = (90 + (360 * (this.topicMastery[i])) / 100);
+    let cssStyle = (
+      `linear-gradient(${degree}deg, transparent 50%, #CCCCCC 50%)` +
+      ', linear-gradient(90deg, #CCCCCC 50%, transparent 50%)');
+    if (this.topicMastery[i] > 50) {
+      degree = 3.6 * (this.topicMastery[i] - 50) - 90;
+      cssStyle = (
+        'linear-gradient(270deg, #00645C 50%, transparent 50%), ' +
+        `linear-gradient(${degree}deg, #00645C 50%, #CCCCCC 50%)`);
+    }
+    return cssStyle;
   }
 }

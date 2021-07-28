@@ -438,7 +438,6 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
   let LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
-  let SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data';
   let ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
@@ -479,7 +478,7 @@ describe('Learner Dashboard Backend API Service', () => {
     ' backend', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    var topicIds = ['topic_id'];
+    var topicIds = 'topic_id';
 
     learnerDashboardBackendApiService.getFetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
@@ -500,12 +499,13 @@ describe('Learner Dashboard Backend API Service', () => {
     ' backend request failed', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    var topicIds = [];
+    var topicIds = 'topic_id';
 
     learnerDashboardBackendApiService.getFetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(SUBTOPIC_MASTERY_DATA_URL);
+    let req = httpTestingController.expectOne(
+      '/subtopic_mastery_handler/data?comma_separated_topic_ids=topic_id');
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 400

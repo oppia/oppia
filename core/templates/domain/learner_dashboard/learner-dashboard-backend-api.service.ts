@@ -103,7 +103,7 @@ export interface AddMessagePayload {
 }
 
 export interface SubtopicMasterySummaryBackendDict {
-  'mastery': number;
+  [mastery: string]: number;
 }
 
 export interface SubtopicMasteryDict {
@@ -228,7 +228,7 @@ export class LearnerDashboardBackendApiService {
   }
 
   async _getFetchSubtopicMastery(
-      topicIds: string[]): Promise<Record<string,
+      topicIds: string): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
       this.http.get<SubtopicMasteryDict>(
@@ -242,7 +242,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async getFetchSubtopicMastery(topicIds: string[]): Promise<Record<string,
+  async getFetchSubtopicMastery(topicIds: string): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return this._getFetchSubtopicMastery(topicIds);
   }

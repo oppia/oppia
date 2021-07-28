@@ -2,7 +2,35 @@
   <div class="skill-proficiency-heading">
     <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROFICIENCY_SECTION' | translate">
     </p>
-    <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
+    <a class="info-tooltip" href="#/">
+      <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
+      <span>
+        <div class="badge-info">
+          <p class="badge-type">
+            Gold
+          </p>
+          <p class="badge-percent">
+            100%
+          </p>
+        </div>
+        <div class="badge-info">
+          <p class="badge-type">
+            Silver
+          </p>
+          <p class="badge-percent">
+            80-99%
+          </p>
+        </div>
+        <div class="badge-info">
+          <p class="badge-type">
+            Bronze
+          </p>
+          <p class="badge-percent">
+            60-79%
+          </p>
+        </div>
+      </span>
+    </a>
   </div>
   <div *ngIf="emptySkillProficiency">
     <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
@@ -16,9 +44,13 @@
         </span>
         <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
         <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')" alt="up image" class="oppia-svg-up-image" (click)="showSkills(i)" *ngIf="displaySkills[i]">
-        <div>
+        <div *ngIf="topicMastery[i] > 0">
+          <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
+            <div class="circle">
+            </div>
+          </div>
           <span class="progress-text">
-            Progress:
+            Progress: {{topicMastery[i]}}%
           </span>
         </div>
       </div>
@@ -30,7 +62,8 @@
                       [subtopicsList]="tile.subtopics"
                       [displayArea]="'progressTab'"
                       [topicUrl]="tile.urlFragment"
-                      [classroomUrl]="tile.classroom">
+                      [classroomUrl]="tile.classroom"
+                      [subtopicMastery]="subtopicMastery[tile.id]">
         </practice-tab>
       </div>
     </div>
@@ -91,6 +124,8 @@
     width: 656px;
   }
   .skill-proficiency-topic-title {
+    position: relative;
+    left: 48px;
     color: #333333;
     font-size: 19px;
     font-weight: 500;
@@ -106,9 +141,84 @@
     letter-spacing: 0;
     opacity: 1;
     position: relative;
-    right: 40px;
+    right: 20px;
     text-align: left;
   }
+  .circle {
+    position: relative;
+    top: 6px;
+    left: 6px;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    background-color: #ffffff;
+}
+
+.circle-border {
+  display: inline-block;
+  left: 280px;
+  bottom: 24px;
+  position: relative;
+  text-align: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 30%;
+  border-radius: 100%;
+  background-color: #00645C;
+}
+.info-tooltip {
+  display: inline-block;
+  text-decoration:none;
+  position:relative;
+  opacity: 1;
+}
+ 
+.info-tooltip span {
+  display:none;
+  -moz-border-radius:6px;
+  -webkit-border-radius:6px;
+  border-radius:6px;
+  color:black;
+  background:white; 
+}
+ 
+.info-tooltip span img {
+  float:left;
+  margin:0px 8px 8px 0;
+}
+ 
+.info-tooltip:hover span {
+  display: block;
+  position: absolute;
+  top: -37px;
+  box-shadow: 0px 3px 6px #00000029;
+  border: 0.5px solid #CCCCCC;
+  border-radius: 4px;
+  width: 157px;
+  height: 155px;
+  margin-left: 32px;
+  padding: 8px;
+  z-index: 2;
+}
+
+.badge-type{
+  text-align: left;
+  font-size: 16px;
+  color: #333333;
+  margin-bottom: 0;
+}
+.badge-percent {
+  text-align: left;
+  font-style: italic;
+  font-size: 12px;
+  color: #555555;
+}
+.badge-info{
+  background-color: #fff;
+  color: #000;
+  margin-bottom: 16px;
+}
   .completed-stories-content {
     display: inline-block;
   }
@@ -169,6 +279,9 @@
       right: 20px;
       width: 555px;
     }
+    .circle-border {
+      left: 138px;
+    }
     .scroll-content {
       overflow: scroll;
     }
@@ -199,6 +312,9 @@
       height: 52px;
       width: 280px;
     }
+    .circle-border {
+      display: none;
+    }
     .skill-proficiency-topic-title {
       font-size: 16px;
     }
@@ -208,6 +324,10 @@
     .progress-text {
       display: contents;
       font-style: italic;
+    }
+    .progress-text::before {
+      content: '';
+      margin-left: 48px;
     }
     .skill-proficiency-title,
     .completed-stories-title {

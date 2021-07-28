@@ -15,7 +15,10 @@
               {{ subtopic.getTitle() }}
             </span>
           </mat-checkbox>
-          <div class="capsule-progress" *ngIf="displayArea === 'progressTab'">
+          <div class="capsule-progress" *ngIf="displayArea === 'progressTab'" [ngStyle]="{'background': 'linear-gradient(to right, #205D86 ' + getBackgroundForProgress(i) + '%,white ' + getBackgroundForProgress(i) + '%)'}">
+            <span class="subtopic-mastery" [ngStyle]="{'right': subtopicMasteryPosition(i) + 'px', 'color': masteryTextColor(i)}">
+              {{subtopicMasteryArray[i]}}%
+            </span>
           </div>
         </div>
       </mat-card-content>
@@ -67,6 +70,17 @@
     border: 1px solid black;
   }
 
+  .subtopic-mastery {
+    bottom: 2.2px;
+    color: #333333;
+    float: right;
+    font-size: 13px;
+    font-style: italic;
+    position: relative;
+    right: 6px;
+    z-index: 2;
+  }
+
   .practice-tab .practice-tab-for-learner-dashboard .subtopic-title {
     font-size: 18px;
     color: #333;
@@ -116,6 +130,9 @@
       height: 13px;
       right: -5px;
       width: 215px;
+    }
+    .subtopic-mastery {
+      font-size: 10px;
     }
     .practice-tab .practice-tab-for-learner-dashboard .practice-tab-subtopic-item {
       padding-bottom: 44px;
