@@ -117,7 +117,7 @@
     "id": "NumericInput",
     "customization_arg_specs": [{
       "description": "Allow only input greater than or equal to zero for Number Input interaction.",
-      "name": "inputGreaterThanZero",
+      "name": "inputGreaterThanOrEqualToZero",
       "schema": {
         "type": "bool"
       },

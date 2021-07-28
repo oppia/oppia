@@ -3775,7 +3775,7 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        inputGreaterThanZero:
+        inputGreaterThanOrEqualToZero:
           value: False
       default_outcome:
         dest: (untitled state)
@@ -3842,7 +3842,7 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        inputGreaterThanZero:
+        inputGreaterThanOrEqualToZero:
           value: False
       default_outcome:
         dest: END
@@ -5579,7 +5579,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Intro-rename',
             'old_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': True
                 }
@@ -5587,7 +5587,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args',
             'new_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': False
                 }
@@ -5869,7 +5869,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Intro-rename',
             'old_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': True
                 }
@@ -5877,7 +5877,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args',
             'new_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': False
                 }
@@ -7675,7 +7675,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'old_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': True
                 }
@@ -7683,7 +7683,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args',
             'new_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': False
                 }
@@ -8093,7 +8093,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'old_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': True
                 }
@@ -8101,7 +8101,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args',
             'new_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': False
                 }
@@ -9721,7 +9721,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'old_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': True
                 }
@@ -9729,7 +9729,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'property_name': 'widget_customization_args',
             'new_value':
             {
-                'inputGreaterThanZero':
+                'inputGreaterThanOrEqualToZero':
                 {
                     'value': False
                 }
@@ -10146,7 +10146,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'state_name': 'Introduction',
                 'old_value':
                 {
-                    'inputGreaterThanZero':
+                    'inputGreaterThanOrEqualToZero':
                     {
                         'value': True
                     }
@@ -10154,7 +10154,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'property_name': 'widget_customization_args',
                 'new_value':
                 {
-                    'inputGreaterThanZero':
+                    'inputGreaterThanOrEqualToZero':
                     {
                         'value': False
                     }

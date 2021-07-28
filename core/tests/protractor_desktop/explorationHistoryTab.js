@@ -329,7 +329,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       25: {
-        text: '    inputGreaterThanZero:',
+        text: '    inputGreaterThanOrEqualToZero:',
         highlighted: true
       },
       26: {

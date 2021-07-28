@@ -35,11 +35,11 @@ import { NumericInputValidationService } from './numeric-input-validation.servic
   templateUrl: './numeric-input-interaction.component.html'
 })
 export class InteractiveNumericInput implements OnInit {
-  @Input() inputGreaterThanZeroWithValue: string = '';
+  @Input() inputGreaterThanOrEqualToZeroWithValue: string = '';
   @Input() savedSolution;
   @Input() labelForFocusTarget;
   errorString = '';
-  inputGreaterThanZero: boolean = false;
+  inputGreaterThanOrEqualToZero: boolean = false;
   answer = null;
   NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
   constructor(
@@ -58,7 +58,7 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== '' &&
       isUndefined(
         this.numericInputValidationService.getErrorString(
-          this.answer, this.inputGreaterThanZero)));
+          this.answer, this.inputGreaterThanOrEqualToZero)));
   }
 
   submitAnswer(answer: number): void {
@@ -71,7 +71,8 @@ export class InteractiveNumericInput implements OnInit {
 
   private getAttributesObject() {
     return {
-      inputGreaterThanZeroWithValue: this.inputGreaterThanZeroWithValue,
+      inputGreaterThanOrEqualToZeroWithValue:
+        this.inputGreaterThanOrEqualToZeroWithValue,
     };
   }
 
@@ -93,7 +94,7 @@ export class InteractiveNumericInput implements OnInit {
 
   ngOnInit(): void {
     const {
-      inputGreaterThanZero
+      inputGreaterThanOrEqualToZero
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
       'NumericInput',
       this.getAttributesObject()
@@ -102,13 +103,13 @@ export class InteractiveNumericInput implements OnInit {
       this.savedSolution !== undefined ?
       this.savedSolution : ''
     );
-    this.inputGreaterThanZero = inputGreaterThanZero.value;
+    this.inputGreaterThanOrEqualToZero = inputGreaterThanOrEqualToZero.value;
     this.labelForFocusTarget = this.labelForFocusTarget || null;
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
       ui_config: {
-        checkInputGreaterThanZero: inputGreaterThanZero.value
+        checkinputGreaterThanOrEqualToZero: inputGreaterThanOrEqualToZero.value
       }
     };
 

@@ -18,9 +18,9 @@
  */
 
 var objects = require(process.cwd() + '/extensions/objects/protractor.js');
-var customizeInteraction = async function(elem, inputGreaterThanZero) {
+var customizeInteraction = async function(elem, inputGreaterThanOrEqualToZero) {
   await objects.BooleanEditor(elem.element(by.tagName(
-    'schema-based-bool-editor'))).setValue(inputGreaterThanZero);
+    'schema-based-bool-editor'))).setValue(inputGreaterThanOrEqualToZero);
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {

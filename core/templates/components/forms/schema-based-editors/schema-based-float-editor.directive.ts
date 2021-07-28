@@ -61,7 +61,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               localValue !== '' &&
               angular.isUndefined(
                 NumericInputValidationService.getErrorString(
-                  localValue, ctrl.uiConfig().checkInputGreaterThanZero)));
+                  localValue,
+                  ctrl.uiConfig().checkinputGreaterThanOrEqualToZero)));
           };
 
           ctrl.onFocus = function() {
@@ -98,7 +99,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.generateErrors = function() {
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
-                ctrl.localValue, ctrl.uiConfig().checkInputGreaterThanZero));
+                ctrl.localValue,
+                ctrl.uiConfig().checkinputGreaterThanOrEqualToZero));
           };
 
           ctrl.onKeypress = function(evt) {
@@ -125,8 +127,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
-            let { checkInputGreaterThanZero } = ctrl.uiConfig() || {};
-            ctrl.minValue = checkInputGreaterThanZero && 0;
+            let { checkinputGreaterThanOrEqualToZero } = ctrl.uiConfig() || {};
+            ctrl.minValue = checkinputGreaterThanOrEqualToZero && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.
             $timeout(function() {

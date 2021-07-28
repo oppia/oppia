@@ -371,8 +371,8 @@ export class InteractionObjectFactory {
   _createFromNumericInputCustomizationArgsBackendDict(
       caBackendDict: NumericInputCustomizationArgsBackendDict
   ): NumericInputCustomizationArgs {
-    const { inputGreaterThanZero } = caBackendDict;
-    return { inputGreaterThanZero };
+    const { inputGreaterThanOrEqualToZero } = caBackendDict;
+    return { inputGreaterThanOrEqualToZero };
   }
 
   convertFromCustomizationArgsBackendDict(
