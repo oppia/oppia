@@ -14,8 +14,8 @@
 
 """Tests for the domain_objects_validator."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import domain_objects_validator
 from core.tests import test_utils

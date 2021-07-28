@@ -48,7 +48,7 @@ describe('Learner Dashboard Backend API Service', () => {
       incomplete_collection_ids: []
     },
     user_email: 'test@example.com',
-    is_admin: false,
+    is_curriculum_admin: false,
     is_super_admin: false,
     is_moderator: false
   };

@@ -14,8 +14,8 @@
 
 """Tests for Tasks Email Handler."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -56,8 +56,7 @@ class TasksTests(test_utils.EmailTestBase):
         self.user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.set_user_role(
-            self.EDITOR_USERNAME, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(

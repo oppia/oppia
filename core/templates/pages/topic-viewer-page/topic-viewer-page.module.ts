@@ -37,22 +37,22 @@ import { SubtopicsListComponent } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     StoriesListComponent,
     SubtopicsListComponent,
     TopicViewerNavbarBreadcrumbComponent,

@@ -14,8 +14,8 @@
 
 """Tests for the Question Player controller."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import skill_services
 from core.domain import topic_domain
@@ -385,7 +385,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         super(SubtopicMasteryDataHandlerTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.set_admins([self.NEW_USER_USERNAME])
+        self.set_curriculum_admins([self.NEW_USER_USERNAME])
 
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(
