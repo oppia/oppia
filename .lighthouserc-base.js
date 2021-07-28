@@ -17,8 +17,8 @@
  */
 
 module.exports = {
-  'numberOfRuns': 3,
-  'puppeteerScript': 'puppeteer-login-script.js',
+  numberOfRuns: 3,
+  puppeteerScript: 'puppeteer-login-script.js',
   urlShards: {
     1: [
       'http://127.0.0.1:8181/',

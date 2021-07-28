@@ -65,7 +65,6 @@ var storyDescriptionField = '.protractor-test-new-story-description-field';
 var storyThumbnailButton = '.protractor-test-photo-button';
 var storyUploadButton = '.protractor-test-photo-upload-input';
 var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
-var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmStoryCreationButton =
   '.protractor-test-confirm-story-creation-button';
 

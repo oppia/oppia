@@ -505,40 +505,48 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_expected_args(self):
         def mock_getenv(unused_env):
             return
-        def mock_join(*unused_args):
+        def mock_samefile(*unused_args):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
-        join_swap = self.swap_with_checks(
-            os.path, 'join', mock_join, expected_args=[('first', 'second')])
-        with getenv_swap, join_swap:
+        samefile_swap = self.swap_with_checks(
+            os.path,
+            'samefile',
+            mock_samefile,
+            expected_args=[('first', 'second')]
+        )
+        with getenv_swap, samefile_swap:
             SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_args_failed_on_run_sequence(self):
         def mock_getenv(unused_env):
             return
-        def mock_join(*unused_args):
+        def mock_samefile(*unused_args):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('456',), ('123',)])
-        join_swap = self.swap_with_checks(
-            os.path, 'join', mock_join, expected_args=[('first', 'second')])
+        samefile_swap = self.swap_with_checks(
+            os.path,
+            'samefile',
+            mock_samefile,
+            expected_args=[('first', 'second')]
+        )
         with self.assertRaisesRegexp(AssertionError, r'os\.getenv'):
-            with getenv_swap, join_swap:
+            with getenv_swap, samefile_swap:
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_args_failed_on_wrong_args_number(self):
         def mock_getenv(unused_env):
             return
-        def mock_join(*unused_args):
+        def mock_samefile(*unused_args):
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
-        join_swap = self.swap_with_checks(
-            os.path, 'join', mock_join, expected_args=[
+        samefile_swap = self.swap_with_checks(
+            os.path, 'samefile', mock_samefile, expected_args=[
                 ('first', 'second'), ('third', 'forth')])
-        with self.assertRaisesRegexp(AssertionError, r'join'):
-            with getenv_swap, join_swap:
+        with self.assertRaisesRegexp(AssertionError, r'samefile'):
+            with getenv_swap, samefile_swap:
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self):
@@ -675,7 +683,7 @@ class SwapWithCheckTestClass(python_utils.OBJECT):
         """Run a few functions with args."""
         os.getenv('123')
         os.getenv('456')
-        os.path.join('first', 'second')
+        os.path.samefile('first', 'second')
 
     @classmethod
     def functions_with_kwargs(cls):
