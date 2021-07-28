@@ -159,9 +159,6 @@ export class StateCard {
 
   isInteractionInline(): boolean {
     let interactionId = this.getInteractionId();
-    console.log(interactionId)
-    console.log(INTERACTION_SPECS[interactionId])
-    console.log(INTERACTION_SPECS[interactionId].display_mode)
     return (
       !interactionId ||
         INTERACTION_SPECS[interactionId].display_mode ===
