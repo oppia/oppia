@@ -16,8 +16,8 @@
 
 """Methods for returning the correct file system class to the client."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import fs_domain
 from core.domain import image_services
