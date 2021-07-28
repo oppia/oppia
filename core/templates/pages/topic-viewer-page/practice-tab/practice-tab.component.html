@@ -59,20 +59,20 @@
   }
 
   .practice-tab .practice-tab-for-learner-dashboard .capsule-progress {
-    height: 16px;
-    width: 256px;
-    margin: 0 auto;
     background: transparent;
-    border-radius: 80px;
-    top: 12px;
-    position: relative;
-    float: right;
     border: 1px solid black;
+    border-radius: 80px;
+    float: right;
+    height: 16px;
+    margin: 0 auto;
+    position: relative;
+    top: 12px;
+    width: 256px;
   }
 
   .subtopic-mastery {
     bottom: 2.2px;
-    color: #333333;
+    color: #333;
     float: right;
     font-size: 13px;
     font-style: italic;
@@ -82,8 +82,12 @@
   }
 
   .practice-tab .practice-tab-for-learner-dashboard .subtopic-title {
-    font-size: 18px;
     color: #333;
+    font-size: 18px;
+  }
+
+  .practice-tab-subtopic-item {
+    margin: 5px 0;
   }
 
   .practice-tab .practice-tab-for-learner-dashboard .practice-tab-subtopic-item {
@@ -94,6 +98,24 @@
 
   .practice-tab .practice-tab-for-learner-dashboard .card-actions {
     border-bottom: 1px solid;
+  }
+
+  .practice-tab .practice-session-button {
+    align-self: center;
+    background-color: #00645C;
+    border-radius: 0.4em;
+    color: white;
+    font-family: "Roboto", Arial, sans-serif;
+    height: 36px;
+    margin-top: 20px;
+    text-transform: uppercase;
+    width: 200px;
+  }
+
+  .practice-tab .practice-session-button:disabled {
+    background-color: rgba(0, 0, 0, .26);
+    box-shadow: none;
+    color: rgba(0, 0, 0, .26);
   }
 
   .practice-tab .practice-tab-for-learner-dashboard .full-width .practice-session-button {
@@ -137,7 +159,7 @@
     .practice-tab .practice-tab-for-learner-dashboard .practice-tab-subtopic-item {
       padding-bottom: 44px;
     }
-    .practice-tab .practice-tab-for-learner-dashboard .practice-tab-mat-checkbox{
+    .practice-tab .practice-tab-for-learner-dashboard .practice-tab-mat-checkbox {
       display: block;
     }
     .practice-tab .practice-tab-for-learner-dashboard .card-actions {
@@ -161,24 +183,6 @@
     vertical-align: top;
   }
 
-  .practice-tab .practice-session-button {
-    align-self: center;
-    background-color: #00645C;
-    border-radius: 0.4em;
-    color: white;
-    font-family: "Roboto", Arial, sans-serif;
-    height: 36px;
-    margin-top: 20px;
-    text-transform: uppercase;
-    width: 200px;
-  }
-
-  .practice-tab .practice-session-button:disabled {
-    background-color: rgba(0, 0, 0, .26);
-    box-shadow: none;
-    color: rgba(0, 0, 0, .26);
-  }
-
   .practice-tab .practice-session-button .question-status-spinner {
     margin: 0 auto;
   }
@@ -200,10 +204,6 @@
 
   .oppia-topic-viewer-container .background-banner-position {
     position: inherit;
-  }
-
-  .practice-tab-subtopic-item {
-    margin: 5px 0;
   }
 
 </style>
