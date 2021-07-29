@@ -107,7 +107,7 @@ export class UrlService {
    * @return {string} the topic URL fragment.
    * @throws Will throw an error if the url is invalid.
    */
-  getTopicUrlFragmentFromLearnerUrl(): string | undefined {
+  getTopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[3]);
@@ -120,9 +120,8 @@ export class UrlService {
           constants.VALID_URL_FRAGMENT_REGEX)) {
         return this.getUrlParams().topic_url_fragment;
       }
-    } else {
-      throw new Error('Invalid URL for topic');
     }
+    throw new Error('Invalid URL for topic');
   }
 
   getStoryUrlFragmentFromLearnerUrl(): string | null {
@@ -149,7 +148,7 @@ export class UrlService {
     return null;
   }
 
-  getSubtopicUrlFragmentFromLearnerUrl(): string | undefined {
+  getSubtopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn') && pathname.includes('/revision')) {
       return decodeURIComponent(pathname.split('/')[5]);
@@ -157,7 +156,7 @@ export class UrlService {
     throw new Error('Invalid URL for subtopic');
   }
 
-  getClassroomUrlFragmentFromLearnerUrl(): string | undefined {
+  getClassroomUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
     if (pathname.startsWith('/learn')) {
       return decodeURIComponent(pathname.split('/')[2]);
@@ -170,9 +169,8 @@ export class UrlService {
           constants.VALID_URL_FRAGMENT_REGEX)) {
         return this.getUrlParams().classroom_url_fragment;
       }
-    } else {
-      throw new Error('Invalid URL for classroom');
     }
+    throw new Error('Invalid URL for classroom');
   }
 
   /**

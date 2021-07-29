@@ -49,8 +49,8 @@ describe('Exploration Recommendations Service', () => {
   }));
 
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
-    contextService = TestBed.get(ContextService);
+    urlService = TestBed.inject(UrlService);
+    contextService = TestBed.inject(ContextService);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       COLLECTION_ID);
@@ -71,7 +71,7 @@ describe('Exploration Recommendations Service', () => {
     });
 
     it('should initialize with editor context', () => {
-      expRecsService = TestBed.get(ExplorationRecommendationsService);
+      expRecsService = TestBed.inject(ExplorationRecommendationsService);
       expect(expRecsService.isInEditorPage).toBeTrue();
     });
 
@@ -83,7 +83,7 @@ describe('Exploration Recommendations Service', () => {
       });
 
       it('should initialize with editor preview context', () => {
-        expRecsService = TestBed.get(ExplorationRecommendationsService);
+        expRecsService = TestBed.inject(ExplorationRecommendationsService);
         expect(expRecsService.isInEditorPage).toBeTrue();
         expect(expRecsService.isInEditorPreviewMode).toBeTrue();
       });
@@ -98,7 +98,7 @@ describe('Exploration Recommendations Service', () => {
     });
 
     it('should not initialize with editor context', () => {
-      expRecsService = TestBed.get(ExplorationRecommendationsService);
+      expRecsService = TestBed.inject(ExplorationRecommendationsService);
       expect(expRecsService.isInEditorPage).toBeFalse();
     });
   });
@@ -108,7 +108,7 @@ describe('Exploration Recommendations Service', () => {
     const AUTHOR_REC_IDS = ['author_rec_1', 'author_rec_2'];
 
     class MockExplorationSummary {
-      id: string;
+      id?: string;
       constructor(id?: string) {
         this.id = id;
       }
@@ -128,7 +128,7 @@ describe('Exploration Recommendations Service', () => {
         new MockExplorationSummary('author_rec_2') as LearnerExplorationSummary
       ];
 
-      expRecsBackendApiService = TestBed.get(
+      expRecsBackendApiService = TestBed.inject(
         ExplorationRecommendationsBackendApiService
       );
 
@@ -148,7 +148,7 @@ describe('Exploration Recommendations Service', () => {
         spyOn(contextService, 'getPageContext').and.returnValue(
           ServicesConstants.PAGE_CONTEXT.OTHER
         );
-        expRecsService = TestBed.get(ExplorationRecommendationsService);
+        expRecsService = TestBed.inject(ExplorationRecommendationsService);
       });
 
       it('should include author recommendations', () => {
@@ -177,7 +177,7 @@ describe('Exploration Recommendations Service', () => {
         spyOn(contextService, 'getPageContext').and.returnValue(
           ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
         );
-        expRecsService = TestBed.get(ExplorationRecommendationsService);
+        expRecsService = TestBed.inject(ExplorationRecommendationsService);
       });
 
       it('should include author recommendations', () => {

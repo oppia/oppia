@@ -26,10 +26,9 @@ import { ReviewTestBackendApiService } from
 import { UrlService } from 'services/contextual/url.service';
 
 describe('Review test backend API service', () => {
-  let reviewTestBackendApiService:
-    ReviewTestBackendApiService = null;
+  let reviewTestBackendApiService: ReviewTestBackendApiService;
   let httpTestingController: HttpTestingController;
-  let urlService: UrlService = null;
+  let urlService: UrlService;
 
   var ERROR_STATUS_CODE = 500;
 
@@ -43,10 +42,9 @@ describe('Review test backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [ReviewTestBackendApiService]
     });
-    reviewTestBackendApiService = TestBed.get(
-      ReviewTestBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    urlService = TestBed.get(UrlService);
+    reviewTestBackendApiService = TestBed.inject(ReviewTestBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.callFake(
       () => 'abbrev-topic');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.callFake(

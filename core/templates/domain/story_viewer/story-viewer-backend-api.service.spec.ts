@@ -29,7 +29,7 @@ import { StoryDataDict, StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 
 describe('Story viewer backend API service', () => {
-  let storyViewerBackendApiService: StoryViewerBackendApiService = null;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {

@@ -33,10 +33,12 @@ import { LearnerExplorationSummary } from
   providedIn: 'root'
 })
 export class ExplorationRecommendationsService {
-  isIframed: boolean = null;
-  isInEditorPage: boolean = null;
-  isInEditorPreviewMode: boolean = null;
-  explorationId: string = null;
+  isIframed: boolean = false;
+  isInEditorPage: boolean = false;
+  isInEditorPreviewMode: boolean = false;
+  // 'explorationId' is only used in 'getRecommendedSummaryDicts()' and is
+  // assigned a value before it is used, hence we need to do non-null assertion.
+  explorationId!: string;
 
   constructor(
     private contextService: ContextService,
@@ -71,8 +73,9 @@ export class ExplorationRecommendationsService {
     }
 
     this.expRecommendationBackendApiService.getRecommendedSummaryDictsAsync(
-      authorRecommendedExpIds, includeSystemRecommendations, collectionId,
-      storyId, currentNodeId, this.explorationId).then(expSummaries => {
+      authorRecommendedExpIds, includeSystemRecommendations,
+      collectionId, storyId, currentNodeId, this.explorationId
+    ).then(expSummaries => {
       successCallback(expSummaries);
     });
   }

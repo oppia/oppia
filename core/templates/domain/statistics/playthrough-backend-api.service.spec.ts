@@ -63,7 +63,26 @@ describe('Playthrough backend api service', () => {
       },
       actions: [{
         action_type: 'AnswerSubmit',
-        action_customization_args: null,
+        action_customization_args: {
+          state_name: {
+            value: ''
+          },
+          dest_state_name: {
+            value: ''
+          },
+          interaction_id: {
+            value: ''
+          },
+          submitted_answer: {
+            value: ''
+          },
+          feedback: {
+            value: ''
+          },
+          time_spent_state_in_msecs: {
+            value: 0
+          },
+        },
         schema_version: 1
       }]
     };

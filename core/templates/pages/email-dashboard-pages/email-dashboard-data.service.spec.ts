@@ -26,19 +26,20 @@ import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 import { EmailDashboardQuery, EmailDashboardQueryDict } from
   'domain/email-dashboard/email-dashboard-query.model';
+import { QueryData } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 
 describe('Email Dashboard Services', () => {
   describe('Email Dashboard Services', () => {
-    let csrfService: CsrfTokenService = null;
-    let emailDashboardDataService: EmailDashboardDataService = null;
+    let csrfService: CsrfTokenService;
+    let emailDashboardDataService: EmailDashboardDataService;
     let httpTestingController: HttpTestingController;
-    let defaultData = {
-      inactive_in_last_n_days: null,
-      has_not_logged_in_for_n_days: null,
-      created_at_least_n_exps: null,
-      created_fewer_than_n_exps: null,
-      edited_at_least_n_exps: null,
-      edited_fewer_than_n_exps: null
+    let defaultData: QueryData = {
+      inactive_in_last_n_days: false,
+      has_not_logged_in_for_n_days: false,
+      created_at_least_n_exps: false,
+      created_fewer_than_n_exps: false,
+      edited_at_least_n_exps: false,
+      edited_fewer_than_n_exps: false
     };
 
     beforeEach(() => {
@@ -46,9 +47,9 @@ describe('Email Dashboard Services', () => {
         imports: [HttpClientTestingModule],
         providers: [EmailDashboardDataService]
       });
-      csrfService = TestBed.get(CsrfTokenService);
-      emailDashboardDataService = TestBed.get(EmailDashboardDataService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      csrfService = TestBed.inject(CsrfTokenService);
+      emailDashboardDataService = TestBed.inject(EmailDashboardDataService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
         return new Promise((resolve) => {
