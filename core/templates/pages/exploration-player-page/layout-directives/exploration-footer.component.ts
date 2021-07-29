@@ -51,7 +51,15 @@ export class ExplorationFooterComponent {
   }
 
   ngOnInit(): void {
-    if (this.contextService.getExplorationId()) {
+    // TODO(#13494): Implement a different footer for practice-session-page.
+    // This component is used at 'exploration-player-page' and
+    // 'practice-session-page' with different usage at both places.
+    // 'contextService.getExplorationId()' throws an error when this component
+    // is used at 'practice-session-page' because the author profiles section
+    // does not exist and the URL does not contain a valid explorationId.
+    // Try-catch is for catching the error thrown from context-service so
+    // that the component behaves properly at both the places.
+    try {
       this.explorationId = this.contextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
@@ -81,7 +89,7 @@ export class ExplorationFooterComponent {
             }
           });
       }
-    }
+    } catch (err) { }
   }
 
   ngOnDestroy(): void {
