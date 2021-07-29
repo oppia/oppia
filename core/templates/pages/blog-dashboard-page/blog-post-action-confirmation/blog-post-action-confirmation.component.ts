@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for resetting image regions editor.
+ * @fileoverview Component for confirming blog post actions.
  */
 
 import { Component, OnInit } from '@angular/core';

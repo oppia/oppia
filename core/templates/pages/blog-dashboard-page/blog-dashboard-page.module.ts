@@ -21,6 +21,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -45,7 +46,8 @@ declare var angular: ng.IAngularStatic;
     SharedComponentsModule,
     MatTabsModule,
     MatMenuModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    BrowserAnimationsModule
   ],
   declarations: [
     BlogDashboardNavbarBreadcrumbComponent,

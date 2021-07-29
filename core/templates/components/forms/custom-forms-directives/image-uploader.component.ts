@@ -38,6 +38,7 @@ export class ImageUploaderComponent {
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() allowedImageFormats!: string[];
+  @Input() isBlogPostThumbnailUploader: boolean;
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
   @ViewChild('imageInput') imageInputRef!: ElementRef;
   fileInputClassName!: string;

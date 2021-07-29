@@ -191,6 +191,9 @@ export class ContextService {
       if (hashValues.length === 3 && hashValues[1] === '/questions') {
         return decodeURI(hashValues[2]);
       }
+      if (pathnameArray[i] === 'blog-dashboard') {
+        return decodeURI(this.urlService.getBlogPostIdFromUrl());
+      }
     }
     return decodeURI(pathnameArray[2]);
   }

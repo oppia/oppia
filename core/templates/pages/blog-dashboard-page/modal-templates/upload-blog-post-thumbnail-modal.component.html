@@ -1,23 +1,21 @@
 <div class="oppia-thumbnail-picture-container">
-  <div>
+  <div class="my-5 mx-3">
     <h3>{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_UPLOAD' | translate }}</h3>
   </div>
 
-  <div class="modal-body oppia-thumbnail-image-uploader-container">
-    <div class="oppia-thumbnail-image-uploader">
+  <div class="modal-body oppia-blog-post-thumbnail-uploader-container">
+    <div class="blog-post-thumbnail-image-uploader">
       <div *ngIf="!uploadedImage">
         <oppia-image-uploader (fileChanged)="onFileChanged($event)"
-                              [allowedImageFormats]="allowedImageFormats">
+                              [allowedImageFormats]="allowedImageFormats"
+                              [isBlogPostThumbnailUploader]="true">
         </oppia-image-uploader>
       </div>
-
       <div class="oppia-form-error oppia-form-error-text"
            *ngIf="invalidImageWarningIsShown">
            {{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_ERROR' | translate }}
       </div>
-
       <div *ngIf="uploadedImage">
-        <span>{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
         <div class="oppia-thumbnail-picture-crop-area protractor-test-photo-crop">
           <button class="btn btn-secondary oppia-thumbnail-picture-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
@@ -41,7 +39,7 @@
   </div>
 </div>
 <style>
-  .oppia-thumbnail-picture-container .oppia-thumbnail-picture-crop-area {
+  .oppia-thumbnail-picture-crop-area {
     background: #E4E4E4;
     height: 350px;
     margin-top: 20px;
@@ -49,15 +47,27 @@
     position: relative;
     width: 500px;
   }
-  .oppia-thumbnail-picture-container .oppia-thumbnail-picture-reset-button {
+
+  .oppia-thumbnail-picture-reset-button {
     position: absolute;
     right: -50px;
     top: 0;
   }
-  .oppia-thumbnail-picture-container .oppia-thumbnail-image-uploader-container {
+
+  .oppia-blog-post-thumbnail-uploader-container {
     min-height: 300px;
   }
-  .oppia-thumbnail-picture-container .oppia-form-error-text {
+
+  .oppia-form-error-text {
     margin-top: 15px;
   }
+
+  .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+    border: #666666 dashed;
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+    padding-top: 0;
+  }
+
 </style>

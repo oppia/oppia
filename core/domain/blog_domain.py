@@ -313,7 +313,7 @@ class BlogPost(python_utils.OBJECT):
         Args:
             tags: list(str). New list of tags for the blog post.
         """
-        self.require_valid_tags(tags, True)
+        self.require_valid_tags(tags, False)
         self.tags = tags
 
     @classmethod

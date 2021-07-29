@@ -21,15 +21,11 @@ interface EditorSchema {
   'ui_config': object
 }
 
-interface ImageData {
-  filename: string;
-  imageBlob: Blob;
-}
-
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
@@ -44,6 +40,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html'
@@ -52,14 +49,20 @@ export class BlogPostEditorComponent implements OnInit {
   blogPostData: BlogPostData;
   blogPostId: string;
   authorProfilePictureUrl: string;
+  uploadedImageDataUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   dateTimeLastSaved: string = '';
   authorUsername: string = '';
+  title: string;
+  windowIsNarrow: boolean;
   defaultTagsList: string[];
   maxAllowedTags: number;
   contentEditorIsActive: boolean = true;
+  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
+  filename: string;
   localEdittedContent: string;
   thumbnailDataUrl: string;
+  invalidImageWarningIsShown: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
@@ -80,6 +83,8 @@ export class BlogPostEditorComponent implements OnInit {
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private windowDimensionService: WindowDimensionsService,
+    private svgSanitizerService: SvgSanitizerService,
   ) {}
 
   ngOnInit(): void {
@@ -88,11 +93,16 @@ export class BlogPostEditorComponent implements OnInit {
       .getStaticImageUrl('/general/no_profile_picture.png');
     this.blogPostData = this.blogDashboardPageService.interstitialBlogPost;
     this.blogPostId = this.blogDashboardPageService.blogPostId;
+    this.title = this.blogPostData.title;
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
       AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE);
     this.loaderService.hideLoadingScreen();
     this.initEditor();
     this.contextService.setImageSaveDestinationToLocalStorage();
+    this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
+    });
   }
 
   getSchema(): EditorSchema {
@@ -110,9 +120,13 @@ export class BlogPostEditorComponent implements OnInit {
           this.authorUsername = editorData.username;
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;
+          this.title = this.blogPostData.title;
+          if (this.blogPostData.content !== '') {
+            this.contentEditorIsActive = false;
+          }
           if (this.blogPostData.thumbnailFilename) {
             this.thumbnailDataUrl = this.assetsBackendApiService
-              .getThumbnailUrlForPreview(
+              .getBlogPostThumbnailUrlForPreview(
                 AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostId,
                 this.blogPostData.thumbnailFilename);
           }
@@ -120,19 +134,16 @@ export class BlogPostEditorComponent implements OnInit {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
               errorResponse.status) !== -1) {
-            this.alertsService.addWarning('Failed to get blog dashboard data.');
+            this.alertsService.addWarning('Failed to get blog post data.');
           }
         });
     this.dateTimeLastSaved = this.getDateStringInWords(
       this.blogPostData.lastUpdated);
-    if (this.blogPostData.content !== '') {
-      this.contentEditorIsActive = false;
-    }
   }
 
   updateLocalTitleValue(): void {
     this.blogPostUpdateService.setBlogPostTitle(
-      this.blogPostData, this.blogPostData.title);
+      this.blogPostData, this.title);
   }
 
   cancelEdit(): void {
@@ -149,9 +160,8 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   updateContentValue(): void {
-    this.blogPostData.content = this.localEdittedContent;
     this.blogPostUpdateService.setBlogPostContent(
-      this.blogPostData, this.blogPostData.content);
+      this.blogPostData, this.localEdittedContent);
     if (this.blogPostData.content !== '') {
       this.contentEditorIsActive = false;
     }
@@ -212,7 +222,10 @@ export class BlogPostEditorComponent implements OnInit {
     );
   }
 
-  postImageDataToServer(imagesData: ImageData[]): void {
+  postImageDataToServer(): void {
+    let imagesData = this.imageLocalStorageService.getStoredImagesData();
+    this.blogPostUpdateService.setBlogPostThumbnail(
+      this.blogPostData, imagesData);
     this.blogPostEditorBackendService.postThumbnailDataAsync(
       this.blogPostId, imagesData).then(
       () => {
@@ -255,6 +268,27 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 
+  onFileChanged(file: File): void {
+    this.filename = file.name;
+    this.invalidImageWarningIsShown = false;
+    let reader = new FileReader();
+    let uploadedImage;
+    reader.onload = (e) => {
+      uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+        (<FileReader>e.target).result as string);
+      if (!uploadedImage) {
+        this.uploadedImageDataUrl = decodeURIComponent(
+          (<FileReader>e.target).result as string);
+      }
+      this.changeDetectorRef.detectChanges();
+      this.imageLocalStorageService.saveImage(
+        this.filename, this.uploadedImageDataUrl);
+      this.thumbnailDataUrl = this.uploadedImageDataUrl;
+      this.postImageDataToServer();
+    };
+    reader.readAsDataURL(file);
+  }
+
   getDateStringInWords(naiveDateTime: string): string {
     return dayjs(
       naiveDateTime, 'MM-DD-YYYY, h:mm A').format('MMMM D, YYYY [at] h:mm A');
@@ -267,10 +301,7 @@ export class BlogPostEditorComponent implements OnInit {
 
     modalRef.result.then((imageDataUrl) => {
       this.thumbnailDataUrl = imageDataUrl;
-      let imagesData = this.imageLocalStorageService.getStoredImagesData();
-      this.blogPostUpdateService.setBlogPostThumbnail(
-        this.blogPostData, imagesData);
-      this.postImageDataToServer(imagesData);
+      this.postImageDataToServer();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

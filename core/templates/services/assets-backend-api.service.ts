@@ -184,6 +184,12 @@ export class AssetsBackendApiService {
       entityType, entityId, filename, constants.ASSET_TYPE_THUMBNAIL);
   }
 
+  getBlogPostThumbnailUrlForPreview(
+      entityType: string, entityId: string, filename: string): string {
+    return this.getDownloadUrl(
+      entityType, entityId, filename, constants.ASSET_TYPE_BLOG_POST_THUMBNAIL);
+  }
+
   private getDownloadUrl(
       entityType: string, entityId: string, filename: string,
       assetType: string): string {

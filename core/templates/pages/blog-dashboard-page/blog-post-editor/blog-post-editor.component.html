@@ -4,39 +4,70 @@
          (mouseover)="showAddImageIcon=true"
          (mouseleave)="showAddImageIcon=false"
          (click)="showuploadThumbnailModal()"
-         tabindex="0">
+         tabindex="0"
+         *ngIf="!windowIsNarrow">
       <img mat-card-image
            class="position-absolute"
            *ngIf="thumbnailDataUrl"
            [src]="thumbnailDataUrl"
            aria-label="Blog Post thumbnail">
       <div *ngIf="showAddImageIcon" class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
-        <mat-icon class="mx-auto">panorama</mat-icon>
-        <span class="mat-card-title">{{ "'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate" }}</span>
+        <mat-icon class="mx-auto">insert_photo</mat-icon>
+        <span class="mat-card-title">{{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}</span>
       </div>
     </div>
-    <div class="blog-post-title d-flex">
-      <div class="title-heading col-sm-2 mr-2 mb-auto text-center">
-        <span class="vertical-sub-align">{{ "'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase" }}</span>
+    <div class="blog-post-title d-flex" [ngClass]="{'flex-column': windowIsNarrow}">
+      <div *ngIf="windowIsNarrow">
+        <mat-card-header [ngClass]="{'flex-column': windowIsNarrow}">
+          <div mat-card-avatar class="author-profile d-flex">
+            <img mat-card-avatar
+                 class="profile-image"
+                 [src]="authorProfilePictureUrl"
+                 alt="Profile image of the author of the blog post.">
+            <span class="author-username text-center general-text-format ml-4 my-auto">
+              {{ authorUsername }}
+            </span>
+          </div>
+          <div class="mat-card-header-text d-block mx-0 mt-3">
+            <mat-card-title class="general-text-format">
+              {{ blogPostData.title }}
+            </mat-card-title>
+            <mat-card-subtitle class="sub-text general-text-format">
+              {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
+            </mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <div class="title-heading mr-2 mb-4 text-left">
+          <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING' | translate | uppercase }}</span>
+        </div>
+        <div *ngIf="!uploadedImage" class="blog-post-thumbnail-image-uploader">
+          <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+                                [allowedImageFormats]="allowedImageFormats"
+                                [isBlogPostThumbnailUploader]="true">
+          </oppia-image-uploader>
+        </div>
+      </div>
+      <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
+        <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
       </div>
       <div class="d-block flex-grow-1">
         <input class="form-control required general-text-format"
-               [(ngModel)]="blogPostData.title"
+               [(ngModel)]="title"
                [ngClass]="{'blog-title-input-field': blogPostData.title !== ''}"
                maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
                (focusout)="updateLocalTitleValue()"               
                autofocus>
-        <span class="oppia-input-box-subtitle">
+        <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em>
             Blog Post title should be at most {{MAX_CHARS_IN_BLOG_POST_TITLE}} characters.
           </em>
         </span>
       </div>
     </div>
-    <div class="blog-post-content d-flex mt-2">
-      <div class="title-heading col-sm-2 mr-2 mb-auto text-center">
-        <span class="vertical-sub-align">{{ "'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase" }}</span>
+    <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
+      <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
+        <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
       </div>
       <div class="d-block flex-grow-1">
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="blog-post-content-button">
@@ -57,19 +88,38 @@
                     class="btn btn-success oppia-save-state-item-button float-right"
                     (click)="updateContentValue()"
                     aria-label="Button to save entered content.">
-              {{ "'I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT' | translate | uppercase" }}
+              {{ 'I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT' | translate | uppercase }}
             </button>
             <button mat-button class="btn delete-button float-right" (click)="cancelEdit()">
-              {{ "'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate | uppercase" }}
+              {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate | uppercase }}
             </button>
             <div class="oppia-clear"></div>
           </div>
+          <div *ngIf="windowIsNarrow">
+            <div class="mt-4 text-left">
+              <span class="tag-heading general-text-format">
+                {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
+              </span>
+              <span class="sub-text tag-limit-text general-text-format">
+                {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
+              </span>
+            </div>
+            <mat-button-toggle-group aria-label="Tags to classify blog post."
+                                    [value]="blogPostData.tags"
+                                    *ngFor="let tag of defaultTagsList"
+                                    multiple="true"
+                                    class="mx-2 my-2 tag">
+              <mat-button-toggle class="text-wrap" (change)="onTagChange($event.value)" [value]="tag">
+              {{ tag }}
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
         </div>
       </div>
     </div>
   </mat-card>
-  <mat-card class="editor-profile-card col-sm-2 mr-auto">
-    <mat-card-header class="d-block">
+  <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
+    <mat-card-header *ngIf="!windowIsNarrow" class="d-block">
       <div mat-card-avatar class="author-profile mx-auto">
         <img mat-card-avatar
              class="profile-image"
@@ -89,20 +139,22 @@
       </div>
     </mat-card-header>
     <mat-card-content class="text-center">
-      <mat-card-actions>
+      <mat-card-actions [ngClass]="{'small-screen-buttons-container': windowIsNarrow}">
         <button mat-button class="mx-2 my-2"
                 [disabled]="blogPostData.validate().length > 0"
                 (click)="saveDraft()"
-                aria-label="Save blog post as draft.">
-          {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }}
+                aria-label="Save blog post as draft."
+                [ngClass]="{'small-screen-button': windowIsNarrow}">
+          {{ 'I18N_BLOG_POST_EDITOR_SAVE_DRAFT_BUTTON' | translate | uppercase }}
         </button>
-        <button mat-button class="mx-2 my-2"
+        <button mat-button class="mx-2 my-2 publish-button"
                 [disabled]="blogPostData.prepublishValidate(maxAllowedTags).length > 0"
                 (click)="publishBlogPost()"
-                aria-label="Publish blog post.">
-          {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }}
+                aria-label="Publish blog post."
+                [ngClass]="{'small-screen-button': windowIsNarrow}">
+          {{ 'I18N_BLOG_POST_EDITOR_PUBLISH_BUTTON' | translate | uppercase }}
         </button>
-        <div class="mt-4 text-left">
+        <div *ngIf="!windowIsNarrow" class="mt-4 text-left">
           <span class="tag-heading general-text-format">
             {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
           </span>
@@ -110,19 +162,22 @@
             {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
           </span>
         </div>
-        <mat-button-toggle-group aria-label="Tags to classify blog post."
-                                 [value]="blogPostData.tags"
-                                 *ngFor="let tag of defaultTagsList"
-                                 multiple="true"
-                                 class="mx-2 my-2 tag">
-          <mat-button-toggle  class="text-wrap" (change)="onTagChange($event.value)">
-            {{ tag }}
-          </mat-button-toggle>
-        </mat-button-toggle-group>
+        <div *ngIf="!windowIsNarrow">
+          <mat-button-toggle-group aria-label="Tags to classify blog post."
+                                  [value]="blogPostData.tags"
+                                  *ngFor="let tag of defaultTagsList"
+                                  multiple="true"
+                                  class="mx-2 my-2 tag">
+            <mat-button-toggle  class="text-wrap" (change)="onTagChange($event.value)" [value]="tag">
+              {{ tag }}
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
         <button mat-button 
                 class="d-block delete-button mx-auto my-0"
                 (click)="deleteBlogPost()"
-                aria-label="Delete blog post.">
+                aria-label="Delete blog post."
+                [ngClass]="{'small-screen-button': windowIsNarrow}">
           {{ 'I18N_BLOG_POST_EDITOR_DELETE_BUTTON' | translate | uppercase }}
         </button>
       </mat-card-actions>
@@ -198,6 +253,10 @@
     line-height: unset;
   }
 
+  .mat-button .publish-button {
+    background-color: #00645C
+  }
+
   .mat-button:disabled {
     letter-spacing: 0px;
     color: #00000061;
@@ -265,7 +324,8 @@
   }
 
   .mat-button-toggle-checked {
-    background-color: aqua;
+    color: #FFF;
+    background-color: #00645C;
   }
 
   @media(max-width: 920px) {
@@ -279,6 +339,60 @@
     }
   }
 
-  @media(max-width: 768px) {}
+  @media(max-width: 768px) {
+    .col-sm-8,
+    .editor-profile-card.col-sm-2 {
+      flex:unset;
+      max-width:unset;
+    }
+
+    .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+      border: #666666 dashed;
+      width: 250px;
+      padding-top: 0;
+      height: 19.722vw;
+    }
+
+    .blog-post-thumbnail-image-uploader /deep/ .blog-post-thumbnail-uploader {
+      width: 250px;
+      height: 19.722vw;
+    }
+
+    .title-heading {
+      width: 120px;
+      font-size: 1.2rem;
+      border: none;
+      line-height: 40px;
+      padding: 0;
+    }
+
+    .editor-field-card {
+      padding: 30px;
+      margin: 0;
+    }
+
+    .small-screen-buttons-container {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .small-screen-button {
+      width: 100%;
+      height: 36px;
+    }
+
+    .buttons-container {
+      margin: -10px 0 0 0;
+      padding: 35px;
+    }
+
+    @media(max-width: 700px) {
+      .btn.mat-button {
+        height: 20px;
+        width: 82px;
+      }
+    }
+  }
 
 </style>
