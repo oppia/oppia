@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # p
 
 MYPY = False
 if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import base_models, datastore_services, transaction_services # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

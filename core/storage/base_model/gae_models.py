@@ -45,7 +45,7 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
 
 MYPY = False
 if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import datastore_services, transaction_services # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -305,7 +305,7 @@ class BaseModel(datastore_services.Model):
         if not include_deleted:
             for i in python_utils.RANGE(len(entities)):
                 entity = entities[i]
-                if entity:
+                if entity is not None:
                     # Ruling out the possibility of None for mypy type checking.
                     assert entity is not None
                     if entity.deleted:

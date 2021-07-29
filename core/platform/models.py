@@ -401,7 +401,7 @@ class Registry(python_utils.OBJECT):
             model_names: list(NAMES). List of storage modules.
 
         Returns:
-            list(module). The corresponding storage-layer modules.
+            tuple(module). The corresponding storage-layer modules.
         """
         return cls._get().import_models(model_names)
 

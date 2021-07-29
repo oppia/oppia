@@ -34,7 +34,7 @@ from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-i
 
 MYPY = False
 if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import base_models, collection_models, user_models # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 
 (base_models, collection_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
