@@ -44,7 +44,9 @@ export interface ExplorationSummaryBackendDict {
 }
 
 interface HumanReadableContributorSummaryBackendDict {
-  'num_commits': number
+  [username: string]: {
+    'num_commits': number
+  }
 }
 
 @Injectable({
@@ -60,9 +62,8 @@ export class ExplorationSummaryBackendApiService {
       explorationIds: string[],
       includePrivateExplorations: boolean,
       successCallback: (
-        value?: ExplorationSummaryBackendDict |
-        Promise<ExplorationSummaryBackendDict>) => void,
-      errorCallback: (reason?: string | string[]) => void): void {
+        value: ExplorationSummaryBackendDict) => void,
+      errorCallback: (reason: string | null[]) => void): void {
     if (!explorationIds.every(expId =>
       this.validatorsService.isValidExplorationId(expId, true))) {
       this.alertsService.addWarning('Please enter a valid exploration ID.');
@@ -75,13 +76,14 @@ export class ExplorationSummaryBackendApiService {
     }
     const explorationSummaryDataUrl =
     AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
-    this.httpClient.get(explorationSummaryDataUrl, {
-      params: {
-        stringified_exp_ids: JSON.stringify(explorationIds),
-        include_private_explorations: JSON.stringify(
-          includePrivateExplorations)
-      }
-    }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
+    this.httpClient.get<ExplorationSummaryBackendDict>(
+      explorationSummaryDataUrl, {
+        params: {
+          stringified_exp_ids: JSON.stringify(explorationIds),
+          include_private_explorations: JSON.stringify(
+            includePrivateExplorations)
+        }
+      }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
       if (summaries === null) {
         const summariesError = (
           'Summaries fetched are null for explorationIds: ' + explorationIds

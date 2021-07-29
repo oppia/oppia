@@ -43,7 +43,9 @@ import { ValidatorsService } from 'services/validators.service';
 import constants from 'assets/constants';
 
 export class Skill {
-  _id: string;
+  // 'SkillId' and 'supersedingSkillId' will be null when creating
+  // interstitial Skill.
+  _id: string | null;
   _description: string;
   _misconceptions: Misconception[];
   _rubrics: Rubric[];
@@ -57,10 +59,17 @@ export class Skill {
   SKILL_DIFFICULTIES: readonly string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(
-      id: string, description: string, misconceptions: Misconception[],
-      rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
-      version: number, nextMisconceptionId: number, supersedingSkillId: string,
-      allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
+      id: string | null,
+      description: string,
+      misconceptions: Misconception[],
+      rubrics: Rubric[],
+      conceptCard: ConceptCard,
+      languageCode: string,
+      version: number,
+      nextMisconceptionId: number,
+      supersedingSkillId: string | null,
+      allQuestionsMerged: boolean,
+      prerequisiteSkillIds: string[]) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -86,7 +95,7 @@ export class Skill {
     this._allQuestionsMerged = skill.getAllQuestionsMerged();
     this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
   }
-  getId(): string {
+  getId(): string | null {
     return this._id;
   }
 
@@ -148,7 +157,7 @@ export class Skill {
     return (parseInt(id) + 1);
   }
 
-  getSupersedingSkillId(): string {
+  getSupersedingSkillId(): string | null {
     return this._supersedingSkillId;
   }
 
@@ -177,7 +186,9 @@ export class Skill {
     return this._misconceptions[idx];
   }
 
-  getRubricExplanations(difficulty: string): string[] {
+  // It will return 'null' if the passed difficulty does not match
+  // any difficulty in the rubrics.
+  getRubricExplanations(difficulty: string): string[] | null {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
         return this._rubrics[idx].getExplanations();
@@ -204,6 +215,9 @@ export class Skill {
   }
 
   toBackendDict(): SkillBackendDict {
+    if (this._id === null || this._supersedingSkillId === null) {
+      throw new Error('The SkillIds are not defined');
+    }
     return {
       id: this._id,
       description: this._description,

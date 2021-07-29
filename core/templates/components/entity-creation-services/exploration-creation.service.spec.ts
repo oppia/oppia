@@ -164,7 +164,7 @@ describe('ExplorationCreationService', () => {
 
       // @ts-ignore in order to ignore JQuery properties that should
       // be declared.
-      spyOn($, 'ajax').and.callFake((options) => {
+      spyOn($, 'ajax').and.callFake((options: Promise) => {
         let d = $.Deferred();
         d.resolve(
           options.dataFilter(')]}\',\n{"explorationId": "expId"}')

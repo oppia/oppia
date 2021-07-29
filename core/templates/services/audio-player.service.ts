@@ -38,6 +38,7 @@ export interface AutoPlayAudioEvent {
 export class AudioPlayerService {
   private _currentTrackFilename: string | null = null;
   private _currentTrack: Howl | null = null;
+  // 'lastPauseOrSeekPos' will be 'null' when the track ends.
   private _lastPauseOrSeekPos: number | null = null;
   private _loadingTrack = false;
   private _updateViewEventEmitter = new EventEmitter<void>();
@@ -51,7 +52,11 @@ export class AudioPlayerService {
     private ngZone: NgZone
   ) {}
 
-  private async _loadAsync(filename: string, successCallback, errorCallback) {
+  private async _loadAsync(
+      filename: string,
+      successCallback: (
+        value: void | PromiseLike<void>) => void,
+      errorCallback: (reason?: string[]) => void) {
     if (this._loadingTrack) {
       throw new Error('Already loading a track... Please try again!');
     }

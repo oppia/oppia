@@ -18,31 +18,31 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardObjectFactory } from
+import { ConceptCardBackendDict, ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
-import { MisconceptionObjectFactory } from
+import { MisconceptionBackendDict, MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
-import { Rubric } from
+import { Rubric, RubricBackendDict } from
   'domain/skill/rubric.model';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import constants from 'assets/constants';
 
 describe('Skill object factory', () => {
-  let skillObjectFactory: SkillObjectFactory = null;
-  let conceptCardObjectFactory: ConceptCardObjectFactory = null;
-  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
+  let skillObjectFactory: SkillObjectFactory;
+  let conceptCardObjectFactory: ConceptCardObjectFactory;
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let example1 = null;
   let example2 = null;
-  let misconceptionDict1 = null;
-  let misconceptionDict2 = null;
-  let rubricDict = null;
-  let skillContentsDict = null;
-  let skillDict = null;
-  let skillDifficulties = null;
+  let misconceptionDict1: MisconceptionBackendDict;
+  let misconceptionDict2: MisconceptionBackendDict;
+  let rubricDict: RubricBackendDict;
+  let skillContentsDict: ConceptCardBackendDict;
+  let skillDict: SkillBackendDict;
+  let skillDifficulties: typeof constants.SKILL_DIFFICULTIES;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -50,10 +50,10 @@ describe('Skill object factory', () => {
         NormalizeWhitespacePipe,
       ]
     });
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillDifficulties = constants.SKILL_DIFFICULTIES;
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     misconceptionDict1 = {
       id: '2',
       name: 'test name',
@@ -243,6 +243,16 @@ describe('Skill object factory', () => {
     expect(skill.getAllQuestionsMerged()).toEqual(false);
     expect(skill.getPrerequisiteSkillIds()).toEqual([]);
   });
+
+  it('should throw error when transforming interstitial skill to backend dict',
+    () => {
+      let skill = skillObjectFactory.createInterstitialSkill();
+      expect(skill.getId()).toEqual(null);
+      expect(skill.getSupersedingSkillId()).toEqual(null);
+      expect(() => {
+        skill.toBackendDict();
+      }).toThrowError('The SkillIds are not defined');
+    });
 
   it('should get misconception id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
