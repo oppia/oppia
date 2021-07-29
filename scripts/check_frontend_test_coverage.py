@@ -81,7 +81,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'google-analytics.initializer.ts',
     'graph-input-validation.service.ts',
     'graph-property-editor.component.ts',
-    'hint-editor.directive.ts',
+    'hint-editor.component.ts',
     'html-select.directive.ts',
     'input-response-pair.component.ts',
     'language-util.service.ts',
