@@ -25,13 +25,15 @@ import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { ProfilePageRootComponent } from './profile-page-root.component';
 import { CommonModule } from '@angular/common';
 import { ProfilePageRoutingModule } from './profile-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
     CommonModule,
     NgbPopoverModule,
     SharedComponentsModule,
-    ProfilePageRoutingModule
+    ProfilePageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     ProfilePageNavbarComponent,

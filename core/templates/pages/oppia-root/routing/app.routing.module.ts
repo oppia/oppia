@@ -20,11 +20,7 @@ import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
-import { AccountDeletionIsEnabledGuard } from './guards/account-deletion-is-enabled.guard';
-import { CanAccessClassroomPageGuard } from './guards/can-access-classroom-page.guard';
 import { CanAccessSplashPageGuard } from './guards/can-access-splash-page.guard';
-import { CanManageOwnAccountGuard } from './guards/can-manage-own-account.guard';
-import { DoesProfileExistGuard } from './guards/does-profile-exist.guard';
 
 
 // All paths should be defined in constants.ts file.
@@ -38,14 +34,12 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
-    canLoad: [CanAccessClassroomPageGuard],
     loadChildren: () => import('pages/classroom-page/classroom-page.module')
       .then(m => m.ClassroomPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
-    canLoad: [CanManageOwnAccountGuard],
     loadChildren: () => import(
       'pages/delete-account-page/delete-account-page.module')
       .then(m => m.DeleteAccountPageModule)
@@ -54,7 +48,6 @@ const routes: Route[] = [
     path: (
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION
         .ROUTE),
-    canLoad: [AccountDeletionIsEnabledGuard],
     loadChildren: () => import(
       'pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.module')
@@ -63,13 +56,11 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE,
     pathMatch: 'full',
-    canLoad: [CanManageOwnAccountGuard],
     loadChildren: () => import('pages/preferences-page/preferences-page.module')
       .then(m => m.PreferencesPageModule)
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
-    canLoad: [DoesProfileExistGuard],
     loadChildren: () => import('pages/profile-page/profile-page.module')
       .then(m => m.ProfilePageModule)
   },

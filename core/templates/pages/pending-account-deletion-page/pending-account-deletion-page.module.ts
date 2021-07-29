@@ -24,6 +24,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
 import { CommonModule } from '@angular/common';
 import { PendingAccountDeletionPageRoutingModule } from './pending-account-deletion-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
@@ -31,7 +32,8 @@ import { PendingAccountDeletionPageRoutingModule } from './pending-account-delet
     SharedComponentsModule,
     SharedPipesModule,
     TranslateModule,
-    PendingAccountDeletionPageRoutingModule
+    PendingAccountDeletionPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     PendingAccountDeletionPageComponent,

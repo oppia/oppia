@@ -18,7 +18,9 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -26,9 +28,14 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './pending-account-deletion-page-root.component.html'
 })
 export class PendingAccountDeletionPageRootComponent {
+  showPage: boolean = false;
+  showError: boolean = false;
+
   constructor(
-    private pageTitleService: PageTitleService,
-    private metaTagCustomizationService: MetaTagCustomizationService
+    private accessValidationBackendApiService:
+    AccessValidationBackendApiService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService
   ) {}
 
   ngOnInit(): void {
@@ -36,5 +43,19 @@ export class PendingAccountDeletionPageRootComponent {
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION);
     // Update default title.
     this.pageTitleService.setPageTitle(pageData.TITLE);
+
+    this.loaderService.showLoadingScreen('Loading');
+    this.accessValidationBackendApiService.accountDeletionIsEnabled()
+      .then((resp) => {
+        if (resp.valid) {
+          this.showPage = true;
+        } else {
+          this.showError = true;
+        }
+        this.loaderService.hideLoadingScreen();
+      }, (err) => {
+        this.showError = true;
+        this.loaderService.hideLoadingScreen();
+      });
   }
 }

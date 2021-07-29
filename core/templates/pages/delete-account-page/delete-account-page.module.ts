@@ -23,12 +23,14 @@ import { DeleteAccountModalComponent } from './templates/delete-account-modal.co
 import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
 import { CommonModule } from '@angular/common';
 import { DeleteAccountPageRoutingModule } from './delete-account-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    DeleteAccountPageRoutingModule
+    DeleteAccountPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     DeleteAccountModalComponent,

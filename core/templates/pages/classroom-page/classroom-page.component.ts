@@ -23,8 +23,10 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -40,6 +42,8 @@ export class ClassroomPageComponent {
   classroomData: ClassroomData;
 
   constructor(
+    private accessValidationBackendApiService:
+    AccessValidationBackendApiService,
     private alertsService: AlertsService,
     private capitalizePipe: CapitalizePipe,
     private classroomBackendApiService: ClassroomBackendApiService,
@@ -48,6 +52,7 @@ export class ClassroomPageComponent {
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -57,20 +62,33 @@ export class ClassroomPageComponent {
       '/splash/books.svg');
 
     this.loaderService.showLoadingScreen('Loading');
-    this.classroomBackendApiService.fetchClassroomDataAsync(
-      this.classroomUrlFragment).then((classroomData) => {
-      this.classroomData = classroomData;
-      this.classroomDisplayName = this.capitalizePipe.transform(
-        classroomData.getName());
-      this.pageTitleService.setPageTitle(
-        `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
-      this.loaderService.hideLoadingScreen();
-      this.classroomBackendApiService.onInitializeTranslation.emit();
-      this.siteAnalyticsService.registerClassroomPageViewed();
-    }, (errorResponse) => {
-      if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-        this.alertsService.addWarning('Failed to get dashboard data');
+
+    this.accessValidationBackendApiService.validateAccessToClassroomPage(
+      this.classroomUrlFragment).then((resp) => {
+      if (!resp.valid) {
+        this.windowRef.nativeWindow.history.pushState(
+          null, 'classroom', resp.redirect_url);
+        this.ngOnInit();
+      } else {
+        this.classroomBackendApiService.fetchClassroomDataAsync(
+          this.classroomUrlFragment).then((classroomData) => {
+          this.classroomData = classroomData;
+          this.classroomDisplayName = this.capitalizePipe.transform(
+            classroomData.getName());
+          this.pageTitleService.setPageTitle(
+            `Learn ${this.classroomDisplayName} with Oppia | Oppia`);
+          this.loaderService.hideLoadingScreen();
+          this.classroomBackendApiService.onInitializeTranslation.emit();
+          this.siteAnalyticsService.registerClassroomPageViewed();
+        }, (errorResponse) => {
+          if (AppConstants.FATAL_ERROR_CODES.indexOf(
+            errorResponse.status) !== -1) {
+            this.alertsService.addWarning('Failed to get dashboard data');
+          }
+        });
       }
+    }, () => {
+
     });
   }
 

@@ -45,11 +45,6 @@ class ProfilePage(base.BaseHandler):
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
 
-        user_settings = user_services.get_user_settings_from_username(username)
-
-        if not user_settings:
-            raise self.PageNotFoundException
-
         self.render_template('oppia-root.mainpage.html')
 
 

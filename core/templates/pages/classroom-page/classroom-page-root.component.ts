@@ -18,7 +18,11 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { MetaTagCustomizationService, MetaAttribute } from 'services/contextual/meta-tag-customization.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -28,7 +32,7 @@ import { PageTitleService } from 'services/page-title.service';
 export class ClassroomPageRootComponent {
   constructor(
     private pageTitleService: PageTitleService,
-    private metaTagCustomizationService: MetaTagCustomizationService
+    private metaTagCustomizationService: MetaTagCustomizationService,
   ) {}
 
   ngOnInit(): void {
