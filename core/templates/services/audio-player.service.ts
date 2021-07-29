@@ -36,9 +36,10 @@ export interface AutoPlayAudioEvent {
   providedIn: 'root'
 })
 export class AudioPlayerService {
+  // 'currentTrackFilename','currentTrack' and 'lastPauseOrSeekPos'
+  // will be 'null' when the track ends.
   private _currentTrackFilename: string | null = null;
   private _currentTrack: Howl | null = null;
-  // 'lastPauseOrSeekPos' will be 'null' when the track ends.
   private _lastPauseOrSeekPos: number | null = null;
   private _loadingTrack = false;
   private _updateViewEventEmitter = new EventEmitter<void>();
