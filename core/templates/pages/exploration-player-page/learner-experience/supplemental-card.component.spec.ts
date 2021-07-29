@@ -245,10 +245,10 @@ describe('Supplemental card component', function() {
       CONTINUE_BUTTON_FOCUS_LABEL: 'continueButtonFocusLabel'
     });
 
-    $scope.getDisplayedCard = function() {
+    ctrl.getDisplayedCard = function() {
       return sampleCard;
     };
-    $scope.displayedCard = $scope.getDisplayedCard();
+    $scope.displayedCard = ctrl.getDisplayedCard();
 
     let helpCardTemplate = angular.element(
       '<div class="conversation-skin-help-card" ' +
@@ -272,7 +272,7 @@ describe('Supplemental card component', function() {
   it('should set properties when initialized', function() {
     expect($scope.OPPIA_AVATAR_LINK_URL).toBe(undefined);
     expect($scope.CONTINUE_BUTTON_FOCUS_LABEL).toBe(undefined);
-    $scope.getDisplayedCard().markAsCompleted();
+    ctrl.getDisplayedCard().markAsCompleted();
 
     ctrl.$onInit();
     activeCardChangedEmitter.emit();

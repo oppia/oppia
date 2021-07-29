@@ -58,7 +58,7 @@ angular.module('oppia').component('supplementalCard', {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var updateDisplayedCard = function() {
-        $scope.displayedCard = $scope.getDisplayedCard();
+        $scope.displayedCard = ctrl.getDisplayedCard();
         $scope.clearHelpCard();
         $scope.lastAnswer = null;
         if ($scope.displayedCard.isCompleted()) {
