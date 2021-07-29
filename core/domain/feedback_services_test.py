@@ -1153,13 +1153,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_correct_emails_are_sent_for_multiple_feedback(self):
         expected_email_html_body = (
@@ -1217,13 +1214,10 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.EDITOR_EMAIL)
+            messages = self._get_sent_email_messages(self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_emails_are_not_sent_if_already_seen(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1306,13 +1300,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 thread_id, self.editor_id, None, None, 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_emails_are_sent_for_status_change(self):
         expected_email_html_body = (
@@ -1355,13 +1346,10 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 feedback_models.STATUS_CHOICES_FIXED, None, '')
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_that_emails_are_sent_for_both_status_change_and_message(self):
         expected_email_html_body_message = (
@@ -1431,17 +1419,12 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
                 'editor message')
             self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.NEW_USER_EMAIL)
+            messages = self._get_sent_email_messages(self.NEW_USER_EMAIL)
             self.assertEqual(len(messages), 2)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body_status)
-            self.assertEqual(
-                messages[0].body.decode(), expected_email_text_body_status)
-            self.assertEqual(
-                messages[1].html.decode(), expected_email_html_body_message)
-            self.assertEqual(
-                messages[1].body.decode(), expected_email_text_body_message)
+            self.assertEqual(messages[0].html, expected_email_html_body_status)
+            self.assertEqual(messages[0].body, expected_email_text_body_status)
+            self.assertEqual(messages[1].html, expected_email_html_body_message)
+            self.assertEqual(messages[1].body, expected_email_text_body_message)
 
     def test_that_emails_are_not_sent_to_anonymous_user(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:

@@ -10174,8 +10174,7 @@ class ExplorationChangesMergeabilityUnitTests(
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), expected_email_html_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
 
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(
             self):
@@ -10260,8 +10259,7 @@ class ExplorationChangesMergeabilityUnitTests(
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                expected_email_html_body, messages[0].html.decode())
+            self.assertEqual(expected_email_html_body, messages[0].html)
 
             # Add a translation after state renames.
             change_list_4 = [exp_domain.ExplorationChange({
@@ -10300,5 +10298,4 @@ class ExplorationChangesMergeabilityUnitTests(
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 2)
-            self.assertEqual(
-                expected_email_html_body_2, messages[1].html.decode())
+            self.assertEqual(expected_email_html_body_2, messages[1].html)

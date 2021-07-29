@@ -211,12 +211,11 @@ def set_multi(namespace, sub_namespace, id_value_mapping):
     if namespace not in SERIALIZATION_FUNCTIONS:
         raise ValueError('Invalid namespace: %s.' % namespace)
 
-    memory_cache_id_value_mapping = (
-        {
-            _get_memcache_key(namespace, sub_namespace, obj_id):
-            SERIALIZATION_FUNCTIONS[namespace](value)
-            for obj_id, value in id_value_mapping.items()
-        })
+    memory_cache_id_value_mapping = {
+        _get_memcache_key(namespace, sub_namespace, obj_id):
+        SERIALIZATION_FUNCTIONS[namespace](value)
+        for obj_id, value in id_value_mapping.items()
+    }
     return memory_cache_services.set_multi(memory_cache_id_value_mapping)
 
 

@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
-import io
 import logging
 import os
 import re
@@ -2092,7 +2091,7 @@ title: A title
                 })], 'Add state name')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(io.BytesIO(zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(zf.namelist(), ['A title.yaml'])
         # Read function returns bytes, so we need to decode them before
@@ -2107,7 +2106,7 @@ title: A title
             self.EXP_0_ID, self.owner_id, title='')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(io.BytesIO(zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
 
@@ -2176,7 +2175,7 @@ title: A title
         fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(io.BytesIO(zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(
             zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
@@ -2233,7 +2232,8 @@ title: A title
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -2257,7 +2257,7 @@ title: A title
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=2)
-        zf = zipfile.ZipFile(io.BytesIO(zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
         # Read function returns bytes, so we need to decode them before
         # we compare.
         self.assertEqual(
@@ -2267,7 +2267,7 @@ title: A title
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=3)
-        zf = zipfile.ZipFile(io.BytesIO(zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
         # Read function returns bytes, so we need to decode them before
         # we compare.
         self.assertEqual(

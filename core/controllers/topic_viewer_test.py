@@ -195,9 +195,7 @@ class TopicPageDataHandlerTests(
                 ' present in topic with id %s' % (
                     self.skill_id_1, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
             expected_dict = {
                 'topic_name': 'public_topic_name',
                 'topic_id': self.topic_id,

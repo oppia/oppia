@@ -64,9 +64,15 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen_failure)
 
         self.install_mypy_prereq_swap_success = self.swap(
-            run_mypy_checks, 'install_mypy_prerequisites', lambda _: 0)
+            run_mypy_checks,
+            'install_mypy_prerequisites',
+            lambda _: (0, 'exec')
+        )
         self.install_mypy_prereq_swap_failure = self.swap(
-            run_mypy_checks, 'install_mypy_prerequisites', lambda _: 1)
+            run_mypy_checks,
+            'install_mypy_prerequisites',
+            lambda _: (1, 'exec')
+        )
 
         self.files_swap = self.swap(
             run_mypy_checks, 'NOT_FULLY_COVERED_FILES',
@@ -165,8 +171,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_install_mypy_prerequisites_with_wrong_script(self):
         with self.popen_swap_failure:
             with self.swap(
-                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH',
-                'scripts.wrong'):
+                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH', 'scripts.wrong'
+            ):
                 code, _ = run_mypy_checks.install_mypy_prerequisites(False)
                 self.assertEqual(code, 1)
 

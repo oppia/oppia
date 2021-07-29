@@ -723,7 +723,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
         def get(self):
             """Handles GET requests."""
-            file_contents = io.BytesIO('example')
+            file_contents = io.BytesIO(b'example')
             self.render_downloadable_file(
                 file_contents, 'example.pdf', 'text/plain')
 
@@ -739,8 +739,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
     def test_downloadable(self):
         response = self.testapp.get('/mock')
         self.assertEqual(
-            response.content_disposition,
-            'attachment; filename=example.pdf')
+            response.content_disposition, 'attachment; filename=example.pdf')
         self.assertEqual(response.body, b'example')
         self.assertEqual(response.content_type, 'text/plain')
 

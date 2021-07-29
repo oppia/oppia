@@ -1059,12 +1059,8 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_non_logged_in_users_cannot_report(self):
         """Check that non-logged in users cannot report."""

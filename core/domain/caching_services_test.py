@@ -577,9 +577,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 self.assertEqual(key, 'config::email_footer')
                 self.assertEqual(
                     value,
-                    b'"You can change your email preferences via the <a href='
-                    b'\\"https://www.example.com\\">Preferences</a> page. '
-                    b'\\u00a9\\u00a9\\u00ae\\u00ae"'
+                    '"You can change your email preferences via the <a href'
+                    '=\\"https://www.example.com\\">Preferences</a> page. '
+                    '\\u00a9\\u00a9\\u00ae\\u00ae"'
                 )
 
         config_id = 'email_footer'
@@ -599,7 +599,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 {
                     config_id: (
                         'You can change your email preferences via the <a href'
-                        '="https://www.example.com">Preferences</a> page. ©©®®')
+                        '="https://www.example.com">Preferences</a> page. ©©®®'
+                    )
                 })
 
         cache_strings_response = caching_services.set_multi(
@@ -607,7 +608,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {
                 config_id: (
                     'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®')
+                    '="https://www.example.com">Preferences</a> page. ©©®®'
+                )
             })
 
         self.assertTrue(cache_strings_response)
@@ -619,7 +621,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             {
                 config_id: (
                     'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®')
+                    '="https://www.example.com">Preferences</a> page. ©©®®'
+                )
             })
 
     def test_explorations_identically_cached_in_dev_and_test_environment(

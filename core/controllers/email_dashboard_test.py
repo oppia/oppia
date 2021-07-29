@@ -269,18 +269,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             messages_a = self._get_sent_email_messages(
                 self.USER_A_EMAIL)
             self.assertEqual(len(messages_a), 1)
-            self.assertEqual(
-                messages_a[0].html.decode(), 'body')
-            self.assertEqual(
-                messages_a[0].body.decode(), 'body')
+            self.assertEqual(messages_a[0].html, 'body')
+            self.assertEqual(messages_a[0].body, 'body')
 
             messages_b = self._get_sent_email_messages(
                 self.USER_B_EMAIL)
             self.assertEqual(len(messages_b), 1)
-            self.assertEqual(
-                messages_b[0].html.decode(), 'body')
-            self.assertEqual(
-                messages_b[0].body.decode(), 'body')
+            self.assertEqual(messages_b[0].html, 'body')
+            self.assertEqual(messages_b[0].body, 'body')
 
             # Check that correct email model is stored in backend.
             query_model = user_models.UserQueryModel.get_by_id(query_id)
@@ -460,10 +456,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
             messages = self._get_sent_email_messages(self.SUBMITTER_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(), test_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(), test_email_text_body)
+            self.assertEqual(messages[0].html, test_email_html_body)
+            self.assertEqual(messages[0].body, test_email_text_body)
 
             all_model = email_models.SentEmailModel.query().fetch()
             self.assertEqual(len(all_model), 1)
