@@ -189,5 +189,6 @@
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Språk",
 	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Laster lyd …",
 	"I18N_SIGNUP_ERROR_USERNAME_ONLY_ALPHANUM": "Brukernavn kan bare ha alfanumeriske tegn.",
+	"I18N_SPLASH_TITLE": "Tenk utenfor bøkene.",
 	"I18N_TOPIC_VIEWER_STORY": "Historie"
 }
