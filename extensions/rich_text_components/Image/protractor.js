@@ -17,7 +17,6 @@
  * testing with Protractor.js
  */
 
-var objects = require(process.cwd() + '/extensions/objects/protractor.js');
 var action = require(process.cwd() + '/core/tests/protractor_utils/action.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
@@ -134,7 +133,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
   //   - args: The input to the editor. If the selected action is 'create',
   //       args would be a list of shapes and for 'upload' action, it
   //       would represent a filepath.
-  //   - altText: The alt text for the image. 
+  //   - altText: The alt text for the image.
   if (selectedAction === 'create') {
     await action.click(
       'Create button',
@@ -181,7 +180,7 @@ var expectComponentDetailsToMatch = async function(
   if (selectedAction === 'create') {
     var svgName = args.join('_');
     var svgDiagramInputElement = elem.element(by.css(
-      '.protractor-test-svg-diagram'));
+      '.protractor-test-image'));
     await waitFor.visibilityOf(
       svgDiagramInputElement,
       'SVG Diagram input element takes too long to load.');

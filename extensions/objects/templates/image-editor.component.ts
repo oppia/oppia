@@ -266,13 +266,13 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   /**
-	  * Resamples an image to the specified dimension.
-	  *
-	  * @param imageDataURI A DOMString containing the input image data URI.
-	  * @param width The desired output width.
-	  * @param height The desired output height.
-	  * @return A DOMString containing the output image data URI.
-	  */
+   * Resamples an image to the specified dimension.
+   *
+   * @param imageDataURI A DOMString containing the input image data URI.
+   * @param width The desired output width.
+   * @param height The desired output height.
+   * @return A DOMString containing the output image data URI.
+   */
 
   private getResampledImageData(imageDataURI, width, height) {
     // Create an Image object with the original data.
