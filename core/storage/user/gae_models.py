@@ -392,8 +392,12 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
+<<<<<<< HEAD
         results = cls.query(cls.roles == role).fetch()
         return cast(List[UserSettingsModel], results)
+=======
+        return cls.query(cls.roles == role).fetch()
+>>>>>>> 35bdbe6d101c2033ceb4b738a78f6f4502bb08eb
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
