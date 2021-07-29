@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the about page.
+ * @fileoverview Scripts for the error iframed page.
  */
-
 import 'core-js/es7/reflect';
 import 'zone.js';
 
@@ -23,17 +22,19 @@ import 'zone.js';
 import 'pages/mock-ajs';
 import 'Polyfills.ts';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AboutPageModule } from './about-page.module';
 import { AppConstants } from 'app.constants';
 import { enableProdMode } from '@angular/core';
+import { ErrorIframedPageModule } from './error-iframed-page.module';
+import { LoggerService } from 'services/contextual/logger.service';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AboutPageModule).catch(
-  // eslint-disable-next-line no-console
-  (err) => console.error(err)
+const loggerService = new LoggerService();
+
+platformBrowserDynamic().bootstrapModule(ErrorIframedPageModule).catch(
+  (err) => loggerService.error(err)
 );
 
 // This prevents angular pages to cause side effects to hybrid pages.
