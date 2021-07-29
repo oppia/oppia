@@ -28,6 +28,12 @@ import feconf
 import python_utils
 import utils
 
+from typing import Dict, List, Optional, Text, Union # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY:
+    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -129,6 +135,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id, model,
         username, normalized_username, and display_alias fields.
         """
@@ -136,11 +143,13 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @staticmethod
     def get_field_names_for_takeout():
+        # type: () -> Dict[Text, Text]
         """The export method renames some time-related fields to clearly
         indicate that they represent time in milliseconds since the epoch.
         """
@@ -157,6 +166,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.EXPORTED,
@@ -200,6 +210,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserSettingsModel for the user.
 
         Args:
@@ -209,6 +220,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserSettingsModel exists for user.
 
         Args:
@@ -221,6 +233,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, Union[Text, float, None]]
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
         Args:
@@ -230,6 +243,7 @@ class UserSettingsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSettingsModel.
         """
         user = UserSettingsModel.get(user_id)
+        assert user is not None
         return {
             'email': user.email,
             'role': user.role,
@@ -282,6 +296,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_new_id(cls, unused_entity_name=''):
+        # type: (Text) -> Text
         """Gets a new id for an entity, based on its name.
         The returned id is guaranteed to be unique among all instances of this
         entity.
@@ -311,6 +326,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
+        # type: (Text) -> bool
         """Returns whether or not a given normalized_username is taken or was
         used by some deleted user.
 
@@ -333,6 +349,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
+        # type: (Text) -> UserSettingsModel
         """Returns a user model given a normalized username.
 
         Args:
@@ -347,6 +364,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_email(cls, email):
+        # type: (Text) -> Optional[UserSettingsModel]
         """Returns a user model given an email.
 
         Args:
@@ -361,6 +379,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_role(cls, role):
+        # type: (Text) -> List[UserSettingsModel]
         """Returns user models with given role.
 
         Args:
@@ -400,16 +419,19 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -421,6 +443,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of CompletedActivitiesModel for the user.
 
         Args:
@@ -430,6 +453,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether CompletedActivitiesModel exists for user.
 
         Args:
@@ -496,16 +520,19 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -518,6 +545,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of IncompleteActivitiesModel for the user.
 
         Args:
@@ -527,6 +555,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether IncompleteActivitiesModel exists for user.
 
         Args:
@@ -587,6 +616,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_id field.
         """
@@ -594,6 +624,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user, since a user
         has multiple playthroughs associated with their account.
         """
@@ -601,6 +632,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -613,6 +645,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of ExpUserLastPlaythroughModel for the user.
 
         Args:
@@ -623,6 +656,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether ExpUserLastPlaythroughModels exist for user.
 
         Args:
@@ -722,16 +756,19 @@ class LearnerGoalsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_ids_to_learn': base_models.EXPORT_POLICY.EXPORTED,
@@ -740,6 +777,7 @@ class LearnerGoalsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of LearnerGoalsModel for the user.
 
         Args:
@@ -749,6 +787,7 @@ class LearnerGoalsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether LearnerGoalsModel exists for user.
 
         Args:
@@ -798,16 +837,19 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -816,6 +858,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of LearnerPlaylistModel for the user.
 
         Args:
@@ -825,6 +868,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether LearnerPlaylistModel exists for user.
 
         Args:
@@ -875,16 +919,19 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'created_exploration_ids':
@@ -895,6 +942,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserContributionsModel for the user.
 
         Args:
@@ -904,6 +952,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserContributionsModel exists for user.
 
         Args:
@@ -960,11 +1009,13 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserEmailPreferencesModel for the user.
 
         Args:
@@ -974,6 +1025,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserEmailPreferencesModel exists for user.
 
         Args:
@@ -986,11 +1038,13 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'site_updates': base_models.EXPORT_POLICY.EXPORTED,
@@ -1042,16 +1096,19 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -1077,6 +1134,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserSubscriptionsModel for the user.
 
         Args:
@@ -1088,6 +1146,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserSubscriptionsModel exists for user or references
         user.
 
@@ -1148,11 +1207,13 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserSubscribersModel for the user.
 
         Args:
@@ -1164,6 +1225,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserSubscribersModel exists for user or references
         user.
 
@@ -1181,6 +1243,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is not included because it contains data corresponding to other
         users.
         """
@@ -1188,6 +1251,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this model is not
         exported because it contains data corresponding to other users.
         """
@@ -1211,11 +1275,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserRecentChangesBatchModel for the user.
 
         Args:
@@ -1225,6 +1291,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserRecentChangesBatchModel exists for user.
 
         Args:
@@ -1237,11 +1304,13 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1302,16 +1371,19 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'impact_score': base_models.EXPORT_POLICY.EXPORTED,
@@ -1324,6 +1396,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of UserStatsModel for the user.
 
         Args:
@@ -1333,6 +1406,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserStatsModel exists for user.
 
         Args:
@@ -1439,6 +1513,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_id field.
         """
@@ -1446,6 +1521,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of ExplorationUserDataModel for the user.
 
         Args:
@@ -1456,6 +1532,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since there are
         multiple explorations (and corresponding data) relevant to a user.
         """
@@ -1463,6 +1540,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_field_names_for_takeout():
+        # type: () -> Dict[Text, Text]
         """Fields are renamed to clarify that they represent the time in
         milliseconds since the epoch.
         """
@@ -1474,6 +1552,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1495,6 +1574,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether ExplorationUserDataModels exist for user.
 
         Args:
@@ -1640,6 +1720,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_id field.
         """
@@ -1647,6 +1728,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since there can be
         multiple collections associated with a user.
         """
@@ -1654,6 +1736,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1664,6 +1747,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of CollectionProgressModel for the user.
 
         Args:
@@ -1674,6 +1758,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether CollectionProgressModels exist for user.
 
         Args:
@@ -1818,6 +1903,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_id field.
         """
@@ -1825,6 +1911,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since a user
         can have multiple stories associated with their account.
         """
@@ -1832,6 +1919,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1842,6 +1930,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of StoryProgressModel for the user.
 
         Args:
@@ -1852,6 +1941,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether StoryProgressModels exist for user.
 
         Args:
@@ -2031,6 +2121,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_ids and submitter_id fields.
         """
@@ -2038,6 +2129,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is not exported since this is a computed model
         and the information already exists in other exported models.
         """
@@ -2045,6 +2137,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but model is not
         exported since this is a computed model and because noteworthy details
         that belong to this model have already been exported.
@@ -2070,6 +2163,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserQueryModel for the user.
 
         Args:
@@ -2080,6 +2174,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserQueryModel exists for user.
 
         Args:
@@ -2134,6 +2229,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data corresponding to a user: id field, but it isn't
         deleted because it is needed for auditing purposes.
         """
@@ -2141,6 +2237,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserBulkEmailsModel exists for user.
 
         Args:
@@ -2153,11 +2250,13 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -2182,6 +2281,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_ids field.
         """
@@ -2189,6 +2289,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since a user has
         many relevant skill masteries.
         """
@@ -2196,6 +2297,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2206,6 +2308,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserSkillMasteryModel for the user.
 
         Args:
@@ -2216,6 +2319,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserSkillMasteryModels exist for user.
 
         Args:
@@ -2284,6 +2388,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user:
         user_ids field.
         """
@@ -2291,6 +2396,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since a user has
         multiple relevant contribution proficiencies.
         """
@@ -2298,6 +2404,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2329,6 +2436,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserContributionProficiencyModel for the user.
 
         Args:
@@ -2339,6 +2447,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserContributionProficiencyModels exist for user.
 
         Args:
@@ -2478,11 +2587,13 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserContributionRightsModel exists for the given user.
 
         Args:
@@ -2495,6 +2606,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserContributionRightsModel for the user.
 
         Args:
@@ -2529,11 +2641,13 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as one instance per user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'can_review_translation_for_language_codes':
@@ -2650,6 +2764,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id, email,
         and normalized_long_term_username fields.
         """
@@ -2657,6 +2772,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not need to be exported as it temporarily holds user
         requests for data deletion, and does not contain any information
         relevant to the user for data export.
@@ -2665,6 +2781,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but the model does not
         need to be exported as it temporarily holds user requests for data
         deletion, and does not contain any information relevant to the user for
@@ -2682,6 +2799,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instance of PendingDeletionRequestModel for the user.
 
         Args:
@@ -2691,6 +2809,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether PendingDeletionRequestModel exists for the given user.
 
         Args:
@@ -2707,6 +2826,7 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data corresponding to a user: id field, but it is
         corresponding to a deleted user.
         """
@@ -2714,11 +2834,13 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a
         particular, existing user. DeletedUserModel contains only IDs that were
         deleted.
@@ -2727,6 +2849,7 @@ class DeletedUserModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether DeletedUserModel exists for the given user.
 
         Args:
@@ -2743,16 +2866,19 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """PseudonymizedUserModel contains only pseudonymous ids."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         PseudonymizedUserModel contains only pseudonymous ids.
         """
@@ -2796,6 +2922,7 @@ class DeletedUsernameModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data corresponding to a user: id field, but it is
         corresponding to a deleted user.
 
@@ -2806,11 +2933,13 @@ class DeletedUsernameModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         DeletedUsernameModel contains only hashes of usernames that were
         deleted.
