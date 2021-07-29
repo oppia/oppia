@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for filepath editor.
+ * @fileoverview Component for image editor.
  */
 
 // This component can only be used in the context of an exploration.
@@ -103,11 +103,13 @@ export class ImageEditorComponent implements OnInit, OnChanges {
 
   // We only use PNG format since that is what canvas can export to in
   // all browsers.
-  // TODO(sll): See if we can add support for other image formats.
   OUTPUT_IMAGE_FORMAT = {
     png: 'png',
     gif: 'gif'
   };
+
+  MIME_TYPE_GIF = 'data:image/gif';
+  CROP_AREA_BORDER_IN_PX = 3;
 
   OUTPUT_IMAGE_MAX_WIDTH_PX = 490;
 
@@ -259,18 +261,18 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         height: dimensions.height + 'px',
         width: dimensions.width + 'px'
       };
-      this.validityChange.emit({empty: true});
+      this.validityChange.emit({ empty: true });
     }
   }
 
   /**
-  * Resamples an image to the specified dimension.
-  *
-  * @param imageDataURI A DOMString containing the input image data URI.
-  * @param width The desired output width.
-  * @param height The desired output height.
-  * @return A DOMString containing the output image data URI.
-  */
+	  * Resamples an image to the specified dimension.
+	  *
+	  * @param imageDataURI A DOMString containing the input image data URI.
+	  * @param width The desired output width.
+	  * @param height The desired output height.
+	  * @return A DOMString containing the output image data URI.
+	  */
 
   private getResampledImageData(imageDataURI, width, height) {
     // Create an Image object with the original data.
@@ -667,8 +669,9 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         this.imgData || this.data.metadata.uploadedImageData) + ')';
       styles.background = data + ' no-repeat';
 
-      const x = this.cropArea.x1 + 3; // Add crop area border.
-      const y = this.cropArea.y1 + 3; // Add crop area border.
+      // Add crop area border.
+      const x = this.cropArea.x1 + this.CROP_AREA_BORDER_IN_PX;
+      const y = this.cropArea.y1 + this.CROP_AREA_BORDER_IN_PX;
       styles['background-position'] = '-' + x + 'px -' + y + 'px';
 
       const dimensions = this.calculateTargetImageDimensions();
@@ -704,7 +707,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
 
     let newImageFile;
 
-    if (mimeType === 'data:image/gif') {
+    if (mimeType === this.MIME_TYPE_GIF) {
       let successCb = obj => {
         this.validateProcessedFilesize(obj.image);
         newImageFile = (
@@ -776,8 +779,10 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const imageWidth = this.data.metadata.originalWidth;
     if (this.imageResizeRatio === 1 &&
       imageWidth > this.OUTPUT_IMAGE_MAX_WIDTH_PX) {
-      return 'This image has been automatically downsized to ensure ' +
-        'that it will fit in the card.';
+      return (
+        'This image has been automatically downsized to ensure ' +
+        'that it will fit in the card.'
+      );
     }
     return null;
   }
@@ -821,7 +826,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     const imageDataURI = (
       this.imgData || <string> this.data.metadata.uploadedImageData);
     const mimeType = (<string>imageDataURI).split(';')[0];
-    if (mimeType === 'data:image/gif') {
+    if (mimeType === this.MIME_TYPE_GIF) {
       let successCb = obj => {
         this.validateProcessedFilesize(obj.image);
         document.body.style.cursor = 'default';
@@ -901,12 +906,12 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       this.alertsService.clearWarnings();
       this.value = filename;
       this.valueChanged.emit(filename);
-      this.validityChange.emit({empty: true});
+      this.validityChange.emit({ empty: true });
       this.resetComponent(filename);
     }
   }
 
-  onFileChanged(file: File, _filename: string): void {
+  onFileChanged(file: File): void {
     this.setUploadedFile(file);
   }
 
@@ -936,7 +941,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
 
     const dimensions = this.calculateTargetImageDimensions();
-
 
     // Check mime type from imageDataURI.
     // Check point 2 in the note before imports and after fileoverview.
@@ -1004,7 +1008,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       processFrameCallback: (dataUrl: string) => void,
       successCallback: (gifshotCallbackObject: GifshotCallbackObject) => void
   ): void {
-    // Looping through individual gif frames can take a while
+    // Looping through individual GIF frames can take a while
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
@@ -1076,7 +1080,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       imageType: string): void {
     if (
       this.contextService.getImageSaveDestination() ===
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    ) {
       this.saveImageToLocalStorage(dimensions, resampledFile, imageType);
     } else {
       this.postImageToServer(dimensions, resampledFile, imageType);
@@ -1093,8 +1098,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       filename: this.imageUploadHelperService.generateImageFilename(
         dimensions.height, dimensions.width, imageType)
     }));
-    const imageUploadUrlTemplate = '/createhandler/imageupload/' +
-      '<entity_type>/<entity_id>';
+    const imageUploadUrlTemplate = (
+      '/createhandler/imageupload/<entity_type>/<entity_id>');
     this.csrfTokenService.getTokenAsync().then((token) => {
       form.append('csrf_token', token);
       $.ajax({
@@ -1142,7 +1147,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (
       changes.value &&
-      changes.value.currentValue !== changes.value.previousValue) {
+      changes.value.currentValue !== changes.value.previousValue
+    ) {
       const newValue = changes.value.currentValue;
       this.resetComponent(newValue);
     }
