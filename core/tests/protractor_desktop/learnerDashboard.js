@@ -32,7 +32,14 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
+var TopicAndStoryViewerPage = require(
+  '../protractor_utils/TopicAndStoryViewerPage.js');
+var forms = require('../protractor_utils/forms.js');
 const { browser } = require('protractor');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
+var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -41,17 +48,46 @@ describe('Learner dashboard functionality', function() {
   var libraryPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
+  var topicAndStoryViewerPage = null;
+  var explorationEditorMainTab = null;
   var learnerDashboardPage = null;
   var subscriptionDashboardPage = null;
+  var skillEditorPage = null;
+  var dummyExplorationIds = [];
+
+  var createDummyExplorations = async function() {
+    var EXPLORATION = {
+      category: 'Learning',
+      objective: 'The goal is to check story viewer functionality.',
+      language: 'English'
+    };
+
+    for (var i = 1; i <= 3; i++) {
+      await workflow.createAndPublishTwoCardExploration(
+        `Exploration TASV1 - ${i}`,
+        EXPLORATION.category,
+        EXPLORATION.objective,
+        EXPLORATION.language,
+        i === 1,
+        true
+      );
+      dummyExplorationIds.push(await general.getExplorationIdFromEditor());
+    }
+  };
 
   beforeAll(function() {
     libraryPage = new LibraryPage.LibraryPage();
     topicsAndSkillsDashboardPage = (
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
     adminPage = new AdminPage.AdminPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    topicAndStoryViewerPage = (
+      new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
@@ -189,8 +225,9 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display all the topics on server in edit goals and ' +
-    'selected topic in current goals', async function() {
+  it('should display all the topics on server in edit goals and suggested ' +
+    'for you section and selected topics in current goals and continue where ' +
+    'you left off section', async function() {
     var driver = browser.driver;
     var TOPIC_NAME = 'Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
@@ -257,6 +294,8 @@ describe('Learner dashboard functionality', function() {
 
     await topicEditorPage.publishTopic();
     await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectCountOfTopicInSuggestedForYou(1);
     await learnerDashboardPage.navigateToGoalsSection();
     await driver.findElement(
       by.css('.protractor-test-edit-goals-section'));
@@ -267,6 +306,235 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCurrentGoalsToMatch(
       `Learn ${TOPIC_NAME}`);
+    await learnerDashboardPage.navigateToHomeSection();
+    await learnerDashboardPage.expectCountOfTopicInContinueWhereYouLeftOff(1);
+    await users.logout();
+  });
+
+  it('should display all the topics on that are partially learnt or learnt ' +
+    'in skill proficiency section', async function() {
+    await users.createAndLoginCurriculumAdminUser(
+      'creator@learnerDashboard2.com', 'learnerDashboard2');
+    await createDummyExplorations();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic TASV1', 'topic-tasv-one', 'Description', false);
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill TASV1', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', ['correct']);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    await skillEditorPage.saveQuestion();
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill TASV1', 'Topic TASV1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.addSubtopic(
+      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    await topicEditorPage.publishTopic();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.createStory(
+      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    for (var i = 0; i < 3; i++) {
+      await storyEditorPage.createNewChapter(
+        `Chapter ${i}`, dummyExplorationIds[i], Constants.TEST_SVG_PATH);
+      await storyEditorPage.navigateToChapterWithName(`Chapter ${i}`);
+      await storyEditorPage.changeNodeDescription('Chapter description');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText(`outline ${i}`));
+      await storyEditorPage.navigateToStoryEditorTab();
+    }
+    await storyEditorPage.saveStory('First save');
+    await storyEditorPage.publishStory();
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectNameOfTopicInSkillProficiencyToMatch(
+      'Topic TASV1'
+    );
+    await users.logout();
+  });
+
+  it('should display all the completed stories in Completed stories section ' +
+    'and completed topics in Completed goals section', async function() {
+    await users.createAndLoginCurriculumAdminUser(
+      'creator@learnerDashboard3.com', 'learnerDashboard3');
+    await createDummyExplorations();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic TASV1', 'topic-tasv-one', 'Description', false);
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill TASV1', 'Concept card explanation', false);
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy', 'Second explanation for easy difficulty.');
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    var url = await browser.getCurrentUrl();
+    skillId = url.split('/')[4];
+    await skillEditorPage.get(skillId);
+
+    await skillEditorPage.moveToQuestionsTab();
+    await skillEditorPage.clickCreateQuestionButton();
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Question 1'));
+    await explorationEditorMainTab.setInteraction(
+      'TextInput', 'Placeholder', 5);
+    await explorationEditorMainTab.addResponse(
+      'TextInput', await forms.toRichText('Correct Answer'), null, false,
+      'FuzzyEquals', ['correct']);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
+    await explorationEditorMainTab.addHint('Hint 1');
+    await explorationEditorMainTab.addSolution('TextInput', {
+      correctAnswer: 'correct',
+      explanation: 'It is correct'
+    });
+    await skillEditorPage.saveQuestion();
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill TASV1', 'Topic TASV1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.addSubtopic(
+      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    await topicEditorPage.publishTopic();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.createStory(
+      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    for (var i = 0; i < 3; i++) {
+      await storyEditorPage.createNewChapter(
+        `Chapter ${i}`, dummyExplorationIds[i], Constants.TEST_SVG_PATH);
+      await storyEditorPage.navigateToChapterWithName(`Chapter ${i}`);
+      await storyEditorPage.changeNodeDescription('Chapter description');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText(`outline ${i}`));
+      await storyEditorPage.navigateToStoryEditorTab();
+    }
+    await storyEditorPage.saveStory('First save');
+    await storyEditorPage.publishStory();
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.goToChapterIndex(1);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
+    await topicAndStoryViewerPage.goToChapterIndex(2);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'story-player-tasv-one');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
+    await learnerDashboardPage.get();
+    await learnerDashboardPage.navigateToProgressSection();
+    await learnerDashboardPage.expectCountOfStoryInCompletedStory(1);
+    await learnerDashboardPage.navigateToGoalsSection();
+    await learnerDashboardPage.expectNameOfTopicInCompletedGoalsToMatch(
+      'Topic TASV1');
     await users.logout();
   });
 

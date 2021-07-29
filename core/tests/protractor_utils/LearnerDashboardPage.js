@@ -45,9 +45,18 @@ var LearnerDashboardPage = function() {
     element.all(by.css('.protractor-test-add-topic-to-current-goals-button'));
   var currentGoalsTopic =
     element(by.css('.protractor-test-topic-name-in-current-goals'));
+  var skillProficiencyTopic =
+    element(by.css('.protractor-test-skill-proficiency-topic-title'));
+  var completedGoalsTopic =
+    element(by.css('.protractor-test-completed-goals-topic-name'));
   var continueWhereYouLeftOffTopicName =
-    element(by.css(
-      '.protractor-test-topic-name-continue-where-you-left-off'));
+    element.all(by.css(
+      '.protractor-test-topic-name-in-learner-story-summary-tile'));
+  var completedStoriesName =
+      element.all(by.css(
+        '.protractor-test-story-name-in-learner-story-summary-tile'));
+  var suggestedForYouTopicName =
+      element.all(by.css('.protractor-test-learner-topic-summary-tile-title'));
 
   this.get = async function() {
     await browser.get(LEARNER_DASHBOARD_URL);
@@ -100,13 +109,6 @@ var LearnerDashboardPage = function() {
     expect(await explorationTitle.getText()).toMatch(title);
   };
 
-  this.expectTitleOfLearnerTopicSummaryTileToMatch = async function(title) {
-    var explorationTitle = element(
-      by.cssContainingText(
-        '.protractor-test-learner-topic-summary-tile-title', title));
-    expect(await explorationTitle.getText()).toMatch(title);
-  };
-
   this.expectNameOfTopicInEditGoalsToMatch = async function(name) {
     var topicName = element(by.cssContainingText(
       '.protractor-test-topic-name-in-edit-goals', name));
@@ -124,17 +126,49 @@ var LearnerDashboardPage = function() {
     expect(await topicName.getText()).toMatch(name);
   };
 
-  this.expectNameOfTopicInContinueWhereYouLeftOff = async function(name) {
+  this.expectNameOfTopicInSkillProficiencyToMatch = async function(name) {
     await waitFor.visibilityOf(
-      continueWhereYouLeftOffTopicName,
-      'Topic in Continue where you left off takes too long to appear');
+      skillProficiencyTopic,
+      'Topic in Skill Proficiency takes too long to appear'
+    );
     await waitFor.textToBePresentInElement(
-      continueWhereYouLeftOffTopicName, name,
-      'No topic in Continue where you left off section');
+      skillProficiencyTopic, name, 'No Skill Proficiency text');
     var topicName = element(by.cssContainingText(
-      '.protractor-test-topic-name-continue-where-you-left-off'
-    ));
+      '.protractor-test-skill-proficiency-topic-title', name));
     expect(await topicName.getText()).toMatch(name);
+  };
+
+  this.expectNameOfTopicInCompletedGoalsToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      completedGoalsTopic,
+      'Topic in completed goals takes too long to appear'
+    );
+    await waitFor.textToBePresentInElement(
+      completedGoalsTopic, name, 'No Completed Goals text');
+    var topicName = element(by.cssContainingText(
+      '.protractor-test-completed-goals-topic-name', name));
+    expect(await topicName.getText()).toMatch(name);
+  };
+
+  this.expectCountOfTopicInSuggestedForYou = async function(value) {
+    await waitFor.visibilityOf(
+      suggestedForYouTopicName.first(),
+      'Learner Topic Name takes too long to appear');
+    expect(await suggestedForYouTopicName.count()).toEqual(value);
+  };
+
+  this.expectCountOfStoryInCompletedStory = async function(value) {
+    await waitFor.visibilityOf(
+      completedStoriesName.first(),
+      'Story Name Card takes too long to appear');
+    expect(await completedStoriesName.count()).toEqual(value);
+  };
+
+  this.expectCountOfTopicInContinueWhereYouLeftOff = async function(value) {
+    await waitFor.visibilityOf(
+      continueWhereYouLeftOffTopicName.first(),
+      'Topic Name Card takes too long to appear');
+    expect(await continueWhereYouLeftOffTopicName.count()).toEqual(value);
   };
 
   this.addTopicToLearnerGoals = async function() {
