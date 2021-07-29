@@ -490,8 +490,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/storage/topic/gae_models_test.py',
     'core/storage/translation/gae_models.py',
     'core/storage/translation/gae_models_test.py',
-    'core/storage/user/gae_models.py',
-    'core/storage/user/gae_models_test.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
     'core/tests/build_sources/extensions/base.py',

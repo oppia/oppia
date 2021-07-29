@@ -28,7 +28,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Dict, List, Optional, Text, Union # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -233,7 +233,7 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
-        # type: (Text) -> Dict[Text, Union[Text, float, None]]
+        # type: (Text) -> Dict[Text, Union[Text, float, bool, List[Text], None]]
         """Exports the data from UserSettingsModel into dict format for Takeout.
 
         Args:
@@ -360,8 +360,9 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel. The UserSettingsModel instance which contains
             the same normalized_username.
         """
-        return cls.get_all().filter(
+        result = cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
+        return cast(UserSettingsModel, result)
 
     @classmethod
     def get_by_email(cls, email):
@@ -375,7 +376,8 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel | None. The UserSettingsModel instance which
             contains the same email.
         """
-        filtered_users = cls.query(cls.email == email).fetch()
+        results = cls.query(cls.email == email).fetch()
+        filtered_users = cast(List[UserSettingsModel], results)
         return None if not filtered_users else filtered_users[0]
 
     @classmethod
@@ -390,7 +392,8 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-        return cls.query(cls.roles == role).fetch()
+        results = cls.query(cls.roles == role).fetch()
+        return cast(List[UserSettingsModel], results)
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
@@ -467,6 +470,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, List[Text]]
         """(Takeout) Export CompletedActivitiesModel's user properties.
 
         Args:
@@ -569,6 +573,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, List[Text]]
         """(Takeout) Export IncompleteActivitiesModel's user properties.
 
         Args:
@@ -652,8 +657,9 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -670,6 +676,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
+        # type: (Text, Text) -> Text
         """Generates key for the instance of ExpUserLastPlaythroughModel
         class in the required format with the arguments provided.
 
@@ -685,6 +692,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
+        # type: (Text, Text) -> ExpUserLastPlaythroughModel
         """Creates a new ExpUserLastPlaythroughModel instance and returns it.
 
         Args:
@@ -700,7 +708,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
     @classmethod
-    def get(cls, user_id, exploration_id):
+    def get(cls, user_id, exploration_id): # type: ignore[override]
+        # type: (Text, Text) -> Optional[ExpUserLastPlaythroughModel]
         """Gets the ExpUserLastPlaythroughModel for the given user and
         exploration id.
 
@@ -719,6 +728,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, Union[int, Text, None]]]
         """Takeout: Export ExpUserLastPlaythroughModel user-relevant properties.
 
         Args:
@@ -801,6 +811,7 @@ class LearnerGoalsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, List[Text]]
         """(Takeout) Export user-relevant properties of LearnerGoalsModel.
 
         Args:
@@ -882,6 +893,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, List[Text]]
         """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
 
         Args:
@@ -966,6 +978,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, List[Text]]
         """(Takeout) Export user-relevant properties of UserContributionsModel.
 
         Args:
@@ -1059,6 +1072,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, bool]
         """Exports the UserEmailPreferencesModel for this user."""
         user_email_preferences = UserEmailPreferencesModel.get_by_id(user_id)
         if user_email_preferences:
@@ -1122,6 +1136,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @classmethod
     def get_field_names_for_takeout(cls):
+        # type: () -> Dict[Text, Text]
         """Indicates that creator_ids are an exception in the export policy
         for Takeout. Also renames timestamp fields to clearly indicate that
         they represent milliseconds since the epoch.
@@ -1141,8 +1156,9 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.creator_ids == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1164,6 +1180,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, Union[List[Text], float, None]]
         """Export UserSubscriptionsModel data as dict for Takeout.
 
         Args:
@@ -1177,10 +1194,13 @@ class UserSubscriptionsModel(base_models.BaseModel):
         if user_model is None:
             return {}
 
+        assert user_model is not None
         creator_user_models = UserSettingsModel.get_multi(
             user_model.creator_ids)
+
         creator_usernames = [
-            creator.username for creator in creator_user_models]
+            creator.username for creator in cast(
+                List[UserSettingsModel], creator_user_models)]
 
         user_data = {
             'exploration_ids': user_model.exploration_ids,
@@ -1220,8 +1240,9 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1420,6 +1441,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_or_create(cls, user_id):
+        # type: (Text) -> UserStatsModel
         """Creates a new UserStatsModel instance, if it does not already exist.
 
         Args:
@@ -1437,6 +1459,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def export_data(user_id):
+        # type: (Text) -> Dict[Text, Union[float, List[Dict[Text, Dict[Text, float]]]]]
         """(Takeout) Export the user-relevant properties of UserStatsModel.
 
         Args:
@@ -1528,8 +1551,9 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @staticmethod
     def get_model_association_to_user():
@@ -1588,6 +1612,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
+        # type: (Text, Text) -> Text
         """Generates key for the instance of ExplorationUserDataModel class in
         the required format with the arguments provided.
 
@@ -1603,6 +1628,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
+        # type: (Text, Text) -> ExplorationUserDataModel
         """Creates a new ExplorationUserDataModel instance and returns it.
 
         Note that the client is responsible for actually saving this entity to
@@ -1621,13 +1647,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
     @classmethod
-    def get(cls, user_id, exploration_id):
+    def get(cls, user_id, exploration_id): # type: ignore[override]
+        # type: (Text, Text) -> Optional[ExplorationUserDataModel]
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration.
+            exploration_id: str|None. The id of the exploration.
 
         Returns:
             ExplorationUserDataModel. The ExplorationUserDataModel instance
@@ -1638,7 +1665,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
             instance_id, strict=False)
 
     @classmethod
-    def get_multi(cls, user_ids, exploration_id):
+    def get_multi(cls, user_ids, exploration_id): # type: ignore[override]
+        # type: (List[Text], Text) -> List[Optional[ExplorationUserDataModel]]
         """Gets the ExplorationUserDataModel for the given user and exploration
          ids.
 
@@ -1647,16 +1675,17 @@ class ExplorationUserDataModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            ExplorationUserDataModel. The ExplorationUserDataModel instance
+            list(ExplorationUserDataModel|None). The ExplorationUserDataModel instance
             which matches with the given user_ids and exploration_id.
         """
-        instance_ids = (
-            cls._generate_id(user_id, exploration_id) for user_id in user_ids)
-        return super(ExplorationUserDataModel, cls).get_multi(
-            instance_ids)
+        instance_ids = [
+            cls._generate_id(user_id, exploration_id) for user_id in user_ids]
+
+        return super(ExplorationUserDataModel, cls).get_multi(instance_ids)
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, Union[Text, float, bool, None]]]
         """Takeout: Export user-relevant properties of ExplorationUserDataModel.
 
         Args:
@@ -1754,8 +1783,10 @@ class CollectionProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
+
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1772,6 +1803,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
+        # type: (Text, Text) -> Text
         """Generates key for the instance of CollectionProgressModel class in
         the required format with the arguments provided.
 
@@ -1787,6 +1819,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, collection_id):
+        # type: (Text, Text) -> CollectionProgressModel
         """Creates a new CollectionProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -1805,7 +1838,8 @@ class CollectionProgressModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, collection_id=collection_id)
 
     @classmethod
-    def get(cls, user_id, collection_id):
+    def get(cls, user_id, collection_id): # type: ignore[override]
+        # type: (Text, Text) -> Optional[CollectionProgressModel]
         """Gets the CollectionProgressModel for the given user and collection
         id.
 
@@ -1814,7 +1848,7 @@ class CollectionProgressModel(base_models.BaseModel):
             collection_id: str. The id of the collection.
 
         Returns:
-            CollectionProgressModel. The CollectionProgressModel instance which
+            CollectionProgressModel|None. The CollectionProgressModel instance which
             matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
@@ -1822,7 +1856,8 @@ class CollectionProgressModel(base_models.BaseModel):
             instance_id, strict=False)
 
     @classmethod
-    def get_multi(cls, user_id, collection_ids):
+    def get_multi(cls, user_id, collection_ids): # type: ignore[override]
+        # type: (Text, List[Text]) -> List[Optional[CollectionProgressModel]]
         """Gets the CollectionProgressModels for the given user and collection
         ids.
 
@@ -1842,6 +1877,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, user_id, collection_id):
+        # type: (Text, Text) -> CollectionProgressModel
         """Gets the CollectionProgressModel for the given user and collection
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -1863,6 +1899,7 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, List[Text]]]
         """Takeout: Export CollectionProgressModel user-relevant properties.
 
         Args:
@@ -1937,8 +1974,9 @@ class StoryProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1955,6 +1993,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
+        # type: (Text, Text) -> Text
         """"Generates the id for StoryProgressModel.
 
         Args:
@@ -1968,6 +2007,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, story_id):
+        # type: (Text, Text) -> StoryProgressModel
         """Creates a new StoryProgressModel instance and returns it.
 
         Note: the client is responsible for actually saving this entity to the
@@ -1986,7 +2026,8 @@ class StoryProgressModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, story_id=story_id)
 
     @classmethod
-    def get(cls, user_id, story_id, strict=True):
+    def get(cls, user_id, story_id, strict=True): # type: ignore[override]
+        # type: (Text, Text, bool) -> Optional[StoryProgressModel]
         """Gets the StoryProgressModel for the given user and story
         id.
 
@@ -1997,7 +2038,7 @@ class StoryProgressModel(base_models.BaseModel):
                 with the given id exists in the datastore.
 
         Returns:
-            StoryProgressModel. The StoryProgressModel instance which
+            StoryProgressModel|None. The StoryProgressModel instance which
             matches the given user_id and story_id.
         """
         instance_id = cls._generate_id(user_id, story_id)
@@ -2005,7 +2046,8 @@ class StoryProgressModel(base_models.BaseModel):
             instance_id, strict=strict)
 
     @classmethod
-    def get_multi(cls, user_id, story_ids):
+    def get_multi(cls, user_id, story_ids): # type: ignore[override]
+        # type: (Text, List[Text]) -> List[Optional[StoryProgressModel]]
         """Gets the StoryProgressModels for the given user and story
         ids.
 
@@ -2014,7 +2056,7 @@ class StoryProgressModel(base_models.BaseModel):
             story_ids: list(str). The ids of the stories.
 
         Returns:
-            list(StoryProgressModel). The list of StoryProgressModel
+            list(StoryProgressModel|None). The list of StoryProgressModel
             instances which matches the given user_id and story_ids.
         """
         instance_ids = [cls._generate_id(user_id, story_id)
@@ -2025,6 +2067,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def get_or_create(cls, user_id, story_id):
+        # type: (Text, Text) -> StoryProgressModel
         """Gets the StoryProgressModel for the given user and story
         ids, or creates a new instance with if no such instance yet exists
         within the datastore.
@@ -2049,6 +2092,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, List[Text]]]
         """Takeout: Export StoryProgressModel user-relevant properties.
 
         Args:
@@ -2170,8 +2214,9 @@ class UserQueryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.submitter_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2189,6 +2234,7 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def fetch_page(cls, page_size, cursor):
+        # type: (int, Optional[Text]) -> Tuple[List[UserQueryModel], Optional[Text], bool]
         """Fetches a list of all query_models sorted by creation date.
 
         Args:
@@ -2213,8 +2259,10 @@ class UserQueryModel(base_models.BaseModel):
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
-        next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
-        return query_models, next_cursor, more
+        next_cursor_str = next_cursor.urlsafe() if (next_cursor and more) else None
+        return (
+            cast(List[UserQueryModel], query_models),
+            next_cursor_str, more)
 
 
 class UserBulkEmailsModel(base_models.BaseModel):
@@ -2315,8 +2363,9 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2333,6 +2382,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
+        # type: (Text, Text) -> Text
         """Returns model id corresponding to user and skill.
 
         Args:
@@ -2346,6 +2396,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, float]]
         """Exports the data from UserSkillMasteryModel
         into dict format for Takeout.
 
@@ -2357,8 +2408,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        mastery_models = cls.get_all().filter(cls.user_id == user_id).fetch()
-
+        results = cls.get_all().filter(cls.user_id == user_id).fetch()
+        mastery_models = cast(List[UserSkillMasteryModel], results)
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
             user_data[mastery_model_skill_id] = {
@@ -2417,6 +2468,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, Union[float, bool]]]
         """(Takeout) Exports the data from UserContributionProficiencyModel
         into dict format.
 
@@ -2427,7 +2479,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             dict. Dictionary of the data from UserContributionProficiencyModel.
         """
         user_data = dict()
-        scoring_models = cls.query(cls.user_id == user_id).fetch()
+        results = cls.query(cls.user_id == user_id).fetch()
+        scoring_models = cast(List[UserContributionProficiencyModel], results)
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
@@ -2443,8 +2496,9 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2461,6 +2515,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):
+        # type: (Text) -> List[Text]
         """Gets all the score categories where the user has a score above the
         threshold.
 
@@ -2471,27 +2526,31 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             list(str). A list of score_categories where the user has score above
             the threshold.
         """
-        scoring_models = cls.get_all().filter(cls.user_id == user_id).filter(
+        results = cls.get_all().filter(cls.user_id == user_id).filter(
             cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+        scoring_models = cast(List[UserContributionProficiencyModel], results)
         return (
             [scoring_model.score_category for scoring_model in scoring_models])
 
     @classmethod
     def get_all_scores_of_user(cls, user_id):
+        # type: (Text) -> List[UserContributionProficiencyModel]
         """Gets all scores for a given user.
 
         Args:
             user_id: str. The id of the user.
 
         Returns:
-            list(UserContributionsScoringModel). All instances for the given
+            list(UserContributionProficiencyModel). All instances for the given
             user.
         """
-        return cls.get_all().filter(cls.user_id == user_id).fetch()
+        results = cls.get_all().filter(cls.user_id == user_id).fetch()
+        return cast(List[UserContributionProficiencyModel], results)
 
     @classmethod
     def get_all_users_with_score_above_minimum_for_category(
             cls, score_category):
+        # type: (Text) -> List[UserContributionProficiencyModel]
         """Gets all instances which have score above the
         MINIMUM_SCORE_REQUIRED_TO_REVIEW threshold for the given category.
 
@@ -2499,15 +2558,17 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             score_category: str. The category being queried.
 
         Returns:
-            list(UserContributionsScoringModel). All instances for the given
+            list(UserContributionProficiencyModel). All instances for the given
             category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
         """
-        return cls.get_all().filter(
+        results = cls.get_all().filter(
             cls.score_category == score_category).filter(
                 cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+        return cast(List[UserContributionProficiencyModel], results)
 
     @classmethod
     def _get_instance_id(cls, user_id, score_category):
+        # type: (Text, Text) -> Text
         """Generates the instance id in the form '[score_category].[user_id]'.
 
         Args:
@@ -2521,7 +2582,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         return '.'.join([score_category, user_id])
 
     @classmethod
-    def get(cls, user_id, score_category):
+    def get(cls, user_id, score_category): # type: ignore[override]
+        # type: (Text, Text) -> Optional[UserContributionProficiencyModel]
         """Gets the user's scoring model corresponding to the score category.
 
         Args:
@@ -2539,6 +2601,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, user_id, score_category, score, onboarding_email_sent=False):
+        # type: (Text, Text, float, bool) -> UserContributionProficiencyModel
         """Creates a new UserContributionProficiencyModel entry.
 
         Args:
@@ -2617,6 +2680,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Union[bool, List[Text], None]]
         """(Takeout) Exports the data from UserContributionRightsModel
         into dict format.
 
@@ -2661,6 +2725,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_reviewer_user_ids(cls, language_code):
+        # type: (Text) -> List[Text]
         """Returns the IDs of the users who have rights to review translations
         in the given language code.
 
@@ -2671,14 +2736,17 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             translations in the given language code.
         """
-        reviewer_keys = (
+        results = (
             cls.query(
                 cls.can_review_translation_for_language_codes == language_code)
             .fetch(keys_only=True))
+
+        reviewer_keys = cast(List[datastore_services.Key], results)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
     def get_voiceover_reviewer_user_ids(cls, language_code):
+        # type: (Text) -> List[Text]
         """Returns the IDs of the users who have rights to review voiceovers in
         the given language code.
 
@@ -2689,34 +2757,39 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             voiceovers in the given language code.
         """
-        reviewer_keys = (
+        results = (
             cls.query(
                 cls.can_review_voiceover_for_language_codes == language_code)
             .fetch(keys_only=True))
+        reviewer_keys = cast(List[datastore_services.Key], results)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
     def get_question_reviewer_user_ids(cls):
+        # type: () -> List[Text]
         """Returns the IDs of the users who have rights to review questions.
 
         Returns:
             list(str). A list of IDs of users who have rights to review
             questions.
         """
-        reviewer_keys = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
+        results = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
             keys_only=True)
+        reviewer_keys = cast(List[datastore_services.Key], results)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
     def get_question_submitter_user_ids(cls):
+        # type: () -> List[Text]
         """Returns the IDs of the users who have rights to submit questions.
 
         Returns:
             list(str). A list of IDs of users who have rights to submit
             questions.
         """
-        contributor_keys = cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
+        results = cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
             keys_only=True)
+        contributor_keys = cast(List[datastore_services.Key], results)
         return [contributor_key.id() for contributor_key in contributor_keys]
 
 
@@ -2843,7 +2916,8 @@ class DeletedUserModel(base_models.BaseModel):
         particular, existing user. DeletedUserModel contains only IDs that were
         deleted.
         """
-        return dict(super(cls, cls).get_export_policy(), **{})
+        empty_dict = {} # type: Dict[Text, base_models.EXPORT_POLICY]
+        return dict(super(cls, cls).get_export_policy(), **empty_dict)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2880,10 +2954,12 @@ class PseudonymizedUserModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user.
         PseudonymizedUserModel contains only pseudonymous ids.
         """
-        return dict(super(cls, cls).get_export_policy(), **{})
+        empty_dict = {} # type: Dict[Text, base_models.EXPORT_POLICY]
+        return dict(super(cls, cls).get_export_policy(), **empty_dict)
 
     @classmethod
     def get_new_id(cls, unused_entity_name):
+        # type: (Text) -> Text
         """Gets a new id for an entity, based on its name.
 
         The returned id is guaranteed to be unique among all instances of this
@@ -2942,4 +3018,5 @@ class DeletedUsernameModel(base_models.BaseModel):
         DeletedUsernameModel contains only hashes of usernames that were
         deleted.
         """
-        return dict(super(cls, cls).get_export_policy(), **{})
+        empty_dict = {} # type: Dict[Text, base_models.EXPORT_POLICY]
+        return dict(super(cls, cls).get_export_policy(), **empty_dict)
