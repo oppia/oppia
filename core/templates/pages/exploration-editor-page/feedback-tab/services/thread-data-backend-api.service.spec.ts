@@ -374,11 +374,13 @@ describe('retrieving threads service', () => {
 
     expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(0);
     threadDataBackendApiService.createNewThreadAsync(subject, 'Text').then(
-      (value: SuggestionAndFeedbackThreads) => {
-        expect(value.feedbackThreads.length).toEqual(1);
-        expect(value.feedbackThreads[0].threadId)
-          .toEqual('exploration.exp1.jkl1');
-        expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
+      (value: void | SuggestionAndFeedbackThreads) => {
+        if (value) {
+          expect(value.feedbackThreads.length).toEqual(1);
+          expect(value.feedbackThreads[0].threadId)
+            .toEqual('exploration.exp1.jkl1');
+          expect(threadDataBackendApiService.getOpenThreadsCount()).toEqual(1);
+        }
         Promise.resolve();
       },
       Promise.reject);

@@ -54,10 +54,6 @@ interface ThreadData {
   'suggestion_thread_dicts': FeedbackThreadBackendDict[];
 }
 
-interface ThreadMessages {
-  'messages': ThreadMessageBackendDict[];
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -130,9 +126,12 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
+  // 'suggestionBackendDict' will be undefined when threadId is invalid
+  // resulting the function to throw an error.
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
+      suggestionBackendDict: SuggestionBackendDict | undefined
+  ): SuggestionThread {
     if (!threadBackendDict || !suggestionBackendDict) {
       throw new Error('Missing input backend dicts');
     }
@@ -142,19 +141,22 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  getThread(threadId: string): SuggestionAndFeedbackThread {
+  // A null value will be returned if threadId is invalid.
+  getThread(threadId: string): SuggestionAndFeedbackThread | null {
     return this.threadsById.get(threadId) || null;
   }
 
   async getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
-    let suggestions$ = this.http.get(this.getSuggestionListHandlerUrl(), {
-      params: {
-        target_type: 'exploration',
-        target_id: this.contextService.getExplorationId()
-      }
-    });
+    let suggestions$ = this.http.get<SuggestionData>(
+      this.getSuggestionListHandlerUrl(), {
+        params: {
+          target_type: 'exploration',
+          target_id: this.contextService.getExplorationId()
+        }
+      });
 
-    let threads$ = this.http.get(this.getThreadListHandlerUrl());
+    let threads$ = this.http.get<ThreadData>(
+      this.getThreadListHandlerUrl());
 
     return forkJoin([suggestions$, threads$])
       .toPromise()
@@ -177,7 +179,7 @@ export class ThreadDataBackendApiService {
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
               dict, suggestionBackendDictsByThreadId.get(
-                (dict === null ? null : dict.thread_id))))
+                (dict.thread_id))))
         };
       },
       async() => Promise.reject('Error on retrieving feedback threads.'));
@@ -190,9 +192,10 @@ export class ThreadDataBackendApiService {
     }
     let threadId = thread.threadId;
 
-    return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
-      .then((response: ThreadMessages) => {
-        let threadMessageBackendDicts = response.messages;
+    return this.http.get<ThreadMessageBackendDict[]>(
+      this.getThreadHandlerUrl(threadId)).toPromise()
+      .then((response: ThreadMessageBackendDict[]) => {
+        let threadMessageBackendDicts = response;
         thread.setMessages(threadMessageBackendDicts.map(
           m => ThreadMessage.createFromBackendDict(m)));
         return thread.getMessages();
@@ -200,7 +203,8 @@ export class ThreadDataBackendApiService {
   }
 
   async getOpenThreadsCountAsync(): Promise<number> {
-    return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
+    return this.http.get<NumberOfOpenThreads>(
+      this.getFeedbackStatsHandlerUrl()).toPromise()
       .then((response: NumberOfOpenThreads) => {
         return this.openThreadsCount = response.num_open_threads;
       });
@@ -212,11 +216,12 @@ export class ThreadDataBackendApiService {
 
   async createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
-    return this.http.post(this.getThreadListHandlerUrl(), {
-      state_name: null,
-      subject: newSubject,
-      text: newText
-    }).toPromise().then(async() => {
+    return this.http.post<void | SuggestionAndFeedbackThreads>(
+      this.getThreadListHandlerUrl(), {
+        state_name: null,
+        subject: newSubject,
+        text: newText
+      }).toPromise().then(async() => {
       this.openThreadsCount += 1;
       return this.getThreadsAsync();
     },
@@ -248,11 +253,12 @@ export class ThreadDataBackendApiService {
     let oldStatus = thread.status;
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
-    return this.http.post(this.getThreadHandlerUrl(threadId), {
-      updated_status: updatedStatus,
-      updated_subject: null,
-      text: newMessage
-    }).toPromise().then((response: ThreadMessages) => {
+    return this.http.post<ThreadMessageBackendDict[]>(
+      this.getThreadHandlerUrl(threadId), {
+        updated_status: updatedStatus,
+        updated_subject: null,
+        text: newMessage
+      }).toPromise().then((response: ThreadMessageBackendDict[]) => {
       if (updatedStatus) {
         if (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) {
           this.openThreadsCount += 1;
@@ -262,7 +268,7 @@ export class ThreadDataBackendApiService {
         }
       }
       thread.status = newStatus;
-      let threadMessageBackendDicts = response.messages;
+      let threadMessageBackendDicts = response;
       thread.setMessages(threadMessageBackendDicts.map(
         m => ThreadMessage.createFromBackendDict(m)));
       return thread.messages;
