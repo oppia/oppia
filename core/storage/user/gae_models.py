@@ -1675,8 +1675,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            list(ExplorationUserDataModel|None). The ExplorationUserDataModel instance
-            which matches with the given user_ids and exploration_id.
+            list(ExplorationUserDataModel|None). The ExplorationUserDataModel
+            instance which matches with the given user_ids and exploration_id.
         """
         instance_ids = [
             cls._generate_id(user_id, exploration_id) for user_id in user_ids]
@@ -1848,8 +1848,8 @@ class CollectionProgressModel(base_models.BaseModel):
             collection_id: str. The id of the collection.
 
         Returns:
-            CollectionProgressModel|None. The CollectionProgressModel instance which
-            matches the given user_id and collection_id.
+            CollectionProgressModel|None. The CollectionProgressModel instance
+            which matches the given user_id and collection_id.
         """
         instance_id = cls._generate_id(user_id, collection_id)
         return super(CollectionProgressModel, cls).get(
@@ -2259,7 +2259,8 @@ class UserQueryModel(base_models.BaseModel):
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
-        next_cursor_str = next_cursor.urlsafe() if (next_cursor and more) else None
+        next_cursor_str = (
+            next_cursor.urlsafe() if (next_cursor and more) else None)
         return (
             cast(List[UserQueryModel], query_models),
             next_cursor_str, more)

@@ -178,9 +178,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         user_data = dict()
         results = cls.get_all().filter(
             cls.original_author_id == user_id).fetch()
-        feedback_models = cast(List[GeneralFeedbackThreadModel], results)
+        models = cast(List[GeneralFeedbackThreadModel], results)
 
-        for feedback_model in feedback_models:
+        for feedback_model in models:
             user_data[feedback_model.id] = {
                 'entity_type': feedback_model.entity_type,
                 'entity_id': feedback_model.entity_id,
@@ -359,9 +359,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         user_data = dict()
         results = cls.get_all().filter(cls.author_id == user_id).fetch()
-        feedback_models = cast(List[GeneralFeedbackMessageModel], results)
+        models = cast(List[GeneralFeedbackMessageModel], results)
 
-        for feedback_model in feedback_models:
+        for feedback_model in models:
             user_data[feedback_model.id] = {
                 'thread_id': feedback_model.thread_id,
                 'message_id': feedback_model.message_id,

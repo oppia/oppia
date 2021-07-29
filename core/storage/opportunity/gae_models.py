@@ -127,8 +127,8 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 cls.incomplete_translation_language_codes).fetch_page(
                     page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[ExplorationOpportunitySummaryModel]], results)
-            , (cursor.urlsafe() if cursor else None), more)
+            cast(Optional[List[ExplorationOpportunitySummaryModel]], results),
+            (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_all_voiceover_opportunities(
