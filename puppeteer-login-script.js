@@ -37,7 +37,7 @@ var addNewRoleButton = '.protractor-test-add-new-role-button';
 var roleSelect = '.protractor-test-new-role-selector';
 
 module.exports = async(browser, context) => {
-  const page = await browser.createIncognitoBrowserContext().newPage();
+  const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
   await login(context, page);

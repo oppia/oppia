@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
@@ -29,7 +30,4 @@ jobs:
         run: python -m scripts.install_chrome_for_ci
       - name: Run Lighthouse performance checks shard 1
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --shard 1
-      - name: Run Lighthouse performance checks shard 2
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python -m scripts.run_lighthouse_tests --mode performance --shard 2
+        run: python -m scripts.run_lighthouse_tests --mode performance --shard ${{ matrix.shard }}
