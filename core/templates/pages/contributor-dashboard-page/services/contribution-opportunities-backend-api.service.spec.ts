@@ -32,10 +32,9 @@ import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-op
 
 describe('Contribution Opportunities backend API service', function() {
   let contributionOpportunitiesBackendApiService:
-    ContributionOpportunitiesBackendApiService = null;
+    ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;
-  let urlInterpolationService:
-    UrlInterpolationService = null;
+  let urlInterpolationService: UrlInterpolationService;
   const skillOpportunityResponse = {
     opportunities: [{
       id: 'skill_id',
@@ -60,9 +59,9 @@ describe('Contribution Opportunities backend API service', function() {
     next_cursor: '6',
     more: true
   };
-  let sampleSkillOpportunitiesResponse = null;
-  let sampleTranslationOpportunitiesResponse = null;
-  let sampleVoiceoverOpportunitiesResponse = null;
+  let sampleSkillOpportunitiesResponse: SkillOpportunity[];
+  let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
+  let sampleVoiceoverOpportunitiesResponse: ExplorationOpportunitySummary[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({

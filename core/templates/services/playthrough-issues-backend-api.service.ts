@@ -35,7 +35,7 @@ import { UrlInterpolationService } from
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {
-  private cachedIssues = null;
+  private cachedIssues: PlaythroughIssue[] = [];
 
   constructor(
       private httpClient: HttpClient,
@@ -45,7 +45,7 @@ export class PlaythroughIssuesBackendApiService {
   async fetchIssuesAsync(
       explorationId: string,
       explorationVersion: number): Promise<PlaythroughIssue[]> {
-    if (this.cachedIssues !== null) {
+    if (this.cachedIssues.length !== 0) {
       return Promise.resolve(this.cachedIssues);
     }
 
@@ -86,7 +86,7 @@ export class PlaythroughIssuesBackendApiService {
         exp_version: explorationVersion
       }).toPromise()
         .then(() => {
-          if (this.cachedIssues !== null) {
+          if (this.cachedIssues.length !== 0) {
             const issueIndex = this.cachedIssues.findIndex(
               issue => angular.equals(issue, issueToResolve));
             if (issueIndex !== -1) {
