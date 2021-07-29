@@ -42,9 +42,10 @@ describe('topicEditorStoriesList', () => {
     $scope = $rootScope.$new();
     ctrl = $componentController('topicEditorStoriesList', {
       $scope: $scope
+    }, {
+      getTopic: () => {}
     });
 
-    $scope.getTopic = () => {};
     storySummaries = [StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -88,28 +89,28 @@ describe('topicEditorStoriesList', () => {
   it('should move story to new location when user stops dragging', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory');
     $scope.fromIndex = 1;
-    $scope.storySummaries = storySummaries;
+    ctrl.storySummaries = storySummaries;
 
     $scope.onMoveStoryFinish(0);
 
     expect($scope.toIndex).toBe(0);
     expect(topicUpdateService.rearrangeCanonicalStory).toHaveBeenCalled();
-    expect($scope.storySummaries[0].getId()).toBe('storyId2');
-    expect($scope.storySummaries[1].getId()).toBe('storyId');
+    expect(ctrl.storySummaries[0].getId()).toBe('storyId2');
+    expect(ctrl.storySummaries[1].getId()).toBe('storyId');
   });
 
   it('should not rearrage when user does not change position of the ' +
   'story', () => {
     spyOn(topicUpdateService, 'rearrangeCanonicalStory');
     $scope.fromIndex = 0;
-    $scope.storySummaries = storySummaries;
+    ctrl.storySummaries = storySummaries;
 
     $scope.onMoveStoryFinish(0);
 
     expect($scope.toIndex).toBe(0);
     expect(topicUpdateService.rearrangeCanonicalStory).not.toHaveBeenCalled();
-    expect($scope.storySummaries[1].getId()).toBe('storyId2');
-    expect($scope.storySummaries[0].getId()).toBe('storyId');
+    expect(ctrl.storySummaries[1].getId()).toBe('storyId2');
+    expect(ctrl.storySummaries[0].getId()).toBe('storyId');
   });
 
   it('should delete story when user deletes story', () => {
@@ -117,17 +118,17 @@ describe('topicEditorStoriesList', () => {
       result: $q.resolve()
     });
     spyOn(topicUpdateService, 'removeCanonicalStory');
-    $scope.storySummaries = storySummaries;
+    ctrl.storySummaries = storySummaries;
 
-    expect($scope.storySummaries.length).toBe(2);
+    expect(ctrl.storySummaries.length).toBe(2);
 
     $scope.deleteCanonicalStory('storyId');
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
     expect(topicUpdateService.removeCanonicalStory).toHaveBeenCalled();
-    expect($scope.storySummaries.length).toBe(1);
-    expect($scope.storySummaries[0].getId()).toBe('storyId2');
+    expect(ctrl.storySummaries.length).toBe(1);
+    expect(ctrl.storySummaries[0].getId()).toBe('storyId2');
   });
 
   it('should close modal when user click cancel button', () => {

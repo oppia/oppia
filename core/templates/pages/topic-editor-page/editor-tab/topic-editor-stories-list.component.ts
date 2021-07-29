@@ -71,10 +71,10 @@ angular.module('oppia').component('topicEditorStoriesList', {
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
           TopicUpdateService.removeCanonicalStory(
-            $scope.getTopic(), storyId);
-          for (var i = 0; i < $scope.storySummaries.length; i++) {
-            if ($scope.storySummaries[i].getId() === storyId) {
-              $scope.storySummaries.splice(i, 1);
+            ctrl.getTopic(), storyId);
+          for (var i = 0; i < ctrl.storySummaries.length; i++) {
+            if (ctrl.storySummaries[i].getId() === storyId) {
+              ctrl.storySummaries.splice(i, 1);
             }
           }
         }, function() {
@@ -90,11 +90,11 @@ angular.module('oppia').component('topicEditorStoriesList', {
           return;
         }
         TopicUpdateService.rearrangeCanonicalStory(
-          $scope.getTopic(), $scope.fromIndex, $scope.toIndex);
+          ctrl.getTopic(), $scope.fromIndex, $scope.toIndex);
         var storySummary = (
-          angular.copy($scope.storySummaries[$scope.fromIndex]));
-        $scope.storySummaries.splice($scope.fromIndex, 1);
-        $scope.storySummaries.splice($scope.toIndex, 0, storySummary);
+          angular.copy(ctrl.storySummaries[$scope.fromIndex]));
+        ctrl.storySummaries.splice($scope.fromIndex, 1);
+        ctrl.storySummaries.splice($scope.toIndex, 0, storySummary);
       };
 
       $scope.onMoveStoryStart = function(fromIndex) {
