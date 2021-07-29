@@ -26,10 +26,10 @@ require(
   'item-selection-input-validation.service.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'oppia-interactive-item-selection-input.directive.ts');
+  'oppia-interactive-item-selection-input.component.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'oppia-response-item-selection-input.directive.ts');
+  'oppia-response-item-selection-input.component.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'oppia-short-response-item-selection-input.directive.ts');
+  'oppia-short-response-item-selection-input.component.ts');

@@ -1,4 +1,8 @@
-var argv = require('yargs').argv;
+var argv = require('yargs').positional('terminalEnabled', {
+  type: 'boolean',
+  'default': false
+}).argv;
+
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
   generatedJs = (
@@ -17,6 +21,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.8.2/angular-mocks.js',
+      '/third_party/static/lamejs-1.2.0/worker-example/worker-realtime.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -31,6 +36,12 @@ module.exports = function(config) {
       // unknown reason.
       'core/templates/combined-tests.spec.ts',
       {
+        pattern: 'assets/**',
+        watched: false,
+        served: true,
+        included: false
+      },
+      {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
@@ -39,13 +50,7 @@ module.exports = function(config) {
       'extensions/interactions/**/*.directive.html',
       'extensions/interactions/**/*.component.html',
       'extensions/interactions/*.json',
-      'core/tests/data/*.json',
-      {
-        pattern: 'assets/i18n/**/*.json',
-        watched: true,
-        served: true,
-        included: false
-      }
+      'core/tests/data/*.json'
     ],
     exclude: [
       'local_compiled_js/core/templates/**/*-e2e.js',
@@ -93,12 +98,9 @@ module.exports = function(config) {
     browserDisconnectTimeout: 60000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
-      // To print debugging information, use `console.error`. We don't
-      // output `log` level logs to avoid printing out success messages
-      // for every passing spec.
-      level: 'error',
+      level: 'log',
       format: '%b %T: %m',
-      terminal: true
+      terminal: argv.terminalEnabled
     },
     // Continue running in the background after running tests.
     singleRun: true,

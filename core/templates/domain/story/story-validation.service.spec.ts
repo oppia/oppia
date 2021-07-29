@@ -25,8 +25,8 @@ describe('Story Validation Service', () => {
   let svs: StoryValidationService;
   let storyContentsObjectFactory: StoryContentsObjectFactory;
   beforeEach(() => {
-    svs = TestBed.get(StoryValidationService);
-    storyContentsObjectFactory = TestBed.get(StoryContentsObjectFactory);
+    svs = TestBed.inject(StoryValidationService);
+    storyContentsObjectFactory = TestBed.inject(StoryContentsObjectFactory);
   });
 
   it('should report a validation error when skill is not aquired in previous' +
@@ -122,5 +122,32 @@ describe('Story Validation Service', () => {
       [], sampleStoryContents);
     let expectedErrorString = 'Loops are not allowed in the node graph';
     expect(issues).toEqual([expectedErrorString]);
+  });
+
+  it('should throw error when initial node id does not exist', () => {
+    let sampleStoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      nodes: [
+        {
+          id: 'node_1',
+          title: 'Title 1',
+          description: 'Description 1',
+          prerequisite_skill_ids: ['skill_1'],
+          acquired_skill_ids: ['skill_2'],
+          destination_node_ids: ['node_2'],
+          outline: 'Outline',
+          exploration_id: null,
+          outline_is_finalized: false,
+          thumbnail_bg_color: '#a33f40',
+          thumbnail_filename: 'filename'
+        }
+      ],
+      next_node_id: 'node_2'
+    };
+    let sampleStoryContents = storyContentsObjectFactory.createFromBackendDict(
+      sampleStoryContentsBackendDict);
+    sampleStoryContents.deleteNode('node_1');
+    expect(() => svs.validatePrerequisiteSkillsInStoryContents(
+      [], sampleStoryContents)).toThrowError('Starting Node does not exist');
   });
 });
