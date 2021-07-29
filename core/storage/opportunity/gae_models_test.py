@@ -38,7 +38,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         # type: () -> None
-        super(ExplorationOpportunitySummaryModelUnitTest, self).setUp()
+        super(ExplorationOpportunitySummaryModelUnitTest, self).setUp() # type: ignore[no-untyped-call]
 
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='opportunity_id1',
@@ -79,6 +79,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(5, None, 'hi'))
+        assert results is not None
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
@@ -90,6 +91,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
@@ -98,6 +100,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, cursor, 'hi'))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
@@ -108,6 +111,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_voiceover_opportunities(5, None, 'en'))
+        assert results is not None
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
@@ -119,6 +123,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_voiceover_opportunities(1, None, 'en'))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
@@ -127,6 +132,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, new_cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_voiceover_opportunities(1, cursor, 'en'))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
@@ -137,12 +143,14 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('topic_id1'))
+        assert model_list is not None
         self.assertEqual(len(model_list), 1)
         self.assertEqual(model_list[0].id, 'opportunity_id1')
 
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('topic_id2'))
+        assert model_list is not None
         self.assertEqual(len(model_list), 1)
         self.assertEqual(model_list[0].id, 'opportunity_id2')
 
@@ -151,6 +159,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         model_list = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_by_topic('non_existing_topic_id'))
+        assert model_list is not None
         self.assertEqual(len(model_list), 0)
 
     def test_delete_all(self):
@@ -158,6 +167,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertTrue(more)
 
@@ -166,6 +176,7 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         results, _, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
             .get_all_translation_opportunities(1, None, 'hi'))
+        assert results is not None
         self.assertEqual(len(results), 0)
         self.assertFalse(more)
 
@@ -175,7 +186,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
 
     def setUp(self):
         # type: () -> None
-        super(SkillOpportunityModelTest, self).setUp()
+        super(SkillOpportunityModelTest, self).setUp() # type: ignore[no-untyped-call]
 
         opportunity_models.SkillOpportunityModel(
             id='opportunity_id1',
@@ -199,6 +210,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
             .get_skill_opportunities(5, None))
+        assert results is not None
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertEqual(results[1].id, 'opportunity_id2')
@@ -210,6 +222,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
             .get_skill_opportunities(1, None))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id1')
         self.assertTrue(more)
@@ -218,6 +231,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
             .get_skill_opportunities(1, cursor))
+        assert results is not None
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
@@ -228,6 +242,7 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         results, _, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
                 1, None))
+        assert results is not None
         self.assertEqual(len(results), 1)
 
         opportunity_models.SkillOpportunityModel.delete_all()
@@ -235,5 +250,6 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         results, _, more = (
             opportunity_models.SkillOpportunityModel.get_skill_opportunities(
                 1, None))
+        assert results is not None
         self.assertEqual(len(results), 0)
         self.assertFalse(more)
