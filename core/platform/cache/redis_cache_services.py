@@ -76,7 +76,8 @@ def get_multi(keys):
         are passed in.
     """
     assert isinstance(keys, list)
-    return OPPIA_REDIS_CLIENT.mget(keys)
+    # Redis saves data as bytes, so we need to decode them.
+    return [value.decode('utf-8') for value in OPPIA_REDIS_CLIENT.mget(keys)]
 
 
 def set_multi(key_value_mapping):
@@ -91,7 +92,11 @@ def set_multi(key_value_mapping):
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    # Redis saves data as bytes, so we need to encode them first.
+    key_value_bytes_mapping = {
+        key: value.encode('utf-8') for key, value in key_value_mapping
+    }
+    return OPPIA_REDIS_CLIENT.mset(key_value_bytes_mapping)
 
 
 def delete_multi(keys):

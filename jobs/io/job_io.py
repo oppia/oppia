@@ -48,13 +48,20 @@ class PutResults(beam.PTransform):
         super(PutResults, self).__init__(label=label)
         self.job_id = job_id
 
-    def expand(self, input_or_inputs):
-        """Writes the given job results to the NDB datastore."""
+    def expand(self, inputs):
+        """Writes the given job results to the NDB datastore.
+
+        Args:
+            inputs: PCollection. Models, can also contain just one model.
+
+        Returns:
+            PCollection. An empty PCollection.
+        """
         return (
-            input_or_inputs
+            inputs
             # NOTE: Pylint is wrong. WithKeys() is a decorated function with a
             # different signature than the one it's defined with.
-            | beam.WithKeys(None) # pylint: disable=no-value-for-parameter
+            | beam.WithKeys(None)  # pylint: disable=no-value-for-parameter
             # GroupIntoBatches() requires (key, value) pairs as input, so we
             # give everything None keys and then immediately discard them.
             | beam.GroupIntoBatches(self._MAX_RESULT_INSTANCES_PER_MODEL)
@@ -62,7 +69,7 @@ class PutResults(beam.PTransform):
             | beam.FlatMap(job_run_result.JobRunResult.accumulate)
             | beam.Map(
                 self.create_beam_job_run_result_model,
-                input_or_inputs.pipeline.options.namespace)
+                inputs.pipeline.options.namespace)
             | ndb_io.PutModels()
         )
 

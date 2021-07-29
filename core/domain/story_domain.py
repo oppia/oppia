@@ -888,18 +888,18 @@ class Story(python_utils.OBJECT):
         }
 
     @classmethod
-    def deserialize(cls, json_bytes):
-        """Returns a Story domain object decoded from a JSON bytes.
+    def deserialize(cls, json_string):
+        """Returns a Story domain object decoded from a JSON string.
 
         Args:
-            json_bytes: bytes. A JSON-encoded bytes that can be
-                decoded into a dictionary representing a Story. Only call
-                on bytes that were created using serialize().
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Story.
+                Only call on strings that were created using serialize().
 
         Returns:
             Story. The corresponding Story domain object.
         """
-        story_dict = json.loads(json_bytes.decode('utf-8'))
+        story_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 story_dict['created_on'])
@@ -918,11 +918,11 @@ class Story(python_utils.OBJECT):
         return story
 
     def serialize(self):
-        """Returns the object serialized as a JSON bytes.
+        """Returns the object serialized as a JSON string.
 
         Returns:
-            bytes. JSON-encoded utf-8 bytes encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         story_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -943,7 +943,7 @@ class Story(python_utils.OBJECT):
             story_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
-        return json.dumps(story_dict).encode('utf-8')
+        return json.dumps(story_dict)
 
     @classmethod
     def from_dict(

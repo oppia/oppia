@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import inspect
+import io
 import json
 import logging
 import os
@@ -722,7 +723,7 @@ class RenderDownloadableTests(test_utils.GenericTestBase):
 
         def get(self):
             """Handles GET requests."""
-            file_contents = 'example'
+            file_contents = io.BytesIO('example')
             self.render_downloadable_file(
                 file_contents, 'example.pdf', 'text/plain')
 
@@ -1978,7 +1979,8 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         with self.swap(self, 'testapp', self.testapp):
             response_dict = self.post_json(

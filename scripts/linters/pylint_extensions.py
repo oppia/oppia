@@ -64,6 +64,7 @@ def read_from_node(node):
     Returns:
         list(str). The data read from the ast node.
     """
+    # Readlines returns bytes, thus we need to decode them to string.
     return [line.decode('utf-8') for line in node.stream().readlines()]
 
 

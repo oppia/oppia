@@ -789,11 +789,13 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             queue_name: str. The name of the queue to add the task to.
             task_name: str|None. Optional. The name of the task.
         """
+        # Header values need to be bytes, thus we encode our strings to bytes.
         headers = {
             'X-AppEngine-Fake-Is-Admin': b'1',
-            'X-Appengine-QueueName': queue_name.encode(),
+            'X-Appengine-QueueName': queue_name.encode('utf-8'),
             # Maps empty strings to None so the output can become 'None'.
-            'X-Appengine-TaskName': task_name.encode() if task_name else b'None'
+            'X-Appengine-TaskName': (
+                task_name.encode('utf-8') if task_name else b'None')
         }
         csrf_token = self._test_base.get_new_csrf_token()
         self._test_base.post_task(url, payload, headers, csrf_token=csrf_token)

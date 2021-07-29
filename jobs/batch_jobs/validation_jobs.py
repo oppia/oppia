@@ -183,21 +183,22 @@ class ApplyAuditDoFns(beam.PTransform):
         self._kind = kind
         self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
 
-    def expand(self, input_or_inputs):
+    def expand(self, inputs):
         """Returns audit errors from every Audit DoFn targeting the models.
 
         This is the method that PTransform requires us to override when
         implementing custom transforms.
 
         Args:
-            input_or_inputs: PCollection. Models of self._kind.
+            inputs: PCollection. Models of self._kind, can also contain
+                just one model.
 
         Returns:
             iterable(PCollection). A chain of PCollections. Each individual one
             is the result of a specific DoFn, and is labeled as such.
         """
         return (
-            input_or_inputs
+            inputs
             | 'Apply %s on %s' % (f.__name__, self._kind) >> beam.ParDo(f())
             for f in self._do_fn_types
         )

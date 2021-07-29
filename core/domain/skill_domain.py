@@ -784,11 +784,11 @@ class Skill(python_utils.OBJECT):
         }
 
     def serialize(self):
-        """Returns the object serialized as a JSON bytes.
+        """Returns the object serialized as a JSON string.
 
         Returns:
-            bytes. JSON-encoded utf-8 bytes encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         skill_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -809,21 +809,21 @@ class Skill(python_utils.OBJECT):
             skill_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
-        return json.dumps(skill_dict).encode('utf-8')
+        return json.dumps(skill_dict)
 
     @classmethod
-    def deserialize(cls, json_bytes):
-        """Returns a Skill domain object decoded from a JSON bytes.
+    def deserialize(cls, json_string):
+        """Returns a Skill domain object decoded from a JSON string.
 
         Args:
-            json_bytes: bytes. A JSON-encoded bytes that can be
-                decoded into a dictionary representing a Skill. Only call
-                on bytes that were created using serialize().
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Skill.
+                Only call on strings that were created using serialize().
 
         Returns:
             Skill. The corresponding Skill domain object.
         """
-        skill_dict = json.loads(json_bytes.decode('utf-8'))
+        skill_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 skill_dict['created_on'])

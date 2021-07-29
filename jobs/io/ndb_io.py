@@ -44,20 +44,20 @@ class GetModels(beam.PTransform):
         super(GetModels, self).__init__(label=label)
         self.query = query
 
-    def expand(self, input_or_inputs):
+    def expand(self, initial_pipeline):
         """Returns a PCollection with models matching the corresponding query.
 
         Args:
-            input_or_inputs: PValue. The initial PValue of the pipeline, used to
-                anchor the models to its underlying pipeline.
+            initial_pipeline: PValue. The initial pipeline. This pipeline
+                is used to anchor the models to itself.
 
         Returns:
             PCollection. The PCollection of models.
         """
         query = job_utils.get_beam_query_from_ndb_query(
-            self.query, namespace=input_or_inputs.pipeline.options.namespace)
+            self.query, namespace=initial_pipeline.pipeline.options.namespace)
         return (
-            input_or_inputs.pipeline
+            initial_pipeline.pipeline
             | 'Reading %r from the datastore' % self.query >> (
                 datastoreio.ReadFromDatastore(query))
             | 'Transforming %r into NDB models' % self.query >> (

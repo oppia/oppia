@@ -77,7 +77,7 @@ def create_http_task(
             }
 
         # The API expects a payload of type bytes.
-        converted_payload = payload.encode()
+        converted_payload = payload.encode('utf-8')
 
         # Add the payload to the request.
         task['app_engine_http_request']['body'] = converted_payload

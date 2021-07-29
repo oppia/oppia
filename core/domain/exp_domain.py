@@ -2180,11 +2180,11 @@ class Exploration(python_utils.OBJECT):
         })
 
     def serialize(self):
-        """Returns the object serialized as a JSON bytes.
+        """Returns the object serialized as a JSON string.
 
         Returns:
-            bytes. JSON-encoded utf-8 bytes encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         exploration_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -2205,21 +2205,21 @@ class Exploration(python_utils.OBJECT):
             exploration_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
-        return json.dumps(exploration_dict).encode('utf-8')
+        return json.dumps(exploration_dict)
 
     @classmethod
-    def deserialize(cls, json_bytes):
-        """Returns an Exploration domain object decoded from a JSON bytes.
+    def deserialize(cls, json_string):
+        """Returns an Exploration domain object decoded from a JSON string.
 
         Args:
-            json_bytes: str. A JSON-encoded utf-8 bytes that can be
-                decoded into a dictionary representing an Exploration. Only call
-                on bytes that were created using serialize().
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Exploration.
+                Only call on strings that were created using serialize().
 
         Returns:
             Exploration. The corresponding Exploration domain object.
         """
-        exploration_dict = json.loads(json_bytes.decode('utf-8'))
+        exploration_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 exploration_dict['created_on'])

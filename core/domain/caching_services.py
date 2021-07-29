@@ -89,8 +89,8 @@ DESERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
-    CACHE_NAMESPACE_CONFIG: lambda x: json.loads(x.decode('utf-8')),
-    CACHE_NAMESPACE_DEFAULT: lambda x: json.loads(x.decode('utf-8'))
+    CACHE_NAMESPACE_CONFIG: json.loads,
+    CACHE_NAMESPACE_DEFAULT: json.loads
 }
 
 SERIALIZATION_FUNCTIONS = {
@@ -100,8 +100,8 @@ SERIALIZATION_FUNCTIONS = {
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
-    CACHE_NAMESPACE_CONFIG: lambda x: json.dumps(x).encode('utf-8'),
-    CACHE_NAMESPACE_DEFAULT: lambda x: json.dumps(x).encode('utf-8')
+    CACHE_NAMESPACE_CONFIG: json.dumps,
+    CACHE_NAMESPACE_DEFAULT: json.dumps
 }
 
 

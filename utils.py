@@ -302,7 +302,7 @@ def convert_png_data_url_to_binary(image_data_url):
             data URL.
 
     Returns:
-        str. Binary content of the PNG created from the data URL.
+        bytes. Binary content of the PNG created from the data URL.
 
     Raises:
         Exception. The given string does not represent a PNG data URL.
@@ -473,10 +473,10 @@ def base64_from_int(value):
         value: int. Integer value for conversion into base64.
 
     Returns:
-        *. Returns the base64 representation of the number passed.
+        str. Returns the base64 representation of the number passed.
     """
     byte_value = (
-        b'[' + python_utils.UNICODE(value).encode(encoding='utf-8') + b']')
+        b'[' + python_utils.UNICODE(value).encode('utf-8') + b']')
     return base64.b64encode(byte_value).decode('utf-8')
 
 

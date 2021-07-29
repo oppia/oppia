@@ -139,9 +139,10 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
-    # Converting to unicode to stay compatible with the rest of the strings.
-    last_stdout_str = last_stdout_str.decode(encoding='utf-8')
-    last_stderr_str = last_stderr_str.decode(encoding='utf-8')
+    # Standard and error output is in bytes, we need to decode them to be
+    # compatible with rest of the code.
+    last_stdout_str = last_stdout_str.decode('utf-8')
+    last_stderr_str = last_stderr_str.decode('utf-8')
     last_stdout = last_stdout_str.split('\n')
 
     if LOG_LINE_PREFIX in last_stdout_str:

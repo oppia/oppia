@@ -508,7 +508,8 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -545,7 +546,8 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -565,7 +567,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.url = feconf.NEW_SKILL_URL
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             self.original_image_content = f.read()
 
     def test_skill_creation(self):
@@ -708,7 +711,8 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(

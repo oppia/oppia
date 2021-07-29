@@ -175,6 +175,8 @@ def get_ndb_model_from_beam_entity(beam_entity):
     ndb_key = get_ndb_key_from_beam_key(beam_entity.key)
     ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind()) # pylint: disable=protected-access
     ndb_properties = {}
+    # NDB datastore does not accept datetime with timezone info (tzinfo) so
+    # it needs to be removed.
     for key, value in beam_entity.properties.items():
         if isinstance(value, datetime.datetime):
             value = value.replace(tzinfo=None)

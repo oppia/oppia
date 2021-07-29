@@ -194,6 +194,7 @@ class DeferredTasksHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_tasks_in_taskqueue
     def post(self):
+        # The request body has bytes type, thus we need to decode it first.
         payload = json.loads(self.request.body.decode('utf-8'))
         if 'fn_identifier' not in payload:
             raise Exception(

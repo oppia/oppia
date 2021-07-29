@@ -84,12 +84,11 @@ def send_email_to_recipients(
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body
+            'subject': subject.encode('utf-8'),
+            'text': plaintext_body.encode('utf-8'),
+            'html': html_body.encode('utf-8'),
+            'to': email_list[0] if len(email_list) == 1 else email_list
         }
-
-        data['to'] = email_list[0] if len(email_list) == 1 else email_list
 
         if bcc:
             data['bcc'] = bcc[0] if len(bcc) == 1 else bcc

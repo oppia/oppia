@@ -283,8 +283,9 @@ def export_to_zip_file(exploration_id, version=None):
             exploration is exported.
 
     Returns:
-        str. The contents of the ZIP archive of the exploration (which can be
-        subsequently converted into a zip file via zipfile.ZipFile()).
+        BytesIO. The contents of the ZIP archive of the exploration
+        (which can be subsequently converted into a zip file via
+        zipfile.ZipFile()).
     """
     # Asset directories that need to be included in exploration download.
     asset_dirs_to_include_in_downloads = ('image',)
@@ -311,7 +312,7 @@ def export_to_zip_file(exploration_id, version=None):
             str_filepath = 'assets/%s' % filepath
             zfile.writestr(str_filepath, file_contents)
 
-    return temp_file.getvalue()
+    return temp_file
 
 
 def export_states_to_yaml(exploration_id, version=None, width=80):

@@ -504,14 +504,15 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
+        # Write expects bytes, thus we need to encode the JSON output.
         self.response.write(
             b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
-    def render_downloadable_file(self, values, filename, content_type):
+    def render_downloadable_file(self, file, filename, content_type):
         """Prepares downloadable content to be sent to the client.
 
         Args:
-            values: bytes. The data of the downloadable file.
+            file: BytesIO. The data of the downloadable file.
             filename: str. The name of the file to be rendered.
             content_type: str. The type of file to be rendered.
         """
@@ -522,7 +523,7 @@ class BaseHandler(webapp2.RequestHandler):
         # We use this super in order to bypass the write method
         # in webapp2.Response, since webapp2.Response doesn't support writing
         # bytes.
-        super(webapp2.Response, self.response).write(values)  # pylint: disable=bad-super-call
+        super(webapp2.Response, self.response).write(file.read())  # pylint: disable=bad-super-call
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
@@ -744,10 +745,10 @@ class CsrfTokenManager(python_utils.OBJECT):
         # Round time to seconds.
         issued_on = python_utils.UNICODE(int(issued_on))
 
-        digester = hmac.new(python_utils.convert_to_bytes(CSRF_SECRET.value))
-        digester.update(python_utils.convert_to_bytes(user_id))
+        digester = hmac.new(CSRF_SECRET.value.encode('utf-8'))
+        digester.update(user_id.encode('utf-8'))
         digester.update(b':')
-        digester.update(python_utils.convert_to_bytes(issued_on))
+        digester.update(issued_on.encode('utf-8'))
 
         digest = digester.digest()
         # The b64encode returns bytes, so we first need to decode the returned

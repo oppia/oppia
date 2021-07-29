@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
 import logging
 import random
 
@@ -981,7 +982,7 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
         # Downloadable file accepts only bytes, so we need to encode
         # topic_similarities to bytes.
         self.render_downloadable_file(
-            topic_similarities.encode('utf-8'),
+            io.BytesIO(topic_similarities.encode('utf-8')),
             'topic_similarities.csv',
             'text/csv'
         )

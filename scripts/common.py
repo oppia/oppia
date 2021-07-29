@@ -305,7 +305,7 @@ def open_new_tab_in_browser_if_possible(url):
 def get_remote_alias(remote_url):
     """Finds the correct alias for the given remote repository URL."""
     git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v']).decode(encoding='utf-8').split('\n')
+        ['git', 'remote', '-v']).decode('utf-8').split('\n')
     remote_alias = None
     for line in git_remote_output:
         if remote_url in line:
@@ -340,12 +340,12 @@ def get_current_branch_name():
         str. The name of current branch.
     """
     git_status_output = subprocess.check_output(
-        ['git', 'status']).strip().split(b'\n')
-    branch_message_prefix = b'On branch '
+        ['git', 'status']).decode('utf-8').strip().split('\n')
+    branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
     # Standard output is in bytes, we need to decode the line to print it.
-    return git_status_first_line[len(branch_message_prefix):].decode('utf-8')
+    return git_status_first_line[len(branch_message_prefix):]
 
 
 def get_current_release_version_number(release_branch_name):

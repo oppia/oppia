@@ -485,7 +485,8 @@ def _run_pip_command(cmd_parts):
         subprocess.check_call(
             command + ['--user', '--prefix=', '--system'])
     else:
-        python_utils.PRINT(stderr.decode(encoding='utf-8'))
+        # Error output is in bytes, we need to decode the line to print it.
+        python_utils.PRINT(stderr.decode('utf-8'))
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
