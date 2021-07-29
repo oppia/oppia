@@ -31,7 +31,10 @@ export class EmailDashboardDataService {
   // No. of query results to display on a single page.
   QUERIES_PER_PAGE: number = 10;
   // Store latest cursor value for fetching next query page.
-  latestCursor: string = null;
+  // 'latestCursor' will be 'null' when there are no more query results
+  // or when the returned result starts from the beginning of the full
+  // list of results.
+  latestCursor: string | null = null;
   // Array containing all fetched queries.
   queries: EmailDashboardQuery[] = [];
   // Index of currently-shown page of query results.
@@ -49,7 +52,7 @@ export class EmailDashboardDataService {
     return this.currentPageIndex;
   }
 
-  getLatestCursor(): string {
+  getLatestCursor(): string | null {
     return this.latestCursor;
   }
 
