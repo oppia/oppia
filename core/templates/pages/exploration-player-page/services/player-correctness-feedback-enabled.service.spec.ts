@@ -16,23 +16,22 @@
  * @fileoverview Unit tests for the player correctness feedback enabled service.
  */
 
- import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
- import { PlayerCorrectnessFeedbackEnabledService } from
-   './player-correctness-feedback-enabled.service';
- 
- describe('Player correctness feedback enabled service', () => {
-   let pcfes: PlayerCorrectnessFeedbackEnabledService = null;
- 
-   beforeEach(() => {
-     pcfes = TestBed.get(PlayerCorrectnessFeedbackEnabledService);
-   });
- 
-   it('should set correctness feedback is enabled to given value', () => {
-     pcfes.init(false);
-     expect(pcfes.isEnabled()).toBe(false);
-     pcfes.init(true);
-     expect(pcfes.isEnabled()).toBe(true);
-   });
- });
- 
+import { PlayerCorrectnessFeedbackEnabledService } from
+  './player-correctness-feedback-enabled.service';
+
+describe('Player correctness feedback enabled service', () => {
+  let pcfes: PlayerCorrectnessFeedbackEnabledService = null;
+
+  beforeEach(() => {
+    pcfes = TestBed.get(PlayerCorrectnessFeedbackEnabledService);
+  });
+
+  it('should set correctness feedback is enabled to given value', () => {
+    pcfes.init(false);
+    expect(pcfes.isEnabled()).toBe(false);
+    pcfes.init(true);
+    expect(pcfes.isEnabled()).toBe(true);
+  });
+});
