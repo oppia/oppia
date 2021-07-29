@@ -30,7 +30,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -67,8 +67,9 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
-        saved_exploration = (
+        result = (
             exp_models.ExplorationModel.get_all().fetch(limit=1)[0])
+        saved_exploration = cast(exp_models.ExplorationModel, result)
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')

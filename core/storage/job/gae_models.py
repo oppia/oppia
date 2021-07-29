@@ -25,7 +25,7 @@ from core.platform import models
 import python_utils
 import utils
 
-from typing import Dict, List, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -156,9 +156,10 @@ class JobModel(base_models.BaseModel):
         """
         earliest_time_msec = (
             utils.get_current_time_in_millisecs() - recency_msec)
-        return cls.query().filter(
+        results = cls.query().filter(
             cls.time_queued_msec > earliest_time_msec
         ).order(-cls.time_queued_msec).fetch(limit)
+        return cast(List[JobModel], results)
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
@@ -172,9 +173,10 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
-        return cls.query().filter(
+        results = cls.query().filter(
             JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
         ).order(-cls.time_queued_msec).fetch(limit)
+        return cast(List[JobModel], results)
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):

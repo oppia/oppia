@@ -176,8 +176,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        feedback_models = cls.get_all().filter(
+        results = cls.get_all().filter(
             cls.original_author_id == user_id).fetch()
+        feedback_models = cast(List[GeneralFeedbackThreadModel], results)
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
@@ -260,8 +261,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             list(GeneralFeedbackThreadModel). List of threads associated with
             the entity. Doesn't include deleted entries.
         """
-        return cls.get_all().filter(cls.entity_type == entity_type).filter(
+        results = cls.get_all().filter(cls.entity_type == entity_type).filter(
             cls.entity_id == entity_id).order(-cls.last_updated).fetch(limit)
+        return cast(List[GeneralFeedbackThreadModel], results)
 
 
 class GeneralFeedbackMessageModel(base_models.BaseModel):
@@ -356,7 +358,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
+        results = cls.get_all().filter(cls.author_id == user_id).fetch()
+        feedback_models = cast(List[GeneralFeedbackMessageModel], results)
 
         for feedback_model in feedback_models:
             user_data[feedback_model.id] = {
@@ -518,8 +521,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
             messages.
         """
-        return cls.get_all().filter(
+        results = cls.get_all().filter(
             cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return cast(List[GeneralFeedbackMessageModel], results)
 
     @classmethod
     def get_most_recent_message(cls, thread_id):
@@ -645,8 +649,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

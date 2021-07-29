@@ -26,7 +26,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -251,7 +251,7 @@ class SentEmailModel(base_models.BaseModel):
 
         messages = query.fetch()
 
-        return messages
+        return cast(List[SentEmailModel], messages)
 
     @classmethod
     def _generate_hash(cls, recipient_id, email_subject, email_body):

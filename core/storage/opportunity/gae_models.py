@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from core.platform import models
 
-from typing import Dict, List, Optional, Text, Tuple # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -126,7 +126,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.incomplete_translation_language_codes == language_code).order(
                 cls.incomplete_translation_language_codes).fetch_page(
                     page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        return (
+            cast(Optional[List[ExplorationOpportunitySummaryModel]], results)
+            , (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_all_voiceover_opportunities(
@@ -166,7 +168,9 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         results, cursor, more = cls.query(
             cls.language_codes_needing_voice_artists == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        return (
+            cast(Optional[List[ExplorationOpportunitySummaryModel]], results),
+            (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_by_topic(cls, topic_id):
@@ -177,14 +181,16 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             list(ExplorationOpportunitySummaryModel)|None. A list of
             ExplorationOpportunitySummaryModel having given topic_id.
         """
-        return cls.query(cls.topic_id == topic_id).fetch()
+        results = cls.query(cls.topic_id == topic_id).fetch()
+        return cast(Optional[List[ExplorationOpportunitySummaryModel]], results)
 
     @classmethod
     def delete_all(cls):
         # type: () -> None
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
+        datastore_services.delete_multi(
+            cast(List[datastore_services.Key], keys))
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -258,11 +264,14 @@ class SkillOpportunityModel(base_models.BaseModel):
 
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
-        return (results, (cursor.urlsafe() if cursor else None), more)
+        return (
+            cast(Optional[List[SkillOpportunityModel]], results),
+            (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def delete_all(cls):
         # type: () -> None
         """Deletes all entities of this class."""
         keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
+        datastore_services.delete_multi(
+            cast(List[datastore_services.Key], keys))

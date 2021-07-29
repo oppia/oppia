@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 from constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -145,8 +145,8 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
-            cls.query(cls.resolver_id == user_id).fetch(keys_only=True))
+        keys = cls.query(cls.resolver_id == user_id).fetch(keys_only=True)
+        cls.delete_multi(cast(List[TaskEntryModel], keys))
 
     @staticmethod
     def get_model_association_to_user():
