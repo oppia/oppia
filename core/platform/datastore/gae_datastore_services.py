@@ -16,8 +16,8 @@
 
 """Provides a seam for datastore services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import contextlib
 import datetime
@@ -32,7 +32,8 @@ from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import ndb
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Callable, Iterator, List, Optional, Text, Tuple, TypeVar)
+    Any, Callable, Iterator, List, Optional, Sequence,
+    Text, Tuple, TypeVar)
 
 MYPY = False
 if MYPY:
@@ -62,6 +63,8 @@ TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
 def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.StringProperty
     """Enforces requirement for models to use StringProperty(indexed=True)."""
+    # We use ‘ignore[call-overload]’ because this method includes a boolean arg
+    # which is not part of the signature of the overridden method.
     if not kwargs.get('indexed', True): # type: ignore[call-overload]
         raise ValueError('StringProperty(indexed=False) is no longer supported')
     return ndb.StringProperty(*args, **kwargs)
@@ -71,6 +74,8 @@ def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
 def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.TextProperty
     """Enforces requirement for models to use TextProperty(indexed=False)."""
+    # We use ‘ignore[call-overload]’ because this method includes a boolean arg
+    # which is not part of the signature of the overridden method.
     if kwargs.get('indexed', False): # type: ignore[call-overload]
         raise ValueError('TextProperty(indexed=True) is no longer supported')
     return ndb.TextProperty(*args, **kwargs)
@@ -91,7 +96,7 @@ def get_multi(keys):
 
 
 def update_timestamps_multi(entities, update_last_updated_time=True):
-    # type: (List[TYPE_MODEL_SUBCLASS], bool) -> None
+    # type: (Sequence[base_models.BaseModel], bool) -> None
     """Update the created_on and last_updated fields of all given entities.
 
     Args:
@@ -101,7 +106,7 @@ def update_timestamps_multi(entities, update_last_updated_time=True):
             last_updated field of the model.
     """
     for entity in entities:
-        entity.update_timestamps( # type: ignore[attr-defined]
+        entity.update_timestamps(
             update_last_updated_time=update_last_updated_time)
 
 
@@ -308,6 +313,8 @@ def mock_datetime_for_datastore(mocked_now):
             """Validates whether the given instance is a datetime instance."""
             return isinstance(other, old_datetime_type)
 
+    # We use ‘ignore[misc]’ because MockDatetime subclasses a class created
+    # dynamically. These dynamic classes are not supported by mypy.
     class MockDatetime( # pylint: disable=inherit-non-class
             python_utils.with_metaclass(MockDatetimeType, old_datetime_type)): # type: ignore[misc]
         """Always returns mocked_now as the current time."""

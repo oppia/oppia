@@ -171,8 +171,8 @@ describe('NoninteractiveVideo', () => {
   });
 
   it('should not update video view if atleast one video parameters' +
-    ' is undefined', () => {
-    component.videoIdWithValue = null;
+    ' is empty', () => {
+    component.videoIdWithValue = '';
     spyOn(htmlEscaperService, 'escapedJsonToObj');
 
     component.ngOnInit();

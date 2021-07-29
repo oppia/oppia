@@ -14,8 +14,8 @@
 
 """Models for storing the classification data models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -24,14 +24,15 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, Union # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Text, Tuple, Union, cast)
 
 MYPY = False
 if MYPY:
     from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
-else:
-    (base_models,) = models.Registry.import_models([models.NAMES.base_model])
-    datastore_services = models.Registry.import_datastore_services()
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+datastore_services = models.Registry.import_datastore_services()
 
 NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
 
@@ -137,10 +138,18 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, algorithm_id, interaction_id, exp_id, exp_version,
-            next_scheduled_check_time, training_data, state_name, status,
-            algorithm_version):
-        # type: (Text, Text, Text, int, datetime.datetime, Union[Dict[Text, Any], List[Dict[Text, Any]]], Text, Text, int) -> Text
+            cls,
+            algorithm_id, # type: Text
+            interaction_id, # type: Text
+            exp_id, # type: Text
+            exp_version, # type: int
+            next_scheduled_check_time, # type: datetime.datetime
+            training_data, # type: Union[Dict[Text, Union[int, List[Text]]], List[Dict[Text, Union[int, List[Text]]]]]
+            state_name, # type: Text
+            status, # type: Text
+            algorithm_version # type: int
+    ):
+        # type: (...) -> Text
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -204,7 +213,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                         cls.next_scheduled_check_time, cls._key)
 
         job_models = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset) # type: List[ClassifierTrainingJobModel]
+            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+        job_models = cast(List[ClassifierTrainingJobModel], job_models)
         offset = offset + len(job_models)
         return job_models, offset
 
@@ -306,7 +316,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def get_models(cls, exp_id, exp_version, state_names):
-        # type: (Text, int, List[Text]) -> List[Optional[ClassifierTrainingJobModel]]
+        # type: (Text, int, List[Text]) -> List[Optional[StateTrainingJobsMappingModel]]
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 
@@ -325,12 +335,12 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         for state_name in state_names:
             mapping_id = cls._generate_id(exp_id, exp_version, state_name)
             mapping_ids.append(mapping_id)
-        mapping_instances = cls.get_multi(mapping_ids) # type: List[Optional[ClassifierTrainingJobModel]] # type: ignore[assignment]
+        mapping_instances = cls.get_multi(mapping_ids)
         return mapping_instances
 
     @classmethod
     def get_model(cls, exp_id, exp_version, state_name):
-        # type: (Text, int, Text) -> Optional[ClassifierTrainingJobModel]
+        # type: (Text, int, Text) -> Optional[StateTrainingJobsMappingModel]
         """Retrieves the Classifier Exploration Mapping model for given
         exploration.
 
@@ -347,7 +357,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             entry for given <exp_id, exp_version, state_name> is found.
         """
         mapping_id = cls._generate_id(exp_id, exp_version, state_name)
-        model = cls.get_by_id(mapping_id) # type: Optional[ClassifierTrainingJobModel] # type: ignore[assignment]
+        model = cls.get_by_id(mapping_id)
         return model
 
     @classmethod

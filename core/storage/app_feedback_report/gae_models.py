@@ -14,8 +14,8 @@
 
 """Models for Oppia feedback reports from both Android and web."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -141,14 +141,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, platform, submitted_on, report_type, category,
-            platform_version, android_device_country_locale_code,
-            android_sdk_version, android_device_model, entry_point,
-            entry_point_topic_id, entry_point_story_id,
-            entry_point_exploration_id, entry_point_subtopic_id,
-            text_language_code, audio_language_code, android_report_info,
-            web_report_info):
-        # type: (Text, datetime.datetime, Text, Text, Text, Optional[Text], Optional[int], Optional[Text], Text, Optional[Text], Optional[Text], Optional[Text], Optional[Text], Text, Text, Optional[Dict[Text, Any]], Optional[Dict[Text, Any]]) -> Text
+            cls,
+            platform, # type: Text
+            submitted_on, # type: datetime.datetime
+            report_type, # type: Text
+            category, # type: Text
+            platform_version, # type: Text
+            android_device_country_locale_code, # type: Optional[Text]
+            android_sdk_version, # type: Optional[int]
+            android_device_model, # type: Optional[Text]
+            entry_point, # type: Text
+            entry_point_topic_id, # type: Optional[Text]
+            entry_point_story_id, # type: Optional[Text]
+            entry_point_exploration_id, # type: Optional[Text]
+            entry_point_subtopic_id, # type: Optional[Text]
+            text_language_code, # type: Text
+            audio_language_code, # type: Text
+            android_report_info, # type: Optional[Dict[Text, Any]]
+            web_report_info # type: Optional[Dict[Text, Any]]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
@@ -294,7 +306,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Any]
+        # type: (Text) -> Dict[Text, Dict[Text, Text]]
         """Exports the data from AppFeedbackReportModel into dict format for
         Takeout.
 
@@ -308,7 +320,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         user_data = dict()
         report_models = cls.get_all().filter(
             cls.scrubbed_by == user_id).fetch()
-
+        report_models = cast(List[AppFeedbackReportModel], report_models)
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
@@ -529,7 +541,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
     def create(
             cls, platform, ticket_id, stats_tracking_date,
             total_reports_submitted, daily_param_stats):
-        # type: (Text, Text, datetime.date, int, Dict[Text, Any]) -> Text
+        # type: (Text, Text, datetime.date, int, Dict[Text, Dict[Text, int]]) -> Text
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 
@@ -598,7 +610,9 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             AppFeedbackReportStatsModel entities that record stats on the
             ticket.
         """
-        return cls.query(cls.ticket_id == ticket_id).fetch()
+        ticket_models = cls.query(cls.ticket_id == ticket_id).fetch()
+        ticket_models = cast(List[AppFeedbackReportStatsModel], ticket_models)
+        return ticket_models
 
     @staticmethod
     def get_deletion_policy():

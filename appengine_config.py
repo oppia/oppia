@@ -14,15 +14,15 @@
 
 """Configuration for App Engine."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import sys
 
 import python_utils
 
-from google.appengine.ext import vendor # type: ignore[attr-defined]
+from google.appengine.ext import vendor
 import pkg_resources
 
 from typing import Any, Text # isort:skip # pylint: disable=unused-import

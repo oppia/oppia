@@ -16,8 +16,8 @@
 
 """Tests for the appengine datastore API wrapper."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import unittest
@@ -80,6 +80,7 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
             [collection_services.get_collection_summary_from_model(model) # type: ignore[no-untyped-call]
              if model else None for model in collection_summary_models])
 
+        # Ruling out the possibility of None for mypy type checking.
         assert exploration_summaries[0] is not None
         assert exploration_summaries[1] is not None
         assert collection_summaries[0] is not None

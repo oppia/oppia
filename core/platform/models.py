@@ -16,8 +16,8 @@
 
 """Interface for storage model switching."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import inspect
 
@@ -26,11 +26,11 @@ import feconf
 import python_utils
 
 from types import ModuleType # isort:skip # pylint: disable=import-only-modules,unused-import
-from typing import Text, List, Tuple, Any, Optional, Type # isort:skip # pylint: disable=unused-import
+from typing import Text, List, Tuple, Optional, Type # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from core.storage.base_model.gae_models import BaseModel # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import,unused-import
+    from core.storage.base_model.gae_models import BaseModel # pragma: no cover # pylint: disable=import-only-modules,unused-import
 
 # Valid model names.
 NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
@@ -387,7 +387,10 @@ class Registry(python_utils.OBJECT):
         Returns:
             class. The corresponding platform-specific interface class.
         """
-        return cls._PLATFORM_MAPPING.get(GAE_PLATFORM) # type: ignore[return-value]
+        klass = cls._PLATFORM_MAPPING.get(GAE_PLATFORM)
+        # Ruling out the possibility of None for mypy type checking.
+        assert klass is not None
+        return klass
 
     @classmethod
     def import_models(cls, model_names):

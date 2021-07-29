@@ -16,8 +16,8 @@
 
 """Tests for core.storage.classifier.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import types
@@ -56,8 +56,10 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
 
         training_job = (
-            classifier_models.ClassifierTrainingJobModel.get(job_id) # type: ignore[assignment]
-        ) # type: classifier_models.ClassifierTrainingJobModel
+            classifier_models.ClassifierTrainingJobModel.get(job_id)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert training_job is not None
 
         self.assertEqual(training_job.algorithm_id, 'TextClassifier')
         self.assertEqual(training_job.interaction_id, 'TextInput')
@@ -241,8 +243,10 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(job_ids), 2)
 
         training_job1 = (
-            classifier_models.ClassifierTrainingJobModel.get(job_ids[0])# type: ignore[assignment]
-        ) # type: classifier_models.ClassifierTrainingJobModel
+            classifier_models.ClassifierTrainingJobModel.get(job_ids[0])
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert training_job1 is not None
 
         self.assertEqual(
             training_job1.algorithm_id,
@@ -261,8 +265,10 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(training_job1.algorithm_version, 1)
 
         training_job2 = (
-            classifier_models.ClassifierTrainingJobModel.get(job_ids[1]) # type: ignore[assignment]
-        ) # type: classifier_models.ClassifierTrainingJobModel
+            classifier_models.ClassifierTrainingJobModel.get(job_ids[1])
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert training_job2 is not None
 
         self.assertEqual(
             training_job2.algorithm_id,
@@ -318,7 +324,9 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
                 'exp_id1', 2, 'state_name4', {'algorithm_id': 'job_id4'}))
 
         mapping = classifier_models.StateTrainingJobsMappingModel.get(
-            mapping_id) # type: classifier_models.StateTrainingJobsMappingModel # type: ignore[assignment]
+            mapping_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert mapping is not None
 
         self.assertEqual(mapping.exp_id, 'exp_id1')
         self.assertEqual(mapping.exp_version, 2)
@@ -339,8 +347,10 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, state_name1, {'algorithm_id': 'job_id4'}))
 
-        mapping = classifier_models.StateTrainingJobsMappingModel.get(  # type: ignore[assignment]
+        mapping = classifier_models.StateTrainingJobsMappingModel.get(
             mapping_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert mapping is not None
 
         self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name1.encode(
             encoding='utf-8')))
@@ -350,8 +360,10 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_models.StateTrainingJobsMappingModel.create(
                 'exp_id1', 2, state_name2, {'algorithm_id': 'job_id4'}))
 
-        mapping = classifier_models.StateTrainingJobsMappingModel.get(  # type: ignore[assignment]
+        mapping = classifier_models.StateTrainingJobsMappingModel.get(
             mapping_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert mapping is not None
 
         self.assertEqual(mapping_id, b'exp_id1.2.%s' % (state_name2.encode(
             encoding='utf-8')))
@@ -366,8 +378,10 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             exp_id, exp_version, state_name, {'algorithm_id': job_id})
 
         mappings = (
-            classifier_models.StateTrainingJobsMappingModel.get_models(  # type: ignore[assignment]
-                exp_id, exp_version, [state_name])) # type: List[classifier_models.StateTrainingJobsMappingModel]
+            classifier_models.StateTrainingJobsMappingModel.get_models(
+                exp_id, exp_version, [state_name]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert mappings[0] is not None
 
         self.assertEqual(len(mappings), 1)
         self.assertEqual(mappings[0].exp_id, exp_id)
@@ -392,8 +406,10 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(mapping_ids), 2)
 
         mapping1 = (
-            classifier_models.StateTrainingJobsMappingModel.get( # type: ignore[assignment]
-                mapping_ids[0])) # type: classifier_models.StateTrainingJobsMappingModel
+            classifier_models.StateTrainingJobsMappingModel.get(
+                mapping_ids[0]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert mapping1 is not None
 
         self.assertEqual(mapping1.exp_id, '1')
         self.assertEqual(mapping1.exp_version, 1)
@@ -402,8 +418,10 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(mapping1.state_name, 'Home')
 
         mapping2 = (
-            classifier_models.StateTrainingJobsMappingModel.get(  # type: ignore[assignment]
-                mapping_ids[1])) # type: classifier_models.StateTrainingJobsMappingModel
+            classifier_models.StateTrainingJobsMappingModel.get(
+                mapping_ids[1]))
+        # Ruling out the possibility of None for mypy type checking.
+        assert mapping2 is not None
 
         self.assertEqual(mapping2.exp_id, '1')
         self.assertEqual(mapping2.exp_version, 2)

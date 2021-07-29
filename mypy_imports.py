@@ -14,7 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Files having imports from storage and platform for mypy checks."""
+"""Files having imports from storage and platform for mypy checks.
+Mypy is not good with handling module imports as variable like we do using
+datastore and transaction services. So this will will be imported in every file
+which uses storage models and platform services. This file will be imported only
+in mypy checks not during runtime.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -38,6 +43,9 @@ from core.storage.feedback import gae_models as feedback_models
 from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
 from core.storage.opportunity import gae_models as opportunity_models
+from core.storage.skill import gae_models as skill_models
+from core.storage.story import gae_models as story_models
+from core.storage.subtopic import gae_models as subtopic_models
 from core.storage.user import gae_models as user_models
 
 __all__ = [
@@ -57,6 +65,9 @@ __all__ = [
     b'improvements_models',
     b'job_models',
     b'opportunity_models',
+    b'skill_models',
+    b'story_models',
+    b'subtopic_models',
     b'transaction_services',
     b'user_models'
 ]

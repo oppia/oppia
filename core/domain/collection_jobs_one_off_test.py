@@ -16,8 +16,8 @@
 
 """Tests for Collection-related one-off jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import ast
 
@@ -39,12 +39,6 @@ class MockCollectionModel(collection_models.CollectionModel):
     """Mock CollectionModel so that it allows to set `nodes`."""
 
     nodes = datastore_services.JsonProperty(default={}, indexed=False)
-
-    def __init__(self, *args, **kwargs):
-        # type: (*Any, **Any) -> None
-        # Not using super() here because this creates an infinite loop
-        # when mocked.
-        base_models.VersionedModel.__init__(self, *args, **kwargs)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

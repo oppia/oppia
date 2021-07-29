@@ -108,14 +108,14 @@ export default {
   // eslint-disable-next-line max-len
   "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
 
-  // The SVG tag-specific attribute whitelist is based on the list of tags and
+  // The SVG tag-specific attribute allowlist is based on the list of tags and
   // and attributes specified in this project:
   // https://github.com/cure53/DOMPurify
   // The mapping of SVG tag to attribute is based on the following pages:
   // https://github.com/wooorm/svg-element-attributes/blob/master/index.json
   // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute
   // https://www.w3schools.com/graphics/svg_reference.asp
-  "SVG_ATTRS_WHITELIST": {
+  "SVG_ATTRS_ALLOWLIST": {
     "a": [
       "about",
       "alignment-baseline",
@@ -5951,6 +5951,22 @@ export default {
 
   // When the site cookie policy was last updated in UNIX time milliseconds.
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
+
+  // Pages registered with angular router.
+  "PAGES_REGISTERED_WITH_FRONTEND": {
+    "ABOUT": {
+      "ROUTE": "about",
+      "TITLE": "About | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "name",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    }
+  },
 
   "DEV_MODE": true,
   "EMULATOR_MODE": true,

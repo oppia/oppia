@@ -16,8 +16,8 @@
 
 """Tests for core.storage.base_model.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Any, Dict, Set, Text, Union # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
@@ -219,9 +219,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
         models_2 = base_models.BaseModel.get_multi(model_ids)
+        models_2_without_none = cast(List[base_models.BaseModel], models_2)
         base_models.BaseModel.update_timestamps_multi(
-            models_2, update_last_updated_time=False) # type: ignore[arg-type]
-        base_models.BaseModel.put_multi(models_2) # type: ignore[arg-type]
+            models_2_without_none, update_last_updated_time=False)
+        base_models.BaseModel.put_multi(models_2_without_none)
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
@@ -230,8 +231,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
         models_3 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(models_3) # type: ignore[arg-type]
-        base_models.BaseModel.put_multi(models_3) # type: ignore[arg-type]
+        models_3_without_none = cast(List[base_models.BaseModel], models_3)
+        base_models.BaseModel.update_timestamps_multi(models_3_without_none)
+        base_models.BaseModel.put_multi(models_3_without_none)
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)
@@ -296,14 +298,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
             base_models.BaseModel(id=new_id).put()
             ids.add(new_id)
-
-    def test_get_new_id_method_does_not_fail_with_bad_names(self):
-        # type: () -> None
-        base_models.BaseModel.get_new_id(None)
-        base_models.BaseModel.get_new_id('¡Hola!')
-        base_models.BaseModel.get_new_id(u'¡Hola!')
-        base_models.BaseModel.get_new_id(12345)
-        base_models.BaseModel.get_new_id({'a': 'b'})
 
 
 class TestBaseHumanMaintainedModel(base_models.BaseHumanMaintainedModel):
@@ -580,7 +574,9 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
         model1.update_timestamps()
         model1.put()
 
-        test_model = TestCommitLogEntryModel.get_commit('id', 1) # type: TestCommitLogEntryModel # type: ignore[assignment]
+        test_model = TestCommitLogEntryModel.get_commit('id', 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert test_model is not None
         self.assertEqual(test_model.version, 1)
         self.assertEqual(test_model.user_id, 'user')
         self.assertEqual(test_model.commit_type, 'create')
@@ -775,11 +771,13 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
-        version_model = TestVersionedModel.get_version('model_id1', 2) # type: TestVersionedModel # type: ignore[assignment]
+        version_model = TestVersionedModel.get_version('model_id1', 2)
+        # Ruling out the possibility of None for mypy type checking.
+        assert version_model is not None
         self.assertEqual(version_model.version, 2)
 
         version_model = (
-            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False)) # type: ignore[assignment]
+            TestVersionedModel.get_version('nonexistent_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -789,7 +787,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             TestVersionedModel.get_version('nonexistent_id1', 4, strict=True)
 
         version_model = (
-            TestVersionedModel.get_version('model_id1', 4, strict=False)) # type: ignore[assignment]
+            TestVersionedModel.get_version('model_id1', 4, strict=False))
         self.assertIsNone(version_model)
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]

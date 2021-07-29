@@ -16,14 +16,14 @@
 
 """Models for activity references."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 import core.storage.base_model.gae_models as base_models
 import feconf
 
-from typing import Any, Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:

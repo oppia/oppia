@@ -16,8 +16,8 @@
 
 """Models for Oppia users."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import random
 import string
@@ -54,7 +54,7 @@ class UserSettingsModel(base_models.BaseModel):
     # TODO(1995YogeshSharma): Remove the default value once the one-off
     # migration (to give role to all users) is run.
     role = datastore_services.StringProperty(
-        required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
+        required=True, indexed=True, default=feconf.ROLE_ID_FULL_USER)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = datastore_services.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
@@ -170,8 +170,9 @@ class UserSettingsModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.EXPORTED,
-            'role': base_models.EXPORT_POLICY.EXPORTED,
             'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+            'roles': base_models.EXPORT_POLICY.EXPORTED,
+            'banned': base_models.EXPORT_POLICY.EXPORTED,
             'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
             'display_alias': base_models.EXPORT_POLICY.EXPORTED,
             'user_bio': base_models.EXPORT_POLICY.EXPORTED,
@@ -202,10 +203,9 @@ class UserSettingsModel(base_models.BaseModel):
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
 
-            # TODO(#12755): Change export policy for roles and banned fields to
-            # "EXPORTED" once the fields are populated in the datastore.
-            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            # The role is a deprecated field and doesn't contain any correct
+            # information related to user settings.
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
     @classmethod
@@ -246,7 +246,8 @@ class UserSettingsModel(base_models.BaseModel):
         assert user is not None
         return {
             'email': user.email,
-            'role': user.role,
+            'roles': user.roles,
+            'banned': user.banned,
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms_msec': (
@@ -389,7 +390,7 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-        return cls.query(cls.role == role).fetch()
+        return cls.query(cls.roles == role).fetch()
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
@@ -2735,9 +2736,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # known on the Oppia site.
     normalized_long_term_username = (
         datastore_services.StringProperty(indexed=True))
-    # Role of the user. Needed to decide which storage models have to be deleted
-    # for it.
-    role = datastore_services.StringProperty(required=True, indexed=True)
+
     # Whether the deletion is completed.
     deletion_complete = (
         datastore_services.BooleanProperty(default=False, indexed=True))
@@ -2793,8 +2792,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
 
     @classmethod

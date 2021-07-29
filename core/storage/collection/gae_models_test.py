@@ -16,8 +16,8 @@
 
 """Tests for collection models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import datetime
@@ -154,12 +154,12 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
             email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
@@ -256,7 +256,9 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             ).save(
                 self.USER_ID_COMMITTER, 'Created new collection',
                 [{'cmd': rights_domain.CMD_CREATE_NEW}])
-        collection_model = collection_models.CollectionRightsModel.get('id') # type: collection_models.CollectionRightsModel # type: ignore[assignment]
+        collection_model = collection_models.CollectionRightsModel.get('id')
+        # Ruling out the possibility of None for mypy type checking.
+        assert collection_model is not None
 
         self.assertEqual('id', collection_model.id)
         self.assertEqual(
@@ -346,8 +348,10 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 self.USER_ID_COMMITTER, 'Created new collection',
                 [{'cmd': rights_domain.CMD_CREATE_NEW}])
         collection_rights_model = (
-            collection_models.CollectionRightsModel.get('id') # type: ignore[assignment]
-            ) # type: collection_models.CollectionRightsModel
+            collection_models.CollectionRightsModel.get('id')
+            )
+        # Ruling out the possibility of None for mypy type checking.
+        assert collection_rights_model is not None
         snapshot_dict = collection_rights_model.compute_snapshot()
         snapshot_dict['translator_ids'] = ['tid1', 'tid2']
         snapshot_dict = collection_rights_model.convert_to_valid_dict(
@@ -592,12 +596,12 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
             email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
 
     def test_get_deletion_policy(self):

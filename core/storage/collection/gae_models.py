@@ -16,8 +16,8 @@
 
 """Model for an Oppia collection."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import datetime
@@ -29,7 +29,8 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, Union # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Text, Tuple, Union, cast)
 
 MYPY = False
 if MYPY:
@@ -329,10 +330,13 @@ class CollectionModel(base_models.VersionedModel):
         if not force_deletion:
             commit_log_models = []
             collection_rights_models = CollectionRightsModel.get_multi(
-                entity_ids, include_deleted=True) # type: List[CollectionRightsModel] # type: ignore[assignment]
-            versioned_models = cls.get_multi(entity_ids, include_deleted=True) # type: List[CollectionModel] # type: ignore[assignment]
+                entity_ids, include_deleted=True)
+            versioned_models = cls.get_multi(entity_ids, include_deleted=True)
             for model, rights_model in python_utils.ZIP(
                     versioned_models, collection_rights_models):
+                # Ruling out the possibility of None for mypy type checking.
+                assert model is not None
+                assert rights_model is not None
                 collection_commit_log = CollectionCommitLogEntryModel.create(
                     model.id, model.version, committer_id,
                     cls._COMMIT_TYPE_DELETE,
@@ -620,7 +624,9 @@ class CollectionRightsModel(base_models.VersionedModel):
             ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
-            self.get_snapshot_id(self.id, self.version)) # type: CollectionRightsSnapshotMetadataModel # type: ignore[assignment]
+            self.get_snapshot_id(self.id, self.version))
+        # Ruling out the possibility of None for mypy type checking.
+        assert snapshot_metadata_model is not None
 
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
@@ -830,11 +836,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         Returns:
             iterable. An iterable with non-private collection summary models.
         """
-        return CollectionSummaryModel.query().filter(
+        summary_models = CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+        summary_models = cast(List[CollectionSummaryModel], summary_models)
+        return summary_models
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -849,7 +858,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with private collection summary models that
             are at least viewable by the given user.
         """
-        return CollectionSummaryModel.query().filter(
+        summary_models = CollectionSummaryModel.query().filter(
             CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             datastore_services.any_of(
@@ -859,6 +868,9 @@ class CollectionSummaryModel(base_models.BaseModel):
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+        summary_models = cast(List[CollectionSummaryModel], summary_models)
+        return summary_models
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -873,10 +885,13 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with collection summary models that are at
             least viewable by the given user.
         """
-        return CollectionSummaryModel.query().filter(
+        summary_models = CollectionSummaryModel.query().filter(
             datastore_services.any_of(
                 CollectionSummaryModel.owner_ids == user_id,
                 CollectionSummaryModel.editor_ids == user_id)
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+        summary_models = cast(List[CollectionSummaryModel], summary_models)
+        return summary_models
