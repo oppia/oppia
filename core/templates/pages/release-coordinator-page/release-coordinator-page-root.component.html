@@ -1,3 +1,4 @@
-<oppia-angular-root>
+<oppia-angular-root *ngIf="showPage">
   <oppia-release-coordinator-page></oppia-release-coordinator-page>
 </oppia-angular-root>
+<oppia-error-page-root *ngIf="showError"></oppia-error-page-root>

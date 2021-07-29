@@ -47,6 +47,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
+import { ReleaseCoordinatorPageRoutingModule } from './release-coordinator-page-routing.module';
+import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 const toastrConfig = {
@@ -66,12 +68,9 @@ const toastrConfig = {
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
     CommonModule,
     ClipboardModule,
     FormsModule,
-    HttpClientModule,
     MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
@@ -85,7 +84,8 @@ const toastrConfig = {
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ReleaseCoordinatorPageRoutingModule,
+    Error404PageModule
   ],
   declarations: [
     BeamJobsTabComponent,
@@ -105,20 +105,6 @@ const toastrConfig = {
     ReleaseCoordinatorPageRootComponent,
     StartNewBeamJobDialogComponent,
     ViewBeamJobOutputDialogComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-  ],
-  bootstrap: [ReleaseCoordinatorPageRootComponent]
+  ]
 })
 export class ReleaseCoordinatorPageModule {}

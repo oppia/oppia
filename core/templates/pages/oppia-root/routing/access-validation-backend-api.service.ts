@@ -44,6 +44,8 @@ export class AccessValidationBackendApiService {
   CAN_MANAGE_OWN_ACCOUNT_VALIDATOR = '/access_validator/can_manage_own_account';
   DOES_PROFILE_EXIST = '/access_validator/does_profile_exist/<username>';
   ACCOUNT_DELETION_IS_ENABLED = '/access_validator/account_deletion_is_enabled';
+  RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR = (
+    '/access_validator/can_access_release_coordinator_page');
 
   constructor(
     private http: HttpClient,
@@ -83,5 +85,11 @@ export class AccessValidationBackendApiService {
   accountDeletionIsEnabled(): Promise<ValidatorResponse> {
     return this.http.get<ValidatorResponse>(
       this.ACCOUNT_DELETION_IS_ENABLED).toPromise();
+  }
+
+  validateAccessToReleaseCoordinatorPage():
+  Promise<ValidatorResponse> {
+    return this.http.get<ValidatorResponse>(
+      this.RELEASE_COORDINATOR_PAGE_ACCESS_VALIDATOR).toPromise();
   }
 }

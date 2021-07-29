@@ -233,6 +233,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/account_deletion_is_enabled' % feconf.ACCESS_VALIDATORS_PREFIX,
         access_validators.AccountDeletionIsEnabledValidationHandler),
 
+    get_redirect_route(
+        r'%s/can_access_release_coordinator_page' %
+        feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ReleaseCoordinatorAccessValidationHandler
+    ),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -522,8 +528,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
-    get_redirect_route(
-        r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
     get_redirect_route(
         r'/joboutputhandler', release_coordinator.JobOutputHandler),
     get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),

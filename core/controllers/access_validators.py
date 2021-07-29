@@ -130,3 +130,17 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
             return
 
         self.render_json({ 'valid': True })
+
+class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
+
+    URL_PATH_ARGS_SCHEMAS = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_release_coordinator_page
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_json({ 'valid': True })

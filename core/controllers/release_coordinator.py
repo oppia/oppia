@@ -26,15 +26,6 @@ import feconf
 import utils
 
 
-class ReleaseCoordinatorPage(base.BaseHandler):
-    """Handler for the release cordinator page."""
-
-    @acl_decorators.can_access_release_coordinator_page
-    def get(self):
-        """Handles GET requests."""
-        self.render_template('release-coordinator-page.mainpage.html')
-
-
 class JobsHandler(base.BaseHandler):
     """Handler to present/start/stop jobs through release coordinator page."""
 

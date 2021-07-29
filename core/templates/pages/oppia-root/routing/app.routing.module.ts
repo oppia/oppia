@@ -65,6 +65,14 @@ const routes: Route[] = [
       .then(m => m.ProfilePageModule)
   },
   {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE
+        .ROUTE),
+    loadChildren: () => import(
+      'pages/release-coordinator-page/release-coordinator-page.module')
+      .then(m => m.ReleaseCoordinatorPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
     pathMatch: 'full',
     canLoad: [CanAccessSplashPageGuard],

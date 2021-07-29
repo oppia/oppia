@@ -118,8 +118,6 @@ module.exports = {
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.import.ts',
-    release_coordinator: commonPrefix + (
-      '/pages/release-coordinator-page/release-coordinator-page.import.ts'),
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.import.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.import.ts',
@@ -161,7 +159,7 @@ module.exports = {
       meta: {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
+          'math, physics, statistics, chemiastry, music, history and ' +
           'more from anywhere in the world. Oppia is a nonprofit ' +
           'with the mission of providing high-quality ' +
           'education to those who lack access to it.'
@@ -514,24 +512,6 @@ module.exports = {
       filename: 'privacy-page.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['release_coordinator'],
-      filename: 'release-coordinator-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template: (
-        commonPrefix +
-        '/pages/release-coordinator-page/release-coordinator-page.mainpage.html'
-      ),
       minify: htmlMinifyConfig,
       inject: false
     }),
