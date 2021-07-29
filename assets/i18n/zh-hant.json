@@ -393,7 +393,7 @@
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "檢視",
 	"I18N_LIBRARY_VIEW_ALL": "檢視全部",
 	"I18N_LICENSE_PAGE_LICENSE_HEADING": "許可協議",
-	"I18N_LICENSE_PAGE_PARAGRAPH_1": "所有在 Oppia 裡的課程內容皆依據<a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode.zh-Hant\" class=\"inline-links\">姓名標示-相同方式分享 4.0 </a>許可協議。",
+	"I18N_LICENSE_PAGE_PARAGRAPH_1": "所有在 Oppia 裡的課程內容皆依據<a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\">姓名標示-相同方式分享 4.0 </a>許可協議。",
 	"I18N_LICENSE_PAGE_PARAGRAPH_2": "Oppia 是提供自開放原始碼軟體，其中<a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">程式碼</a>依據 <a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">Apache 2.0</a> 許可所發佈。",
 	"I18N_LICENSE_TERMS_HEADING": "許可條款",
 	"I18N_LOGOUT_LOADING": "正在登出",

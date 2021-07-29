@@ -16,8 +16,8 @@
 
 """Models for Oppia feedback threads and messages."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 import feconf
@@ -735,6 +735,10 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
     The key of each instance is the exploration ID.
     """
 
+    # NOTE TO DEVELOPERS: The method create() was removed in #13237 as part of
+    # the migration to Apache Beam. Please refer to that PR if you need to
+    # reinstate it.
+
     # The number of open feedback threads for this exploration.
     num_open_threads = (
         datastore_services.IntegerProperty(default=None, indexed=True))
@@ -759,24 +763,6 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'num_total_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def create(cls, model_id, num_open_threads, num_total_threads):
-        """Creates a new FeedbackAnalyticsModel entry.
-
-        Args:
-            model_id: str. ID of the model instance to be created. This
-                is the same as the exploration ID.
-            num_open_threads: int. Number of open feedback threads for
-                this exploration.
-            num_total_threads: int. Total number of feedback threads for
-                this exploration.
-        """
-        cls(
-            id=model_id,
-            num_open_threads=num_open_threads,
-            num_total_threads=num_total_threads
-        ).put()
 
 
 class UnsentFeedbackEmailModel(base_models.BaseModel):

@@ -37,32 +37,85 @@ describe('Audio File Uploader Component', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeDefined();
+  it('should successfully instantiate the component from beforeEach block',
+    () => {
+      expect(component).toBeDefined();
+    });
+
+  it('should upload an audio file', () => {
+    let files = [
+      new File(['foo'], 'audio.mp3', {
+        type: 'audio/mpeg',
+      }),
+      new File(['bar'], 'audio.mp3', {
+        type: 'audio/mp3',
+      })
+    ];
+    spyOn(component.fileChange, 'emit');
+    spyOn(component.fileClear, 'emit');
+
+    files.forEach(file => {
+      component.fileInputRef.nativeElement = {
+        files: [file]
+      };
+
+      component.addAudio(new Event('add'));
+
+      expect(component.fileChange.emit).toHaveBeenCalledWith(files[0]);
+      expect(component.fileClear.emit).not.toHaveBeenCalled();
+    });
   });
 
-  it('should validate files correctly', () => {
-    let mockFile = new File(['foo'], 'audio.mp3', {
-      type: 'audio/mpeg',
+  it('should not upload an audio file when the file fails' +
+    ' validation criteria', () => {
+    const testCases = [
+      {
+        title: 'Uploading a file that is not an mp3 audio.',
+        file: new File(['foo'], 'audio.mp3', {type: 'audio/aac'}),
+        expected: 'Only the MP3 audio format is currently supported.'
+      },
+      {
+        title: 'Uploading a file with no name.',
+        file: new File(['foo'], '', {type: 'audio/mpeg'}),
+        expected: 'Filename must not be empty.'
+      },
+      {
+        title: 'Uploading an audio whose audio format does not match the' +
+          ' filename extension.',
+        file: new File(['foo'], 'video.mp4', {type: 'audio/mpeg'}),
+        expected: 'This audio format does not match the filename extension.'
+      },
+      {
+        title: 'Uploading a non-audio file.',
+        file: new File(['foo'], 'video.mp4', {type: 'png'}),
+        expected: 'This file is not recognized as an audio file.'
+      }
+    ];
+
+    spyOn(component.fileClear, 'emit');
+    spyOn(component.fileChange, 'emit');
+    spyOn(component.inputFormRef.nativeElement, 'reset');
+
+    testCases.forEach(testCase => {
+      component.fileInputRef.nativeElement = {
+        files: [testCase.file]
+      };
+
+      component.addAudio(new Event('add'));
+
+      expect(component.errorMessage).toEqual(testCase.expected, testCase.title);
+      expect(component.fileClear.emit).toHaveBeenCalled();
+      expect(component.fileChange.emit).not.toHaveBeenCalled();
+      expect(component.inputFormRef.nativeElement.reset).toHaveBeenCalled();
     });
-    expect(component.validateUploadedFile(mockFile))
-      .toEqual(null);
-    expect(component.validateUploadedFile(null))
-      .toEqual('No audio file was uploaded.');
-    mockFile = new File(['foo'], 'audio.mp3', {
-      type: 'other than audio'
-    });
-    expect(component.validateUploadedFile(mockFile))
-      .toEqual('Only the MP3 audio format is currently supported.');
-    mockFile = new File(['foo'], '', {
-      type: 'audio/mpeg',
-    });
-    expect(component.validateUploadedFile(mockFile))
-      .toEqual('Filename must not be empty.');
-    mockFile = new File(['foo'], 'video.mp4', {
-      type: 'audio/mpeg',
-    });
-    expect(component.validateUploadedFile(mockFile))
-      .toEqual('This audio format does not match the filename extension.');
+
+    // Testing an empty file separately, as inputForm.nativeElement.reset() is
+    // not called in that case.
+    component.fileInputRef.nativeElement = {
+      files: [null]
+    };
+    component.addAudio(new Event('add'));
+    expect(component.fileClear.emit).toHaveBeenCalled();
+    expect(component.fileChange.emit).not.toHaveBeenCalled();
   });
 });

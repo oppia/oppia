@@ -16,32 +16,80 @@
 
 """Beam DoFns and PTransforms to provide validation of question models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import question_domain
 from core.platform import models
+from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models, skill_models) = models.Registry.import_models(
+    [models.NAMES.question, models.NAMES.skill])
 
 
 @validation_decorators.AuditsExisting(
-    question_models.QuestionSnapshotMetadataModel,
-    question_models.QuestionCommitLogEntryModel)
-class ValidateQuestionCommitCmdsSchema(
+    question_models.QuestionSnapshotMetadataModel)
+class ValidateQuestionSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for question models."""
+    """Overrides _get_change_domain_class for QuestionSnapshotMetadataModel."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
+            question_domain.QuestionChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return question_domain.QuestionChange
+
+
+@validation_decorators.RelationshipsOf(question_models.QuestionSkillLinkModel)
+def question_skill_link_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [question_models.QuestionModel]
+    yield model.skill_id, [skill_models.SkillModel]
+
+
+@validation_decorators.RelationshipsOf(
+    question_models.QuestionCommitLogEntryModel)
+def question_commit_log_entry_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.question_id, [question_models.QuestionModel]
+
+
+@validation_decorators.RelationshipsOf(question_models.QuestionSummaryModel)
+def question_summary_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [question_models.QuestionModel]
+
+
+@validation_decorators.AuditsExisting(
+    question_models.QuestionCommitLogEntryModel)
+class ValidateQuestionCommitLogEntryModel(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for QuestionCommitLogEntryModel."""
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            question_domain.QuestionChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        model = job_utils.clone_model(input_model)
+
+        if model.id.startswith('question'):
+            return question_domain.QuestionChange
+        else:
+            return None

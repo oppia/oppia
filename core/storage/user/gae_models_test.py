@@ -16,8 +16,8 @@
 
 """Tests for core.storage.user.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import types
@@ -40,17 +40,16 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_EMAIL = 'user@example.com'
-    USER_1_ROLE = feconf.ROLE_ID_ADMIN
+    USER_1_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     USER_2_ID = 'user2_id'
     USER_2_EMAIL = 'user2@example.com'
-    USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
     USER_3_EMAIL = 'user3@example.com'
-    USER_3_ROLE = feconf.ROLE_ID_ADMIN
+    USER_3_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     GENERIC_PIN = '12345'
     PROFILE_1_ID = 'profile_id'
     PROFILE_1_EMAIL = 'user@example.com'
-    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
+    PROFILE_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
@@ -65,23 +64,27 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE
+            roles=[self.USER_1_ROLE],
+            banned=False
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_1_ID,
             email=self.PROFILE_1_EMAIL,
-            role=self.PROFILE_1_ROLE
+            roles=[self.PROFILE_1_ROLE],
+            banned=False
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
             email=self.USER_2_EMAIL,
-            role=self.USER_2_ROLE,
+            roles=[],
+            banned=True,
             deleted=True
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             email=self.USER_3_EMAIL,
-            role=self.USER_3_ROLE,
+            roles=[self.USER_3_ROLE],
+            banned=False,
             username=self.GENERIC_USERNAME,
             normalized_username=self.GENERIC_USERNAME,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -167,9 +170,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
         self.assertItemsEqual(
-            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_ADMIN),
-            actual_users
-        )
+            user_models.UserSettingsModel.get_by_role(
+                feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
     def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
@@ -182,7 +184,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': 'user@example.com',
-            'role': feconf.ROLE_ID_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
@@ -209,7 +212,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': self.USER_3_EMAIL,
-            'role': feconf.ROLE_ID_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
             'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
@@ -273,6 +277,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
     USER_2_ID = 'id_2'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+    STORY_IDS_1 = ['story_1', 'story_2', 'story_3']
+    TOPIC_IDS_1 = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -281,12 +287,16 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         user_models.CompletedActivitiesModel(
             id=self.USER_1_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
-            collection_ids=self.COLLECTION_IDS_1
+            collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            learnt_topic_ids=self.TOPIC_IDS_1
         ).put()
         user_models.CompletedActivitiesModel(
             id=self.USER_2_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
             collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            learnt_topic_ids=self.TOPIC_IDS_1,
             deleted=True
         ).put()
 
@@ -331,7 +341,10 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
             'exploration_ids': self.EXPLORATION_IDS_1,
-            'collection_ids': self.COLLECTION_IDS_1
+            'collection_ids': self.COLLECTION_IDS_1,
+            'story_ids': self.STORY_IDS_1,
+            'learnt_topic_ids': self.TOPIC_IDS_1,
+            'mastered_topic_ids': []
         }
         self.assertEqual(expected_data, user_data)
 
@@ -344,6 +357,8 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
     USER_2_ID = 'id_2'
     EXPLORATION_IDS_1 = ['exp_1', 'exp_2', 'exp_3']
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
+    STORY_IDS_1 = ['story_1', 'story_2', 'story_3']
+    TOPIC_IDS_1 = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -352,12 +367,16 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         user_models.IncompleteActivitiesModel(
             id=self.USER_1_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
-            collection_ids=self.COLLECTION_IDS_1
+            collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            partially_learnt_topic_ids=self.TOPIC_IDS_1
         ).put()
         user_models.IncompleteActivitiesModel(
             id=self.USER_2_ID,
             exploration_ids=self.EXPLORATION_IDS_1,
             collection_ids=self.COLLECTION_IDS_1,
+            story_ids=self.STORY_IDS_1,
+            partially_learnt_topic_ids=self.TOPIC_IDS_1,
             deleted=True
         ).put()
 
@@ -402,7 +421,80 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             user_models.IncompleteActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
             'exploration_ids': self.EXPLORATION_IDS_1,
-            'collection_ids': self.COLLECTION_IDS_1
+            'collection_ids': self.COLLECTION_IDS_1,
+            'story_ids': self.STORY_IDS_1,
+            'partially_learnt_topic_ids': self.TOPIC_IDS_1,
+            'partially_mastered_topic_ids': []
+        }
+        self.assertEqual(expected_data, user_data)
+
+
+class LearnerGoalsModelTests(test_utils.GenericTestBase):
+    """Tests for the LearnerGoalsModel."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'id_1'
+    USER_2_ID = 'id_2'
+    TOPIC_IDS = ['topic_1', 'topic_2', 'topic_3']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(LearnerGoalsModelTests, self).setUp()
+
+        user_models.LearnerGoalsModel(
+            id=self.USER_1_ID,
+            topic_ids_to_learn=self.TOPIC_IDS,
+            topic_ids_to_master=[]
+        ).put()
+        user_models.LearnerGoalsModel(
+            id=self.USER_2_ID,
+            topic_ids_to_learn=self.TOPIC_IDS,
+            topic_ids_to_master=[],
+            deleted=True
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.LearnerGoalsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_apply_deletion_policy(self):
+        user_models.LearnerGoalsModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.LearnerGoalsModel.get_by_id(self.USER_1_ID))
+        # Test that calling apply_deletion_policy with no existing model
+        # doesn't fail.
+        user_models.LearnerGoalsModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.LearnerGoalsModel
+            .has_reference_to_user_id(self.USER_1_ID)
+        )
+        self.assertTrue(
+            user_models.LearnerGoalsModel
+            .has_reference_to_user_id(self.USER_2_ID)
+        )
+        self.assertFalse(
+            user_models.LearnerGoalsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in datastore."""
+        user_data = user_models.LearnerGoalsModel.export_data(
+            self.NONEXISTENT_USER_ID)
+        self.assertEqual({}, user_data)
+
+    def test_export_data_on_existent_user(self):
+        """Test if export_data works as intended on a user in datastore."""
+        user_data = (
+            user_models.LearnerGoalsModel.export_data(self.USER_1_ID))
+        expected_data = {
+            'topic_ids_to_learn': self.TOPIC_IDS,
+            'topic_ids_to_master': []
         }
         self.assertEqual(expected_data, user_data)
 
@@ -2353,7 +2445,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
-    USER_1_ROLE = feconf.ROLE_ID_LEARNER
+    USER_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -2362,7 +2454,6 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE,
         ).put()
 
     def test_get_deletion_policy(self):

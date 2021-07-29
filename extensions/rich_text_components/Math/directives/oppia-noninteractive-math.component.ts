@@ -18,9 +18,23 @@
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -46,7 +60,7 @@ interface ImageContainerStyle {
   templateUrl: './math.component.html',
   styleUrls: []
 })
-export class NoninteractiveMath implements OnInit {
+export class NoninteractiveMath implements OnInit, OnChanges {
   @Input() mathContentWithValue: string;
   imageContainerStyle: ImageContainerStyle;
   imageUrl: string | ArrayBuffer | SafeResourceUrl;
@@ -60,9 +74,15 @@ export class NoninteractiveMath implements OnInit {
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  ngOnInit(): void {
+  private _updateImage() {
+    if (!this.mathContentWithValue) {
+      return;
+    }
     const mathExpressionContent = this.htmlEscaperService.escapedJsonToObj(
       this.mathContentWithValue) as MathExpression;
+    if (mathExpressionContent as unknown as string === '') {
+      return;
+    }
     if (mathExpressionContent.hasOwnProperty('raw_latex')) {
       const svgFilename = mathExpressionContent.svg_filename;
       const dimensions = this.imagePreloaderService.getDimensionsOfMathSvg(
@@ -122,6 +142,16 @@ export class NoninteractiveMath implements OnInit {
         e.message += additionalInfo;
         throw e;
       }
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateImage();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.mathContentWithValue) {
+      this._updateImage();
     }
   }
 }

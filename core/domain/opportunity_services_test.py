@@ -16,8 +16,8 @@
 
 """Unit tests for core.domain.opportunity_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -43,9 +43,10 @@ import feconf
 import python_utils
 
 (
-    feedback_models, opportunity_models, suggestion_models
+    feedback_models, opportunity_models, story_models, suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.suggestion
+    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.story,
+    models.NAMES.suggestion
 ])
 
 
@@ -55,23 +56,24 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     suggestion_target_id = '0'
     suggestion_target_version_at_submission = 1
     suggestion_change = {
-        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'End State',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '',
-        'translation_html': '<p>This is translated html.</p>'
+        'translation_html': '<p>This is translated html.</p>',
+        'data_format': 'html'
     }
 
     def setUp(self):
         super(OpportunityServicesIntegrationTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
@@ -103,7 +105,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         subtopic_page = (
@@ -439,12 +441,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }
             }),
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>'
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html'
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -456,12 +459,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }
             }),
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'End State',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>'
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html'
             }),
         ]
         exp_services.update_exploration(
@@ -753,12 +757,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     def setUp(self):
         super(OpportunityServicesUnitTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -781,7 +785,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -912,3 +916,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'exp_2', strict=False
             )
         )
+
+    def test_regenerate_opportunities_related_to_topic_when_story_deleted(self):
+        story_models.StoryModel.delete_by_id(self.STORY_ID)
+
+        self.assertRaisesRegexp(
+            Exception, 'Failed to regenerate opportunities',
+            lambda: (
+                opportunity_services.regenerate_opportunities_related_to_topic(
+                    self.TOPIC_ID)))

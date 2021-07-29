@@ -16,8 +16,8 @@
 
 """Tests for the exploration editor page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import logging
@@ -52,26 +52,32 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup('voiceoveradmin@app.com', 'voiceoverManager')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            'voiceoveradmin@app.com')
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.add_user_role('voiceoverManager', feconf.ROLE_ID_VOICEOVER_ADMIN)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.system_user = user_services.get_system_user()
         self.editor = user_services.get_user_actions_info(self.editor_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
 
     def assert_can_edit(self, exp_id):
         """Returns True if the current user can edit the exploration
@@ -202,7 +208,7 @@ class EditorTests(BaseEditorControllerTests):
         # A request with the wrong version number is invalid.
         response_dict = _put_and_expect_400_error(
             _get_payload('New state', version=123))
-        self.assertIn('which is too old', response_dict['error'])
+        self.assertIn('which is not possible', response_dict['error'])
 
         # A request with an empty state name is invalid.
         response_dict = _put_and_expect_400_error(
@@ -242,7 +248,7 @@ class EditorTests(BaseEditorControllerTests):
         self.logout()
 
     def test_publish_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(
@@ -923,23 +929,11 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
     def test_cannot_get_unresolved_answers_with_no_state_name(self):
         self.login(self.OWNER_EMAIL)
 
-        self.get_json(
-            '/createhandler/get_top_unresolved_answers/%s' % self.exp_id,
-            expected_status_int=404)
-
-        self.logout()
-
-    def test_get_top_unresolved_answers(self):
-        self.login(self.OWNER_EMAIL)
-
-        answers = stats_services.get_top_state_unresolved_answers(
-            self.exp_id, self.exploration.init_state_name)
-
         response = self.get_json(
-            '/createhandler/get_top_unresolved_answers/%s?state_name=%s'
-            % (self.exp_id, self.exploration.init_state_name))
+            '/createhandler/get_top_unresolved_answers/%s' % self.exp_id,
+            expected_status_int=200)
 
-        self.assertEqual(response['unresolved_answers'], answers)
+        self.assertEqual(response['unresolved_answers'], [])
 
         self.logout()
 
@@ -998,38 +992,13 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
         exploration = self.save_new_valid_exploration(exp_id, owner_id)
 
         response = self.get_json(
             '/createhandler/state_interaction_stats/%s/%s' % (
                 exp_id, exploration.init_state_name))
 
-        visualizations_info = stats_services.get_visualizations_info(
-            exploration.id, 'Introduction',
-            exploration.states[exploration.init_state_name].interaction.id)
-
-        self.assertEqual(
-            response['visualizations_info'], visualizations_info)
-
-        exploration.add_states(['new_state_name'])
-
-        exploration.update_init_state_name('new_state_name')
-
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-
-        response = self.get_json(
-            '/createhandler/state_interaction_stats/%s/%s' % (
-                exp_id, exploration.init_state_name))
-
-        visualizations_info = stats_services.get_visualizations_info(
-            exploration.id, 'new_state_name',
-            exploration.states[exploration.init_state_name].interaction.id)
-
-        self.assertEqual(
-            response['visualizations_info'], visualizations_info)
-
-        self.logout()
+        self.assertEqual(response['visualizations_info'], [])
 
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
@@ -1045,10 +1014,6 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.owner, unpublished_exp_id, self.editor_id,
             rights_domain.ROLE_EDITOR)
 
-        rights_manager.assign_role_for_exploration(
-            self.owner, unpublished_exp_id, self.voice_artist_id,
-            rights_domain.ROLE_VOICE_ARTIST)
-
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % unpublished_exp_id,
@@ -1056,12 +1021,6 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
-        self.delete_json(
-            '/createhandler/data/%s' % unpublished_exp_id,
-            expected_status_int=401)
-        self.logout()
-
-        self.login(self.VOICE_ARTIST_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % unpublished_exp_id,
             expected_status_int=401)
@@ -1079,14 +1038,14 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id, title='A title', category='A category')
         exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
             rights_domain.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
-            self.owner, published_exp_id, self.voice_artist_id,
+            self.voiceover_admin, published_exp_id, self.voice_artist_id,
             rights_domain.ROLE_VOICE_ARTIST)
-        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
         self.delete_json(
@@ -1112,7 +1071,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % published_exp_id,
             expected_status_int=200)
@@ -1145,28 +1104,10 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id),
+                ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id)
+                ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id)
             ])
-            self.logout()
-
-            # Checking for admin.
-            observed_log_messages = []
-            exp_id = 'unpublished_eid2'
-            exploration = exp_domain.Exploration.create_default_exploration(
-                exp_id)
-            exp_services.save_new_exploration(self.admin_id, exploration)
-
-            self.login(self.ADMIN_EMAIL)
-            self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(observed_log_messages, [
-                '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id),
-                '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id)
-            ])
-
             self.logout()
 
             # Checking for moderator.
@@ -1179,10 +1120,12 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.login(self.MODERATOR_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(observed_log_messages, [
-                '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id),
-                '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id)
+                '(%s) %s tried to delete exploration %s' % (
+                    [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                    self.moderator_id, exp_id),
+                '(%s) %s deleted exploration %s' % (
+                    [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                    self.moderator_id, exp_id)
             ])
             self.logout()
 
@@ -1349,7 +1292,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
         self.assert_can_edit(exp_id)
 
         # Ban joe.
-        self.set_banned_users(['joe'])
+        self.mark_user_banned('joe')
 
         # Test that Joe is banned (He can still access the library page).
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
@@ -1413,12 +1356,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.VIEWER_USERNAME,
                 'new_member_role': rights_domain.ROLE_VIEWER
             }, csrf_token=csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.VOICE_ARTIST_USERNAME,
-                'new_member_role': rights_domain.ROLE_VOICE_ARTIST
-            }, csrf_token=csrf_token)
+
         self.put_json(
             rights_url, {
                 'version': exploration.version,
@@ -1497,25 +1435,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertIn('State 5', response_dict['states'])
 
         # Check that collaborator2 cannot add new members.
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_username': self.COLLABORATOR3_USERNAME,
-                'new_member_role': rights_domain.ROLE_EDITOR,
-                }, csrf_token=csrf_token, expected_status_int=401)
-
-        self.logout()
-
-        # Check that voice artist can access editor page and can only voiceover.
-        self.login(self.VOICE_ARTIST_EMAIL)
-        self.get_html_response('/create/%s' % exp_id)
-        self.assert_cannot_edit(exp_id)
-        self.assert_can_voiceover(exp_id)
-        csrf_token = self.get_new_csrf_token()
-
-        # Check that voice artist cannot add new members.
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(
@@ -1906,6 +1825,59 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assertEqual(
             response['error'], 'No change was made to this exploration.')
 
+    def test_can_not_assign_roles_with_invalid_payload_version(self):
+         # Create collaborator user.
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+
+        csrf_token = self.get_new_csrf_token()
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        # Raises error as version from payload is None.
+        response_dict = self.put_json(
+            rights_url, {
+                'version': None,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Invalid POST request: a version must be specified.')
+
+        # Raises error as version from payload does not match the exploration
+        # version.
+        response_dict = self.put_json(
+            rights_url, {
+                'version': 2,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Trying to update version 1 of exploration from version 2, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
 
 class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
@@ -2002,8 +1974,8 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
@@ -2651,6 +2623,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 2)
+        self.assertTrue(response['changes_are_mergeable'])
 
     def test_draft_updated_version_invalid(self):
         payload = {
@@ -2665,6 +2638,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertEqual(exp_user_data.draft_change_list, self.NEW_CHANGELIST)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 10)
         self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertFalse(response['changes_are_mergeable'])
         self.assertEqual(response['draft_change_list_id'], 2)
 
     def test_discard_draft(self):
@@ -2746,7 +2720,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(state_stats['answers'], {'Introduction': []})
+        self.assertEqual(state_stats['answers'], {})
 
     def test_get_returns_assigned_interaction_ids_of_exploration_states(self):
         with self.login_context(self.OWNER_EMAIL) as owner_id:
@@ -2759,50 +2733,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(
-            state_stats['interaction_ids'],
-            {'A': 'FractionInput', 'B': 'TextInput', 'End': 'EndExploration'})
-
-    def test_get_returns_recorded_answers_from_exploration(self):
-        with self.login_context(self.OWNER_EMAIL) as owner_id:
-            exp_id = exp_fetchers.get_new_exploration_id()
-            exp = self.save_new_valid_exploration(exp_id, owner_id)
-
-        def mock_get_top_state_answer_stats(exploration_id, state_name):
-            """Returns a fake list of top answers for a particular state.
-
-            Args:
-                exploration_id: str. The exploration ID.
-                state_name: str. The name of the state to fetch answers for.
-
-            Returns:
-                list(dict(str: *)). A list of the top 10 answers, sorted by
-                decreasing frequency.
-            """
-            if (exploration_id, state_name) == (exp_id, exp.init_state_name):
-                return [
-                    {'answer': 'C', 'frequency': 12},
-                    {'answer': 'B', 'frequency': 11},
-                    {'answer': 'A', 'frequency': 10},
-                ]
-
-        swap_get_answers = self.swap(
-            stats_services, 'get_top_state_answer_stats',
-            mock_get_top_state_answer_stats)
-
-        with self.login_context(self.OWNER_EMAIL), swap_get_answers:
-            state_stats = self.get_json(
-                '%s/%s' % (
-                    feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
-
-        self.assertEqual(
-            state_stats['answers'], {
-                exp.init_state_name: [
-                    {'answer': 'C', 'frequency': 12},
-                    {'answer': 'B', 'frequency': 11},
-                    {'answer': 'A', 'frequency': 10},
-                ],
-            })
+        self.assertEqual(state_stats['interaction_ids'], {})
 
 
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
@@ -2938,7 +2869,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2993,5 +2924,6 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.assertFalse(response['can_release_ownership'])
         self.assertTrue(response['can_voiceover'])
         self.assertFalse(response['can_unpublish'])
+        self.assertFalse(response['can_manage_voice_artist'])
 
         self.logout()

@@ -16,8 +16,8 @@
 the same e2e test suites.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import re
@@ -27,10 +27,7 @@ import utils
 
 # These test suites are not present in CI. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
-TEST_SUITES_NOT_RUN_IN_CI = [
-    'full', 'library',
-    'topicsAndSkillsDashboard', 'topicAndStoryEditor',
-    'topicAndStoryEditorFileUploadFeatures', 'topicAndStoryViewer']
+TEST_SUITES_NOT_RUN_IN_CI = ['full']
 
 
 PROTRACTOR_CONF_FILE_PATH = os.path.join(

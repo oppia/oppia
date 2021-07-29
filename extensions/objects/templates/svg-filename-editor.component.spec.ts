@@ -62,10 +62,10 @@ var initializeMockDocument = (svgFilenameCtrl: SvgFilenameEditorComponent) => {
 };
 
 describe('SvgFilenameEditor', () => {
-  var alertSpy = null;
+  var alertSpy: jasmine.Spy<(warning: string) => void>;
   let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
-  var contextService = null;
-  var csrfService = null;
+  var contextService: ContextService;
+  var csrfService: CsrfTokenService;
   let fixture: ComponentFixture<SvgFilenameEditorComponent>;
   var component: SvgFilenameEditorComponent;
   let svgSanitizerService: SvgSanitizerService;
@@ -242,15 +242,15 @@ describe('SvgFilenameEditor', () => {
     svgFileFetcherBackendApiService = (
       TestBed.inject(SvgFileFetcherBackendApiService));
     // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockImageObject'.
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new mockImageObject());
     // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties.
+    // We have only defined the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
     fixture = TestBed.createComponent(SvgFilenameEditorComponent);
@@ -709,7 +709,7 @@ describe('SvgFilenameEditor', () => {
 
 describe('SvgFilenameEditor initialized with value attribute', () => {
   var component: SvgFilenameEditorComponent;
-  var contextService = null;
+  var contextService: ContextService;
   var samplesvg = (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
       'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
@@ -752,12 +752,12 @@ describe('SvgFilenameEditor initialized with value attribute', () => {
       TestBed.inject(SvgFileFetcherBackendApiService));
     spyOn(svgFileFetcherBackendApiService, 'fetchSvg').and.returnValue(
       of(samplesvg));
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('1');
     initializeMockDocument(component);
   }));
 
   it('should load the svg file', waitForAsync(fakeAsync(() => {
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(contextService, 'getEntityId').and.returnValue('1');
     component.ngOnInit();
     tick(10);
     expect(component.diagramStatus).toBe('saved');
@@ -769,7 +769,7 @@ describe('SvgFilenameEditor initialized with value attribute', () => {
 describe(
   'SvgFilenameEditor with image save destination as local storage',
   () => {
-    var contextService = null;
+    var contextService: ContextService;
     let fixture: ComponentFixture<SvgFilenameEditorComponent>;
     var component: SvgFilenameEditorComponent = null;
     var samplesvg = (
@@ -879,17 +879,19 @@ describe(
       contextService = TestBed.inject(ContextService);
       spyOn(contextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+
 
       // This throws "Argument of type 'mockImageObject' is not assignable to
-      // parameter of type 'HTMLImageElement'.". This is because
-      // 'HTMLImageElement' has around 250 more properties. We have only defined
-      // the properties we need in 'mockImageObject'.
+      // parameter of type 'HTMLImageElement'.". We need to suppress this error
+      // because 'HTMLImageElement' has around 250 more properties. We have only
+      // defined the properties we need in 'mockImageObject'.
       // @ts-expect-error
       spyOn(window, 'Image').and.returnValue(new mockImageObject());
       // This throws "Argument of type 'mockReaderObject' is not assignable
-      // to parameter of type 'FileReader'.". This is because
-      // 'FileReader' has around 15 more properties. We have only defined
-      // the properties we need in 'mockReaderObject'.
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only
+      // defined the properties we need in 'mockReaderObject'.
       // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
       fixture = TestBed.createComponent(SvgFilenameEditorComponent);

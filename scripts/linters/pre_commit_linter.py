@@ -52,8 +52,8 @@ CUSTOMIZATION OPTIONS
 Note that the root folder MUST be named 'oppia'.
  """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import fnmatch
@@ -89,6 +89,7 @@ SHARDS = {
         'core/storage/',
         'core/controllers/',
         'core/platform',
+        'jobs/',
     ],
     'other': None,
 }
@@ -262,9 +263,7 @@ def _get_linters_for_file_extension(file_extension_to_lint):
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'py':
-        custom_linter, third_party_linter = python_linter.get_linters(
-            _FILES['.py'], FILE_CACHE)
-        custom_linters.append(custom_linter)
+        _, third_party_linter = python_linter.get_linters(_FILES['.py'])
         third_party_linters.append(third_party_linter)
 
     elif file_extension_to_lint == 'other':

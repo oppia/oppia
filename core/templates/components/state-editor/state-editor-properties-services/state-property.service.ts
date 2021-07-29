@@ -43,10 +43,10 @@ import { UtilsService } from 'services/utils.service';
 export class StatePropertyService<StatePropertyType> {
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
-  setterMethodKey: string;
-  displayed: StatePropertyType;
-  stateName: string;
-  savedMemento: StatePropertyType;
+  setterMethodKey!: string | null;
+  displayed!: StatePropertyType;
+  stateName!: string;
+  savedMemento!: StatePropertyType;
 
   constructor(
     private alertsService: AlertsService,

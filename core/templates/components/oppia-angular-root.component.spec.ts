@@ -25,6 +25,10 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -34,9 +38,7 @@ describe('OppiaAngularRootComponent', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule, RichTextComponentsModule],
       declarations: [OppiaAngularRootComponent],
       providers: [
         {
@@ -45,13 +47,21 @@ describe('OppiaAngularRootComponent', function() {
         },
         {
           provide: TranslateCacheService,
-          useValue: null
+          useValue: {
+            init: () => {},
+            getCachedLanguage: () => {
+              return 'en';
+            }
+          }
         },
         {
           provide: TranslateService,
-          useValue: null
+          useValue: {
+            use: () => {}
+          }
         }
       ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(OppiaAngularRootComponent);
@@ -60,11 +70,18 @@ describe('OppiaAngularRootComponent', function() {
     emitSpy = spyOn(component.initialized, 'emit');
   }));
 
-  describe('.initialized', () => {
-    it('should emit once ngAfterViewInit is called', () => {
-      component.ngAfterViewInit();
+  it('should only intialize rteElements once', () => {
+    expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
+    expect(TestBed.createComponent(
+      OppiaAngularRootComponent).componentInstance).toBeDefined();
+  });
 
-      expect(emitSpy).toHaveBeenCalled();
-    });
+  it('should emit once ngAfterViewInit is called', () => {
+    spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(
+      () => {});
+    component.ngAfterViewInit();
+    TestBed.inject(I18nLanguageCodeService).setI18nLanguageCode('en');
+
+    expect(emitSpy).toHaveBeenCalled();
   });
 });

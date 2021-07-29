@@ -23,54 +23,50 @@ import { Injectable } from '@angular/core';
 import { AdminPageConstants } from
   'pages/admin-page/admin-page.constants';
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict
+} from 'domain/topic/creator-topic-summary.model';
 import {
   PlatformParameter,
   PlatformParameterBackendDict
 } from 'domain/platform_feature/platform-parameter.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { Schema } from 'services/schema-default-value.service';
 
 
-interface UserRolesBackendResponse {
+export interface UserRolesBackendResponse {
+  roles: string[];
+  'managed_topic_ids': string[];
+  banned: boolean;
+}
+
+export interface UpdatableRolesBackendResponse {
   [role: string]: string;
 }
 
-interface RoleToActionsBackendResponse {
+export interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
-interface ConfigPropertiesBackendResponse {
-  [property: string]: Object;
-}
-
-interface ViewContributionBackendResponse {
-  usernames: string[];
-}
-
-interface ContributionRightsBackendResponse {
-  'can_review_questions': boolean,
-  'can_review_translation_for_language_codes': string[],
-  'can_review_voiceover_for_language_codes': string[],
-  'can_submit_questions': boolean
+export interface ConfigPropertiesBackendResponse {
+  [key: string]: ConfigProperty;
 }
 
 interface PendingDeletionRequestBackendResponse {
   'number_of_pending_deletion_models': string
 }
 
-interface ModelsRelatedToUserBackendResponse {
+export interface ModelsRelatedToUserBackendResponse {
   'related_models_exist': boolean
 }
 
-interface SignupEmailContent {
+export interface SignupEmailContent {
   'html_body': string,
   'subject': string
 }
 
-interface ClassroomPageData {
+export interface ClassroomPageData {
   'name': string,
   'topic_ids': string[],
   'course_details': string,
@@ -78,12 +74,18 @@ interface ClassroomPageData {
   'topic_list_intro': string
 }
 
-interface VmidSharedSecretKeyMapping {
+export interface VmidSharedSecretKeyMapping {
   'shared_secret_key': string,
   'vm_id': string
 }
 
-interface ConfigPropertyValues {
+export interface ConfigProperty {
+  description: string,
+  schema: Schema,
+  value: number | boolean | string | string[] | Object | Object[]
+}
+
+export interface ConfigPropertyValues {
   'always_ask_learners_for_answer_details': boolean,
   'classroom_pages_data': ClassroomPageData,
   'classroom_promos_are_enabled': boolean,
@@ -118,11 +120,11 @@ export interface AdminPageDataBackendDict {
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
   'human_readable_current_time': string;
-  'updatable_roles': UserRolesBackendResponse;
+  'updatable_roles': UpdatableRolesBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': UserRolesBackendResponse;
-  'topic_summaries': TopicSummaryBackendDict[];
+  'viewable_roles': UpdatableRolesBackendResponse;
+  'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
 
@@ -130,11 +132,11 @@ export interface AdminPageData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  updatableRoles: UserRolesBackendResponse;
+  updatableRoles: UpdatableRolesBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
-  viewableRoles: UserRolesBackendResponse;
-  topicSummaries: TopicSummary[];
+  viewableRoles: UpdatableRolesBackendResponse;
+  topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }
 
@@ -159,7 +161,7 @@ export class AdminBackendApiService {
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
-            TopicSummary.createFromBackendDict),
+            CreatorTopicSummary.createFromBackendDict),
           featureFlags: response.feature_flags.map(
             dict => PlatformParameter.createFromBackendDict(
               dict)
@@ -171,8 +173,11 @@ export class AdminBackendApiService {
     });
   }
 
+  // This is a helper function to handle all post<void>
+  // requests in admin page.
   private async _postRequestAsync(
-      handlerUrl: string, payload?: Object, action?: string): Promise<void> {
+      handlerUrl: string, payload?: Object, action?: string):
+      Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
@@ -205,15 +210,13 @@ export class AdminBackendApiService {
     });
   }
 
-  async updateUserRoleAsync(
-      newRole: string, username: string, topicId: string
-  ): Promise<void> {
+  async addUserRoleAsync(
+      newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
+      this.http.put<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           role: newRole,
-          username: username,
-          topic_id: topicId
+          username: username
         }
       ).toPromise().then(response => {
         resolve(response);
@@ -223,81 +226,47 @@ export class AdminBackendApiService {
     });
   }
 
-  async addContributionReviewerAsync(
-      category: string, username: string, languageCode: string
-  ): Promise<void> {
+  async removeUserRoleAsync(
+      roleToRemove: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
-          category: category,
-          username: username,
-          language_code: languageCode
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async viewContributionReviewersAsync(
-      category: string, languageCode: string
-  ): Promise<ViewContributionBackendResponse> {
-    let params = {};
-    if (languageCode === null) {
-      params = { category: category };
-    } else {
-      params = {
-        category: category,
-        language_code: languageCode
-      };
-    }
-    return new Promise((resolve, reject) => {
-      this.http.get<ViewContributionBackendResponse>(
-        AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
-          params
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async contributionReviewerRightsAsync(
-      username: string): Promise<ContributionRightsBackendResponse> {
-    return new Promise((resolve, reject) => {
-      this.http.get<ContributionRightsBackendResponse>(
-        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
+            role: roleToRemove,
             username: username
           }
         }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
+      ).toPromise().then(resolve, errorResponse => {
         reject(errorResponse.error.error);
       });
     });
   }
 
-  async removeContributionReviewerAsync(
-      username: string, method: string,
-      category: string, languageCode: string
-  ): Promise<void> {
+  async assignManagerToTopicAsync(
+      username: string, topicId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
-        AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
           username: username,
-          removal_type: method,
-          category: category,
-          language_code: languageCode
+          topic_id: topicId,
+          action: 'assign'
         }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deassignManagerFromTopicAsync(
+      username: string, topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+          username: username,
+          topic_id: topicId,
+          action: 'deassign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
         reject(errorResponse.error.error);
       });
     });
@@ -309,27 +278,24 @@ export class AdminBackendApiService {
       AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
-  async populateExplorationStatsRegenerationCsvResultAsync(
-      expIdToRegenerate: string): Promise<void> {
-    let action = 'regenerate_missing_exploration_stats';
-    let payload = {
-      exp_id: expIdToRegenerate
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
   async regenerateOpportunitiesRelatedToTopicAsync(
-      topicId: string): Promise<void> {
-    let action = 'regenerate_topic_related_opportunities';
-    let payload = {
-      topic_id: topicId
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
+      topicId: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.http.post<number>(
+        AdminPageConstants.ADMIN_HANDLER_URL, {
+          action: 'regenerate_topic_related_opportunities',
+          topic_id: topicId
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
   }
 
-  async uploadTopicSimilaritiesAsync(data: string): Promise<void> {
+  async uploadTopicSimilaritiesAsync(data: string):
+  Promise<void> {
     let action = 'upload_topic_similarities';
     let payload = {
       data: data
@@ -420,7 +386,8 @@ export class AdminBackendApiService {
   }
 
   // Admin Config Tab Services.
-  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
+  async revertConfigPropertyAsync(configPropertyId: string):
+  Promise<void> {
     let action = 'revert_config_property';
     let payload = {
       config_property_id: configPropertyId
@@ -430,7 +397,8 @@ export class AdminBackendApiService {
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: ConfigPropertyValues): Promise<void> {
+      newConfigPropertyValues: ConfigPropertyValues):
+      Promise<void> {
     let action = 'save_config_properties';
     let payload = {
       new_config_property_values: newConfigPropertyValues
@@ -450,7 +418,8 @@ export class AdminBackendApiService {
     });
   }
 
-  async reloadExplorationAsync(explorationId: string): Promise<void> {
+  async reloadExplorationAsync(explorationId: string):
+  Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
       exploration_id: String(explorationId)
@@ -469,10 +438,37 @@ export class AdminBackendApiService {
     });
   }
 
-  async reloadCollectionAsync(collectionId: string): Promise<void> {
+  async reloadCollectionAsync(collectionId: string):
+  Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
+    });
+  }
+
+  async markUserBannedAsync(username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
+        { username }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async unmarkUserBannedAsync(username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
+        { params: { username } }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 }

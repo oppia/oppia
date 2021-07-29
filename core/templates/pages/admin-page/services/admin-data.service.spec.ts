@@ -26,7 +26,7 @@ import { AdminPageData, AdminPageDataBackendDict } from
   'domain/admin/admin-backend-api.service';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 
 describe('Admin Data Service', () => {
@@ -53,7 +53,9 @@ describe('Admin Data Service', () => {
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#C6DCDA',
         total_published_node_count: 10,
-        url_fragment: 'topicurlfrag'
+        url_fragment: 'topicurlfrag',
+        can_edit_topic: false,
+        is_published: false
       }
     ],
     updatable_roles: {
@@ -115,7 +117,7 @@ describe('Admin Data Service', () => {
       configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
-        TopicSummary.createFromBackendDict),
+        CreatorTopicSummary.createFromBackendDict),
       featureFlags: sampleAdminData.feature_flags.map(
         dict => PlatformParameter.createFromBackendDict(dict))
     };

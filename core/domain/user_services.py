@@ -16,8 +16,8 @@
 
 """Services for user data."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import hashlib
@@ -42,6 +42,7 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
+bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -120,6 +121,23 @@ def get_user_settings_from_username(username):
         return get_user_settings(user_model.id)
 
 
+def get_user_settings_from_email(email):
+    """Gets the user settings for a given email.
+
+    Args:
+        email: str. Email of the user.
+
+    Returns:
+        UserSettingsModel or None. The UserSettingsModel instance corresponding
+        to the given email, or None if no such model was found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_email(email)
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
 def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     """Gets domain objects representing the settings for the given user_ids.
 
@@ -141,6 +159,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=include_marked_deleted)
+
     if strict:
         for user_id, user_settings_model in python_utils.ZIP(
                 user_ids, user_settings_models):
@@ -152,7 +171,11 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
             result.append(user_domain.UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ID_ADMIN,
+                roles=[
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_CURRICULUM_ADMIN,
+                    feconf.ROLE_ID_MODERATOR],
+                banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -276,19 +299,19 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
         return None
 
 
-def get_user_role_from_id(user_id):
-    """Returns role of the user with given user_id.
+def get_user_roles_from_id(user_id):
+    """Returns roles of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        str. Role of the user with given id.
+        list(str). Roles of the user with given id.
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
-        return feconf.ROLE_ID_GUEST
-    return user_settings.role
+        return [feconf.ROLE_ID_GUEST]
+    return user_settings.roles
 
 
 def _create_user_contribution_rights_from_model(user_contribution_rights_model):
@@ -552,9 +575,9 @@ def get_user_actions_info(user_id):
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    role = get_user_role_from_id(user_id)
-    actions = role_services.get_all_actions(role)
-    return user_domain.UserActionsInfo(user_id, role, actions)
+    roles = get_user_roles_from_id(user_id)
+    actions = role_services.get_all_actions(roles)
+    return user_domain.UserActionsInfo(user_id, roles, actions)
 
 
 def get_system_user():
@@ -585,9 +608,6 @@ def _save_user_settings(user_settings):
         user_settings_dict['id'] = user_settings.user_id
         user_model = user_models.UserSettingsModel(**user_settings_dict)
 
-    # TODO(#12755): Remove update_roles_and_banned_fields call once roles and
-    # banned fields are in use.
-    update_roles_and_banned_fields(user_model)
     user_model.update_timestamps()
     user_model.put()
 
@@ -604,7 +624,8 @@ def _get_user_settings_from_model(user_settings_model):
     return user_domain.UserSettings(
         user_id=user_settings_model.id,
         email=user_settings_model.email,
-        role=user_settings_model.role,
+        roles=user_settings_model.roles,
+        banned=user_settings_model.banned,
         username=user_settings_model.username,
         last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
@@ -730,7 +751,7 @@ def create_new_user(auth_id, email):
             user_settings.user_id, auth_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = user_domain.UserSettings(
-        user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
+        user_id, email, [feconf.ROLE_ID_FULL_USER], False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -785,7 +806,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id()
         user_settings = user_domain.UserSettings(
-            user_id, email, feconf.ROLE_ID_LEARNER,
+            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
@@ -861,7 +882,6 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
-        update_roles_and_banned_fields(user_model)
 
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
@@ -1208,8 +1228,8 @@ def update_preferred_audio_language_code(
     _save_user_settings(user_settings)
 
 
-def update_user_role(user_id, role):
-    """Updates the role of the user with given user_id.
+def add_user_role(user_id, role):
+    """Updates the roles of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user whose role is to be updated.
@@ -1218,14 +1238,42 @@ def update_user_role(user_id, role):
     Raises:
         Exception. The given role does not exist.
     """
-    if not role_services.is_valid_role(role):
-        raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
-    if user_settings.role == feconf.ROLE_ID_LEARNER:
-        raise Exception('The role of a Learner cannot be changed.')
-    if role == feconf.ROLE_ID_LEARNER:
-        raise Exception('Updating to a Learner role is not allowed.')
-    user_settings.role = role
+    if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
+        raise Exception('The role of a Mobile Learner cannot be changed.')
+    if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
+        raise Exception('Adding a %s role is not allowed.' % role)
+
+    user_settings.roles.append(role)
+    role_services.log_role_query(
+        user_id, feconf.ROLE_ACTION_ADD, role=role,
+        username=user_settings.username)
+
+    _save_user_settings(user_settings)
+
+
+def remove_user_role(user_id, role):
+    """Updates the roles of the user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user whose role is to be updated.
+        role: str. The role to be assigned to user with given id.
+
+    Raises:
+        Exception. The given role does not exist.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
+        raise Exception('The role of a Mobile Learner cannot be changed.')
+    if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
+        raise Exception('Removing a default role is not allowed.')
+
+    user_settings.roles.remove(role)
+
+    role_services.log_role_query(
+        user_id, feconf.ROLE_ACTION_REMOVE, role=role,
+        username=user_settings.username)
+
     _save_user_settings(user_settings)
 
 
@@ -1381,7 +1429,8 @@ def record_user_created_an_exploration(user_id):
 
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
-        can_receive_feedback_email, can_receive_subscription_email):
+        can_receive_feedback_email, can_receive_subscription_email,
+        bulk_email_db_already_updated=False):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -1397,6 +1446,14 @@ def update_email_preferences(
             emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
+        bulk_email_db_already_updated: bool. Whether the bulk email provider's
+            database is already updated. This is set to true only when calling
+            from the webhook controller since in that case, the external update
+            to the bulk email provider's database initiated the update here.
+
+    Returns:
+        bool. Whether to send a mail to the user to complete bulk email service
+        signup.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -1404,15 +1461,26 @@ def update_email_preferences(
         email_preferences_model = user_models.UserEmailPreferencesModel(
             id=user_id)
 
-    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
     email_preferences_model.feedback_message_notifications = (
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
+    email = get_email_from_user_id(user_id)
+    if not bulk_email_db_already_updated:
+        user_creation_successful = (
+            bulk_email_services.add_or_update_user_status(
+                email, can_receive_email_updates))
+        if not user_creation_successful:
+            email_preferences_model.site_updates = False
+            email_preferences_model.update_timestamps()
+            email_preferences_model.put()
+            return True
+    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
+    return False
 
 
 def get_email_preferences(user_id):
@@ -1843,23 +1911,19 @@ def update_dashboard_stats_log(user_id):
     model.put()
 
 
-def is_at_least_moderator(user_id):
-    """Checks if a user with given user_id is at least a moderator.
+def is_moderator(user_id):
+    """Checks if a user with given user_id is a moderator.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        bool. True if user is atleast a moderator, False otherwise.
+        bool. True if user is a moderator, False otherwise.
     """
-    user_role = get_user_role_from_id(user_id)
-    if (user_role == feconf.ROLE_ID_MODERATOR or
-            user_role == feconf.ROLE_ID_ADMIN):
-        return True
-    return False
+    return feconf.ROLE_ID_MODERATOR in get_user_roles_from_id(user_id)
 
 
-def is_admin(user_id):
+def is_curriculum_admin(user_id):
     """Checks if a user with given user_id is an admin.
 
     Args:
@@ -1868,10 +1932,7 @@ def is_admin(user_id):
     Returns:
         bool. True if user is an admin, False otherwise.
     """
-    user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_ADMIN:
-        return True
-    return False
+    return feconf.ROLE_ID_CURRICULUM_ADMIN in get_user_roles_from_id(user_id)
 
 
 def is_topic_manager(user_id):
@@ -1883,10 +1944,7 @@ def is_topic_manager(user_id):
     Returns:
         bool. Whether the user is a topic manager.
     """
-    user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
-        return True
-    return False
+    return feconf.ROLE_ID_TOPIC_MANAGER in get_user_roles_from_id(user_id)
 
 
 def can_review_translation_suggestions(user_id, language_code=None):
@@ -2171,29 +2229,62 @@ def create_login_url(return_url):
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})
 
 
-def update_roles_and_banned_fields(user_settings_model):
-    """Updates the new roles and banned fields in the UserSettingsModel which
-    are not in use but needs to kept in sync.
-
-    TODO(#12755): Remove this function once the roles and banned field of
-    UserSettingsModel are in use. It is not recommended to use this function in
-    new places.
+def mark_user_banned(user_id):
+    """Marks a user banned.
 
     Args:
-        user_settings_model: UserSettingsModel. The models which needs update.
+        user_id: str. The Id of the user.
     """
-    if user_settings_model.role == feconf.ROLE_ID_BANNED_USER:
-        user_settings_model.banned = True
-        user_settings_model.roles = []
-        return
-    if user_settings_model.role in [
-            feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR]:
-        user_settings_model.banned = False
-        user_settings_model.roles = [user_settings_model.role]
-        return
+    user_settings = get_user_settings(user_id)
+    user_settings.mark_banned()
+    _save_user_settings(user_settings)
 
-    # Learners are not allowed to have other roles, so user with role other than
-    # exploration editor or learner should have exploration editor role.
-    user_settings_model.roles = [
-        feconf.ROLE_ID_EXPLORATION_EDITOR, user_settings_model.role]
-    user_settings_model.banned = False
+
+def unmark_user_banned(user_id):
+    """Unmarks a banned user.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
+    user_auth_details = auth_services.get_user_auth_details_from_model(
+        auth_models.UserAuthDetailsModel.get(user_id))
+
+    user_settings = get_user_settings(user_id)
+    user_settings.unmark_banned(
+        feconf.ROLE_ID_FULL_USER if user_auth_details.is_full_user() else (
+            feconf.ROLE_ID_MOBILE_LEARNER
+        ))
+
+    _save_user_settings(user_settings)
+
+
+def get_dashboard_stats(user_id):
+    """Returns the dashboard stats associated with the given user_id.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        dict. Has the keys:
+            total_plays: int. Number of times the user's explorations were
+                played.
+            num_ratings: int. Number of times the explorations have been
+                rated.
+            average_ratings: float. Average of average ratings across all
+                explorations.
+    """
+    user_stats_model = user_models.UserStatsModel.get(user_id, strict=False)
+    if user_stats_model is None:
+        total_plays = 0
+        num_ratings = 0
+        average_ratings = None
+    else:
+        total_plays = user_stats_model.total_plays
+        num_ratings = user_stats_model.num_ratings
+        average_ratings = user_stats_model.average_ratings
+
+    return {
+        'total_plays': total_plays,
+        'num_ratings': num_ratings,
+        'average_ratings': average_ratings
+    }

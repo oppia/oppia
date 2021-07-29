@@ -30,7 +30,7 @@ import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service';
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
@@ -138,6 +138,14 @@ describe('Create New Chapter Modal Controller', function() {
     function() {
       expect($scope.nodeTitles).toEqual(nodeTitles);
       expect($scope.errorMsg).toBe(null);
+    });
+
+  it('should validate explorationId correctly',
+    function() {
+      $scope.explorationId = 'validId';
+      expect($scope.validateExplorationId()).toBeTrue();
+      $scope.explorationId = 'oppia.org/validId';
+      expect($scope.validateExplorationId()).toBeFalse();
     });
 
   it('should update thumbnail filename when changing thumbnail file',

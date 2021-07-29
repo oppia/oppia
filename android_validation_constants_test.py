@@ -16,8 +16,8 @@
 constants are the same.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import android_validation_constants
 from constants import constants
@@ -28,6 +28,7 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
     """Tests verifying the character limits."""
 
     def test_that_character_limits_in_both_files_are_equal(self):
+        # type: () -> None
         self.assertEqual(
             android_validation_constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME,
             constants.MAX_CHARS_IN_ABBREV_TOPIC_NAME)
@@ -57,6 +58,7 @@ class AndroidValidationConstantsTest(test_utils.GenericTestBase):
             constants.MAX_CHARS_IN_MISCONCEPTION_NAME)
 
     def test_exploration_constants_in_both_files_are_equal(self):
+        # type: () -> None
         interaction_ids_in_constants = []
         language_ids_in_constants = []
         constants_interactions_list = (

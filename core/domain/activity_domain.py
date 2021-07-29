@@ -16,8 +16,8 @@
 
 """Domain object for a reference to an activity."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 import python_utils
@@ -74,6 +74,20 @@ class ActivityReference(python_utils.OBJECT):
             'type': self.type,
             'id': self.id,
         }
+
+    @classmethod
+    def from_dict(cls, activity_reference_dict):
+        """Return the ActivityReference object from a dict.
+
+        Args:
+            activity_reference_dict: dict. Dictionary representation
+                of the object.
+
+        Returns:
+            ActivityReference. The correcponding ActivityReference object.
+        """
+        return cls(
+            activity_reference_dict['type'], activity_reference_dict['id'])
 
 
 class ActivityReferences(python_utils.OBJECT):

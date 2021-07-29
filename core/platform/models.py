@@ -16,8 +16,8 @@
 
 """Interface for storage model switching."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import inspect
 
@@ -28,19 +28,19 @@ import python_utils
 # Valid model names.
 NAMES = python_utils.create_enum(
     'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
-    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
-    'improvements', 'job', 'opportunity', 'question', 'recommendations',
-    'skill', 'statistics', 'activity', 'audit', 'auth', 'base_model',
-    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
-    'improvements', 'job', 'opportunity', 'question', 'recommendations',
-    'skill', 'statistics', 'story', 'subtopic', 'suggestion', 'topic',
-    'translation', 'user')
+    'blog', 'classifier', 'collection', 'config', 'email', 'exploration',
+    'feedback', 'improvements', 'job', 'opportunity', 'question',
+    'recommendations', 'skill', 'statistics', 'activity', 'audit', 'auth',
+    'base_model', 'classifier', 'collection', 'config', 'email', 'exploration',
+    'feedback', 'improvements', 'job', 'opportunity', 'question',
+    'recommendations', 'skill', 'statistics', 'story', 'subtopic', 'suggestion',
+    'topic', 'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.collection, NAMES.config,
+    NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
     NAMES.subtopic, NAMES.suggestion, NAMES.topic)
 
@@ -101,6 +101,9 @@ class _Gae(Platform):
             elif name == NAMES.beam_job:
                 from core.storage.beam_job import gae_models as beam_job_models
                 returned_models.append(beam_job_models)
+            elif name == NAMES.blog:
+                from core.storage.blog import gae_models as blog_models # pylint: disable=line-too-long
+                returned_models.append(blog_models)
             elif name == NAMES.classifier:
                 from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
                 returned_models.append(classifier_data_models)
@@ -266,6 +269,32 @@ class _Gae(Platform):
                     feconf.EMAIL_SERVICE_PROVIDER))
 
     @classmethod
+    def import_bulk_email_services(cls):
+        """Imports and returns the bulk email services module specified in
+        feconf.py. If in DEV_MODE, uses the dev mode version of email services.
+
+        Returns:
+            module. The email_services module to use, based on the feconf.py
+            setting and DEV_MODE setting.
+
+        Raises:
+            Exception. The value of feconf.BULK_EMAIL_SERVICE_PROVIDER does not
+                correspond to a valid email_services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.bulk_email import dev_mode_bulk_email_services
+            return dev_mode_bulk_email_services
+        elif (
+                feconf.BULK_EMAIL_SERVICE_PROVIDER ==
+                feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP):
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            return mailchimp_bulk_email_services
+        else:
+            raise Exception(
+                'Invalid bulk email service provider: %s' % (
+                    feconf.BULK_EMAIL_SERVICE_PROVIDER))
+
+    @classmethod
     def import_cache_services(cls):
         """Imports and returns a cache_services module from core.platform.cache.
 
@@ -418,6 +447,15 @@ class Registry(python_utils.OBJECT):
             module. The email_services module.
         """
         return cls._get().import_email_services()
+
+    @classmethod
+    def import_bulk_email_services(cls):
+        """Imports and returns bulk email_services module.
+
+        Returns:
+            module. The bulk email_services module.
+        """
+        return cls._get().import_bulk_email_services()
 
     @classmethod
     def import_cache_services(cls):

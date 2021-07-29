@@ -14,8 +14,8 @@
 
 """Base constants and handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import datetime
@@ -23,8 +23,10 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 
+from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
@@ -35,8 +37,10 @@ import python_utils
 import utils
 
 import backports.functools_lru_cache
+from typing import Any # pylint: disable=unused-import
+from typing import Dict # pylint: disable=unused-import
+from typing import Text # pylint: disable=unused-import
 import webapp2
-
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -145,6 +149,9 @@ class BaseHandler(webapp2.RequestHandler):
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = None # type: Dict[Text, Any]
+    HANDLER_ARGS_SCHEMAS = None # type: Dict[Text, Any]
+
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
@@ -154,6 +161,8 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
+        # TODO(#13155): Remove the if-else part once all the handlers have had
+        # schema validation implemented.
         if self.request.get('payload'):
             self.payload = json.loads(self.request.get('payload'))
         else:
@@ -166,6 +175,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
         self.current_user_is_super_admin = False
+        self.normalized_request = None
+        self.normalized_payload = None
 
         try:
             auth_claims = auth_services.get_auth_claims_from_request(request)
@@ -221,18 +232,20 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.role = (
-            feconf.ROLE_ID_GUEST
-            if self.user_id is None else user_settings.role)
+        self.roles = (
+            [feconf.ROLE_ID_GUEST]
+            if self.user_id is None else user_settings.roles)
         self.user = user_services.get_user_actions_info(self.user_id)
 
         if not self._is_requested_path_currently_accessible_to_user():
             auth_services.destroy_auth_session(self.response)
             return
 
-        self.values['is_moderator'] = (
-            user_services.is_at_least_moderator(self.user_id))
-        self.values['is_admin'] = user_services.is_admin(self.user_id)
+        # TODO(#13447): Remove populating response values with `is_moderator`,
+        # `is_curriculum_admin` & `is_topic_manager`.
+        self.values['is_moderator'] = user_services.is_moderator(self.user_id)
+        self.values['is_curriculum_admin'] = (
+            user_services.is_curriculum_admin(self.user_id))
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.current_user_is_super_admin
@@ -295,7 +308,131 @@ class BaseHandler(webapp2.RequestHandler):
                 self.handle_exception(e, self.app.debug)
                 return
 
+        schema_validation_succeeded = True
+        try:
+            self.vaidate_and_normalize_args()
+        except self.InvalidInputException as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+        # TODO(#13155): Remove this clause once all the handlers have had
+        # schema validation implemented.
+        except NotImplementedError as e:
+            self.handle_exception(e, self.app.debug)
+            schema_validation_succeeded = False
+
+        if not schema_validation_succeeded:
+            return
+
         super(BaseHandler, self).dispatch()
+
+    def vaidate_and_normalize_args(self):
+        """Validates schema for controller layer handler class arguments.
+
+        Raises:
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
+        """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url_path_args = self.request.route_kwargs
+        handler_class_names_with_no_schema = (
+            payload_validator.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA)
+
+        if handler_class_name in handler_class_names_with_no_schema:
+            return
+
+        handler_args = {}
+        payload_arg_keys = []
+        request_arg_keys = []
+        for arg in self.request.arguments():
+            if arg == 'csrf_token':
+                # 'csrf_token' has been already validated in the
+                # dispatch method.
+                continue
+            elif arg == 'source':
+                source_url = self.request.get('source')
+                regex_pattern = (
+                    r'http[s]?://(?:[a-zA-Z]|[0-9]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' # pylint: disable=line-too-long
+                )
+                regex_verified_url = re.findall(regex_pattern, source_url)
+                if not regex_verified_url:
+                    raise self.InvalidInputException(
+                        'Not a valid source url.')
+            elif arg == 'payload':
+                payload_args = self.payload
+                if payload_args is not None:
+                    payload_arg_keys = payload_args.keys()
+                    handler_args.update(payload_args)
+            else:
+                request_arg_keys.append(arg)
+                handler_args[arg] = self.request.get(arg)
+
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
+        extra_args_are_allowed = (
+            self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+            request_method == 'GET')
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Missing schema for url path args in %s handler class.' % (
+                    handler_class_name))
+
+        schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
+        normalized_arg_values, errors = (
+            payload_validator.validate(
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+        )
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+        # This check ensures that if a request method is not defined
+        # in the handler class then schema validation will not raise
+        # NotImplementedError for that corresponding request method.
+        if request_method in ['GET', 'POST', 'PUT', 'DELETE'] and (
+                getattr(self.__class__, request_method.lower()) ==
+                getattr(BaseHandler, request_method.lower())):
+            return
+
+        try:
+            schema_for_request_method = self.HANDLER_ARGS_SCHEMAS[
+                request_method]
+        except Exception:
+            raise NotImplementedError(
+                'Missing schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name))
+
+        normalized_arg_values, errors = (
+            payload_validator.validate(
+                handler_args, schema_for_request_method, extra_args_are_allowed)
+        )
+
+        self.normalized_payload = {
+            arg: normalized_arg_values.get(arg) for arg in payload_arg_keys
+        }
+        self.normalized_request = {
+            arg: normalized_arg_values.get(arg) for arg in request_arg_keys
+        }
+
+        # The following keys are absent in request/payload but present in
+        # normalized_arg_values because these args are populated from their
+        # default_value provided in the schema.
+        keys_that_correspond_to_default_values = list(
+            set(normalized_arg_values.keys()) -
+            set(payload_arg_keys + request_arg_keys)
+        )
+        # Populate the payload/request with the default args before passing
+        # execution onwards to the handler.
+        for arg in keys_that_correspond_to_default_values:
+            if request_method in ['GET', 'DELETE']:
+                self.normalized_request[arg] = normalized_arg_values.get(arg)
+            else:
+                self.normalized_payload[arg] = normalized_arg_values.get(arg)
+
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
 
     @property
     def current_user_is_site_maintainer(self):
@@ -308,7 +445,7 @@ class BaseHandler(webapp2.RequestHandler):
         """
         return (
             self.current_user_is_super_admin or
-            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+            feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
 
     def _is_requested_path_currently_accessible_to_user(self):
         """Checks whether the requested path is currently accessible to user.
@@ -439,6 +576,11 @@ class BaseHandler(webapp2.RequestHandler):
                     'error-iframed.mainpage.html', iframe_restriction=None)
             elif values['status_code'] == 503:
                 self.render_template('maintenance-page.mainpage.html')
+            elif values['status_code'] == 404:
+                # Only 404 routes can be handled with angular router as it only
+                # has access to the path, not to the status code.
+                # That's why 404 status code is treated differently.
+                self.render_template('oppia-root.mainpage.html')
             else:
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])

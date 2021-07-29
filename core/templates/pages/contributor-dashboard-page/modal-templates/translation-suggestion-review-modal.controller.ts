@@ -19,33 +19,41 @@
 
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
+require('domain/utilities/language-util.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
-    'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
-    'initialSuggestionId', 'reviewable', 'subheading',
-    'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
-    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT',
+    'LanguageUtilService', 'SiteAnalyticsService', 'UrlInterpolationService',
+    'UserService', 'ValidatorsService', 'initialSuggestionId', 'reviewable',
+    'subheading', 'suggestionIdToContribution', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT', 'MAX_REVIEW_MESSAGE_LENGTH',
     function(
         $http, $scope, $uibModalInstance, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
-        SiteAnalyticsService, UrlInterpolationService, UserService,
-        initialSuggestionId, reviewable, subheading, suggestionIdToContribution,
-        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT) {
+        LanguageUtilService, SiteAnalyticsService, UrlInterpolationService,
+        UserService, ValidatorsService, initialSuggestionId, reviewable,
+        subheading, suggestionIdToContribution, ACTION_ACCEPT_SUGGESTION,
+        ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT, MAX_REVIEW_MESSAGE_LENGTH) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
       $scope.activeContribution = suggestionIdToContribution[
         $scope.activeSuggestionId];
       $scope.activeSuggestion = $scope.activeContribution.suggestion;
+      $scope.authorName = $scope.activeSuggestion.author_name;
+      $scope.languageDescription = (
+        LanguageUtilService.getAudioLanguageDescription(
+          $scope.activeSuggestion.language_code));
       $scope.activeContributionDetails = $scope.activeContribution.details;
       $scope.subheading = subheading;
+      $scope.MAX_REVIEW_MESSAGE_LENGTH = MAX_REVIEW_MESSAGE_LENGTH;
       $scope.startedEditing = false;
       $scope.translationUpdated = false;
       $scope.HTML_SCHEMA = {
@@ -108,7 +116,7 @@ angular.module('oppia').controller(
           language_code;
         UserService.getUserInfoAsync().then(userInfo => {
           $scope.username = userInfo.getUsername();
-          $scope.isAdmin = userInfo.isAdmin();
+          $scope.isCurriculumAdmin = userInfo.isCurriculumAdmin();
         });
         UserService.getUserContributionRightsDataAsync().then(
           userContributionRights => {
@@ -193,14 +201,17 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function(reviewMessage) {
-        $scope.resolvingSuggestion = true;
-        SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
-          'Translation');
+        if (ValidatorsService.isValidReviewMessage(reviewMessage,
+          /* ShowWarnings= */ true)) {
+          $scope.resolvingSuggestion = true;
+          SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
+            'Translation');
 
-        ContributionAndReviewService.resolveSuggestionToExploration(
-          $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
-          generateCommitMessage(), $scope.showNextItemToReview);
+          ContributionAndReviewService.resolveSuggestionToExploration(
+            $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
+            ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
+            generateCommitMessage(), $scope.showNextItemToReview);
+        }
       };
 
       $scope.editSuggestion = function() {

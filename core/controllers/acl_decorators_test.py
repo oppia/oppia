@@ -16,14 +16,15 @@
 
 """Tests for core.domain.acl_decorators."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
@@ -61,6 +62,14 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
@@ -69,10 +78,10 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PlayExplorationDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -103,8 +112,8 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_play_exploration/%s' % self.private_exp_id,
                 expected_status_int=404)
 
-    def test_admin_can_access_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_access_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id)
@@ -140,6 +149,14 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_collection
         def get(self, collection_id):
@@ -148,10 +165,10 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PlayCollectionDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -183,8 +200,8 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_play_collection/%s' % self.private_col_id,
                 expected_status_int=404)
 
-    def test_admin_can_access_private_collection(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_access_private_collection(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_collection/%s' % self.private_col_id)
@@ -228,6 +245,14 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_collection
         def get(self, collection_id):
@@ -236,11 +261,11 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(EditCollectionDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -300,12 +325,13 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
 
-    def test_moderator_cannot_edit_private_collection(self):
+    def test_moderator_can_edit_private_collection(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_collection/%s' % self.private_col_id,
-                expected_status_int=401)
+            response = self.get_json(
+                '/mock_edit_collection/%s' % self.private_col_id)
+
+        self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
 
     def test_moderator_can_edit_public_collection(self):
@@ -317,7 +343,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_any_private_collection(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_collection/%s' % self.private_col_id)
@@ -333,6 +359,8 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_exploration
         def get(self):
@@ -342,7 +370,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
         super(CreateExplorationDecoratorTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_banned_users([self.username])
+        self.mark_user_banned(self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/create', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -381,6 +409,8 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_collection
         def get(self):
@@ -390,9 +420,9 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         super(CreateCollectionDecoratorTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_collection_editors([self.username])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/create', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -422,13 +452,6 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['success'], True)
         self.logout()
 
-    def test_admins_can_create_collection(self):
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/create')
-        self.assertEqual(response['success'], True)
-        self.logout()
-
 
 class AccessCreatorDashboardTests(test_utils.GenericTestBase):
     """Tests for can_access_creator_dashboard decorator."""
@@ -438,6 +461,8 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_creator_dashboard
         def get(self):
@@ -447,7 +472,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
         super(AccessCreatorDashboardTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_banned_users([self.username])
+        self.mark_user_banned(self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/access', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -476,6 +501,14 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'thread_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_comment_on_feedback_thread
         def get(self, thread_id):
@@ -485,11 +518,11 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         super(CommentOnFeedbackThreadTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -571,8 +604,8 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
                 % (self.published_exp_id))
         self.logout()
 
-    def test_admin_can_comment_on_feeback_for_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_comment_on_feeback_for_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
@@ -590,6 +623,14 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_feedback_thread
         def get(self, exploration_id):
@@ -599,11 +640,11 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         super(CreateFeedbackThreadTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -654,8 +695,8 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_create_feedback_thread/%s' % self.published_exp_id)
         self.logout()
 
-    def test_admin_can_create_feeback_for_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_create_feeback_for_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s' % self.private_exp_id)
@@ -672,6 +713,14 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'thread_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_view_feedback_thread
         def get(self, thread_id):
@@ -681,11 +730,11 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         super(ViewFeedbackThreadTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -751,8 +800,8 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
         self.logout()
 
-    def test_admin_can_view_feeback_for_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_view_feeback_for_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id)
@@ -766,6 +815,18 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'query_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+            'PUT': {}
+        }
 
         @acl_decorators.can_manage_email_dashboard
         def get(self):
@@ -778,9 +839,8 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
     def setUp(self):
 
         super(ManageEmailDashboardTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
@@ -796,8 +856,8 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
-    def test_admin_can_access_email_dashboard(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_super_admin_can_access_email_dashboard(self):
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -817,6 +877,14 @@ class RateExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_rate_exploration
         def get(self, exploration_id):
@@ -849,6 +917,8 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_moderator_page
         def get(self):
@@ -856,9 +926,9 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AccessModeratorPageTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -870,8 +940,8 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
-    def test_admin_can_access_moderator_page(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_access_moderator_page(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -887,6 +957,14 @@ class FlagExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_flag_exploration
         def get(self, exploration_id):
@@ -921,6 +999,8 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_subscribe_to_users
         def get(self):
@@ -953,6 +1033,8 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_send_moderator_emails
         def get(self):
@@ -960,9 +1042,9 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SendModeratorEmailsTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -974,8 +1056,8 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
-    def test_admin_can_send_moderator_emails(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_send_moderator_emails(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -989,6 +1071,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_release_coordinator_page
         def get(self):
@@ -996,13 +1080,13 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanAccessReleaseCoordinatorPageDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -1054,6 +1138,398 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_access_blog_admin_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessBlogAdminPageDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/blog-admin', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_blog_admin_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access blog admin page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_blog_admin_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_blog_post_editor_cannot_access_blog_admin_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access blog admin page.')
+        self.logout()
+
+    def test_blog_admin_can_access_blog_admin_page(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blog-admin')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_manage_blog_post_editors
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanManageBlogPostEditorsDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/blogadminrolehandler', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_manage_blog_post_editors(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blogadminrolehandler', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to add or remove blog post editors.')
+        self.logout()
+
+    def test_guest_user_cannot_manage_blog_post_editors(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blogadminrolehandler', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_blog_post_editors_cannot_manage_blog_post_editors(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blogadminrolehandler', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to add or remove blog post editors.')
+        self.logout()
+
+    def test_blog_admin_can_manage_blog_editors(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blogadminrolehandler')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_access_blog_dashboard
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessBlogDashboardDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/blog-dashboard', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_blog_dashboard(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-dashboard', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access blog dashboard page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_blog_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/blog-dashboard', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_blog_editors_can_access_blog_dashboard(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blog-dashboard')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_blog_admins_can_access_blog_dashboard(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/blog-dashboard')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanDeleteBlogPostTests(test_utils.GenericTestBase):
+    """Tests for can_delete_blog_post decorator."""
+
+    username = 'userone'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'unicode'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_delete_blog_post
+        def get(self, blog_post_id):
+            self.render_json({'blog_id': blog_post_id})
+
+    def setUp(self):
+        super(CanDeleteBlogPostTests, self).setUp()
+        self.signup(self.user_email, self.username)
+
+        self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.add_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_delete_blog_post/<blog_post_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        self.blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
+        self.blog_post_id = blog_post.id
+
+    def test_guest_can_not_delete_blog_post(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_blog_editor_can_delete_owned_blog_post(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_admin_can_delete_any_blog_post(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_editor_cannot_delete_not_owned_blog_post(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'User %s does not have permissions to delete blog post %s'
+                % (self.user_id, self.blog_post_id))
+        self.logout()
+
+
+class CanEditBlogPostTests(test_utils.GenericTestBase):
+    """Tests for can_edit_blog_post decorator."""
+
+    username = 'userone'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'blog_post_id': {
+                'schema': {
+                    'type': 'unicode'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {},
+        }
+
+        @acl_decorators.can_edit_blog_post
+        def get(self, blog_post_id):
+            self.render_json({'blog_id': blog_post_id})
+
+    def setUp(self):
+        super(CanEditBlogPostTests, self).setUp()
+        self.signup(
+            self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
+        self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.add_user_role(
+            self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.add_user_role(
+            self.BLOG_ADMIN_USERNAME, feconf.ROLE_ID_BLOG_ADMIN)
+        self.add_user_role(self.username, feconf.ROLE_ID_BLOG_POST_EDITOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_edit_blog_post/<blog_post_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+        self.blog_editor_id = (
+            self.get_user_id_from_email(self.BLOG_EDITOR_EMAIL))
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        blog_post = blog_services.create_new_blog_post(self.blog_editor_id)
+        self.blog_post_id = blog_post.id
+
+    def test_guest_can_not_edit_blog_post(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_blog_editor_can_edit_owned_blog_post(self):
+        self.login(self.BLOG_EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_admin_can_edit_any_blog_post(self):
+        self.login(self.BLOG_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id)
+        self.assertEqual(response['blog_id'], self.blog_post_id)
+        self.logout()
+
+    def test_blog_editor_cannot_edit_not_owned_blog_post(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_blog_post/%s' % self.blog_post_id,
+                expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'User %s does not have permissions to edit blog post %s'
+                % (self.user_id, self.blog_post_id))
+        self.logout()
+
+
 class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     username = 'user'
@@ -1061,6 +1537,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_run_any_job
         def get(self):
@@ -1068,13 +1546,13 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanRunAnyJobDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -1130,6 +1608,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_memcache
         def get(self):
@@ -1137,13 +1617,13 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CanManageMemcacheDecoratorTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -1195,6 +1675,132 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+    QUESTION_ADMIN_EMAIL = 'questionExpert@app.com'
+    QUESTION_ADMIN_USERNAME = 'questionExpert'
+    TRANSLATION_ADMIN_EMAIL = 'translatorExpert@app.com'
+    TRANSLATION_ADMIN_USERNAME = 'translationExpert'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'category': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.can_manage_contributors_role
+        def get(self, unused_category):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanManageContributorsRoleDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.TRANSLATION_ADMIN_EMAIL, self.TRANSLATION_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.TRANSLATION_ADMIN_USERNAME, feconf.ROLE_ID_TRANSLATION_ADMIN)
+
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/can_manage_contributors_role/<category>', self.MockHandler)
+            ], debug=feconf.DEBUG))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to modify contributor\'s role.')
+        self.logout()
+
+    def test_guest_user_cannot_manage_contributors_role(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_translation_admin_can_manage_translation_role(self):
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_translation_admin_cannot_manage_question_role(self):
+        self.login(self.TRANSLATION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/question',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to modify contributor\'s role.')
+        self.logout()
+
+    def test_question_admin_can_manage_question_role(self):
+        self.login(self.QUESTION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/question')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+    def test_question_admin_cannot_manage_translation_role(self):
+        self.login(self.QUESTION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/translation',
+                expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to modify contributor\'s role.')
+        self.logout()
+
+    def test_invalid_category_raise_error(self):
+        self.login(self.QUESTION_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/can_manage_contributors_role/invalid',
+                expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid category: invalid')
+        self.logout()
+
+
 class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     username = 'user'
@@ -1202,6 +1808,8 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_delete_any_user
         def get(self):
@@ -1209,7 +1817,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DeleteAnyUserTests, self).setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -1249,6 +1857,14 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_voiceover_exploration
         def get(self, exploration_id):
@@ -1258,17 +1874,24 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         super(VoiceoverExplorationTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.banned_username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mark_user_banned(self.banned_username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.add_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1285,10 +1908,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
     def test_banned_user_cannot_voiceover_exploration(self):
         self.login(self.banned_user_email)
@@ -1311,15 +1932,16 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
-    def test_moderator_cannot_voiceover_private_exploration(self):
+    def test_moderator_can_voiceover_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_admin_can_voiceover_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
@@ -1339,20 +1961,6 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
 
-    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self):
-        self.login(self.VOICE_ARTIST_EMAIL)
-        # Checking voice artist can voiceover assigned private exploration.
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id_1)
-        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
-
-        # Checking voice artist cannot voiceover private exploration which
-        # he/she is not assigned for.
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_2, expected_status_int=401)
-        self.logout()
-
     def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_public_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1368,6 +1976,157 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class VoiceArtistManagementTests(test_utils.GenericTestBase):
+
+    role = rights_domain.ROLE_VOICE_ARTIST
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banneduser@example.com'
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'entity_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
+
+        @acl_decorators.can_manage_voice_artist
+        def post(self, entity_type, entity_id):
+            self.render_json({
+                'entity_type': entity_type,
+                'entity_id': entity_id})
+
+    def setUp(self):
+        super(VoiceArtistManagementTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mark_user_banned(self.banned_username)
+        user_services.add_user_role(
+            self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock/<entity_type>/<entity_id>', self.MockHandler)],
+            debug=feconf.DEBUG,))
+        self.save_new_valid_exploration(
+            self.published_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
+
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
+            self.role)
+
+    def test_voiceover_admin_can_manage_voice_artist_in_public_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/%s' % self.published_exp_id_1,
+                {}, csrf_token=csrf_token)
+        self.logout()
+
+    def test_assigning_voice_artist_for_unsupported_entity_type_raise_400(self):
+        unsupported_entity_type = 'topic'
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/%s/%s' % (
+                    unsupported_entity_type, self.published_exp_id_1),
+                {}, csrf_token=csrf_token, expected_status_int=400)
+            self.assertEqual(
+                response['error'],
+                'Unsupported entity_type: topic')
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voice_artist_in_private_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_owner_cannot_assign_voice_artist_in_public_exp(self):
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_random_user_cannot_assign_voice_artist_in_public_exp(self):
+        self.login(self.user_email)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to manage voice artists.')
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voice_artist_in_invalid_exp(self):
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/invalid_exp_id', {},
+                csrf_token=csrf_token, expected_status_int=404)
+        self.logout()
+
+    def test_voiceover_admin_cannot_assign_voice_artist_without_login(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/mock/exploration/%s' % self.private_exp_id_1, {},
+                csrf_token=csrf_token, expected_status_int=401)
+
+
 class EditExplorationTests(test_utils.GenericTestBase):
     """Tests for can_edit_exploration decorator."""
 
@@ -1378,6 +2137,14 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_exploration
         def get(self, exploration_id):
@@ -1387,12 +2154,12 @@ class EditExplorationTests(test_utils.GenericTestBase):
         super(EditExplorationTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mark_user_banned(self.username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -1438,16 +2205,17 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.published_exp_id)
         self.logout()
 
-    def test_moderator_cannot_edit_private_exploration(self):
+    def test_moderator_can_edit_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_exploration/%s' % self.private_exp_id,
-                expected_status_int=401)
+            response = self.get_json(
+                '/mock_edit_exploration/%s' % self.private_exp_id)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
     def test_admin_can_edit_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id)
@@ -1465,6 +2233,8 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_own_account
         def get(self):
@@ -1474,7 +2244,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
         super(ManageOwnAccountTests, self).setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1499,6 +2269,8 @@ class UploadExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_upload_exploration
         def get(self):
@@ -1506,7 +2278,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UploadExplorationTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_upload_exploration/', self.MockHandler)],
@@ -1514,7 +2286,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
         ))
 
     def test_super_admin_can_upload_explorations(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_upload_exploration/')
         self.logout()
@@ -1546,6 +2318,14 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_delete_exploration
         def get(self, exploration_id):
@@ -1607,16 +2387,13 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
                 % (self.owner_id, self.published_exp_id))
         self.logout()
 
-    def test_moderator_cannot_delete_private_exploration(self):
+    def test_moderator_can_delete_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_delete_exploration/%s' % self.private_exp_id,
-                expected_status_int=401)
-            self.assertEqual(
-                response['error'],
-                'User %s does not have permissions to delete exploration %s'
-                % (self.moderator_id, self.private_exp_id))
+                '/mock_delete_exploration/%s' % self.private_exp_id)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
 
@@ -1631,6 +2408,14 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_suggest_changes_to_exploration
         def get(self, exploration_id):
@@ -1640,7 +2425,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         super(SuggestChangesToExplorationTests, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
-        self.set_banned_users([self.banned_username])
+        self.mark_user_banned(self.banned_username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1672,6 +2457,8 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_suggest_changes
         def get(self):
@@ -1681,7 +2468,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
         super(SuggestChangesDecoratorsTests, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
-        self.set_banned_users([self.banned_username])
+        self.mark_user_banned(self.banned_username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1722,6 +2509,14 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'suggestion_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_resubmit_suggestion
         def get(self, suggestion_id):
@@ -1784,6 +2579,19 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'suggestion_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'target_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.get_decorator_for_accepting_suggestion(
             acl_decorators.can_edit_exploration)
@@ -1857,6 +2665,14 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_publish_exploration
         def get(self, exploration_id):
@@ -1866,9 +2682,9 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         super(PublishExplorationTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1900,7 +2716,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_already_published_exploration_cannot_be_published(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_exploration/%s' % self.public_exp_id,
@@ -1916,7 +2732,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_publish_any_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_exploration/%s' % self.private_exp_id)
@@ -1930,6 +2746,14 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_modify_exploration_roles
         def get(self, exploration_id):
@@ -1939,9 +2763,9 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         super(ModifyExplorationRolesTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
@@ -1957,15 +2781,14 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
-    def test_moderator_cannot_modify_roles_of_unowned_exploration(self):
+    def test_moderator_can_modify_roles_of_unowned_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id, expected_status_int=401)
+            self.get_json('/mock/%s' % self.private_exp_id)
         self.logout()
 
     def test_admin_can_modify_roles_of_any_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id)
         self.assertEqual(response['exploration_id'], self.private_exp_id)
@@ -1984,6 +2807,14 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     class MockPublishHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_publish_collection
         def get(self, collection_id):
@@ -1991,6 +2822,14 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     class MockUnpublishHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_unpublish_collection
         def get(self, collection_id):
@@ -1999,11 +2838,11 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CollectionPublishStatusTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -2072,7 +2911,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_publish_any_collection(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_collection/%s' % self.private_col_id)
@@ -2080,7 +2919,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_cannot_publish_already_published_collection(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_collection/%s' % self.published_col_id,
@@ -2098,6 +2937,8 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_learner_dashboard
         def get(self):
@@ -2107,7 +2948,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         super(AccessLearnerDashboardDecoratorTests, self).setUp()
         self.signup(self.user_email, self.user)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -2137,6 +2978,14 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_topic
         def get(self, topic_id):
@@ -2144,17 +2993,15 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EditTopicDecoratorTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.manager_username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
@@ -2167,18 +3014,19 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-        topic_services.assign_role(
-            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+        self.set_topic_managers([self.manager_username], self.topic_id)
+        self.manager = user_services.get_user_actions_info(self.manager_id)
 
     def test_can_not_edit_topic_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_topic/invalid_topic_id', expected_status_int=404)
         self.logout()
 
     def test_admin_can_edit_topic(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_topic/%s' % self.topic_id)
         self.assertEqual(response['topic_id'], self.topic_id)
@@ -2209,6 +3057,14 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'story_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_story
         def get(self, story_id):
@@ -2216,10 +3072,10 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EditStoryDecoratorTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -2237,14 +3093,14 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_can_not_edit_story_with_invalid_story_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/story_id_new', expected_status_int=404)
         self.logout()
 
     def test_can_not_edit_story_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(story_id, self.admin_id, topic_id)
@@ -2254,7 +3110,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_story(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_story/%s' % self.story_id)
         self.assertEqual(response['story_id'], self.story_id)
@@ -2262,11 +3118,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_topic_manager_can_edit_story(self):
         self.signup(self.manager_email, self.manager_username)
-        self.set_topic_managers([self.manager_username])
-        manager_id = self.get_user_id_from_email(self.manager_email)
-        manager = user_services.get_user_actions_info(manager_id)
-        topic_services.assign_role(
-            self.admin, manager, topic_domain.ROLE_MANAGER, self.topic_id)
+        self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2295,6 +3147,14 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_add_new_story_to_topic
         def get(self, topic_id):
@@ -2302,16 +3162,14 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AddStoryToTopicTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.manager_username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -2326,11 +3184,12 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-        topic_services.assign_role(
-            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+        self.set_topic_managers([self.manager_username], self.topic_id)
+        self.manager = user_services.get_user_actions_info(self.manager_id)
 
     def test_can_not_add_story_to_topic_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_add_story_to_topic/invalid_topic_id',
@@ -2338,7 +3197,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_add_story_to_topic(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id)
@@ -2391,25 +3250,62 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'story_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, story_url_fragment):
             self.render_json({'story_url_fragment': story_url_fragment})
 
     class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'story_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_story_viewer_page
         def get(self, _):
             self.render_template('story-viewer-page.mainpage.html')
 
     def setUp(self):
         super(StoryViewerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         story_data_url = (
             '/mock_story_data/<classroom_url_fragment>/'
             '<topic_url_fragment>/<story_url_fragment>')
@@ -2542,25 +3438,62 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'subtopic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_subtopic_viewer_page
         def get(self, unused_topic_url_fragment, subtopic_url_fragment):
             self.render_json({'subtopic_url_fragment': subtopic_url_fragment})
 
     class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'subtopic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_subtopic_viewer_page
         def get(self, unused_topic_url_fragment, unused_subtopic_url_fragment):
             self.render_template('subtopic-viewer-page.mainpage.html')
 
     def setUp(self):
         super(SubtopicViewerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         subtopic_data_url = (
             '/mock_subtopic_data/<classroom_url_fragment>/'
             '<topic_url_fragment>/<subtopic_url_fragment>')
@@ -2679,25 +3612,52 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
     class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
         def get(self, topic_name):
             self.render_json({'topic_name': topic_name})
 
     class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_topic_viewer_page
         def get(self, unused_topic_name):
             self.render_template('topic-viewer-page.mainpage.html')
 
     def setUp(self):
         super(TopicViewerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         topic_data_url = (
             '/mock_topic_data/<classroom_url_fragment>/<topic_url_fragment>')
         topic_page_url = (
@@ -2786,6 +3746,8 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_skill
         def get(self):
@@ -2793,13 +3755,13 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CreateSkillTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_create_skill', self.MockHandler)],
@@ -2807,7 +3769,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_create_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_create_skill')
         self.logout()
@@ -2841,6 +3803,14 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'skill_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_question_skill_status
         def get(self, skill_id):
@@ -2848,10 +3818,10 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ManageQuestionSkillStatusTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
@@ -2869,7 +3839,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
             self.admin_id, self.question_id, self.skill_id, 0.5)
 
     def test_admin_can_manage_question_skill_status(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_question_skill_status/%s' % self.skill_id)
@@ -2905,6 +3875,8 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_topic
         def get(self):
@@ -2912,13 +3884,13 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CreateTopicTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_create_topic', self.MockHandler)],
@@ -2926,7 +3898,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_create_topic(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_create_topic')
         self.logout()
@@ -2959,6 +3931,14 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_rights_for_topic
         def get(self, topic_id):
@@ -2966,13 +3946,13 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ManageRightsForTopicTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -2982,7 +3962,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_admin_can_manage_rights(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_manage_rights_for_topic/%s' % self.topic_id)
         self.logout()
@@ -3016,6 +3996,14 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_change_topic_publication_status
         def get(self, topic_id):
@@ -3025,13 +4013,13 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ChangeTopicPublicationStatusTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -3048,14 +4036,14 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         ))
 
     def test_admin_can_change_topic_publication_status(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_change_publication_status/%s' % self.topic_id)
         self.logout()
 
     def test_can_not_change_topic_publication_status_with_invalid_topic_id(
             self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_change_publication_status/invalid_topic_id',
@@ -3091,6 +4079,8 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_perform_cron_tasks
         def get(self):
@@ -3098,10 +4088,10 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(PerformCronTaskTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.viewer_email, self.viewer_username)
 
@@ -3111,7 +4101,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
         ))
 
     def test_super_admin_can_perform_cron_tasks(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_perform_cron_task')
         self.logout()
@@ -3140,6 +4130,14 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'skill_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_skill
         def get(self, skill_id):
@@ -3147,19 +4145,31 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EditSkillDecoratorTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.second_admin_email, self.second_admin_username)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_admins([self.ADMIN_USERNAME, self.second_admin_username])
-        self.set_topic_managers([self.manager_username])
+        self.set_curriculum_admins(
+            [self.CURRICULUM_ADMIN_USERNAME, self.second_admin_username])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.second_admin_id = self.get_user_id_from_email(
             self.second_admin_email)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.manager = user_services.get_user_actions_info(self.manager_id)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_skill/<skill_id>', self.MockHandler)],
@@ -3167,14 +4177,14 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         ))
 
     def test_cannot_edit_skill_with_invalid_skill_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_custom_response(
                 '/mock_edit_skill/', 'text/plain', expected_status_int=404)
         self.logout()
 
     def test_admin_can_edit_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
         self.assertEqual(response['skill_id'], self.skill_id)
@@ -3208,6 +4218,14 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_question
         def get(self, question_id):
@@ -3216,25 +4234,38 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(EditQuestionDecoratorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email('a@example.com')
         self.question_id = 'question_id'
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
         self.save_new_question(
             self.question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3252,7 +4283,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_cannot_edit_question_with_invalid_question_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_question/invalid_question_id',
@@ -3260,7 +4291,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_question(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id)
@@ -3291,6 +4322,14 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'question_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_question
         def get(self, question_id):
@@ -3326,6 +4365,19 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'entity_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_entity
         def get(self, entity_type, entity_id):
@@ -3335,10 +4387,10 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PlayEntityDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3413,6 +4465,19 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'entity_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'entity_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_entity
         def get(self, entity_type, entity_id):
@@ -3423,13 +4488,13 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         super(EditEntityDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mark_user_banned(self.username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3477,7 +4542,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_question_with_valid_question_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_QUESTION, self.question_id))
@@ -3486,7 +4551,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_topic(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.admin_id, name='Name',
@@ -3501,7 +4566,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_topic_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         topic_id = 'incorrect_id'
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -3511,7 +4576,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3522,7 +4587,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_story(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(story_id, self.admin_id, topic_id)
@@ -3559,6 +4624,14 @@ class SaveExplorationTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_save_exploration
         def get(self, exploration_id):
@@ -3568,17 +4641,25 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         super(SaveExplorationTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.banned_username])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.mark_user_banned(self.banned_username)
+        self.add_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -3595,10 +4676,8 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.voiceover_admin, self.published_exp_id_1, self.voice_artist_id,
             self.role)
-        rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
     def test_unautheticated_user_cannot_save_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3633,15 +4712,16 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
-    def test_moderator_cannot_save_private_exploration(self):
+    def test_moderator_can_save_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_admin_can_save_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
@@ -3668,6 +4748,26 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
     class MockHandler(base.OppiaMLVMHandler):
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'vm_id': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'message': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                },
+                'signature': {
+                    'schema': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        }
 
         def extract_request_message_vm_id_and_signature(self):
             """Returns message, vm_id and signature retrived from incoming
@@ -3754,8 +4854,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     """Tests for can_update_suggestion decorator."""
 
-    admin_username = 'adn'
-    admin_email = 'admin@example.com'
+    curriculum_admin_username = 'adn'
+    curriculum_admin_email = 'admin@example.com'
     author_username = 'author'
     author_email = 'author@example.com'
     hi_language_reviewer = 'reviewer1@example.com'
@@ -3766,16 +4866,25 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     exploration_id = 'exp_id'
     target_version_id = 1
     change_dict = {
-        'cmd': 'add_translation',
+        'cmd': 'add_written_translation',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '<p>old content html</p>',
         'state_name': 'State 1',
-        'translation_html': '<p>Translation for content.</p>'
+        'translation_html': '<p>Translation for content.</p>',
+        'data_format': 'html'
     }
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'suggestion_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_update_suggestion
         def get(self, suggestion_id):
@@ -3785,18 +4894,19 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         super(DecoratorForUpdatingSuggestionTests, self).setUp()
         self.signup(self.author_email, self.author_username)
         self.signup(self.user_email, self.username)
-        self.signup(self.admin_email, self.admin_username)
+        self.signup(self.curriculum_admin_email, self.curriculum_admin_username)
         self.signup(self.hi_language_reviewer, 'reviewer1')
         self.signup(self.en_language_reviewer, 'reviewer2')
         self.author_id = self.get_user_id_from_email(self.author_email)
-        self.admin_id = self.get_user_id_from_email(self.admin_email)
+        self.admin_id = self.get_user_id_from_email(self.curriculum_admin_email)
         self.hi_language_reviewer_id = self.get_user_id_from_email(
             self.hi_language_reviewer)
         self.en_language_reviewer_id = self.get_user_id_from_email(
             self.en_language_reviewer)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.author = user_services.get_user_actions_info(self.author_id)
-        user_services.update_user_role(self.admin_id, feconf.ROLE_ID_ADMIN)
+        user_services.add_user_role(
+            self.admin_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
         user_services.allow_user_to_review_translation_in_language(
             self.hi_language_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
@@ -3906,7 +5016,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self):
-        self.login(self.admin_email)
+        self.login(self.curriculum_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id)
@@ -3915,7 +5025,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_update_any_given_question_suggestion(self):
-        self.login(self.admin_email)
+        self.login(self.curriculum_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
         self.assertEqual(response['suggestion_id'], self.question_suggestion_id)

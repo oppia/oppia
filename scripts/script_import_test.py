@@ -22,8 +22,8 @@ in start, then adding the same import statement in a test function
 (as done in this file) creates a conflict.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import subprocess
@@ -77,5 +77,9 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 sys.executable, '-m', 'pip', 'install',
                 'certifi==2020.12.5', '--target',
                 '../oppia_tools/certifi-2020.12.5',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'typing==3.7.4.3', '--target',
+                'third_party/python_libs',
                 '--user', '--prefix=', '--system',
             ])

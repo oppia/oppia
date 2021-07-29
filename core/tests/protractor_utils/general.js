@@ -51,6 +51,12 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
     'relyingparty/verifyPassword?key=fake-api-key'),
+  // This error covers the case when the PencilCode site uses an
+  // invalid SSL certificate (which can happen when it expires).
+  // In such cases, we ignore the error since it is out of our control.
+  _.escapeRegExp(
+    'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
+    'load resource: net::ERR_CERT_DATE_INVALID'),
 ];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
@@ -62,8 +68,8 @@ var checkForConsoleErrors = async function(errorsToIgnore) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
 
-  const browserLogs = await browser.manage().logs().get('browser');
-  const browserErrors = browserLogs.filter(logEntry => (
+  var browserLogs = await browser.manage().logs().get('browser');
+  var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
   expect(browserErrors).toEqual([]);
@@ -150,11 +156,17 @@ var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
-    '.oppia-base-container'));
+    '.protractor-test-base-container'));
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
-  var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
+
+  // We try to avoid browser.executeScript whereas possible as it
+  // can introduce flakiness.
+  // The usage here is only allowed because this the recommended approach
+  // by protractor to read innerHTML.
+  let promiseValue = await browser.executeScript(
+    'return arguments[0].innerHTML;', oppiaBaseContainer);
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
@@ -172,7 +184,7 @@ var ensurePageHasNoTranslationIds = async function() {
 
 var acceptPrompt = async function(promptResponse) {
   await waitFor.alertToBePresent();
-  const alert = await browser.switchTo().alert();
+  var alert = await browser.switchTo().alert();
   await alert.sendKeys(promptResponse);
   await alert.accept();
   await waitFor.pageToFullyLoad();

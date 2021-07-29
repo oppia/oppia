@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -35,18 +34,19 @@ import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-vid
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { PortalModule } from '@angular/cdk/portal';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,
     NgbModalModule,
     NgbNavModule,
     NgbTooltipModule,
+    PortalModule,
     YouTubePlayerModule
   ],
   declarations: [

@@ -14,8 +14,8 @@
 
 """Tests for the topic viewer page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import question_services
@@ -37,9 +37,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         super(BaseTopicViewerControllerTests, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.topic_id = 'topic'
@@ -67,7 +67,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'subtopic-name'))
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.svg'
@@ -120,7 +120,7 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
         self.get_html_response(
             '/learn/staging/%s' % 'private',
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response('/learn/staging/%s' % 'private')
         self.logout()
 
@@ -162,6 +162,7 @@ class TopicPageDataHandlerTests(
             'subtopics': [{
                 u'thumbnail_filename': u'image.svg',
                 u'thumbnail_bg_color': u'#FFFFFF',
+                u'thumbnail_size_in_bytes': 21131,
                 u'skill_ids': [self.skill_id_2],
                 u'id': 1,
                 u'title': u'subtopic_name',
@@ -228,6 +229,7 @@ class TopicPageDataHandlerTests(
                 'subtopics': [{
                     u'thumbnail_filename': u'image.svg',
                     u'thumbnail_bg_color': u'#FFFFFF',
+                    u'thumbnail_size_in_bytes': 21131,
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name',

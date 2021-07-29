@@ -22,14 +22,15 @@ import { MetaTagCustomizationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Meta Tag Customization Service', () => {
-  let mtcs, wrs;
+  let mtcs: MetaTagCustomizationService;
+  let wrs: WindowRef;
 
   beforeEach(() => {
-    mtcs = TestBed.get(MetaTagCustomizationService);
-    wrs = TestBed.get(WindowRef);
+    mtcs = TestBed.inject(MetaTagCustomizationService);
+    wrs = TestBed.inject(WindowRef);
   });
 
-  it('should add a meta tag in the html head', () => {
+  it('should replace a meta tag in the html head', () => {
     const metaTags = [
       {
         propertyType: 'name',
@@ -37,14 +38,24 @@ describe('Meta Tag Customization Service', () => {
         content: 'Oppia.org'
       }
     ];
+
+    let removeSpy = jasmine.createSpy();
+
+    spyOn(wrs.nativeWindow.document, 'querySelector').and.returnValue({
+      remove: () => {
+        removeSpy();
+      }
+    } as Element);
+
     const appendChildSpy = spyOn(
       wrs.nativeWindow.document.head, 'appendChild').and.callThrough();
-    mtcs.addMetaTags(metaTags);
+    mtcs.addOrReplaceMetaTags(metaTags);
 
     const meta = wrs.nativeWindow.document.createElement('meta');
     meta.setAttribute('name', 'application-name');
     meta.setAttribute('content', 'Oppia.org');
 
+    expect(removeSpy).toHaveBeenCalled();
     expect(appendChildSpy).toHaveBeenCalledWith(meta);
   });
 });

@@ -36,12 +36,32 @@
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
-        <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
-        <schema-based-editor [schema]="getHtmlSchema.bind(this)"
+        <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
+        <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
+                             [schema]="getHtmlSchema.bind(this)"
+                             [localValue]="activeWrittenTranslation.html"
+                             (localValueChange)="updateHtml($event)">
+        </schema-based-editor>
+        <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
+                             [schema]="getUnicodeSchema.bind(this)"
                              [localValue]="activeWrittenTranslation.html"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
       </div>
+    </div>
+    <div class="oppia-translation-error-section">
+      <p *ngIf="hasImgCopyError">
+        All images should be copied.
+      </p>
+      <p *ngIf="hasImgTextError">
+        Image caption and/or description should be translated if they exist.
+      </p>
+      <p *ngIf="hadCopyParagraphError">
+        Paragraphs are not allowed to be copied. Please make sure to translate the text.
+      </p>
+      <p *ngIf="hasIncompleteTranslationError">
+        Translation is incomplete. Please make sure all elements in the original content are included in the translated content.
+      </p>
     </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">
@@ -165,5 +185,8 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  .oppia-translation-error-section {
+    color: red;
   }
 </style>

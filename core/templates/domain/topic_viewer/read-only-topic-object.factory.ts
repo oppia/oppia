@@ -20,10 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ShortSkillSummary } from
-  'domain/skill/short-skill-summary.model';
-import { StorySummaryBackendDict, StorySummary } from
-  'domain/story/story-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { StorySummaryBackendDict, StorySummary } from 'domain/story/story-summary.model';
 import {
   SkillIdToDescriptionMap,
   SubtopicBackendDict,
@@ -168,7 +166,7 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes);
+            storyDict.url_fragment, allNodes, null, null, null);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
@@ -181,7 +179,7 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes);
+            storyDict.url_fragment, allNodes, null, null, null);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,

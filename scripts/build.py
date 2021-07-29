@@ -14,8 +14,8 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import collections
@@ -122,8 +122,10 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
+    'webpack_bundles/license.mainpage.html',
     'webpack_bundles/login-page.mainpage.html',
     'webpack_bundles/logout-page.mainpage.html',
+    'webpack_bundles/partnerships-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
     'webpack_bundles/playbook.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
@@ -671,7 +673,7 @@ def build_using_webpack(config_path):
 
     python_utils.PRINT('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
-        config_path=config_path, max_old_space_size=2400)
+        config_path=config_path, max_old_space_size=4096)
     with managed_webpack_compiler as p:
         p.wait()
 

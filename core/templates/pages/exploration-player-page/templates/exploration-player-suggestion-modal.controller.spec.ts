@@ -23,15 +23,17 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {AudioTranslationLanguageService} from
+  'pages/exploration-player-page/services/audio-translation-language.service';
+
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 describe('Exploration Player Suggestion Modal Controller', function() {
   importAllAngularServices();
@@ -44,9 +46,9 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var interactionObjectFactory = null;
   var playerPositionService = null;
   var playerTranscriptService = null;
-  var stateCardObjectFactory = null;
   var suggestionModalService = null;
   var writtenTranslationsObjectFactory = null;
+  var audioTranslationLanguageService = null;
 
   var card = null;
 
@@ -56,10 +58,11 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     playerPositionService = TestBed.get(PlayerPositionService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     suggestionModalService = TestBed.get(SuggestionModalService);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
+    audioTranslationLanguageService = TestBed.get(
+      AudioTranslationLanguageService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -83,9 +86,10 @@ describe('Exploration Player Suggestion Modal Controller', function() {
 
     var recordedVoiceovers = RecordedVoiceovers.createEmpty();
     var writtenTranslations = writtenTranslationsObjectFactory.createEmpty();
-    card = stateCardObjectFactory.createNewCard(
+    card = StateCard.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
-      recordedVoiceovers, writtenTranslations, 'content_id');
+      recordedVoiceovers, writtenTranslations, 'content_id',
+      audioTranslationLanguageService);
 
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Introduction');
@@ -105,6 +109,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     function() {
       expect($scope.originalHtml).toBe('Content html');
       expect($scope.description).toBe('');
+      $scope.updateValue('Content html');
       expect($scope.suggestionData).toEqual({
         suggestionHtml: 'Content html'
       });

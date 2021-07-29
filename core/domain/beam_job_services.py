@@ -16,8 +16,8 @@
 
 """Services for managing Apache Beam jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import itertools
@@ -151,6 +151,24 @@ def get_beam_job_run_result(job_id):
         None if not stdouts and not stderrs else
         beam_job_domain.AggregateBeamJobRunResult(
             stdout='\n'.join(stdouts), stderr='\n'.join(stderrs)))
+
+
+def create_beam_job_run_result_model(job_id, stdout, stderr):
+    """Creates a new BeamJobRunResultModel without putting it into storage.
+
+    Args:
+        job_id: str. The ID of the job run to fetch.
+        stdout: str. The standard output from a job run.
+        stderr: str. The error output from a job run.
+
+    Returns:
+        BeamJobRunResultModel. The model.
+    """
+    model_id = beam_job_models.BeamJobRunResultModel.get_new_id()
+    model = beam_job_models.BeamJobRunResultModel(
+        id=model_id, job_id=job_id, stdout=stdout, stderr=stderr)
+    model.update_timestamps()
+    return model
 
 
 def refresh_state_of_all_beam_job_run_models():

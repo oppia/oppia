@@ -16,8 +16,8 @@
 
 """Tests for core.storage.base_model.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import re
@@ -622,6 +622,29 @@ class VersionedModelTests(test_utils.GenericTestBase):
                 'class. It should be implemented in the derived class.')):
             model1.update_timestamps()
             model1.put()
+
+    def test_force_deletion(self):
+        model_id = 'model_id'
+        model = TestVersionedModel(id=model_id)
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit_msg', [])
+        model_version_numbers = [
+            python_utils.UNICODE(num + 1) for num in
+            python_utils.RANGE(model.version)]
+        model_snapshot_ids = [
+            model.get_snapshot_id(model.id, version_number)
+            for version_number in model_version_numbers]
+
+        model.delete(
+            feconf.SYSTEM_COMMITTER_ID, 'commit_msg', force_deletion=True)
+
+        self.assertIsNone(TestVersionedModel.get_by_id(model_id))
+        for model_snapshot_id in model_snapshot_ids:
+            self.assertIsNone(
+                TestSnapshotContentModel.get_by_id(model_snapshot_id))
+            self.assertIsNone(
+                TestSnapshotMetadataModel.get_by_id(model_snapshot_id))
 
     def test_delete_multi(self):
         model_1_id = 'model_1_id'

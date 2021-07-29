@@ -57,8 +57,11 @@ module.exports = {
     }
   },
   entry: {
-    about: commonPrefix + '/pages/about-page/about-page.import.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.import.ts',
+    blog_admin:
+      commonPrefix + '/pages/blog-admin-page/blog-admin-page.import.ts',
+    blog_dashboard:
+      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.import.ts',
     collection_editor:
@@ -75,6 +78,9 @@ module.exports = {
     contributor_dashboard:
       commonPrefix + '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
+    contributor_dashboard_admin:
+      commonPrefix + '/pages/contributor-dashboard-admin-page/' +
+      'contributor-dashboard-admin-page.import.ts',
     delete_account:
       commonPrefix + '/pages/delete-account-page/' +
         'delete-account-page.import.ts',
@@ -86,6 +92,8 @@ module.exports = {
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
     error: commonPrefix + '/pages/error-pages/error-page.import.ts',
+    error_iframed: commonPrefix + '/pages/error-pages/error-iframed-page/' +
+                   'error-iframed-page.import.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
@@ -101,15 +109,17 @@ module.exports = {
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
     library: commonPrefix + '/pages/library-page/library-page.import.ts',
+    license: commonPrefix + '/pages/license-page/license.import.ts',
     login: commonPrefix + '/pages/login-page/login-page.import.ts',
     logout: commonPrefix + '/pages/logout-page/logout-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
-    notifications_dashboard:
-      commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.import.ts',
+    oppia_root:
+      commonPrefix + '/pages/oppia-root/index.ts',
+    partnerships:
+      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -152,25 +162,16 @@ module.exports = {
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
   },
+
+  /**
+  * TODO(#13079): Remove the hybrid field from the html webpack plugin options
+  * once angularjs is removed from corresponding pages.
+  */
   plugins: [
-    new HtmlWebpackPlugin({
-      chunks: ['about'],
-      filename: 'about-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
     new HtmlWebpackPlugin({
       chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'With Oppia, you can access free lessons on ' +
@@ -180,6 +181,34 @@ module.exports = {
           'education to those who lack access to it.'
       },
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['blog_admin'],
+      filename: 'blog-admin-page.mainpage.html',
+      hybrid: true,
+      meta: {
+        name: defaultMeta.name,
+        description: 'With Oppia, you can access free lessons on ' +
+          'math, physics, statistics, chemistry, music, history and ' +
+          'more from anywhere in the world. Oppia is a nonprofit ' +
+          'with the mission of providing high-quality ' +
+          'education to those who lack access to it.'
+      },
+      template:
+        commonPrefix + '/pages/blog-admin-page/blog-admin-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['blog_dashboard'],
+      filename: 'blog-dashboard-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/blog-dashboard-page/' +
+        'blog-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -200,6 +229,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
       filename: 'collection-editor-page.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Contact the Oppia team, submit feedback, and learn ' +
@@ -214,6 +244,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['collection_player'],
       filename: 'collection-player-page.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Contact the Oppia team, submit feedback, and learn ' +
@@ -228,6 +259,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['console_errors'],
       filename: 'console_errors.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Contact the Oppia team, submit feedback, and learn ' +
@@ -252,6 +284,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['creator_dashboard'],
       filename: 'creator-dashboard-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/creator-dashboard-page/' +
@@ -260,8 +293,20 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['contributor_dashboard_admin'],
+      filename: 'contributor-dashboard-admin-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
+        'contributor-dashboard-admin-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['contributor_dashboard'],
       filename: 'contributor-dashboard-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/contributor-dashboard-page/' +
@@ -294,6 +339,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard'],
       filename: 'email-dashboard-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: (
         commonPrefix +
@@ -304,6 +350,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix +
@@ -312,10 +359,11 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['error'],
+      chunks: ['error_iframed'],
       filename: 'error-iframed.mainpage.html',
       meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
+      template: commonPrefix + '/pages/error-pages/error-iframed-page/' +
+                'error-iframed.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -339,15 +387,6 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error-page-404.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 404
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
       filename: 'error-page-500.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
@@ -356,16 +395,9 @@ module.exports = {
       statusCode: 500
     }),
     new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-iframed.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-iframed.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
+      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Help others learn new things. Create lessons through ' +
@@ -380,6 +412,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['exploration_player'],
       filename: 'exploration-player-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/exploration-player-page/' +
@@ -412,6 +445,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['learner_dashboard'],
       filename: 'learner-dashboard-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/learner-dashboard-page/' +
@@ -430,6 +464,18 @@ module.exports = {
           'level you want.'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['license'],
+      filename: 'license.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'License terms that Oppia is attributed under.'
+      },
+      template:
+        commonPrefix + '/pages/license-page/license.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -461,6 +507,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['moderator'],
       filename: 'moderator-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
@@ -468,18 +515,21 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['notifications_dashboard'],
-      filename: 'notifications-dashboard-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Keep track of the lessons you have created, as well ' +
-          'as feedback from learners.'
-      },
-      template: (
-        commonPrefix +
-        '/pages/notifications-dashboard-page/' +
-        'notifications-dashboard-page.mainpage.html'
-      ),
+      chunks: ['oppia_root'],
+      filename: 'oppia-root.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['partnerships'],
+      filename: 'partnerships-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/partnerships-page/' +
+          'partnerships-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -510,6 +560,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['practice_session'],
       filename: 'practice-session-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/practice-session-page/' +
@@ -566,6 +617,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['review_test'],
       filename: 'review-test-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
@@ -586,6 +638,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['skill_editor'],
       filename: 'skill-editor-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/skill-editor-page/' +
@@ -621,6 +674,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['story_editor'],
       filename: 'story-editor-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/story-editor-page/' +
@@ -641,6 +695,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['subtopic_viewer'],
       filename: 'subtopic-viewer-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/subtopic-viewer-page/' +
@@ -688,6 +743,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['topic_editor'],
       filename: 'topic-editor-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/topic-editor-page/' +
@@ -698,6 +754,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['topics_and_skills_dashboard'],
       filename: 'topics-and-skills-dashboard-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template: (
         commonPrefix +
@@ -710,6 +767,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['topic_viewer'],
       filename: 'topic-viewer-page.mainpage.html',
+      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/topic-viewer-page/' +

@@ -24,15 +24,13 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
-import { Title } from '@angular/platform-browser';
+import { PreferencesBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
-  let userBackendApiService: UserBackendApiService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
-  let titleService: Title;
+  let userBackendApiService: UserBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +40,6 @@ describe('User Backend Api Service', () => {
     userBackendApiService = TestBed.inject(UserBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     csrfService = TestBed.inject(CsrfTokenService);
-    titleService = TestBed.inject(Title);
 
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
@@ -60,8 +57,9 @@ describe('User Backend Api Service', () => {
   it('should return userInfo data', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
+      roles: ['USER_ROLE'],
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -74,7 +72,8 @@ describe('User Backend Api Service', () => {
       sampleUserInfoBackendObject);
 
     userBackendApiService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo.isAdmin()).toBe(sampleUserInfo.isAdmin());
+      expect(userInfo.isCurriculumAdmin()).toBe(
+        sampleUserInfo.isCurriculumAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
       expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());
@@ -98,8 +97,9 @@ describe('User Backend Api Service', () => {
   it('should return new userInfo data if user is not logged', fakeAsync(() => {
     // Creating a test user.
     const sampleUserInfoBackendObject = {
+      role: 'GUEST',
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,
@@ -184,21 +184,30 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should show number of Unseen Notifications', fakeAsync(() => {
-    let response = {
-      num_unseen_notifications: 10
+  it('should return user preferences data', fakeAsync(() => {
+    let samplePreferencesData: PreferencesBackendDict = {
+      preferred_language_codes: ['en', 'hi'],
+      preferred_site_language_code: 'en',
+      preferred_audio_language_code: 'en',
+      profile_picture_data_url: '',
+      default_dashboard: 'learner',
+      user_bio: '',
+      subject_interests: '',
+      can_receive_email_updates: true,
+      can_receive_editor_role_email: true,
+      can_receive_feedback_message_email: true,
+      can_receive_subscription_email: true,
+      subscription_list: []
     };
-    userBackendApiService.showUnseenNotifications();
-    titleService.setTitle('home');
-    expect(titleService.getTitle()).toEqual('home');
-    userBackendApiService.numUnseenNotifications = 10;
-    expect(userBackendApiService.numUnseenNotifications).toEqual(10);
-    let req = httpTestingController.expectOne(
-      '/notificationshandler');
+    userBackendApiService.getPreferencesAsync().then((preferencesData) => {
+      expect(preferencesData).toEqual(samplePreferencesData);
+    });
+
+    const req = httpTestingController.expectOne('/preferenceshandler/data');
     expect(req.request.method).toEqual('GET');
-    req.flush(response);
+    req.flush(samplePreferencesData);
+
     flushMicrotasks();
-    expect(titleService.getTitle()).toBe('(10) home');
   }));
 
   it('should update preferred site langauge', fakeAsync(() => {
