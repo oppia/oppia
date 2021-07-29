@@ -19,23 +19,18 @@
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaResponseNumberWithUnits', [
-  'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
-  function(HtmlEscaperService, NumberWithUnitsObjectFactory) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./number-with-units-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
-            answer).toString();
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').component('oppiaResponseNumberWithUnits', {
+  template: require('./number-with-units-response.component.html'),
+  controllerAs: '$ctrl',
+  controller: [
+    '$attrs', 'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
+    function(
+        $attrs, HtmlEscaperService, NumberWithUnitsObjectFactory) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
+          answer).toString();
+      };
+    }]
+});
