@@ -572,6 +572,7 @@
 
 
 # Simple pages.
+/core/domain/interaction_jobs_one_off*.py @vojtechjelinek
 /core/controllers/pages*.py @vojtechjelinek
 /core/controllers/custom_landing_pages*.py @vojtechjelinek
 /core/templates/pages/contact-page/ @vojtechjelinek
