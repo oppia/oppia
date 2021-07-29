@@ -460,7 +460,8 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 'No user_feedback_selected_items supplied.')
         if self.user_feedback_other_text_input is None:
             raise utils.ValidationError(
-                'No user_feedback_other_text_input supplied.')
+                'No user_feedback_selected_items supplied for '
+                'category %s.' % self.category)
         self.require_valid_user_feedback_items_for_category(
             self.category, self.user_feedback_selected_items,
             self.user_feedback_other_text_input)
@@ -536,10 +537,6 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Report cannot have selection options for category %r.' % (
                         category))
-            if other_text_input is None:
-                raise utils.ValidationError(
-                    'Category %r with \'other\' selected requires text input '
-                    'provided by the user.' % category)
             if not isinstance(other_text_input, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Invalid input text, must be a string, received: %r.' % (
@@ -561,29 +558,6 @@ class UserSuppliedFeedback(python_utils.OBJECT):
             if not isinstance(item, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Invalid option %s selected by user.' % item)
-
-    @classmethod
-    def _selected_items_include_other(cls, selected_items):
-        # type: (List[Text]) -> bool
-        """Checks whether the user_feedback_selected_items include an 'other'
-        option. Unless the category is one of ALLOWED_INPUT_TEXT_CATEGORIES, an
-        'other' option must be selected for the user to add input text to the
-        report.
-
-        Args:
-            selected_items: list(str). The list of checkbox options selected
-                by the user.
-
-        Returns:
-            bool. Whether the selection items include an "other" option.
-
-        Raises:
-            bool. Whether an 'other' option is included in the selected items.
-        """
-        for item in selected_items:
-            if 'other' in item.lower():
-                return True
-        return False
 
 
 class DeviceSystemContext(python_utils.OBJECT):

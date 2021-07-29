@@ -189,15 +189,42 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(expected_dict, self.android_report_obj.to_dict())
 
+    def test_report_web_platform_validation_fails(self):
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
+            NotImplementedError,
+            'Domain objects for web reports have not been implemented yet.'):
+            self.web_report_obj.validate()
+
+    def test_report_android_schema_version_not_an_int_validation_fails(self):
+        # type: () -> None
+        self.android_report_obj.schema_version = 'bad_schema_version' # type: ignore[assignment]
+        self._assert_validation_error(
+            self.android_report_obj,
+            'The report schema version %r is invalid, expected an integer' % (
+                self.android_report_obj.schema_version))
+
     def test_report_android_schema_version_less_than_minimum_validation_fails(
             self):
         # type: () -> None
+        # The current minimum is 1 a version less than the minimum returns
+        # an error for a non-positive integer.
         self.android_report_obj.schema_version = (
             feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION - 1)
         self._assert_validation_error(
             self.android_report_obj,
             'The report schema version %r is invalid, expected an integer' % (
-                feconf.MINIMUM_ANDROID_REPORT_SCHEMA_VERSION - 1))
+                self.android_report_obj.schema_version))
+
+    def test_report_android_schema_version_greater_than_max_validation_fails(
+            self):
+        # type: () -> None
+        self.android_report_obj.schema_version = (
+            feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION + 1)
+        self._assert_validation_error(
+            self.android_report_obj,
+            'The supported report schema versions for %s reports are' % (
+                PLATFORM_ANDROID))
 
     def test_report_platform_is_invalid_validation_fails(self):
         # type: () -> None
@@ -445,13 +472,20 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
             self.user_supplied_feedback,
             'Invalid category invalid_category,')
 
-    def test_validation_has_selection_items_for_invalid_category_fails(self):
+    def test_validation_has_selected_items_for_invalid_category_fails(self):
         # type: () -> None
         self.user_supplied_feedback.user_feedback_selected_items = (
             ['invalid', 'list'])
         self._assert_validation_error(
             self.user_supplied_feedback,
             'Report cannot have selection options for category ')
+
+    def test_validation_selected_items_is_none_fails(self):
+        # type: () -> None
+        self.user_supplied_feedback.user_feedback_selected_items = None # type: ignore[assignment]
+        self._assert_validation_error(
+            self.user_supplied_feedback,
+            'No user_feedback_selected_items supplied')
 
     def test_validation_text_input_is_none_fails(self):
         # type: () -> None
@@ -461,7 +495,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         self.user_supplied_feedback.user_feedback_other_text_input = None # type: ignore[assignment]
         self._assert_validation_error(
             self.user_supplied_feedback,
-            'No user_feedback_other_text_input supplied.')
+            'No user_feedback_selected_items supplied')
 
     def test_validation_invalid_selected_item_list_fails(self):
         # type: () -> None
