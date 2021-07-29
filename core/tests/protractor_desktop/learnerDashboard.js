@@ -426,7 +426,7 @@ describe('Learner dashboard functionality', function() {
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      'Topic TASV1', 'topic-tasv-one', 'Description', false);
+      'Topic TASV2', 'topic-tasv-two', 'Description', false);
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
@@ -442,7 +442,7 @@ describe('Learner dashboard functionality', function() {
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill TASV1', 'Concept card explanation', false);
+      'Skill TASV2', 'Concept card explanation', false);
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
@@ -474,16 +474,16 @@ describe('Learner dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.assignSkillToTopic(
-      'Skill TASV1', 'Topic TASV1');
+      'Skill TASV2', 'Topic TASV2');
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV2');
     await topicEditorPage.addSubtopic(
-      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
+      'Subtopic TASV2', 'subtopic-tasv-two', Constants.TEST_SVG_PATH,
       'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
     await topicEditorPage.navigateToTopicEditorTab();
     await topicEditorPage.navigateToReassignModal();
-    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
+    await topicEditorPage.dragSkillToSubtopic('Skill TASV2', 0);
     await topicEditorPage.saveRearrangedSkills();
     await topicEditorPage.saveTopic('Added skill to subtopic.');
     await topicEditorPage.updateMetaTagContent('topic meta tag');
@@ -491,9 +491,9 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.togglePracticeTab();
     await topicEditorPage.saveTopic('Added thumbnail.');
     await topicEditorPage.publishTopic();
-    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV2');
     await topicEditorPage.createStory(
-      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      'Story TASV2', 'story-player-tasv-two', 'Story description',
       Constants.TEST_SVG_PATH);
     await storyEditorPage.updateMetaTagContent('story meta tag');
     for (var i = 0; i < 3; i++) {
@@ -508,25 +508,25 @@ describe('Learner dashboard functionality', function() {
     await storyEditorPage.saveStory('First save');
     await storyEditorPage.publishStory();
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-two', 'story-player-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-two', 'story-player-tasv-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.goToChapterIndex(1);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-two', 'story-player-tasv-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.goToChapterIndex(2);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
-      'math', 'topic-tasv-one', 'story-player-tasv-one');
+      'math', 'topic-tasv-two', 'story-player-tasv-two');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(0);
     await learnerDashboardPage.get();
@@ -534,7 +534,7 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.expectCountOfStoryInCompletedStory(1);
     await learnerDashboardPage.navigateToGoalsSection();
     await learnerDashboardPage.expectNameOfTopicInCompletedGoalsToMatch(
-      'Topic TASV1');
+      'Topic TASV2');
     await users.logout();
   });
 
