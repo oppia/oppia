@@ -25,10 +25,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
 
-import python_utils
-
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
-
 
 
 class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
