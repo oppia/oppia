@@ -41,6 +41,10 @@ export class ProgressTabComponent implements OnInit {
   widthConst: number = 233;
   subtopicMastery: Record<string, SubtopicMasterySummaryBackendDict> = {};
   topicIdsInSkillProficiency: string[] = [];
+  goldBadgeImageUrl: string = '';
+  bronzeBadgeImageUrl: string = '';
+  silverBadgeImageUrl: string = '';
+  emptyBadgeImageUrl: string = '';
   topicMastery: number[] = [];
   width: number;
   LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
@@ -60,6 +64,14 @@ export class ProgressTabComponent implements OnInit {
     for (topic of this.topicsInSkillProficiency) {
       this.topicIdsInSkillProficiency.push(topic.id);
     }
+    this.goldBadgeImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/gold.png');
+    this.bronzeBadgeImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/bronze.png');
+    this.silverBadgeImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/silver.png');
+    this.emptyBadgeImageUrl = this.getStaticImageUrl(
+      '/learner_dashboard/empty_badge.png');
     if (this.topicsInSkillProficiency.length !== 0) {
       this.subtopicMastery = await (
         this.learnerDashboardBackendApiService.getFetchSubtopicMastery(

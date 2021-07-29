@@ -7,6 +7,7 @@
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
         <span>
           <div class="badge-info">
+            <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image">
             <p class="badge-type">
               Gold
             </p>
@@ -15,6 +16,7 @@
             </p>
           </div>
           <div class="badge-info">
+            <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image">
             <p class="badge-type">
               Silver
             </p>
@@ -23,6 +25,7 @@
             </p>
           </div>
           <div class="badge-info">
+            <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image">
             <p class="badge-type">
               Bronze
             </p>
@@ -40,7 +43,11 @@
     <div *ngIf="!emptySkillProficiency">
       <div *ngFor="let tile of topicsInSkillProficiency; index as i" class="skill-proficiency-content">
         <div class="skill-proficiency-topic-tile" [ngStyle]="displaySkills[i] && {'border-bottom': 'none', 'margin-bottom': '0'}" *ngIf="tile.practiceTabIsDisplayed">
-          <span class="skill-proficiency-topic-title">
+          <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] === 100">
+          <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] >= 80 && topicMastery[i] <= 99">
+          <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] >= 60 && topicMastery[i] <= 79">
+          <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="topicMastery[i] > 0 && topicMastery[i] <= 59">
+          <span class="skill-proficiency-topic-title" [ngStyle]="topicMastery[i] === 0 && {'left': '51px'}">
           {{tile.name}}
           </span>
           <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')" alt="dropdown image" class="oppia-svg-dropdown-image" (click)="showSkills(i)" *ngIf="!displaySkills[i]">
@@ -154,6 +161,17 @@
     font-size: 18px;
     text-align: left;
   }
+  .oppia-badge-image {
+    margin-right: 12px;
+    width: 32px;
+  }
+  .oppia-badge-image-for-topic {
+    bottom: 6px;
+    float: left;
+    margin-right: 20px;
+    position: relative;
+    width: 31px;
+  }
   .progress-tab .skill-proficiency-topic-tile {
     border-bottom: 1px solid;
     height: 43px;
@@ -164,7 +182,6 @@
     color: #333;
     font-size: 19px;
     font-weight: 500;
-    left: 48px;
     letter-spacing: 0;
     opacity: 1;
     position: relative;
@@ -197,7 +214,7 @@
     bottom: 24px;
     display: inline-block;
     height: 28px;
-    left: 280px;
+    left: 230px;
     margin-left: 30%;
     position: relative;
     text-align: center;
@@ -228,7 +245,7 @@
     display: block;
     height: 155px;
     margin-left: 32px;
-    padding: 8px;
+    padding: 9px 16px;
     position: absolute;
     top: -37px;
     width: 157px;
@@ -313,7 +330,7 @@
       width: 555px;
     }
     .progress-tab .circle-border {
-      left: 138px;
+      left: 88px;
     }
     .progress-tab .scroll-content {
       overflow: scroll;
@@ -367,10 +384,6 @@
     .progress-tab .progress-text {
       display: contents;
       font-style: italic;
-    }
-    .progress-tab .progress-text::before {
-      content: '';
-      margin-left: 48px;
     }
     .progress-tab .skill-proficiency-title,
     .progress-tab .completed-stories-title {
