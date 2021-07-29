@@ -26,15 +26,15 @@ ruleTester.run('check-element-selector-at-top', rule, {
   valid: [
     {
       code:
-      `var action = require('./action.js');
-      var forms = require('./forms.js');
-      var waitFor = require('./waitFor.js');
-
-      var LibraryPage = function() {
-        var allCollectionSummaryTile = element.all(
-         by.css('.protractor-test-collection-summary-tile'));
+      `var LibraryPage = function() {
+        var lostChangesModal = element(
+         by.css('.protractor-test-lost-changes-modal'));
         var allExplorationSummaryTile = element.all(
          by.css('.protractor-test-exp-summary-tile'));
+        var allCollectionSummaryTile = pageEditor.element.all(
+         by.css('.protractor-test-collection-summary-tile'));
+        var pageEditorInput = pageEditor.element(
+         by.css('.protractor-test-rte'));
         var allCollectionsTitled = function(collectionName) {
           return element.all(by.cssContainingText(
           '.protractor-test-collection-summary-tile-title', collectionName));
@@ -42,23 +42,25 @@ ruleTester.run('check-element-selector-at-top', rule, {
 
         var allExplorationsTitled = function(explorationName) {
           var allCollectionSummaryTile = element.all(
-           by.css('.protractor-test-collection-summary-tile' + check));};
-        };`,
+           by.cssContainingText('.protractor-test-collection-summary-tile'));
+          return nodeElement.element(nodeBackgroundLocator);
+        };
+      };`
     }
   ],
 
   invalid: [
     {
       code:
-      `var action = require('./action.js');
-      var forms = require('./forms.js');
-      var waitFor = require('./waitFor.js');
-
-      var LibraryPage = function() {
-        var allCollectionSummaryTile = element.all(
-         by.css('.protractor-test-collection-summary-tile'));
+      `var LibraryPage = function() {
+        var lostChangesModal = element(
+         by.css('.protractor-test-lost-changes-modal'));
         var allExplorationSummaryTile = element.all(
          by.css('.protractor-test-exp-summary-tile'));
+        var allCollectionSummaryTile = pageEditor.element.all(
+         by.css('.protractor-test-collection-summary-tile'));
+        var pageEditorInput = pageEditor.element(
+         by.css('.protractor-test-rte'));
         var allCollectionsTitled = function(collectionName) {
           return element.all(by.cssContainingText(
           '.protractor-test-collection-summary-tile-title', collectionName));
@@ -66,11 +68,38 @@ ruleTester.run('check-element-selector-at-top', rule, {
 
         var allExplorationsTitled = function(explorationName) {
           var allCollectionSummaryTile = element.all(
-           by.css('.protractor-test-collection-summary-tile'));};
-        };`,
+           by.css('.protractor-test-collection-summary-tile'));
+        };
+      };`,
       errors: [{
         message: (
-          'Please declare element in the topmost scope of the module function.')
+          'Please declare element selector in the topmost scope of the' +
+          ' module function.')
+      }],
+    },
+    {
+      code:
+      `var LibraryPage = function() {
+        var lostChangesModal = element(
+         by.css('.protractor-test-lost-changes-modal'));
+        var allExplorationSummaryTile = element.all(
+         by.css('.protractor-test-exp-summary-tile'));
+        var allCollectionSummaryTile = pageEditor.element.all(
+         by.css('.protractor-test-collection-summary-tile'));
+        var allCollectionsTitled = function(collectionName) {
+          return element.all(by.cssContainingText(
+          '.protractor-test-collection-summary-tile-title', collectionName));
+        };
+
+        var allExplorationsTitled = function(explorationName) {
+          var pageEditorInput = pageEditor.element(
+           by.css('.protractor-test-rte'));
+        };
+      };`,
+      errors: [{
+        message: (
+          'Please declare element locator in the topmost scope of the' +
+          ' module function.')
       }],
     },
   ]

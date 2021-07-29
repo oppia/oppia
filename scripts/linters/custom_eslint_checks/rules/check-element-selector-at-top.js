@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure that element in the topmost
- * scope of the module function.
+ * @fileoverview Lint check to ensure that element selector or locator in the
+ * topmost scope of the module function.
  */
 
 'use strict';
@@ -24,38 +24,72 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to ensure that element in the topmost scope' +
-        ' of the module function.'),
+        'Lint check to ensure that element selector or locator in the topmost' +
+        ' scope of the module function.'),
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      elementDeclaration: (
-        'Please declare element in the topmost scope of the module function.')
+      defineLocatorOnTop: (
+        'Please declare element locator in the topmost scope of' +
+        ' the module function.'),
+      defineSelectorOnTop: (
+        'Please declare element selector in the topmost scope of' +
+        ' the module function.')
     },
   },
 
   create: function(context) {
-    var elementSelector = (
-      'CallExpression[callee.property.name=css][callee.object.name=by]');
-    var checkAndReportElementSelector = function(node) {
+    var elementSelector = 'CallExpression[callee.name=element]';
+    var elmentAllSelector = (
+      'CallExpression[callee.object.name=element][callee.property.name=all]');
+    var subElementSelector = 'CallExpression[callee.property.name=element]';
+    var subElmentAllSelector = (
+      'CallExpression[callee.object.property.name=element]' +
+      '[callee.property.name=all]');
+
+    var checkLoctator = function(node, inNestedSelector) {
       var upperScopeType = context.getScope().upper.type;
       if (['global', 'module'].includes(upperScopeType)) {
         return;
       }
-      if (node.arguments[0].type === 'Literal') {
-        context.report({
+      if (node.arguments[0].type !== 'CallExpression' ||
+        node.arguments[0].arguments[0].type !== 'Literal') {
+        return;
+      }
+      if (node.arguments[0].callee.property.name !== 'css' ||
+          node.arguments[0].callee.object.name !== 'by') {
+        return;
+      }
+      if (inNestedSelector) {
+        context.report ({
+          node: node.arguments[0],
+          messageId: 'defineLocatorOnTop'
+        });
+      } else {
+        context.report ({
           node: node,
-          messageId: 'elementDeclaration'
+          messageId: 'defineSelectorOnTop'
         });
       }
     };
 
     return {
       [elementSelector]: function(node) {
-        checkAndReportElementSelector(node);
+        checkLoctator(node);
+      },
+      [elmentAllSelector]: function(node) {
+        checkLoctator(node);
+      },
+      [subElementSelector]: function(node) {
+        var inNestedSelector = true;
+        checkLoctator(node, inNestedSelector);
+      },
+      [subElmentAllSelector]: function(node) {
+        var inNestedSelector = true;
+        checkLoctator(node, inNestedSelector);
       }
     };
   }

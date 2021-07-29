@@ -137,7 +137,8 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-show-schema-editor'));
   var subtopicDescriptionEditor = element(
     by.css('.protractor-test-subtopic-description-editor'));
-  var newSubtopicEditorLocator = by.css('.protractor-test-new-subtopic-editor');
+  var newSubtopicEditorElement = element(
+    by.css('.protractor-test-new-subtopic-editor'));
   var cKEditorElement = element(by.css('.protractor-test-ck-editor'));
   var closeRTEButton = element(
     by.css('.protractor-test-close-rich-text-component-editor'));
@@ -287,7 +288,7 @@ var TopicEditorPage = function() {
     await action.click(
       'Confirm subtopic creation button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
-      element(newSubtopicEditorLocator),
+      newSubtopicEditorElement,
       'Create subtopic modal taking too long to disappear.');
   };
 
