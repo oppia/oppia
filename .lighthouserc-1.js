@@ -94,7 +94,8 @@ module.exports = {
             // We need to use passive event listeners on this page so that
             // the page works correctly.
             'uses-passive-event-listeners': ['error', {'minScore': 0}],
-            'deprecations': ['error', {'minScore': 1}]
+            'deprecations': ['error', {'minScore': 1}],
+            'redirects': ['error', {'minScore': 0.5}]
           }
         },
         {

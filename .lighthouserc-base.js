@@ -71,7 +71,6 @@ module.exports = {
       'uses-responsive-images': ['error', {'minScore': 1}],
       'uses-optimized-images': ['error', {'minScore': 1}],
       'uses-rel-preconnect': ['error', {'minScore': 0.5}],
-      'redirects': ['error', {'minScore': 1}],
       'uses-rel-preload': ['error', {'minScore': 1}],
       'efficient-animated-content': ['error',{'minScore': 1}],
       'offscreen-images': ['error', {'minScore': 0.45}],
@@ -97,7 +96,8 @@ module.exports = {
       'error', {'maxLength': 0, 'strategy': 'pessimistic'}
     ],
     'uses-passive-event-listeners': ['error', {'minScore': 1}],
-    'deprecations': ['error', {'minScore': 1}]
+    'deprecations': ['error', {'minScore': 1}],
+    'redirects': ['error', {'minScore': 1}]
   },
   baseAccessibilityAssertions: {
     'categories:accessibility': ['error', {'minScore': 1}]
