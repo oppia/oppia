@@ -102,7 +102,8 @@ export class AudioPlayerService {
 
     this.ngZone.runOutsideAngular(() => {
       if (this._currentTrack !== null) {
-        this._currentTrack.seek(this._lastPauseOrSeekPos);
+        // 'lastPauseOrSeekPos' will not be null since currentTrack exists.
+        this._currentTrack.seek(<number> this._lastPauseOrSeekPos);
       }
       interval(500).pipe(takeUntil(
         this._stopIntervalSubject)).subscribe(() => {
@@ -110,8 +111,9 @@ export class AudioPlayerService {
           this._updateViewEventEmitter.emit();
         });
       });
-
-      this._currentTrack.play();
+      if (this._currentTrack !== null) {
+        this._currentTrack.play();
+      }
     });
   }
 
@@ -120,7 +122,8 @@ export class AudioPlayerService {
       return;
     }
     this._lastPauseOrSeekPos = this.getCurrentTime();
-    this._currentTrack.pause();
+    // 'currentTrack' is not null since the track is playing.
+    this._currentTrack?.pause();
     this._stopIntervalSubject.next();
   }
 
@@ -196,7 +199,7 @@ export class AudioPlayerService {
   }
 
   isPlaying(): boolean {
-    return this._currentTrack && this._currentTrack.playing();
+    return this._currentTrack !== null && this._currentTrack.playing();
   }
 
   isTrackLoaded(): boolean {
