@@ -120,6 +120,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && checkMobileView()">
           <oppia-progress-tab [completedStoriesList]="completedStoriesList"
                               [partiallyLearntTopicsList]="partiallyLearntTopicsList"
+                              [learntTopicsList]="learntTopicsList"
                               [activeSubsection]="activeSubsection">
           </oppia-progress-tab>
         </div>
