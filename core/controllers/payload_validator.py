@@ -152,7 +152,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'LibraryGroupIndexHandler',
     'LibraryGroupPage',
     'LibraryIndexHandler',
-    'LibraryPage',
     'LibraryRedirectPage',
     'MemoryCacheAdminHandler',
     'MemoryCacheHandler',

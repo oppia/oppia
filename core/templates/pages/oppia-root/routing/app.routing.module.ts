@@ -73,6 +73,32 @@ const routes: Route[] = [
       .then(m => m.ReleaseCoordinatorPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import('pages/library-page/library-page.module')
+      .then(m => m.LibraryPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_SEARCH.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import('pages/library-page/library-page.module')
+      .then(m => m.LibraryPageModule)
+  },
+  {
+    path: (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
+        .ROUTE),
+    pathMatch: 'full',
+    loadChildren: () => import('pages/library-page/library-page.module')
+      .then(m => m.LibraryPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_TOP_RATED.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import('pages/library-page/library-page.module')
+      .then(m => m.LibraryPageModule)
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
     pathMatch: 'full',
     canLoad: [CanAccessSplashPageGuard],

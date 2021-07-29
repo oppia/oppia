@@ -55,7 +55,10 @@
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-admin" role="navigation">
     <div class="navbar-container oppia-navbar-container">
       <div class="navbar-header protractor-test-navbar-header float-left">
-        <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/community-library">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
+           href="/community-library"
+           routerLink="/community-library"
+           >
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
