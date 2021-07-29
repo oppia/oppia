@@ -26,15 +26,11 @@ from jobs.types import base_validation_errors
 
 import apache_beam as beam
 
-<<<<<<< HEAD
 MYPY = False
 if MYPY:
     from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
 
 (base_models, subtopic_models) = models.Registry.import_models(
-=======
-(base_models, subtopic_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
->>>>>>> 35bdbe6d101c2033ceb4b738a78f6f4502bb08eb
     [models.NAMES.base_model, models.NAMES.subtopic])
 
 

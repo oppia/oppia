@@ -89,39 +89,14 @@ NOT_FULLY_COVERED_FILENAMES = [
     'learner-view-rating.service.ts',
     'list-of-sets-of-translatable-html-content-ids-editor.component.ts',
     'mathjax-bind.directive.ts',
-<<<<<<< HEAD
-    'music-phrase-editor.component.ts',
-=======
->>>>>>> 35bdbe6d101c2033ceb4b738a78f6f4502bb08eb
     'normalize-whitespace-punctuation-and-case.pipe.ts',
     'object-editor.directive.ts',
     'oppia-footer.component.ts',
-<<<<<<< HEAD
-    'oppia-interactive-drag-and-drop-sort-input.directive.ts',
-    'oppia-interactive-interactive-map.component.ts',
-    'oppia-interactive-item-selection-input.directive.ts',
-=======
->>>>>>> 35bdbe6d101c2033ceb4b738a78f6f4502bb08eb
     'oppia-interactive-music-notes-input.directive.ts',
     'oppia-interactive-pencil-code-editor.directive.ts',
-<<<<<<< HEAD
-    'oppia-interactive-set-input.component.ts',
-    'oppia-noninteractive-math.component.ts',
-    'oppia-noninteractive-skillreview.component.ts',
-    'oppia-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-response-interactive-map.component.ts',
-    'oppia-response-item-selection-input.directive.ts',
-=======
->>>>>>> 35bdbe6d101c2033ceb4b738a78f6f4502bb08eb
     'oppia-response-music-notes-input.directive.ts',
     'oppia-response-pencil-code-editor.directive.ts',
     'oppia-root.directive.ts',
-<<<<<<< HEAD
-    'oppia-short-response-drag-and-drop-sort-input.directive.ts',
-    'oppia-short-response-interactive-map.component.ts',
-    'oppia-short-response-item-selection-input.directive.ts',
-=======
->>>>>>> 35bdbe6d101c2033ceb4b738a78f6f4502bb08eb
     'oppia-short-response-music-notes-input.directive.ts',
     'oppia-short-response-pencil-code-editor.directive.ts',
     'oppia-visualization-enumerated-frequency-table.directive.ts',
