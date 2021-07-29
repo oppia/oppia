@@ -67,7 +67,7 @@ export class CkEditorCopyContentService {
     let parentElement = currentElement.parentElement;
     let descendants = Array.from(target.childNodes);
 
-    if (parentElement === null || descendants === undefined) {
+    if (parentElement === null || descendants === null) {
       throw new Error(
         'The element target should contain or be a descendant' +
         'of a widget, or be a plain HTML element/group'
@@ -90,9 +90,7 @@ export class CkEditorCopyContentService {
     while (descendants.length !== 0) {
       // 'shift()' returns 'undefined' only when 'descendants' array is empty,
       // the while loop terminates before that condition is reached.
-      // non-null assertion (!) is used to make typescript typing happy.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      let currentDescendant = descendants.shift()!;
+      let currentDescendant = <ChildNode> descendants.shift();
 
       const currentTagName = currentDescendant.nodeName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
