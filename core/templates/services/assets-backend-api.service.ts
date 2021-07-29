@@ -26,7 +26,10 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
+
+import constants from 'assets/constants';
 
 interface SaveAudioResponse {
   'filename': string;
@@ -73,22 +76,24 @@ export class AssetsBackendApiService {
   }
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
-    if (this.isCached(filename)) {
-      return new AudioFile(filename, this.assetsCache.get(filename));
+    let data = this.assetsCache.get(filename);
+    if (this.isCached(filename) && data !== undefined) {
+      return new AudioFile(filename, data);
     }
     return this.fetchFile(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
-      AppConstants.ASSET_TYPE_AUDIO);
+      constants.ASSET_TYPE_AUDIO);
   }
 
   async loadImage(
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
-    if (this.isCached(filename)) {
-      return new ImageFile(filename, this.assetsCache.get(filename));
+    let data = this.assetsCache.get(filename);
+    if (this.isCached(filename) && data !== undefined) {
+      return new ImageFile(filename, data);
     }
     return this.fetchFile(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+      entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }
 
   async saveAudio(
@@ -122,59 +127,79 @@ export class AssetsBackendApiService {
     }
   }
 
+  postThumbnailFile(
+      resampledFile: Blob, filename: string,
+      entityType: string, entityId: string): Observable<{filename: string}> {
+    let form = new FormData();
+    form.append('image', resampledFile);
+    form.append('payload', JSON.stringify({
+      filename: filename,
+      filename_prefix: 'thumbnail'
+    }));
+    let imageUploadUrlTemplate = '/createhandler/imageupload/' +
+    '<entity_type>/<entity_id>';
+    let thumbnailFileUrl = this.urlInterpolationService.interpolateUrl(
+      imageUploadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId
+      });
+    return this.http.post<{filename: string}>(thumbnailFileUrl, form);
+  }
+
   isCached(filename: string): boolean {
     return this.assetsCache.has(filename);
   }
 
   abortAllCurrentAudioDownloads(): void {
-    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_AUDIO);
+    this.abortAllCurrentDownloads(constants.ASSET_TYPE_AUDIO);
   }
 
   abortAllCurrentImageDownloads(): void {
-    this.abortAllCurrentDownloads(AppConstants.ASSET_TYPE_IMAGE);
+    this.abortAllCurrentDownloads(constants.ASSET_TYPE_IMAGE);
   }
 
   getAssetsFilesCurrentlyBeingRequested(): (
     {[assetType: string]: readonly FileDownloadRequest[]}) {
     return {
-      [AppConstants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
-      [AppConstants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
+      [constants.ASSET_TYPE_AUDIO]: this.audioFileDownloadRequests,
+      [constants.ASSET_TYPE_IMAGE]: this.imageFileDownloadRequests,
     };
   }
 
   getAudioDownloadUrl(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_AUDIO);
+      entityType, entityId, filename, constants.ASSET_TYPE_AUDIO);
   }
 
   getImageUrlForPreview(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
+      entityType, entityId, filename, constants.ASSET_TYPE_IMAGE);
   }
 
   getThumbnailUrlForPreview(
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
-      entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
+      entityType, entityId, filename, constants.ASSET_TYPE_THUMBNAIL);
   }
 
   private getDownloadUrl(
       entityType: string, entityId: string, filename: string,
       assetType: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let downloadUrl = this.urlInterpolationService.interpolateUrl(
       this.downloadUrlTemplate, {
         entity_type: entityType,
         entity_id: entityId,
         asset_type: assetType,
         filename: filename,
       });
+    return downloadUrl;
   }
 
   private getFileDownloadRequestsByAssetType(
       assetType: string): FileDownloadRequest[] {
-    if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+    if (assetType === constants.ASSET_TYPE_AUDIO) {
       return this.audioFileDownloadRequests;
     } else {
       return this.imageFileDownloadRequests;
@@ -184,8 +209,8 @@ export class AssetsBackendApiService {
   private async fetchFile(
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
-    let onResolve: (_: Blob) => void;
-    let onReject: () => void;
+    let onResolve!: (_: Blob) => void;
+    let onReject!: () => void;
     const blobPromise = new Promise<Blob>((resolve, reject) => {
       onResolve = resolve;
       onReject = reject;
@@ -203,7 +228,7 @@ export class AssetsBackendApiService {
     try {
       const blob = await blobPromise;
       this.assetsCache.set(filename, blob);
-      if (assetType === AppConstants.ASSET_TYPE_AUDIO) {
+      if (assetType === constants.ASSET_TYPE_AUDIO) {
         return new AudioFile(filename, blob);
       } else {
         return new ImageFile(filename, blob);
@@ -226,16 +251,19 @@ export class AssetsBackendApiService {
   }
 
   private getAudioUploadUrl(explorationId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let audioUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
+    return audioUploadUrl;
   }
 
-  private getImageUploadUrl(entityType: string, entityId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+  private getImageUploadUrl(
+      entityType: string, entityId: string): string {
+    let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
+    return imageUploadUrl;
   }
 }
 

@@ -22,7 +22,7 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -53,6 +53,12 @@ describe('Translation Modal Component', () => {
     subheading: 'subheading',
     progressPercentage: '20',
     actionButtonTitle: 'Action Button'
+  };
+  const getTranslatableItem = (text) => {
+    return {
+      data_format: 'html',
+      content: text,
+    };
   };
 
   beforeEach(waitForAsync(() => {
@@ -167,8 +173,8 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: {contentId1: getTranslatableItem('text1')},
+        stateName2: {contentId2: getTranslatableItem('text2')}
       };
 
       const req = httpTestingController.expectOne(
@@ -205,6 +211,10 @@ describe('Translation Modal Component', () => {
         expect(component.getHtmlSchema().ui_config.language)
           .toBe('ar');
       }));
+
+    it('should get the unicode schema', () => {
+      expect(component.getUnicodeSchema()).toEqual({type: 'unicode'});
+    });
   });
 
   describe('when clicking on the translatable content', () => {
@@ -273,8 +283,8 @@ describe('Translation Modal Component', () => {
         component.ngOnInit();
 
         const sampleStateWiseContentMapping = {
-          stateName1: {contentId1: 'text1'},
-          stateName2: {contentId2: 'text2'}
+          stateName1: {contentId1: getTranslatableItem('text1')},
+          stateName2: {contentId2: getTranslatableItem('text2')}
         };
 
         const req = httpTestingController.expectOne(
@@ -306,19 +316,20 @@ describe('Translation Modal Component', () => {
         target_id: '1',
         target_version_at_submission: 1,
         change: {
-          cmd: 'add_translation',
+          cmd: 'add_written_translation',
           content_id: 'contentId1',
           state_name: 'stateName1',
           language_code: 'es',
           content_html: 'text1',
-          translation_html: 'texto1'
+          translation_html: 'texto1',
+          data_format: 'html'
         }
       };
       component.ngOnInit();
 
       const sampleStateWiseContentMapping = {
-        stateName1: {contentId1: 'text1'},
-        stateName2: {contentId2: 'text2'}
+        stateName1: {contentId1: getTranslatableItem('text1')},
+        stateName2: {contentId2: getTranslatableItem('text2')}
       };
 
       const req = httpTestingController.expectOne(
@@ -367,7 +378,8 @@ describe('Translation Modal Component', () => {
         text: 'abc',
         more: true,
         status: 'submitted',
-        translationHtml: 'cba'
+        translation: 'cba',
+        dataFormat: 'html'
       });
       expect(component.isSubmitted()).toBeFalse();
 
@@ -399,23 +411,6 @@ describe('Translation Modal Component', () => {
     describe('when currently loading data', () => {
       it('should not submit the translation', () => {
         component.loadingData = true;
-        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
-
-        component.suggestTranslatedText();
-
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
-      });
-    });
-
-    describe('when all images are not copied', () => {
-      it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-val' +
-          'ue="&amp;quot;Image description&amp;quot;" caption-with-value="&' +
-          'amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
-          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
-          '</oppia-noninteractive-image>';
-        component.activeWrittenTranslation.html = '';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();
@@ -467,25 +462,18 @@ describe('Translation Modal Component', () => {
       });
     });
 
-    describe('when translation is not completed', () => {
-      it('should not submit the translation', () => {
-        component.textToTranslate = '<p>First para</p><p>Second para</p>';
-        component.activeWrittenTranslation.html = '<p>New First para</p>';
-        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
-
-        component.suggestTranslatedText();
-
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
-      });
-    });
-
     describe('when translation elements are not matching with the elements ' +
         'of the text to translate', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<p>First para</p><p>Second para</p>';
-        component.activeWrittenTranslation.html = '<p>New First para</p><div>' +
-          '</div>';
+        // Original text contains math and skillreview custom tags.
+        component.textToTranslate = (
+          '<p>First para</p><p>Second para</p><oppia-noninteractive-math>' +
+          '</oppia-noninteractive-math><oppia-noninteractive-skillreview>' +
+          '</oppia-noninteractive-skillreview>');
+        // Translated text contains only math custom tag.
+        component.activeWrittenTranslation.html = (
+          '<p>First para</p>' +
+          '<p><oppia-noninteractive-math></oppia-noninteractive-math></p>');
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();
@@ -504,12 +492,13 @@ describe('Translation Modal Component', () => {
           target_id: '1',
           target_version_at_submission: 1,
           change: {
-            cmd: 'add_translation',
+            cmd: 'add_written_translation',
             content_id: 'contentId2',
             state_name: 'stateName2',
             language_code: 'es',
             content_html: 'text2',
-            translation_html: 'texto2'
+            translation_html: 'texto2',
+            data_format: 'html'
           }
         };
         component.skipActiveTranslation();

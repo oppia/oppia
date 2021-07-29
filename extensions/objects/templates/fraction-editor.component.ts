@@ -19,7 +19,7 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/fraction.model';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 
@@ -37,15 +37,13 @@ export class FractionEditorComponent implements OnInit {
   currentFractionValueIsValid = false;
   eventBus: EventBusGroup;
   constructor(
-    private fractionObjectFactory: FractionObjectFactory,
     private eventBusService: EventBusService) {
     this.eventBus = new EventBusGroup(this.eventBusService);
   }
 
   ngOnInit(): void {
     if (this.value !== null) {
-      this.fractionString = this.fractionObjectFactory.fromDict(
-        this.value).toString();
+      this.fractionString = Fraction.fromDict(this.value).toString();
     }
   }
 
@@ -53,11 +51,12 @@ export class FractionEditorComponent implements OnInit {
     if (newFraction.length === 0) {
       this.errorMessage = 'Please enter a non-empty fraction value.';
       this.currentFractionValueIsValid = false;
+      return;
     }
     try {
       const INTERMEDIATE_REGEX = /^\s*-?\s*$/;
       if (!INTERMEDIATE_REGEX.test(newFraction)) {
-        this.value = this.fractionObjectFactory.fromRawInputString(newFraction);
+        this.value = Fraction.fromRawInputString(newFraction);
         this.valueChanged.emit(this.value);
       }
       this.errorMessage = '';

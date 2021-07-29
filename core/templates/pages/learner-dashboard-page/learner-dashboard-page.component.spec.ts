@@ -29,7 +29,7 @@ import { FeedbackThreadSummary } from
 
 import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
 import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
@@ -46,6 +46,9 @@ import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -226,18 +229,30 @@ describe('Learner dashboard page', () => {
   let learnerDashboardData = {
     completed_explorations_list: [],
     completed_collections_list: [],
+    completed_stories_list: [],
+    learnt_topic_list: [],
     incomplete_explorations_list: [],
     incomplete_collections_list: [],
+    partially_learnt_topics_list: [],
+    topics_to_learn_list: [],
+    all_topics_list: [],
+    untracked_topics: {},
     subscription_list: subscriptionsList,
+    completed_to_incomplete_collections: [],
+    completed_to_incomplete_stories: [],
+    learnt_to_partially_learnt_topics: [],
     number_of_nonexistent_activities: {
       incomplete_explorations: 0,
       incomplete_collections: 0,
+      partially_learnt_topics: 0,
       completed_explorations: 0,
       completed_collections: 0,
+      completed_stories: 0,
+      learnt_topics: 0,
+      topics_to_learn: 0,
       exploration_playlist: 0,
       collection_playlist: 0
     },
-    completed_to_incomplete_collections: [],
     thread_summaries: threadSummaryList,
     number_of_unread_threads: 10,
     exploration_playlist: [],
@@ -245,8 +260,9 @@ describe('Learner dashboard page', () => {
   };
 
   let userInfo = {
+    _roles: ['USER_ROLE'],
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -255,9 +271,11 @@ describe('Learner dashboard page', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
+    isTranslationAdmin: () => false,
+    isQuestionAdmin: () => false,
     canCreateCollections: () => true,
     getPreferredSiteLanguageCode: () =>'en',
     getUsername: () => 'username1',
@@ -269,6 +287,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule
@@ -410,6 +429,27 @@ describe('Learner dashboard page', () => {
             learnerDashboardData.incomplete_collections_list.map(
               collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
+          completedStoriesList: (
+            learnerDashboardData.completed_stories_list.map(
+              storySummary => StorySummary.createFromBackendDict(
+                storySummary))),
+          learntTopicsList: (
+            learnerDashboardData.learnt_topic_list.map(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
+                topicSummary))),
+          partiallyLearntTopicsList: (
+            learnerDashboardData.partially_learnt_topics_list.map(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
+                topicSummary))),
+          topicsToLearnList: (
+            learnerDashboardData.topics_to_learn_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          allTopicsList: (
+            learnerDashboardData.all_topics_list.map(
+              topicSummary => LearnerTopicSummary
+                .createFromBackendDict(topicSummary))),
+          untrackedTopics: learnerDashboardData.untracked_topics,
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary
@@ -421,6 +461,10 @@ describe('Learner dashboard page', () => {
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
+          completedToIncompleteStories: (
+            learnerDashboardData.completed_to_incomplete_stories),
+          learntToPartiallyLearntTopics: (
+            learnerDashboardData.learnt_to_partially_learnt_topics),
           numberOfNonexistentActivities: (
             NonExistentActivities.createFromBackendDict(
               learnerDashboardData.number_of_nonexistent_activities)),
@@ -1870,6 +1914,7 @@ describe('Learner dashboard page', () => {
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
+          BrowserAnimationsModule,
           MaterialModule,
           FormsModule,
           HttpClientTestingModule

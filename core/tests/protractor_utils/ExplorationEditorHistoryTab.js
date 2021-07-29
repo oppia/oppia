@@ -113,6 +113,10 @@ var ExplorationEditorHistoryTab = function() {
           'Close State History button takes too long to disappear.');
       },
       deselectVersion: async function() {
+        var toastSuccessElement = element(by.css('.toast-success'));
+        await waitFor.invisibilityOf(
+          toastSuccessElement,
+          'Toast message is taking too long to disappear after saving changes');
         await action.click('Reset graph button', resetGraphButton);
       },
       /*
@@ -238,11 +242,11 @@ var ExplorationEditorHistoryTab = function() {
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          await element.all(by.css('.CodeMirror-code')).first(),
+          element.all(by.css('.CodeMirror-code')).first(),
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          await element.all(by.css('.CodeMirror-code')).last(),
+          element.all(by.css('.CodeMirror-code')).last(),
           'last'
         ).expectTextWithHighlightingToBe(v2StateContents);
       }

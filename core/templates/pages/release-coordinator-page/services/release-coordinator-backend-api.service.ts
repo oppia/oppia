@@ -16,14 +16,19 @@
  * @fileoverview Service that manages release coordinator's backend api calls.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ComputationData, ComputationDataBackendDict } from 'domain/admin/computation-data.model';
-import { Job, JobDataBackendDict } from 'domain/admin/job.model';
+import { BeamJobRunResult, BeamJobRunResultBackendDict } from 'domain/jobs/beam-job-run-result.model';
+import { BeamJobRun, BeamJobRunBackendDict } from 'domain/jobs/beam-job-run.model';
+import { BeamJob, BeamJobBackendDict } from 'domain/jobs/beam-job.model';
 import { JobStatusSummary, JobStatusSummaryBackendDict } from 'domain/admin/job-status-summary.model';
+import { Job, JobDataBackendDict } from 'domain/admin/job.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
 
 interface JobOutputBackendResponse {
   output: string[];
@@ -35,7 +40,6 @@ export interface JobsDataBackendDict {
   'audit_job_status_summaries': JobStatusSummaryBackendDict[];
   'unfinished_job_data': JobDataBackendDict[];
   'recent_job_data': JobDataBackendDict[];
-  'continuous_computations_data': ComputationDataBackendDict[];
 }
 
 interface MemoryCacheProfileResponse {
@@ -44,13 +48,20 @@ interface MemoryCacheProfileResponse {
   'total_keys_stored': string
 }
 
+interface BeamJobsResponse {
+  'jobs': BeamJobBackendDict[];
+}
+
+interface BeamJobRunsResponse {
+  'runs': BeamJobRunBackendDict[];
+}
+
 export interface JobsData {
   oneOffJobStatusSummaries: JobStatusSummary[];
   humanReadableCurrentTime: string;
   auditJobStatusSummaries: JobStatusSummary[];
   unfinishedJobData: Job[];
   recentJobData: Job[];
-  continuousComputationsData: ComputationData[];
 }
 
 @Injectable({
@@ -75,8 +86,6 @@ export class ReleaseCoordinatorBackendApiService {
             Job.createFromBackendDict),
           recentJobData: response.recent_job_data.map(
             Job.createFromBackendDict),
-          continuousComputationsData: response.continuous_computations_data.map(
-            ComputationData.createFromBackendDict),
         });
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -86,15 +95,8 @@ export class ReleaseCoordinatorBackendApiService {
 
   private async _postRequestAsync(
       payload?: Object, action?: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        '/jobshandler', { action, ...payload }).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
-    });
+    return this.http.post<void>(
+      '/jobshandler', { action, ...payload }).toPromise();
   }
 
   async startNewJobAsync(jobType: string): Promise<void> {
@@ -110,22 +112,6 @@ export class ReleaseCoordinatorBackendApiService {
     let payload = {
       job_id: jobId,
       job_type: jobType
-    };
-    return this._postRequestAsync(payload, action);
-  }
-
-  async startComputationAsync(computationType: string): Promise<void> {
-    let action = 'start_computation';
-    let payload = {
-      computation_type: computationType
-    };
-    return this._postRequestAsync(payload, action);
-  }
-
-  async stopComputationAsync(computationType: string): Promise<void> {
-    let action = 'stop_computation';
-    let payload = {
-      computation_type: computationType
     };
     return this._postRequestAsync(payload, action);
   }
@@ -165,6 +151,38 @@ export class ReleaseCoordinatorBackendApiService {
         reject(errorResponse.error.error);
       });
     });
+  }
+
+  getBeamJobs(): Observable<BeamJob[]> {
+    return this.http.get<BeamJobsResponse>('/beam_job').pipe(
+      map(r => r.jobs.map(BeamJob.createFromBackendDict))
+    );
+  }
+
+  getBeamJobRuns(): Observable<BeamJobRun[]> {
+    return this.http.get<BeamJobRunsResponse>('/beam_job_run').pipe(
+      map(r => r.runs.map(BeamJobRun.createFromBackendDict))
+    );
+  }
+
+  startNewBeamJob(
+      beamJob: BeamJob, jobArguments: string[]): Observable<BeamJobRun> {
+    const params = {job_name: beamJob.name, job_arguments: jobArguments};
+    return this.http.put<BeamJobRunBackendDict>('/beam_job_run', params).pipe(
+      map(BeamJobRun.createFromBackendDict)
+    );
+  }
+
+  cancelBeamJobRun(beamJobRun: BeamJobRun): Observable<BeamJobRun> {
+    return this.http.delete<BeamJobRunBackendDict>('/beam_job_run', {
+      params: { job_id: beamJobRun.jobId }
+    }).pipe(map(BeamJobRun.createFromBackendDict));
+  }
+
+  getBeamJobRunOutput(beamJobRun: BeamJobRun): Observable<BeamJobRunResult> {
+    return this.http.get<BeamJobRunResultBackendDict>('/beam_job_run_result', {
+      params: { job_id: beamJobRun.jobId }
+    }).pipe(map(BeamJobRunResult.createFromBackendDict));
   }
 }
 

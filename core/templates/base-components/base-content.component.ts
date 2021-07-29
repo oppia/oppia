@@ -16,9 +16,10 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
+import { CookieService } from 'ngx-cookie';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -37,16 +38,20 @@ export class BaseContentComponent {
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean;
   DEV_MODE = AppConstants.DEV_MODE;
+  COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
+  ONE_YEAR_IN_MSECS = 31536000000;
 
   constructor(
     private windowRef: WindowRef,
     private backgroundMaskService: BackgroundMaskService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
+    private changeDetectorRef: ChangeDetectorRef,
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
+    private cookieService: CookieService
   ) {}
 
   ngOnInit(): void {
@@ -63,9 +68,17 @@ export class BaseContentComponent {
     }
     this.iframed = this.urlService.isIframed();
     this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => this.loadingMessage = message
+      (message: string) => {
+        this.loadingMessage = message;
+        this.changeDetectorRef.detectChanges();
+      }
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+
+    // TODO(sll): Use 'touchstart' for mobile.
+    this.windowRef.nativeWindow.document.addEventListener('click', () => {
+      this.sidebarStatusService.onDocumentClick();
+    });
   }
 
   getHeaderText(): string {
@@ -112,7 +125,51 @@ export class BaseContentComponent {
     mainContentElement.scrollIntoView();
     mainContentElement.focus();
   }
+
+  hasAcknowledgedCookies(): boolean {
+    let cookieSetDateMsecs = this.cookieService.get(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
+    return (
+      !!cookieSetDateMsecs &&
+      Number(cookieSetDateMsecs) > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+    );
+  }
+
+  acknowledgeCookies(): void {
+    let currentDateInUnixTimeMsecs = new Date().valueOf();
+    let cookieOptions = {
+      expires: new Date(currentDateInUnixTimeMsecs + this.ONE_YEAR_IN_MSECS)
+    };
+    this.cookieService.put(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED, String(currentDateInUnixTimeMsecs),
+      cookieOptions);
+  }
 }
+
+/**
+ * This directive is used as selector for navbar breadcrumb transclusion.
+ */
+@Directive({
+  selector: 'navbar-breadcrumb'
+})
+export class BaseContentNavBarBreadCrumbDirective {}
+
+/**
+ * This directive is used as selector for navbar pre logo action transclusion.
+ */
+@Directive({
+  selector: 'navbar-pre-logo-action'
+})
+export class BaseContentNavBarPreLogoActionDirective {}
+
+
+/**
+ * This directive is used as selector for page footer transclusion.
+ */
+@Directive({
+  selector: 'page-footer'
+})
+export class BaseContentPageFooterDirective {}
 
 angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({

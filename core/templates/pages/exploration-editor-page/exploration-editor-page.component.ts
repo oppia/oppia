@@ -17,8 +17,6 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
@@ -176,8 +174,8 @@ angular.module('oppia').component('explorationEditorPage', {
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
@@ -199,8 +197,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
@@ -281,7 +279,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
+          ctrl.currentUserIsCurriculumAdmin = (
+            explorationData.is_curriculum_admin);
           ctrl.currentUserIsModerator = explorationData.is_moderator;
 
           ctrl.currentUser = explorationData.user;
@@ -370,30 +369,8 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
-          // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and is being played by
-          // learners.
-          if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
-
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
-          }
+          // TODO(#13352): Initialize StateTopAnswersStatsService and register
+          // relevant callbacks.
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
@@ -442,8 +419,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeModalController',
@@ -494,8 +471,8 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',

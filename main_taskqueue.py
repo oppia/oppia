@@ -14,8 +14,8 @@
 
 """Main package for URL routing for requests originating from the task queue."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import tasks
 from core.platform import models
@@ -25,7 +25,7 @@ import main
 import webapp2
 
 
-transaction_services = models.Registry.import_transaction_services()
+transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [

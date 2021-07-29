@@ -16,13 +16,12 @@
 
 """Domain objects for user."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
 
 from constants import constants
-from core.domain import role_services
 
 from core.platform import models
 import feconf
@@ -38,7 +37,7 @@ class UserSettings(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         email: str. The user email.
-        role: str. Role of the user.
+        roles: list(str). Roles of the user.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -70,7 +69,7 @@ class UserSettings(python_utils.OBJECT):
     """
 
     def __init__(
-            self, user_id, email, role, username=None,
+            self, user_id, email, roles, banned, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
             last_started_state_translation_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None, last_edited_an_exploration=None,
@@ -86,7 +85,8 @@ class UserSettings(python_utils.OBJECT):
         Args:
             user_id: str. The unique ID of the user.
             email: str. The user email.
-            role: str. Role of the user.
+            roles: list(str). Roles of the user.
+            banned: bool. Whether the uses is banned.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -126,7 +126,7 @@ class UserSettings(python_utils.OBJECT):
         """
         self.user_id = user_id
         self.email = email
-        self.role = role
+        self.roles = roles
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (
@@ -149,18 +149,19 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_audio_language_code = preferred_audio_language_code
         self.pin = pin
         self.display_alias = display_alias
+        self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
 
     def validate(self):
-        """Checks that the user_id, email, role, pin and display_alias
+        """Checks that the user_id, email, roles, banned, pin and display_alias
         fields of this UserSettings domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
             ValidationError. The email is not str.
             ValidationError. The email is invalid.
-            ValidationError. The role is not str.
+            ValidationError. The roles is not a list.
             ValidationError. Given role does not exist.
             ValidationError. The pin is not str.
             ValidationError. The display alias is not str.
@@ -177,11 +178,39 @@ class UserSettings(python_utils.OBJECT):
         ):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
-        if not isinstance(self.role, python_utils.BASESTRING):
+        if not isinstance(self.banned, bool):
             raise utils.ValidationError(
-                'Expected role to be a string, received %s' % self.role)
-        if not role_services.is_valid_role(self.role):
-            raise utils.ValidationError('Role %s does not exist.' % self.role)
+                'Expected banned to be a bool, received %s' % self.banned)
+
+        if not isinstance(self.roles, list):
+            raise utils.ValidationError(
+                'Expected roles to be a list, received %s' % self.roles)
+
+        if self.banned:
+            if self.roles:
+                raise utils.ValidationError(
+                    'Expected roles for banned user to be empty, '
+                    'recieved %s.' % self.roles)
+        else:
+            default_roles = []
+            if len(self.roles) != len(set(self.roles)):
+                raise utils.ValidationError(
+                    'Roles contains duplicate values: %s' % self.roles)
+            for role in self.roles:
+                if not isinstance(role, python_utils.BASESTRING):
+                    raise utils.ValidationError(
+                        'Expected roles to be a string, received %s' % role)
+
+                if role not in feconf.ALLOWED_USER_ROLES:
+                    raise utils.ValidationError(
+                        'Role %s does not exist.' % role)
+
+                if role in feconf.ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION:
+                    default_roles.append(role)
+
+            if len(default_roles) != 1:
+                raise utils.ValidationError(
+                    'Expected roles to contains one default role.')
 
         if self.pin is not None:
             if not isinstance(self.pin, python_utils.BASESTRING):
@@ -275,7 +304,8 @@ class UserSettings(python_utils.OBJECT):
         """
         return {
             'email': self.email,
-            'role': self.role,
+            'roles': self.roles,
+            'banned': self.banned,
             'username': self.username,
             'normalized_username': self.normalized_username,
             'last_agreed_to_terms': self.last_agreed_to_terms,
@@ -386,19 +416,33 @@ class UserSettings(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'This username is not available.')
 
+    def mark_banned(self):
+        """Marks a user banned."""
+        self.banned = True
+        self.roles = []
+
+    def unmark_banned(self, default_role):
+        """Unmarks ban for a banned user.
+
+        Args:
+            default_role: str. The role assigned to the user after marking
+                unbanned.
+        """
+        self.banned = False
+        self.roles = [default_role]
+
 
 class UserActionsInfo(python_utils.OBJECT):
     """A class representing information of user actions.
-
     Attributes:
         user_id: str. The unique ID of the user.
-        role: str. The role ID of the user.
+        roles: list(str). The roles of the user.
         actions: list(str). A list of actions accessible to the role.
     """
 
-    def __init__(self, user_id, role, actions):
+    def __init__(self, user_id, roles, actions):
         self._user_id = user_id
-        self._role = role
+        self._roles = roles
         self._actions = actions
 
     @property
@@ -411,13 +455,13 @@ class UserActionsInfo(python_utils.OBJECT):
         return self._user_id
 
     @property
-    def role(self):
-        """Returns the role ID of user.
+    def roles(self):
+        """Returns the roles of user.
 
         Returns:
-            role: str. The role ID of the user.
+            role: list(str). The roles of the user.
         """
-        return self._role
+        return self._roles
 
     @property
     def actions(self):
@@ -621,60 +665,218 @@ class IncompleteActivities(python_utils.OBJECT):
     """Domain object for the incomplete activities model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids,
+            partially_learnt_topic_ids, partially_mastered_topic_id=None):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
+        self.story_ids = story_ids
+        self.partially_learnt_topic_ids = partially_learnt_topic_ids
+        self.partially_mastered_topic_id = partially_mastered_topic_id
 
     def add_exploration_id(self, exploration_id):
-        """Adds the exploration id to the list of incomplete exploration ids."""
+        """Adds the exploration id to the list of incomplete exploration ids.
+
+        Args:
+            exploration_id: str. The exploration id to be inserted into the
+                incomplete list.
+        """
         self.exploration_ids.append(exploration_id)
 
     def remove_exploration_id(self, exploration_id):
         """Removes the exploration id from the list of incomplete exploration
         ids.
+
+        Args:
+            exploration_id: str. The exploration id to be removed from the
+                incomplete list.
         """
         self.exploration_ids.remove(exploration_id)
 
     def add_collection_id(self, collection_id):
-        """Adds the collection id to the list of incomplete collection ids."""
+        """Adds the collection id to the list of incomplete collection ids.
+
+        Args:
+            collection_id: str. The collection id to be inserted into the
+                incomplete list.
+        """
         self.collection_ids.append(collection_id)
 
     def remove_collection_id(self, collection_id):
         """Removes the collection id from the list of incomplete collection
         ids.
+
+        Args:
+            collection_id: str. The collection id to be removed from the
+                incomplete list.
         """
         self.collection_ids.remove(collection_id)
+
+    def add_story_id(self, story_id):
+        """Adds the story id to the list of incomplete story ids.
+
+        Args:
+            story_id: str. The story id to be inserted into the
+                incomplete list.
+        """
+        self.story_ids.append(story_id)
+
+    def remove_story_id(self, story_id):
+        """Removes the story id from the list of incomplete story
+        ids.
+
+        Args:
+            story_id: str. The story id to be removed from the
+                incomplete list.
+        """
+        self.story_ids.remove(story_id)
+
+    def add_partially_learnt_topic_id(self, partially_learnt_topic_id):
+        """Adds the topic id to the list of partially learnt topic ids.
+
+        Args:
+            partially_learnt_topic_id: str. The topic id to be inserted in the
+                partially learnt list.
+        """
+        self.partially_learnt_topic_ids.append(partially_learnt_topic_id)
+
+    def remove_partially_learnt_topic_id(self, partially_learnt_topic_id):
+        """Removes the topic id from the list of partially learnt topic
+        ids.
+
+        Args:
+            partially_learnt_topic_id: str. The topic id to be removed from the
+                partially learnt list.
+        """
+        self.partially_learnt_topic_ids.remove(partially_learnt_topic_id)
 
 
 class CompletedActivities(python_utils.OBJECT):
     """Domain object for the activities completed by learner model."""
 
     def __init__(
-            self, user_id, exploration_ids, collection_ids):
+            self, user_id, exploration_ids, collection_ids, story_ids,
+            learnt_topic_ids, mastered_topic_ids=None):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
+        self.story_ids = story_ids
+        self.learnt_topic_ids = learnt_topic_ids
+        self.mastered_topic_ids = mastered_topic_ids
 
     def add_exploration_id(self, exploration_id):
-        """Adds the exploration id to the list of completed exploration ids."""
+        """Adds the exploration id to the list of completed exploration ids.
+
+        Args:
+            exploration_id: str. The exploration id to be inserted into the
+                completed list.
+        """
         self.exploration_ids.append(exploration_id)
 
     def remove_exploration_id(self, exploration_id):
         """Removes the exploration id from the list of completed exploration
         ids.
+
+        Args:
+            exploration_id: str. The exploration id to be removed from the
+                completed list.
         """
         self.exploration_ids.remove(exploration_id)
 
     def add_collection_id(self, collection_id):
-        """Adds the collection id to the list of completed collection ids."""
+        """Adds the collection id to the list of completed collection ids.
+
+        Args:
+            collection_id: str. The collection id to be inserted into the
+                completed list.
+        """
         self.collection_ids.append(collection_id)
 
     def remove_collection_id(self, collection_id):
         """Removes the collection id from the list of completed collection
         ids.
+
+        Args:
+            collection_id: str. The collection id to be removed from the
+                completed list.
         """
         self.collection_ids.remove(collection_id)
+
+    def add_story_id(self, story_id):
+        """Adds the story id to the list of completed story ids.
+
+        Args:
+            story_id: str. The story id to be inserted in the
+                completed list.
+        """
+        self.story_ids.append(story_id)
+
+    def remove_story_id(self, story_id):
+        """Removes the story id from the list of completed story
+        ids.
+
+        Args:
+            story_id: str. The story id to be removed from the
+                completed list.
+        """
+        self.story_ids.remove(story_id)
+
+    def add_learnt_topic_id(self, learnt_topic_id):
+        """Adds the topic id to the list of learnt topic ids.
+
+        Args:
+            learnt_topic_id: str. The topic id to be inserted in the
+                learnt list.
+        """
+        self.learnt_topic_ids.append(learnt_topic_id)
+
+    def remove_learnt_topic_id(self, learnt_topic_id):
+        """Removes the topic id from the list of learnt topic
+        ids.
+
+        Args:
+            learnt_topic_id: str. The topic id to be removed from the
+                learnt list.
+        """
+        self.learnt_topic_ids.remove(learnt_topic_id)
+
+
+class LearnerGoals(python_utils.OBJECT):
+    """Domain object for the learner goals model."""
+
+    def __init__(
+            self, user_id, topic_ids_to_learn,
+            topic_ids_to_master):
+        self.id = user_id
+        self.topic_ids_to_learn = topic_ids_to_learn
+        self.topic_ids_to_master = topic_ids_to_master
+
+    def add_topic_id_to_learn(self, topic_id):
+        """Adds the topic id to 'topic IDs to learn' list.
+
+        Args:
+            topic_id: str. The topic id to be inserted to the learn list.
+        """
+        self.topic_ids_to_learn.append(topic_id)
+
+    def remove_topic_id_from_learn(self, topic_id):
+        """Removes the topic id from the 'topic IDs to learn' list.
+
+        topic_id: str. The id of the topic to be removed.
+        """
+        self.topic_ids_to_learn.remove(topic_id)
+
+    def to_dict(self):
+        """Return dictionary representation of LearnerGoals.
+
+        Returns:
+            dict. A dictionary containing the LearnerGoals class information
+            in a dictionary form.
+        """
+        return {
+            'topic_ids_to_learn': self.topic_ids_to_learn,
+            'topic_ids_to_master': self.topic_ids_to_master
+        }
 
 
 class LearnerPlaylist(python_utils.OBJECT):

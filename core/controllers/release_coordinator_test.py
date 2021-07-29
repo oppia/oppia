@@ -14,14 +14,11 @@
 
 """Tests for the release coordinator page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core import jobs
 from core import jobs_registry
-from core import jobs_test
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
@@ -57,7 +54,7 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -75,7 +72,8 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
 
         response = self.get_html_response('/release-coordinator')
         response.mustcontain(
-            '<oppia-release-coordinator-page></oppia-release-coordinator-page>')
+            '<oppia-release-coordinator-page-root>' +
+            '</oppia-release-coordinator-page-root>')
         self.logout()
 
 
@@ -85,12 +83,12 @@ class JobsHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(JobsHandlerTest, self).setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -104,7 +102,7 @@ class JobsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
         # Login as an admin.
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.get_json('/jobshandler', expected_status_int=401)
         self.logout()
 
@@ -112,7 +110,7 @@ class JobsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         response = self.get_json('/jobshandler')
         self.assertItemsEqual(list(response), [
-            'continuous_computations_data', 'human_readable_current_time',
+            'human_readable_current_time',
             'one_off_job_status_summaries', 'audit_job_status_summaries',
             'recent_job_data', 'unfinished_job_data'])
         self.logout()
@@ -171,155 +169,6 @@ class JobsHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_start_computation(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'start_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        self.logout()
-
-    def test_stop_computation_with_running_jobs(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_mapreduce_tasks()
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'stop_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        self.logout()
-
-    def test_stop_computation_with_finished_jobs(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        jobs_test.StartExplorationEventCounter.start_computation()
-
-        self.process_and_flush_pending_mapreduce_tasks()
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'stop_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        self.logout()
-
-    def test_stop_computation_with_stopped_jobs(self):
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assertEqual(
-            jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
-
-        jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_mapreduce_tasks()
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-
-        jobs_test.StartExplorationEventCounter.stop_computation(self.admin_id)
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        with self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            [jobs_test.StartExplorationEventCounter]):
-
-            self.get_json('/jobshandler')
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '/jobshandler', {
-                    'action': 'stop_computation',
-                    'computation_type': 'StartExplorationEventCounter'
-                }, csrf_token=csrf_token)
-
-        status = jobs_test.StartExplorationEventCounter.get_status_code()
-        self.assertEqual(
-            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-
-        self.logout()
-
     def test_handler_with_invalid_action_raise_400(self):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
@@ -342,12 +191,12 @@ class JobOutputHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(JobOutputHandlerTest, self).setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
@@ -382,11 +231,11 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MemoryCacheHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
 
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 

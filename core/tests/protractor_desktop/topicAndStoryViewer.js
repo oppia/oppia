@@ -81,7 +81,7 @@ describe('Topic and Story viewer functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
@@ -161,11 +161,10 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    const loginButton = element(by.css('.protractor-test-login-button'));
+    var loginButton = element(by.css('.protractor-test-login-button'));
     await action.click('Login button', loginButton);
-    const useManualNavigation = false;
     await users.createAndLoginUser(
-      'newStoryViewer@storyviewer.com', 'newStoryViewer', useManualNavigation);
+      'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
 
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
@@ -178,7 +177,7 @@ describe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
-      await users.createAndLoginAdminUser(
+      await users.createAndLoginCurriculumAdminUser(
         'creator1@storyViewer.com', 'creatorStoryViewer1');
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.expectTopicInformationToBe('Description');

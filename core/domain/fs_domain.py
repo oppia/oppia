@@ -16,8 +16,8 @@
 
 """Domain objects representing a file system and a file stream."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 import feconf
@@ -31,9 +31,10 @@ app_identity_services = models.Registry.import_app_identity_services()
 CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 
 ALLOWED_ENTITY_NAMES = [
-    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_TOPIC,
-    feconf.ENTITY_TYPE_SKILL, feconf.ENTITY_TYPE_STORY,
-    feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
+    feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_BLOG_POST,
+    feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_SKILL,
+    feconf.ENTITY_TYPE_STORY, feconf.ENTITY_TYPE_QUESTION,
+    feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
 ALLOWED_SUGGESTION_IMAGE_CONTEXTS = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
     feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS]

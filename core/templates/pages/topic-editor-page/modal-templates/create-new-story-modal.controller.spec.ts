@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EditableStoryBackendApiService } from
   'domain/story/editable-story-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 import CONSTANTS from 'assets/constants';
 
@@ -119,5 +119,9 @@ describe('Create New Story Modal Controller', function() {
 
     $scope.story.title = '';
     expect($scope.isValid()).toBe(false);
+  });
+
+  it ('should update View when thumbnail has been uploaded', function() {
+    $scope.updateView();
   });
 });

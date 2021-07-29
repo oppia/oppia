@@ -19,7 +19,6 @@
 
 var forms = require('./forms.js');
 var path = require('path');
-var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
@@ -32,9 +31,9 @@ var imageUploadInput = element(
 var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
-  '.protractor-thumbnail-reset-button'));
+  '.protractor-test-thumbnail-reset-button'));
 var stateNameText = element(
-  by.css('.oppia-state-name-text'));
+  by.css('.protractor-test-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -70,7 +69,7 @@ var openEditRolesForm = async function() {
 
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = async function(welcomeModalIsShown) {
-  await createExplorationAndStartTutorial();
+  await createExplorationAndStartTutorial(false);
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   if (welcomeModalIsShown) {
@@ -79,14 +78,12 @@ var createExploration = async function(welcomeModalIsShown) {
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
-var createExplorationAndStartTutorial = async function() {
+var createExplorationAndStartTutorial = async function(isCollectionEditor) {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
-  // Wait for the dashboard to transition the creator into the editor page.
-  var isAdmin = await users.isAdmin();
 
   await creatorDashboardPage.clickCreateActivityButton();
-  if (isAdmin) {
+  if (isCollectionEditor) {
     var activityCreationModal = element(
       by.css('.protractor-test-creation-modal'));
     await waitFor.visibilityOf(
@@ -251,7 +248,15 @@ var addExplorationCollaborator = async function(username) {
 };
 
 var addExplorationVoiceArtist = async function(username) {
-  await _addExplorationRole('Voice Artist', username);
+  await action.click('Edit voice artist role button', element(
+    by.css('.protractor-test-edit-voice-artist-roles')));
+  await action.sendKeys(
+    'New voice artist username input',
+    element(by.css('.protractor-test-new-voice-artist-username')), username);
+  await action.click('Add voice artist button', element(
+    by.css('.protractor-test-add-voice-artist-role-button')));
+  await waitFor.visibilityOf(element(by.css(
+    '.protractor-test-voice-artist-' + username)));
 };
 
 var addExplorationPlaytester = async function(username) {
@@ -310,17 +315,10 @@ var getImageSource = async function(customImageElement) {
 
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
-  await waitFor.visibilityOf(
-    imageClickableElement,
-    'Image element is taking too long to appear.');
-  await imageClickableElement.click();
-
+  await action.click('Image clickable element', imageClickableElement);
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
-    await waitFor.elementToBeClickable(
-      thumbnailResetButton,
-      'Topic thumbnail reset button taking too long to appear.');
-    await thumbnailResetButton.click();
+    await action.click('Topic thumbnail reset button', thumbnailResetButton);
   } else {
     expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
@@ -337,7 +335,7 @@ var submitImage = async function(
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  await imageSubmitButton.click();
+  await action.click('Image submit button', imageSubmitButton);
   await waitFor.invisibilityOf(
     imageUploadInput,
     'Image uploader is taking too long to disappear');

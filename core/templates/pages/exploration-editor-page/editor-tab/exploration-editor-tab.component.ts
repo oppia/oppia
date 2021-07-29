@@ -54,7 +54,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
-require('components/state-editor/state-editor.directive.ts');
+require('components/state-editor/state-editor.component.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-card-is-checkpoint.service.ts');
@@ -82,7 +82,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateCardIsCheckpointService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTutorialFirstTimeService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
     'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
@@ -92,7 +92,7 @@ angular.module('oppia').component('explorationEditorTab', {
         LoaderService,
         RouterService, SiteAnalyticsService, StateCardIsCheckpointService,
         StateEditorRefreshService, StateEditorService,
-        StateTutorialFirstTimeService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -292,8 +292,8 @@ angular.module('oppia').component('explorationEditorTab', {
         });
         if (shouldPrompt) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/components/forms/forms-templates/mark-all-audio-and-' +
+            template: require(
+              'components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
@@ -309,8 +309,8 @@ angular.module('oppia').component('explorationEditorTab', {
                 contentId)) {
                 writtenTranslations.markAllTranslationsAsNeedingUpdate(
                   contentId);
-                ExplorationStatesService.saveWrittenTranslations(
-                  stateName, writtenTranslations);
+                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
+                  contentId, stateName);
               }
             });
           }, function() {

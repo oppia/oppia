@@ -115,7 +115,7 @@ describe('GraphInputValidationService', () => {
         rule_type: 'IsIsomorphicTo'
       }, 'GraphInput')],
       goodDefaultOutcome,
-      null,
+      [],
       null);
     answerGroups = [answerGroup, cloneDeep(answerGroup)];
   });
@@ -130,10 +130,10 @@ describe('GraphInputValidationService', () => {
   it('should expect graph and edit customization arguments', () => {
     expect(() => {
       validatorService.getAllWarnings(
-        // This throws "Argument of type '{}' is not assignable to
-        // parameter of type 'GraphInputCustomizationArgs'." We are purposely
-        // assigning the wrong type of customization args in order to test
-        // validations.
+        // This throws "Argument of type '{}'. We need to suppress this error
+        // because ..  oppia/comment-style is not assignable to parameter of
+        // type 'GraphInputCustomizationArgs'." We are purposely assigning the
+        // wrong type of customization args in order to test validations.
         // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(

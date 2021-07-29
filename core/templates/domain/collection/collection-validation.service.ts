@@ -51,7 +51,7 @@ export class CollectionValidationService {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
     var tagRegex = new RegExp(AppConstants.TAG_REGEX);
-    return tags.every(function(tag) {
+    return tags.every((tag) => {
       return tag.match(tagRegex);
     });
   }

@@ -21,7 +21,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
 import { ImagesData } from 'services/image-local-storage.service';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -44,7 +43,7 @@ export class TranslateTextBackendApiService {
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
       languageCode: string, contentHtml: string, translationHtml: string,
-      imagesData: ImagesData[]): Promise<unknown> {
+      imagesData: ImagesData[], dataFormat: string): Promise<unknown> {
     const postData = {
       suggestion_type: 'translate_content',
       target_type: 'exploration',
@@ -52,12 +51,13 @@ export class TranslateTextBackendApiService {
       target_id: expId,
       target_version_at_submission: expVersion,
       change: {
-        cmd: 'add_translation',
+        cmd: 'add_written_translation',
         content_id: contentId,
         state_name: stateName,
         language_code: languageCode,
         content_html: contentHtml,
-        translation_html: translationHtml
+        translation_html: translationHtml,
+        data_format: dataFormat
       }
     };
 

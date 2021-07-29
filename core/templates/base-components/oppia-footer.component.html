@@ -6,6 +6,7 @@
         <ul>
           <li>
             <a href="/about"
+               [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
                [innerHTML]="'I18N_FOOTER_ABOUT' | translate">
             </a>
           </li>
@@ -17,11 +18,6 @@
           <li>
             <a href="https://medium.com/oppia-org"
                [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
-            </a>
-          </li>
-          <li>
-            <a href="/about#credits"
-               [innerHTML]="'I18N_FOOTER_CREDITS' | translate">
             </a>
           </li>
           <li>
@@ -99,8 +95,6 @@
         </ul>
       </div>
       <div class="col">
-        <h3><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h3>
-        <oppia-i18n-language-selector></oppia-i18n-language-selector>
         <oppia-social-buttons></oppia-social-buttons>
       </div>
     </div>

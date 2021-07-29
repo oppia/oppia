@@ -21,9 +21,9 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Site Analytics Service', () => {
-  let sas = null;
-  let ws = null;
-  let gtagSpy: jasmine.Spy = null;
+  let sas: SiteAnalyticsService;
+  let ws: WindowRef;
+  let gtagSpy: jasmine.Spy;
 
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);
@@ -567,6 +567,14 @@ describe('Site Analytics Service', () => {
     });
   });
 
+  it('should register classroom page viewed', () => {
+    spyOn(sas, '_sendEventToGoogleAnalytics');
+
+    sas.registerClassroomPageViewed();
+    expect(sas._sendEventToGoogleAnalytics).toHaveBeenCalledWith(
+      'ClassroomEngagement', 'impression', 'ViewClassroom');
+  });
+
   it('should register active classroom lesson usage', () => {
     let explorationId = '123';
     sas.registerClassroomLessonActiveUse('Fractions', explorationId);
@@ -578,7 +586,7 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register classroom header click event', () => {
-    sas.registerClassoomHeaderClickEvent();
+    sas.registerClassroomHeaderClickEvent();
 
     expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
       event_category: 'ClassroomEngagement',

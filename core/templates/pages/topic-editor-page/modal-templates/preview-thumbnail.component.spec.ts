@@ -19,15 +19,16 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ThumbnailDisplayComponent } from 'components/forms/custom-forms-directives/thumbnail-display.component';
-import { ContextService } from 'services/context.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PreviewThumbnailComponent } from './preview-thumbnail.component';
+import { ContextService } from 'services/context.service';
 
 describe('Preview Thumbnail Component', function() {
   let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;
   let testUrl = 'test_url';
+  let contextService: ContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,11 +48,13 @@ describe('Preview Thumbnail Component', function() {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
     componentInstance = fixture.componentInstance;
     imageUploadHelperService = (
-      TestBed.inject(ImageUploadHelperService) as unknown) as
-        jasmine.SpyObj<ImageUploadHelperService>;
+       TestBed.inject(ImageUploadHelperService) as unknown) as
+         jasmine.SpyObj<ImageUploadHelperService>;
+    contextService = TestBed.inject(ContextService);
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
       .and.returnValue(testUrl);
+    spyOn(contextService, 'getEntityType').and.returnValue('topic');
   });
 
   it('should create', () => {

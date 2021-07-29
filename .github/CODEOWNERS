@@ -44,20 +44,19 @@
 
 
 # Android team
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/android_validation_constants*.py @rt4914
+/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
+/core/controllers/oppia_root*.py @srijanreddy98 @darksun27
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
 /core/templates/components/code-mirror/ @srijanreddy98 @darksun27
-/core/templates/components/material.module.ts @srijanreddy98 @darksun27
-/core/templates/components/oppia-angular-root.component.ts @srijanreddy98 @darksun27
-/core/templates/pages/missing-translation-custom-handler*.ts @srijanreddy98 @darksun27
-/core/templates/pages/translate-cache.factory*.ts @srijanreddy98 @darksun27
-/core/templates/pages/translate-custom-parser*.ts @srijanreddy98 @darksun27
-/core/templates/pages/translate-loader.factory*.ts @srijanreddy98 @darksun27
+/core/templates/modules/ @srijanreddy98 @darksun27
+/core/templates/components/oppia-angular-root.component.* @srijanreddy98 @darksun27
+/core/templates/pages/mock-ajs.ts @srijanreddy98 @darksun27
+/core/templates/pages/oppia-root/ @srijanreddy98 @darksun27
+/core/templates/i18n/ @srijanreddy98 @darksun27
 /core/templates/base-components/oppia-root.directive.ts @srijanreddy98 @darksun27
 /core/templates/base-components/oppia-root.directive.html @srijanreddy98 @darksun27
 /core/templates/services/angular-services.index.ts @srijanreddy98 @darksun27
@@ -68,6 +67,7 @@
 /core/templates/services/question-validation.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
+/core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @darksun27
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
 /tsconfig-strict.json @vojtechjelinek
@@ -84,11 +84,6 @@
 /buf.gen.yaml @oppia/ml
 
 
-# App Feedback Reporting project
-# TODO(#12736): Restore code ownership for @BenHenning after 2021-05-24.
-/core/domain/app_feedback_report_*.py @vinitamurthi
-
-
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
@@ -99,6 +94,13 @@
 /core/templates/services/speech-synthesis-chunker.service*.ts @DubeySandeep
 /core/templates/services/assets-backend-api.service*.ts @DubeySandeep
 
+
+# Blog project
+/core/domain/blog*.py @iamprayush @aks681
+/core/controllers/blog_dashboard*.py @aks681
+/core/controllers/blog_homepage*.py @aks681
+/core/templates/domain/blog/ @kevintab95 @iamprayush
+/core/templates/pages/blog-dashboard-page/ @aks681 @iamprayush
 
 # Collection project.
 /core/controllers/collection*.py @aks681
@@ -118,35 +120,36 @@
 /core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
+/core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
 
 
 # Core documentation
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/AUTHORS @seanlip
+/AUTHORS @seanlip @BenHenning
 /CHANGELOG @seanlip
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/about-page/about-page.constants.ts @seanlip
+/core/templates/pages/about-page/about-page.constants.ts @seanlip @BenHenning
+/core/templates/pages/license-page/ @vojtechjelinek
+/core/templates/pages/license-page/license-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/privacy-page/privacy-page.component.html @seanlip
-/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
+/core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.component.ts @seanlip @BenHenning
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/templates/pages/terms-page/terms-page.component.html @seanlip
+/core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
 
 
 # Dashboard pages.
 /core/controllers/creator_dashboard*.py @nithusha21
 /core/controllers/email_dashboard*.py @nithusha21
 /core/controllers/learner_dashboard*.py @nithusha21
+/core/controllers/learner_goals*.py @nithusha21
 /core/controllers/learner_playlist*.py @nithusha21
 /core/controllers/subscriptions*.py @nithusha21
 /core/domain/activity*.py @nithusha21
+/core/domain/learner_goals_services*.py @nithusha21
 /core/domain/learner_playlist_services*.py @nithusha21
 /core/domain/learner_progress*.py @nithusha21
 /core/domain/subscription_services*.py @nithusha21
@@ -156,12 +159,10 @@
 /core/templates/pages/creator-dashboard-page/ @nithusha21
 /core/templates/pages/email-dashboard-pages/ @nithusha21
 /core/templates/pages/learner-dashboard-page/ @nithusha21
-/core/templates/pages/notifications-dashboard-page/ @nithusha21
 
 
 # Dev workflow team.
-# TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
-/.circleci/ @kevintab95 @krishnarao22
+/.circleci/ @kevintab95 @krishnarao22 @U8NWXD
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -179,12 +180,11 @@
 /scripts/check_frontend_test_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
-/scripts/typescript_checks*.py @DubeySandeep @vojtechjelinek
+/scripts/typescript_checks*.py @vojtechjelinek @DubeySandeep
 /scripts/linters/ @Hudda @DubeySandeep
 /scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
 /scripts/linters/python_linter*.py @sajalasati @DubeySandeep
-/scripts/linters/ts_ignore_exceptions.json @vojtechjelinek
 /ubuntu_dockerfile @DubeySandeep
 
 
@@ -240,8 +240,8 @@
 /appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
 /index.yaml @vojtechjelinek
-/queue.yaml @vojtechjelinek
-/main_taskqueue.py @vojtechjelinek
+/queue.yaml @nithusha21
+/main_taskqueue.py @nithusha21
 
 
 # Global components and filters.
@@ -250,7 +250,7 @@
 /core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/background-banner.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @srijanreddy98
@@ -261,7 +261,7 @@
 /core/templates/components/common-layout-directives/common-elements/promo-bar.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/promo-bar.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/sharing-links.component.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @srijanreddy98
 /core/templates/components/profile-link-directives/ @srijanreddy98
 /core/templates/components/summary-tile/ @srijanreddy98
@@ -307,7 +307,6 @@
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
 /core/domain/expression_parser*.py @iamprayush
-/core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
 /core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681
@@ -321,11 +320,11 @@
 /core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
 /extensions/interactions/ @iamprayush @vojtechjelinek
-/extensions/objects/ @iamprayush
+/extensions/objects/ @iamprayush @vojtechjelinek
 /extensions/objects/templates/filepath-editor.component*.ts @kevintab95
 /extensions/objects/templates/filepath-editor.component.html @kevintab95
-/extensions/value_generators/ @vojtechjelinek
-/extensions/__init__.py @iamprayush
+/extensions/value_generators/ @iamprayush @vojtechjelinek
+/extensions/__init__.py @iamprayush @vojtechjelinek
 
 
 # Lesson Analytics team.
@@ -336,10 +335,8 @@
 /core/domain/event_services*.py @brianrodri
 /core/domain/improvements_domain*.py @brianrodri
 /core/domain/improvements_services*.py @brianrodri
-/core/domain/improvements_validators*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
-/core/domain/statistics_validators*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
@@ -393,7 +390,6 @@
 /core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
 /core/domain/rights_domain*.py @aks681
-/core/domain/subtopic_validators*.py @vojtechjelinek
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -416,7 +412,7 @@
 /core/controllers/concept_card_viewer*.py @aks681
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
-/core/templates/components/entity-creation-services/skill-creation.service.ts @kevintab95
+/core/templates/components/entity-creation-services/skill-creation.service*.ts @kevintab95
 /core/templates/components/question-difficulty-selector/ @aks681
 /core/templates/components/review-material-editor/ @kevintab95
 /core/templates/components/rubrics-editor/ @kevintab95
@@ -458,7 +454,10 @@
 
 
 # Infrastructure.
-/jobs/ @brianrodri @rohitkatlaa
+/jobs/ @brianrodri
+/jobs/transforms @rohitkatlaa @brianrodri
+/jobs/types @rohitkatlaa @brianrodri
+/core/templates/domain/jobs/ @brianrodri
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -467,26 +466,19 @@
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
-/core/domain/audit_validators*.py @vojtechjelinek
-/core/domain/base_model_validators*.py @vojtechjelinek
 /core/domain/beam_job*.py @brianrodri
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
-/core/domain/job_validators*.py @vojtechjelinek
-/core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
-/core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
 /core/jobs*.py @brianrodri
 /core/platform/ @brianrodri
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
 /core/templates/combined-tests.spec.ts @srijanreddy98
-/core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
+/core/templates/pages/interaction-specs.constants.ajs.ts @vojtechjelinek
 /core/templates/pages/interaction-specs.constants.ts @nithusha21
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
-/core/templates/base-components/i18n-language-selector.component.ts @nithusha21
-/core/templates/base-components/i18n-language-selector.component.html @nithusha21
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
@@ -494,8 +486,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/redis.conf @seanlip
+/redis.conf @seanlip @BenHenning
 /release_constants.json @nithusha21
 /.firebase.json @brianrodri
 
@@ -511,26 +502,31 @@
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
+/mypy.ini @vojtechjelinek
+/mypy_requirements.txt @vojtechjelinek
+/python_utils*.py @DubeySandeep
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
-/python_utils*.py @DubeySandeep
+
 
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
+/core/controllers/blog_admin*.py @DubeySandeep
 /core/controllers/moderator*.py @DubeySandeep
 /core/controllers/recent_commits*.py @DubeySandeep
 /core/domain/moderator_services*.py @DubeySandeep
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
+/core/templates/domain/blog-admin/ @DubeySandeep
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
+/core/templates/pages/blog-admin-page/ @DubeySandeep @nithusha21
 
 
 # Release team.
-# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
-/core/controllers/release_coordinator*.py @vojtechjelinek
-/core/templates/pages/release-coordinator-page/ @vojtechjelinek
-/scripts/release_scripts/ @vojtechjelinek
+/core/controllers/release_coordinator*.py @nithusha21 @vojtechjelinek
+/core/templates/pages/release-coordinator-page/ @nithusha21 @vojtechjelinek
+/scripts/release_scripts/ @nithusha21 @vojtechjelinek
 
 
 # Rich text editor team.
@@ -540,7 +536,7 @@
 /core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @aks681
-/core/templates/components/ck-editor-helpers/ck-editor-copy-content-service*.ts @DubeySandeep @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-copy-content.service*.ts @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @DubeySandeep @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @DubeySandeep @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681
@@ -551,9 +547,9 @@
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
 /core/domain/image_validation_services*.py @DubeySandeep
 /core/domain/rte_component_registry*.py @vojtechjelinek
-/extensions/ckeditor_plugins/ @vojtechjelinek
-/extensions/rich_text_components/ @vojtechjelinek
-/assets/rich_text_components_definitions.ts @vojtechjelinek
+/extensions/ckeditor_plugins/ @aks681
+/extensions/rich_text_components/ @aks681
+/assets/rich_text_components_definitions.ts @aks681
 
 
 # Suggestion and feedback team.
@@ -576,38 +572,39 @@
 
 
 # Simple pages.
-/core/controllers/pages*.py @jameesjohn @vojtechjelinek
-/core/controllers/custom_landing_pages*.py @jameesjohn @vojtechjelinek
-/core/templates/pages/contact-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/delete-account-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/donate-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/error-pages/ @jameesjohn @vojtechjelinek
-/core/templates/pages/get-started-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/landing-pages/ @jameesjohn @vojtechjelinek
-/core/templates/pages/maintenance-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/participation-playbook/ @jameesjohn @vojtechjelinek
+/core/controllers/pages*.py @vojtechjelinek
+/core/controllers/custom_landing_pages*.py @vojtechjelinek
+/core/templates/pages/contact-page/ @vojtechjelinek
+/core/templates/pages/delete-account-page/ @vojtechjelinek
+/core/templates/pages/donate-page/ @vojtechjelinek
+/core/templates/pages/error-pages/ @vojtechjelinek
+/core/templates/pages/get-started-page/ @vojtechjelinek
+/core/templates/pages/landing-pages/ @vojtechjelinek
+/core/templates/pages/maintenance-page/ @vojtechjelinek
+/core/templates/pages/partnerships-page/ @vojtechjelinek
+/core/templates/pages/pending-account-deletion-page/ @vojtechjelinek
+/core/templates/pages/preferences-page/ @vojtechjelinek
+/core/templates/pages/signup-page/ @vojtechjelinek
+/core/templates/pages/splash-page/ @vojtechjelinek
+/core/templates/pages/teach-page/ @vojtechjelinek
+/core/templates/pages/thanks-page/ @vojtechjelinek
+/core/templates/pages/participation-playbook/ @vojtechjelinek
 
 # Speed Improvement team.
-/app_dev.yaml @vojtechjelinek
-/core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
-/core/templates/base-components/ @jameesjohn @vojtechjelinek
-/core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-/core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
-/core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
-/core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
-/core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
-/core/templates/third-party-imports/ @vojtechjelinek
-/.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
-/.lighthouserc-accessibility.js @jimbyo
+/app_dev.yaml @nithusha21 @vojtechjelinek
+/core/templates/google-analytics.initializer.ts @vojtechjelinek
+/core/templates/base-components/ @vojtechjelinek
+/core/templates/pages/Base.ts @vojtechjelinek
+/core/templates/pages/footer_js_libs.html @vojtechjelinek
+/core/templates/pages/header_css_libs.html @vojtechjelinek
+/core/templates/pages/header_js_libs.html @vojtechjelinek
+/core/templates/services/csrf-token.service*.ts @vojtechjelinek
+/core/templates/third-party-imports/ @nithusha21 @vojtechjelinek
+/.lighthouserc.js @jimbyo @vojtechjelinek
+/.lighthouserc-accessibility.js @jimbyo @vojtechjelinek
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
-/scripts/run_lighthouse_tests.py @jameesjohn @vojtechjelinek
-/webpack.*.ts @vojtechjelinek
+/scripts/run_lighthouse_tests.py @vojtechjelinek
+/webpack.*.ts @nithusha21 @vojtechjelinek
 
 
 # Typings.
@@ -616,9 +613,8 @@
 
 
 # User Data Takeout.
-# TODO(#12736): Restore code ownership for @BenHenning after 2021-05-24.
-/core/domain/takeout_*.py @vojtechjelinek
-/core/domain/wipeout_*.py @vojtechjelinek
+/core/domain/takeout_*.py @BenHenning @vojtechjelinek
+/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
 
 
 # User’s profile page.
@@ -635,43 +631,47 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
-/core/controllers/platform_feature*.py @vinitamurthi
-/core/domain/platform_feature_services*.py @vinitamurthi
-/core/domain/platform_parameter*.py @vinitamurthi
-/core/platform_feature*.py @vinitamurthi
-/core/templates/domain/platform_feature/ @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @vinitamurthi
-/core/templates/services/platform-feature*.ts @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
+/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
-/core/templates/**/*.spec.ts @nithusha21
-/core/templates/**/*Spec.ts @nithusha21
-/extensions/**/*.spec.ts @nithusha21
-/extensions/**/*Spec.ts @nithusha21
+/core/templates/**/*.spec.ts @oppia/frontend-test-reviewers
+/core/templates/**/*Spec.ts @oppia/frontend-test-reviewers
+/extensions/**/*.spec.ts @oppia/frontend-test-reviewers
+/extensions/**/*Spec.ts @oppia/frontend-test-reviewers
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# Data stability.
+/core/controllers/domain_objects_validator*.py @rohitkatlaa @vojtechjelinek
+/core/controllers/payload_validator*.py @rohitkatlaa @vojtechjelinek
 
 
 # QA team.
 /core/tests/ @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+/core/controllers/android_e2e_config*.py @BenHenning
 /core/templates/karma.module.ts @vojtechjelinek
-# TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
-/core/tests/protractor_utils/ @kevintab95 @krishnarao22
-/core/tests/protractor_desktop/ @kevintab95 @krishnarao22
-/core/tests/protractor/ @kevintab95 @krishnarao22
-/core/tests/protractor.conf.js @kevintab95 @krishnarao22
-/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22
-/extensions/interactions/protractor.js @kevintab95 @krishnarao22
-/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22
-/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22
-/extensions/objects/protractor.js @kevintab95 @krishnarao22
-/scripts/backend_test_shards.json @krishnarao22
-/.github/actions @krishnarao22
+/core/tests/protractor_utils/ @kevintab95 @krishnarao22 @U8NWXD
+/core/tests/protractor_desktop/ @kevintab95 @krishnarao22 @U8NWXD
+/core/tests/protractor/ @kevintab95 @krishnarao22 @U8NWXD
+/core/tests/protractor.conf.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/interactions/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/extensions/objects/protractor.js @kevintab95 @krishnarao22 @U8NWXD
+/scripts/backend_test_shards.json @krishnarao22 @U8NWXD
+/.github/actions @krishnarao22 @U8NWXD
 
 
 # Python 3 Migration project.
@@ -692,24 +692,22 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-# TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24 (up to /core/domain/user*.py).
-/core/templates/services/svg-sanitizer.service.ts @seanlip
-/scripts/linters/warranted_angular_security_bypasses.py @seanlip
-/core/controllers/acl_decorators*.py @seanlip
-/core/controllers/base*.py @seanlip
-/core/domain/html*.py @seanlip
-/core/domain/rights_manager*.py @seanlip
-/core/domain/role_services*.py @seanlip
-/core/storage/ @seanlip
-/core/domain/user*.py @seanlip
+/core/templates/services/svg-sanitizer.service.ts @seanlip @BenHenning
+/scripts/linters/warranted_angular_security_bypasses.py @seanlip @BenHenning
+/core/controllers/acl_decorators*.py @seanlip @BenHenning
+/core/controllers/base*.py @seanlip @BenHenning
+/core/domain/html*.py @seanlip @BenHenning
+/core/domain/rights_manager*.py @seanlip @BenHenning
+/core/domain/role_services*.py @seanlip @BenHenning
+/core/storage/ @seanlip @BenHenning
+/core/domain/user*.py @seanlip @BenHenning
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek
-/scripts/install_third_party_libs.py @vojtechjelinek
+/scripts/install_third_party_libs.py @DubeySandeep
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-# TODO(#12993): Restore code ownership to @U8NWXD after 2021-07-10
-/.github/workflows/ @DubeySandeep @krishnarao22
+/.github/workflows/ @DubeySandeep @krishnarao22 @U8NWXD

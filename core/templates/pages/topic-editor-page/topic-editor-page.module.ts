@@ -35,25 +35,34 @@ import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
+import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
+import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
+import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
-    PracticeTabComponent,
-    StoriesListComponent,
-    SubtopicsListComponent
-  ],
-  entryComponents: [
-    OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
+    SubtopicPreviewTab,
+    TopicPreviewTabComponent,
+    TopicEditorNavbarBreadcrumbComponent,
+  ],
+  entryComponents: [
+    PracticeTabComponent,
+    StoriesListComponent,
+    SubtopicsListComponent,
+    SubtopicPreviewTab,
+    TopicPreviewTabComponent,
+    TopicEditorNavbarBreadcrumbComponent,
   ],
   providers: [
     {

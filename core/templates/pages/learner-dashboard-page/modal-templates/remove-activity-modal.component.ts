@@ -29,11 +29,14 @@ import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/lear
   templateUrl: './remove-activity-modal.component.html',
 })
 export class RemoveActivityModalComponent implements OnInit {
-  @Input() sectionNameI18nId: string;
-  @Input() subsectionName: string;
-  @Input() activityId: string;
-  @Input() activityTitle: string;
-  removeActivityUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() sectionNameI18nId!: string;
+  @Input() subsectionName!: string;
+  @Input() activityId!: string;
+  @Input() activityTitle!: string;
+  removeActivityUrl!: string;
 
   constructor(
     private activeModal: NgbActiveModal,
@@ -51,6 +54,11 @@ export class RemoveActivityModalComponent implements OnInit {
         .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
         .COLLECTIONS) {
       activityType = constants.ACTIVITY_TYPE_COLLECTION;
+    } else if (this.subsectionName ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .LEARN_TOPIC) {
+      activityType = constants.ACTIVITY_TYPE_LEARN_TOPIC;
     } else {
       throw new Error('Subsection name is not valid.');
     }
@@ -66,6 +74,11 @@ export class RemoveActivityModalComponent implements OnInit {
         .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
       removeActivityUrlPrefix =
         '/learnerincompleteactivityhandler/';
+    } else if (this.sectionNameI18nId ===
+      LearnerDashboardPageConstants
+        .LEARNER_DASHBOARD_SECTION_I18N_IDS.CURRENT_GOALS) {
+      removeActivityUrlPrefix =
+        '/learnergoalshandler/';
     } else {
       throw new Error('Section name is not valid.');
     }
