@@ -37,7 +37,7 @@ describe('Assign Skill to Topic Modal Component', () => {
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
       return {
-        then: (callback: (resp) => void) => {
+        then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);
         }
       };
