@@ -14,8 +14,8 @@
 
 """Check for decrease in coverage from 100% of frontend files."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import fnmatch
 import os
@@ -118,9 +118,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'review-material-editor.directive.ts',
     'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
-    'schema-based-bool-editor.directive.ts',
     'schema-based-choices-editor.directive.ts',
-    'schema-based-custom-editor.directive.ts',
     'schema-based-custom-viewer.directive.ts',
     'schema-based-dict-editor.directive.ts',
     'schema-based-dict-viewer.directive.ts',

@@ -19,12 +19,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { ServicesConstants } from './services.constants';
 
 export class SearchResponseBackendDict {
   'search_cursor': string;
-  'activity_list': ExplorationSummaryBackendDict;
+  'activity_list': ExplorationSummaryDict[];
 }
 
 

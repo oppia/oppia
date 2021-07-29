@@ -35,8 +35,10 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 
 describe('Full exploration editor', function() {
+  var adminPage = null;
   var collectionEditorPage = null;
   var creatorDashboardPage = null;
   var explorationEditorPage = null;
@@ -47,6 +49,7 @@ describe('Full exploration editor', function() {
   var explorationEditorSettingsTab = null;
 
   beforeAll(async function() {
+    adminPage = new AdminPage.AdminPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -63,7 +66,7 @@ describe('Full exploration editor', function() {
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       await users.login('userTutorial@stateEditor.com');
 
-      await workflow.createExplorationAndStartTutorial();
+      await workflow.createExplorationAndStartTutorial(false);
       await explorationEditorMainTab.startTutorial();
       await explorationEditorMainTab.playTutorial();
       await explorationEditorMainTab.finishTutorial();
@@ -220,7 +223,9 @@ describe('Full exploration editor', function() {
 
   it('should give option for redirection when author has specified ' +
       'a refresher exploration ID', async function() {
-    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    await users.createCollectionEditor('testadm@collections.com', 'testadm');
+    await users.login('testadm@collections.com');
+    await adminPage.addRole('testadm', 'curriculum admin');
 
     // Create Parent Exploration not added to collection.
     await creatorDashboardPage.get();

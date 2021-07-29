@@ -34,7 +34,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { BeamJobsTabComponent } from 'pages/release-coordinator-page/beam-jobs-tab/beam-jobs-tab.component';
 import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
@@ -45,12 +44,14 @@ import { ReleaseCoordinatorNavbarComponent } from 'pages/release-coordinator-pag
 import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/release-coordinator-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
 
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     CommonModule,
     ClipboardModule,
     FormsModule,
@@ -73,7 +74,6 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
     BeamJobsTabComponent,
     CancelBeamJobDialogComponent,
     JobsTabComponent,
-    OppiaAngularRootComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,
@@ -83,7 +83,6 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
   entryComponents: [
     CancelBeamJobDialogComponent,
     JobsTabComponent,
-    OppiaAngularRootComponent,
     ReleaseCoordinatorNavbarComponent,
     ReleaseCoordinatorPageComponent,
     ReleaseCoordinatorPageRootComponent,
