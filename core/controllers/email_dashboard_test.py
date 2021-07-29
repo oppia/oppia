@@ -299,12 +299,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         csrf_token = self.get_new_csrf_token()
         params = {
-            'data': {
-                'email_body': 'random_email_body',
-                'email_subject': 'random_email_subject',
-                'email_intent': 'random_email_intent',
-                'max_recipients': 0
-            }
+            'email_body': 'random_email_body',
+            'email_subject': 'random_email_subject',
+            'email_intent': 'random_email_intent',
+            'max_recipients': 0
         }
         response = self.post_json(
             '/emaildashboardresult/%s' % 'invalid_query_id', params,
@@ -345,12 +343,10 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         csrf_token = self.get_new_csrf_token()
         params = {
-            'data': {
-                'email_body': 'random_email_body',
-                'email_subject': 'random_email_subject',
-                'email_intent': 'random_email_intent',
-                'max_recipients': 0
-            }
+            'email_body': 'random_email_body',
+            'email_subject': 'random_email_subject',
+            'email_intent': 'random_email_intent',
+            'max_recipients': 0
         }
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
@@ -566,12 +562,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_model.id, {
-                    'data': {
-                        'email_subject': 'subject',
-                        'email_body': 'body',
-                        'max_recipients': None,
-                        'email_intent': 'bulk_email_create_exploration'
-                    }}, csrf_token=csrf_token)
+                    'email_subject': 'subject',
+                    'email_body': 'body',
+                    'max_recipients': None,
+                    'email_intent': 'bulk_email_create_exploration'
+                    }, csrf_token=csrf_token)
             self.logout()
 
             # Check that emails are sent to qualified users.
@@ -685,12 +680,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
-                    'data': {
-                        'email_subject': 'subject',
-                        'email_body': 'body',
-                        'max_recipients': 1,
-                        'email_intent': 'bulk_email_create_exploration'
-                    }}, csrf_token=csrf_token)
+                    'email_subject': 'subject',
+                    'email_body': 'body',
+                    'max_recipients': 1,
+                    'email_intent': 'bulk_email_create_exploration'
+                    }, csrf_token=csrf_token)
             self.logout()
 
         query_models = user_models.UserQueryModel.query().fetch()
@@ -733,12 +727,11 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardresult/%s' % query_models[0].id, {
-                    'data': {
-                        'email_subject': 'subject',
-                        'email_body': 'body',
-                        'max_recipients': 1,
-                        'email_intent': 'bulk_email_create_exploration'
-                    }}, csrf_token=csrf_token)
+                    'email_subject': 'subject',
+                    'email_body': 'body',
+                    'max_recipients': 1,
+                    'email_intent': 'bulk_email_create_exploration'
+                    }, csrf_token=csrf_token)
             self.logout()
 
             # Check that emails are sent to max n qualified users.
