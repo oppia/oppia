@@ -22,25 +22,19 @@
 
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaResponseItemSelectionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./item-selection-input-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          const choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-          const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+angular.module('oppia').component('oppiaResponseItemSelectionInput', {
+  template: require('./item-selection-input-response.component.html'),
+  controllerAs: '$ctrl',
+  controller: ['$attrs', 'HtmlEscaperService',
+    function($attrs, HtmlEscaperService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        const choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
+        const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-          const choicesContentIds = choices.map(choice => choice._contentId);
-          ctrl.answer = answer.map(
-            contentId => choices[choicesContentIds.indexOf(contentId)]._html);
-        };
-      }]
-    };
-  }
-]);
+        const choicesContentIds = choices.map(choice => choice._contentId);
+        ctrl.answer = answer.map(
+          contentId => choices[choicesContentIds.indexOf(contentId)]._html);
+      };
+    }]
+});

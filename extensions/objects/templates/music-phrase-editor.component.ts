@@ -86,10 +86,6 @@ export class MusicPhraseEditorComponent implements OnInit {
 
   private _createProxy(): void {
     this._proxy = new Proxy(this._localValue, {
-      apply: function(target, thisArg, argumentsList) {
-        return thisArg[
-          target as unknown as string].apply(this, argumentsList);
-      },
       deleteProperty: function(target, property) {
         return true;
       },

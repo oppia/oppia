@@ -24,10 +24,10 @@ require(
   'number-with-units-validation.service.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'oppia-interactive-number-with-units.directive.ts');
+  'oppia-interactive-number-with-units.component.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'oppia-response-number-with-units.directive.ts');
+  'oppia-response-number-with-units.component.ts');
 require(
   'interactions/NumberWithUnits/directives/' +
-  'oppia-short-response-number-with-units.directive.ts');
+  'oppia-short-response-number-with-units.component.ts');
