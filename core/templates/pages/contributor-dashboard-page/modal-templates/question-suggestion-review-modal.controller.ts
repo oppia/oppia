@@ -33,8 +33,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   'ContributionOpportunitiesService', 'SkillBackendApiService',
   'SiteAnalyticsService', 'SuggestionModalService', 'UrlInterpolationService',
   'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
-  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics', 
-  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION', 
+  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
+  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
   'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $http, $scope, $uibModal, $uibModalInstance, ContextService,
