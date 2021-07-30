@@ -25,7 +25,7 @@ require('third-party-imports/leaflet.import');
 import { Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-import { icon, latLng, marker, tileLayer } from 'leaflet';
+import { icon, latLng, MapOptions, Marker, marker, tileLayer } from 'leaflet';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -33,21 +33,24 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './interactive-map-response.component.html'
 })
 export class ResponseInteractiveMapComponent implements OnInit {
-  @Input() answer;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() answer!: string;
+  mapOptions!: MapOptions;
+  mapMarkers!: Marker;
   private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   optionsSpec = {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
   };
-  mapOptions;
-  mapMarkers;
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private urlInterpolationService: UrlInterpolationService
   ) { }
 
-  private changeMarkerPosition(lat, lng) {
+  private changeMarkerPosition(lat: number, lng: number) {
     const newMarker = marker(
       [lat, lng],
       {
@@ -78,7 +81,8 @@ export class ResponseInteractiveMapComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
+    const answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as number[];
     this.mapOptions = {
       layers: [tileLayer(
         this.optionsSpec.layers[0].url,

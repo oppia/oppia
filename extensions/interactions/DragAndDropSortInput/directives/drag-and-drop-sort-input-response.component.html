@@ -36,7 +36,7 @@
   <li ng-repeat="responses in $ctrl.answer">
     <ul ng-model="responses">
       <li ng-repeat="response in responses track by $index">
-        <div ng-if="$ctrl.chooseItemType($index)" ng-class="itemtype">
+        <div ng-class="$ctrl.chooseItemType($index)">
           <angular-html-bind html-data="response"></angular-html-bind>
         </div>
       </li>
