@@ -16,7 +16,7 @@
  * @fileoverview Component for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, ViewRef } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -46,12 +46,14 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   }
 
   initializeCropper(): void {
-    let profilePicture = this.croppableImageRef.nativeElement;
-    this.cropper = new Cropper(profilePicture, {
-      minContainerWidth: 500,
-      minContainerHeight: 350,
-      aspectRatio: 1
-    });
+    if (this.croppableImageRef) {
+      let profilePicture = this.croppableImageRef.nativeElement;
+      this.cropper = new Cropper(profilePicture, {
+        minContainerWidth: 500,
+        minContainerHeight: 350,
+        aspectRatio: 1
+      });
+    }
   }
 
   onFileChanged(file: Blob): void {
@@ -64,7 +66,9 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         this.uploadedImage = decodeURIComponent(
           (<FileReader>e.target).result as string);
       }
-      this.changeDetectorRef.detectChanges();
+      if (!(this.changeDetectorRef as ViewRef).destroyed) {
+        this.changeDetectorRef.detectChanges();
+      }
       this.initializeCropper();
     };
 
