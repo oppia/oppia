@@ -16,8 +16,8 @@
 
 """Tests for services that operate on app feedback reports."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -49,9 +49,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     REPORT_SUBMITTED_TIMESTAMP = datetime.datetime.fromtimestamp(1615519337)
     # Timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
     TIMESTAMP_AT_MAX_DAYS = datetime.datetime.utcnow() - (
-        feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN)
+        feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN)
     TIMESTAMP_OVER_MAX_DAYS = datetime.datetime.utcnow() - (
-        feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN +
+        feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN +
         datetime.timedelta(days=2))
     TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
     TICKET_CREATION_TIMESTAMP_MSEC = utils.get_time_in_millisecs(

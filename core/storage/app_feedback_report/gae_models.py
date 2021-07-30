@@ -270,7 +270,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """
         datetime_now = datetime.datetime.utcnow()
         datetime_before_which_to_scrub = datetime_now - (
-            feconf.APP_FEEDBACK_REPORT_MAX_LIFESPAN +
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN +
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
         # the latter throws "Cannot filter a non-Node argument; received False".
