@@ -60,6 +60,7 @@ export class ImageUploadHelperService {
       return blob;
     }
 
+    // Return null when the image cannot be converted.
     return null;
   }
 
