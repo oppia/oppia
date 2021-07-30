@@ -43,8 +43,8 @@ describe('Blog Dashboard backend api service', () => {
     thumbnail_filename: 'image',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
-    last_updated: 3232323,
-    published_on: 1212121,
+    last_updated: '3232323',
+    published_on: '1212121',
   };
   let blogDashboardDataObject = {
     username: blogDashboardBackendResponse.username,

@@ -26,8 +26,8 @@ export interface BlogPostBackendDict {
   'thumbnail_filename': string | null;
   'tags': string[];
   'url_fragment': string;
-  'last_updated'?: number;
-  'published_on'?: number;
+  'last_updated'?: string;
+  'published_on'?: string;
 }
 export class BlogPostData {
   _id: string | null;
@@ -37,8 +37,8 @@ export class BlogPostData {
   _tags: string[];
   _thumbnailFilename: string | null;
   _urlFragment: string;
-  _lastUpdated?: number;
-  _publishedOn?: number;
+  _lastUpdated?: string;
+  _publishedOn?: string;
   constructor(
       id: string | null,
       authorUsername: string,
@@ -47,8 +47,8 @@ export class BlogPostData {
       tags: string[],
       thumbnailFilename: string | null,
       urlFragment: string,
-      lastUpdated?: number,
-      publishedOn?: number) {
+      lastUpdated?: string,
+      publishedOn?: string) {
     this._id = id;
     this._authorUsername = authorUsername;
     this._title = title;
@@ -68,11 +68,11 @@ export class BlogPostData {
     return this._authorUsername;
   }
 
-  get lastUpdated(): number | undefined {
+  get lastUpdated(): string | undefined {
     return this._lastUpdated;
   }
 
-  get publishedOn(): number | undefined {
+  get publishedOn(): string | undefined {
     return this._publishedOn;
   }
 

@@ -1,0 +1,117 @@
+<mat-card class="blog-card">
+  <picture>
+    <img mat-card-image
+         class="blog-card-thumbnail"
+         [src]="thumbnailUrl"
+         alt="Thumbnail image of the blog card">
+  </picture>
+  <div class="blog-card-content">
+    <mat-card-title class="blog-card-title">{{ blogPostSummary.title }}</mat-card-title>
+    <mat-card-header class="mt-2">
+      <img mat-card-avatar
+           [src]="authorProfilePictureUrl"
+           alt="Profile image of the author of the blog post">
+      <mat-card-subtitle>{{ blogPostSummary.authorUsername }}</mat-card-subtitle>
+      <mat-card-subtitle class="font-weight-light mobile-published-date">
+        {{ publishedDateString }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="mt-4 blog-card-summary">
+      <p>
+        {{ blogPostSummary.summary }}
+      </p>
+    </mat-card-content>
+  </div>
+</mat-card>
+<style>
+  .blog-card {
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    box-shadow: 0 3px 3px #00000029;
+    height: 384px;
+    margin: 10px;
+    width: 576px;
+  }
+
+  .mat-card-image.blog-card-thumbnail {
+    height: 144px;
+    max-width: unset;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .blog-card-content {
+    margin: 4px 46px;
+  }
+
+  .blog-card-title {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 2rem;
+    font-weight: 100;
+    line-height: 28px;
+    margin-bottom: 0;
+    text-align: left;
+  }
+
+  .blog-card-content .mat-card-avatar {
+    height: 32px;
+    width: 32px;
+  }
+
+  .blog-card-content mat-card-subtitle {
+    color: #555;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 20px;
+    margin-bottom: 3px;
+    margin-left: -10px;
+  }
+
+  .blog-card-summary {
+    color: #555;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.6rem;
+    line-height: 24px;
+    text-align: left;
+  }
+
+@media(max-width: 680px) {
+  .blog-card {
+    height: 280px;
+    width: 222px;
+  }
+
+  .mat-card-image.blog-card-thumbnail {
+    height: 78px;
+  }
+
+  .blog-card-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 14px;
+  }
+
+  .blog-card-content .mat-card-avatar {
+    height: 27px;
+    width: 27px;
+  }
+
+  .mobile-published-date {
+    font-size: 9px;
+  }
+
+  .blog-card-summary {
+    font-size: 1rem;
+  }
+
+  .blog-card-content {
+    margin: 0;
+  }
+
+  .blog-card-content mat-card-subtitle {
+    font-size: 0.9rem;
+    line-height: 16px;
+  }
+}
+</style>

@@ -16,17 +16,21 @@
  * @fileoverview Module for the blog-dashboard page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
+import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserModule } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
+import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
+import { BlogDashboardTileComponent } from './blog-dashboard-tile/blog-dashboard-tile.component';
 import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/blog-dashboard-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 
 declare var angular: ng.IAngularStatic;
 
@@ -34,15 +38,20 @@ declare var angular: ng.IAngularStatic;
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    MatTabsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     BlogDashboardNavbarBreadcrumbComponent,
+    BlogDashboardPageComponent,
+    BlogCardComponent,
+    BlogDashboardTileComponent,
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
-    BlogDashboardNavbarBreadcrumbComponent
+    BlogDashboardNavbarBreadcrumbComponent,
+    BlogDashboardPageComponent,
+    BlogCardComponent,
+    BlogDashboardTileComponent,
   ],
   providers: [
     {
@@ -62,11 +71,23 @@ class BlogDashboardPageModule implements DoBootstrap {
   ngDoBootstrap() {}
 }
 
-angular.module('oppia').requires.push(downgradeModule(extraProviders => {
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { downgradeModule } from '@angular/upgrade/static';
+
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(BlogDashboardPageModule);
-}));
+};
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}));
+declare var angular: ng.IAngularStatic;
+
+angular.module('oppia').requires.push(downgradedModule);
+
+angular.module('oppia').directive(
+  // This directive is the downgraded version of the Angular component to
+  // bootstrap the Angular 8.
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent
+  }) as angular.IDirectiveFactory);

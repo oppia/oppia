@@ -1,0 +1,85 @@
+<mat-card class="blog-dashboard-tile">
+  <div class="blog-dashboard-tile-content">
+    <mat-card-content>
+      <div class="blog-dashboard-tile-header">
+        <mat-card-title class="blog-dashboard-tile-title">{{ blogPostSummary.title }}</mat-card-title>
+        <button mat-icon-button>
+          <mat-icon class="align-text-bottom pl-4">more_vert</mat-icon>
+        </button>
+      </div>
+      <mat-card-subtitle class="blog-dashboard-tile-subtitle">
+        {{ lastUpdatedDateString }}
+      </mat-card-subtitle>
+      <p class="blog-post-summary">
+        {{ blogPostSummary.summary }}
+      </p>
+    </mat-card-content>
+  </div>
+</mat-card>
+<style>
+  .blog-dashboard-tile {
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    box-shadow: 0 3px 3px #00000029;
+    height: 230px;
+    margin: 10px;
+    width: 344px;
+  }
+
+  .blog-dashboard-tile-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .blog-dashboard-tile-title {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 2rem;
+    line-height: 24px;
+    text-align: left;
+  }
+
+  .blog-dashboard-tile-subtitle {
+      font-size: 1.2rem;
+      line-height: 10px;
+      margin-bottom: 8px;
+      margin-top: -10px;
+    }
+
+  .blog-post-summary {
+    color: #555;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.6rem;
+    text-align: left;
+  }
+
+  @media(max-width: 820px) {
+    .blog-dashboard-tile {
+      height: 160px;
+      width: 280px;
+    }
+
+    .blog-dashboard-tile-title {
+      font-size: 1.4rem;
+      line-height: 16.8px;
+    }
+
+    .blog-post-summary {
+      color: #555;
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1.2rem;
+      text-align: left;
+    }
+
+    .blog-dashboard-tile-subtitle {
+      margin-top: -20px;
+    }
+
+    @media(max-width: 420px) {
+      .blog-dashboard-tile {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  }
+</style>

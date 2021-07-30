@@ -34,8 +34,8 @@ describe('Blog Post update service', () => {
       thumbnail_filename: 'image',
       url_fragment: 'sampleUrl',
       tags: ['news'],
-      last_updated: 3454354354,
-      published_on: 3454354354,
+      last_updated: '3454354354',
+      published_on: '3454354354',
     };
     sampleBlogPost = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);

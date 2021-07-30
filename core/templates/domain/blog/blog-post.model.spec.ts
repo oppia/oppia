@@ -29,8 +29,8 @@ describe('Blog Post Object Factory', () => {
       thumbnail_filename: 'image',
       url_fragment: 'sampleUrl',
       tags: ['news'],
-      last_updated: 3454354354,
-      published_on: 3454354354,
+      last_updated: '3454354354',
+      published_on: '3454354354',
     };
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
@@ -96,7 +96,7 @@ describe('Blog Post Object Factory', () => {
   });
 
   it('should return correct property values', () => {
-    expect(sampleBlogPostData.lastUpdated).toEqual(3454354354);
-    expect(sampleBlogPostData.publishedOn).toEqual(3454354354);
+    expect(sampleBlogPostData.lastUpdated).toEqual('3454354354');
+    expect(sampleBlogPostData.publishedOn).toEqual('3454354354');
   });
 });

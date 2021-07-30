@@ -41,8 +41,10 @@ def _get_blog_card_summary_dicts_for_homepage(summaries):
     summary_dicts = []
     for summary in summaries:
         summary_dict = summary.to_dict()
-        summary_dict['author_name'] = (
-            user_services.get_username(summary_dict['author_id']))
+        user_settings = user_services.get_user_settings(
+            summary_dict['author_id'])
+        summary_dict['author_name'] = user_settings.username
+        summary_dict['profile_pic_url'] = user_settings.profile_picture_data_url
         del summary_dict['author_id']
         summary_dicts.append(summary_dict)
     return summary_dicts

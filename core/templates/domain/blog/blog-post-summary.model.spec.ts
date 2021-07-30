@@ -30,8 +30,8 @@ describe('Blog post summary object factory', () => {
     tags: ['news'],
     thumbnail_filename: 'image.png',
     url_fragment: 'title',
-    last_updated: 3232323,
-    published_on: 3232323,
+    last_updated: '3232323',
+    published_on: '3232323',
   };
 
   beforeEach(() => {
@@ -51,8 +51,8 @@ describe('Blog post summary object factory', () => {
     expect(sampleSummary.tags).toEqual(['news']);
     expect(sampleSummary.summary).toEqual('Hello World');
     expect(sampleSummary.urlFragment).toEqual('title');
-    expect(sampleSummary.lastUpdated).toEqual(3232323);
-    expect(sampleSummary.publishedOn).toEqual(3232323);
+    expect(sampleSummary.lastUpdated).toEqual('3232323');
+    expect(sampleSummary.publishedOn).toEqual('3232323');
     expect(sampleSummary.thumbnailFilename).toEqual('image.png');
   });
 });
