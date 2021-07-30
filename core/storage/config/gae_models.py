@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-i
 
 MYPY = False
 if MYPY:
-    from mypy_imports import datastore_services # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import datastore_services # pragma: no cover # pylint: disable=unused-import
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -80,6 +80,10 @@ class ConfigPropertyModel(base_models.VersionedModel):
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict to remove Any here.
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with VersionedModel.commit().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit(self, committer_id, commit_cmds): # type: ignore[override]
         # type: (Text, List[Dict[Text, Any]]) -> None
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
@@ -138,6 +142,7 @@ class PlatformParameterModel(base_models.VersionedModel):
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change 'rule_dicts' to TypedDict to remove Any here.
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):
         # type: (Text, List[Dict[Text, Any]], int) -> PlatformParameterModel

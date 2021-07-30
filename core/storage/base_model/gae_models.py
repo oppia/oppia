@@ -45,7 +45,8 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
 
 MYPY = False
 if MYPY:
-    from mypy_imports import datastore_services, transaction_services # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import ( # pragma: no cover
+        datastore_services, transaction_services) # pragma: no cover # pylint: disable=unused-import
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -196,6 +197,9 @@ class BaseModel(datastore_services.Model):
             'The has_reference_to_user_id() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
+    # Using Dict[Text, Any] here so that the return type of all the export_data
+    # methods in BaseModel's subclasses is a subclass of Dict[Text, Any].
+    # Otherwise subclass methods will throw [override] error.
     @staticmethod
     def export_data(user_id):
         # type: (Text) -> Dict[Text, Any]
@@ -303,8 +307,7 @@ class BaseModel(datastore_services.Model):
             entities.insert(index, None)
 
         if not include_deleted:
-            for i in python_utils.RANGE(len(entities)):
-                entity = entities[i]
+            for i, entity in enumerate(entities):
                 if entity is not None:
                     # Ruling out the possibility of None for mypy type checking.
                     assert entity is not None
@@ -495,8 +498,8 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
-    def put(self): # type: ignore[override]
-        # type: () -> None
+    def put(self, *args, **kwargs):
+        # type: (*Any, **Any) -> None
         """Unsupported operation on human-maintained models."""
         raise NotImplementedError('Use put_for_human or put_for_bot instead')
 
@@ -624,6 +627,7 @@ class BaseCommitLogEntryModel(BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict to remove Any here.
     @classmethod
     def create(
             cls, entity_id, version, committer_id, commit_type, commit_message,
@@ -799,11 +803,13 @@ class VersionedModel(BaseModel):
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
+    # TODO(#13523): Change 'snapshot' to domain objects to remove Any here.
     def compute_snapshot(self):
         # type: () -> Dict[Text, Any]
         """Generates a snapshot (dict) from the model property values."""
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
+    # TODO(#13523): Change 'snapshot_dict' to domain objects to remove Any here.
     def _reconstitute(self, snapshot_dict):
         # type: (SELF_VERSIONED_MODEL, Dict[Text, Any]) -> SELF_VERSIONED_MODEL
         """Populates the model instance with the snapshot.
@@ -862,6 +868,7 @@ class VersionedModel(BaseModel):
         return '%s%s%s' % (
             instance_id, VERSION_DELIMITER, version_number)
 
+    # TODO(#13523): Change 'commit_cmds' to domain objects to remove Any here.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -909,6 +916,9 @@ class VersionedModel(BaseModel):
         BaseModel.update_timestamps_multi(entities)
         BaseModel.put_multi_transactional(entities)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def delete(self, committer_id, commit_message, force_deletion=False): # type: ignore[override]
         # type: (Text, Text, bool) -> None
         """Deletes this model instance.
@@ -968,6 +978,9 @@ class VersionedModel(BaseModel):
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message,
                 commit_cmds)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete_multi().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def delete_multi( # type: ignore[override]
             cls, entity_ids, committer_id, commit_message,
@@ -1072,6 +1085,7 @@ class VersionedModel(BaseModel):
             'The put() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
+    # TODO(#13523): Change 'commit_cmds' to domain objects to remove Any here.
     def commit(self, committer_id, commit_message, commit_cmds):
         # type: (Text, Text, List[Dict[Text, Any]]) -> None
         """Saves a version snapshot and updates the model.
@@ -1274,6 +1288,7 @@ class VersionedModel(BaseModel):
         else:
             return cls.get_version(entity_id, version, strict=strict)
 
+    # TODO(#13523): Change 'snapshot' to domain objects to remove Any here.
     @classmethod
     def get_snapshots_metadata(
             cls, model_instance_id, version_numbers, allow_deleted=False):
@@ -1438,6 +1453,7 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.content_user_ids == user_id,
         )).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'commit_cmds' to domain objects to remove Any here.
     @classmethod
     def create(
             cls, snapshot_id, committer_id, commit_type, commit_message,
@@ -1534,6 +1550,7 @@ class BaseSnapshotContentModel(BaseModel):
             'content': EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change 'content' to domain objects to remove Any here.
     @classmethod
     def create(cls, snapshot_id, content):
         # type: (Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL], Text, Dict[Text, Any]) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL

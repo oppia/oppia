@@ -27,7 +27,8 @@ import utils
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, app_feedback_report_models # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import (
+    base_models, app_feedback_report_models) # pragma: no cover # pylint: disable=unused-import
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])

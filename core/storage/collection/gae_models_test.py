@@ -34,7 +34,8 @@ from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-i
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, collection_models, user_models # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import ( # pragma: no cover # pylint: disable=unused-import
+        base_models, collection_models, user_models) # pragma: no cover
 
 (base_models, collection_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
@@ -441,6 +442,8 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_invalid_status_is_successful(self):
         # type: () -> None
+        # TODO(#13523): Any here will be removed when model_dict is converted
+        # to TypedDicts.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['status'] = 'publicized'
 
@@ -467,6 +470,8 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_translator_ids_field_is_successful(self):
         # type: () -> None
+        # TODO(#13523): Any here will be removed when model_dict is converted
+        # to TypedDicts.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]

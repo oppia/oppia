@@ -28,7 +28,9 @@ from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # p
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, datastore_services, transaction_services # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import ( # pragma: no cover # pylint: disable=unused-import
+        base_models, datastore_services, # pragma: no cover
+        transaction_services)  # pragma: no cover
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -139,6 +141,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
 
+    # TODO(#13523): Change 'android_report_info' and 'web_report_info' to domain
+    # objects to remove Any here.
     @classmethod
     def create(
             cls,
@@ -611,8 +615,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             ticket.
         """
         ticket_models = cls.query(cls.ticket_id == ticket_id).fetch()
-        ticket_models = cast(List[AppFeedbackReportStatsModel], ticket_models)
-        return ticket_models
+        return cast(List[AppFeedbackReportStatsModel], ticket_models)
 
     @staticmethod
     def get_deletion_policy():

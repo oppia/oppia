@@ -29,7 +29,7 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, datastore_services # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import base_models, datastore_services # pragma: no cover # pylint: disable=unused-import
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()
@@ -212,12 +212,13 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                     datetime.datetime.utcnow())).order(
                         cls.next_scheduled_check_time, cls._key)
 
-        job_models = query.fetch(
+        results = query.fetch(
             NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
-        job_models = cast(List[ClassifierTrainingJobModel], job_models)
-        offset = offset + len(job_models)
-        return job_models, offset
+        models = cast(List[ClassifierTrainingJobModel], results)
+        offset = offset + len(models)
+        return models, offset
 
+    # TODO(#13523): Change 'job_dict' to TypedDict to remove Any here.
     @classmethod
     def create_multi(cls, job_dicts_list):
         # type: (List[Dict[Text, Any]]) -> List[Text]
@@ -312,7 +313,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             str. ID of the new Classifier Exploration Mapping instance.
         """
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return python_utils.convert_to_bytes(new_id) # type: ignore[no-untyped-call,no-any-return]
+        return cast(Text, python_utils.convert_to_bytes(new_id)) # type: ignore[no-untyped-call]
 
     @classmethod
     def get_models(cls, exp_id, exp_version, state_names):

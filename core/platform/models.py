@@ -76,6 +76,9 @@ class _Gae(Platform):
     GAE (Google App Engine).
     """
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete_multi().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def import_models(cls, model_names): # type: ignore[override]
         # type: (List[Text]) -> Tuple[ModuleType,...]

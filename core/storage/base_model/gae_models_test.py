@@ -29,11 +29,11 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+    from mypy_imports import base_models # pragma: no cover # pylint: disable=unused-import
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -316,7 +316,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
         super(BaseHumanMaintainedModelTests, self).setUp() # type: ignore[no-untyped-call]
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self):
-            # type: (Any) -> None
+            # type: (base_models.BaseHumanMaintainedModel) -> None
             self._last_updated_timestamp_is_fresh = True
             self.last_updated_by_human = datetime.datetime.utcnow()
 
@@ -328,7 +328,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             if self.last_updated is None:
                 self.last_updated = datetime.datetime.utcnow()
 
-            super(base_models.BaseHumanMaintainedModel, self).put() # type: ignore[misc]
+            super(base_models.BaseHumanMaintainedModel, self).put()
             return
 
         with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
@@ -513,7 +513,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         # type: () -> None
         user_data = (
             base_models.BaseSnapshotMetadataModel.export_data('trivial_user'))
-        expected_data = {} # type: Dict[Text, Any]
+        expected_data = {} # type: Dict[Text, Text]
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_nontrivial(self):
@@ -634,12 +634,16 @@ class VersionedModelTests(test_utils.GenericTestBase):
     def test_trusted_commit_with_no_snapshot_metadata_raises_error(self):
         # type: () -> None
         model1 = TestVersionedModel(id='model_id1')
+        # Here ignore[assignment] is used to assign invalid value to
+        # SNAPSHOT_METADATA_CLASS for testing.
         model1.SNAPSHOT_METADATA_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'No snapshot metadata class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         model1 = TestVersionedModel(id='model_id1')
+        # Here ignore[assignment] is used to assign invalid value to
+        # SNAPSHOT_CONTENT_CLASS for testing.
         model1.SNAPSHOT_CONTENT_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'No snapshot content class defined.'):
@@ -648,11 +652,15 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            # Here ignore[arg-type] is used to test method for invalid
+            # input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {}) # type: ignore[arg-type]
 
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            # Here ignore[list-time] is used to test method for invalid
+            # input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
     def test_put_raises_not_implemented_error_for_versioned_models(self):
@@ -823,6 +831,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'At least one version number is invalid'):
+            # Here ignore[list-item] is used to test method for invalid
+            # input type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
 
