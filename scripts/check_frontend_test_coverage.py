@@ -114,7 +114,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'remove-duplicates-in-array.pipe.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
-    'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
     'schema-based-choices-editor.directive.ts',
     'schema-based-custom-viewer.directive.ts',
@@ -178,7 +177,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate.pipe.ts',
     'tutor-card.directive.ts',
     'unit-test-utils.ajs.ts', # Please don't try to cover this file.
-    'version-diff-visualization.directive.ts',
     'voiceover-recording.service.ts',
     'worked-example-editor.directive.ts',
 ]
