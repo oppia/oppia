@@ -98,8 +98,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.activityType = constants.ACTIVITY_TYPE_EXPLORATION;
-    let contributorsSummary: HumanReadableContributorsSummary =
-      this.getContributorsSummary || {};
+    let contributorsSummary: HumanReadableContributorsSummary = (
+      this.getContributorsSummary || {});
     this.contributors = Object.keys(
       contributorsSummary).sort(
       (contributorUsername1, contributorUsername2) => {

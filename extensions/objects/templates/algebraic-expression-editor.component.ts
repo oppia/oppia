@@ -30,6 +30,8 @@ import { GuppyConfigurationService } from 'services/guppy-configuration.service'
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
+type focusObjType = { focused: boolean; };
+
 @Component({
   selector: 'algebraic-expression-editor',
   templateUrl: './algebraic-expression-editor.component.html'
@@ -58,7 +60,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value === (null || undefined)) {
+    if (this.value === null || this.value === undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
@@ -75,7 +77,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       // We need the 'focus' event while using the on screen keyboard (only
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
-      Guppy.event('focus', (focusObj: { focused: boolean; }) => {
+      Guppy.event('focus', (focusObj: focusObjType) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -90,7 +92,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       // We need the 'focus' event while using the on screen keyboard (only
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
-      Guppy.event('change', (focusObj: { focused: boolean; }) => {
+      Guppy.event('change', (focusObj: focusObjType) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -102,7 +104,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
           this.isCurrentAnswerValid();
         }
       });
-      Guppy.event('focus', (focusObj: { focused: boolean; }) => {
+      Guppy.event('focus', (focusObj: focusObjType) => {
         if (!focusObj.focused) {
           this.isCurrentAnswerValid();
         }

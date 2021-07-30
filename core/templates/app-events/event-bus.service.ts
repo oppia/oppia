@@ -22,7 +22,7 @@ import { OperatorFunction, Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BaseEvent } from './app-events';
 
-export type NewableType<T> = new(message: unknown) => T;
+export type Newable<T> = new(message: unknown) => T;
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +46,7 @@ export class EventBusService {
   * @returns A subscription to the event asked for.
   */
   on<T extends BaseEvent>(
-      eventType: NewableType<T>,
+      eventType: Newable<T>,
       action: (event: T) => void,
       callbackContext = null): Subscription {
     return this._subject$.pipe(
@@ -98,7 +98,7 @@ export class EventBusGroup {
 
 
   public on<T extends BaseEvent>(
-      eventType: NewableType<T>,
+      eventType: Newable<T>,
       action: (event: T) => void,
       callbackContext = null): void {
     this.subscriptions.add(

@@ -18,7 +18,7 @@
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subject, Subscription } from 'rxjs';
-import { EventBusGroup, EventBusService, NewableType } from './event-bus.service';
+import { EventBusGroup, EventBusService, Newable } from './event-bus.service';
 import { BaseEvent } from './app-events';
 
 abstract class EventWithMessage<T> extends BaseEvent {
@@ -47,8 +47,9 @@ describe('Event Bus Group', () => {
   it('should listen to an event', waitForAsync(() => {
     let value = '';
     eventbusGroup.on(
-      CustomEvent as NewableType<CustomEvent>,
-      event => value = event.message);
+      CustomEvent as Newable<CustomEvent>,
+      event => value = event.message
+    );
     eventbusGroup.emit(new CustomEvent('Event'));
     eventbusGroup.unsubscribe();
     expect(value).toBe('Event');
@@ -71,7 +72,7 @@ describe('Event Bus Group', () => {
         return new Subscription();
       }
     );
-    eventbusGroup.on(CustomEvent as NewableType<CustomEvent>, _ => {
+    eventbusGroup.on(CustomEvent as Newable<CustomEvent>, _ => {
       throw new Error('Random Error');
     });
     eventbusGroup.emit(new CustomEvent('Event'));
