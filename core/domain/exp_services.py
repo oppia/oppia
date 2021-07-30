@@ -302,10 +302,13 @@ def export_to_zip_file(exploration_id, version=None):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
-        dir_list = fs.listdir('')
-        for filepath in dir_list:
-            if not filepath.startswith(asset_dirs_to_include_in_downloads):
-                continue
+        exploration_html_strings = exploration.get_all_html_content_strings()
+        filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                exploration_html_strings))
+
+        for filename in filenames:
+            filepath = 'image/%s' % filename
             file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
