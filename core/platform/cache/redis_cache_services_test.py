@@ -32,17 +32,6 @@ from scripts import servers
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
 
-    @classmethod
-    def setUpClass(cls):
-        super(RedisCacheServicesUnitTests, cls).setUpClass()
-        cls._managed_redis_server = servers.managed_redis_server()
-        cls._managed_redis_server.__enter__()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls._managed_redis_server.__exit__(None, None, None)
-        super(RedisCacheServicesUnitTests, cls).tearDownClass()
-
     def test_memory_stats_returns_dict(self):
         memory_stats = redis_cache_services.get_memory_cache_stats()
         self.assertIsNotNone(memory_stats.total_allocated_in_bytes)

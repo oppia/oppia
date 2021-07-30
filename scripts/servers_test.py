@@ -533,6 +533,12 @@ class ManagedProcessTests(test_utils.TestBase):
             os.path, 'exists', mock_os_path_exists))
         self.exit_stack.enter_context(self.swap_with_checks(
             os, 'remove', mock_os_remove))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            subprocess,
+            'check_call',
+            lambda _: 0,
+            expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)]
+        ))
 
         self.exit_stack.enter_context(servers.managed_redis_server())
         self.exit_stack.close()

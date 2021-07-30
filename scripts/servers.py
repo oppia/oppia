@@ -459,13 +459,6 @@ def managed_portserver():
         try:
             yield proc
         finally:
-            python_utils.PRINT('Portserver output:')
-            for line in iter(lambda: proc.stdout.readline() or None, None):
-                common.write_stdout_safe(line)
-
-            python_utils.PRINT('Portserver errors:')
-            for line in iter(lambda: proc.stderr.readline() or None, None):
-                common.write_stdout_safe(line)
             # Before exiting the proc_context, try to end the process with
             # SIGINT. The portserver is configured to shut down cleanly upon
             # receiving this signal.
