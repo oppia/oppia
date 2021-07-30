@@ -39,7 +39,7 @@ interface StoryChapterCompletionBackendResponse {
   'summaries': LearnerExplorationSummaryBackendDict[];
 }
 
-interface StoryChapterCompletionResponse {
+export interface StoryChapterCompletionResponse {
   nextNodeId: string;
   readyForReviewTest: boolean;
   summaries: LearnerExplorationSummary[];
