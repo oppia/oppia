@@ -110,6 +110,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
     // whether this parameter is not used at all in this state, or
     // whether its first occurrence is a 'set' or 'get'.
     var getParamStatus = function(stateParamMetadata, paramName) {
+      console.error(`[DEBUGGING] stateParamMetadata: ${stateParamMetadata}`);
       for (var i = 0; i < stateParamMetadata.length; i++) {
         if (stateParamMetadata[i].paramName === paramName) {
           return stateParamMetadata[i].action;
@@ -148,6 +149,10 @@ angular.module('oppia').factory('ParameterMetadataService', [
         states.getStateNames().forEach(function(stateName) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
             states.getState(stateName));
+          console.error(
+            `[DEBUGGING] stateParamMetadatas[${stateName}]: 
+            ${stateParamMetadatas[stateName]}`
+          );
           for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
             var pName = stateParamMetadatas[stateName][i].paramName;
             if (allParamNames.indexOf(pName) === -1) {
@@ -161,6 +166,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
         // through any nodes that set this parameter.
         var unsetParametersInfo = [];
 
+        console.error(`[DEBUGGING] allParamNames: ${allParamNames}`);
         for (var paramInd = 0; paramInd < allParamNames.length; paramInd++) {
           var paramName = allParamNames[paramInd];
           var tmpUnsetParameter = null;
@@ -181,6 +187,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
           var queue = [];
           var seen = {};
+          console.error(`[DEBUGGING] initNodeIds: ${initNodeIds}`);
           for (var i = 0; i < initNodeIds.length; i++) {
             seen[initNodeIds[i]] = true;
             var paramStatus = getParamStatus(
@@ -201,8 +208,10 @@ angular.module('oppia').factory('ParameterMetadataService', [
             continue;
           }
 
+          console.error(`[DEBUGGING] queue: ${queue}`);
           while (queue.length > 0) {
             var currNodeId = queue.shift();
+            console.error(`[DEBUGGING] graphData: ${graphData}`);
             for (var edgeInd = 0; edgeInd < graphData.links.length; edgeInd++) {
               var edge = graphData.links[edgeInd];
               if (edge.source === currNodeId &&

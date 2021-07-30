@@ -249,7 +249,8 @@ class _PortPool(python_utils.OBJECT):
                     candidate.pid = pid
                     candidate.start_time = _get_process_start_time(pid)
                     if not candidate.start_time:
-                        python_utils.PRINT('Can\'t read start time for pid %d.', pid)
+                        python_utils.PRINT(
+                            'Can\'t read start time for pid %d.', pid)
                     self.ports_checked_for_last_request = check_count
                     return candidate.port
                 else:

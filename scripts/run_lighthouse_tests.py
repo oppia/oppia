@@ -212,7 +212,6 @@ def main(args=None):
         stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],
             port=GOOGLE_APP_ENGINE_PORT,
-            clear_datastore=True,
             log_level='critical',
             skip_sdk_update_check=True))
 

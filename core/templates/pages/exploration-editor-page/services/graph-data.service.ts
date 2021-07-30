@@ -41,7 +41,9 @@ angular.module('oppia').factory('GraphDataService', [
 
     return {
       recompute: function() {
+        console.error('[DEBUGGING] called GraphDataService.recompute()');
         _recomputeGraphData();
+        console.error('[DEBUGGING] finished GraphDataService.recompute()');
       },
       /**
        * @return graphData - Directed graph visualization input. This object
@@ -54,6 +56,7 @@ angular.module('oppia').factory('GraphDataService', [
        * - finalStateName: the name of the final state.
        */
       getGraphData: function() {
+        console.error('[DEBUGGING] called GraphDataService.getGraphData()');
         return angular.copy(_graphData);
       }
     };
