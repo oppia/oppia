@@ -30,20 +30,20 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   '$http', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
-  'ContributionOpportunitiesService', 'SiteAnalyticsService',
-  'SuggestionModalService', 'UrlInterpolationService', 'authorName',
-  'contentHtml', 'misconceptionsBySkill', 'question', 'questionHeader',
-  'reviewable', 'skillDifficulty', 'skillRubrics', 'suggestion',
-  'suggestionId', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
-  'SKILL_DIFFICULTY_LABEL_TO_FLOAT', 'SkillBackendApiService',
+  'ContributionOpportunitiesService', 'SkillBackendApiService',
+  'SiteAnalyticsService', 'SuggestionModalService', 'UrlInterpolationService',
+  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
+  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics', 
+  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION', 
+  'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $http, $scope, $uibModal, $uibModalInstance, ContextService,
-      ContributionOpportunitiesService, SiteAnalyticsService,
-      SuggestionModalService, UrlInterpolationService, authorName,
-      contentHtml, misconceptionsBySkill, question, questionHeader,
+      ContributionOpportunitiesService, SkillBackendApiService,
+      SiteAnalyticsService, SuggestionModalService, UrlInterpolationService,
+      authorName, contentHtml, misconceptionsBySkill, question, questionHeader,
       reviewable, skillDifficulty, skillRubrics, suggestion, suggestionId,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT, SkillBackendApiService) {
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT);
