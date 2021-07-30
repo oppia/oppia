@@ -20,7 +20,7 @@
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -279,7 +279,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
+          ctrl.currentUserIsCurriculumAdmin = (
+            explorationData.is_curriculum_admin);
           ctrl.currentUserIsModerator = explorationData.is_moderator;
 
           ctrl.currentUser = explorationData.user;

@@ -31,7 +31,7 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
 interface LearnerPlaylistResponseObject {
   'belongs_to_completed_or_incomplete_list': boolean
   'belongs_to_subscribed_activities': boolean
-  'is_admin': boolean
+  'is_curriculum_admin': boolean
   'is_moderator': boolean
   'is_super_admin': boolean
   'is_topic_manager': boolean

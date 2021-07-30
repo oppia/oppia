@@ -16,8 +16,8 @@
 
 """Tests for the email services API wrapper in DEV_MODE."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 import textwrap

@@ -20,28 +20,27 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LogoutPageRootComponent } from './logout-page-root.component';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
   ],
   declarations: [
     LogoutPageComponent,
-    LogoutPageRootComponent,
-    OppiaAngularRootComponent,
+    LogoutPageRootComponent
   ],
   entryComponents: [
     LogoutPageComponent,
     LogoutPageRootComponent,
-    OppiaAngularRootComponent,
   ],
   providers: [
     {

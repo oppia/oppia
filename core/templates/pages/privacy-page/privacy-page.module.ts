@@ -22,26 +22,24 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { PrivacyPageComponent } from './privacy-page.component';
 import { PrivacyPageRootComponent } from './privacy-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     PrivacyPageRootComponent,
     PrivacyPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     PrivacyPageRootComponent,
     PrivacyPageComponent
   ],

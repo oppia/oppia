@@ -27,12 +27,12 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserModule } from '@angular/platform-browser';
 import firebase from 'firebase/app';
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LoginPageComponent } from 'pages/login-page/login-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { LoginPageRootComponent } from './login-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -67,6 +67,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     MatAutocompleteModule,
     MatCardModule,
@@ -79,12 +80,10 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   declarations: [
     LoginPageComponent,
     LoginPageRootComponent,
-    OppiaAngularRootComponent,
   ],
   entryComponents: [
     LoginPageComponent,
     LoginPageRootComponent,
-    OppiaAngularRootComponent,
   ],
   providers: [
     {

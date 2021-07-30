@@ -32,7 +32,7 @@ require(
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.component.ts');
-require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'add-answer-group-modal.controller.ts');

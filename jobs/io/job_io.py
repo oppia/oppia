@@ -16,8 +16,8 @@
 
 """Provides PTransforms for writing job results to the datastore."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import beam_job_services
 from core.platform import models

@@ -22,10 +22,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
 import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
 import { SignupPageRootComponent } from './signup-page-root.component';
@@ -34,18 +33,17 @@ import { SignupPageComponent } from './signup-page.component';
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SignupPageComponent,
     SignupPageRootComponent,
     RegistrationSessionExpiredModalComponent,
     LicenseExplanationModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SignupPageComponent,
     SignupPageRootComponent,
     RegistrationSessionExpiredModalComponent,

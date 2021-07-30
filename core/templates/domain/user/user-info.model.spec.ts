@@ -20,9 +20,9 @@ import { UserInfo } from 'domain/user/user-info.model';
 
 describe('User info model', () => {
   let sampleUserInfoBackendObject = {
-    role: 'USER_ROLE',
+    roles: ['USER_ROLE'],
     is_moderator: true,
-    is_admin: false,
+    is_curriculum_admin: false,
     is_super_admin: false,
     is_topic_manager: false,
     can_create_collections: true,
@@ -37,7 +37,7 @@ describe('User info model', () => {
       sampleUserInfoBackendObject);
 
     expect(userInfo.isModerator()).toBe(true);
-    expect(userInfo.isAdmin()).toBe(false);
+    expect(userInfo.isCurriculumAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
     expect(userInfo.isTranslationAdmin()).toBe(false);
@@ -52,7 +52,7 @@ describe('User info model', () => {
   it('should create correct default UserInfo object', () => {
     let userInfo = UserInfo.createDefault();
     expect(userInfo.isModerator()).toBe(false);
-    expect(userInfo.isAdmin()).toBe(false);
+    expect(userInfo.isCurriculumAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
     expect(userInfo.canCreateCollections()).toBe(false);
