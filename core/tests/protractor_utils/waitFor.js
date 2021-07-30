@@ -19,7 +19,6 @@
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
-const { browser } = require('protractor');
 var Constants = require('./ProtractorConstants');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
@@ -124,16 +123,12 @@ var elementAttributeToBe = async function(
 * Wait for new tab is opened
 */
 var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  var handles = await browser.driver.getAllWindowHandles();
-  await browser.waitForAngularEnabled(false);
-  await browser.switchTo().window(await handles.pop());
-  // This will wait for the page to load completely and then it will fetch
-  // the url.
-  /* eslint-disable-next-line oppia/protractor-practices */
-  await browser.sleep(10000);
-  await browser.waitForAngularEnabled(true);
   await browser.wait(async function() {
+    var handles = await browser.driver.getAllWindowHandles();
+    await browser.waitForAngularEnabled(false);
+    await browser.switchTo().window(await handles.pop());
     var url = await browser.getCurrentUrl();
+    await browser.waitForAngularEnabled(true);
     return await url.match(urlToMatch);
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
