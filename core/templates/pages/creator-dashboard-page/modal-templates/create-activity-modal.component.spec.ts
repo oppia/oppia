@@ -36,9 +36,7 @@ class MockExplorationCreationService {
 }
 
 class MockCollectionCreationService {
-  createNewCollection(): void {
-    return;
-  }
+  createNewCollection(): void {}
 }
 
 describe('Create Activity Modal Component', () =>{
