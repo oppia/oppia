@@ -25,7 +25,7 @@ import { ExplorationFeaturesBackendApiService } from
 
 describe('exploration features backend api service', () => {
   let explorationFeaturesBackendApiService:
-    ExplorationFeaturesBackendApiService = null;
+    ExplorationFeaturesBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var ERROR_STATUS_CODE = 500;
