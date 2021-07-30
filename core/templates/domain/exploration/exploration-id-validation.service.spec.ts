@@ -20,13 +20,13 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationIdValidationService } from 'domain/exploration/exploration-id-validation.service';
-import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
+import { ExplorationSummaryBackendDict, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 
 describe('Exploration id validation service', () => {
   let explorationIdValidationService:
     ExplorationIdValidationService;
   let httpTestingController: HttpTestingController;
-  let validExpResults: CreatorExplorationSummaryBackendDict;
+  let validExpResults: ExplorationSummaryBackendDict;
   let successHandler: jasmine.Spy<jasmine.Func>;
   let failHandler: jasmine.Spy<jasmine.Func>;
 
@@ -46,30 +46,34 @@ describe('Exploration id validation service', () => {
 
   beforeEach(() => {
     validExpResults = {
-      id: '0',
-      num_views: 0,
-      human_readable_contributors_summary: {},
-      created_on_msec: 1581965806278.269,
-      ratings: {
-        5: 0,
-        4: 0,
-        1: 0,
-        3: 0,
-        2: 0
-      },
-      last_updated_msec: 1581965806278.183,
-      language_code: 'en',
-      category: 'Test',
-      objective: 'Dummy exploration for testing all interactions',
-      activity_type: 'exploration',
-      status: 'public',
-      thumbnail_bg_color: '#a33f40',
-      tags: [],
-      thumbnail_icon_url: '/subjects/Lightbulb.svg',
-      community_owned: true,
-      title: 'Test of all interactions',
-      num_total_threads: 0,
-      num_open_threads: 0
+      summaries: [{
+        id: '0',
+        num_views: 0,
+        human_readable_contributors_summary: {
+          num_commits: 0,
+        },
+        created_on_msec: 1581965806278.269,
+        ratings: {
+          5: 0,
+          4: 0,
+          1: 0,
+          3: 0,
+          2: 0
+        },
+        last_updated_msec: 1581965806278.183,
+        language_code: 'en',
+        category: 'Test',
+        objective: 'Dummy exploration for testing all interactions',
+        activity_type: 'exploration',
+        status: 'public',
+        thumbnail_bg_color: '#a33f40',
+        tags: [],
+        thumbnail_icon_url: '/subjects/Lightbulb.svg',
+        community_owned: true,
+        title: 'Test of all interactions',
+        num_total_threads: 0,
+        num_open_threads: 0
+      } as ExplorationSummaryDict]
     };
   });
 
