@@ -32,7 +32,8 @@
          [attr.style]="getImageContainerDynamicStyles()">
       <div *ngIf="isNoImageUploaded()">
         <oppia-image-uploader (fileChanged)="onFileChanged($event)"
-                              [allowedImageFormats]="allowedImageFormats">
+                              [allowedImageFormats]="allowedImageFormats"
+                              [isBlogPostThumbnailUploader]="false">
         </oppia-image-uploader>
       </div>
       <div *ngIf="isImageUploaded()"

@@ -16,13 +16,14 @@
  * @fileoverview Tests for Blog Dashboard Page service.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageService } from './blog-dashboard-page.service';
 
-describe('Blog Post update service', () => {
+describe('Blog Post Page service', () => {
   let blogPostEditorBackendApiService: BlogPostEditorBackendApiService;
   let blogDashboardPageService: BlogDashboardPageService;
   let mockWindowRef: MockWindowRef;
@@ -39,6 +40,9 @@ describe('Blog Post update service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+      ],
       providers: [
         BlogPostEditorBackendApiService,
         {
