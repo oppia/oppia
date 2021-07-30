@@ -1826,10 +1826,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
+
     DUMMY_IMAGE_TAG = (
-    '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
-    'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
-    '&quot;abc.png&quot;"></oppia-noninteractive-image>'
+        '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
+        'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
+        '&quot;abc.png&quot;"></oppia-noninteractive-image>'
     )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
@@ -2267,8 +2268,7 @@ title: A title
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
             'state_name': 'New state',
             'new_value': 1
-        }),
-        exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'New state',
