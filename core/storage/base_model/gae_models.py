@@ -82,7 +82,8 @@ class DELETION_POLICY(enum.Enum): # pylint: disable=invalid-name
     LOCALLY_PSEUDONYMIZE = 'LOCALLY_PSEUDONYMIZE'
     # Models that should be pseudonymized if they are published and otherwise
     # (when private) deleted.
-    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = 'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE'
+    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = (
+        'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE')
     # Models that are not directly or indirectly related to users.
     NOT_APPLICABLE = 'NOT_APPLICABLE'
 
@@ -1216,7 +1217,6 @@ class VersionedModel(BaseModel):
             if not strict:
                 return None
             return cast(None, python_utils.reraise_exception()) # type: ignore[no-untyped-call]
-
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):

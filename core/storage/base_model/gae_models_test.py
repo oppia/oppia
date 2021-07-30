@@ -657,16 +657,16 @@ class VersionedModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
             # TODO(#13528): Remove this test after back-end is fully type
-            # annotated. Here ignore[arg-type] is used to test method for invalid
-            # input type.
+            # annotated. Here ignore[arg-type] is used to test method for
+            # invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {}) # type: ignore[arg-type]
 
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
             # TODO(#13528): Remove this test after back-end is fully type
-            # annotated. Here ignore[list-item] is used to test method for invalid
-            # input type.
+            # annotated. Here ignore[list-item] is used to test method for
+            # invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
     def test_put_raises_not_implemented_error_for_versioned_models(self):
@@ -838,8 +838,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             ValueError,
             'At least one version number is invalid'):
             # TODO(#13528): Remove this test after back-end is fully type
-            # annotated. Here ignore[list-item] is used to test method for invalid
-            # input type.
+            # annotated. Here ignore[list-item] is used to test method for
+            # invalid input type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
 

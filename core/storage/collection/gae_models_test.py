@@ -549,7 +549,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
-            # Here ignore[arg-type] is used to test method for invalid
+            # TODO(#13528): Remove this test after back-end is fully type
+            # annotated. Here ignore[arg-type] is used to test method for invalid
             # input type.
             (
                 collection_models.CollectionCommitLogEntryModel
