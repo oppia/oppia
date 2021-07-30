@@ -24,12 +24,15 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
+import { BlogPostData } from 'domain/blog/blog-post.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BlogDashboardPageService {
   private _blogPostId: string;
+  private _authorPictureUrl: string;
+  private _blogPostData: BlogPostData;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
@@ -88,6 +91,22 @@ export class BlogDashboardPageService {
 
   get blogPostId(): string {
     return this._blogPostId;
+  }
+
+  set blogPostData(data: BlogPostData) {
+    this._blogPostData = data;
+  }
+
+  get blogPostData(): BlogPostData {
+    return this._blogPostData;
+  }
+
+  get authorPictureUrl(): string {
+    return this._authorPictureUrl;
+  }
+
+  set authorPictureUrl(url: string) {
+    this._authorPictureUrl = url;
   }
 
   get updateViewEventEmitter(): EventEmitter<void> {

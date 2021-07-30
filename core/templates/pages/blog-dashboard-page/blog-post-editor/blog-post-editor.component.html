@@ -36,6 +36,10 @@
               {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
             </mat-card-subtitle>
           </div>
+        <button mat-icon-button class="preview-button">
+          <mat-icon>remove_red_eye</mat-icon>
+          <span>{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</span>
+        </button>
         </mat-card-header>
         <div class="title-heading mr-2 mb-4 text-left">
           <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING' | translate | uppercase }}</span>
@@ -47,6 +51,10 @@
           </oppia-image-uploader>
         </div>
       </div>
+      <button mat-icon-button *ngIf="!windowIsNarrow" (click)='showPreview()'>
+        <mat-icon>remove_red_eye</mat-icon>
+        <span>{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</span>
+      </button>
       <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
       </div>

@@ -186,6 +186,7 @@ class BlogPostHandler(base.BaseHandler):
 
         blog_post_dict = blog_post.to_dict()
         del blog_post_dict['author_id']
+        blog_post_dict['author_username'] = username
 
         self.values.update({
             'blog_post_dict': blog_post_dict,

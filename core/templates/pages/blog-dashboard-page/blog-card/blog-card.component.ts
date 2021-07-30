@@ -43,7 +43,7 @@ export class BlogCardComponent implements OnInit {
   ngOnInit(): void {
     if (this.blogPostSummary.thumbnailFilename) {
       this.thumbnailUrl = this.assetsBackendApiService
-        .getThumbnailUrlForPreview(
+        .getBlogPostThumbnailUrlForPreview(
           AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostSummary.id,
           this.blogPostSummary.thumbnailFilename);
     }

@@ -37,6 +37,7 @@ import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-pag
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
 import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
+import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 declare var angular: ng.IAngularStatic;
 
 @NgModule({
@@ -56,7 +57,8 @@ declare var angular: ng.IAngularStatic;
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
     BlogPostActionConfirmationModalComponent,
-    UploadBlogPostThumbnailComponent
+    UploadBlogPostThumbnailComponent,
+    BlogCardPreviewModalComponent,
   ],
   entryComponents: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -65,7 +67,8 @@ declare var angular: ng.IAngularStatic;
     BlogDashboardTileComponent,
     BlogPostEditorComponent,
     BlogPostActionConfirmationModalComponent,
-    UploadBlogPostThumbnailComponent
+    UploadBlogPostThumbnailComponent,
+    BlogCardPreviewModalComponent
   ],
   providers: [
     {
