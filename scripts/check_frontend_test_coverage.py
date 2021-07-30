@@ -169,7 +169,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'top-navigation-bar.component.ts',
     'topic-creation.service.ts',
     'topic-editor-navbar-breadcrumb.component.ts',
-    'topic-editor-navbar.directive.ts',
     'topic-editor-state.service.ts',
     'topic-editor-stories-list.directive.ts',
     'topic-summary-tile.component.ts',
