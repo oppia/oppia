@@ -1066,7 +1066,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'role': feconf.ROLE_ID_MODERATOR
             })
         self.assertEqual(response_dict, {
-            'usernames': [feconf.ROLE_ID_MODERATOR]
+            'usernames': ['user1']
         })
         self.logout()
 

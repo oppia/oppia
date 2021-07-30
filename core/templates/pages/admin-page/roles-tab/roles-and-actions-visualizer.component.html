@@ -51,14 +51,19 @@
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <button class="nav-link"
-         [ngClass]="activeTab===TAB_ACTIONS ? 'active' : ''"
-         (click)="activeTab=TAB_ACTIONS">Allocated actions</button>
+              [ngClass]="activeTab===TAB_ACTIONS ? 'active' : ''"
+              (click)="activeTab=TAB_ACTIONS">
+         Allocated actions
+      </button>
     </li>
     <li class="nav-item">
       <button class="nav-link"
-         [ngClass]="activeTab===TAB_ASSIGNED_USER ? 'active' : ''"
-         (click)="activeTab=TAB_ASSIGNED_USER; showAssignedUsers()"
-         [class.disabled]="viewableRoles.includes(activeRole) ? null : true">Assigned users</button>
+              [ngClass]="activeTab===TAB_ASSIGNED_USER ? 'active' : ''"
+              (click)="activeTab=TAB_ASSIGNED_USER; showAssignedUsers()"
+              [class.disabled]="viewableRoles.includes(activeRole) ? null : true">
+        Assigned users
+      </button>
+    </li>
   </ul>
   <div class="mt-3">
     <div *ngIf="activeTab===TAB_ACTIONS">
@@ -73,7 +78,7 @@
       <div class="oppia-usernames-loading-spinner" *ngIf="loadingAssignedUsernames">
         <mat-spinner class="center-block" [diameter]="40"></mat-spinner>
       </div>
-      <i class="oppia-usernames-loading-spinner" *ngIf="!loadingAssignedUsernames && !assignUsersToActiveRole.length">None</i>
+      <i *ngIf="!loadingAssignedUsernames && !assignUsersToActiveRole.length">There are no users assigned to this role.</i>
       <ul *ngIf="!loadingAssignedUsernames && assignUsersToActiveRole.length">
         <li *ngFor="let username of assignUsersToActiveRole">{{ username }}</li>
       </ul>

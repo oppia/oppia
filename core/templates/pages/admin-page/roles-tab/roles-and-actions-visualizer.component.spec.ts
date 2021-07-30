@@ -22,7 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing
 
 import { RolesAndActionsVisualizerComponent } from './roles-and-actions-visualizer.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 
 describe('Roles and actions visualizer component', function() {
