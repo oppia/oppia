@@ -208,9 +208,9 @@ export class NumberWithUnitsObjectFactory {
 
         startsWithCorrectCurrencyUnit = false;
         for (let i = 0; i < keys.length; i++) {
-          for (let j = 0;
-            j < ObjectsDomainConstants.CURRENCY_UNITS[
-              keys[i]].front_units.length; j++) {
+          let unitLength = (
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          for (let j = 0; j < unitLength; j++) {
             if (units === ObjectsDomainConstants.CURRENCY_UNITS[
               keys[i]].front_units[j].trim()) {
               startsWithCorrectCurrencyUnit = true;
