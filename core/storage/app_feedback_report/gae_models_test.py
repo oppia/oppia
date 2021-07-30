@@ -26,9 +26,9 @@ import feconf
 import utils
 
 MYPY = False
-if MYPY:
-    from mypy_imports import ( # pragma: no cover
-        base_models, app_feedback_report_models) # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import (
+        base_models, app_feedback_report_models)
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])

@@ -27,10 +27,9 @@ import utils
 from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import ( # pragma: no cover
-        base_models, datastore_services, # pragma: no cover
-        transaction_services)  # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import ( # pylint: disable=unused-import
+        base_models, datastore_services, transaction_services)
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -322,9 +321,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
         user_data = dict()
-        report_models = cls.get_all().filter(
+        results = cls.get_all().filter(
             cls.scrubbed_by == user_id).fetch()
-        report_models = cast(List[AppFeedbackReportModel], report_models)
+        report_models = cast(List[AppFeedbackReportModel], results)
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)

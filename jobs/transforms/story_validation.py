@@ -28,8 +28,8 @@ from jobs.transforms import base_validation
 from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import story_models
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 

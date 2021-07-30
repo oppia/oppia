@@ -28,8 +28,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
     Any, Dict, List, Optional, Text, Tuple, Union, cast)
 
 MYPY = False
-if MYPY:
-    from mypy_imports import base_models, datastore_services # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()

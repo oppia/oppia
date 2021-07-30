@@ -44,9 +44,9 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
     'SELF_BASE_SNAPSHOT_CONTENT_MODEL', bound='BaseSnapshotContentModel')
 
 MYPY = False
-if MYPY:
-    from mypy_imports import ( # pragma: no cover
-        datastore_services, transaction_services) # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import (
+        datastore_services, transaction_services)
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -473,9 +473,9 @@ class BaseModel(datastore_services.Model):
         else:
             start_cursor = None
 
-        result = query.order(-cls.last_updated).fetch_page(
+        results = query.order(-cls.last_updated).fetch_page(
             page_size, start_cursor=start_cursor)
-        base_model_results = cast(List[SELF_BASE_MODEL], result[0])
+        base_model_results = cast(List[SELF_BASE_MODEL], results[0])
         return (
             base_model_results,
             (result[1].urlsafe() if result[1] else None),
@@ -1507,12 +1507,12 @@ class BaseSnapshotMetadataModel(BaseModel):
     @classmethod
     def export_data(cls, user_id):
         # type: (Text) -> Dict[Text, Dict[Text, Text]]
-        metadata_models = (
+        results = (
             cls.query(cls.committer_id == user_id).fetch(
                 projection=[cls.commit_type, cls.commit_message]))
 
         metadata_models = cast(
-            List[BaseSnapshotMetadataModel], metadata_models)
+            List[BaseSnapshotMetadataModel], results)
         user_data = {}
         for metadata_model in metadata_models:
             user_data[metadata_model.id] = {

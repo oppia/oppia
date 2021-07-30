@@ -36,9 +36,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
     Text, Tuple, TypeVar)
 
 MYPY = False
-if MYPY:
-    from mypy_imports import ( # pragma: no cover # pylint: disable=unused-import
-        base_models, transaction_services) # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, transaction_services # pylint: disable=unused-import
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -312,6 +311,10 @@ def mock_datetime_for_datastore(mocked_now):
 
     # We use ‘ignore[misc]’ because MockDatetime subclasses a class created
     # dynamically. These dynamic classes are not supported by mypy.
+    # This can be fixed after py3 migration as this error is resolved when
+    # mypy is able to get return type of the function
+    # python_utils.with_metaclass and we will be removing python_utils
+    # in py3 migration.
     class MockDatetime( # pylint: disable=inherit-non-class
             python_utils.with_metaclass(MockDatetimeType, old_datetime_type)): # type: ignore[misc]
         """Always returns mocked_now as the current time."""

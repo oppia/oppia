@@ -29,8 +29,8 @@ from types import ModuleType # isort:skip # pylint: disable=import-only-modules,
 from typing import Text, List, Tuple, Optional, Type # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from core.storage.base_model.gae_models import BaseModel # pragma: no cover # pylint: disable=import-only-modules,unused-import
+if MYPY: # pragma: no cover
+    from core.storage.base_model.gae_models import BaseModel # pylint: disable=import-only-modules,unused-import
 
 # Valid model names.
 NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
@@ -58,8 +58,8 @@ class Platform(python_utils.OBJECT):
     """A base class for platform-specific imports related to GAE."""
 
     @classmethod
-    def import_models(cls):
-        # type: () -> None
+    def import_models(cls, unused_model_names=[]):
+        # type: (List[Text]) -> Tuple[ModuleType,...]
         """An abstract method that should be implemented on inherited
         classes.
 
@@ -80,7 +80,7 @@ class _Gae(Platform):
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def import_models(cls, model_names): # type: ignore[override]
+    def import_models(cls, model_names=[]):
         # type: (List[Text]) -> Tuple[ModuleType,...]
         """Imports and returns the storage modules listed in model_names.
 

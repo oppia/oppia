@@ -24,8 +24,8 @@ from core.tests import test_utils
 import feconf
 
 MYPY = False
-if MYPY:
-    from mypy_imports import audit_models, base_models # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import audit_models, base_models
 
 (audit_models, base_models) = models.Registry.import_models(
     [models.NAMES.audit, models.NAMES.base_model])

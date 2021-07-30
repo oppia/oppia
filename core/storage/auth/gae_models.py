@@ -25,9 +25,9 @@ import feconf
 from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import ( # pragma: no cover
-        base_models, datastore_services, user_models) # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import (
+        base_models, datastore_services, user_models)
 
 base_models, user_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
