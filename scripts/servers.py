@@ -116,8 +116,8 @@ def managed_process(
 def managed_dev_appserver(
         app_yaml_path, env=None, log_level='info',
         host='0.0.0.0', port=8080, admin_host='0.0.0.0', admin_port=8000,
-        clear_datastore=False, enable_console=False, enable_host_checking=True,
-        automatic_restart=True, skip_sdk_update_check=False):
+        enable_host_checking=True, automatic_restart=True,
+        skip_sdk_update_check=False):
     """Returns a context manager to start up and shut down a GAE dev appserver.
 
     Args:
@@ -133,8 +133,6 @@ def managed_dev_appserver(
         admin_host: str. The host name to which the admin server should bind.
         admin_port: int. The port to which the admin server should bind.
         clear_datastore: bool. Whether to clear the datastore on startup.
-        enable_console: bool. Whether to enable interactive console in admin
-            view.
         enable_host_checking: bool. Whether to enforce HTTP Host checking for
             application modules, API server, and admin server. Host checking
             protects against DNS rebinding attacks, so only disable after
@@ -154,8 +152,6 @@ def managed_dev_appserver(
         '--port', port,
         '--admin_host', admin_host,
         '--admin_port', admin_port,
-        '--clear_datastore', 'true' if clear_datastore else 'false',
-        '--enable_console', 'true' if enable_console else 'false',
         '--enable_host_checking', 'true' if enable_host_checking else 'false',
         '--automatic_restart', 'true' if automatic_restart else 'false',
         '--skip_sdk_update_check', 'true' if skip_sdk_update_check else 'false',
@@ -454,7 +450,17 @@ def managed_portserver():
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
-        portserver_args, human_readable_name='Portserver', shell=True)
+        portserver_args, human_readable_name='Portserver', shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    python_utils.PRINT('Portserver output:')
+    for line in iter(lambda: proc.stdout.readline() or None, None):
+        common.write_stdout_safe(line)
+
+    python_utils.PRINT('Portserver errors:')
+    for line in iter(lambda: proc.stderr.readline() or None, None):
+        common.write_stdout_safe(line)
+
     with proc_context as proc:
         try:
             yield proc

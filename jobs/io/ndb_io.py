@@ -47,6 +47,8 @@ class GetModels(beam.PTransform):
     def expand(self, initial_pipeline):
         """Returns a PCollection with models matching the corresponding query.
 
+        This overrides expand from parent class.
+
         Args:
             initial_pipeline: PValue. The initial pipeline. This pipeline
                 is used to anchor the models to itself.
@@ -70,17 +72,21 @@ class GetModels(beam.PTransform):
 class PutModels(beam.PTransform):
     """Writes NDB models to the datastore."""
 
-    def expand(self, input_or_inputs):
+    def expand(self, entities):
         """Writes the given models to the datastore.
 
+        This overrides expand from parent class.
+
         Args:
-            input_or_inputs: PCollection. A PCollection of NDB models.
+            entities: PCollection. A PCollection of NDB models to write
+                to the datastore. Can also contain just one model.
 
         Returns:
-            PCollection. An empty PCollection.
+            PCollection. An empty PCollection. This is needed because all expand
+            methods need to return some PCollection.
         """
         return (
-            input_or_inputs
+            entities
             | 'Transforming the NDB models into Apache Beam entities' >> (
                 beam.Map(job_utils.get_beam_entity_from_ndb_model))
             | 'Writing the NDB models to the datastore' >> (
@@ -93,17 +99,21 @@ class PutModels(beam.PTransform):
 class DeleteModels(beam.PTransform):
     """Deletes NDB models from the datastore."""
 
-    def expand(self, input_or_inputs):
+    def expand(self, entities):
         """Deletes the given models from the datastore.
 
+        This overrides expand from parent class.
+
         Args:
-            input_or_inputs: PCollection. The PCollection of NDB keys to delete.
+            entities: PCollection. The PCollection of NDB keys to delete
+                from the datastore. Can also contain just one model.
 
         Returns:
-            PCollection. An empty PCollection.
+            PCollection. An empty PCollection. This is needed because all expand
+            methods need to return some PCollection.
         """
         return (
-            input_or_inputs
+            entities
             | 'Transforming the NDB keys into Apache Beam keys' >> (
                 beam.Map(job_utils.get_beam_key_from_ndb_key))
             | 'Deleting the NDB keys from the datastore' >> (

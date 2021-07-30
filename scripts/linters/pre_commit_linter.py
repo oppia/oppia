@@ -477,6 +477,8 @@ def _get_all_filepaths(
                 namespace=namespace)
     else:
         all_filepaths = _get_changed_filepaths()
+    # TODO(#12912): The pylint complains about 'pattern' being used out of the
+    # comprehension, which is not true, this needs to be investigated and fixed.
     all_matching_filepaths = [
         filename for filename in all_filepaths if not
         any(

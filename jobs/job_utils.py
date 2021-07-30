@@ -175,12 +175,14 @@ def get_ndb_model_from_beam_entity(beam_entity):
     ndb_key = get_ndb_key_from_beam_key(beam_entity.key)
     ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind()) # pylint: disable=protected-access
     ndb_properties = {}
-    # NDB datastore does not accept datetime with timezone info (tzinfo) so
-    # it needs to be removed.
     for key, value in beam_entity.properties.items():
-        if isinstance(value, datetime.datetime):
-            value = value.replace(tzinfo=None)
-        ndb_properties[key] = value
+        # NDB datastore does not accept datetime with timezone info (tzinfo) so
+        # it needs to be removed.
+        ndb_properties[key] = (
+            value.replace(tzinfo=None)
+            if isinstance(value, datetime.datetime)
+            else value
+        )
     return ndb_model_class(key=ndb_key, **ndb_properties)
 
 
@@ -228,8 +230,9 @@ def get_beam_query_from_ndb_query(query, namespace=None):
         beam_datastore_types.Query. The equivalent Apache Beam query.
     """
     kind = query.kind
+    # This is needed mainly for testing and it adds an easy way to force
+    # the queries into their own namespace.
     namespace = namespace or query.namespace
-    project = query.project or feconf.OPPIA_PROJECT_ID
 
     if query.filters:
         filters = _get_beam_filters_from_ndb_filter_node(query.filters)
@@ -245,8 +248,12 @@ def get_beam_query_from_ndb_query(query, namespace=None):
         order = ('__key__',)
 
     return beam_datastore_types.Query(
-        kind=kind, namespace=namespace, project=project, filters=filters,
-        order=order)
+        kind=kind,
+        namespace=namespace,
+        project=feconf.OPPIA_PROJECT_ID,
+        filters=filters,
+        order=order
+    )
 
 
 def _get_beam_filters_from_ndb_filter_node(filter_node):

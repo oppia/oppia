@@ -1596,7 +1596,10 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
     topic_ids = [topic.id for topic in topic_summaries]
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
     for index, topic in enumerate(topics):
-        all_skill_ids = topic.get_all_skill_ids()
+        try:
+            all_skill_ids = topic.get_all_skill_ids()
+        except Exception as e:
+            raise Exception('%s %s %s' % (topic_ids, index, e))
         skill_descriptions = (
             skill_services.get_descriptions_of_skills(
                 all_skill_ids))

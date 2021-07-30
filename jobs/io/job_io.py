@@ -48,17 +48,19 @@ class PutResults(beam.PTransform):
         super(PutResults, self).__init__(label=label)
         self.job_id = job_id
 
-    def expand(self, inputs):
+    def expand(self, entities):
         """Writes the given job results to the NDB datastore.
 
+        This overrides expand from parent class.
+
         Args:
-            inputs: PCollection. Models, can also contain just one model.
+            entities: PCollection. Models, can also contain just one model.
 
         Returns:
             PCollection. An empty PCollection.
         """
         return (
-            inputs
+            entities
             # NOTE: Pylint is wrong. WithKeys() is a decorated function with a
             # different signature than the one it's defined with.
             | beam.WithKeys(None)  # pylint: disable=no-value-for-parameter
@@ -69,7 +71,7 @@ class PutResults(beam.PTransform):
             | beam.FlatMap(job_run_result.JobRunResult.accumulate)
             | beam.Map(
                 self.create_beam_job_run_result_model,
-                inputs.pipeline.options.namespace)
+                entities.pipeline.options.namespace)
             | ndb_io.PutModels()
         )
 
