@@ -418,6 +418,7 @@ angular.module('oppia').directive('conversationSkin', [
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
+          var questionPlayerConfig = null;
 
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
@@ -446,7 +447,6 @@ angular.module('oppia').directive('conversationSkin', [
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           // This variable is used only when viewport is narrow.
           // Indicates whether the tutor card is displayed.
-          var questionPlayerConfig = $scope.getQuestionPlayerConfig();
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -1307,6 +1307,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           ctrl.$onInit = function() {
+            questionPlayerConfig = $scope.getQuestionPlayerConfig();
             ctrl.directiveSubscriptions.add(
               // TODO(#11996): Remove when migrating to Angular2+.
               CurrentInteractionService.onAnswerChanged$.subscribe(() => {
