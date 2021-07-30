@@ -29,8 +29,8 @@ import feconf
 from typing import Any, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, email_models, user_models
 
 (base_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])
@@ -46,7 +46,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         def mock_generate_hash(
                 unused_cls, unused_recipient_id, unused_email_subject,
                 unused_email_body):
-            # type: (Any, Text, Text, Text) -> Text
+            # type: (email_models.SentEmailModel, Text, Text, Text) -> Text
             return 'Email Hash'
 
         self.generate_constant_hash_ctx = self.swap(
@@ -165,6 +165,8 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 Exception,
                 'Expected datetime, received Not a datetime object of type '
                 '<type \'unicode\'>'):
+                # Here ignore[arg-type] is used to test method for invalid
+                # input type.
                 email_models.SentEmailModel.get_by_hash(
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object') # type: ignore[arg-type]

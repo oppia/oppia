@@ -31,8 +31,9 @@ import utils
 from typing import Dict, List, Optional, Text, Tuple, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import (
+        base_models, datastore_services, transaction_services)
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -707,6 +708,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, user_id, exploration_id): # type: ignore[override]
         # type: (Text, Text) -> Optional[ExpUserLastPlaythroughModel]
@@ -1646,6 +1649,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, user_id, exploration_id): # type: ignore[override]
         # type: (Text, Text) -> Optional[ExplorationUserDataModel]
@@ -1664,6 +1669,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi(cls, user_ids, exploration_id): # type: ignore[override]
         # type: (List[Text], Text) -> List[Optional[ExplorationUserDataModel]]
@@ -1837,6 +1844,8 @@ class CollectionProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, collection_id=collection_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, user_id, collection_id): # type: ignore[override]
         # type: (Text, Text) -> Optional[CollectionProgressModel]
@@ -1855,6 +1864,8 @@ class CollectionProgressModel(base_models.BaseModel):
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi(cls, user_id, collection_ids): # type: ignore[override]
         # type: (Text, List[Text]) -> List[Optional[CollectionProgressModel]]
@@ -2025,6 +2036,8 @@ class StoryProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, story_id=story_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, user_id, story_id, strict=True): # type: ignore[override]
         # type: (Text, Text, bool) -> Optional[StoryProgressModel]
@@ -2045,6 +2058,8 @@ class StoryProgressModel(base_models.BaseModel):
         return super(StoryProgressModel, cls).get(
             instance_id, strict=strict)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi(cls, user_id, story_ids): # type: ignore[override]
         # type: (Text, List[Text]) -> List[Optional[StoryProgressModel]]
@@ -2582,6 +2597,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         """
         return '.'.join([score_category, user_id])
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, user_id, score_category): # type: ignore[override]
         # type: (Text, Text) -> Optional[UserContributionProficiencyModel]

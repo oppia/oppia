@@ -31,8 +31,8 @@ import utils
 from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, feedback_models, user_models
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.feedback, models.NAMES.user])

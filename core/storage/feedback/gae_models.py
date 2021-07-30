@@ -27,9 +27,9 @@ import utils
 from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
-    from core.domain import feedback_domain  # pragma: no cover
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, datastore_services, user_models
+    from core.domain import feedback_domain
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -477,6 +477,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
         return [cls(id=instance_id) for instance_id in instance_ids]
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, thread_id, message_id, strict=True): # type: ignore[override]
         # type: (Text, int, bool) -> Optional[GeneralFeedbackMessageModel]
@@ -681,6 +683,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         """
         return '%s.%s' % (user_id, thread_id)
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(cls, user_id, thread_id): # type: ignore[override]
         # type: (Text, Text) -> Optional[GeneralFeedbackThreadUserModel]
@@ -740,6 +744,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         GeneralFeedbackThreadUserModel.put_multi(new_instances)
         return new_instances
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi(cls, user_id, thread_ids): # type: ignore[override]
         # type: (Text, List[Text]) -> List[Optional[GeneralFeedbackThreadUserModel]]

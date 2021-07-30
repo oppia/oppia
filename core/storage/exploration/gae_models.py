@@ -31,8 +31,8 @@ import utils
 from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -96,6 +96,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi(cls, exp_id, exp_versions): # type: ignore[override]
         # type: (Text, List[int]) -> List[Optional[ExplorationCommitLogEntryModel]]
@@ -299,6 +301,8 @@ class ExplorationModel(base_models.VersionedModel):
         exploration_commit_log.update_timestamps()
         exploration_commit_log.put()
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete_multi().
     @classmethod
     def delete_multi( # type: ignore[override]
             cls, entity_ids, committer_id, commit_message,

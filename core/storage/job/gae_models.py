@@ -28,8 +28,8 @@ import utils
 from typing import Dict, List, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

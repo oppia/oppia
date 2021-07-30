@@ -33,8 +33,8 @@ import feconf
 from typing import Any, Dict, List, Text, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, exp_models, user_models
 
 (base_models, exp_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
@@ -574,6 +574,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
+            # Here ignore[arg-type] is used to test method for invalid
+            # input type.
             results, _, more = (
                 exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1)) # type: ignore[arg-type]
