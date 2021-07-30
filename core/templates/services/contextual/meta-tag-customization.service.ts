@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 
 import { WindowRef } from './window-ref.service';
 
-interface MetaAttribute {
+export interface MetaAttribute {
   propertyType: string;
   propertyValue: string;
   content: string;
@@ -33,8 +33,16 @@ interface MetaAttribute {
 export class MetaTagCustomizationService {
   constructor(private windowRef: WindowRef) {}
 
-  addMetaTags(attrArray: MetaAttribute[]): void {
+  addOrReplaceMetaTags(attrArray: MetaAttribute[]): void {
     attrArray.forEach(attr => {
+      // Find and remove exisiting meta tag.
+      let existingMetaTag = (
+        this.windowRef.nativeWindow.document.querySelector(
+          'meta[' + attr.propertyType + '="' + attr.propertyValue + '"]'));
+      if (existingMetaTag) {
+        existingMetaTag.remove();
+      }
+      // Add new meta tag.
       let meta = this.windowRef.nativeWindow.document.createElement('meta');
       meta.setAttribute(attr.propertyType, attr.propertyValue);
       meta.setAttribute('content', attr.content);
