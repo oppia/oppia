@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Image with regions reset confirmation component.
+ * @fileoverview Unit tests for blog post action confirmation component.
  */
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { BlogPostActionConfirmationModalComponent } from './blog-post-action-confirmation.component';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockActiveModal {
   dismiss(): void {
@@ -40,8 +41,13 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        NgbModalModule,
+      ],
       declarations: [BlogPostActionConfirmationModalComponent],
       providers: [
+        BlogDashboardPageService,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
@@ -71,59 +77,59 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should initialize with correct action', () => {
     blogDashboardPageService.blogPostAction = 'delete';
-    component.ngOnInit;
+    component.ngOnInit();
 
     expect(component.blogPostAction).toBe('delete');
   });
 
   it('should return correct boolean value if action is delete', () => {
     component.blogPostAction = 'delete';
-    component.isActionDelete;
+    component.isActionDelete();
 
-    expect(component.isActionDelete).toBe(true);
+    expect(component.isActionDelete()).toBe(true);
 
     component.blogPostAction = 'publish';
-    component.isActionDelete;
+    component.isActionDelete();
 
-    expect(component.isActionDelete).toBe(false);
+    expect(component.isActionDelete()).toBe(false);
 
     component.blogPostAction = 'unpublish';
-    component.isActionDelete;
+    component.isActionDelete();
 
-    expect(component.isActionDelete).toBe(true);
+    expect(component.isActionDelete()).toBe(false);
   });
 
   it('should return correct boolean value if action is publish', () => {
     component.blogPostAction = 'publish';
-    component.isActionPublish;
+    component.isActionPublish();
 
-    expect(component.isActionPublish).toBe(true);
+    expect(component.isActionPublish()).toBe(true);
 
     component.blogPostAction = 'delete';
-    component.isActionPublish;
+    component.isActionPublish();
 
-    expect(component.isActionPublish).toBe(false);
+    expect(component.isActionPublish()).toBe(false);
 
     component.blogPostAction = 'unpublish';
-    component.isActionPublish;
+    component.isActionPublish();
 
-    expect(component.isActionPublish).toBe(true);
+    expect(component.isActionPublish()).toBe(false);
   });
 
   it('should return correct boolean value if action is unpublish', () => {
     component.blogPostAction = 'unpublish';
-    component.isActionUnpublish;
+    component.isActionUnpublish();
 
-    expect(component.isActionUnpublish).toBe(true);
+    expect(component.isActionUnpublish()).toBe(true);
 
     component.blogPostAction = 'delete';
-    component.isActionUnpublish;
+    component.isActionUnpublish();
 
-    expect(component.isActionUnpublish).toBe(false);
+    expect(component.isActionUnpublish()).toBe(false);
 
     component.blogPostAction = 'unpublish';
-    component.isActionUnpublish;
+    component.isActionUnpublish();
 
-    expect(component.isActionUnpublish).toBe(true);
+    expect(component.isActionUnpublish()).toBe(false);
   });
 });

@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
@@ -27,14 +28,28 @@ import { AlertsService } from 'services/alerts.service';
 import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
 import { MatTabsModule } from '@angular/material/tabs';
+import { BlogDashboardPageService } from './services/blog-dashboard-page.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Blog Dashboard Page Component', () => {
   let component: BlogDashboardPageComponent;
   let fixture: ComponentFixture<BlogDashboardPageComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let loaderService: LoaderService;
+  let mockWindowRef: MockWindowRef;
   let blogDashboardBackendApiService: BlogDashboardBackendApiService;
   let alertsService: AlertsService;
+  let blogDashboardPageService: BlogDashboardPageService;
+
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: '',
+        hash: '/'
+      },
+      open: (url) => {}
+    };
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -52,7 +67,12 @@ describe('Blog Dashboard Page Component', () => {
           provide: CapitalizePipe,
           useClass: MockCapitalizePipe
         },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        },
         BlogDashboardBackendApiService,
+        BlogDashboardPageService,
         LoaderService,
         UrlInterpolationService,
       ],
@@ -64,6 +84,8 @@ describe('Blog Dashboard Page Component', () => {
     fixture = TestBed.createComponent(BlogDashboardPageComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     loaderService = TestBed.inject(LoaderService);
     blogDashboardBackendApiService = TestBed.inject(
       BlogDashboardBackendApiService);
@@ -74,7 +96,20 @@ describe('Blog Dashboard Page Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize', fakeAsync(() => {
+  it('should initialize tab according to url', () => {
+    spyOn(component, 'initMainTab');
+
+    component.ngOnInit();
+    expect(component.activeTab).toBe('main');
+    expect(component.initMainTab).toHaveBeenCalled();
+
+    mockWindowRef.nativeWindow.location.hash = '/blog_post_editor/123456ABCEFG';
+    component.ngOnInit();
+    expect(component.activeTab).toBe('editor_tab');
+    expect(component.initMainTab).not.toHaveBeenCalled();
+  });
+
+  it('should initialize main tab', fakeAsync(() => {
     let defaultImageUrl = 'banner_image_url';
     let blogDashboardData = {
       username: 'test_user',
@@ -91,7 +126,7 @@ describe('Blog Dashboard Page Component', () => {
     spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
       .and.returnValue(Promise.resolve(blogDashboardData));
 
-    component.ngOnInit();
+    component.initMainTab();
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     tick();
 
@@ -122,5 +157,41 @@ describe('Blog Dashboard Page Component', () => {
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to get blog dashboard data');
+    }));
+
+  it('should succesfully create new blog post', fakeAsync(() => {
+    let updateViewEventEmitter = new EventEmitter();
+    spyOn(blogDashboardPageService, 'updateViewEventEmitter')
+      .and.returnValue(updateViewEventEmitter);
+    spyOn(blogDashboardBackendApiService, 'createBlogPostAsync')
+      .and.returnValue(Promise.resolve('123456abcdef'));
+    spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
+
+    component.createNewBlogPost();
+    tick();
+
+    expect(blogDashboardBackendApiService.createBlogPostAsync)
+      .toHaveBeenCalled();
+    expect(blogDashboardPageService.navigateToEditorTabWithId)
+      .toHaveBeenCalledWith('123456abcdef');
+    expect(component.activeTab).toBe('editor_tab');
+  }));
+
+  it('should display alert when unable to create new blog post.',
+    fakeAsync(() => {
+      spyOn(blogDashboardBackendApiService, 'createBlogPostAsync')
+        .and.returnValue(Promise.reject(
+          'To many collisions with existing blog post ids.'));
+      spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
+      spyOn(alertsService, 'addWarning');
+
+      component.ngOnInit();
+      tick();
+
+      expect(blogDashboardBackendApiService.createBlogPostAsync)
+        .toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Unable to create new blog post.Error: ' +
+        'To many collisions with existing blog post ids.');
     }));
 });

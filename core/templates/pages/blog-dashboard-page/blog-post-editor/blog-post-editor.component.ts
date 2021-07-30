@@ -91,7 +91,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
       .getStaticImageUrl('/general/no_profile_picture.png');
-    this.blogPostData = this.blogDashboardPageService.interstitialBlogPost;
+    this.blogPostData = BlogPostData.createInterstitialBlogPost();
     this.blogPostId = this.blogDashboardPageService.blogPostId;
     this.title = this.blogPostData.title;
     this.MAX_CHARS_IN_BLOG_POST_TITLE = (
@@ -121,6 +121,8 @@ export class BlogPostEditorComponent implements OnInit {
           this.defaultTagsList = editorData.listOfDefaulTags;
           this.maxAllowedTags = editorData.maxNumOfTags;
           this.title = this.blogPostData.title;
+          this.dateTimeLastSaved = this.getDateStringInWords(
+            this.blogPostData.lastUpdated);
           if (this.blogPostData.content !== '') {
             this.contentEditorIsActive = false;
           }
@@ -137,8 +139,12 @@ export class BlogPostEditorComponent implements OnInit {
             this.alertsService.addWarning('Failed to get blog post data.');
           }
         });
-    this.dateTimeLastSaved = this.getDateStringInWords(
-      this.blogPostData.lastUpdated);
+  }
+
+  getDateStringInWords(naiveDateTime: string): string {
+    let datestring = naiveDateTime.substring(0, naiveDateTime.length - 7);
+    return dayjs(
+      datestring, 'MM-DD-YYYY, HH:mm:ss').format('MMMM D, YYYY [at] hh:mm A');
   }
 
   updateLocalTitleValue(): void {
@@ -287,11 +293,6 @@ export class BlogPostEditorComponent implements OnInit {
       this.postImageDataToServer();
     };
     reader.readAsDataURL(file);
-  }
-
-  getDateStringInWords(naiveDateTime: string): string {
-    return dayjs(
-      naiveDateTime, 'MM-DD-YYYY, h:mm A').format('MMMM D, YYYY [at] h:mm A');
   }
 
   showuploadThumbnailModal(): void {

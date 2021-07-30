@@ -16,7 +16,7 @@
  * @fileoverview Component for the navbar breadcrumb of the blog dashboard.
  */
 
-import { Component, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit} from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { AlertsService } from 'services/alerts.service';
@@ -30,7 +30,7 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
   selector: 'oppia-blog-dashboard-page',
   templateUrl: './blog-dashboard-page.component.html'
 })
-export class BlogDashboardPageComponent implements OnInit {
+export class BlogDashboardPageComponent implements OnInit, OnDestroy {
   blogDashboardData: BlogDashboardData;
   authorProfilePictureUrl: string;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
@@ -62,6 +62,10 @@ export class BlogDashboardPageComponent implements OnInit {
     );
   }
 
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
   initMainTab(): void {
     this.loaderService.showLoadingScreen('Loading');
     this.DEFAULT_PROFILE_PICTURE_URL = this.urlInterpolationService
@@ -86,6 +90,9 @@ export class BlogDashboardPageComponent implements OnInit {
     this.blogDashboardBackendService.createBlogPostAsync().then(
       (blogPostId) => {
         this.blogDashboardPageService.navigateToEditorTabWithId(blogPostId);
+      }, (error) => {
+        this.alertsService.addWarning(
+          `Unable to create new blog post.Error: ${error}`);
       }
     );
   }

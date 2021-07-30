@@ -56,7 +56,7 @@
                [ngClass]="{'blog-title-input-field': blogPostData.title !== ''}"
                maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
-               (focusout)="updateLocalTitleValue()"    
+               (focusout)="updateLocalTitleValue()"
                autofocus>
         <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em>
@@ -188,7 +188,7 @@
   .author-username {
     color: #333;
     display: block;
-    font: normal normal normal 1.8rem/2.1rem Roboto;
+    font: normal normal normal 1.8rem/2.1rem 'Roboto', Arial, sans-serif;
   }
 
   .blog-post-editor {
@@ -198,7 +198,7 @@
   .blog-title-input-field {
     border: #FFF;
     color: #333;
-    font: normal normal bold 28px/33px Roboto;
+    font: normal normal bold 28px/33px 'Roboto', Arial, sans-serif;
     height: unset;
     padding: 0;
   }
@@ -206,11 +206,6 @@
   .blog-title-input-field:focus {
     border: 1px solid #ced4da;
     height: calc(1.5em + 0.75rem + 2px);
-  }
-
-  .delete-button {
-    background-color: #FFF;
-    color: #333;
   }
 
   .general-text-format {
@@ -226,7 +221,12 @@
     width: 13.438vw;
   }
 
-  .mat-button .publish-button {
+  .delete-button {
+    background-color: #FFF;
+    color: #333;
+  }
+
+  .mat-button.publish-button {
     background-color: #00645C
   }
 
@@ -268,7 +268,7 @@
 
   .mat-card-title {
     color: #333;
-    font: normal normal bold 1.6rem/1.9rem Roboto;
+    font: normal normal bold 1.6rem/1.9rem 'Roboto', Arial, sans-serif;
   }
 
   .mat-icon {
@@ -280,7 +280,7 @@
 
   .sub-text {
     color: #555;
-    font: italic normal normal 1.2rem/1.4rem Roboto;
+    font: italic normal normal 1.2rem/1.4rem 'Roboto', Arial, sans-serif;
     margin: 0
   }
 
@@ -288,13 +288,13 @@
     border: 1px solid #333;
     border-radius: 2px;
     color: #555;
-    font: normal normal normal 1.6rem/1.9rem Roboto;
+    font: normal normal normal 1.6rem/1.9rem 'Roboto', Arial, sans-serif;
     line-height: 0;
   }
 
   .tag-heading {
     color: #333;
-    font: normal normal bold 2.0rem/2.4rem Roboto;
+    font: normal normal bold 2.0rem/2.4rem 'Roboto', Arial, sans-serif;
   }
 
   .tag-limit-text {
@@ -313,7 +313,7 @@
   .title-heading {
     border-right: 2px solid #999;
     color: #555;
-    font: normal normal normal 1.6rem/1.9rem Roboto;
+    font: normal normal normal 1.6rem/1.9rem 'Roboto', Arial, sans-serif;
     height: 28px;
   }
 

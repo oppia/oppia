@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for edit profile picture modal.
+ * @fileoverview Unit tests for upload blog post tumbnail modal.
  */
 
 import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
@@ -23,7 +23,7 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail-modal.component';
 
-describe('Delete Topic Modal Component', () => {
+describe('Upload Blog Post Thumbnail Modal Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailComponent>;
   let componentInstance: UploadBlogPostThumbnailComponent;
 

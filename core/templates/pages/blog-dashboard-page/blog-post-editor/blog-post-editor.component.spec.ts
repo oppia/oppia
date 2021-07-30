@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for resetting image regions editor.
+ * @fileoverview Component for blog post editor.
  */
 
 import { ChangeDetectorRef } from '@angular/core';
@@ -65,7 +65,7 @@ describe('Blog Post Editor Component', () => {
     author_username: 'test_user',
     title: 'sample_title',
     content: '<p>hello</p>',
-    thumbnail_filename: 'image',
+    thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
     last_updated: '11/21/2014, 09:45:00',
@@ -117,6 +117,7 @@ describe('Blog Post Editor Component', () => {
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
+    blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     loaderService = TestBed.inject(LoaderService);
     blogPostEditorBackendApiService = TestBed.inject(
       BlogPostEditorBackendApiService);
@@ -143,7 +144,7 @@ describe('Blog Post Editor Component', () => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(component, 'initEditor');
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough();
 
     component.ngOnInit();
 
@@ -191,7 +192,7 @@ describe('Blog Post Editor Component', () => {
     expect(component.defaultTagsList).toEqual(['news', 'Learners']);
     expect(component.maxAllowedTags).toEqual(2);
     expect(component.thumbnailDataUrl).toEqual(
-      '/assetsdevhandler/blog_post/sampleId/assets/blog_post_thumbnail' +
+      '/assetsdevhandler/blog_post/sampleBlogId/assets/blog_post_thumbnail' +
       '/image.png');
     expect(component.dateTimeLastSaved).toEqual(
       'November 21, 2014 at 12:00 AM');
@@ -226,18 +227,19 @@ describe('Blog Post Editor Component', () => {
     expect(component.blogPostData.title).toBe('Sample title changed');
   });
 
-  it('should update local content value', () => {
+  it('should update local content value', fakeAsync(() => {
     spyOn(blogPostUpdateService, 'setBlogPostContent');
     component.localEdittedContent = '<p>Sample content changed</p>';
 
     component.blogPostData = sampleBlogPostData;
     component.updateContentValue();
+    tick();
 
     expect(blogPostUpdateService.setBlogPostContent).toHaveBeenCalled();
     expect(component.blogPostData.content).toBe(
       '<p>Sample content changed</p>');
     expect(component.contentEditorIsActive).toBe(false);
-  });
+  }));
 
   it('should cancel edit of blog post content and should close RTE', () => {
     component.blogPostData = sampleBlogPostData;
@@ -343,92 +345,91 @@ describe('Blog Post Editor Component', () => {
         .toBe('February 2, 2018 at 12:00 AM');
     });
 
-  it('should cancel delete blog post model', () => {
+  it('should cancel delete blog post model', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
     spyOn(blogDashboardPageService, 'deleteBlogPost');
 
     component.deleteBlogPost();
-    tick();
     tick();
 
     expect(blogDashboardPageService.deleteBlogPost)
       .not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should successfully place call to delete blog post model', () => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
-    spyOn(blogDashboardPageService, 'deleteBlogPost');
+  it('should successfully place call to delete blog post model', fakeAsync(
+    () => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      } as NgbModalRef);
+      spyOn(blogDashboardPageService, 'deleteBlogPost');
 
-    component.deleteBlogPost();
-    tick();
-    tick();
+      component.deleteBlogPost();
+      tick();
 
-    expect(blogDashboardPageService.deleteBlogPost).toHaveBeenCalled();
-  });
+      expect(blogDashboardPageService.deleteBlogPost).toHaveBeenCalled();
+    }));
 
-  it('should cancel publishing blog post model', () => {
-    component.blogPostData = sampleBlogPostData;
-    component.maxAllowedTags = 3;
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.reject()
-    } as NgbModalRef);
-    spyOn(component, 'updateBlogPostData');
+  it('should cancel publishing blog post model', fakeAsync(
+    () => {
+      component.blogPostData = sampleBlogPostData;
+      component.maxAllowedTags = 3;
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject()
+      } as NgbModalRef);
+      spyOn(component, 'updateBlogPostData');
 
-    component.publishBlogPost();
-    tick();
-    tick();
+      component.publishBlogPost();
+      tick();
 
-    expect(component.updateBlogPostData).not.toHaveBeenCalled();
-  });
+      expect(component.updateBlogPostData).not.toHaveBeenCalled();
+    }));
 
-  it('should successfully place call to publish blog post model', () => {
-    component.blogPostData = sampleBlogPostData;
-    component.maxAllowedTags = 3;
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
-    spyOn(component, 'updateBlogPostData');
+  it('should successfully place call to publish blog post model', fakeAsync(
+    () => {
+      component.blogPostData = sampleBlogPostData;
+      component.maxAllowedTags = 3;
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve()
+      } as NgbModalRef);
+      spyOn(component, 'updateBlogPostData');
 
-    component.publishBlogPost();
-    tick();
-    tick();
+      component.publishBlogPost();
+      tick();
 
-    expect(component.updateBlogPostData).toHaveBeenCalledWith(true);
-  });
+      expect(component.updateBlogPostData).toHaveBeenCalledWith(true);
+    }));
 
-  it('should cancel blog post thumbnail upload', () => {
+  it('should cancel blog post thumbnail upload', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
     spyOn(component, 'postImageDataToServer');
 
     component.showuploadThumbnailModal();
-    tick();
     tick();
 
     expect(component.postImageDataToServer).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should successfully place call to post thumbnail to server', () => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve('sample-url-string')
-    } as NgbModalRef);
-    spyOn(component, 'postImageDataToServer');
+  it('should successfully place call to post thumbnail to server', fakeAsync(
+    () => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve('sample-url-string')
+      } as NgbModalRef);
+      spyOn(component, 'postImageDataToServer');
 
-    component.showuploadThumbnailModal();
-    tick();
-    tick();
+      component.showuploadThumbnailModal();
+      tick();
 
-    expect(component.postImageDataToServer).toHaveBeenCalledWith();
-    expect(component.thumbnailDataUrl).toEqual('sample-url-string');
-  });
+      expect(component.postImageDataToServer).toHaveBeenCalledWith();
+      expect(component.thumbnailDataUrl).toEqual('sample-url-string');
+    }));
 
   it('should change tags for blog post successfully', () => {
     component.blogPostData = sampleBlogPostData;
+    component.maxAllowedTags = 4;
 
     component.onTagChange('sampleTag');
     expect(component.blogPostData.tags).toEqual(

@@ -24,7 +24,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
-import { BlogPostData } from 'domain/blog/blog-post.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,13 +32,8 @@ export class BlogDashboardPageService {
   private _blogPostId: string;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
-  private _DRAFT_TAB_URL = (
-    BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.DRAFTS
-  );
   private _activeTab = 'main';
   private _blogPostAction: string;
-  private _blogPostData: BlogPostData;
-  private _maxTags: number;
   private _updateViewEventEmitter= new EventEmitter<void>();
 
   constructor(
@@ -96,30 +90,8 @@ export class BlogDashboardPageService {
     return this._blogPostId;
   }
 
-  set blogPostId(blogPostId: string) {
-    this._blogPostId = blogPostId;
-  }
-
-  set maxTags(maxTags: number) {
-    this._maxTags = maxTags;
-  }
-
-  get interstitialBlogPost(): BlogPostData {
-    return BlogPostData.createInterstitialBlogPost();
-  }
-
   get updateViewEventEmitter(): EventEmitter<void> {
     return this._updateViewEventEmitter;
-  }
-
-  fetchBlogPost(blogPostId: string): void {
-    this.blogPostEditorBackendService.fetchBlogPostEditorData(blogPostId).then(
-      (editorData) => {
-        this._blogPostData = editorData.blogPostDict;
-        this._maxTags = editorData.maxNumOfTags;
-      }, (error) => {
-        this.alertsService.addWarning('Failed to get blog dashboard data.');
-      });
   }
 
   deleteBlogPost(): void {
@@ -133,15 +105,6 @@ export class BlogDashboardPageService {
           this.alertsService.addWarning('Failed to delete blog post.');
         }
       );
-  }
-
-  isBlogPostPublishable(): boolean {
-    let validationErrors = this._blogPostData.prepublishValidate(this._maxTags);
-    if (validationErrors.length === 0) {
-      return true;
-    } else {
-      return false;
-    }
   }
 }
 
