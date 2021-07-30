@@ -1383,3 +1383,5 @@ def update_question_suggestion(
     suggestion.change = new_change_obj
 
     _update_suggestion(suggestion)
+
+    return suggestion

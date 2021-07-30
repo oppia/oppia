@@ -419,7 +419,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
     """Handles update operations relating to question suggestions."""
 
     @acl_decorators.can_update_suggestion
-    def put(self, suggestion_id):
+    def post(self, suggestion_id):
         """Handles PUT requests.
 
         Raises:
@@ -458,9 +458,50 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
 
         question_state_data_obj.validate(None, False)
 
-        suggestion_services.update_question_suggestion(
+        updated_suggestion = suggestion_services.update_question_suggestion(
             suggestion_id,
             self.payload.get('skill_difficulty'),
             self.payload.get('question_state_data'))
+        
+        suggestion_image_context = updated_suggestion.image_context
+
+        previous_image_filenames = (
+            suggestion.get_new_image_filenames_added_in_suggestion())
+
+        new_image_filenames = (
+            updated_suggestion.get_new_image_filenames_added_in_suggestion())
+
+        for filename in new_image_filenames:
+            if filename not in previous_image_filenames:
+                image = self.request.get(filename)
+                if not image:
+                    logging.exception(
+                        'Image not provided for file with name %s when the '
+                        ' suggestion with target id %s was created.' % (
+                            filename, suggestion.target_id))
+                    raise self.InvalidInputException(
+                        'No image data provided for file with name %s.'
+                        % (filename))
+                try:
+                    file_format = (
+                        image_validation_services.validate_image_and_filename(
+                            image, filename))
+                except utils.ValidationError as e:
+                    raise self.InvalidInputException('%s' % (e))
+                image_is_compressible = (
+                    file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+                fs_services.save_original_and_compressed_versions_of_image(
+                    filename, suggestion_image_context, suggestion.target_id,
+                    image, 'image', image_is_compressible)
+
+        target_entity_html_list = suggestion.get_target_entity_html_strings()
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                target_entity_html_list))
+
+        fs_services.copy_images(
+            suggestion.target_type, suggestion.target_id,
+            suggestion_image_context, suggestion.target_id,
+            target_image_filenames)
 
         self.render_json(self.values)

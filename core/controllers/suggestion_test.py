@@ -929,13 +929,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None) as f:
+            raw_image = f.read()
 
-        self.put_json('%s/%s' % (
+        self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token)
+            }, csrf_token=csrf_token,
+            upload_files=(('img.png', 'img.png', raw_image),))
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)
@@ -995,7 +1000,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
@@ -1050,7 +1055,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'skill_difficulty': 0.6
@@ -1104,7 +1109,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data
@@ -1161,7 +1166,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        response = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
@@ -1204,7 +1209,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json('%s/%s' % (
+        self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': invalid_question_state_data,
