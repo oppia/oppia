@@ -41,7 +41,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import dayjs from 'dayjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { BlogCardPreviewModelComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
+import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html'
@@ -315,7 +315,7 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogDashboardPageService.blogPostData = this.blogPostData;
     this.blogDashboardPageService.authorPictureUrl = (
       this.authorProfilePictureUrl);
-    this.ngbModal.open(BlogCardPreviewModelComponent, {
+    this.ngbModal.open(BlogCardPreviewModalComponent, {
       backdrop: 'static'
     });
   }

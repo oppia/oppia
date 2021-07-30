@@ -16,7 +16,13 @@
         <span class="mat-card-title">{{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}</span>
       </div>
     </div>
-    <div class="blog-post-title d-flex" [ngClass]="{'flex-column': windowIsNarrow}">
+    <div class="row preview-button-div" *ngIf="!windowIsNarrow" >
+      <button mat-icon-button (click)="showPreview()" class="preview-button">
+        <mat-icon>remove_red_eye</mat-icon>
+        <h5 class="mt-2">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h5>
+      </button>
+    </div>
+    <div class="blog-post-title d-flex mt-5" [ngClass]="{'flex-column': windowIsNarrow}">
       <div *ngIf="windowIsNarrow">
         <mat-card-header [ngClass]="{'flex-column': windowIsNarrow}">
           <div mat-card-avatar class="author-profile d-flex">
@@ -28,18 +34,20 @@
               {{ authorUsername }}
             </span>
           </div>
-          <div class="mat-card-header-text d-block mx-0 mt-3">
-            <mat-card-title class="general-text-format">
-              {{ blogPostData.title }}
-            </mat-card-title>
-            <mat-card-subtitle class="sub-text general-text-format">
-              {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
-            </mat-card-subtitle>
+          <div class="mat-card-header-text mx-0 mt-3">
+            <div class="w-100">
+              <mat-card-title class="general-text-format">
+                {{ blogPostData.title }}
+              </mat-card-title>
+              <mat-card-subtitle class="sub-text general-text-format">
+                {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
+              </mat-card-subtitle>
+            </div>
+            <button mat-icon-button (click)="showPreview()" class="preview-button">
+              <mat-icon>remove_red_eye</mat-icon>
+              <h5 class="mt-2">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h5>
+            </button>
           </div>
-        <button mat-icon-button class="preview-button">
-          <mat-icon>remove_red_eye</mat-icon>
-          <span>{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</span>
-        </button>
         </mat-card-header>
         <div class="title-heading mr-2 mb-4 text-left">
           <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING' | translate | uppercase }}</span>
@@ -51,10 +59,6 @@
           </oppia-image-uploader>
         </div>
       </div>
-      <button mat-icon-button *ngIf="!windowIsNarrow" (click)='showPreview()'>
-        <mat-icon>remove_red_eye</mat-icon>
-        <span>{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</span>
-      </button>
       <div class="title-heading col-sm-2 mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left' : 'text-center'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
       </div>
@@ -285,6 +289,24 @@
     width: unset;
   }
 
+  .preview-button-div {
+    justify-content: flex-end;
+    margin: 0 0 0 10px;
+    width: 100%;
+  }
+
+  .preview-button {
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+  }
+
+  .preview-button /deep/ .mat-button-wrapper {
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    float: right;
+  }
 
   .sub-text {
     color: #555;
@@ -368,7 +390,6 @@
       width: 230px;
     }
 
-
     .blog-post-thumbnail-image-uploader /deep/ .mat-icon {
       font-size: 28px;
       height: 28px;
@@ -405,6 +426,17 @@
     }
 
     @media(max-width: 700px) {
+
+      .preview-button.mat-icon-button {
+        height: unset;
+        width: unset;
+      }
+
+      .preview-button .mat-icon {
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+      }
       .btn.mat-button {
         height: 20px;
         width: 82px;
