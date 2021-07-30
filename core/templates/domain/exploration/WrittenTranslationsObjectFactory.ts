@@ -166,8 +166,8 @@ export class WrittenTranslationsObjectFactory {
     private writtenTranslationObjectFactory: WrittenTranslationObjectFactory) {}
 
   createFromBackendDict(
-      writtenTranslationsDict: WrittenTranslationsBackendDict):
-      WrittenTranslations {
+      writtenTranslationsDict: WrittenTranslationsBackendDict
+  ): WrittenTranslations {
     const translationsMapping: WrittenTranslationsMapping = {};
     Object.keys(writtenTranslationsDict.translations_mapping).forEach(
       (contentId) => {

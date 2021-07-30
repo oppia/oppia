@@ -219,8 +219,7 @@ export class Interaction {
 
     Object.values(customizationArgs).forEach(
       caValue => {
-        traverseValueAndRetrieveContentIdsFromSubtitled(
-          caValue.value);
+        traverseValueAndRetrieveContentIdsFromSubtitled(caValue.value);
       }
     );
 

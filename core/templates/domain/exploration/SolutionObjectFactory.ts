@@ -89,8 +89,7 @@ export class Solution {
   }
 
   getSummary(interactionId: string): string {
-    const solutionType = (
-      this.answerIsExclusive ? 'The only' : 'One');
+    const solutionType = this.answerIsExclusive ? 'The only' : 'One';
     let correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';

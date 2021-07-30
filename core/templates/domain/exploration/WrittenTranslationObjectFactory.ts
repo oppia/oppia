@@ -33,8 +33,8 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
 
-export type DataFormatToDefaultValuesKey =
-  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
+export type DataFormatToDefaultValuesKey = (
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
 
 export interface TranslationBackendDict {
   'data_format': string;

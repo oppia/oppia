@@ -35,6 +35,8 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
+type InteractionSpecsKeys = keyof typeof INTERACTION_SPECS;
+
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
   let oof: OutcomeObjectFactory;
@@ -488,8 +490,8 @@ describe('Interaction object factory', () => {
       training_data: ['training_data'],
       tagged_skill_misconception_id: 'skill_id-1'
     }, 'TextInput')]);
-    const newAnswerGroup =
-      agof.createFromBackendDict(newAnswerGroupBackendDict, 'TextInput');
+    const newAnswerGroup = (
+      agof.createFromBackendDict(newAnswerGroupBackendDict, 'TextInput'));
     testInteraction.setAnswerGroups([newAnswerGroup]);
     expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
   });
@@ -582,7 +584,8 @@ describe('Interaction object factory', () => {
     expect(testInteraction.hints).toEqual(hintsDict.map(
       (hintDict: HintBackendDict) => {
         return hof.createFromBackendDict(hintDict);
-      }));
+      }
+    ));
     testInteraction.setHints([newHint]);
     expect(testInteraction.hints).toEqual([newHint]);
   });
@@ -780,8 +783,7 @@ describe('Interaction object factory', () => {
 
   it('should fully cover constructing customization arguments for all ' +
      'interactions', () => {
-    type Keys = keyof typeof INTERACTION_SPECS;
-    const keys = <Keys[]> Object.keys(INTERACTION_SPECS);
+    const keys = <InteractionSpecsKeys[]> Object.keys(INTERACTION_SPECS);
     keys.forEach(interactionId => {
       expect(() => {
         const defaultCa: Record<string, Object> = {};
@@ -790,7 +792,8 @@ describe('Interaction object factory', () => {
         caSpecs.forEach(
           (caSpec: { name: string; 'default_value': Object; }) => {
             defaultCa[caSpec.name] = {value: caSpec.default_value};
-          });
+          }
+        );
 
         iof.createFromBackendDict({
           answer_groups: answerGroupsDict,
