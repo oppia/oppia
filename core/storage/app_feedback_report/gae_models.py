@@ -34,8 +34,8 @@ PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
-# The model field names that we will want to filter for when maintainers parse
-# the feedback reports.
+# The model field names that can be filtered / sorted for when maintainers
+# triage feedback reports.
 FILTER_FIELD_NAMES = python_utils.create_enum(
     'platform', 'report_type', 'entry_point', 'submitted_on',
     'android_device_model', 'android_sdk_version', 'text_language_code',
@@ -446,8 +446,8 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
     # Whether this ticket has been archived.
     archived = datastore_services.BooleanProperty(required=True, indexed=True)
     # The datetime in UTC that the newest report in this ticket was created on,
-    # to help with sorting tickets. If all reports for this ticket have been
-    # reassigned to a different ticketn then this timestamp is None.
+    # to help with sorting tickets. If all reports assigned to this ticket have
+    # been reassigned to a different ticket then this timestamp is None.
     newest_report_timestamp = datastore_services.DateTimeProperty(
         required=False, indexed=True)
     # A list of report IDs associated with this ticket.
