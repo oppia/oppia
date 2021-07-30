@@ -256,13 +256,6 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
 
         self.assertEqual(beam_query.namespace, 'abc')
 
-    def test_query_with_project(self):
-        query = datastore_services.Query(project='foo-project')
-
-        beam_query = job_utils.get_beam_query_from_ndb_query(query)
-
-        self.assertEqual(beam_query.project, 'foo-project')
-
     def test_query_with_filter(self):
         query = datastore_services.Query(filters=BarModel.prop >= 3)
 
