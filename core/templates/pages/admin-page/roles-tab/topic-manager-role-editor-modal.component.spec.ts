@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, TestBed, async, tick } from '@angular/core
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MaterialModule } from 'components/material.module';
+import { MaterialModule } from 'modules/material.module';
 
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { AlertsService } from 'services/alerts.service';

@@ -35,15 +35,16 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
   ],
   declarations: [
-    OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
@@ -55,7 +56,6 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
     LearnerDashboardSuggestionModalComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     ProgressTabComponent,
