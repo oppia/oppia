@@ -473,9 +473,9 @@ class BaseModel(datastore_services.Model):
         else:
             start_cursor = None
 
-        results = query.order(-cls.last_updated).fetch_page(
+        result = query.order(-cls.last_updated).fetch_page(
             page_size, start_cursor=start_cursor)
-        base_model_results = cast(List[SELF_BASE_MODEL], results[0])
+        base_model_results = cast(List[SELF_BASE_MODEL], result[0])
         return (
             base_model_results,
             (result[1].urlsafe() if result[1] else None),
@@ -1215,8 +1215,8 @@ class VersionedModel(BaseModel):
         except cls.EntityNotFoundError:
             if not strict:
                 return None
-            python_utils.reraise_exception() # type: ignore[no-untyped-call]
-            return None
+            return cast(None, python_utils.reraise_exception()) # type: ignore[no-untyped-call]
+
 
     @classmethod
     def get_multi_versions(cls, entity_id, version_numbers):
