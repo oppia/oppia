@@ -28,7 +28,7 @@ require(
 require('components/state-editor/state-editor.component.ts');
 require(
   'components/state-directives/outcome-editor/' +
-  'outcome-destination-editor.directive.ts');
+  'outcome-destination-editor.component.ts');
 require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.component.ts');
