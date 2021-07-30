@@ -27,7 +27,7 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { SimpleChanges } from '@angular/core';
 
-fdescribe('NoninteractiveImage', () => {
+describe('NoninteractiveImage', () => {
   let component: NoninteractiveImage;
   let fixture: ComponentFixture<NoninteractiveImage>;
   let contextService: ContextService;
