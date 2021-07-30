@@ -797,6 +797,10 @@ URLS = MAPREDUCE_HANDLERS + [
         skill_editor.SkillRightsHandler),
 
     get_redirect_route(
+        r'%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+        skill_mastery.SubtopicMasteryDataHandler),
+
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         story_editor.StoryEditorPage),
     get_redirect_route(
