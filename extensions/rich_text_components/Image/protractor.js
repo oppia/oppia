@@ -141,12 +141,9 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
     for (var i = 0; i < args.length; i++) {
       var shapeClass = '.protractor-test-create-' + args[i];
       var shapeTool = modal.element(by.css(shapeClass));
-      await waitFor.elementToBeClickable(
-        shapeTool,
-        'Could not click on the required tool');
       var customTools = ['bezier', 'piechart', 'svgupload'];
       if (customTools.includes(args[i])) {
-        await shapeTool.click();
+        await action.click('Shape tool', shapeTool);
         if (args[i] === 'svgupload') {
           var imageUploadInput = element(
             by.css('.protractor-test-photo-upload-input'));
@@ -157,17 +154,14 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
           await imageUploadInput.sendKeys(absPath);
         }
       }
-      await shapeTool.click();
+      await action.click('Shape tool', shapeTool);
     }
     var altTextInputElement = (
       element(by.css(
         '[placeholder = "Description of Image (Example : George Handel, ' +
         '18th century baroque composer)"]')));
     var saveDiagram = modal.element(by.css('.protractor-test-save-diagram'));
-    await waitFor.elementToBeClickable(
-      saveDiagram,
-      'Could not save the diagram');
-    await saveDiagram.click();
+    await action.click('Save diagram button', saveDiagram);
     await waitFor.visibilityOf(
       modal.element(by.css('.protractor-test-saved-diagram-container')),
       'Diagram container not visible');
