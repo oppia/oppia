@@ -26,7 +26,7 @@ require(
     'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
-    'question-editor.directive.ts');
+    'question-editor.component.ts');
 
 require(
   'components/question-directives/modal-templates/' +

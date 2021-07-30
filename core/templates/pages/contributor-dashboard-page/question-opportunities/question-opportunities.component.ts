@@ -28,7 +28,7 @@ require(
   'question-difficulty-selector.component.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 require(
   'pages/contributor-dashboard-page/login-required-message/' +
   'login-required-message.component.ts');

@@ -47,7 +47,7 @@ require('domain/question/question-update.service.ts');
 require('domain/state/StateObjectFactory.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 
 describe('Question update service', function() {
   var QuestionUpdateService = null;
