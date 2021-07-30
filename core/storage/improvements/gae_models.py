@@ -145,8 +145,8 @@ class TaskEntryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.resolver_id == user_id).fetch(keys_only=True)
-        cls.delete_multi(cast(List[TaskEntryModel], keys))
+        models = cls.query(cls.resolver_id == user_id).fetch()
+        cls.delete_multi(cast(List[TaskEntryModel], models))
 
     @staticmethod
     def get_model_association_to_user():
