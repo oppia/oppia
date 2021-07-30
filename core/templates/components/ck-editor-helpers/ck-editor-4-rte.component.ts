@@ -44,7 +44,8 @@ interface RteConfig extends CKEDITOR.config {
             '</div></div>',
   styleUrls: []
 })
-export class CkEditor4RteComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
+    OnDestroy {
   @Input() uiConfig: UiConfig;
   @Input() value;
   @Input() headersEnabled = false;
@@ -82,7 +83,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges, OnDestro
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
     if (this.ck && this.ck.status === 'ready') {
-      this.ck.setData(this.wrapComponents(this.value))
+      this.ck.setData(this.wrapComponents(this.value));
     }
   }
 
@@ -179,7 +180,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges, OnDestro
    * component in a span (inline) or div (block).
    * For block elements, we add an overlay div as well.
    */
-  wrapComponents(html): string {
+  wrapComponents(html: string): string {
     if (html === undefined) {
       return html;
     }
