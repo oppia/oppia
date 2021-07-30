@@ -56,7 +56,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
     $provide.service('ContributionAndReviewService', function() {
       this.updateQuestionSuggestionAsync = function(
-          suggestionId, skillDifficulty, question_state_data, imagesData) {
+          suggestionId, skillDifficulty, questionStateData, imagesData) {
         return {
           then: (successCallback, errorCallback) => {
             successCallback();
@@ -221,7 +221,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
     it('should update the question', function() {
       spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
-            suggestionId, skillDifficulty, question_state_data, imagesData,
+            suggestionId, skillDifficulty, questionStateData, imagesData,
             successCallback, errorCallback) => {
           successCallback();
         });

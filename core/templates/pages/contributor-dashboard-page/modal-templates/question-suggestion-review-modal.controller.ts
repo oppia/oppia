@@ -29,19 +29,21 @@ require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$http', '$scope', '$uibModal', '$uibModalInstance', 'ContextService', 'ContributionOpportunitiesService',
-  'SiteAnalyticsService', 'SuggestionModalService', 'UrlInterpolationService',
-  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
-  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
-  'suggestion', 'suggestionId', 'ACTION_ACCEPT_SUGGESTION',
-  'ACTION_REJECT_SUGGESTION', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT', 'SkillBackendApiService',
+  '$http', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
+  'ContributionOpportunitiesService', 'SiteAnalyticsService',
+  'SuggestionModalService', 'UrlInterpolationService', 'authorName',
+  'contentHtml', 'misconceptionsBySkill', 'question', 'questionHeader',
+  'reviewable', 'skillDifficulty', 'skillRubrics', 'suggestion',
+  'suggestionId', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT', 'SkillBackendApiService',
   function(
-      $http, $scope, $uibModal, $uibModalInstance, ContextService, ContributionOpportunitiesService,
-      SiteAnalyticsService, SuggestionModalService, UrlInterpolationService,
-      authorName, contentHtml, misconceptionsBySkill, question,
-      questionHeader, reviewable, skillDifficulty, skillRubrics,
-      suggestion, suggestionId, ACTION_ACCEPT_SUGGESTION,
-      ACTION_REJECT_SUGGESTION, SKILL_DIFFICULTY_LABEL_TO_FLOAT, SkillBackendApiService) {
+      $http, $scope, $uibModal, $uibModalInstance, ContextService,
+      ContributionOpportunitiesService, SiteAnalyticsService,
+      SuggestionModalService, UrlInterpolationService, authorName,
+      contentHtml, misconceptionsBySkill, question, questionHeader,
+      reviewable, skillDifficulty, skillRubrics, suggestion, suggestionId,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT, SkillBackendApiService) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT);
@@ -139,7 +141,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.edit = function() {
-      SkillBackendApiService.fetchSkillAsync(suggestion.change.skill_id).then((skillDict) => {
+      SkillBackendApiService.fetchSkillAsync(
+        suggestion.change.skill_id).then((skillDict) => {
         var skill = skillDict.skill;
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -163,7 +166,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
         });
-        
       });
     };
 

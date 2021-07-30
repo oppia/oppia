@@ -939,8 +939,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token,
-            upload_files=(('img.png', 'img.png', raw_image),))
+            }, csrf_token=csrf_token, upload_files=(
+                ('img.png', 'img.png', raw_image),))
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id)

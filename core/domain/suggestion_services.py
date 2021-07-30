@@ -1357,6 +1357,10 @@ def update_question_suggestion(
         suggestion_id: str. The id of the suggestion to be updated.
         skill_difficulty: double. The difficulty level of the question.
         question_state_data: obj. Details of the question.
+
+    Returns:
+        Suggestion|None. The corresponding suggestion, or None if no suggestion
+        is found.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
     new_change_obj = question_domain.QuestionSuggestionChange(

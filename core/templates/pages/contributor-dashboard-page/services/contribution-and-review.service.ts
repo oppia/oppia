@@ -140,8 +140,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         }, () => onFailure && onFailure(suggestionId));
       },
       updateQuestionSuggestionAsync: async function(
-        suggestionId, skillDifficulty, questionStateData, imagesData,
-        onSuccess, onFailure) {
+          suggestionId, skillDifficulty, questionStateData, imagesData,
+          onSuccess, onFailure) {
         var url = UrlInterpolationService.interpolateUrl(
           _UPDATE_QUESTION_HANDLER_URL, {
             suggestion_id: suggestionId
@@ -149,12 +149,12 @@ angular.module('oppia').factory('ContributionAndReviewService', [
         const payload = {
           skill_difficulty: skillDifficulty,
           question_state_data: questionStateData
-        }
+        };
         const body = new FormData();
         body.append('payload', JSON.stringify(payload));
         imagesData.forEach(obj => {
-          if (obj.imageBlob != null) {
-            body.append(obj.filename, obj.imageBlob)
+          if (obj.imageBlob !== null) {
+            body.append(obj.filename, obj.imageBlob);
           }
         });
         return $http({
@@ -163,7 +163,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           data: body,
           headers: {
             'Content-Type': undefined
-          },  
+          },
         }).then(function() {
           onSuccess(suggestionId);
         }, () => onFailure && onFailure(suggestionId));

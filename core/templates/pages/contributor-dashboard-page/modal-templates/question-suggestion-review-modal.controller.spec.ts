@@ -185,7 +185,7 @@ describe('Question Suggestion Review Modal Controller', function() {
           })
         }));
 
-      suggestion = { 
+      suggestion = {
         status: 'accepted',
         change: {
           skill_id: 'skill_1'

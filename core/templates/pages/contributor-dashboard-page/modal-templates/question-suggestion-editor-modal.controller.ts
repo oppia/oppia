@@ -50,7 +50,7 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
     $scope.questionId = questionId;
     $scope.skill = skill;
     $scope.skillDifficulty = skillDifficulty;
-    $scope.isEditing = suggestionId != '' ? true : false;
+    $scope.isEditing = suggestionId !== '' ? true : false;
     $scope.misconceptionsBySkill = {};
     $scope.misconceptionsBySkill[$scope.skill.getId()] = (
       $scope.skill.getMisconceptions());
@@ -78,7 +78,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           qcuestionDict.question_state_data,
           imagesData,
           () => {
-            AlertsService.addSuccessMessage('Question is successfully updated.');
+            AlertsService.addSuccessMessage(
+              'Question is successfully updated.');
 
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
@@ -86,7 +87,8 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
           });
       } else {
         QuestionSuggestionBackendApiService.submitSuggestionAsync(
-          $scope.question, $scope.skill, $scope.skillDifficulty, imagesData).then(
+          $scope.question, $scope.skill, $scope.skillDifficulty,
+          imagesData).then(
           () => {
             AlertsService.addSuccessMessage('Submitted question for review.');
 

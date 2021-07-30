@@ -462,7 +462,7 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             suggestion_id,
             self.payload.get('skill_difficulty'),
             self.payload.get('question_state_data'))
-        
+
         suggestion_image_context = updated_suggestion.image_context
 
         previous_image_filenames = (
