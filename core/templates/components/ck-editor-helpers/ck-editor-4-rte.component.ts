@@ -331,9 +331,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
           .css('height', '24px')
           .css('width', '24px')
           .css('padding', '0px 0px');
-        $('.cke_button__oppia' + name).wrap(
-          "<span class='cke_button_wrap" + name + "'></span>");
       });
+      $('.cke_inner').append(
+        // eslint-disable-next-line max-len
+        '<span id="offline-warning">* Tools with dark background can not be used while being offline.<span>');
+      $('#offline-warning').css('display', 'none');
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')
@@ -433,7 +435,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
     this.disableOnOfflineNames.forEach((name) => {
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_button__oppia' + name)
-        .css('display', 'none');
+        .css('background-color', '#cccccc')
+        .css('pointer-events', 'none');
+      $('#offline-warning').css('display', '');
     });
   }
   enableRTEicons(): void {
@@ -441,7 +445,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
     this.disableOnOfflineNames.forEach((name) => {
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_button__oppia' + name)
-        .css('display', '');
+        .css('background-color', '')
+        .css('pointer-events', '');
+      $('#offline-warning').css('display', 'none');
     });
   }
 

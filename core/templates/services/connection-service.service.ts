@@ -17,11 +17,12 @@
  */
 
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
-import { fromEvent, Subscription, timer } from 'rxjs';
+import { Subscription, timer, Observable } from 'rxjs';
 import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 /**
  * Instance of this interface is used to report current connection status.
@@ -51,26 +52,29 @@ export class ConnectionService implements OnDestroy {
   private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
   private checkConnectionUrl: string = '/connectivity/check';
 
-  private stateChangeEventEmitter = new EventEmitter<ConnectionState>();
+  private _stateChangeEventEmitter = new EventEmitter<ConnectionState>();
 
   private currentState: ConnectionState = {
     hasInternetAccess: true,
     hasNetworkConnection: window.navigator.onLine
   };
-  private offlineSubscription: Subscription;
-  private onlineSubscription: Subscription;
   private httpSubscription: Subscription;
 
 
   constructor(
-      private http: HttpClient) {}
+      private windowRef: WindowRef,
+      private http: HttpClient) {
+    this.httpSubscription = new Subscription();
+  }
 
-  checkInternetState(): void {
-    this.httpSubscription = timer(
+
+  get getStatus(): Observable<number | ConnectionCheckResponse> {
+    return timer(
       0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
       .pipe(
         switchMap(() => {
           if (this.currentState.hasNetworkConnection) {
+            console.error('asd');
             return this.http.get<ConnectionCheckResponse>(
               this.checkConnectionUrl).toPromise();
           }
@@ -83,34 +87,34 @@ export class ConnectionService implements OnDestroy {
           delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
         )
         )
-      )
-      .subscribe(result => {
-        this.currentState.hasInternetAccess = true;
-        this.emitEvent();
-      });
+      );
+  }
+  checkInternetState(): void {
+    this.httpSubscription.add(this.getStatus.subscribe(result => {
+      this.currentState.hasInternetAccess = true;
+      this.emitEvent();
+    }));
   }
 
   checkNetworkState(): void {
-    this.onlineSubscription = fromEvent(window, 'online').subscribe(() => {
+    this.windowRef.nativeWindow.ononline = () => {
       this.currentState.hasNetworkConnection = true;
-      this.checkInternetState();
       this.emitEvent();
-    });
+    };
 
-    this.offlineSubscription = fromEvent(window, 'offline').subscribe(() => {
+    this.windowRef.nativeWindow.onoffline = () => {
       this.currentState.hasNetworkConnection = false;
+      this.currentState.hasInternetAccess = false;
       this.emitEvent();
-    });
+    };
   }
 
   private emitEvent() {
-    this.stateChangeEventEmitter.emit(this.currentState);
+    this._stateChangeEventEmitter.emit(this.currentState);
   }
 
   ngOnDestroy(): void {
     try {
-      this.offlineSubscription.unsubscribe();
-      this.onlineSubscription.unsubscribe();
       this.httpSubscription.unsubscribe();
     } catch (e) {
     }
@@ -121,7 +125,7 @@ export class ConnectionService implements OnDestroy {
    * observer.
    */
   get monitor(): EventEmitter<ConnectionState> {
-    return this.stateChangeEventEmitter;
+    return this._stateChangeEventEmitter;
   }
 }
 

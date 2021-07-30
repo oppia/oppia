@@ -17,54 +17,99 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { ConnectionService, ConnectionState } from 'services/connection-service.service';
+import { TestBed } from '@angular/core/testing';
+import { ConnectionService } from 'services/connection-service.service';
 import { Subscription } from 'rxjs';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
+class MockWindowRef {
+  nativeWindow = {
+    ononline() {
+      return;
+    },
+    onoffline() {
+      return;
+    }
+  };
+}
 
 describe('Connection Service', () => {
   let connectionService: ConnectionService;
   let subscriptions: Subscription;
   let httpTestingController: HttpTestingController;
-  let connectionState: ConnectionState;
+  let connectionStateSpy: jasmine.Spy;
+  let checkStateSpy: jasmine.Spy;
+  let mockWindowRef: MockWindowRef;
   beforeEach(() => {
+    mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
       ],
-      providers: [ConnectionService]
+      providers: [
+        ConnectionService,
+        {
+          provide: WindowRef,
+          useValue: mockWindowRef
+        }]
     });
     connectionService = TestBed.get(ConnectionService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
-
   beforeEach(() => {
-    spyOnProperty(Navigator.prototype, 'onLine').and.returnValue(true);
-    connectionService.checkInternetState();
-    connectionService.checkNetworkState();
+    connectionStateSpy = jasmine.createSpy('stateChange');
     subscriptions = new Subscription();
     subscriptions.add(connectionService.monitor.subscribe(
-      currentState => connectionState = currentState
+      connectionStateSpy
     ));
   });
+
   afterEach(() => {
     subscriptions.unsubscribe();
+    httpTestingController.verify();
   });
+
   // Check whether the connection service is initialized correctly.
   it('should be initialized correctly', () => {
     expect(connectionService).toBeTruthy();
   });
 
-  // Check whether the connection service is able to make a request.
-  it('should be able to make a request', fakeAsync(() => {
-    let req = httpTestingController.expectOne(
-      '/connectivity/check');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      isInternetConnected: true
+  it('should return connection state when offline', () => {
+    connectionService.checkNetworkState();
+    spyOn(connectionService, 'checkNetworkState');
+    mockWindowRef.nativeWindow.onoffline();
+    expect(connectionStateSpy).toHaveBeenCalledWith({
+      hasNetworkConnection: false,
+      hasInternetAccess: false
     });
-    flushMicrotasks();
-    expect(connectionState.hasInternetAccess).toBe(true);
-    expect(connectionState.hasNetworkConnection).toBe(true);
-  }));
+  });
+
+  it('should return connection state when online', () => {
+    connectionService.checkNetworkState();
+    spyOn(connectionService, 'checkNetworkState');
+    mockWindowRef.nativeWindow.ononline();
+    expect(connectionStateSpy).toHaveBeenCalledWith({
+      hasNetworkConnection: true,
+      hasInternetAccess: true
+    });
+  });
+
+  // It('should have internet access after getting reconnection', () => {
+  //   checkStateSpy = jasmine.createSpy('connectionState');
+  //   subscriptions.add(connectionService.getStatus.subscribe(checkStateSpy));
+  //   connectionService.checkNetworkState();
+  //   connectionService.checkInternetState();
+  //   spyOn(connectionService, 'checkInternetState');
+  //   spyOn(connectionService, 'checkNetworkState');
+  //   mockWindowRef.nativeWindow.onoffline();
+  //   expect(connectionStateSpy).toHaveBeenCalledWith({
+  //     hasNetworkConnection: false,
+  //     hasInternetAccess: false
+  //   });
+  //   mockWindowRef.nativeWindow.ononline();
+  //   expect(connectionStateSpy).toHaveBeenCalledWith({
+  //     hasNetworkConnection: true,
+  //     hasInternetAccess: true
+  //   });
+  // });
 });
