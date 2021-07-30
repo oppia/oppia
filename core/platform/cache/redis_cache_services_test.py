@@ -26,7 +26,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 from scripts import common
-from scripts import servers
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):

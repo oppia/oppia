@@ -453,7 +453,7 @@ def managed_portserver():
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
         portserver_args, human_readable_name='Portserver', shell=True,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     with proc_context as proc:
         try:
@@ -464,6 +464,9 @@ def managed_portserver():
             # receiving this signal.
             try:
                 proc.send_signal(signal.SIGINT)
+                python_utils.PRINT('Portserver output:')
+                for line in iter(lambda: proc.stdout.readline() or None, None):
+                    common.write_stdout_safe(line)
             except OSError:
                 # Raises when the process has already shutdown, in which case we
                 # can just return immediately.
