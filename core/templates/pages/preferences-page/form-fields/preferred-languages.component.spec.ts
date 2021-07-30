@@ -51,6 +51,7 @@ describe('Preferred Languages Component', () => {
   });
 
   it('should initialize', () => {
+    fixture.detectChanges();
     let value = 'en';
     componentInstance.preferredLanguages = [];
     componentInstance.choices = [{

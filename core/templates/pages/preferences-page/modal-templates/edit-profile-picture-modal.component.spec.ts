@@ -59,6 +59,7 @@ describe('Edit Profile Picture Modal Component', () => {
   });
 
   it('should initialize cropper', () => {
+    fixture.detectChanges();
     componentInstance.croppableImageRef = (
       new ElementRef(document.createElement('img')));
     componentInstance.initializeCropper();
