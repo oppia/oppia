@@ -20,13 +20,13 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { SearchBackendApiService } from './search-backend-api.service';
+import { SearchBackendApiService, SearchResponseBackendDict } from './search-backend-api.service';
 
-export class SelectionList {
+export interface SelectionList {
   [key: string]: boolean;
 }
 
-class FilterDetails {
+interface FilterDetails {
   description: string;
   itemsName: string;
   masterList: {
@@ -38,7 +38,7 @@ class FilterDetails {
   summary: string;
 }
 
-export class SelectionDetails {
+export interface SelectionDetails {
   categories: FilterDetails;
   languageCodes: FilterDetails;
 }
@@ -47,10 +47,10 @@ export class SelectionDetails {
   providedIn: 'root'
 })
 export class SearchService {
-  private _lastQuery: string = null;
+  private _lastQuery!: string;
   private _lastSelectedCategories: SelectionList = {};
   private _lastSelectedLanguageCodes: SelectionList = {};
-  private _searchCursor: string = null;
+  private _searchCursor!: string;
   private _isCurrentlyFetchingResults = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
@@ -228,12 +228,16 @@ export class SearchService {
   }
 
   loadMoreData(
-      successCallback: (SearchResponseData, boolean) => void,
-      failureCallback?: (any) => void): void {
+      successCallback: (
+        SearchResponseData: SearchResponseBackendDict,
+        boolean: boolean) => void,
+      failureCallback?: (arg0: boolean) => void): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this._isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
-      failureCallback(this.hasReachedEndOfPage());
+      if (failureCallback) {
+        failureCallback(this.hasReachedEndOfPage());
+      }
       return;
     }
 
