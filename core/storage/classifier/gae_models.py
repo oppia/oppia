@@ -29,7 +29,7 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, datastore_services # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import base_models, datastore_services # pragma: no cover
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()
@@ -214,9 +214,9 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
         results = query.fetch(
             NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
-        models = cast(List[ClassifierTrainingJobModel], results)
-        offset = offset + len(models)
-        return models, offset
+        classifier_job_models = cast(List[ClassifierTrainingJobModel], results)
+        offset = offset + len(classifier_job_models)
+        return classifier_job_models, offset
 
     # TODO(#13523): Change 'job_dict' to TypedDict to remove Any here.
     @classmethod

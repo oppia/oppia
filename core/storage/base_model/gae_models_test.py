@@ -33,7 +33,7 @@ from typing import Dict, List, Set, Text, Union, cast # isort:skip # pylint: dis
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import base_models # pragma: no cover
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

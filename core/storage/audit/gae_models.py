@@ -26,7 +26,7 @@ from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, datastore_services # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import base_models, datastore_services # pragma: no cover
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()

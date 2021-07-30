@@ -34,7 +34,7 @@ from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-i
 
 MYPY = False
 if MYPY:
-    from mypy_imports import ( # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import ( # pragma: no cover
         base_models, collection_models, user_models) # pragma: no cover
 
 (base_models, collection_models, user_models) = models.Registry.import_models(
@@ -549,6 +549,8 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
+            # Here ignore[arg-type] is used to test method for invalid
+            # input type.
             (
                 collection_models.CollectionCommitLogEntryModel
                 .get_all_non_private_commits(

@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # p
 
 MYPY = False
 if MYPY:
-    from mypy_imports import ( # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import ( # pragma: no cover
         base_models, datastore_services, # pragma: no cover
         transaction_services)  # pragma: no cover
 

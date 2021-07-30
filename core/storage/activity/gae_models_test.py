@@ -25,7 +25,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:
-    from mypy_imports import base_models, activity_models # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import base_models, activity_models # pragma: no cover
 
 (base_models, activity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.activity])

@@ -34,7 +34,7 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY:
-    from mypy_imports import datastore_services # pragma: no cover # pylint: disable=unused-import
+    from mypy_imports import datastore_services # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 

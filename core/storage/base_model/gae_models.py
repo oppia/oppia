@@ -46,7 +46,7 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
 MYPY = False
 if MYPY:
     from mypy_imports import ( # pragma: no cover
-        datastore_services, transaction_services) # pragma: no cover # pylint: disable=unused-import
+        datastore_services, transaction_services) # pragma: no cover
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()

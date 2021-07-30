@@ -278,7 +278,7 @@ def make_instantaneous_global_consistency_policy():
 
 @contextlib.contextmanager
 def mock_datetime_for_datastore(mocked_now):
-    # type: (datetime.datetime) -> Iterator[Any]
+    # type: (datetime.datetime) -> Iterator[None]
     """Mocks parts of the datastore to accept a fake datetime type that always
     returns the same value for utcnow.
 
