@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
-import { Subscription, timer, Observable } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
@@ -48,7 +48,7 @@ export interface ConnectionCheckResponse {
   providedIn: 'root'
 })
 export class ConnectionService implements OnDestroy {
-  private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 4000;
+  private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 3500;
   private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
   private checkConnectionUrl: string = '/connectivity/check';
 
@@ -67,9 +67,8 @@ export class ConnectionService implements OnDestroy {
     this.httpSubscription = new Subscription();
   }
 
-
-  get getStatus(): Observable<number | ConnectionCheckResponse> {
-    return timer(
+  checkInternetState(): void {
+    this.httpSubscription.add(timer(
       0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
       .pipe(
         switchMap(() => {
@@ -87,19 +86,16 @@ export class ConnectionService implements OnDestroy {
           delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
         )
         )
-      );
-  }
-  checkInternetState(): void {
-    this.httpSubscription.add(this.getStatus.subscribe(result => {
-      this.currentState.hasInternetAccess = true;
-      this.emitEvent();
-    }));
+      ).subscribe(result => {
+        this.currentState.hasInternetAccess = true;
+        this.emitEvent();
+      }));
   }
 
   checkNetworkState(): void {
     this.windowRef.nativeWindow.ononline = () => {
       this.currentState.hasNetworkConnection = true;
-      this.emitEvent();
+      this.checkInternetState();
     };
 
     this.windowRef.nativeWindow.onoffline = () => {
@@ -124,7 +120,7 @@ export class ConnectionService implements OnDestroy {
    * Monitor Network & Internet connection status by subscribing to this
    * observer.
    */
-  get monitor(): EventEmitter<ConnectionState> {
+  get onInternetStateChange(): EventEmitter<ConnectionState> {
     return this._stateChangeEventEmitter;
   }
 }

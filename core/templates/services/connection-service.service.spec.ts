@@ -38,7 +38,6 @@ describe('Connection Service', () => {
   let subscriptions: Subscription;
   let httpTestingController: HttpTestingController;
   let connectionStateSpy: jasmine.Spy;
-  let checkStateSpy: jasmine.Spy;
   let mockWindowRef: MockWindowRef;
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
@@ -59,7 +58,7 @@ describe('Connection Service', () => {
   beforeEach(() => {
     connectionStateSpy = jasmine.createSpy('stateChange');
     subscriptions = new Subscription();
-    subscriptions.add(connectionService.monitor.subscribe(
+    subscriptions.add(connectionService.onInternetStateChange.subscribe(
       connectionStateSpy
     ));
   });
@@ -94,22 +93,20 @@ describe('Connection Service', () => {
     });
   });
 
-  // It('should have internet access after getting reconnection', () => {
-  //   checkStateSpy = jasmine.createSpy('connectionState');
-  //   subscriptions.add(connectionService.getStatus.subscribe(checkStateSpy));
-  //   connectionService.checkNetworkState();
-  //   connectionService.checkInternetState();
-  //   spyOn(connectionService, 'checkInternetState');
-  //   spyOn(connectionService, 'checkNetworkState');
-  //   mockWindowRef.nativeWindow.onoffline();
-  //   expect(connectionStateSpy).toHaveBeenCalledWith({
-  //     hasNetworkConnection: false,
-  //     hasInternetAccess: false
-  //   });
-  //   mockWindowRef.nativeWindow.ononline();
-  //   expect(connectionStateSpy).toHaveBeenCalledWith({
-  //     hasNetworkConnection: true,
-  //     hasInternetAccess: true
-  //   });
-  // });
+  it('should have internet access after getting reconnection', () => {
+    connectionService.checkNetworkState();
+    connectionService.checkInternetState();
+    spyOn(connectionService, 'checkInternetState');
+    spyOn(connectionService, 'checkNetworkState');
+    mockWindowRef.nativeWindow.onoffline();
+    expect(connectionStateSpy).toHaveBeenCalledWith({
+      hasNetworkConnection: false,
+      hasInternetAccess: false
+    });
+    mockWindowRef.nativeWindow.ononline();
+    expect(connectionStateSpy).toHaveBeenCalledWith({
+      hasNetworkConnection: true,
+      hasInternetAccess: true
+    });
+  });
 });

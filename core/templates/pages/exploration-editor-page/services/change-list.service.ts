@@ -95,7 +95,7 @@ export class ChangeListService implements OnInit {
     private loggerService: LoggerService,
     private connectionService: ConnectionService,
   ) {
-    this.connectionService.monitor.subscribe(currentState => {
+    this.connectionService.onInternetStateChange.subscribe(currentState => {
       this.hasNetworkConnection = currentState.hasNetworkConnection;
       this.hasInternetAccess = currentState.hasInternetAccess;
       if (this.hasNetworkConnection && this.hasInternetAccess) {

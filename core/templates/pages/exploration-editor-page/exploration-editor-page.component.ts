@@ -382,43 +382,44 @@ angular.module('oppia').component('explorationEditorPage', {
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
           ctrl.connectionService.checkNetworkState();
           ctrl.connectionService.checkInternetState();
-          ctrl.connectionService.monitor.subscribe(currentState => {
-            ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
-            ctrl.hasInternetAccess = currentState.hasInternetAccess;
-            if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
-              if (ctrl.status === 'OFFLINE') {
-                if (
-                  !ChangeListService.isExplorationLockedForEditing() &&
-                  !ctrl.countWarnings()) {
-                  $(
-                    '.oppia-editor-publish-button'
-                  ).removeAttr('disabled');
+          ctrl.connectionService.onInternetStateChange.subscribe(
+            currentState => {
+              ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
+              ctrl.hasInternetAccess = currentState.hasInternetAccess;
+              if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
+                if (ctrl.status === 'OFFLINE') {
+                  if (
+                    !ChangeListService.isExplorationLockedForEditing() &&
+                    !ctrl.countWarnings()) {
+                    $(
+                      '.oppia-editor-publish-button'
+                    ).removeAttr('disabled');
+                  }
+                  if (ExplorationSaveService.isExplorationSaveable()) {
+                    $(
+                      '.oppia-save-draft-button'
+                    ).removeAttr('disabled');
+                  }
+                  if (ChangeListService.getChangeList().length) {
+                    $('.oppia-discard-button').removeAttr('disabled');
+                  }
+                  ctrl.alertsService.addSuccessMessage(
+                    'Reconnected. Checking whether your changes are mergeable.',
+                    4000);
                 }
-                if (ExplorationSaveService.isExplorationSaveable()) {
-                  $(
-                    '.oppia-save-draft-button'
-                  ).removeAttr('disabled');
-                }
-                if (ChangeListService.getChangeList().length) {
-                  $('.oppia-discard-button').removeAttr('disabled');
-                }
-                ctrl.alertsService.addSuccessMessage(
-                  'Reconnected. Checking whether your changes are mergeable.',
-                  4000);
+                ctrl.status = 'ONLINE';
+              } else if (ctrl.status === 'ONLINE') {
+                $(
+                  '.oppia-save-draft-button, .oppia-editor-publish-button, ' +
+                  '.oppia-discard-button'
+                ).attr('disabled', 'disabled');
+                ctrl.alertsService.addInfoMessage(
+                  'Looks like you are offline. ' +
+                  // eslint-disable-next-line max-len
+                  'You can continue working, and can save your changes once reconnected.', 5000);
+                ctrl.status = 'OFFLINE';
               }
-              ctrl.status = 'ONLINE';
-            } else if (ctrl.status === 'ONLINE') {
-              $(
-                '.oppia-save-draft-button, .oppia-editor-publish-button, ' +
-                '.oppia-discard-button'
-              ).attr('disabled', 'disabled');
-              ctrl.alertsService.addInfoMessage(
-                'Looks like you are offline. ' +
-                // eslint-disable-next-line max-len
-                'You can continue working, and can save your changes once reconnected.', 5000);
-              ctrl.status = 'OFFLINE';
-            }
-          });
+            });
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
           $scope.$applyAsync();

@@ -67,7 +67,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.connectionService.monitor.subscribe(currentState => {
+    this.connectionService.onInternetStateChange.subscribe(currentState => {
       this.hasNetworkConnection = currentState.hasNetworkConnection;
       this.hasInternetAccess = currentState.hasInternetAccess;
       if (this.hasNetworkConnection && this.hasInternetAccess) {
