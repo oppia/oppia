@@ -19,15 +19,15 @@
     <br>
     <oppia-continue-button ng-if="helpCardHasContinueButton"
                            [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
-                           [is-learn-again-button]="isLearnAgainButton()"
-                           (click-continue-button)="onClickContinueButton()"
+                           [is-learn-again-button]="$ctrl.isLearnAgainButton()"
+                           (click-continue-button)="$ctrl.onClickContinueButton()"
                            class="d-inline-block">
     </oppia-continue-button>
   </div>
 
   <!--This CSS class is essential for auto-scrolling in Drag and drop interaction to work
   correctly. More details about the class can be found in extensions/interactions/
-  DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.directive.html-->
+  DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
   <div class="conversation-skin-interaction-container">
     <angular-html-bind class="protractor-test-conversation-input"
                        html-data="displayedCard.getInteractionHtml()">
