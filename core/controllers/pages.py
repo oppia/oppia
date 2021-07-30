@@ -25,6 +25,11 @@ import feconf
 class ForumRedirectPage(base.BaseHandler):
     """A handler to redirect to Oppia's Google group."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -33,6 +38,11 @@ class ForumRedirectPage(base.BaseHandler):
 
 class AboutRedirectPage(base.BaseHandler):
     """A page that redirects to the main About page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -43,6 +53,11 @@ class AboutRedirectPage(base.BaseHandler):
 class FoundationRedirectPage(base.BaseHandler):
     """A page that redirects to the separate Oppia Foundation site."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -52,6 +67,11 @@ class FoundationRedirectPage(base.BaseHandler):
 class TeachRedirectPage(base.BaseHandler):
     """A page that redirects to the main Teach page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -60,6 +80,11 @@ class TeachRedirectPage(base.BaseHandler):
 
 class ConsoleErrorPage(base.BaseHandler):
     """Page with missing resources to test cache slugs."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
