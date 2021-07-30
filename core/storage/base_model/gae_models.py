@@ -72,44 +72,44 @@ class DELETION_POLICY(enum.Enum): # pylint: disable=invalid-name
     """Enum for Deletion Policy of a model."""
 
     # Models that should be kept.
-    KEEP = 1
+    KEEP = 'KEEP'
     # Models that should be deleted.
-    DELETE = 2
+    DELETE = 'DELETE'
     # Models that should be deleted after all the other models are deleted and
     # verified to be deleted.
-    DELETE_AT_END = 3
+    DELETE_AT_END = 'DELETE_AT_END'
     # Models that should be pseudonymized in their local context.
-    LOCALLY_PSEUDONYMIZE = 4
+    LOCALLY_PSEUDONYMIZE = 'LOCALLY_PSEUDONYMIZE'
     # Models that should be pseudonymized if they are published and otherwise
     # (when private) deleted.
-    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = 5
+    PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE = 'PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE'
     # Models that are not directly or indirectly related to users.
-    NOT_APPLICABLE = 6
+    NOT_APPLICABLE = 'NOT_APPLICABLE'
 
 
 class EXPORT_POLICY(enum.Enum): # pylint: disable=invalid-name
     """Enum for Export Policy of a model."""
 
     # Indicates that a model's field is to be exported.
-    EXPORTED = 1
+    EXPORTED = 'EXPORTED'
     # Indicates that the value of the field is exported as the key in the
     # Takeout dict.
-    EXPORTED_AS_KEY_FOR_TAKEOUT_DICT = 2
+    EXPORTED_AS_KEY_FOR_TAKEOUT_DICT = 'EXPORTED_AS_KEY_FOR_TAKEOUT_DICT'
     # Indicates that a model's field should not be exported.
-    NOT_APPLICABLE = 3
+    NOT_APPLICABLE = 'NOT_APPLICABLE'
 
 
 class MODEL_ASSOCIATION_TO_USER(enum.Enum): # pylint: disable=invalid-name
     """Enum for model's association to the user."""
 
     # Indicates that a model has a single instance per user.
-    ONE_INSTANCE_PER_USER = 1
+    ONE_INSTANCE_PER_USER = 'ONE_INSTANCE_PER_USER'
     # Indicates that a model can be shared by multiple users.
-    ONE_INSTANCE_SHARED_ACROSS_USERS = 2
+    ONE_INSTANCE_SHARED_ACROSS_USERS = 'ONE_INSTANCE_SHARED_ACROSS_USERS'
     # Indicates that a model has multiple instances, specific to a user.
-    MULTIPLE_INSTANCES_PER_USER = 3
+    MULTIPLE_INSTANCES_PER_USER = 'MULTIPLE_INSTANCES_PER_USER'
     # Indicates that a model should not be exported.
-    NOT_CORRESPONDING_TO_USER = 4
+    NOT_CORRESPONDING_TO_USER = 'NOT_CORRESPONDING_TO_USER'
 
 
 class BaseModel(datastore_services.Model):

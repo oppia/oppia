@@ -636,14 +636,18 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
         # Here ignore[assignment] is used to assign invalid value to
         # SNAPSHOT_METADATA_CLASS for testing.
+        # TODO(#13528): Remove this test after back-end is fully type
+        # annotated. Here ignore[assignment] is used to test method for invalid
+        # input type.
         model1.SNAPSHOT_METADATA_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'No snapshot metadata class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         model1 = TestVersionedModel(id='model_id1')
-        # Here ignore[assignment] is used to assign invalid value to
-        # SNAPSHOT_CONTENT_CLASS for testing.
+        # TODO(#13528): Remove this test after back-end is fully type
+        # annotated. Here ignore[assignment] is used to test method for invalid
+        # input type.
         model1.SNAPSHOT_CONTENT_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'No snapshot content class defined.'):
@@ -652,14 +656,16 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
-            # Here ignore[arg-type] is used to test method for invalid
+            # TODO(#13528): Remove this test after back-end is fully type
+            # annotated. Here ignore[arg-type] is used to test method for invalid
             # input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {}) # type: ignore[arg-type]
 
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
-            # Here ignore[list-time] is used to test method for invalid
+            # TODO(#13528): Remove this test after back-end is fully type
+            # annotated. Here ignore[list-item] is used to test method for invalid
             # input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
@@ -831,7 +837,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'At least one version number is invalid'):
-            # Here ignore[list-item] is used to test method for invalid
+            # TODO(#13528): Remove this test after back-end is fully type
+            # annotated. Here ignore[list-item] is used to test method for invalid
             # input type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
