@@ -27,7 +27,7 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { SimpleChanges } from '@angular/core';
 
-describe('NoninteractiveImage', () => {
+fdescribe('NoninteractiveImage', () => {
   let component: NoninteractiveImage;
   let fixture: ComponentFixture<NoninteractiveImage>;
   let contextService: ContextService;
@@ -52,6 +52,12 @@ describe('NoninteractiveImage', () => {
   class mockHtmlEscaperService {
     escapedJsonToObj(data): string {
       return data;
+    }
+  }
+
+  class MockSvgSanitizerService {
+    getTrustedSvgResourceUrl(str: string): string {
+      return str;
     }
   }
 
@@ -83,6 +89,10 @@ describe('NoninteractiveImage', () => {
           provide: ImageLocalStorageService,
           useValue: mockImageLocalStorageService
         },
+        {
+          provide: SvgSanitizerService,
+          useClass: MockSvgSanitizerService
+        }
       ]
     }).compileComponents();
   }));
@@ -238,10 +248,6 @@ describe('NoninteractiveImage', () => {
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
-    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and
-      .callFake((data) => {
-        return data;
-      });
     let changes: SimpleChanges = {
       altWithValue: {
         currentValue: 'new image label',
