@@ -313,7 +313,10 @@ def managed_redis_server():
         human_readable_name='Redis Server', shell=True)
     with proc_context as proc:
         common.wait_for_port_to_be_in_use(feconf.REDISPORT)
-        yield proc
+        try:
+            yield proc
+        finally:
+            subprocess.check_call([common.REDIS_CLI_PATH, 'shutdown', 'nosave'])
 
 
 def create_managed_web_browser(port):

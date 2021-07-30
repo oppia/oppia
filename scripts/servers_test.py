@@ -493,16 +493,23 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             os.path, 'exists', mock_os_path_exists))
         self.exit_stack.enter_context(self.swap_with_checks(
+            subprocess,
+            'check_call',
+            lambda _: 0,
+            expected_args=[([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)]
+        ))
+        self.exit_stack.enter_context(self.swap_with_checks(
             os, 'remove', mock_os_remove, called=False))
 
         self.exit_stack.enter_context(servers.managed_redis_server())
-        self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
             '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH))
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+        self.exit_stack.close()
 
     def test_managed_redis_server_deletes_redis_dump_when_it_exists(self):
         original_os_remove = os.remove
