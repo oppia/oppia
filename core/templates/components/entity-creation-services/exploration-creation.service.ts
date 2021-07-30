@@ -34,7 +34,7 @@ import { ExplorationCreationBackendApiService } from './exploration-creation-bac
  })
 export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-  explorationCreationInProgress: boolean;
+  explorationCreationInProgress: boolean = false;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private csrfTokenService: CsrfTokenService,
