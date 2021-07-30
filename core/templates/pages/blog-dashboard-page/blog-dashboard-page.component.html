@@ -2,8 +2,8 @@
   <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
     <mat-card-header class="blog-dashboard-header">
       <img mat-card-avatar
-          [src]="authorProfilePictureUrl"
-          alt="Profile image of the author of the blog post">
+           [src]="authorProfilePictureUrl"
+           alt="Profile image of the author of the blog post">
       <mat-card-title class="blog-dashboard-card-title">{{ blogDashboardData.username }}</mat-card-title>
       <mat-card-subtitle>
         <button mat-button class="new-post-button" (click)="createNewBlogPost()">

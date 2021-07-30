@@ -31,7 +31,7 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Misconception Modal Component', () => {
+describe('Blog Post Action Confirmation Modal Component', () => {
   let component: BlogPostActionConfirmationModalComponent;
   let blogDashboardPageService: BlogDashboardPageService;
   let fixture: ComponentFixture<

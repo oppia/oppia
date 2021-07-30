@@ -776,6 +776,7 @@ def require_valid_thumbnail_filename(thumbnail_filename):
                 'Expected a filename ending in svg, received %s' %
                 thumbnail_filename)
 
+
 def require_valid_image_filename(image_filename):
      # type: (Text) -> None
     """Generic image filename validation.

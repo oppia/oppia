@@ -56,7 +56,7 @@
                [ngClass]="{'blog-title-input-field': blogPostData.title !== ''}"
                maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
-               (focusout)="updateLocalTitleValue()"               
+               (focusout)="updateLocalTitleValue()"    
                autofocus>
         <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em>
@@ -72,8 +72,8 @@
       <div class="d-block flex-grow-1">
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="blog-post-content-button">
           <div class="oppia-editable-section-mask">
-          <angular-html-bind-wrapper [htmlData]="this.blogPostData.content">
-          </angular-html-bind-wrapper>
+            <angular-html-bind-wrapper [htmlData]="this.blogPostData.content">
+            </angular-html-bind-wrapper>
           </div>
         </div>
         <div *ngIf="contentEditorIsActive">
@@ -105,15 +105,15 @@
               </span>
             </div>
             <mat-button-toggle-group aria-label="Tags to classify blog post."
-                                    [value]="blogPostData.tags"
-                                    *ngFor="let tag of defaultTagsList"
-                                    multiple="true"
-                                    class="mx-2 my-2 tag">
+                                     [value]="blogPostData.tags"
+                                     *ngFor="let tag of defaultTagsList"
+                                     multiple="true"
+                                     class="mx-2 my-2 tag">
               <mat-button-toggle class="text-wrap" (change)="onTagChange($event.value)" [value]="tag">
               {{ tag }}
               </mat-button-toggle>
             </mat-button-toggle-group>
-        </div>
+          </div>
         </div>
       </div>
     </div>
@@ -164,16 +164,16 @@
         </div>
         <div *ngIf="!windowIsNarrow">
           <mat-button-toggle-group aria-label="Tags to classify blog post."
-                                  [value]="blogPostData.tags"
-                                  *ngFor="let tag of defaultTagsList"
-                                  multiple="true"
-                                  class="mx-2 my-2 tag">
+                                   [value]="blogPostData.tags"
+                                   *ngFor="let tag of defaultTagsList"
+                                   multiple="true"
+                                   class="mx-2 my-2 tag">
             <mat-button-toggle  class="text-wrap" (change)="onTagChange($event.value)" [value]="tag">
               {{ tag }}
             </mat-button-toggle>
           </mat-button-toggle-group>
         </div>
-        <button mat-button 
+        <button mat-button
                 class="d-block delete-button mx-auto my-0"
                 (click)="deleteBlogPost()"
                 aria-label="Delete blog post."
@@ -185,23 +185,70 @@
   </mat-card>
 </div>
 <style>
-  .blog-post-editor {
-    padding: 10px 50px;
-  }
-
-  .mat-card {
-    margin: 10px
-  }
-
   .author-username {
     color: #333;
     display: block;
     font: normal normal normal 1.8rem/2.1rem Roboto;
   }
 
-  .mat-card-avatar.author-profile {
-    text-align: center;
+  .blog-post-editor {
+    padding: 10px 50px;
+  }
+
+  .blog-title-input-field {
+    border: #FFF;
+    color: #333;
+    font: normal normal bold 28px/33px Roboto;
     height: unset;
+    padding: 0;
+  }
+
+  .blog-title-input-field:focus {
+    border: 1px solid #ced4da;
+    height: calc(1.5em + 0.75rem + 2px);
+  }
+
+  .delete-button {
+    background-color: #FFF;
+    color: #333;
+  }
+
+  .general-text-format {
+    font-family: 'Roboto', Arial, sans-serif;
+    text-align: left;
+  }
+
+  .mat-button {
+    background-color: #00609C;
+    color: white;
+    height: 2.813vw;
+    line-height: unset;
+    width: 13.438vw;
+  }
+
+  .mat-button .publish-button {
+    background-color: #00645C
+  }
+
+  .mat-button:disabled {
+    background-color: #00000061;
+    color: #00000061;
+    letter-spacing: 0;
+    opacity: 1;
+  }
+
+  .mat-button-toggle-checked {
+    background-color: #00645C;
+    color: #FFF;
+  }
+
+  .mat-card {
+    margin: 10px
+  }
+
+  .mat-card-avatar.author-profile {
+    height: unset;
+    text-align: center;
     width: unset;
   }
 
@@ -212,9 +259,11 @@
     width: 3.750vw;
   }
 
-  .general-text-format {
-    font-family: 'Roboto', Arial, sans-serif;
-    text-align: left;
+  .mat-card-image:first-child {
+    height: 15.625vw;
+    margin: 0;
+    object-fit: cover;
+    width: calc(100%)
   }
 
   .mat-card-title {
@@ -222,10 +271,25 @@
     font: normal normal bold 1.6rem/1.9rem Roboto;
   }
 
+  .mat-icon {
+    font-size: 4.4rem;
+    height: unset;
+    width: unset;
+  }
+
+
   .sub-text {
     color: #555;
     font: italic normal normal 1.2rem/1.4rem Roboto;
     margin: 0
+  }
+
+  .tag {
+    border: 1px solid #333;
+    border-radius: 2px;
+    color: #555;
+    font: normal normal normal 1.6rem/1.9rem Roboto;
+    line-height: 0;
   }
 
   .tag-heading {
@@ -237,37 +301,6 @@
     color: #555;
   }
 
-  .tag {
-    color: #555555;
-    font: normal normal normal 1.6rem/1.9rem Roboto;
-    line-height: 0;
-    border: 1px solid #333333;
-    border-radius: 2px;
-  }
-
-  .mat-button {
-    background-color: #00609C;
-    height: 2.813vw;
-    width: 13.438vw;
-    color: white;
-    line-height: unset;
-  }
-
-  .mat-button .publish-button {
-    background-color: #00645C
-  }
-
-  .mat-button:disabled {
-    letter-spacing: 0px;
-    color: #00000061;
-    background-color: #00000061;
-    opacity: 1;
-  }
-
-  .delete-button {
-    background-color: #FFF;
-    color: #333;
-  }
 
   .tag /deep/ .mat-button-toggle-label-content {
     line-height: 19px;
@@ -277,24 +310,11 @@
     padding: 0 2px;
   }
 
-  .blog-title-input-field {
-    font: normal normal bold 28px/33px Roboto;
-    color: #333;
-    border:#FFF;
-    height: unset;
-    padding: 0;
-  }
-
-  .blog-title-input-field:focus {
-    border:1px solid #ced4da;
-    height: calc(1.5em + 0.75rem + 2px);
-  }
-
   .title-heading {
+    border-right: 2px solid #999;
     color: #555;
     font: normal normal normal 1.6rem/1.9rem Roboto;
     height: 28px;
-    border-right: 2px solid #999;
   }
 
   .vertical-sub-align {
@@ -302,30 +322,12 @@
   }
 
   .blog-post-thumbnail:first-child {
-    height: 15.625vw;
-    width: calc(100% + 32px);
-    background-color: #AAAAAA99;
-    margin: -16px -16px 16px -16px;
+    background-color: #AAA9;
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
-  }
-
-  .mat-card-image:first-child {
-    margin: 0;
-    object-fit: cover;
     height: 15.625vw;
-    width: calc(100%)
-  }
-
-  .mat-icon {
-    font-size: 4.4rem;
-    height: unset;
-    width: unset;
-  }
-
-  .mat-button-toggle-checked {
-    color: #FFF;
-    background-color: #00645C;
+    margin: -16px -16px 16px -16px;
+    width: calc(100% + 32px);
   }
 
   @media(max-width: 920px) {
@@ -342,21 +344,22 @@
   @media(max-width: 768px) {
     .col-sm-8,
     .editor-profile-card.col-sm-2 {
-      flex:unset;
-      max-width:unset;
-    }
-
-    .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
-      border: #666666 dashed;
-      width: 230px;
-      padding-top: 0;
-      height: 19.722vw;
+      flex: unset;
+      max-width: unset;
     }
 
     .blog-post-thumbnail-image-uploader /deep/ .blog-post-thumbnail-uploader {
-      width: 230px;
       height: 19.722vw;
+      width: 230px;
     }
+
+    .blog-post-thumbnail-image-uploader /deep/ .image-uploader-drop-area {
+      border: #666 dashed;
+      height: 19.722vw;
+      padding-top: 0;
+      width: 230px;
+    }
+
 
     .blog-post-thumbnail-image-uploader /deep/ .mat-icon {
       font-size: 28px;
@@ -364,28 +367,28 @@
       width: 28px;
     }
 
-    .title-heading {
-      width: 120px;
-      font-size: 1.2rem;
-      border: none;
-      line-height: 40px;
-      padding: 0;
+    .editor-field-card {
+      margin: 0;
+      padding: 30px;
     }
 
-    .editor-field-card {
-      padding: 30px;
-      margin: 0;
+    .title-heading {
+      border: none;
+      font-size: 1.2rem;
+      line-height: 40px;
+      padding: 0;
+      width: 120px;
     }
 
     .small-screen-buttons-container {
-      display: flex;
       align-items: center;
+      display: flex;
       flex-direction: column;
     }
 
     .small-screen-button {
-      width: 100%;
       height: 36px;
+      width: 100%;
     }
 
     .buttons-container {
@@ -400,5 +403,4 @@
       }
     }
   }
-
 </style>

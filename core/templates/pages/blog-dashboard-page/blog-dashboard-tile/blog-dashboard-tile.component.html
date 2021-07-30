@@ -3,7 +3,7 @@
     <mat-card-content>
       <div class="blog-dashboard-tile-header">
         <mat-card-title class="blog-dashboard-tile-title">{{ blogPostSummary.title }}</mat-card-title>
-        <button mat-icon-button>
+        <button mat-icon-button [matMenuTriggerFor]="blogCardOptions">
           <mat-icon class="align-text-bottom pl-4">more_vert</mat-icon>
         </button>
         <mat-menu #blogCardOptions="matMenu">
@@ -12,9 +12,6 @@
           </button>
           <button *ngIf="blogPostIsPublished" mat-menu-item>
             <span>Unpublish</span>
-          </button>
-          <button *ngIf="!blogPostIsPublished" mat-menu-item>
-            <span>Publish</span>
           </button>
           <button mat-menu-item>
             <span>Delete</span>

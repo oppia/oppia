@@ -41,6 +41,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
 
 
 describe('Blog Post Editor Component', () => {
@@ -84,6 +85,7 @@ describe('Blog Post Editor Component', () => {
         BlogPostEditorComponent,
         SchemaBasedEditorDirective,
         AngularHtmlBindWrapperDirective,
+        ImageUploaderComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -122,16 +124,11 @@ describe('Blog Post Editor Component', () => {
     blogPostUpdateService = TestBed.inject(BlogPostUpdateService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    ngbModal = TestBed.inject(NgbModal);
     sampleBlogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
     spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sampleBlogId');
     component.ngOnInit();
-  });
-
-  beforeEach(() => {
-    component.defaultTagsList = [];
-    component.maxAllowedTags = null;
-    component.thumbnailDataUrl = null;
   });
 
   it('should create', () => {
@@ -179,6 +176,7 @@ describe('Blog Post Editor Component', () => {
       maxNumOfTags: 2,
       blogPostDict: sampleBlogPostData,
     };
+    component.blogPostId = 'sampleBlogId';
     spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
       .and.returnValue(Promise.resolve(blogPostEditorData));
 
@@ -204,7 +202,7 @@ describe('Blog Post Editor Component', () => {
   it('should display alert when unable to fetch blog post editor data',
     fakeAsync(() => {
       spyOn(blogPostEditorBackendApiService, 'fetchBlogPostEditorData')
-        .and.returnValue(Promise.reject('status: 500'));
+        .and.returnValue(Promise.reject({status: 500}));
       spyOn(alertsService, 'addWarning');
 
       component.initEditor();
@@ -213,7 +211,7 @@ describe('Blog Post Editor Component', () => {
       expect(blogPostEditorBackendApiService.fetchBlogPostEditorData)
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to get blog post data');
+        'Failed to get blog post data.');
     }));
 
   it('should update local title value', () => {
@@ -223,7 +221,8 @@ describe('Blog Post Editor Component', () => {
     component.blogPostData = sampleBlogPostData;
     component.updateLocalTitleValue();
 
-    expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalled();
+    expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
+      component.blogPostData, component.title);
     expect(component.blogPostData.title).toBe('Sample title changed');
   });
 
@@ -263,6 +262,7 @@ describe('Blog Post Editor Component', () => {
   it('should call update blog post if blog post passes validation' +
   'when user saves blog post as draft', () => {
     spyOn(component, 'updateBlogPostData');
+    spyOn(sampleBlogPostData, 'validate').and.returnValue([]);
     component.blogPostData = sampleBlogPostData;
 
     component.saveDraft();
@@ -315,7 +315,7 @@ describe('Blog Post Editor Component', () => {
       spyOn(blogPostUpdateService, 'getBlogPostChangeDict')
         .and.returnValue({});
       spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
-        .and.returnValue(Promise.reject({ status: 500 }));
+        .and.returnValue(Promise.reject('status: 500'));
       spyOn(alertsService, 'addWarning');
 
       component.updateBlogPostData(false);
@@ -324,7 +324,7 @@ describe('Blog Post Editor Component', () => {
       expect(blogPostEditorBackendApiService.updateBlogPostDataAsync)
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to save Blog Post. Internal Error: { status: 500}');
+        'Failed to save Blog Post. Internal Error: status: 500');
     }));
 
   it('should get formatted date string from the timestamp in milliseconds',
@@ -350,6 +350,9 @@ describe('Blog Post Editor Component', () => {
     spyOn(blogDashboardPageService, 'deleteBlogPost');
 
     component.deleteBlogPost();
+    tick();
+    tick();
+
     expect(blogDashboardPageService.deleteBlogPost)
       .not.toHaveBeenCalled();
   });
@@ -361,6 +364,9 @@ describe('Blog Post Editor Component', () => {
     spyOn(blogDashboardPageService, 'deleteBlogPost');
 
     component.deleteBlogPost();
+    tick();
+    tick();
+
     expect(blogDashboardPageService.deleteBlogPost).toHaveBeenCalled();
   });
 
@@ -373,6 +379,9 @@ describe('Blog Post Editor Component', () => {
     spyOn(component, 'updateBlogPostData');
 
     component.publishBlogPost();
+    tick();
+    tick();
+
     expect(component.updateBlogPostData).not.toHaveBeenCalled();
   });
 
@@ -385,6 +394,9 @@ describe('Blog Post Editor Component', () => {
     spyOn(component, 'updateBlogPostData');
 
     component.publishBlogPost();
+    tick();
+    tick();
+
     expect(component.updateBlogPostData).toHaveBeenCalledWith(true);
   });
 
@@ -395,6 +407,9 @@ describe('Blog Post Editor Component', () => {
     spyOn(component, 'postImageDataToServer');
 
     component.showuploadThumbnailModal();
+    tick();
+    tick();
+
     expect(component.postImageDataToServer).not.toHaveBeenCalled();
   });
 
@@ -405,6 +420,9 @@ describe('Blog Post Editor Component', () => {
     spyOn(component, 'postImageDataToServer');
 
     component.showuploadThumbnailModal();
+    tick();
+    tick();
+
     expect(component.postImageDataToServer).toHaveBeenCalledWith();
     expect(component.thumbnailDataUrl).toEqual('sample-url-string');
   });
@@ -428,7 +446,7 @@ describe('Blog Post Editor Component', () => {
         imageBlob: new Blob([''], { type: 'image/jpeg' })
       }];
       spyOn(blogPostEditorBackendApiService, 'postThumbnailDataAsync')
-        .and.returnValue(Promise.reject({ status: 500 }));
+        .and.returnValue(Promise.reject('status: 500'));
       spyOn(alertsService, 'addWarning');
       spyOn(imageLocalStorageService, 'getStoredImagesData')
         .and.returnValue(imagesData);
@@ -439,7 +457,7 @@ describe('Blog Post Editor Component', () => {
       expect(blogPostEditorBackendApiService.postThumbnailDataAsync)
         .toHaveBeenCalled();
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to save thumbnail data. Internal Error: { status: 500}');
+        'Failed to save thumbnail data. Internal Error: status: 500');
     }));
 
 

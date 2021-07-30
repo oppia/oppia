@@ -90,7 +90,7 @@ describe('Delete Topic Modal Component', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
   });
 
-  it('should confirm profile picture', () => {
+  it('should confirm thumbnail picutre', () => {
     let pictureDataUrl = 'picture_data';
     componentInstance.cropper = {
       getCroppedCanvas(options) {

@@ -559,7 +559,8 @@ def update_blog_post(blog_post_id, change_dict):
             blog_models.BlogPostModel.title == updated_blog_post.title
             ).filter(blog_models.BlogPostModel.deleted == False).fetch()  # pylint: disable=singleton-comparison
         if blog_post_models != []:
-            if (len(blog_post_models) != 1 or blog_post_models[0].id != blog_post_id):
+            if (len(blog_post_models) != 1 or (
+                    blog_post_models[0].id != blog_post_id)):
                 raise utils.ValidationError(
                     'Blog Post with given title already exists: %s'
                     % updated_blog_post.title)

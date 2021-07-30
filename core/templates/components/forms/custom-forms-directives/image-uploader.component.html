@@ -17,11 +17,11 @@
          class="image-uploader-file-input protractor-test-photo-upload-input"
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
-          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
-          for="image-file-input">
+         class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
+         for="image-file-input">
     <mat-icon class="mx-auto">insert_photo</mat-icon>
     <span class="font-weight-light">{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
-</label>
+  </label>
 </div>
 <style>
   .image-uploader-license-warning {
