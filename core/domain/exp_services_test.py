@@ -1826,7 +1826,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
-
+    DUMMY_IMAGE_TAG = (
+    '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
+    'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
+    '&quot;abc.png&quot;"></oppia-noninteractive-image>'
+    )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -1887,8 +1891,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <oppia-noninteractive-image alt-with-value="&quot;Image&quot;" caption-with-value="&quot;&quot;"
-        filepath-with-value="&quot;abc.png&quot;"></oppia-noninteractive-image>
+      html: %s
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1933,6 +1936,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
+    DUMMY_IMAGE_TAG,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = (
@@ -1995,8 +1999,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <oppia-noninteractive-image alt-with-value="&quot;Image&quot;" caption-with-value="&quot;&quot;"
-        filepath-with-value="&quot;abc.png&quot;"></oppia-noninteractive-image>
+      html: %s
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2041,6 +2044,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
+    DUMMY_IMAGE_TAG,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
