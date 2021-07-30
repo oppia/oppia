@@ -44,6 +44,7 @@ from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
 from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.question import gae_models as question_models
+from core.storage.recommendations import gae_models as recommendations_models
 from core.storage.skill import gae_models as skill_models
 from core.storage.story import gae_models as story_models
 from core.storage.subtopic import gae_models as subtopic_models
@@ -67,6 +68,7 @@ __all__ = [
     b'job_models',
     b'opportunity_models',
     b'question_models',
+    b'recommendations_models',
     b'skill_models',
     b'story_models',
     b'subtopic_models',
