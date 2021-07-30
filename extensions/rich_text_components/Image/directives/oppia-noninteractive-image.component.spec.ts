@@ -106,6 +106,7 @@ describe('NoninteractiveImage', () => {
   it('should initialise component when exploration loads', fakeAsync(() => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
     spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
 
     component.ngOnInit();
     tick();
