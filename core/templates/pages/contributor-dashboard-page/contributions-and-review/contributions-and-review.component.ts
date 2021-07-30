@@ -23,7 +23,7 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
   'components/question-directives/question-editor/' +
-  'question-editor.directive.ts');
+  'question-editor.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
