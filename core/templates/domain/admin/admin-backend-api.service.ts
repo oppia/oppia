@@ -215,7 +215,7 @@ export class AdminBackendApiService {
     });
   }
 
-  async fetchUserAssignedToRoleAsync(
+  async fetchUsersAssignedToRoleAsync(
       role: string): Promise<AssignedUsersBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<AssignedUsersBackendResponse>(

@@ -52,7 +52,7 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
 
   showAssignedUsers(): void {
     this.loadingAssignedUsernames = true;
-    this.adminBackendApiService.fetchUserAssignedToRoleAsync(
+    this.adminBackendApiService.fetchUsersAssignedToRoleAsync(
       this.activeRole).then((response) => {
       this.assignUsersToActiveRole = response.usernames;
       this.loadingAssignedUsernames = false;

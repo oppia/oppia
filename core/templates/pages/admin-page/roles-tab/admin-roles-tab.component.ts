@@ -65,7 +65,7 @@ export class AdminRolesTabComponent implements OnInit {
   startEditing(): void {
     this.roleIsCurrentlyBeingEdited = true;
     this.adminBackendApiService.viewUsersRoleAsync(
-        this.username).then((userRoles) => {
+      this.username).then((userRoles) => {
       this.rolesFetched = true;
       this.userRoles = userRoles.roles;
       this.managedTopicIds = userRoles.managed_topic_ids;
