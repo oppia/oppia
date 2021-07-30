@@ -72,8 +72,8 @@
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
-                       [href]="logoutUrl"
-                       [routerLink]="logoutUrl"
+                       [href]="'/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
+                       [routerLink]="'/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>
