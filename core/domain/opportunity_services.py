@@ -812,7 +812,8 @@ def _get_skill_opportunities_with_updated_question_counts(skill_ids, delta):
 
 def regenerate_opportunities_related_to_topic(
         topic_id, delete_existing_opportunities=False):
-    """Regenerates opportunity models which belongs to a given topic.
+    """Regenerates opportunity models which belongs to a given topic if the
+    corresponding story is published.
 
     Args:
         topic_id: str. The ID of the topic.
@@ -830,7 +831,15 @@ def regenerate_opportunities_related_to_topic(
             exp_opportunity_models)
 
     topic = topic_fetchers.get_topic_by_id(topic_id)
-    story_ids = topic.get_canonical_story_ids()
+    story_id_to_reference = {
+        story_reference.story_id: story_reference
+        for story_reference in topic.get_all_story_references()
+        # Only create opportunities if the corresponding story is published.
+        if story_reference is not None and story_reference.story_is_published
+    }
+    story_ids = story_id_to_reference.keys()
+    # We have to use get_stories_by_ids() so as to not fetch cached stories in
+    # case stories were recently deleted.
     stories = story_fetchers.get_stories_by_ids(story_ids)
     exp_ids = []
     non_existing_story_ids = []
