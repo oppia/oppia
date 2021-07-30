@@ -20,7 +20,7 @@
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
