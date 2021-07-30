@@ -14,8 +14,8 @@
 
 """Controllers for the contributor dashboard page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -232,12 +232,12 @@ class ContributionRightsDataHandler(base.BaseHandler):
         user_rights = (
             user_services.get_user_contribution_rights(user_id))
         response = {}
-        if self.role == feconf.ROLE_ID_TRANSLATION_ADMIN:
+        if feconf.ROLE_ID_TRANSLATION_ADMIN in self.roles:
             response = {
                 'can_review_translation_for_language_codes': (
                     user_rights.can_review_translation_for_language_codes)
             }
-        if self.role == feconf.ROLE_ID_QUESTION_ADMIN:
+        if feconf.ROLE_ID_QUESTION_ADMIN in self.roles:
             response.update({
                 'can_review_questions': user_rights.can_review_questions,
                 'can_submit_questions': user_rights.can_submit_questions

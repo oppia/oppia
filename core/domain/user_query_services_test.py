@@ -16,8 +16,8 @@
 
 """Tests for user query services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import user_query_services
 from core.platform import models
@@ -34,8 +34,9 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserQueryServicesTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_user_id = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 

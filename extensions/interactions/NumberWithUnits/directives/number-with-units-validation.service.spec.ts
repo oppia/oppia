@@ -25,7 +25,9 @@ import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/d
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { Unit } from 'interactions/answer-defs';
-import { FractionDict } from 'domain/objects/fraction.model';
+import { Fraction, FractionDict } from 'domain/objects/fraction.model';
+import { NumberWithUnits, NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 
 describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
@@ -41,8 +43,10 @@ describe('NumberWithUnitsValidationService', () => {
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
   let rof: RuleObjectFactory;
+  let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
+    numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
@@ -218,5 +222,48 @@ describe('NumberWithUnitsValidationService', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should throw error when rule equivalency check fails', () => {
+    spyOn(numberWithUnitsObjectFactory, 'fromDict').and.returnValue({
+      type: 'real',
+      real: 0.0,
+      // This throws "Type '{ toFloat: () => number; }' is missing the
+      // following properties from type 'Fraction': isNegative, wholeNumber,
+      // numerator, denominator, and 6 more." We need to suppress this error
+      // because we only need to mock the toFloat function for testing.
+      // @ts-expect-error
+      fraction: {
+        toFloat: () => {
+          return 0.0;
+        }
+      },
+      toMathjsCompatibleString: () => {
+        return null as unknown as string;
+      },
+      toDict: () => {
+        let uof = new UnitsObjectFactory();
+        let tmp = new NumberWithUnits('real', 2.02, new Fraction(
+          false, 0, 0, 1), uof.fromRawInputString(
+          'm / s^2'));
+
+        return tmp.toDict();
+      }
+    });
+    answerGroups[0].rules = [equivalentToTwoByThreeRule,
+      equivalentToTwoThousandRule];
+    expect(() => {
+      validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+    }).toThrowError(
+      'Unexpected type of argument in function unit ' +
+      '(expected: number or Complex or BigNumber or Fraction or Unit or ' +
+      'string or Array or Matrix or boolean, actual: null, index: 0)\n' +
+      'laterInput: {"type":"real","real":2.02,"fraction":{"isNegative":false,' +
+      '"wholeNumber":0,"numerator":0,"denominator":1},"units":[{"unit":"m",' +
+      '"exponent":1},{"unit":"s","exponent":-2}]}\n' +
+      'earlierInput: {"type":"real","real":2.02,"fraction":{"isNegative":' +
+      'false,"wholeNumber":0,"numerator":0,"denominator":1},"units":[{"unit":' +
+      '"m","exponent":1},{"unit":"s","exponent":-2}]}');
   });
 });
