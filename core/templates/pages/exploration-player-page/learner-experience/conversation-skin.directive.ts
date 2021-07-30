@@ -36,7 +36,7 @@ require(
   'learner-answer-info-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'supplemental-card.directive.ts');
+  'supplemental-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
