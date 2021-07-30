@@ -82,6 +82,7 @@ angular.module('oppia').component('previewTab', {
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
         var deferred = $q.defer();
 
+        console.error('[DEBUGGING] Called getUnsetParametersInfo');
         var unsetParametersInfo = ParameterMetadataService
           .getUnsetParametersInfo([initStateNameForPreview]);
 
@@ -191,9 +192,8 @@ angular.module('oppia').component('previewTab', {
 
           // Prompt user to enter any unset parameters, then populate
           // exploration.
-          ctrl.getManualParamChanges(
-            initStateNameForPreview)
-            .then(function(manualParamChanges) {
+          ctrl.getManualParamChanges(initStateNameForPreview).then(
+            function(manualParamChanges) {
               ctrl.loadPreviewState(
                 initStateNameForPreview, manualParamChanges);
             });

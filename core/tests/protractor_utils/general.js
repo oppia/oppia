@@ -57,6 +57,8 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
+  // REMOVE_BEFORE_MERGE.
+  _.escapeRegExp('[DEBUGGING]')
 ];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {

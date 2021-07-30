@@ -28,6 +28,6 @@ jobs:
       - name: Install chrome
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_chrome_for_ci
-      - name: Run Lighthouse accessibility checks shard 1
+      - name: Run Lighthouse accessibility checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode accessibility --shard ${{ matrix.shard }}
