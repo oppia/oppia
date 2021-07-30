@@ -30,7 +30,7 @@ angular.module('oppia').component('parameterNameEditor', {
     function($scope, ExplorationParamSpecsService) {
       var ctrl = this;
       ctrl.validate = function() {
-        return (ctrl.availableParamNames.length === 0) ? false : true;
+        return !(ctrl.availableParamNames.length === 0);
       };
       ctrl.$onInit = function() {
         // Reset the component each time the value changes (e.g. if this is
@@ -44,8 +44,8 @@ angular.module('oppia').component('parameterNameEditor', {
         $scope.$watch('$ctrl.localValue', function(newValue) {
           ctrl.value = newValue;
         });
-        ctrl.availableParamNames =
-              ExplorationParamSpecsService.savedMemento.getParamNames();
+        ctrl.availableParamNames = (
+          ExplorationParamSpecsService.savedMemento.getParamNames());
 
         if (ctrl.availableParamNames.length === 0) {
           ctrl.localValue = null;
