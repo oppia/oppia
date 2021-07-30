@@ -118,7 +118,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-add-misconception-modal'));
   var deleteMisconceptionModal = element(
     by.css('.protractor-test-delete-misconception-modal'));
-  var conceptCardTextLocator = by.css('.protractor-test-concept-card-text');
+  var conceptCardTextElement = element(
+    by.css('.protractor-test-concept-card-text'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -260,9 +261,9 @@ var SkillEditorPage = function() {
     await action.click(
       'Edit concept card explanation', editConceptCardExplanationButton);
 
-    var editor = element(conceptCardTextLocator);
     await waitFor.visibilityOf(
-      editor, 'Explanation Editor takes too long to appear');
+      conceptCardTextElement,
+      'Concept card text Editor takes too long to appear');
 
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
@@ -270,7 +271,8 @@ var SkillEditorPage = function() {
       'Save Concept Card Explanation Button',
       saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
-      editor, 'Explanation Editor takes too long to close');
+      conceptCardTextElement,
+      'Concept card text Editor takes too long to close');
   };
 
   this.expectConceptCardExplanationToMatch = async function(explanation) {

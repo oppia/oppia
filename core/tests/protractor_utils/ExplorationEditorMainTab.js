@@ -103,7 +103,7 @@ var ExplorationEditorMainTab = function() {
   var answerDescription = element(
     by.css('.protractor-test-answer-description'));
   var deleteNodeLocator = by.css('.protractor-test-delete-node');
-  var titleLocator = by.css('.ng-joyride-title');
+  var titleElement = element(by.css('.ng-joyride-title'));
   var CkEditorElement = element(by.css('.protractor-test-ck-editor'));
   var interactionHtmlElement = element(
     by.css('.protractor-test-interaction-html'));
@@ -245,8 +245,7 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
     await action.click('Start Tutorial button', startTutorialButton);
     await waitFor.visibilityOf(
-      element(titleLocator),
-      'Tutorial modal takes too long to appear');
+      titleElement, 'Tutorial modal takes too long to appear');
   };
 
   // ---- RESPONSE EDITOR ----

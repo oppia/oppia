@@ -72,7 +72,8 @@ var AdminPage = function() {
   var valueSelectorLocator = by.css('.protractor-test-value-selector');
   var addConditionButtonLocator = by.css(
     '.protractor-test-add-condition-button');
-  var rolesResultRowsLocator = by.css('.protractor-test-roles-result-rows');
+  var rolesResultRowsElements = element.all(
+    by.css('.protractor-test-roles-result-rows'));
 
 
   // The reload functions are used for mobile testing
@@ -304,14 +305,13 @@ var AdminPage = function() {
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
     if (expectedUsernamesArray.length !== 0) {
-      await waitFor.visibilityOf(element(rolesResultRowsLocator));
+      await waitFor.visibilityOf(rolesResultRowsElements.first());
     }
-    var usernames = await element.all(rolesResultRowsLocator)
-      .map(async function(elm) {
-        var text = await action.getText(
-          'Username in roles list on admin page', elm);
-        return text;
-      });
+    var usernames = await rolesResultRowsElements.map(async function(elm) {
+      var text = await action.getText(
+        'Username in roles list on admin page', elm);
+      return text;
+    });
 
     for (i = 0; i < usernames.length; i++) {
       var name = usernames[i];

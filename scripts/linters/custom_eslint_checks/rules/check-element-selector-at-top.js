@@ -50,27 +50,28 @@ module.exports = {
       'CallExpression[callee.object.property.name=element]' +
       '[callee.property.name=all]');
 
-    var checkLoctator = function(node, inNestedSelector) {
+    var checkLocator = function(selectorNode, inNestedSelector) {
+      var locatorNode = selectorNode.arguments[0];
       var upperScopeType = context.getScope().upper.type;
       if (['global', 'module'].includes(upperScopeType)) {
         return;
       }
-      if (node.arguments[0].type !== 'CallExpression' ||
-        node.arguments[0].arguments[0].type !== 'Literal') {
+      if (locatorNode.type !== 'CallExpression' ||
+          locatorNode.arguments[0].type !== 'Literal') {
         return;
       }
-      if (node.arguments[0].callee.property.name !== 'css' ||
-          node.arguments[0].callee.object.name !== 'by') {
+      if (locatorNode.callee.property.name !== 'css' ||
+          locatorNode.callee.object.name !== 'by') {
         return;
       }
       if (inNestedSelector) {
         context.report ({
-          node: node.arguments[0],
+          node: locatorNode,
           messageId: 'defineLocatorOnTop'
         });
       } else {
         context.report ({
-          node: node,
+          node: selectorNode,
           messageId: 'defineSelectorOnTop'
         });
       }
@@ -78,18 +79,16 @@ module.exports = {
 
     return {
       [elementSelector]: function(node) {
-        checkLoctator(node);
+        checkLocator(node, false);
       },
       [elmentAllSelector]: function(node) {
-        checkLoctator(node);
+        checkLocator(node, false);
       },
       [subElementSelector]: function(node) {
-        var inNestedSelector = true;
-        checkLoctator(node, inNestedSelector);
+        checkLocator(node, true);
       },
       [subElmentAllSelector]: function(node) {
-        var inNestedSelector = true;
-        checkLoctator(node, inNestedSelector);
+        checkLocator(node, true);
       }
     };
   }

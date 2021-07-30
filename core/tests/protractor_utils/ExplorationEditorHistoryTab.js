@@ -27,7 +27,7 @@ var ExplorationEditorHistoryTab = function() {
    */
   var historyGraph = element(by.css('.protractor-test-history-graph'));
   var stateNodes = historyGraph.all(by.css('.protractor-test-node'));
-  var codeMirrorLocator = by.css('.CodeMirror-code');
+  var codeMirrorElement = element.all(by.css('.CodeMirror-code'));
   var nodeBackgroundLocator = by.css('.protractor-test-node-background');
   var nodeLabelLocator = by.css('.protractor-test-node-label');
   var toastSuccessElement = element(by.css('.toast-success'));
@@ -223,11 +223,11 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextToMatch: async function(v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          element.all(codeMirrorLocator).first(),
+          codeMirrorElement.first(),
           'first'
         ).expectTextToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          element.all(codeMirrorLocator).last(),
+          codeMirrorElement.last(),
           'last'
         ).expectTextToBe(v2StateContents);
       },
@@ -245,11 +245,11 @@ var ExplorationEditorHistoryTab = function() {
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          element.all(codeMirrorLocator).first(),
+          codeMirrorElement.first(),
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          element.all(codeMirrorLocator).last(),
+          codeMirrorElement.last(),
           'last'
         ).expectTextWithHighlightingToBe(v2StateContents);
       }
