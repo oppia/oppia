@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import contextlib
+import io
 import logging
 import os
 import re
@@ -453,24 +454,20 @@ def managed_portserver():
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
         portserver_args, human_readable_name='Portserver', shell=True,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    
     with proc_context as proc:
         try:
             yield proc
         finally:
-            python_utils.PRINT('Portserver output:')
-            for line in iter(lambda: proc.stdout.readline() or None, None):
-                common.write_stdout_safe(line)
-
-            python_utils.PRINT('Portserver errors:')
-            for line in iter(lambda: proc.stderr.readline() or None, None):
-                common.write_stdout_safe(line)
             # Before exiting the proc_context, try to end the process with
             # SIGINT. The portserver is configured to shut down cleanly upon
             # receiving this signal.
             try:
                 proc.send_signal(signal.SIGINT)
+                python_utils.PRINT('Portserver output:')
+                for line in iter(lambda: proc.stdout.readline() or None, None):
+                    common.write_stdout_safe(line)
             except OSError:
                 # Raises when the process has already shutdown, in which case we
                 # can just return immediately.
