@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Validator to check if input matches the regular expression provided.
+ * @fileoverview Validator to check if input matches
+ * the regular expression provided.
  */
- 
 
- angular.module('oppia').filter('isRegexMatched', [function() {
-    return function(input, args) {
-        let re = new RegExp(args.regexPattern);
-        return (
-            re.test(input)
-        );
-    };
+angular.module('oppia').filter('isRegexMatched', [function() {
+  return function(input, args) {
+    let re = new RegExp(args.regexPattern);
+    return (
+      re.test(input)
+    );
+  };
 }]);

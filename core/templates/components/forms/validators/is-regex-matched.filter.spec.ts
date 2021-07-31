@@ -13,40 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Validator to check if input matches the provided 
+ * @fileoverview Tests for Validator to check if input matches the provided
  * regular expression.
  */
 
 
- describe('isRegexMatched Filter', function() {
-    const filterName = 'isRegexMatched';
-    
-    beforeEach(angular.mock.module('oppia'));
-    
-    it('should exist', angular.mock.inject(function($filter) {
-      expect($filter(filterName)).not.toEqual(null);
+describe('isRegexMatched Filter', function() {
+  const filterName = 'isRegexMatched';
+
+  beforeEach(angular.mock.module('oppia'));
+
+  it('should exist', angular.mock.inject(function($filter) {
+    expect($filter(filterName)).not.toEqual(null);
+  }));
+
+  it('should pass if the string matches the given regular expression',
+    angular.mock.inject(function($filter) {
+      let filter = $filter(filterName);
+      let args = {
+        regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
+      };
+      expect(filter('https://', args)).toBe(true);
+      expect(filter('https://jshjakhsak', args)).toBe(true);
+      expect(filter('https://www.oppia.com', args)).toBe(true);
+      expect(filter('www.oppia.com', args)).toBe(true);
     }));
-    
-    it('should pass if the string matches the given regular expression',
-        angular.mock.inject(function($filter) {
-        let filter = $filter(filterName);
-        let args = {
-          regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
-        };
-        expect(filter('https://', args)).toBe(true);
-        expect(filter('https://jshjakhsak', args)).toBe(true);
-        expect(filter('https://www.oppia.com', args)).toBe(true);
-        expect(filter('www.oppia.com', args)).toBe(true);
+
+  it('should fail if the string does not match the given regular expression',
+    angular.mock.inject(function($filter) {
+      let filter = $filter(filterName);
+      let args = {
+        regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
+      };
+      expect(filter('http://', args)).toBe(false);
+      expect(filter('abc://www.oppia.com', args)).toBe(false);
     }));
-  
-    it('should fail if the string does not match the given regular expression',
-      angular.mock.inject(function($filter) {
-        let filter = $filter(filterName);
-        let args = {
-            regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
-        };
-        expect(filter('http://', args)).toBe(false);
-        expect(filter('abc://www.oppia.com', args)).toBe(false);
-      }));
-  });
-    
+});
