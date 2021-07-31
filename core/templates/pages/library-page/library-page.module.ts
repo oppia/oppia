@@ -16,49 +16,26 @@
  * @fileoverview Module for the library page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
+
 import { LibraryFooterComponent } from './library-footer/library-footer.component';
 import { LibraryPageRootComponent } from './library-page-root.component';
 import { LibraryPageComponent } from './library-page.component';
 import { ActivityTilesInfinityGridComponent } from './search-results/activity-tiles-infinity-grid.component';
 import { SearchResultsComponent } from './search-results/search-results.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { LibraryPageRoutingModule } from './library-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
     InfiniteScrollModule,
-    ToastrModule.forRoot(toastrConfig)
+    LibraryPageRoutingModule
   ],
   declarations: [
     LearnerPlaylistModalComponent,
@@ -75,20 +52,6 @@ const toastrConfig = {
     ActivityTilesInfinityGridComponent,
     LibraryPageComponent,
     LibraryPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [LibraryPageRootComponent]
+  ]
 })
 export class LibraryPageModule {}
