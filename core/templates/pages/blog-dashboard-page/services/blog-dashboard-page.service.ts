@@ -50,10 +50,7 @@ export class BlogDashboardPageService {
   ) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._setActiveTab(currentHash);
-    this.windowRef.nativeWindow.onhashchange = () => {
-      let newHash: string = this.windowRef.nativeWindow.location.hash;
-      this._setActiveTab(newHash);
-    };
+    this.detectUrlChange();
   }
 
   private _setActiveTab(hash: string) {
@@ -64,6 +61,13 @@ export class BlogDashboardPageService {
       this._activeTab = 'main';
     }
     this.updateViewEventEmitter.emit();
+  }
+
+  detectUrlChange(): void {
+    this.windowRef.nativeWindow.onhashchange = () => {
+      let newHash: string = this.windowRef.nativeWindow.location.hash;
+      this._setActiveTab(newHash);
+    };
   }
 
   navigateToEditorTabWithId(blogPostId: string): void {

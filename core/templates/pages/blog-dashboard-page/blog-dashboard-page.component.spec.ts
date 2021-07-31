@@ -98,7 +98,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize tab according to url', fakeAsync(() => {
+  it('should initialize tab according to url', (() => {
     spyOn(component, 'initMainTab');
 
     component.ngOnInit();
@@ -106,8 +106,9 @@ describe('Blog Dashboard Page Component', () => {
     expect(component.initMainTab).toHaveBeenCalled();
 
     mockWindowRef.nativeWindow.location.hash = '/blog_post_editor/123456ABCEFG';
+    blogDashboardPageService.detectUrlChange();
+    mockWindowRef.nativeWindow.onhashchange();
     component.ngOnInit();
-    tick();
     expect(component.activeTab).toBe('editor_tab');
     expect(component.initMainTab).not.toHaveBeenCalled();
   }));
@@ -167,6 +168,8 @@ describe('Blog Dashboard Page Component', () => {
       .and.returnValue(Promise.resolve('123456abcdef'));
     spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
 
+    blogDashboardPageService.detectUrlChange();
+    mockWindowRef.nativeWindow.onhashchange();
     component.createNewBlogPost();
     tick();
 

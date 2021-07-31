@@ -135,11 +135,6 @@ describe('Url Service', () => {
     expect(function() {
       urlService.getBlogPostIdFromUrl();
     }).toThrowError('Invalid Blog Post Id.');
-
-    mockLocation.pathname = '/blog-dashboard';
-    expect(function() {
-      urlService.getBlogPostIdFromUrl();
-    }).toThrowError('Invalid Blog Post Id.');
   });
 
   it('should correctly retrieve story url fragment from url', () => {

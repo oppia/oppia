@@ -74,7 +74,7 @@ describe('Blog Post Object Factory', () => {
   it('should correctly set tags in the blog post', () => {
     sampleBlogPostData.tags = ['news', 'learners'];
 
-    expect(sampleBlogPostData.tags).toBe(['news', 'learners']);
+    expect(sampleBlogPostData.tags).toEqual(['news', 'learners']);
   });
 
   it('should raise correct validation issues for' +

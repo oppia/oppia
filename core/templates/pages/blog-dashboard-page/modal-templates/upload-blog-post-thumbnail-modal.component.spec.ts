@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for upload blog post tumbnail modal.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -33,6 +34,9 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+      ],
       declarations: [
         UploadBlogPostThumbnailComponent,
         MockTranslatePipe

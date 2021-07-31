@@ -238,7 +238,7 @@ class BlogPostHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         entity_id = blog_post_id
-        filename_prefix = 'blog_post_thumbnail'
+        filename_prefix = 'thumbnail'
 
         image_is_compressible = (
             file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)

@@ -129,7 +129,7 @@ export class BlogPostEditorComponent implements OnInit {
           }
           if (this.blogPostData.thumbnailFilename) {
             this.thumbnailDataUrl = this.assetsBackendApiService
-              .getBlogPostThumbnailUrlForPreview(
+              .getThumbnailUrlForPreview(
                 AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostId,
                 this.blogPostData.thumbnailFilename);
           }
