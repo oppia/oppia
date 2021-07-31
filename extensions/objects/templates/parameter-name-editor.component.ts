@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for parameter name editor.
+ * @fileoverview Component for parameter name editor.
  */
 
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
@@ -30,7 +30,7 @@ angular.module('oppia').component('parameterNameEditor', {
     function($scope, ExplorationParamSpecsService) {
       var ctrl = this;
       ctrl.validate = function() {
-        return !(ctrl.availableParamNames.length === 0);
+        return ctrl.availableParamNames.length;
       };
       ctrl.$onInit = function() {
         // Reset the component each time the value changes (e.g. if this is
