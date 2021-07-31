@@ -29,24 +29,25 @@ import { SubtopicViewerPageComponent } from './subtopic-viewer-page.component';
 import { SubtopicViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/subtopic-viewer-navbar-pre-logo-action.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SubtopicViewerNavbarBreadcrumbComponent,
     SubtopicViewerPageComponent,
     SubtopicViewerNavbarPreLogoActionComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SubtopicViewerNavbarBreadcrumbComponent,
     SubtopicViewerPageComponent,
-    SubtopicViewerNavbarPreLogoActionComponent
+    SubtopicViewerNavbarPreLogoActionComponent,
+    SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [
     {

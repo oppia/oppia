@@ -34,7 +34,7 @@ import { CollectionRightsBackendDict } from
 })
 export class CollectionRightsBackendApiService {
   // Maps previously loaded collection rights to their IDs.
-  collectionRightsCache: Object = {};
+  collectionRightsCache: Record<string, CollectionRights> = {};
 
   constructor(
     private http: HttpClient,
@@ -49,9 +49,9 @@ export class CollectionRightsBackendApiService {
         CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
           collection_id: collectionId
         });
-
-    this.http.get<CollectionRightsBackendDict>(collectionRightsUrl).toPromise()
-      .then(response => {
+    this.http.get<CollectionRightsBackendDict>(
+      collectionRightsUrl).toPromise().then(
+      response => {
         if (successCallback) {
           successCallback(
             CollectionRights.create(response)
@@ -87,7 +87,6 @@ export class CollectionRightsBackendApiService {
 
     let requestUrl = (
       isPublic ? collectionPublishUrl : collectionUnpublishUrl);
-
     this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
       .toPromise().then(response => {
         let collectionRights = CollectionRights.create(response);

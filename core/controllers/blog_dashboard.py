@@ -14,8 +14,8 @@
 
 """Controllers for the blog dashboard page"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -49,6 +49,21 @@ def _get_blog_card_summary_dicts_for_dashboard(summaries):
     return summary_dicts
 
 
+class BlogDashboardPage(base.BaseHandler):
+    """Blog Dashboard Page Handler to render the frontend template."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_blog_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_template('blog-dashboard-page.mainpage.html')
+
+
 class BlogDashboardDataHandler(base.BaseHandler):
     """Provides user data for the blog dashboard."""
 
@@ -66,9 +81,9 @@ class BlogDashboardDataHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
 
         no_of_published_blog_posts = 0
-        published_post_summary_dicts = None
+        published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
-        draft_blog_post_summary_dicts = None
+        draft_blog_post_summary_dicts = []
         published_post_summaries = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
                 self.user_id, True))

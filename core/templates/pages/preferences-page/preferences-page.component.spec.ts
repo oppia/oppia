@@ -153,7 +153,7 @@ describe('Preferences Page Component', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(userService, 'getUserInfoAsync').and
       .returnValue(Promise.resolve(new UserInfo(
-        'USER_ROLE', false, false, false, false, false, 'en', username,
+        ['USER_ROLE'], false, false, false, false, false, 'en', username,
         userEmail, true)));
     spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue(
       [{

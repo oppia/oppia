@@ -21,7 +21,7 @@ require(
   'skill-description-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'skill-concept-card-editor.directive.ts');
+  'skill-concept-card-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'skill-misconceptions-editor.directive.ts');

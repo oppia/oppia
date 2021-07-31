@@ -21,8 +21,8 @@ Usage: Run this script from your oppia root folder:
     python -m scripts.release_scripts.update_configs
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import getpass
 import os

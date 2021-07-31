@@ -24,27 +24,25 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DonatePageComponent } from './donate-page.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { DonatePageRootComponent } from './donate-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
     DonatePageComponent,
     DonatePageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     DonatePageComponent,
     DonatePageRootComponent,
-    OppiaAngularRootComponent
   ],
   providers: [
     {
