@@ -39,7 +39,28 @@ describe('Topic editor state service', () => {
 
   let skillCreationIsAllowed: boolean = true;
   let skillQuestionCountDict = {};
-  let groupedSkillSummaries = {};
+  let groupedSkillSummaries = {
+    topic_name: [{
+      id: 'skillId1',
+      description: 'description1',
+      language_code: 'en',
+      version: 1,
+      misconception_count: 3,
+      worked_examples_count: 3,
+      skill_model_created_on: 1593138898626.193,
+      skill_model_last_updated: 1593138898626.193
+    }],
+    others: [{
+      id: 'skillId2',
+      description: 'description2',
+      language_code: 'en',
+      version: 1,
+      misconception_count: 3,
+      worked_examples_count: 3,
+      skill_model_created_on: 1593138898626.193,
+      skill_model_last_updated: 1593138898626.193
+    }]
+  };
   let topicDict: TopicBackendDict;
   let storySummaryBackendDict: StorySummaryBackendDict;
   let subtopicPage: SubtopicPageBackendDict;
@@ -49,28 +70,7 @@ describe('Topic editor state service', () => {
       return Promise.resolve({
         skillCreationIsAllowed: skillCreationIsAllowed,
         skillQuestionCountDict: skillQuestionCountDict,
-        groupedSkillSummaries: {
-          topic_name: [{
-            id: 'skillId1',
-            description: 'description1',
-            language_code: 'en',
-            version: 1,
-            misconception_count: 3,
-            worked_examples_count: 3,
-            skill_model_created_on: 1593138898626.193,
-            skill_model_last_updated: 1593138898626.193
-          }],
-          others: [{
-            id: 'skillId2',
-            description: 'description2',
-            language_code: 'en',
-            version: 1,
-            misconception_count: 3,
-            worked_examples_count: 3,
-            skill_model_created_on: 1593138898626.193,
-            skill_model_last_updated: 1593138898626.193
-          }]
-        },
+        groupedSkillSummaries: groupedSkillSummaries,
         topicDict: topicDict,
         skillIdToDescriptionDict: {},
         skillIdToRubricsDict: {},
@@ -184,28 +184,6 @@ describe('Topic editor state service', () => {
       jasmine.SpyObj<AlertsService>;
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
 
-    groupedSkillSummaries = {
-      current: [{
-        id: 'skillId1',
-        description: 'description1',
-        language_code: 'en',
-        version: 1,
-        misconception_count: 3,
-        worked_examples_count: 3,
-        skill_model_created_on: 1593138898626.193,
-        skill_model_last_updated: 1593138898626.193
-      }],
-      others: [{
-        id: 'skillId2',
-        description: 'description2',
-        language_code: 'en',
-        version: 1,
-        misconception_count: 3,
-        worked_examples_count: 3,
-        skill_model_created_on: 1593138898626.193,
-        skill_model_last_updated: 1593138898626.193
-      }]
-    };
     topicDict = {
       id: 'topic_id',
       name: 'topic_name',
