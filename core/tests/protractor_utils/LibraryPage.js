@@ -93,7 +93,7 @@ var LibraryPage = function() {
     );
 
     await browser.actions().mouseMove(element(by.css(
-      '.protractor-test-exp-summary-tile-title'))).perform();
+      '.protractor-test-exp-hover'))).perform();
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,

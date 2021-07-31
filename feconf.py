@@ -16,8 +16,8 @@
 
 """Stores various configuration options and constants for Oppia."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import datetime
@@ -253,7 +253,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 45
+CURRENT_STATE_SCHEMA_VERSION = 46
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -262,7 +262,7 @@ CURRENT_STATE_SCHEMA_VERSION = 45
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story contents dict in the story schema.
-CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
@@ -274,7 +274,7 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
 CURRENT_RUBRIC_SCHEMA_VERSION = 3
 
 # The current version of subtopics dict in the topic schema.
-CURRENT_SUBTOPIC_SCHEMA_VERSION = 3
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 
 # The current version of story reference dict in the topic schema.
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
@@ -804,6 +804,7 @@ COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
 CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CONTRIBUTOR_DASHBOARD_URL = '/contributor-dashboard'
+CONTRIBUTOR_DASHBOARD_ADMIN_URL = '/contributor-dashboard-admin'
 CONTRIBUTOR_OPPORTUNITIES_DATA_URL = '/opportunitiessummaryhandler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator-dashboard'
@@ -902,6 +903,7 @@ STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_URL_FRAGMENT_HANDLER = '/story_url_fragment_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
+SUBTOPIC_MASTERY_DATA_URL = '/subtopic_mastery_handler/data'
 SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
@@ -1044,29 +1046,46 @@ HANDLER_TYPE_JSON = 'json'
 HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
 
 # Following are the constants for the role IDs.
-ROLE_ID_GUEST = 'GUEST'
-ROLE_ID_BANNED_USER = 'BANNED_USER'
-ROLE_ID_LEARNER = 'LEARNER'
-ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
-ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
-ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
-ROLE_ID_MODERATOR = 'MODERATOR'
-ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
-ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
-ROLE_ID_ADMIN = 'ADMIN'
+# TODO(#13388): The role id variable name doesn't match the string value,
+# write a one-off job to update the string value in the datastore.
+ROLE_ID_CURRICULUM_ADMIN = 'ADMIN'
 ROLE_ID_BLOG_ADMIN = 'BLOG_ADMIN'
 ROLE_ID_BLOG_POST_EDITOR = 'BLOG_POST_EDITOR'
+ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_FULL_USER = 'EXPLORATION_EDITOR'
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_MOBILE_LEARNER = 'LEARNER'
+ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_QUESTION_ADMIN = 'QUESTION_ADMIN'
+ROLE_ID_RELEASE_COORDINATOR = 'RELEASE_COORDINATOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
+ROLE_ID_TRANSLATION_ADMIN = 'TRANSLATION_ADMIN'
+ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
+
+ALLOWED_DEFAULT_USER_ROLES_ON_REGISTRATION = [
+    ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
 
 ALLOWED_USER_ROLES = [
-    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
-    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
-    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_RELEASE_COORDINATOR,
-    ROLE_ID_ADMIN, ROLE_ID_BLOG_ADMIN, ROLE_ID_BLOG_POST_EDITOR,
-    ROLE_ID_VOICEOVER_ADMIN]
+    ROLE_ID_CURRICULUM_ADMIN,
+    ROLE_ID_BLOG_ADMIN,
+    ROLE_ID_BLOG_POST_EDITOR,
+    ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_FULL_USER,
+    ROLE_ID_GUEST,
+    ROLE_ID_MOBILE_LEARNER,
+    ROLE_ID_MODERATOR,
+    ROLE_ID_QUESTION_ADMIN,
+    ROLE_ID_RELEASE_COORDINATOR,
+    ROLE_ID_TOPIC_MANAGER,
+    ROLE_ID_TRANSLATION_ADMIN,
+    ROLE_ID_VOICEOVER_ADMIN
+]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
-ROLE_ACTION_UPDATE = 'update'
+ROLE_ACTION_ADD = 'add'
+ROLE_ACTION_REMOVE = 'remove'
+DEPRECATED_ROLE_ACTION_UPDATE = 'update'
 ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
 ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
 

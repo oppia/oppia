@@ -16,8 +16,8 @@
 
 """Tests for generic controller behavior."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import importlib
@@ -63,16 +63,12 @@ PADDING = 1
 class HelperFunctionTests(test_utils.GenericTestBase):
 
     def test_load_template(self):
-        about_path = os.path.join('core', 'templates', 'pages', 'about-page')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', about_path):
+        oppia_root_path = os.path.join(
+            'core', 'templates', 'pages', 'oppia-root')
+        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
-                '"About | Oppia"',
-                base.load_template('about-page.mainpage.html'))
-        donate_path = os.path.join('core', 'templates', 'pages', 'donate-page')
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', donate_path):
-            self.assertIn(
-                '"Donate - Oppia"',
-                base.load_template('donate-page.mainpage.html'))
+                '"Loading | Oppia"',
+                base.load_template('oppia-root.mainpage.html'))
 
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
@@ -377,8 +373,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/mock_iframed', expected_status_int=500)
 
         self.assertIn(
-            'Uh-oh! The Oppia exploration you requested may have been removed '
-            'or deleted.', response.body)
+            '<oppia-error-iframed-page-root></oppia-error-iframed-page-root>', response.body)
 
     def test_dev_mode_cannot_be_true_on_production(self):
         # We need to delete the existing module else the re-importing
@@ -619,7 +614,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         super(MaintenanceModeTests, self).setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-        self.set_user_role(
+        self.add_user_role(
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
         with python_utils.ExitStack() as context_stack:
@@ -638,8 +633,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         response = self.get_html_response(
             '/community-library', expected_status_int=503)
 
-        self.assertIn('<maintenance-page>', response.body)
-        self.assertNotIn('<library-page>', response.body)
+        self.assertIn('<oppia-maintenance-page>', response.body)
+        self.assertNotIn('<oppia-library-page-root>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
@@ -649,7 +644,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<library-page>', response.body)
+        self.assertIn('<oppia-library-page-root>', response.body)
         self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -662,7 +657,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn('<library-page>', response.body)
+        self.assertIn('<oppia-library-page-root>', response.body)
         self.assertNotIn('<maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -724,7 +719,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_user_is_super_admin(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME, is_super_admin=True)
 
     def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self):
         # TODO(#12692): Use stateful login sessions to assert the behavior of
@@ -825,8 +820,8 @@ class EscapingTests(test_utils.GenericTestBase):
         super(EscapingTests, self).setUp()
 
         # Update a config property that shows in all pages.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Modify the testapp to use the fake handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1303,7 +1298,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'about-page.mainpage.html',
+                'oppia-root.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
@@ -1834,6 +1829,50 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             exploration_id = self.request.get('exploration_id')
             return self.render_json({'exploration_id': exploration_id})
 
+    class MockHandlerWithDefaultGetSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {
+                'exploration_id': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': 'random_exp_id'
+                }
+            }
+        }
+
+        def get(self):
+            exploration_id = self.normalized_request.get('exploration_id')
+            if exploration_id != 'random_exp_id':
+                raise self.InvalidInputException(
+                    'Expected exploration_id to be random_exp_id received %s'
+                    % exploration_id)
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithDefaultPutSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'PUT': {
+                'exploration_id': {
+                    'schema': {
+                        'type': 'basestring'
+                    },
+                    'default_value': 'random_exp_id'
+                }
+            }
+        }
+
+        def put(self):
+            exploration_id = self.normalized_payload.get('exploration_id')
+            if exploration_id != 'random_exp_id':
+                raise self.InvalidInputException(
+                    'Expected exploration_id to be random_exp_id received %s'
+                    % exploration_id)
+            return self.render_json({'exploration_id': exploration_id})
+
     def setUp(self):
         super(SchemaValidationRequestArgsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -1848,6 +1887,16 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration',
                     self.MockHandlerWithMissingRequestSchema)],
                 debug=feconf.DEBUG))
+
+        self.mock_testapp3 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithDefaultGetSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp4 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithDefaultPutSchema)], debug=feconf.DEBUG))
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
@@ -1874,6 +1923,17 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                     expected_status_int=500)
             self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_can_access_exploration_with_default_value_in_schema(self):
+        self.login(self.OWNER_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp3):
+            self.get_json('/mock_play_exploration')
+
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(self, 'testapp', self.mock_testapp4):
+            self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
 
 

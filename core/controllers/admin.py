@@ -14,8 +14,8 @@
 
 """Controllers for the admin view."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 import random
@@ -210,7 +210,10 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_to_actions': role_services.get_role_actions(),
+            'role_to_actions': {
+                role_services.HUMAN_READABLE_ROLES[role]: actions
+                for role, actions in role_services.get_role_actions().items()
+            },
             'feature_flags': feature_flag_dicts,
         })
 
@@ -414,7 +417,7 @@ class AdminHandler(base.BaseHandler):
             Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
-            if self.user.role != feconf.ROLE_ID_ADMIN:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.')
             topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -579,7 +582,7 @@ class AdminHandler(base.BaseHandler):
             Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
-            if self.user.role != feconf.ROLE_ID_ADMIN:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
@@ -695,7 +698,7 @@ class AdminRoleHandler(base.BaseHandler):
                 'default_value': None
             }
         },
-        'POST': {
+        'PUT': {
             'role': {
                 'schema': {
                     'type': 'basestring',
@@ -706,12 +709,19 @@ class AdminRoleHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring'
                 }
+            }
+        },
+        'DELETE': {
+            'role': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': feconf.ALLOWED_USER_ROLES
+                }
             },
-            'topic_id': {
+            'username': {
                 'schema': {
                     'type': 'basestring'
-                },
-                'default_value': None
+                }
             }
         }
     }
@@ -741,37 +751,162 @@ class AdminRoleHandler(base.BaseHandler):
             if user_id is None:
                 raise self.InvalidInputException(
                     'User with given username does not exist.')
-            user_role_dict = {
-                username: user_services.get_user_role_from_id(user_id)
+
+            user_settings = user_services.get_user_settings(user_id)
+            user_roles = user_settings.roles
+            managed_topic_ids = []
+            if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
+                managed_topic_ids = [
+                    rights.id for rights in
+                    topic_fetchers.get_topic_rights_with_user(user_id)]
+            user_roles_dict = {
+                'roles': user_roles,
+                'managed_topic_ids': managed_topic_ids,
+                'banned': user_settings.banned
             }
-            self.render_json(user_role_dict)
+            self.render_json(user_roles_dict)
 
     @acl_decorators.can_access_admin_page
-    def post(self):
-        username = self.normalized_payload.get('username')
-        role = self.normalized_payload.get('role')
-        topic_id = self.normalized_payload.get('topic_id')
+    def put(self):
+        username = self.payload.get('username')
+        role = self.payload.get('role')
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            # The Topic manager role assignment is handled via
+            # TopicManagerRoleHandler.
+            raise self.InvalidInputException(
+                'Unsupported role for this handler.')
+
+        user_services.add_user_role(user_settings.user_id, role)
+
+        self.render_json({})
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        username = self.request.get('username')
+        role = self.request.get('role')
+
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
 
-        if (
-                user_services.get_user_role_from_id(user_id) ==
-                feconf.ROLE_ID_TOPIC_MANAGER):
-            topic_services.deassign_user_from_all_topics(
-                user_services.get_system_user(), user_id)
+        if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            topic_services.deassign_user_from_all_topics(self.user, user_id)
 
-        user_services.update_user_role(user_id, role)
-        role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
-            username=username)
+        user_services.remove_user_role(user_id, role)
 
-        if topic_id:
-            user = user_services.get_user_actions_info(user_id)
+        self.render_json({})
+
+
+class TopicManagerRoleHandler(base.BaseHandler):
+    """Handler to assign or deassigning manager to a topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign']
+                }
+            },
+            'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.normalized_payload.get('username')
+        action = self.normalized_payload.get('action')
+        topic_id = self.normalized_payload.get('topic_id')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_TOPIC_MANAGER in user_settings.roles:
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
+            topic_manager = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
-                user_services.get_system_user(), user,
-                topic_domain.ROLE_MANAGER, topic_id)
+                user_services.get_system_user(),
+                topic_manager, topic_domain.ROLE_MANAGER, topic_id)
+        elif action == 'deassign':
+            topic_services.deassign_manager_role_from_topic(
+                user_services.get_system_user(), user_id, topic_id)
+
+            if not topic_fetchers.get_topic_rights_with_user(user_id):
+                user_services.remove_user_role(
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+
+        self.render_json({})
+
+
+class BannedUsersHandler(base.BaseHandler):
+    """Handler to ban and unban users."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        },
+        'DELETE': {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.normalized_payload.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+        topic_services.deassign_user_from_all_topics(self.user, user_id)
+        user_services.mark_user_banned(user_id)
+
+        self.render_json({})
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        username = self.normalized_request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+        user_services.unmark_user_banned(user_id)
 
         self.render_json({})
 
@@ -909,255 +1044,6 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
-
-
-class AddContributionRightsHandler(base.BaseHandler):
-    """Handles adding contribution rights for contributor dashboard page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'category': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
-                }
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
-                },
-                'default_value': None
-            }
-        }
-    }
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        username = self.normalized_payload.get('username')
-        user_id = user_services.get_user_id_from_username(username)
-
-        if user_id is None:
-            raise self.InvalidInputException('Invalid username: %s' % username)
-
-        category = self.normalized_payload.get('category')
-        language_code = self.normalized_payload.get('language_code')
-
-        if category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION:
-            if user_services.can_review_translation_suggestions(
-                    user_id, language_code=language_code):
-                raise self.InvalidInputException(
-                    'User %s already has rights to review translation in '
-                    'language code %s' % (username, language_code))
-            user_services.allow_user_to_review_translation_in_language(
-                user_id, language_code)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER:
-            if user_services.can_review_voiceover_applications(
-                    user_id, language_code=language_code):
-                raise self.InvalidInputException(
-                    'User %s already has rights to review voiceover in '
-                    'language code %s' % (username, language_code))
-            user_services.allow_user_to_review_voiceover_in_language(
-                user_id, language_code)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION:
-            if user_services.can_review_question_suggestions(user_id):
-                raise self.InvalidInputException(
-                    'User %s already has rights to review question.' % (
-                        username))
-            user_services.allow_user_to_review_question(user_id)
-        elif category == constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION:
-            if user_services.can_submit_question_suggestions(user_id):
-                raise self.InvalidInputException(
-                    'User %s already has rights to submit question.' % (
-                        username))
-            user_services.allow_user_to_submit_question(user_id)
-
-        if category in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-        ]:
-            email_manager.send_email_to_new_contribution_reviewer(
-                user_id, category, language_code=language_code)
-        self.render_json({})
-
-
-class RemoveContributionRightsHandler(base.BaseHandler):
-    """Handles removing contribution rights for contributor dashboard."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'removal_type': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': [
-                        constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-                        constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS
-                    ]
-                }
-            },
-            'category': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
-                },
-                'default_value': None
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
-                },
-                'default_value': None
-            }
-        }
-    }
-
-    @acl_decorators.can_access_admin_page
-    def put(self):
-        username = self.normalized_payload.get('username')
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % username)
-
-        language_code = self.normalized_payload.get('language_code')
-
-        removal_type = self.normalized_payload.get('removal_type')
-        if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
-            user_services.remove_contribution_reviewer(user_id)
-        elif (removal_type ==
-              constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
-            category = self.normalized_payload.get('category')
-            if (category ==
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
-                if not user_services.can_review_translation_suggestions(
-                        user_id, language_code=language_code):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to review translation in '
-                        'language %s.' % (username, language_code))
-                user_services.remove_translation_review_rights_in_language(
-                    user_id, language_code)
-            elif (category ==
-                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER):
-                if not user_services.can_review_voiceover_applications(
-                        user_id, language_code=language_code):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to review voiceover in '
-                        'language %s.' % (username, language_code))
-                user_services.remove_voiceover_review_rights_in_language(
-                    user_id, language_code)
-            elif (category ==
-                  constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION):
-                if not user_services.can_review_question_suggestions(user_id):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to review question.' % (
-                            username))
-                user_services.remove_question_review_rights(user_id)
-            elif (category ==
-                  constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION):
-                if not user_services.can_submit_question_suggestions(user_id):
-                    raise self.InvalidInputException(
-                        '%s does not have rights to submit question.' % (
-                            username))
-                user_services.remove_question_submit_rights(user_id)
-
-            if category in [
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                    constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION
-            ]:
-                email_manager.send_email_to_removed_contribution_reviewer(
-                    user_id, category, language_code=language_code)
-
-        self.render_json({})
-
-
-class ContributorUsersListHandler(base.BaseHandler):
-    """Handler to show users with contribution rights."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'category': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': constants.CONTRIBUTION_RIGHT_CATEGORIES
-                }
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
-                },
-                'default_value': None
-            }
-        }
-    }
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        category = self.normalized_request.get('category')
-        language_code = self.normalized_request.get('language_code')
-
-        usernames = user_services.get_contributor_usernames(
-            category, language_code=language_code)
-        self.render_json({'usernames': usernames})
-
-
-class ContributionRightsDataHandler(base.BaseHandler):
-    """Handler to show the contribution rights of a user."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
-    }
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        username = self.normalized_request.get('username')
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % username)
-        user_rights = (
-            user_services.get_user_contribution_rights(user_id))
-        self.render_json({
-            'can_review_translation_for_language_codes': (
-                user_rights.can_review_translation_for_language_codes),
-            'can_review_voiceover_for_language_codes': (
-                user_rights.can_review_voiceover_for_language_codes),
-            'can_review_questions': user_rights.can_review_questions,
-            'can_submit_questions': user_rights.can_submit_questions
-        })
 
 
 class SendDummyMailToAdminHandler(base.BaseHandler):

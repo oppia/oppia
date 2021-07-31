@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
@@ -36,13 +35,11 @@ import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-nonint
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
 import { PortalModule } from '@angular/cdk/portal';
-import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-output-display.component';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     DynamicContentModule,
     MatButtonModule,
     NgbAccordionModule,
@@ -62,9 +59,7 @@ import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-outp
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-    RteOutputDisplayComponent,
-    OppiaRteTextNodeDirective
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
   entryComponents: [
     NoninteractiveCollapsible,
@@ -75,8 +70,7 @@ import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-outp
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-    RteOutputDisplayComponent
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
   exports: [
     ConceptCardComponent,
@@ -88,9 +82,7 @@ import { OppiaRteTextNodeDirective, RteOutputDisplayComponent } from './rte-outp
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-    RteOutputDisplayComponent,
-    OppiaRteTextNodeDirective
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
 })
 

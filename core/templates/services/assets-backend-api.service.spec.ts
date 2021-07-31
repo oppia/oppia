@@ -22,7 +22,6 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { AudioFile } from 'domain/utilities/audio-file.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -31,7 +30,6 @@ describe('Assets Backend API Service', () => {
     let assetsBackendApiService: AssetsBackendApiService;
     let csrfTokenService: CsrfTokenService;
     let httpTestingController: HttpTestingController;
-    let urlInterpolationService: UrlInterpolationService;
 
     const audioRequestUrl = (
       '/assetsdevhandler/exploration/0/assets/audio/myfile.mp3');
@@ -48,7 +46,6 @@ describe('Assets Backend API Service', () => {
       assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
       httpTestingController = TestBed.inject(HttpTestingController);
-      urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
@@ -385,59 +382,6 @@ describe('Assets Backend API Service', () => {
       expect(successHandler.calls.first().args[0].data.type)
         .toEqual('audiotype');
     }));
-
-    it('should not make HTTP request to save an audio with invalid' +
-    'URL', fakeAsync(() => {
-      const onSuccess = jasmine.createSpy('onSuccess');
-      const onFailure = jasmine.createSpy('onFailure');
-
-      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(null);
-      assetsBackendApiService.saveAudio(
-        '0', 'a.mp3', new File([], 'a.mp3')).then(onSuccess, onFailure);
-
-      expect(onSuccess).not.toHaveBeenCalled();
-      expect(onFailure).not.toHaveBeenCalled();
-    }));
-
-    it('should not make HTTP request to save a math expression image' +
-    ' with invalid URL', fakeAsync(() => {
-      const onSuccess = jasmine.createSpy('onSuccess');
-      const onFailure = jasmine.createSpy('onFailure');
-
-      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(null);
-      assetsBackendApiService.saveMathExpresionImage(
-        imageBlob, 'new.svg', 'exploration', 'expid12345'
-      ).then(onSuccess, onFailure);
-
-      expect(onSuccess).not.toHaveBeenCalled();
-      expect(onFailure).not.toHaveBeenCalled();
-    }));
-
-    it('should not formulate the thumbnail url for preview' +
-    'if download URL is null', () => {
-      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(null);
-      expect(() => {
-        assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.EXPLORATION, 'expid12345', 'thumbnail.png');
-      }).toThrowError('Download Url is null');
-    });
-
-    it('should fail to post a thumbnail to server if thumbnailFileUrl is null',
-      fakeAsync(() => {
-        spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(null);
-
-        expect(() => {
-          assetsBackendApiService.postThumbnailFile(
-            new Blob(['abc']),
-            'filename.svg',
-            'entity_type',
-            'entity_id'
-          );
-        }).toThrowError('Thumbnail File Url is null');
-        flushMicrotasks();
-        httpTestingController.expectNone('#');
-        flushMicrotasks();
-      }));
   });
 
   describe('on emulator mode', () => {

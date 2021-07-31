@@ -35,7 +35,7 @@ import { Subscription } from 'rxjs';
 
 /* eslint-disable-next-line angular/directive-restrict */
 angular.module('oppia').directive('stateGraphVisualization', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       // Note: This directive is used as attribute because pannability does not
       //    work when directive is used as element. (Convention in the codebase
@@ -84,8 +84,8 @@ angular.module('oppia').directive('stateGraphVisualization', [
         showWarningSign: '@',
         showTranslationWarnings: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-editor-page/editor-tab/graph-directives/' +
+      template: require(
+        'pages/exploration-editor-page/editor-tab/graph-directives/' +
         'state-graph-visualization.directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',

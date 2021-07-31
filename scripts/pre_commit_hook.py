@@ -26,8 +26,8 @@ On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import argparse
 import os
