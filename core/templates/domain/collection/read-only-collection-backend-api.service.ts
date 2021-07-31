@@ -96,8 +96,9 @@ export class ReadOnlyCollectionBackendApiService {
         canEdit: details.can_edit,
         title: details.collection.title,
       };
+    } else {
+      throw new Error('Id and title are possibly null!');
     }
-    throw new Error('Id and title are possibly null!');
   }
 
   private _isCached(collectionId: string): boolean {
