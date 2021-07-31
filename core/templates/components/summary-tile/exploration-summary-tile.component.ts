@@ -147,7 +147,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.href = this.getExplorationLink();
   }
 
-  // Function will return undefined when Exploration Ratings are not present.
+  // Function will return null when Exploration Ratings are not present.
   getAverageRating(): number | null {
     if (this.getRatings) {
       return this.ratingComputationService.computeAverageRating(
