@@ -21,6 +21,7 @@ import logging
 from constants import constants
 
 from core.controllers import acl_decorators
+from core.controllers import access_validators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
@@ -112,26 +113,6 @@ class WarmupPage(base.BaseHandler):
         pass
 
 
-class HomePageRedirectPage(base.BaseHandler):
-    """When a request is made to '/', check the user's login status, and
-    redirect them appropriately.
-    """
-
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
-        if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
-                self.user_id):
-            user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
-            default_dashboard = user_settings.default_dashboard
-            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
-                self.redirect(feconf.CREATOR_DASHBOARD_URL)
-            else:
-                self.redirect(feconf.LEARNER_DASHBOARD_URL)
-        else:
-            self.render_template('splash-page.mainpage.html') # type: ignore[no-untyped-call]
-
-
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
@@ -221,7 +202,6 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
-    get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
 
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
@@ -232,12 +212,36 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'/forum', pages.ForumRedirectPage),
 
+    # Access Validators.
+    get_redirect_route(
+        r'%s/can_access_classroom_page' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ClassroomPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.SplashPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ManageOwnAccountValidationHandler),
+
+    get_redirect_route(
+        r'%s/does_profile_exist/<username>' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ProfileExistsValidationHandler),
+
+    get_redirect_route(
+        r'%s/account_deletion_is_enabled' % feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.AccountDeletionIsEnabledValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_release_coordinator_page' %
+        feconf.ACCESS_VALIDATORS_PREFIX,
+        access_validators.ReleaseCoordinatorAccessValidationHandler
+    ),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
-    get_redirect_route(r'/bannedusershandler', admin.BannedUsersHandler),
-    get_redirect_route(
-        r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler),
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
     get_redirect_route(
@@ -466,18 +470,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(
-        r'%s' % feconf.LIBRARY_INDEX_URL, library.LibraryPage),
-    get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_RECENTLY_PUBLISHED_URL,
-        library.LibraryGroupPage),
-    get_redirect_route(
-        r'%s' % feconf.LIBRARY_TOP_RATED_URL, library.LibraryGroupPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_GROUP_DATA_URL,
         library.LibraryGroupIndexHandler),
-    get_redirect_route(r'%s' % feconf.LIBRARY_SEARCH_URL, library.LibraryPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_SEARCH_DATA_URL, library.SearchHandler),
     get_redirect_route(r'/gallery', library.LibraryRedirectPage),
@@ -491,10 +487,11 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
+    # Usually all frontend pages are served using OppiaRootPage handler
+    # but this is a special case as this route contains a url fragment.
     get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
-    get_redirect_route(feconf.PREFERENCES_URL, profile.PreferencesPage),
     get_redirect_route(
         r'%s/<secret>' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
         profile.BulkEmailWebhookEndpoint),
@@ -507,14 +504,10 @@ URLS = MAPREDUCE_HANDLERS + [
         profile.ProfilePictureHandlerByUsernameHandler),
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
-    get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
     get_redirect_route(
         feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
     get_redirect_route(
         feconf.EXPORT_ACCOUNT_HANDLER_URL, profile.ExportAccountHandler),
-    get_redirect_route(
-        feconf.PENDING_ACCOUNT_DELETION_URL,
-        profile.PendingAccountDeletionPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
@@ -527,8 +520,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
-    get_redirect_route(
-        r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
     get_redirect_route(
         r'/joboutputhandler', release_coordinator.JobOutputHandler),
     get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
@@ -883,8 +874,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.BLOG_DASHBOARD_DATA_URL,
         blog_dashboard.BlogDashboardDataHandler),
-    get_redirect_route(
-        r'%s' % feconf.BLOG_DASHBOARD_URL, blog_dashboard.BlogDashboardPage),
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
@@ -911,6 +900,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/platform_feature_dummy_handler',
         platform_feature.PlatformFeatureDummyHandler),
 
+    # Usually all frontend pages are served using OppiaRootPage handler
+    # but this is a special case as this route contains a url fragment.
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
 
@@ -935,10 +926,10 @@ if constants.DEV_MODE:
 
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
-    URLS.append(
-        get_redirect_route(
-            r'/%s' % page['ROUTE'],
-            oppia_root.OppiaRootPage))
+    if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
+        URLS.append(
+            get_redirect_route(
+                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
