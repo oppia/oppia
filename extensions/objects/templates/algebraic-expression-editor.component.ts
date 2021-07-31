@@ -60,7 +60,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.value) {
+    if (this.value !== null || this.value !== undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
