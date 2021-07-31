@@ -13,11 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the MusicNotesInput response.
+ * @fileoverview Unit tests for the MusicNotesInput short response.
  */
 
-describe('oppiaResponseMusicNotesInput', function() {
+describe('oppiaShortResponseMusicNotesInput', function() {
   let ctrl = null;
+  let directive = null;
 
   let mockHtmlEscaperService = {
     escapedJsonToObj: function(answer) {
@@ -43,8 +44,10 @@ describe('oppiaResponseMusicNotesInput', function() {
       });
     }));
 
-    beforeEach(angular.mock.inject(function($componentController) {
-      ctrl = $componentController('oppiaResponseMusicNotesInput');
+    beforeEach(angular.mock.inject(function($injector) {
+      directive =
+        $injector.get('oppiaShortResponseMusicNotesInputDirective')[0];
+      ctrl = $injector.instantiate(directive.controller);
     }));
 
     it('should initialise the component when submits answer', function() {
@@ -61,7 +64,7 @@ describe('oppiaResponseMusicNotesInput', function() {
     }));
 
     beforeEach(angular.mock.inject(function($componentController) {
-      ctrl = $componentController('oppiaResponseMusicNotesInput');
+      ctrl = $componentController('oppiaShortResponseMusicNotesInput');
     }));
 
     it('should initialise the component when submits answer', function() {

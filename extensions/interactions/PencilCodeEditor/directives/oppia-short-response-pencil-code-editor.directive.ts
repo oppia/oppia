@@ -24,15 +24,21 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').component('oppiaShortResponsePencilCodeEditor', {
-  template: require('./pencil-code-editor-short-response.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['$attrs', 'HtmlEscaperService',
-    function($attrs, HtmlEscaperService) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        ctrl.answerCode = (
-          HtmlEscaperService.escapedJsonToObj($attrs.answer).code);
-      };
-    }]
-});
+angular.module('oppia').directive('oppiaShortResponsePencilCodeEditor', [
+  'HtmlEscaperService', function(HtmlEscaperService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      template: require('./pencil-code-editor-short-response.directive.html'),
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          ctrl.answerCode = (
+            HtmlEscaperService.escapedJsonToObj($attrs.answer).code);
+        };
+      }]
+    };
+  }
+]);

@@ -13,11 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the PencilCodeEditor response.
+ * @fileoverview Directive for the PencilCodeEditor short response.
  */
 
-describe('oppiaResponsePencilCodeEditor', function() {
+describe('oppiaShortResponsePencilCodeEditor', function() {
   let ctrl = null;
+  let directive = null;
 
   let mockHtmlEscaperService = {
     escapedJsonToObj: function(answer) {
@@ -35,8 +36,9 @@ describe('oppiaResponsePencilCodeEditor', function() {
       }
     });
   }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaResponsePencilCodeEditor');
+  beforeEach(angular.mock.inject(function($injector) {
+    directive = $injector.get('oppiaShortResponsePencilCodeEditorDirective')[0];
+    ctrl = $injector.instantiate(directive.controller);
   }));
 
   it('should initialise the component when submits answer', function() {

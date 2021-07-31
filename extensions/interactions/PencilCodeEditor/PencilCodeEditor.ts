@@ -27,7 +27,7 @@ require(
   'oppia-interactive-pencil-code-editor.directive.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-response-pencil-code-editor.component.ts');
+  'oppia-response-pencil-code-editor.directive.ts');
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-short-response-pencil-code-editor.component.ts');
+  'oppia-short-response-pencil-code-editor.directive.ts');
