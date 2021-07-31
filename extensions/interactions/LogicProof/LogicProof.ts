@@ -21,12 +21,6 @@ require('interactions/LogicProof/static/logic_proof.css');
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'interactions/LogicProof/directives/' +
-  'logic-proof-validation.service.ts');
-require(
-  'interactions/LogicProof/directives/' +
-  'oppia-interactive-logic-proof.component.ts');
-require(
-  'interactions/LogicProof/directives/' +
   'oppia-response-logic-proof.component.ts');
 require(
   'interactions/LogicProof/directives/' +

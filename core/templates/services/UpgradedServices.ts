@@ -229,8 +229,6 @@ import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { LogicProofRulesService } from
   'interactions/LogicProof/directives/logic-proof-rules.service';
-import { LogicProofValidationService } from
-  'interactions/LogicProof/directives/logic-proof-validation.service';
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { MathEquationInputRulesService } from
@@ -710,9 +708,6 @@ export class UpgradedServices {
       new ItemSelectionInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['LocalStorageService'] = new LocalStorageService();
-    upgradedServices['LogicProofValidationService'] =
-      new LogicProofValidationService(
-        upgradedServices['baseInteractionValidationService']);
     upgradedServices['MathEquationInputValidationService'] =
       new MathEquationInputValidationService(
         upgradedServices['baseInteractionValidationService']);
