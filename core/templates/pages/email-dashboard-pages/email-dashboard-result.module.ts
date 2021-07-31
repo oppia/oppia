@@ -36,6 +36,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     HttpClientModule,
     SharedComponentsModule
   ],
+  declarations: [
+    EmailDashboardResultComponent
+  ],
+  entryComponents: [
+    EmailDashboardResultComponent
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
@@ -57,6 +63,7 @@ class EmailDashboardResultModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { EmailDashboardResultComponent } from './email-dashboard-result.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

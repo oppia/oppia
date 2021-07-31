@@ -29,6 +29,7 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { EmailDashboardPageComponent } from './email-dashboard-page.component';
 
 @NgModule({
   imports: [
@@ -36,6 +37,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
+  ],
+  declarations: [
+    EmailDashboardPageComponent
+  ],
+  entryComponents: [
+    EmailDashboardPageComponent
   ],
   providers: [
     {
