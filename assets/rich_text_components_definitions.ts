@@ -102,8 +102,12 @@ export default {
       "name": "url",
       "description": "The link URL. If no protocol is specified, HTTPS will be used.",
       "schema": {
-        "type": "custom",
-        "obj_type": "SanitizedUrl"
+        "type": "unicode",
+        "obj_type": "SanitizedUrl",
+        "validators": [{
+          "id": "is_regex_matched",
+          "regex_pattern": "(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))"
+        }]
       },
       "default_value": ""
     }, {
