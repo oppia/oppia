@@ -66,7 +66,7 @@ export class ContributorDashboardAdminBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         this.urlInterpolationService.interpolateUrl(
-          PageConstants.ADD_CONTRIBUTION_RIGHTS_HANDLER_URL, { category }), {
+          PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category }), {
           username: username,
           language_code: languageCode
         }
@@ -105,7 +105,7 @@ export class ContributorDashboardAdminBackendApiService {
       username: string): Promise<ContributionRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<ContributionRightsBackendResponse>(
-        PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, {
+        PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL, {
           params: {
             username: username
           }
@@ -121,11 +121,14 @@ export class ContributorDashboardAdminBackendApiService {
   async removeContributionReviewerAsync(
       username: string, category: string, languageCode: string): Promise<void> {
     var url = this.urlInterpolationService.interpolateUrl(
-      PageConstants.REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
+      PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
+    var params = {
+      username: username,
+      language_code: languageCode
+    };
     return new Promise((resolve, reject) => {
-      this.http.put<void>(url, {
-        username: username,
-        language_code: languageCode
+      this.http.delete<void>(url, {
+        params
       }
       ).toPromise().then(response => {
         resolve(response);

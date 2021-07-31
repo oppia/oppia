@@ -14,8 +14,8 @@
 
 """Tests for the contributor dashboard admin page controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -44,10 +44,10 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
         self.signup(self.QUESTION_ADMIN_EMAIL, 'questionExpert')
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
 
@@ -74,8 +74,8 @@ class ContributorDashboardAdminPageTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
-    """Tests related to add reviewers for contributor's
+class ContributionRightsHandlerTest(test_utils.GenericTestBase):
+    """Tests related to reviewers for contributor's
     suggestion/application.
     """
 
@@ -85,8 +85,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
     QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
 
     def setUp(self):
-        super(AddContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        super(ContributionRightsHandlerTest, self).setUp()
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationExpert')
@@ -97,10 +96,10 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
 
@@ -109,7 +108,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler/translation', {
+            '/contributionrightshandler/translation', {
                 'username': 'invalid',
                 'language_code': 'en'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -126,7 +125,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler/translation', {
+            '/contributionrightshandler/translation', {
                 'username': 'translator',
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
@@ -141,7 +140,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
                 self.translation_reviewer_id, language_code='hi'))
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler/translation', {
+            '/contributionrightshandler/translation', {
                 'username': 'translator',
                 'language_code': 'hi'
             }, csrf_token=csrf_token)
@@ -149,7 +148,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         response = self.post_json(
-            '/addcontributionrightshandler/translation', {
+            '/contributionrightshandler/translation', {
                 'username': 'translator',
                 'language_code': 'hi'
             }, csrf_token=csrf_token, expected_status_int=400)
@@ -167,7 +166,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler/question', {
+            '/contributionrightshandler/question', {
                 'username': 'question'
             }, csrf_token=csrf_token)
 
@@ -181,14 +180,14 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler/question', {
+            '/contributionrightshandler/question', {
                 'username': 'question'
             }, csrf_token=csrf_token)
         self.assertTrue(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/addcontributionrightshandler/question', {
+            '/contributionrightshandler/question', {
                 'username': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -204,7 +203,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/addcontributionrightshandler/submit_question', {
+            '/contributionrightshandler/submit_question', {
                 'username': 'question'
             }, csrf_token=csrf_token)
 
@@ -218,14 +217,14 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler/submit_question', {
+            '/contributionrightshandler/submit_question', {
                 'username': 'question'
             }, csrf_token=csrf_token)
         self.assertTrue(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
         response = self.post_json(
-            '/addcontributionrightshandler/submit_question', {
+            '/contributionrightshandler/submit_question', {
                 'username': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -238,7 +237,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/addcontributionrightshandler/invalid', {
+            '/contributionrightshandler/invalid', {
                 'username': 'question'
             }, csrf_token=csrf_token, expected_status_int=400)
 
@@ -248,42 +247,13 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             'is not in the allowed range of choices: %s' % (
                 constants.CONTRIBUTION_RIGHT_CATEGORIES))
 
-
-class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
-    """Tests related to remove reviewers from contributor dashboard page."""
-
-    TRANSLATION_REVIEWER_EMAIL = 'translationreviewer@example.com'
-    QUESTION_REVIEWER_EMAIL = 'questionreviewer@example.com'
-    TRANSLATION_ADMIN_EMAIL = 'translationadmin@example.com'
-    QUESTION_ADMIN_EMAIL = 'questionadmin@example.com'
-
-    def setUp(self):
-        super(RemoveContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
-        self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
-        self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationAdmen')
-        self.signup(self.QUESTION_ADMIN_EMAIL, 'questionAdmen')
-
-        self.translation_reviewer_id = self.get_user_id_from_email(
-            self.TRANSLATION_REVIEWER_EMAIL)
-        self.question_reviewer_id = self.get_user_id_from_email(
-            self.QUESTION_REVIEWER_EMAIL)
-        user_services.update_user_role(
-            self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
-            feconf.ROLE_ID_TRANSLATION_ADMIN)
-        user_services.update_user_role(
-            self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
-            feconf.ROLE_ID_QUESTION_ADMIN)
-
-    def test_add_reviewer_with_invalid_username_raise_error(self):
+    def test_remove_reviewer_with_invalid_username_raise_error(self):
         self.login(self.QUESTION_ADMIN_EMAIL)
 
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '/removecontributionrightshandler/question', {
+        response = self.delete_json(
+            '/contributionrightshandler/question', params={
                 'username': 'invalid'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'Invalid username: invalid')
@@ -297,12 +267,11 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            '/removecontributionrightshandler/translation', {
+        self.delete_json(
+            '/contributionrightshandler/translation', params={
                 'username': 'translator',
                 'language_code': 'hi'
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_review_translation_suggestions(
             self.translation_reviewer_id, language_code='hi'))
@@ -312,12 +281,11 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
         self.login(self.TRANSLATION_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '/removecontributionrightshandler/translation', {
+        response = self.delete_json(
+            '/contributionrightshandler/translation', params={
                 'username': 'translator',
                 'language_code': 'hi'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -330,11 +298,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.QUESTION_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            '/removecontributionrightshandler/question', {
+        self.delete_json(
+            '/contributionrightshandler/question', params={
                 'username': 'question',
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
@@ -344,11 +311,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.QUESTION_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '/removecontributionrightshandler/question', {
+        response = self.delete_json(
+            '/contributionrightshandler/question', params={
                 'username': 'question'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -360,11 +326,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.QUESTION_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(
-            '/removecontributionrightshandler/submit_question', {
+        self.delete_json(
+            '/contributionrightshandler/submit_question', params={
                 'username': 'question'
-            }, csrf_token=csrf_token)
+            })
 
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
@@ -374,11 +339,10 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.question_reviewer_id))
 
         self.login(self.QUESTION_ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response = self.put_json(
-            '/removecontributionrightshandler/submit_question', {
+        response = self.delete_json(
+            '/contributionrightshandler/submit_question', params={
                 'username': 'question'
-            }, csrf_token=csrf_token, expected_status_int=400)
+            }, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -395,7 +359,6 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributorUsersListHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
         self.signup(self.TRANSLATION_ADMIN_EMAIL, 'translationAdmen')
@@ -405,10 +368,10 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self.TRANSLATION_REVIEWER_EMAIL)
         self.question_reviewer_id = self.get_user_id_from_email(
             self.QUESTION_REVIEWER_EMAIL)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN_EMAIL),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN_EMAIL),
             feconf.ROLE_ID_QUESTION_ADMIN)
 
@@ -453,14 +416,13 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionRightsDataHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.signup(self.TRANSLATION_ADMIN, 'translationAdmen')
         self.signup(self.QUESTION_ADMIN, 'questionAdmen')
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.TRANSLATION_ADMIN),
             feconf.ROLE_ID_TRANSLATION_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.get_user_id_from_email(self.QUESTION_ADMIN),
             feconf.ROLE_ID_QUESTION_ADMIN)
 
@@ -534,14 +496,14 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslationContributionStatsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.CONTRIBUTOR_EMAIL, self.CONTRIBUTOR_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.contributor_id = self.get_user_id_from_email(
             self.CONTRIBUTOR_EMAIL)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.set_admins([self.ADMIN_USERNAME])
-        user_services.update_user_role(
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        user_services.add_user_role(
             self.contributor_id, feconf.ROLE_ID_TRANSLATION_ADMIN)
 
     def _publish_topic(self, topic_id, topic_name):

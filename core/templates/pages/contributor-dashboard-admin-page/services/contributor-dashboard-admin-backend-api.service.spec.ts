@@ -64,7 +64,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler/translation');
+      '/contributionrightshandler/translation');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
@@ -91,7 +91,7 @@ describe('Contributor dashboard admin backend api service', () => {
     ).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/addcontributionrightshandler/translation');
+      '/contributionrightshandler/translation');
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
     req.flush(
@@ -230,10 +230,11 @@ describe('Contributor dashboard admin backend api service', () => {
     cdabas.removeContributionReviewerAsync(
       username, category, languageCode).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler/translation');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    const query = new URLSearchParams(payload);
+    const url = (
+      '/contributionrightshandler/' + category + '?' + query.toString());
+    const req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
     req.flush(
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();
@@ -254,10 +255,11 @@ describe('Contributor dashboard admin backend api service', () => {
     cdabas.removeContributionReviewerAsync(
       username, category, languageCode).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler/translation');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    const query = new URLSearchParams(payload);
+    const url = (
+      '/contributionrightshandler/' + category + '?' + query.toString());
+    const req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
 
     req.flush({
       error: 'User with given username does not exist.'
@@ -282,10 +284,11 @@ describe('Contributor dashboard admin backend api service', () => {
     cdabas.removeContributionReviewerAsync(
       username, category, null).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/removecontributionrightshandler/submit_question');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+    const query = new URLSearchParams(payload);
+    const url = (
+      '/contributionrightshandler/' + category + '?' + query.toString());
+    const req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('DELETE');
     req.flush(
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();

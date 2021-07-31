@@ -113,13 +113,13 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
       tick(150);
 
-      expect(ecs.explorationCreationInProgress).toBe(true);
+      expect(ecs.explorationCreationInProgress).toBeTrue();
       expect(windowRef.nativeWindow.location.href).toBe('/url/to/exp1');
     }));
 
@@ -135,13 +135,13 @@ describe('ExplorationCreationService', () => {
         });
       });
 
-      expect(ecs.explorationCreationInProgress).toBe(undefined);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
 
       ecs.createNewExploration();
       tick(150);
 
-      expect(ecs.explorationCreationInProgress).toBe(false);
+      expect(ecs.explorationCreationInProgress).toBeFalse();
       expect(windowRef.nativeWindow.location.href).toBe('');
       expect(siteAnalyticsService.registerCreateNewExplorationEvent)
         .not.toHaveBeenCalled();
@@ -164,7 +164,7 @@ describe('ExplorationCreationService', () => {
 
       // @ts-ignore in order to ignore JQuery properties that should
       // be declared.
-      spyOn($, 'ajax').and.callFake((options) => {
+      spyOn($, 'ajax').and.callFake((options: Promise) => {
         let d = $.Deferred();
         d.resolve(
           options.dataFilter(')]}\',\n{"explorationId": "expId"}')

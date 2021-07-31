@@ -22,11 +22,9 @@ jobs:
           python-version: '2.x'
           architecture: 'x64'
       - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
       - uses: ./.github/actions/merge
       - name: Install third party
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.install_third_party_libs
       - id: check-risk
         name: Check if PR is low-risk

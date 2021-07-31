@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { InteractiveLogicProofComponent } from './directives/oppia-interactive-logic-proof.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
@@ -31,7 +30,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     SharedPipesModule,
     CodeMirrorModule,
     TranslateModule

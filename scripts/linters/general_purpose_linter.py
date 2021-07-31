@@ -16,8 +16,8 @@
 
 """Lint checks used by all the linters."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import re
@@ -107,56 +107,6 @@ BAD_PATTERNS_REGEXP = [
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
         'excluded_files': (),
-        'excluded_dirs': ()
-    }
-]
-
-BAD_PATTERNS_JS_AND_TS_REGEXP = [
-    {
-        'regexp': re.compile(r'bypassSecurity'),
-        'message': 'The use of the word "bypassSecurity" is not allowed, ' +
-                   'particularly with regards to bypassSecurityTrustHTML() ' +
-                   'and similar functions in Angular.',
-        'excluded_files': (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES),
-        'excluded_dirs': (
-            warranted_angular_security_bypasses
-            .EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES)
-    },
-    {
-        'regexp': re.compile(r'templateUrl: \''),
-        'message': 'The directives must be directly referenced.',
-        'excluded_files': (
-            'core/templates/pages/exploration-player-page/'
-            'FeedbackPopupDirective.js',
-            '.component.ts'
-        ),
-        'excluded_dirs': (
-            'extensions/answer_summarizers/',
-            'extensions/classifiers/',
-            'extensions/dependencies/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
-    },
-    {
-        'regexp': re.compile(r'require\(.*\.\..*\);'),
-        'message': 'Please, don\'t use relative imports in require().',
-        'excluded_files': (),
-        'excluded_dirs': ('core/tests/',)
-    },
-    {
-        'regexp': re.compile(r':\n? *HttpClient'),
-        'message': (
-            'An instance of HttpClient is found in this file. You are not '
-            'allowed to create http requests from files that are not backend '
-            'api services.'),
-        'excluded_files': (
-            'backend-api.service.ts',
-            'core/templates/pages/translate-loader.factory.ts',
-            'translate-loader.factory.spec.ts',
-            'core/templates/services/auth-interceptor.service.spec.ts',
-            'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
 ]
@@ -308,8 +258,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
 ]
 
 BAD_PATTERNS_MAP = {
-    '.js': BAD_PATTERNS_JS_AND_TS_REGEXP,
-    '.ts': BAD_PATTERNS_JS_AND_TS_REGEXP,
     '.html': BAD_LINE_PATTERNS_HTML_REGEXP,
     '.py': BAD_PATTERNS_PYTHON_REGEXP
 }
@@ -576,6 +524,36 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
+    def check_disallowed_flags(self):
+        """This function is used to disallow flags."""
+        name = 'Disallow flags'
+        disallow_flag = (
+            'eslint-disable-next-line oppia/no-bypass-security-phrase')
+        error_messages = []
+        files_to_lint = self.all_filepaths
+        failed = False
+        excluded_files = (
+            warranted_angular_security_bypasses
+            .EXCLUDED_BYPASS_SECURITY_TRUST_FILES)
+        allowed_files = ''
+        for filepath in files_to_lint:
+            for excluded_file in excluded_files:
+                if excluded_file in filepath:
+                    allowed_files = filepath
+            if not filepath.endswith('.ts') or filepath == allowed_files:
+                continue
+            file_content = self.file_cache.read(filepath)
+
+            if disallow_flag in file_content:
+                error_message = (
+                    '%s --> Please do not use "no-bypass-security-phrase" flag.'
+                    ' It is only expected to be used in files listed in'
+                    ' warranted_angular_security_bypasses.py' % filepath)
+                error_messages.append(error_message)
+                failed = True
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def check_extra_js_files(self):
         """Checks if the changes made include extra js files in core
         or extensions folder which are not specified in
@@ -624,7 +602,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
                     ['There are no files to be checked.'])]
         task_results = [
             self.check_mandatory_patterns(), self.check_bad_patterns(),
-            self.check_newline_at_eof(), self.check_extra_js_files()]
+            self.check_newline_at_eof(), self.check_extra_js_files(),
+            self.check_disallowed_flags()]
         return task_results
 
 

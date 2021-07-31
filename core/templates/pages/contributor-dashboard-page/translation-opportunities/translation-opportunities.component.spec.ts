@@ -45,11 +45,11 @@ describe('Translation opportunities component', () => {
   let translationModal: NgbModalRef;
   let httpTestingController;
   let loggedInUserInfo = new UserInfo(
-    'EXPLORATION_EDITOR', false, false, false, false, false,
+    ['EXPLORATION_EDITOR'], false, false, false, false, false,
     'en', 'username', 'test@example.com', true
   );
   const notLoggedInUserInfo = new UserInfo(
-    'GUEST', false, false, false, false, false,
+    ['GUEST'], false, false, false, false, false,
     'en', null, null, false
   );
 
