@@ -1507,12 +1507,11 @@ class BaseSnapshotMetadataModel(BaseModel):
     @classmethod
     def export_data(cls, user_id):
         # type: (Text) -> Dict[Text, Dict[Text, Text]]
-        results = (
-            cls.query(cls.committer_id == user_id).fetch(
-                projection=[cls.commit_type, cls.commit_message]))
-
         metadata_models = cast(
-            List[BaseSnapshotMetadataModel], results)
+            List[BaseSnapshotMetadataModel],
+            cls.query(cls.committer_id == user_id).fetch(
+                projection=[cls.commit_type, cls.commit_message])
+        )
         user_data = {}
         for metadata_model in metadata_models:
             user_data[metadata_model.id] = {

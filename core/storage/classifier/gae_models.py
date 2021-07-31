@@ -212,9 +212,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                     datetime.datetime.utcnow())).order(
                         cls.next_scheduled_check_time, cls._key)
 
-        results = query.fetch(
-            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
-        classifier_job_models = cast(List[ClassifierTrainingJobModel], results)
+        classifier_job_models = cast(
+            List[ClassifierTrainingJobModel],
+            query.fetch(
+                NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+        )
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 

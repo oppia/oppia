@@ -309,8 +309,10 @@ def mock_datetime_for_datastore(mocked_now):
             """Validates whether the given instance is a datetime instance."""
             return isinstance(other, old_datetime_type)
 
+    # TODO(#13534): Fix with_metaclass() and remove type: ignore after py3
+    # migration.
     # We use ‘ignore[misc]’ because MockDatetime subclasses a class created
-    # dynamically. These dynamic classes are not supported by mypy.
+    # dynamically.
     # This can be fixed after py3 migration as this error is resolved when
     # mypy is able to get return type of the function
     # python_utils.with_metaclass and we will be removing python_utils
