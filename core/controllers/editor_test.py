@@ -775,9 +775,9 @@ written_translations:
         error_msg = (
             'Schema validation for \'output_format\' failed: Received '
             'invalid_output_format which is not in the allowed range of '
-            'choices: [u\'zip\', u\'json\']')
-        self.assertEqual(
-            response['error'], error_msg)
+            'choices: [u\'zip\', u\'json\']'
+        )
+        self.assertEqual(response['error'], error_msg)
 
         self.logout()
 
@@ -1274,10 +1274,11 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 'current_version': 'invalid_version',
                 'revert_to_version': 1
             }, csrf_token=csrf_token, expected_status_int=400)
+
         error_msg = (
             'Schema validation for \'current_version\' failed: Could not '
-            'convert unicode to int: invalid_version')
-
+            'convert unicode to int: invalid_version'
+        )
         self.assertEqual(response['error'], error_msg)
 
 
@@ -1764,9 +1765,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         error_msg = (
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({u\'max_value\': 375}) for object %s'
-            % long_commit_message)
-        self.assertEqual(
-            response_dict['error'], error_msg)
+            % long_commit_message
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
     def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
@@ -1961,7 +1962,8 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         error_msg = (
             'Schema validation for \'message_type\' failed: Received '
             'invalid_message_type which is not in the allowed range '
-            'of choices: [u\'feedback\', u\'suggestion\']')
+            'of choices: [u\'feedback\', u\'suggestion\']'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2024,7 +2026,8 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
             error_msg = (
                 'Schema validation for \'email_body\' failed: Validation '
-                'failed: is_nonempty ({}) for object ')
+                'failed: is_nonempty ({}) for object '
+            )
             self.assertIn(error_msg, response_dict['error'])
 
             # Try to unpublish the exploration even if the relevant feconf
@@ -2602,7 +2605,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
         error_msg = (
             'Schema validation for \'change_list\' failed: Command '
-            'edit_exploration_propert is not allowed')
+            'edit_exploration_propert is not allowed'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_draft_not_updated_validation_error(self):

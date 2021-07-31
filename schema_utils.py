@@ -644,7 +644,7 @@ class _Validators(python_utils.OBJECT):
         return bool(re.match(regex_pattern, obj))
 
     @staticmethod
-    def is_string_contained_within_parenthesis(obj):
+    def is_string_contained_within_parenthesis_and_quotes(obj):
         # type: (Text) -> bool
         """Checks if the given obj (a string) is contained within double quotes
         followed by parenthesis.

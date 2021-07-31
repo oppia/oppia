@@ -54,6 +54,25 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
+# Common schemas used in this file.
+SCHEMA_FOR_EXPLORATION_ID = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'has_length_at_most',
+        'max_value': 12 # Max length of an exploration_id
+    }, {
+        'id': 'is_nonempty'
+    }]
+}
+SCHEMA_FOR_VERSION = {
+    'type': 'int',
+    'validators': [{
+        'id': 'is_at_least',
+        'min_value': 1 # Version must be grater than zero.
+    }]
+}
+
+
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
 
@@ -65,15 +84,7 @@ class ExplorationPage(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -93,23 +104,13 @@ class ExplorationHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'v': {
-                'schema': {
-                    'type': 'int'
-                },
+                'schema': SCHEMA_FOR_VERSION,
                 'default_value': None
             },
             'apply_draft': {
@@ -121,9 +122,7 @@ class ExplorationHandler(EditorHandler):
         },
         'PUT': {
             'version': {
-                'schema': {
-                    'type': 'int'
-                }
+                'schema': SCHEMA_FOR_VERSION
             },
             'commit_message': {
                 'schema': {
@@ -255,15 +254,7 @@ class UserExplorationPermissionsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -305,23 +296,13 @@ class ExplorationRightsHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'version': {
-                'schema': {
-                    'type': 'int'
-                }
+                'schema': SCHEMA_FOR_VERSION
             },
             'make_community_owned': {
                 'schema': {
@@ -434,15 +415,7 @@ class ExplorationStatusHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -493,15 +466,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -515,9 +480,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
                 }
             },
             'version': {
-                'schema': {
-                    'type': 'int'
-                }
+                'schema': SCHEMA_FOR_VERSION
             }
         }
     }
@@ -562,15 +525,7 @@ class UserExplorationEmailsHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -631,27 +586,13 @@ class ExplorationFileDownloader(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'v': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1 # Version must be grater than zero.
-                    }]
-                },
+                'schema': SCHEMA_FOR_VERSION,
                 'default_value': None
             },
             'output_format': {
@@ -704,15 +645,7 @@ class StateYamlHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -754,15 +687,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -792,36 +717,16 @@ class ExplorationRevertHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'current_version': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
-                }
+                'schema': SCHEMA_FOR_VERSION
             },
             'revert_to_version': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
-                }
+                'schema': SCHEMA_FOR_VERSION
             }
         }
     }
@@ -851,15 +756,7 @@ class ExplorationStatisticsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -880,15 +777,7 @@ class StateInteractionStatsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         },
         'escaped_state_name': {
             'schema': {
@@ -924,27 +813,13 @@ class FetchIssuesHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'exp_version': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1 # Version must be greater than zero.
-                    }]
-                }
+                'schema': SCHEMA_FOR_VERSION
             }
         }
     }
@@ -973,15 +848,7 @@ class FetchPlaythroughHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         },
         'playthrough_id': {
             'schema': {
@@ -1010,15 +877,7 @@ class ResolveIssueHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -1031,9 +890,7 @@ class ResolveIssueHandler(EditorHandler):
                 'default_value': None
             },
             'exp_version': {
-                'schema': {
-                    'type': 'int'
-                }
+                'schema': SCHEMA_FOR_VERSION
             }
         }
     }
@@ -1158,15 +1015,7 @@ class StartedTutorialEventHandler(EditorHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
@@ -1185,23 +1034,13 @@ class EditorAutosaveHandler(ExplorationHandler):
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'version': {
-                'schema': {
-                    'type': 'int'
-                }
+                'schema': SCHEMA_FOR_VERSION
             },
             'change_list': {
                 'schema': {
@@ -1219,9 +1058,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         # present in schema since these two are inherited from its parent class.
         'GET': {
             'v': {
-                'schema': {
-                    'type': 'int'
-                },
+                'schema': SCHEMA_FOR_VERSION,
                 'default_value': None
             },
             'apply_draft': {
@@ -1290,15 +1127,7 @@ class StateAnswerStatisticsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1316,15 +1145,7 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -1351,15 +1172,7 @@ class LearnerAnswerInfoHandler(EditorHandler):
             }
         },
         'entity_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of any entity_id
-                }, {
-                    'id': 'is_nonempty'
-                }]
-            }
+            'schema': SCHEMA_FOR_EXPLORATION_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
