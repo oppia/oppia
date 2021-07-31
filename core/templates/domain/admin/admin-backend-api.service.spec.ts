@@ -253,7 +253,7 @@ describe('Admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should handlefailing request when calling ' +
+  it('should handle failing request when calling ' +
       'fetchUsersAssignedToRoleAsync', fakeAsync(() => {
     let role = 'invalidRole';
     abas.fetchUsersAssignedToRoleAsync(role).then(successHandler, failHandler);

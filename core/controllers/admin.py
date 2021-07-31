@@ -731,7 +731,7 @@ class AdminRoleHandler(base.BaseHandler):
                 role=role)
             self.render_json({
                 'usernames': user_services.get_usernames_by_role(role)
-                })
+            })
         elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)
