@@ -5953,7 +5953,6 @@ export default {
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
   // Pages registered with angular router.
-
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": {
       "ROUTE": "about",
@@ -6018,8 +6017,8 @@ export default {
         }
       ]
     },
-    "LIBRARY_SEARCH": {
-      "ROUTE": "search/find",
+    "LIBRARY_RECENTLY_PUBLISHED": {
+      "ROUTE": "community-library/recently-published",
       "TITLE": "Oppia",
       "META": [
         {
@@ -6036,8 +6035,8 @@ export default {
         }
       ]
     },
-    "LIBRARY_RECENTLY_PUBLISHED": {
-      "ROUTE": "community-library/recently-published",
+    "LIBRARY_SEARCH": {
+      "ROUTE": "search/find",
       "TITLE": "Oppia",
       "META": [
         {
