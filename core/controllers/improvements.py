@@ -60,7 +60,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
                         'type': 'object_dict',
                         'validation_method': (
                             domain_objects_validator
-                            .validate_task_entriy_for_improvements
+                            .validate_task_entry_for_improvements
                         )
                     }
                 }
@@ -160,7 +160,13 @@ class ExplorationImprovementsConfigHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': 12 # Max length of an exploration_id
+                }, {
+                    'id': 'is_nonempty'
+                }]
             }
         }
     }

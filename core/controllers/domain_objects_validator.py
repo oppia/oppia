@@ -99,7 +99,7 @@ def validate_collection_change(obj):
     collection_domain.CollectionChange(obj)
 
 
-def validate_task_entriy_for_improvements(task_entry):
+def validate_task_entry_for_improvements(task_entry):
     # type: (Dict[String, Any]) -> None
     """Validates collection change.
 
@@ -120,5 +120,3 @@ def validate_task_entriy_for_improvements(task_entry):
     status = task_entry.get('status', None)
     if status is None:
         raise base.BaseHandler.InvalidInputException('No status provided')
-    # The issue_description is allowed to be None.
-    task_entry.get('issue_description', None)

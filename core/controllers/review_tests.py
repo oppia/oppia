@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
@@ -30,17 +31,29 @@ class ReviewTestsPage(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
             }
         },
         'topic_url_fragment': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+                }]
             }
         },
         'story_url_fragment': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+                }]
             }
         }
     }
@@ -64,17 +77,29 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
             }
         },
         'topic_url_fragment': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+                }]
             }
         },
         'story_url_fragment': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+                }]
             }
         }
     }
