@@ -19,7 +19,7 @@
  */
 
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
 
 require('domain/collection/collection-update.service.ts');
 require('domain/collection/collection-validation.service.ts');

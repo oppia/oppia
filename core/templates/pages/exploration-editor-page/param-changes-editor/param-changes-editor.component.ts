@@ -18,7 +18,7 @@
  */
 
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
 require(
   'pages/exploration-editor-page/param-changes-editor/' +
   'value-generator-editor.directive.ts');

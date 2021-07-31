@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
 require(
   'components/forms/custom-forms-directives/thumbnail-uploader.component.ts');
 require('domain/topic/topic-update.service.ts');

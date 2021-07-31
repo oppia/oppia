@@ -23,7 +23,7 @@ require(
 require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
-  'components/state-directives/solution-editor/solution-editor.directive.ts');
+  'components/state-directives/solution-editor/solution-editor.component.ts');
 require(
   'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
   'add-or-update-solution-modal.controller.ts');
