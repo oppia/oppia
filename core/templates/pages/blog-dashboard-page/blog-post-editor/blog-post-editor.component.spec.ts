@@ -192,7 +192,7 @@ describe('Blog Post Editor Component', () => {
     expect(component.defaultTagsList).toEqual(['news', 'Learners']);
     expect(component.maxAllowedTags).toEqual(2);
     expect(component.thumbnailDataUrl).toEqual(
-      '/assetsdevhandler/blog_post/sampleBlogId/assets/blog_post_thumbnail' +
+      '/assetsdevhandler/blog_post/sampleBlogId/assets/blog_post' +
       '/image.png');
     expect(component.dateTimeLastSaved).toEqual(
       'November 21, 2014 at 12:00 AM');
