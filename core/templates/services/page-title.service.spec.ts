@@ -28,8 +28,21 @@ describe('Page title service', () => {
     TestBed.configureTestingModule({
       providers: [PageTitleService, Title]
     });
-    titleService = TestBed.get(Title);
-    pts = TestBed.get(PageTitleService);
+    titleService = TestBed.inject(Title);
+    pts = TestBed.inject(PageTitleService);
+  });
+
+  it('should throw error if title for mobile is not set', () => {
+    expect(() => {
+      pts.getPageTitleForMobileView();
+    }).toThrowError('Page Title for mobile is not set');
+  });
+
+
+  it('should throw error if subtitle for mobile is not set', () => {
+    expect(() => {
+      pts.getPageSubtitleForMobileView();
+    }).toThrowError('Page Subtitle for mobile is not set');
   });
 
   it('should correctly set the page title', () => {

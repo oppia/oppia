@@ -24,8 +24,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class PageTitleService {
-  pageTitleForMobile: string = null;
-  pageSubtitleForMobile: string = null;
+  pageTitleForMobile: string | null = null;
+  pageSubtitleForMobile: string | null = null;
   constructor(
     private metaTagService: Meta,
     private titleService: Title) {}
@@ -66,10 +66,16 @@ export class PageTitleService {
   }
 
   getPageTitleForMobileView(): string {
+    if (this.pageTitleForMobile === null) {
+      throw new Error('Page Title for mobile is not set');
+    }
     return this.pageTitleForMobile;
   }
 
   getPageSubtitleForMobileView(): string {
+    if (this.pageSubtitleForMobile === null) {
+      throw new Error('Page Subtitle for mobile is not set');
+    }
     return this.pageSubtitleForMobile;
   }
 }

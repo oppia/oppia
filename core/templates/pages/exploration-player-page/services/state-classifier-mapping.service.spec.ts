@@ -76,7 +76,7 @@ describe('State classifier mapping service', () => {
       });
 
       let classifierData = new Classifier(
-        'TestClassifier', classifierFrozenModel.serialize(), 1);
+        'TestClassifier', <Uint8Array> classifierFrozenModel.serialize(), 1);
 
       beforeEach(() => {
         TestBed.configureTestingModule({
