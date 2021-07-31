@@ -244,8 +244,8 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
-    const noParentElement = generateContent('<html></html>');
-    const noChildElement = generateContent('dummy');
+    const noParentElement = document.createElement('html');
+    const noChildElement = document.createElement('dummy');
     expect(() => service.broadcastCopy(noParentElement)).toThrowError(
       'The element target should contain or be a descendant' +
       'of a widget, or be a plain HTML element/group'
