@@ -635,6 +635,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID_1, self.EXP_ID_0)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
@@ -1456,6 +1457,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         retrieved_object = user_models.ExplorationUserDataModel.get(
             self.USER_1_ID, self.EXP_ID_ONE)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
@@ -1804,6 +1806,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
 
         story_progress_models = user_models.StoryProgressModel.get_multi(
             'user_id', ['story_id_1', 'story_id_2'])
+        # Ruling out the possibility of None for mypy type checking.
         assert story_progress_models[0] is not None
         assert story_progress_models[1] is not None
         self.assertEqual(len(story_progress_models), 2)
@@ -1900,6 +1903,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             submitter_id=self.USER_ID_1).put()
 
         query_model = user_models.UserQueryModel.get(self.QUERY_1_ID)
+        # Ruling out the possibility of None for mypy type checking.
         assert query_model is not None
         self.assertEqual(query_model.submitter_id, self.USER_ID_1)
         self.assertEqual(
@@ -2131,6 +2135,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         retrieved_object = user_models.UserSkillMasteryModel.get(
             constructed_model_id)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.skill_id, self.SKILL_ID_1)
@@ -2153,6 +2158,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         retrieved_object = user_models.UserSkillMasteryModel.get_multi(
             skill_ids)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert retrieved_object[0] is not None
         assert retrieved_object[1] is not None
         self.assertEqual(retrieved_object[0].user_id, self.USER_1_ID)

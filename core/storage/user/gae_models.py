@@ -244,6 +244,7 @@ class UserSettingsModel(base_models.BaseModel):
             dict. Dictionary of the data from UserSettingsModel.
         """
         user = UserSettingsModel.get(user_id)
+        # Ruling out the possibility of None for mypy type checking.
         assert user is not None
         return {
             'email': user.email,
@@ -1197,6 +1198,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         if user_model is None:
             return {}
 
+        # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
         creator_user_models = UserSettingsModel.get_multi(
             user_model.creator_ids)
