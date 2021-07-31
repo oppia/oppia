@@ -46,6 +46,7 @@ from core.storage.opportunity import gae_models as opportunity_models
 from core.storage.question import gae_models as question_models
 from core.storage.recommendations import gae_models as recommendations_models
 from core.storage.skill import gae_models as skill_models
+from core.storage.statistics import gae_models as stats_models
 from core.storage.story import gae_models as story_models
 from core.storage.subtopic import gae_models as subtopic_models
 from core.storage.user import gae_models as user_models
@@ -70,6 +71,7 @@ __all__ = [
     b'question_models',
     b'recommendations_models',
     b'skill_models',
+    b'stats_models',
     b'story_models',
     b'subtopic_models',
     b'transaction_services',
