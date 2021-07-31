@@ -540,6 +540,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
         message = cls.get(thread_id, thread.message_count - 1)
+        # Ruling out the possibility of None for mypy type checking.
         assert message is not None
         return message
 

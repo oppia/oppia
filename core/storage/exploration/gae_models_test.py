@@ -275,6 +275,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
+        # Ruling out the possibility of None for mypy type checking.
         assert saved_model is not None
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
@@ -366,6 +367,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
+        # Ruling out the possibility of None for mypy type checking.
         assert saved_model is not None
 
         snapshot_dict = saved_model.compute_snapshot()
@@ -574,8 +576,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
-            # Here ignore[arg-type] is used to test method for invalid
-            # input type.
+            # TODO(#13528): Remove this test after the backend is fully
+            # type-annotated. Here ignore[arg-type] is used to test method
+            # get_all_non_private_commits() for invalid input type.
             results, _, more = (
                 exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1)) # type: ignore[arg-type]
@@ -606,6 +609,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_multi(
                 'a', [1, 2, 3]))
 
+        # Ruling out the possibility of None for mypy type checking.
         assert actual_models[0] is not None
         assert actual_models[1] is not None
         self.assertEqual(len(actual_models), 3)

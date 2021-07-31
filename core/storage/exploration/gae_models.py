@@ -333,6 +333,7 @@ class ExplorationModel(base_models.VersionedModel):
             versioned_and_exp_rights_models = python_utils.ZIP(
                 versioned_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
+                # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
@@ -719,6 +720,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
+        # Ruling out the possibility of None for mypy type checking.
         assert snapshot_metadata_model is not None
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |

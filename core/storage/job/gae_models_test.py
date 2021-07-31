@@ -91,6 +91,7 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
         self.assertTrue(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType2'))
         job2 = job_models.JobModel.get('MyJobId2', strict=True)
+        # Ruling out the possibility of None for mypy type checking.
         assert job2 is not None
         job2.status_code = job_models.STATUS_CODE_COMPLETED
         job2.update_timestamps()
