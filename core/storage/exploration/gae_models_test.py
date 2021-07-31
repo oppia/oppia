@@ -67,9 +67,10 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
-        result = (
-            exp_models.ExplorationModel.get_all().fetch(limit=1)[0])
-        saved_exploration = cast(exp_models.ExplorationModel, result)
+        saved_exploration = cast(
+            exp_models.ExplorationModel,
+            exp_models.ExplorationModel.get_all().fetch(limit=1)[0]
+        )
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')

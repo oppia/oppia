@@ -378,8 +378,10 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel | None. The UserSettingsModel instance which
             contains the same email.
         """
-        results = cls.query(cls.email == email).fetch()
-        filtered_users = cast(List[UserSettingsModel], results)
+        filtered_users = cast(
+            List[UserSettingsModel],
+            cls.query(cls.email == email).fetch()
+        )
         return None if not filtered_users else filtered_users[0]
 
     @classmethod
@@ -1200,12 +1202,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
-        creator_user_models = UserSettingsModel.get_multi(
-            user_model.creator_ids)
-
+        creator_user_models = cast(
+            List[UserSettingsModel],
+            UserSettingsModel.get_multi(user_model.creator_ids)
+        )
         creator_usernames = [
-            creator.username for creator in cast(
-                List[UserSettingsModel], creator_user_models)]
+            creator.username for creator in creator_user_models]
 
         user_data = {
             'exploration_ids': user_model.exploration_ids,
@@ -2426,8 +2428,10 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        results = cls.get_all().filter(cls.user_id == user_id).fetch()
-        mastery_models = cast(List[UserSkillMasteryModel], results)
+        mastery_models = cast(
+            List[UserSkillMasteryModel],
+            cls.get_all().filter(cls.user_id == user_id).fetch()
+        )
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
             user_data[mastery_model_skill_id] = {
@@ -2497,8 +2501,10 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             dict. Dictionary of the data from UserContributionProficiencyModel.
         """
         user_data = dict()
-        results = cls.query(cls.user_id == user_id).fetch()
-        scoring_models = cast(List[UserContributionProficiencyModel], results)
+        scoring_models = cast(
+            List[UserContributionProficiencyModel],
+            cls.query(cls.user_id == user_id).fetch()
+        )
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
@@ -2544,9 +2550,11 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             list(str). A list of score_categories where the user has score above
             the threshold.
         """
-        results = cls.get_all().filter(cls.user_id == user_id).filter(
-            cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
-        scoring_models = cast(List[UserContributionProficiencyModel], results)
+        scoring_models = cast(
+            List[UserContributionProficiencyModel],
+            cls.get_all().filter(cls.user_id == user_id).filter(
+                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+        )
         return (
             [scoring_model.score_category for scoring_model in scoring_models])
 
@@ -2756,12 +2764,12 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             translations in the given language code.
         """
-        results = (
+        reviewer_keys = cast(
+            List[datastore_services.Key],
             cls.query(
                 cls.can_review_translation_for_language_codes == language_code)
-            .fetch(keys_only=True))
-
-        reviewer_keys = cast(List[datastore_services.Key], results)
+            .fetch(keys_only=True)
+        )
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2777,11 +2785,12 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             voiceovers in the given language code.
         """
-        results = (
+        reviewer_keys = cast(
+            List[datastore_services.Key],
             cls.query(
                 cls.can_review_voiceover_for_language_codes == language_code)
-            .fetch(keys_only=True))
-        reviewer_keys = cast(List[datastore_services.Key], results)
+            .fetch(keys_only=True)
+        )
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2793,9 +2802,11 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to review
             questions.
         """
-        results = cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
-            keys_only=True)
-        reviewer_keys = cast(List[datastore_services.Key], results)
+        reviewer_keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
+                keys_only=True)
+        )
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2807,9 +2818,11 @@ class UserContributionRightsModel(base_models.BaseModel):
             list(str). A list of IDs of users who have rights to submit
             questions.
         """
-        results = cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
-            keys_only=True)
-        contributor_keys = cast(List[datastore_services.Key], results)
+        contributor_keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
+                keys_only=True)
+        )
         return [contributor_key.id() for contributor_key in contributor_keys]
 
 

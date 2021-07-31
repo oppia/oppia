@@ -176,9 +176,10 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        results = cls.get_all().filter(
-            cls.original_author_id == user_id).fetch()
-        models = cast(List[GeneralFeedbackThreadModel], results)
+        models = cast(
+            List[GeneralFeedbackThreadModel],
+            cls.get_all().filter(cls.original_author_id == user_id).fetch()
+        )
 
         for feedback_model in models:
             user_data[feedback_model.id] = {
@@ -358,8 +359,10 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         """
 
         user_data = dict()
-        results = cls.get_all().filter(cls.author_id == user_id).fetch()
-        models = cast(List[GeneralFeedbackMessageModel], results)
+        models = cast(
+            List[GeneralFeedbackMessageModel],
+            cls.get_all().filter(cls.author_id == user_id).fetch()
+        )
 
         for feedback_model in models:
             user_data[feedback_model.id] = {
@@ -570,12 +573,13 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             list(int). List of the message counts for the threads.
         """
-        thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
-        thread_models_without_none = cast(
-            List[GeneralFeedbackThreadModel], thread_models)
+        thread_models = cast(
+            List[GeneralFeedbackThreadModel],
+            GeneralFeedbackThreadModel.get_multi(thread_ids)
+        )
         return [
             thread_model.message_count
-            for thread_model in thread_models_without_none]
+            for thread_model in thread_models]
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
