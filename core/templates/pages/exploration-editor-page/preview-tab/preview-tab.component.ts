@@ -82,7 +82,8 @@ angular.module('oppia').component('previewTab', {
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
         var deferred = $q.defer();
 
-        console.error('[DEBUGGING] Called getUnsetParametersInfo');
+        console.error(
+          '[DEBUGGING] Called getUnsetParametersInfo from previewTab');
         var unsetParametersInfo = ParameterMetadataService
           .getUnsetParametersInfo([initStateNameForPreview]);
 

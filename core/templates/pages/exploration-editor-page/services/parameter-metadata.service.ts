@@ -137,7 +137,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
         var allParamNames = [];
         console.error(
           `[DEBUGGING] ExplorationParamChangesService.savedMemento
-          ${ExplorationParamChangesService.savedMemento}`
+          "${ExplorationParamChangesService.savedMemento}"`
         );
         var expParamChangesMetadata = getMetadataFromParamChanges(
           ExplorationParamChangesService.savedMemento);
