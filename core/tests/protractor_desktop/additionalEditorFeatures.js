@@ -449,6 +449,7 @@ describe('Full exploration editor', function() {
     });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([]);
+    // REMOVE_BEFORE_MERGE.
+    await general.checkForConsoleErrors([], false);
   });
 });

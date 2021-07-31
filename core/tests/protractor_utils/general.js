@@ -57,17 +57,20 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
     'load resource: net::ERR_CERT_DATE_INVALID'),
-  // REMOVE_BEFORE_MERGE.
-  _.escapeRegExp('[DEBUGGING]')
 ];
 
-var checkForConsoleErrors = async function(errorsToIgnore) {
+var checkForConsoleErrors = async function(
+    errorsToIgnore, skipDebugging = true) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
   // This causes the tests to fail, therefore, we remove such logs.
   if (browser.isMobile) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
+  }
+  // REMOVE_BEFORE_MERGE.
+  if (skipDebugging) {
+    errorsToIgnore.push(_.escapeRegExp('[DEBUGGING]'));
   }
 
   var browserLogs = await browser.manage().logs().get('browser');

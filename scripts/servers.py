@@ -445,6 +445,12 @@ def managed_portserver():
         sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
     import psutil
 
+    # Check if a socket file exists. This file can exist when previous instance
+    # of the portserver did not close properly. We need to remove as otherwise
+    # the portserver will fail to start.
+    if os.path.exists(common.PORTSERVER_SOCKET_FILEPATH):
+        os.remove(common.PORTSERVER_SOCKET_FILEPATH)
+
     portserver_args = [
         'python', '-m', 'scripts.run_portserver',
         '--portserver_unix_socket_address', common.PORTSERVER_SOCKET_FILEPATH,

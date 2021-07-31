@@ -480,8 +480,7 @@ class Server(python_utils.OBJECT):
             sock.bind(path)
         except socket.error as err:
             raise RuntimeError(
-                'Failed to bind socket {}. Error: {}'.format(
-                    path, err)
+                'Failed to bind socket {}. Error: {}'.format(path, err)
             )
         sock.listen(self.max_backlog)
         return sock
@@ -495,10 +494,12 @@ class Server(python_utils.OBJECT):
             is created.
         """
         if hasattr(socket, 'AF_UNIX'):
-            return socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         else:
             # Fallback to AF_INET if this is not unix.
-            return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return sock
 
 
 def main():
