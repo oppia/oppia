@@ -64,7 +64,7 @@ describe('parameterNameEditor', () => {
   it('should return true if the available param names are not empty', () => {
     ctrl.$onInit();
 
-    expect(ctrl.validate()).toBe(2);
+    expect(ctrl.validate()).toBeTrue();
   });
 
   it('should return false if the available param names is empty', () => {
@@ -72,7 +72,7 @@ describe('parameterNameEditor', () => {
       and.returnValue([]);
     ctrl.$onInit();
 
-    expect(ctrl.validate()).toBe(0);
+    expect(ctrl.validate()).toBeFalse();
   });
 
   it('should update value when user enter new local value', () => {

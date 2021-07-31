@@ -30,7 +30,7 @@ angular.module('oppia').component('parameterNameEditor', {
     function($scope, ExplorationParamSpecsService) {
       var ctrl = this;
       ctrl.validate = function() {
-        return ctrl.availableParamNames.length;
+        return ctrl.availableParamNames.length !== 0;
       };
       ctrl.$onInit = function() {
         // Reset the component each time the value changes (e.g. if this is
