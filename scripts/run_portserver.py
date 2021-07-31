@@ -529,6 +529,7 @@ def main():
         server.close()
         request_handler.dump_stats()
         python_utils.PRINT('Shutting down portserver.')
+        sys.exit(0)
 
 
 if __name__ == '__main__':
