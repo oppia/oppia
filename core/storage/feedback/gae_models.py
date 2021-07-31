@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Optional, Text, Tuple, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -164,7 +164,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Any]
+        # type: (Text) -> Dict[Text, Union[Text, bool, None]]
         """Exports the data from GeneralFeedbackThreadModel
         into dict format for Takeout.
 
@@ -346,7 +346,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Any]
+        # type: (Text) -> Dict[Text, Union[Text, int, bool, None]]
         """Exports the data from GeneralFeedbackMessageModel
         into dict format for Takeout.
 

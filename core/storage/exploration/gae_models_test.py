@@ -458,6 +458,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_all_viewer_ids_field_successful(self):
         # type: () -> None
+        # TODO(#13523): Use of Any in the type-annotation below will be
+        # removed when the snapshot of ExplorationRightsModel
+        # is converted to TypedDict/Domain Object.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['all_viewer_ids'] = [
             self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
@@ -485,6 +488,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_invalid_status_is_successful(self):
         # type: () -> None
+        # TODO(#13523): Use of Any in the type-annotation below will be
+        # removed when the snapshot of ExplorationRightsModel
+        # is converted to TypedDict/Domain Object.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['status'] = 'publicized'
 

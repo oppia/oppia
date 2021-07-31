@@ -26,7 +26,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any, Text # isort:skip # pylint: disable=unused-import
+from typing import Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover

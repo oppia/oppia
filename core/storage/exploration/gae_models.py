@@ -269,6 +269,8 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -348,6 +350,8 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
+    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
+    # to remove Any used below.
     @staticmethod
     def convert_to_valid_dict(snapshot_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -376,6 +380,8 @@ class ExplorationModel(base_models.VersionedModel):
 
         return snapshot_dict
 
+    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
+    # to remove Any used below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> ExplorationModel
         """Populates the model instance with the snapshot.
@@ -585,6 +591,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def save(self, committer_id, commit_message, commit_cmds):
         # type: (Text, Text, List[Dict[Text, Any]]) -> None
         """Saves a new version of the exploration, updating the Exploration
@@ -607,6 +615,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
+    # to remove Any used below.
     @staticmethod
     def convert_to_valid_dict(model_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -657,6 +667,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         return model_dict
 
+    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
+    # to remove Any used below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> ExplorationRightsModel
         """Populates the model instance with the snapshot.
@@ -678,6 +690,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
