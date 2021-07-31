@@ -177,7 +177,7 @@ describe('Exploration editor page component', function() {
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
     state_classifier_mapping: [],
-    is_admin: true,
+    is_curriculum_admin: true,
     is_moderator: true,
     user: {},
     version: '1',
@@ -547,7 +547,7 @@ describe('Exploration editor page component', function() {
         '/createhandler/revert/' + explorationId);
       expect(ctrl.areExplorationWarningsVisible).toBeFalse();
 
-      expect(ctrl.currentUserIsAdmin).toBeTrue();
+      expect(ctrl.currentUserIsCurriculumAdmin).toBeTrue();
       expect(ctrl.currentUserIsModerator).toBeTrue();
       expect(ctrl.currentUser).toEqual(explorationData.user);
       expect(ctrl.currentVersion).toBe(explorationData.version);
