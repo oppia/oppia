@@ -67,7 +67,7 @@ describe('Blog Post Page service', () => {
 
   it('should navigate to different tabs', function() {
     expect(blogDashboardPageService.activeTab).toEqual('main');
-    blogDashboardPageService.navigateToEditorTabWithId('sampleId');
+    blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
     expect(blogDashboardPageService.activeTab).toEqual('editor_tab');
     blogDashboardPageService.navigateToMainTab();
     expect(blogDashboardPageService.activeTab).toEqual('main');
@@ -114,7 +114,7 @@ describe('Blog Post Page service', () => {
       expect(blogPostEditorBackendApiService.deleteBlogPostAsync)
         .toHaveBeenCalled();
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Deleted Successfully.');
+        'Blog Post Deleted Successfully.', 5000);
       expect(blogDashboardPageService.activeTab).toBe('main');
     }));
 });

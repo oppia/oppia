@@ -105,10 +105,7 @@ describe('Blog Post Editor backend api service', () => {
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith({
-      status: 500,
-      statusText: 'Error loading blog post.'
-    });
+    expect(failHandler).toHaveBeenCalledWith(500);
   }));
 
   it('should successfully delete a blog post', fakeAsync(() => {

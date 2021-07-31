@@ -100,7 +100,6 @@ describe('Blog Post Editor Component', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        BlogPostData,
         BlogDashboardPageService,
         BlogPostUpdateService,
         BlogPostEditorBackendApiService,

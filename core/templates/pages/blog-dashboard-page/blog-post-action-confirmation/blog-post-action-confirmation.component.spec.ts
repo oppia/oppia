@@ -127,7 +127,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
     expect(component.isActionUnpublish()).toBe(false);
 
-    component.blogPostAction = 'unpublish';
+    component.blogPostAction = 'publish';
     component.isActionUnpublish();
 
     expect(component.isActionUnpublish()).toBe(false);

@@ -18,7 +18,6 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
@@ -47,7 +46,10 @@ describe('Blog Dashboard Page Component', () => {
         href: '',
         hash: '/'
       },
-      open: (url) => {}
+      open: (url) => {},
+      onhashchange() {
+        return this.location._hashChange;
+      },
     };
   }
 
@@ -96,7 +98,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize tab according to url', () => {
+  it('should initialize tab according to url', fakeAsync(() => {
     spyOn(component, 'initMainTab');
 
     component.ngOnInit();
@@ -105,9 +107,10 @@ describe('Blog Dashboard Page Component', () => {
 
     mockWindowRef.nativeWindow.location.hash = '/blog_post_editor/123456ABCEFG';
     component.ngOnInit();
+    tick();
     expect(component.activeTab).toBe('editor_tab');
     expect(component.initMainTab).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should initialize main tab', fakeAsync(() => {
     let defaultImageUrl = 'banner_image_url';
@@ -145,7 +148,7 @@ describe('Blog Dashboard Page Component', () => {
         .and.returnValue(defaultImageUrl);
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(blogDashboardBackendApiService, 'fetchBlogDashboardDataAsync')
-        .and.returnValue(Promise.reject({ status: 500 }));
+        .and.returnValue(Promise.reject(500));
       spyOn(alertsService, 'addWarning');
 
       component.ngOnInit();
@@ -160,9 +163,6 @@ describe('Blog Dashboard Page Component', () => {
     }));
 
   it('should succesfully create new blog post', fakeAsync(() => {
-    let updateViewEventEmitter = new EventEmitter();
-    spyOn(blogDashboardPageService, 'updateViewEventEmitter')
-      .and.returnValue(updateViewEventEmitter);
     spyOn(blogDashboardBackendApiService, 'createBlogPostAsync')
       .and.returnValue(Promise.resolve('123456abcdef'));
     spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
@@ -185,7 +185,7 @@ describe('Blog Dashboard Page Component', () => {
       spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
       spyOn(alertsService, 'addWarning');
 
-      component.ngOnInit();
+      component.createNewBlogPost();
       tick();
 
       expect(blogDashboardBackendApiService.createBlogPostAsync)

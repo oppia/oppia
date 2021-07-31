@@ -80,7 +80,7 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
       }, (errorResponse) => {
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(
-            errorResponse.status) !== -1) {
+            errorResponse) !== -1) {
           this.alertsService.addWarning('Failed to get blog dashboard data');
         }
       });

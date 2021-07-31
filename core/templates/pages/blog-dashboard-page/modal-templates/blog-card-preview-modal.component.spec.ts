@@ -27,6 +27,8 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
 import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { BlogCardComponent } from '../blog-card/blog-card.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
@@ -46,7 +48,7 @@ class MockTruncatePipe {
 }
 
 
-describe('Blog Post Action Confirmation Modal Component', () => {
+describe('Blog Card Preview Modal Component', () => {
   let component: BlogCardPreviewModalComponent;
   let blogDashboardPageService: BlogDashboardPageService;
   let fixture: ComponentFixture<BlogCardPreviewModalComponent>;
@@ -60,6 +62,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
     last_updated: '11/21/2014, 09:45:00',
+    published_on: '11/21/2014, 09:45:00',
   };
 
   beforeEach(waitForAsync(() => {
@@ -68,12 +71,13 @@ describe('Blog Post Action Confirmation Modal Component', () => {
         HttpClientTestingModule,
         NgbModalModule,
         MatCardModule,
-        MatIconModule
+        MatIconModule,
       ],
-      declarations: [BlogCardPreviewModalComponent],
+      declarations: [
+        BlogCardPreviewModalComponent,
+        BlogCardComponent,
+        MockTranslatePipe],
       providers: [
-        BlogPostData,
-        BlogPostSummary,
         BlogDashboardPageService,
         {
           provide: NgbActiveModal,
@@ -91,6 +95,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     blogPostData = BlogPostData.createFromBackendDict(
       sampleBlogPostBackendDict);
+    console.error(blogPostData);
   }));
 
   it('should initialize correctly', () => {
@@ -98,7 +103,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
       blogPostData.id,
       blogPostData.authorUsername,
       blogPostData.title,
-      'hello',
+      '<p>hello</p>',
       blogPostData.tags,
       blogPostData.thumbnailFilename,
       blogPostData.urlFragment,
@@ -109,7 +114,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
     component.ngOnInit();
 
-    expect(component.blogPostSummary).toBe(
+    expect(component.blogPostSummary).toEqual(
       expectedBlogPostSummary);
     expect(component.profilePicUrl).toBe('sample-url');
   });

@@ -17,6 +17,7 @@
  */
 
 import { Injectable, EventEmitter } from '@angular/core';
+import { Location } from '@angular/common';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -44,10 +45,15 @@ export class BlogDashboardPageService {
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
+    private location: Location,
     private windowRef: WindowRef,
   ) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._setActiveTab(currentHash);
+    this.windowRef.nativeWindow.onhashchange = () => {
+      let newHash: string = this.windowRef.nativeWindow.location.hash;
+      this._setActiveTab(newHash);
+    };
   }
 
   private _setActiveTab(hash: string) {
@@ -72,9 +78,6 @@ export class BlogDashboardPageService {
   navigateToMainTab(): void {
     this.windowRef.nativeWindow.location.hash = '/';
     this._setActiveTab('/');
-    // // The reload is needed in order to flush the blog post data from
-    // // blog post update service and dashboard page service.
-    // this.windowRef.nativeWindow.location.reload();
   }
 
   set blogPostAction(action: string) {
