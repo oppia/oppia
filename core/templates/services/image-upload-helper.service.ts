@@ -42,7 +42,7 @@ export class ImageUploadHelperService {
 
   // Image file returned will be null when blob is not of type
   // 'image' or blob size is zero.
-  convertImageDataToImageFile(dataURI: string): Blob {
+  convertImageDataToImageFile(dataURI: string): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     let byteString = atob(dataURI.split(',')[1]);
