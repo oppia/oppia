@@ -43,6 +43,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   subtopicTitle: string;
   parentTopicId: string;
   nextSubtopic: Subtopic;
+
   constructor(
     private alertsService: AlertsService,
     private contextService: ContextService,
