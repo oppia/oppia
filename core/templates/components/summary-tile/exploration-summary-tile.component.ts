@@ -79,8 +79,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // A null value for 'lastUpdatedDateTime' indicates that lastUpdatedMsecs
   // received after component interactions is empty or does not exist.
   lastUpdatedDateTime: string | null = '';
-  // 'avgRating' will be undefined if the exploration has no ratings.
-  avgRating!: number | undefined;
+  // 'avgRating' will be null if the exploration has no ratings.
+  avgRating!: number | null;
   thumbnailIcon!: string;
 
   constructor(
@@ -148,12 +148,12 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   }
 
   // Function will return undefined when Exploration Ratings are not present.
-  getAverageRating(): number | undefined {
+  getAverageRating(): number | null {
     if (this.getRatings) {
       return this.ratingComputationService.computeAverageRating(
         this.getRatings);
     }
-    return undefined;
+    return null;
   }
 
   // Function will return null when the property 'getLastUpdatedMsec' is null

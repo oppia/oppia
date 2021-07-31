@@ -333,14 +333,14 @@ describe('Exploration Summary Tile Component', () => {
     ' if rating are undefined', fakeAsync(() => {
     const ratingsSpy = spyOn(
       ratingComputationService, 'computeAverageRating')
-      .and.returnValue(undefined);
+      .and.returnValue(null);
 
     let averageRatings = component.getAverageRating();
     tick();
     fixture.detectChanges();
 
     expect(ratingsSpy).not.toHaveBeenCalled();
-    expect(averageRatings).toBeUndefined();
+    expect(averageRatings).toBeNull();
   }));
 
   it('should get last updated Date & time', () => {
