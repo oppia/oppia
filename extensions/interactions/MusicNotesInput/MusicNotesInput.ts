@@ -28,7 +28,7 @@ require(
   'oppia-interactive-music-notes-input.directive.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'oppia-response-music-notes-input.directive.ts');
+  'oppia-response-music-notes-input.component.ts');
 require(
   'interactions/MusicNotesInput/directives/' +
-  'oppia-short-response-music-notes-input.directive.ts');
+  'oppia-short-response-music-notes-input.component.ts');

@@ -13,32 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the PencilCodeEditor short response.
+ * @fileoverview Directive for the PencilCodeEditor response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
-
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaShortResponsePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./pencil-code-editor-short-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answerCode = (
-            HtmlEscaperService.escapedJsonToObj($attrs.answer).code);
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').component('oppiaResponsePencilCodeEditor', {
+  template: require('./pencil-code-editor-response.component.html'),
+  controllerAs: '$ctrl',
+  controller: ['$attrs', 'HtmlEscaperService',
+    function($attrs, HtmlEscaperService) {
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
+          $attrs.answer).code;
+      };
+    }]
+});
