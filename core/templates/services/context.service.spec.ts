@@ -420,7 +420,7 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('100');
       expect(ecs.getEntityType()).toBe('other');
       ecs.removeCustomEntityContext();
-      expect(ecs.customEntityContext).toBeNull();
+      expect(ContextService.customEntityContext).toBeNull();
     });
   });
 
