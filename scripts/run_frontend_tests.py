@@ -54,6 +54,11 @@ _PARSER.add_argument(
     help='optional; if specified, skips installing dependencies',
     action='store_true')
 _PARSER.add_argument(
+    '--verbose',
+    help='optional; if specified, enables the karma terminal and prints all the'
+    ' logs.',
+    action='store_true')
+_PARSER.add_argument(
     '--run_minified_tests',
     help='optional; if specified, runs frontend karma tests on both minified '
     'and non-minified code',
@@ -124,6 +129,9 @@ def main(args=None):
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
+    if parsed_args.verbose:
+        cmd.append('--terminalEnabled')
+
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
     # Reads and prints realtime output from the subprocess until it terminates.
@@ -132,7 +140,8 @@ def main(args=None):
         # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
-        if line:
+        # Suppressing the karma web-serevr logs.
+        if line and not u'[web-server]:' in line.decode('utf-8'):
             python_utils.PRINT(line, end='')
             output_lines.append(line)
     concatenated_output = ''.join(

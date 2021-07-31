@@ -13,13 +13,15 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
+      <div ng-controller="Base" dir="<[direction]>">
         <oppia-base-content>
           <navbar-breadcrumb>
             <oppia-blog-dashboard-navbar-breadcrumb>
             </oppia-blog-dashboard-navbar-breadcrumb>
           </navbar-breadcrumb>
           <content>
+            <oppia-blog-dashboard-page>
+            </oppia-blog-dashboard-page>
           </content>
           <page-footer></page-footer>
         </oppia-base-content>
@@ -27,6 +29,5 @@
 
     </oppia-root>
     @load('pages/footer_js_libs.html')
-    <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
   </body>
 </html>
