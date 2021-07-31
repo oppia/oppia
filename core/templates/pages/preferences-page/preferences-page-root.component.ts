@@ -17,9 +17,57 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { MetaTagCustomizationService, MetaAttribute } from 'services/contextual/meta-tag-customization.service';
+import { UrlService } from 'services/contextual/url.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-preferences-page-root',
   templateUrl: './preferences-page-root.component.html'
 })
-export class PreferencesPageRootComponent {}
+export class PreferencesPageRootComponent {
+  showPage: boolean = false;
+  showError: boolean = false;
+
+  constructor(
+    private accessValidationBackendApiService:
+    AccessValidationBackendApiService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService,
+    private metaTagCustomizationService: MetaTagCustomizationService, 
+  ) {}
+
+  ngOnInit(): void {
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+
+    let metaAttributes: MetaAttribute[] = [];
+    for (let i = 0; i < pageData.META.length; i++) {
+      metaAttributes.push({
+        propertyType: pageData.META[i].PROPERTY_TYPE,
+        propertyValue: pageData.META[i].PROPERTY_VALUE,
+        content: pageData.META[i].CONTENT
+      });
+    }
+    // Update meta tags.
+    this.metaTagCustomizationService.addOrReplaceMetaTags(metaAttributes);
+
+    this.loaderService.showLoadingScreen('Loading');
+    this.accessValidationBackendApiService.validateCanManageOwnAccount()
+      .then((resp) => {
+        if (!resp.valid) {
+          this.showError = true;
+        } else {
+          this.showPage = true;
+        }
+        this.loaderService.hideLoadingScreen();
+      }, (err) => {
+        this.showError = true;
+        this.loaderService.hideLoadingScreen();
+      });
+  }
+}

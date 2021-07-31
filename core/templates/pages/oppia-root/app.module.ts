@@ -19,6 +19,22 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 
+// Config for ToastrModule (helps in flashing messages and alerts).
+const toastrConfig = {
+  allowHtml: false,
+  iconClasses: {
+    error: 'toast-error',
+    info: 'toast-info',
+    success: 'toast-success',
+    warning: 'toast-warning'
+  },
+  positionClass: 'toast-bottom-right',
+  messageClass: 'toast-message',
+  progressBar: false,
+  tapToDismiss: true,
+  titleClass: 'toast-title'
+};
+
 // Modules.
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -31,6 +47,7 @@ import { OppiaRootComponent } from './oppia-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CookieModule } from 'ngx-cookie';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -39,6 +56,7 @@ import { CookieModule } from 'ngx-cookie';
     CookieModule.forRoot(),
     HttpClientModule,
     AppRoutingModule,
+    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     OppiaRootComponent,

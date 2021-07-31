@@ -17,9 +17,44 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-release-coordinator-page-root',
   templateUrl: './release-coordinator-page-root.component.html'
 })
-export class ReleaseCoordinatorPageRootComponent {}
+export class ReleaseCoordinatorPageRootComponent {
+  showPage: boolean = false;
+  showError: boolean = false;
+
+  constructor(
+    private accessValidationBackendApiService:
+    AccessValidationBackendApiService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService,
+  ) {}
+
+  ngOnInit(): void {
+    let pageData = (
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE);
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+    this.loaderService.showLoadingScreen('Loading');
+    this.accessValidationBackendApiService
+      .validateAccessToReleaseCoordinatorPage()
+      .then((resp) => {
+        if (!resp.valid) {
+          this.showError = true;
+        } else {
+          this.showPage = true;
+        }
+        this.loaderService.hideLoadingScreen();
+      }, (err) => {
+        this.showError = true;
+        this.loaderService.hideLoadingScreen();
+      });
+  }
+}

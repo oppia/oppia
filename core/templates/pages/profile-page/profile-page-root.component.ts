@@ -17,9 +17,45 @@
  */
 
 import { Component } from '@angular/core';
+import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
+import { LoaderService } from 'services/loader.service';
+import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-profile-page-root',
   templateUrl: './profile-page-root.component.html'
 })
-export class ProfilePageRootComponent {}
+export class ProfilePageRootComponent {
+  showProfile: boolean = false;
+  showError: boolean = false;
+
+  constructor(
+    private accessValidationBackendApiService:
+    AccessValidationBackendApiService,
+    private loaderService: LoaderService,
+    private pageTitleService: PageTitleService,
+    private urlService: UrlService,
+  ) {}
+
+  ngOnInit(): void {
+    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE;
+    // Update default title.
+    this.pageTitleService.setPageTitle(pageData.TITLE);
+    let username = this.urlService.getPathname().split('/')[2];
+    this.loaderService.showLoadingScreen('Loading');
+    this.accessValidationBackendApiService.doesProfileExist(username)
+      .then((resp) => {
+        if (!resp.valid) {
+          this.showError = true;
+        } else {
+          this.showProfile = true;
+        }
+        this.loaderService.hideLoadingScreen();
+      }, (err) => {
+        this.showError = true;
+        this.loaderService.hideLoadingScreen();
+      });
+  }
+}

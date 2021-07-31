@@ -1,5 +1,4 @@
-
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,24 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for profile page
+ * @fileoverview Routing module for profile page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { ProfilePageRootComponent } from './profile-page-root.component';
 
-import { UrlService } from 'services/contextual/url.service';
-
-@Component({
-  selector: 'profile-page-navbar',
-  templateUrl: './profile-page-navbar.component.html',
-  styleUrls: []
-})
-export class ProfilePageNavbarComponent implements OnInit {
-  constructor(
-    private urlService: UrlService
-  ) {}
-  username: string = '';
-  ngOnInit(): void {
-    this.username = this.urlService.getUsernameFromProfileUrl();
+const routes: Route[] = [
+  {
+    path: '',
+    component: ProfilePageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class ProfilePageRoutingModule {}
