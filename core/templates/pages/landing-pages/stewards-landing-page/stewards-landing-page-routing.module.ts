@@ -13,25 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root Component for stewards landing page.
+ * @fileoverview Routing module for stewards landing page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageTitleService } from 'services/page-title.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { StewardsLandingPageRootComponent } from './stewards-landing-page-root.component';
 
-@Component({
-  selector: 'oppia-stewards-landing-page-root',
-  templateUrl: './stewards-landing-page-root.component.html'
-})
-export class StewardsLandingPageRootComponent {
-  constructor(
-    private pageTitleService: PageTitleService
-  ) {}
-
-  ngOnInit(): void {
-    let pageData = AppConstants.STEWARDS_LANDING_PAGE;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
+const routes: Route[] = [
+  {
+    path: '',
+    component: StewardsLandingPageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class StewardsLandingPageRoutingModule {}

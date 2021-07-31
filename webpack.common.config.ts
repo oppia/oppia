@@ -122,9 +122,6 @@ module.exports = {
     signup: commonPrefix + '/pages/signup-page/signup-page.import.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
-    stewards:
-      commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
-      'stewards-landing-page.import.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.import.ts',
     story_viewer:
@@ -529,17 +526,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/skill-editor-page/' +
         'skill-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['stewards'],
-      filename: 'stewards-landing-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/landing-pages/stewards-landing-page/' +
-        'stewards-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

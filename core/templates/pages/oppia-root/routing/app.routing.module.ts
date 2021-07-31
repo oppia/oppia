@@ -104,14 +104,26 @@ const routes: Route[] = [
     canLoad: [CanAccessSplashPageGuard],
     loadChildren: () => import('pages/splash-page/splash-page.module')
       .then(m => m.SplashPageModule)
-  },
-  {
-    path: '**',
-    loadChildren: () => import(
-      'pages/error-pages/error-404/error-404-page.module').then(
-      m => m.Error404PageModule)
   }
 ];
+
+// Register stewards landing pages.
+for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
+  routes.push({
+    path: AppConstants.STEWARDS_LANDING_PAGE.ROUTES[i],
+    loadChildren: () => import(
+      'pages/landing-pages/stewards-landing-page/stewards-landing-page.module')
+      .then(m => m.StewardsLandingPageModule)
+  });
+}
+
+// Add error page for not found routes.
+routes.push({
+  path: '**',
+  loadChildren: () => import(
+    'pages/error-pages/error-404/error-404-page.module').then(
+    m => m.Error404PageModule)
+});
 
 @NgModule({
   imports: [

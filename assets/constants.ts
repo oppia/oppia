@@ -6135,6 +6135,12 @@ export default {
     }
   },
 
+  "STEWARDS_LANDING_PAGE": {
+    "ROUTES": ["parents", "partners", "nonprofits", "teachers", "volunteers"],
+    "TITLE": "Getting Started with Oppia",
+    "META": []
+  },
+
   "DEV_MODE": true,
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",

@@ -452,22 +452,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_PARTNERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-    get_redirect_route(
-        r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
-
     get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler),
@@ -923,6 +907,12 @@ if constants.DEV_MODE:
         get_redirect_route(
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
+
+# Adding redirects for all stewards landing pages.
+for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
+    URLS.append(
+        get_redirect_route(
+            r'/%s' % stewards_route, oppia_root.OppiaRootPage))
 
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
