@@ -5953,6 +5953,7 @@ export default {
   "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
 
   // Pages registered with angular router.
+
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": {
       "ROUTE": "about",
@@ -6132,6 +6133,12 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
+    },
+    "STORY_VIEWER": {
+      // eslint-disable-next-line max-len
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
+      "TITLE": "Oppia",
+      "META": []
     }
   },
 

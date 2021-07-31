@@ -36,10 +36,11 @@ import utils
 class StoryPage(base.BaseHandler):
     """Page describing a single story."""
 
-    @acl_decorators.can_access_story_viewer_page
-    def get(self, _):
+    @acl_decorators.open_access
+    def get(
+        self, classroom_url_fragment, topic_url_fragment, story_url_fragment):
         """Handles GET requests."""
-        self.render_template('story-viewer-page.mainpage.html')
+        self.render_template('oppia-root.mainpage.html')
 
 
 class StoryPageDataHandler(base.BaseHandler):

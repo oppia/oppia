@@ -104,6 +104,13 @@ const routes: Route[] = [
     canLoad: [CanAccessSplashPageGuard],
     loadChildren: () => import('pages/splash-page/splash-page.module')
       .then(m => m.SplashPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_VIEWER.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () => import(
+      'pages/story-viewer-page/story-viewer-page.module')
+      .then(m => m.StoryViewerPageModule)
   }
 ];
 

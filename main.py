@@ -349,6 +349,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
+    # Usually all frontend pages are served using OppiaRootPage handler
+    # but this is a special case as this route contains a url fragment.
     get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),

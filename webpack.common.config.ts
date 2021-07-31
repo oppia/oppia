@@ -124,8 +124,6 @@ module.exports = {
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.import.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.import.ts',
-    story_viewer:
-      commonPrefix + '/pages/story-viewer-page/story-viewer-page.import.ts',
     subtopic_viewer:
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
@@ -537,16 +535,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['story_viewer'],
-      filename: 'story-viewer-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/story-viewer-page/' +
-        'story-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

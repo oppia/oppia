@@ -27,7 +27,7 @@ import { StewardsLandingPageRoutingModule } from './stewards-landing-page-routin
   imports: [
     CommonModule,
     SharedComponentsModule,
-    StewardsLandingPageRoutingModule
+    StewardsLandingPageRoutingModule,
   ],
   declarations: [
     StewardsLandingPageComponent,
