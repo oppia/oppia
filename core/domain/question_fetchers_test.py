@@ -16,8 +16,8 @@
 
 """Tests for methods defined in question fetchers.."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import question_domain
 from core.domain import question_fetchers
@@ -36,13 +36,13 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(QuestionFetchersUnitTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)

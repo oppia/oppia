@@ -14,8 +14,8 @@
 
 """Models for Oppia suggestions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -48,7 +48,7 @@ MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS = 30
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
-    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
+    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT: feconf.ROLE_ID_FULL_USER
 }
 
 # Constants defining various contribution types.

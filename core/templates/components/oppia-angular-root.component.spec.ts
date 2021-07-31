@@ -70,6 +70,12 @@ describe('OppiaAngularRootComponent', function() {
     emitSpy = spyOn(component.initialized, 'emit');
   }));
 
+  it('should only intialize rteElements once', () => {
+    expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
+    expect(TestBed.createComponent(
+      OppiaAngularRootComponent).componentInstance).toBeDefined();
+  });
+
   it('should emit once ngAfterViewInit is called', () => {
     spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(
       () => {});

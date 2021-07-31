@@ -18,8 +18,8 @@
 Also contains a list of handler class names which does not contain the schema.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import schema_utils
 
@@ -79,16 +79,12 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
 # maintained. Please remove the name of the handlers if they already
 # contains schema.
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
-    'AboutRedirectPage',
     'AllTopicNamesHandler',
     'AnswerSubmittedEventHandler',
     'AssetDevHandler',
     'AudioUploadHandler',
     'BulkEmailWebhookEndpoint',
     'CollectionSummariesHandler',
-    'ConsoleErrorPage',
-    'CreatorDashboardHandler',
-    'CreatorDashboardPage',
     'DeferredTasksHandler',
     'DeleteAccountHandler',
     'DeleteAccountPage',
@@ -132,9 +128,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'FetchSkillsHandler',
     'FlagExplorationEmailHandler',
     'FlagExplorationHandler',
-    'ForumRedirectPage',
-    'FoundationRedirectPage',
-    'FractionLandingRedirectPage',
     'ImageUploadHandler',
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
@@ -142,13 +135,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'JobsHandler',
     'LearnerAnswerDetailsSubmissionHandler',
     'LearnerAnswerInfoHandler',
-    'LearnerDashboardFeedbackThreadHandler',
-    'LearnerDashboardHandler',
-    'LearnerDashboardIdsHandler',
-    'LearnerDashboardPage',
     'LearnerGoalsHandler',
     'LearnerIncompleteActivityHandler',
-    'LearnerPlaylistHandler',
     'LeaveForRefresherExpEventHandler',
     'LibraryGroupIndexHandler',
     'LibraryGroupPage',
@@ -158,17 +146,12 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'MemoryCacheAdminHandler',
     'MemoryCacheHandler',
     'MergeSkillHandler',
-    'NewCollectionHandler',
-    'NewExplorationHandler',
     'NewSkillHandler',
     'NewTopicHandler',
     'NotificationHandler',
     'NotificationsDashboardHandler',
     'NotificationsDashboardPage',
     'NotificationsHandler',
-    'OldContributorDashboardRedirectPage',
-    'OldCreatorDashboardRedirectPage',
-    'OldLearnerDashboardRedirectPage',
     'OldLibraryRedirectPage',
     'OldNotificationsDashboardRedirectPage',
     'PendingAccountDeletionPage',
@@ -222,7 +205,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'StateYamlHandler',
     'StateInteractionStatsHandler',
     'StatsEventsHandler',
-    'StewardsLandingPage',
     'StorePlaythroughHandler',
     'StoryEditorPage',
     'StoryPage',
@@ -239,7 +221,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SuggestionToExplorationActionHandler',
     'SuggestionToSkillActionHandler',
     'SuggestionsProviderHandler',
-    'TeachRedirectPage',
     'ThreadHandler',
     'ThreadListHandler',
     'ThreadListHandlerForTopicsHandler',
@@ -247,8 +228,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'TopicAssignmentsHandler',
     'TopicEditorPage',
     'TopicEditorStoryHandler',
-    'TopicLandingPage',
-    'TopicLandingRedirectPage',
     'TopicNameHandler',
     'TopicPageDataHandler',
     'TopicPublishHandler',
@@ -262,7 +241,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'UnsubscribeHandler',
     'UpdateQuestionSuggestionHandler',
     'UpdateTranslationSuggestionHandler',
-    'UploadExplorationHandler',
     'UrlHandler',
     'UserExplorationEmailsHandler',
     'UserExplorationPermissionsHandler',
