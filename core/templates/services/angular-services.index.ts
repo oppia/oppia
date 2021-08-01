@@ -411,7 +411,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
-  ['CanAccessSplashPageGuard', CanAccessSplashPageGuard],
   ['CapitalizePipe', CapitalizePipe],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['CkEditorInitializerService', CkEditorInitializerService],
