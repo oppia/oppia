@@ -73,7 +73,6 @@ export class ConnectionService {
       .pipe(
         switchMap(() => {
           if (this.currentState.hasNetworkConnection) {
-            console.error('asd');
             return this.http.get<ConnectionCheckResponse>(
               this.checkConnectionUrl).toPromise();
           }
