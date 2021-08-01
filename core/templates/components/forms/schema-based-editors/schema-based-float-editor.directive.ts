@@ -54,16 +54,22 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             SchemaFormSubmittedService) {
           var ctrl = this;
           var labelForFocus = $scope.labelForFocusTarget();
-          ctrl.validate = function(localValue) {
-            let { checkinputGreaterThanOrEqualToZero } =
-             ctrl.uiConfig() || {};
+          ctrl.validate = function(localValue, cust) {
+            console.error(cust);
+            //let { checkinputGreaterThanOrEqualToZero } =
+             //ctrl.uiConfig() || {};
+             let { checkinputGreaterThanOrEqualToZero } = cust || {};
+             let aaa = checkinputGreaterThanOrEqualToZero === undefined ? false: checkinputGreaterThanOrEqualToZero;
+             console.error(aaa);
+              //let aaa=cust===undefined?false:cust;
+              //console.error(aaa);
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
               localValue !== '' &&
               angular.isUndefined(
                 NumericInputValidationService.getErrorString(
-                  localValue, checkinputGreaterThanOrEqualToZero)));
+                  localValue, aaa)));
           };
 
           ctrl.onFocus = function() {
@@ -98,10 +104,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           };
 
           ctrl.generateErrors = function() {
-            let { checkinputGreaterThanOrEqualToZero } = ctrl.uiConfig() || {};
+            //let { checkinputGreaterThanOrEqualToZero } = ctrl.uiConfig() || {};
             ctrl.errorString = (
               NumericInputValidationService.getErrorString(
-                ctrl.localValue, checkinputGreaterThanOrEqualToZero));
+                ctrl.localValue, ctrl.cust));
+                console.error(ctrl.cust);
+                console.error(ctrl.errorString);
           };
 
           ctrl.onKeypress = function(evt) {
@@ -129,6 +137,9 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.localValue = 0.0;
             }
             let { checkinputGreaterThanOrEqualToZero } = ctrl.uiConfig() || {};
+            //let { checkinputGreaterThanOrEqualToZeroo } = ctrl.uiConfig() || false;
+            ctrl.cust = checkinputGreaterThanOrEqualToZero === undefined ? false: checkinputGreaterThanOrEqualToZero;
+            console.error(ctrl.cust);
             ctrl.minValue = checkinputGreaterThanOrEqualToZero && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.

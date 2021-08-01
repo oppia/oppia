@@ -52,6 +52,8 @@ export class InteractiveNumericInput implements OnInit {
   ) { }
 
   private isAnswerValid(): boolean {
+    console.error(this.answer);
+    console.error(this.inputGreaterThanOrEqualToZero);
     return (
       this.answer !== undefined &&
       this.answer !== null &&

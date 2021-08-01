@@ -335,7 +335,6 @@ describe('NumericInputValidationService', () => {
       }]);
     });
 
-
   it('should generate errors in the given input', () => {
     expect(validatorService.getErrorString(1200000000E+27, false)).toEqual(
       'The answer can contain at most 15 digits (0-9) or symbols (. or -).');
@@ -350,6 +349,9 @@ describe('NumericInputValidationService', () => {
     expect(validatorService.getErrorString(2.2, false)).toEqual(undefined);
     expect(validatorService.getErrorString(-2.2, false)).toEqual(undefined);
     expect(validatorService.getErrorString(34.56, false)).toEqual(undefined);
+  });
+
+  fit('should generate errors in the given input if true', () => {
     expect(validatorService.getErrorString(1200000000E+27, true)).toEqual(
       'The answer should be greater than or equal to zero and can contain' +
       ' at most 15 digits (0-9) or symbols(.).');
