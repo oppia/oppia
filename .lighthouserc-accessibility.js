@@ -213,7 +213,7 @@ module.exports = {
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/volunteer$',
           'assertions': {
-            // TODO(#13540) Improve the accessibility score to 1.
+            // TODO(iamprayush): Improve the accessibility score to 1.
             'categories:accessibility': ['error', {'minScore': 0.91}]
           }
         },
