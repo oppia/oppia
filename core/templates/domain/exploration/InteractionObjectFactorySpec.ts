@@ -32,6 +32,7 @@ import { SolutionBackendDict, SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
@@ -661,10 +662,9 @@ describe('Interaction object factory', () => {
     const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
-    if ('showChoicesInShuffledOrder' in otherInteraction.customizationArgs) {
-      otherInteraction.customizationArgs.showChoicesInShuffledOrder.value =
-        false;
-    }
+    const args = <MultipleChoiceInputCustomizationArgs> (
+      otherInteraction.customizationArgs);
+    args.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(iof.createFromBackendDict({
       answer_groups: newAnswerGroups,
       confirmed_unclassified_answers: [],

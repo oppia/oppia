@@ -51,6 +51,9 @@ export class ExtensionTagAssemblerService {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
     ): Object[] | Object => {
+      // Non-null assertion is used to make the strict typing happy
+      // while still keeping the value `undefined`, which is used
+      // in the return value of the function.
       let result!: Object[] | Object;
 
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {

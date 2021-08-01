@@ -149,6 +149,9 @@ export class Interaction {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
     ): Object[] | Object => {
+      // Non-null assertion is used to make the strict typing happy
+      // while still keeping the value `undefined`, which is used
+      // in the return value of the function.
       let result!: Object[] | Object;
 
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
@@ -173,8 +176,7 @@ export class Interaction {
     const customizationArgsBackendDict: Record<string, Object> = {};
     Object.entries(customizationArgs).forEach(([caName, caValue]) => {
       customizationArgsBackendDict[caName] = {
-        value: traverseSchemaAndConvertSubtitledToDicts(
-          caValue.value)
+        value: traverseSchemaAndConvertSubtitledToDicts(caValue.value)
       };
     });
 
