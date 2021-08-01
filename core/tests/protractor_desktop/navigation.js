@@ -222,9 +222,9 @@ describe('Static Pages Tour', function() {
 
   it('should visit the Volunteer page', async function() {
     await browser.get('/volunteer');
-    await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.protractor-test-volunteer-page')).isPresent()).toBe(true);
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-volunteer-page')),
+      'Volunteer page taking too long to appear');
   });
 
   it('should show the error page when an incorrect url is given',
