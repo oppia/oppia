@@ -98,9 +98,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        self.render_json({ # type: ignore[no-untyped-call]
-            'isInternetConnected': True
-        })
+        self.render_json({ 'isInternetConnected': True }) # type: ignore[no-untyped-call]
 
 
 class FrontendErrorHandler(base.BaseHandler):
