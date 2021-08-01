@@ -96,6 +96,7 @@ class InternetConnectivityHandler(base.BaseHandler):
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self):
+        # type: () -> None
         """Handles GET requests."""
         self.render_json({
             'isInternetConnected': True
