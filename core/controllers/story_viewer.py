@@ -37,8 +37,7 @@ class StoryPage(base.BaseHandler):
     """Page describing a single story."""
 
     @acl_decorators.open_access
-    def get(
-        self, classroom_url_fragment, topic_url_fragment, story_url_fragment):
+    def get(self, **kwargs):  # pylint: disable=unused-argument
         """Handles GET requests."""
         self.render_template('oppia-root.mainpage.html')
 

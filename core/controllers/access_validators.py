@@ -79,7 +79,7 @@ class ClassroomPageAccessValidationHandler(base.BaseHandler):
                 {
                     'valid': False,
                     'redirect_url': '/learn/%s' %
-                        constants.DEFAULT_CLASSROOM_URL_FRAGMENT
+                    constants.DEFAULT_CLASSROOM_URL_FRAGMENT
                 })
             return
 
