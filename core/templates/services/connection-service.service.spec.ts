@@ -94,7 +94,7 @@ describe('Connection Service', () => {
     });
   });
 
-  it('should send connectivity request', fakeAsync(() => {
+  it('should return online when is connected to internet', fakeAsync(() => {
     connectionService.checkInternetState();
     tick(100);
     discardPeriodicTasks();
@@ -110,7 +110,7 @@ describe('Connection Service', () => {
     });
   }));
 
-  it('should not send connectivity request', fakeAsync(() => {
+  it('should return online when reconnected after offline', fakeAsync(() => {
     connectionService.checkInternetState();
     connectionService.checkNetworkState();
     tick(100);
