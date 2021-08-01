@@ -66,7 +66,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'convert-to-plain-text.pipe.ts',
     'current-interaction.service.ts',
     'exploration-footer.component.ts',
-    'exploration-save.service.ts',
     'exploration-states.service.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
