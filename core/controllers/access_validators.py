@@ -17,15 +17,16 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
 from core.domain import user_services
-from constants import constants
 
 from typing import Any # pylint: disable=unused-import
 from typing import Dict # pylint: disable=unused-import
 from typing import Text # pylint: disable=unused-import
+
 
 class SplashPageAccessValidationHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
