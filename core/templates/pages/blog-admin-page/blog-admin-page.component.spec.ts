@@ -107,9 +107,9 @@ describe('Blog Admin Page component ', () => {
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     startTaskSpy = spyOn(adminTaskManagerService, 'startTask')
-      .and.returnValue(null);
+      .and.returnValue();
     finishTaskSpy = spyOn(adminTaskManagerService, 'finishTask')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(blogAdminBackendApiService, 'getDataAsync')
       .and.resolveTo(blogAdminPageData);
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
@@ -233,11 +233,6 @@ describe('Blog Admin Page component ', () => {
 
         component.formData.updateRole.newRole = null;
         component.formData.updateRole.username = 'username';
-
-        expect(component.formData.updateRole.isValid()).toBe(false);
-
-        component.formData.updateRole.newRole = 'BLOG_ADMIN';
-        component.formData.updateRole.username = null;
 
         expect(component.formData.updateRole.isValid()).toBe(false);
       }));
