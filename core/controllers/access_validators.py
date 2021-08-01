@@ -14,6 +14,9 @@
 
 """Controllers for the validating access."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -42,9 +45,9 @@ class SplashPageAccessValidationHandler(base.BaseHandler):
             user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
             default_dashboard = user_settings.default_dashboard
             self.render_json( # type: ignore[no-untyped-call]
-                { 'valid': False, 'default_dashboard': default_dashboard })
+                {'valid': False, 'default_dashboard': default_dashboard})
         else:
-            self.render_json({ 'valid': True }) # type: ignore[no-untyped-call]
+            self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
 class ClassroomPageAccessValidationHandler(base.BaseHandler):
     """Validates whether request made to /learn route is valid.
@@ -70,13 +73,14 @@ class ClassroomPageAccessValidationHandler(base.BaseHandler):
             classroom_url_fragment)
 
         if not classroom:
-            self.render_json({ # type: ignore[no-untyped-call]
+            self.render_json( # type: ignore[no-untyped-call]
+            {
                 'valid': False,
                 'redirect_url': '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT
             })
             return
 
-        self.render_json({ 'valid': True, 'redirect_url': None }) # type: ignore[no-untyped-call]
+        self.render_json({'valid': True, 'redirect_url': None}) # type: ignore[no-untyped-call]
 
 class ManageOwnAccountValidationHandler(base.BaseHandler):
     """Validates access to preferences page.
@@ -90,7 +94,7 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     @acl_decorators.can_manage_own_account # type: ignore[misc]
     def get(self):
         # type: () -> None
-        self.render_json({ 'valid': True }) # type: ignore[no-untyped-call]
+        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
 class ProfileExistsValidationHandler(base.BaseHandler):
     """The world-viewable profile page."""
@@ -116,10 +120,10 @@ class ProfileExistsValidationHandler(base.BaseHandler):
             username)
 
         if not user_settings:
-            self.render_json({ 'valid': False }) # type: ignore[no-untyped-call]
+            self.render_json({'valid': False}) # type: ignore[no-untyped-call]
             return
 
-        self.render_json({ 'valid': True }) # type: ignore[no-untyped-call]
+        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
 class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
 
@@ -134,10 +138,10 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
         # type: () -> None
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
-            self.render_json({ 'valid': False }) # type: ignore[no-untyped-call]
+            self.render_json({'valid': False}) # type: ignore[no-untyped-call]
             return
 
-        self.render_json({ 'valid': True }) # type: ignore[no-untyped-call]
+        self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
 class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
 
@@ -152,4 +156,4 @@ class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
         # type: () -> None
         """Handles GET requests."""
 
-        self.render_json({ 'valid': True }) # type: ignore[no-untyped-call]
+        self.render_json({'valid': True}) # type: ignore[no-untyped-call]

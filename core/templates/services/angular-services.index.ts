@@ -373,8 +373,11 @@ import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/se
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
 import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { CanAccessSplashPageGuard } from 'pages/oppia-root/routing/guards/can-access-splash-page.guard';
 
 export const angularServices: [string, Type<{}>][] = [
+  ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminBackendApiService', AdminBackendApiService],
   ['AdminDataService', AdminDataService],
   ['AdminRouterService', AdminRouterService],
@@ -408,6 +411,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BottomNavbarStatusService', BottomNavbarStatusService],
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
+  ['CanAccessSplashPageGuard', CanAccessSplashPageGuard],
   ['CapitalizePipe', CapitalizePipe],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['CkEditorInitializerService', CkEditorInitializerService],
