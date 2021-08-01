@@ -206,15 +206,15 @@ export class EditableStoryBackendApiService {
   }
 
   /**
-    * Updates a story in the backend with the provided story ID.
-    * The changes only apply to the story of the given version and the
-    * request to update the story will fail if the provided story
-    * version is older than the current version stored in the backend. Both
-    * the changes and the message to associate with those changes are used
-    * to commit a change to the story. The new story is passed to
-    * the success callback, if one is provided to the returned promise
-    * object. Errors are passed to the error callback, if one is provided.
-    */
+     * Updates a story in the backend with the provided story ID.
+     * The changes only apply to the story of the given version and the
+     * request to update the story will fail if the provided story
+     * version is older than the current version stored in the backend. Both
+     * the changes and the message to associate with those changes are used
+     * to commit a change to the story. The new story is passed to
+     * the success callback, if one is provided to the returned promise
+     * object. Errors are passed to the error callback, if one is provided.
+     */
   async updateStoryAsync(
       storyId: string, storyVersion: number,
       commitMessage: string,
