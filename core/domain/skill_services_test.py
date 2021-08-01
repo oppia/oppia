@@ -1433,12 +1433,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 3)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.skill_contents_schema_version, 2)
+        self.assertEqual(skill.skill_contents_schema_version, 3)
 
         self.assertEqual(
             skill.skill_contents.explanation.html,
@@ -1501,12 +1501,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 3)
+        self.assertEqual(skill.misconceptions_schema_version, 4)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
         self.assertEqual(
@@ -1566,12 +1566,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.rubric_schema_version, 3)
+        self.assertEqual(skill.rubric_schema_version, 4)
         self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
         self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
         self.assertEqual(skill.rubrics[1].difficulty, 'Medium')
