@@ -35,7 +35,7 @@ export class UploadBlogPostThumbnailComponent extends ConfirmOrCancelModal {
   cropppedImageDataUrl: string = '';
   invalidImageWarningIsShown: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  filename: string;
+  croppedFilename: string;
   cropper;
   @ViewChild('croppableImage') croppableImageRef: ElementRef;
 
@@ -58,7 +58,11 @@ export class UploadBlogPostThumbnailComponent extends ConfirmOrCancelModal {
   }
 
   onFileChanged(file: File): void {
-    this.filename = file.name;
+    let originalFilename = file.name;
+    // The cropper always returns a png file, thus the extension should be
+    // changed to png for the final image type to match the extension.
+    this.croppedFilename = (
+      originalFilename.replace(/\.([^.]*?)(?=\?|#|$)/, '.png'));
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
     reader.onload = (e) => {
@@ -89,10 +93,11 @@ export class UploadBlogPostThumbnailComponent extends ConfirmOrCancelModal {
     this.cropppedImageDataUrl = (
       this.cropper.getCroppedCanvas({
         height: 200,
-        width: 800
+        width: 800,
+        fillColor: '#fff',
       }).toDataURL());
     this.imageLocalStorageService.saveImage(
-      this.filename, this.cropppedImageDataUrl);
+      this.croppedFilename, this.cropppedImageDataUrl);
     super.confirm(this.cropppedImageDataUrl);
   }
 }
