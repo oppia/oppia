@@ -486,20 +486,19 @@ def get_invalid_svg_tags_and_attrs(svg_string):
     return (invalid_elements, invalid_attrs)
 
 
-def check_for_math_component_in_html(html_string):
-    """Checks for existence of Math component tags inside an HTML string.
+def check_for_svgdiagram_component_in_html(html_string):
+    """Checks for existence of SvgDiagram component tags inside an HTML string.
 
     Args:
         html_string: str. HTML string to check.
 
     Returns:
-        str. Updated HTML string with all Math component tags having the new
-        attribute.
+        bool. Whether the given HTML string contains SvgDiagram component tag.
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
-    math_tags = soup.findAll(name='oppia-noninteractive-math')
-    return bool(math_tags)
+    svgdiagram_tags = soup.findAll(name='oppia-noninteractive-svgdiagram')
+    return bool(svgdiagram_tags)
 
 
 def get_latex_strings_without_svg_from_html(html_string):
@@ -705,6 +704,23 @@ def is_parsable_as_xml(xml_string):
         return False
 
 
+def convert_svg_diagram_to_image_for_soup(soup_context):
+    """"Renames oppia-noninteractive-svgdiagram tag to
+    oppia-noninteractive-image and changes corresponding attributes for a given
+    soup context.
+
+    Args:
+        soup_context: bs4.BeautifulSoup. The bs4 soup context.
+    """
+    for svg_image in soup_context.findAll(
+            name='oppia-noninteractive-svgdiagram'):
+        svg_filepath = svg_image['svg_filename-with-value']
+        del svg_image['svg_filename-with-value']
+        svg_image['filepath-with-value'] = svg_filepath
+        svg_image['caption-with-value'] = escape_html('""')
+        svg_image.name = 'oppia-noninteractive-image'
+
+
 def convert_svg_diagram_tags_to_image_tags(html_string):
     """Renames all the oppia-noninteractive-svgdiagram on the server to
     oppia-noninteractive-image and changes corresponding attributes.
@@ -717,16 +733,38 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     """
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
+    # Handle conversion of oppia-noninteractive-svgdiagram tags that are not
+    # nested inside complex components.
+    convert_svg_diagram_to_image_for_soup(soup)
 
-    for image in soup.findAll(name='oppia-noninteractive-svgdiagram'):
-        # All the attribute values should be enclosed in double
-        # quotes(&amp;quot;).
-        escaped_svg_filepath = escape_html(image['svg_filename-with-value'])
-        escaped_svg_alt_value = escape_html(image['alt-with-value'])
-        del image['svg_filename-with-value']
-        del image['alt-with-value']
-        image['filepath-with-value'] = escaped_svg_filepath
-        image['caption-with-value'] = escape_html('""')
-        image['alt-with-value'] = escaped_svg_alt_value
-        image.name = 'oppia-noninteractive-image'
+    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
+    # oppia-noninteractive-collapsible.
+    for collapsible in soup.findAll(
+            name='oppia-noninteractive-collapsible'):
+        if 'content-with-value' in collapsible.attrs:
+            content_html = json.loads(
+                unescape_html(collapsible['content-with-value']))
+            soup_for_collapsible = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            convert_svg_diagram_to_image_for_soup(soup_for_collapsible)
+            collapsible['content-with-value'] = escape_html(
+                json.dumps(
+                    python_utils.UNICODE(soup_for_collapsible).replace(
+                        '<br/>', '<br>')))
+
+    # Handle conversion of oppia-noninteractive-svgdiagram nested inside
+    # oppia-noninteractive-tabs.
+    for tabs in soup.findAll(name='oppia-noninteractive-tabs'):
+        tab_content_json = unescape_html(tabs['tab_contents-with-value'])
+        tab_content_list = json.loads(tab_content_json)
+        for tab_content in tab_content_list:
+            content_html = tab_content['content']
+            soup_for_tabs = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            convert_svg_diagram_to_image_for_soup(soup_for_tabs)
+            tab_content['content'] = (
+                python_utils.UNICODE(soup_for_tabs).replace(
+                    '<br/>', '<br>'))
+        tabs['tab_contents-with-value'] = escape_html(
+            json.dumps(tab_content_list))
     return python_utils.UNICODE(soup)

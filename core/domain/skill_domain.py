@@ -935,6 +935,37 @@ class Skill(python_utils.OBJECT):
         return '%s-%d' % (self.id, misconception_id)
 
     @classmethod
+    def convert_html_fields_in_skill_contents(
+            cls, skill_contents_dict, conversion_fn):
+        """Applies a conversion function on all the html strings in a skill
+        to migrate them to a desired state.
+
+        Args:
+            skill_contents_dict: dict. The dict representation of skill
+                contents.
+            conversion_fn: function. The conversion function to be applied on
+                the skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        skill_contents_dict['explanation']['html'] = conversion_fn(
+            skill_contents_dict['explanation']['html'])
+        skill_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                skill_contents_dict['written_translations'], conversion_fn))
+
+        for value_index, value in enumerate(
+                skill_contents_dict['worked_examples']):
+            skill_contents_dict['worked_examples'][value_index][
+                'question']['html'] = conversion_fn(value['question']['html'])
+            skill_contents_dict['worked_examples'][value_index][
+                'explanation']['html'] = conversion_fn(
+                    value['explanation']['html'])
+        return skill_contents_dict
+
+    @classmethod
     def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents_dict):
         """Converts v1 skill contents to the v2 schema. In the v2 schema,
         the new Math components schema is introduced.
@@ -945,29 +976,25 @@ class Skill(python_utils.OBJECT):
         Returns:
             dict. The converted skill_contents_dict.
         """
-        skill_contents_dict['explanation']['html'] = (
-            html_validation_service.add_math_content_to_math_rte_components(
-                skill_contents_dict['explanation']['html']))
-        skill_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                skill_contents_dict['written_translations'],
-                html_validation_service.
-                add_math_content_to_math_rte_components))
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.add_math_content_to_math_rte_components)
 
-        for value_index, value in enumerate(
-                skill_contents_dict['worked_examples']):
-            skill_contents_dict['worked_examples'][value_index][
-                'question']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        value['question']['html']))
-            skill_contents_dict['worked_examples'][value_index][
-                'explanation']['html'] = (
-                    html_validation_service.
-                    add_math_content_to_math_rte_components(
-                        value['explanation']['html']))
-        return skill_contents_dict
+    @classmethod
+    def _convert_skill_contents_v2_dict_to_v3_dict(cls, skill_contents_dict):
+        """Converts v2 skill contents to the v3 schema. The v3 schema
+        deprecates oppia-noninteractive-svgdiagram tag and converts existing
+        occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            skill_contents_dict: dict. The v1 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        return cls.convert_html_fields_in_skill_contents(
+            skill_contents_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -1055,6 +1082,26 @@ class Skill(python_utils.OBJECT):
         return misconception_dict
 
     @classmethod
+    def _convert_misconception_v3_dict_to_v4_dict(cls, misconception_dict):
+        """Converts v3 misconception schema to the v4 schema. The v4 schema
+        deprecates oppia-noninteractive-svgdiagram tag and converts existing
+        occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            misconception_dict: dict. The v3 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['notes'] = (
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                misconception_dict['notes']))
+        misconception_dict['feedback'] = (
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
+                misconception_dict['feedback']))
+        return misconception_dict
+
+    @classmethod
     def _convert_rubric_v1_dict_to_v2_dict(cls, rubric_dict):
         """Converts v1 rubric schema to the v2 schema. In the v2 schema,
         multiple explanations have been added for each difficulty.
@@ -1085,6 +1132,25 @@ class Skill(python_utils.OBJECT):
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
                 html_validation_service.add_math_content_to_math_rte_components(
+                    explanation))
+        return rubric_dict
+
+    @classmethod
+    def _convert_rubric_v3_dict_to_v4_dict(cls, rubric_dict):
+        """Converts v3 rubric schema to the v4 schema. The v4 schema
+        deprecates oppia-noninteractive-svgdiagram tag and converts existing
+        occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            rubric_dict: dict. The v2 rubric dict.
+
+        Returns:
+            dict. The converted rubric_dict.
+        """
+        for explanation_index, explanation in enumerate(
+                rubric_dict['explanations']):
+            rubric_dict['explanations'][explanation_index] = (
+                html_validation_service.convert_svg_diagram_tags_to_image_tags(
                     explanation))
         return rubric_dict
 

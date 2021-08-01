@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for svg filename editor.
+ * @fileoverview Component for svg editor.
  */
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
@@ -31,7 +31,7 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import Picker from 'vanilla-picker';
 import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
-import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
+import { SvgEditorConstants } from './svg-editor.constants';
 
 export interface Dimensions {
   height: number;
@@ -46,12 +46,13 @@ export class PolyPoint {
 }
 
 @Component({
-  selector: 'svg-filename-editor',
-  templateUrl: './svg-filename-editor.component.html'
+  selector: 'svg-editor',
+  templateUrl: './svg-editor.component.html'
 })
-export class SvgFilenameEditorComponent implements OnInit {
+export class SvgEditorComponent implements OnInit {
   @Input() value: string;
   @Output() valueChanged = new EventEmitter();
+  @Output() validityChange = new EventEmitter<Record<'empty', boolean>>();
   // These constants are used to identify the tool that is currently being
   // used so that other tools can be disabled accordingly.
   STATUS_EDITING = 'editing';
@@ -207,7 +208,9 @@ export class SvgFilenameEditorComponent implements OnInit {
         height: dimensions.height + 'px',
         width: dimensions.width + 'px'
       };
+      this.validityChange.emit({ empty: true });
     } else {
+      this.validityChange.emit({ empty: false });
       domReady.then(() => {
         this.initializeFabricJs();
         this.changeDetectorRef.detectChanges();
@@ -216,22 +219,22 @@ export class SvgFilenameEditorComponent implements OnInit {
   }
 
   onWidthInputBlur(): void {
-    if (this.diagramWidth > SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH) {
-      this.diagramWidth = SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH;
+    if (this.diagramWidth > SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH) {
+      this.diagramWidth = SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH;
     } else if (
-      this.diagramWidth < SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH) {
-      this.diagramWidth = SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH;
+      this.diagramWidth < SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH) {
+      this.diagramWidth = SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH;
     }
     this.currentDiagramWidth = this.diagramWidth;
   }
 
   onHeightInputBlur(): void {
     if (
-      this.diagramHeight > SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT) {
-      this.diagramHeight = SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT;
+      this.diagramHeight > SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT) {
+      this.diagramHeight = SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT;
     } else if (
-      this.diagramHeight < SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT) {
-      this.diagramHeight = SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT;
+      this.diagramHeight < SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT) {
+      this.diagramHeight = SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT;
     }
     this.currentDiagramHeight = this.diagramHeight;
   }
@@ -405,6 +408,7 @@ export class SvgFilenameEditorComponent implements OnInit {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
         this.saveImageToLocalStorage(dimensions, resampledFile);
+        this.validityChange.emit({ empty: true });
       } else {
         this.loadingIndicatorIsShown = true;
         this.postSvgToServer(
@@ -423,6 +427,7 @@ export class SvgFilenameEditorComponent implements OnInit {
           };
           img.src = this.getTrustedResourceUrlForSvgFileName(
             data.filename).unsafeUrl;
+          this.validityChange.emit({ empty: true });
         }, (parsedResponse) => {
           this.loadingIndicatorIsShown = false;
           this.alertsService.addWarning(
@@ -1611,6 +1616,6 @@ export class SvgFilenameEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('svgFilenameEditor', downgradeComponent({
-  component: SvgFilenameEditorComponent
+angular.module('oppia').directive('svgEditor', downgradeComponent({
+  component: SvgEditorComponent
 }));

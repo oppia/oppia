@@ -124,19 +124,6 @@ class Image(BaseRteComponent):
             raise utils.ValidationError('Invalid filepath')
 
 
-class Svgdiagram(BaseRteComponent):
-    """Class for Svgdiagram component."""
-
-    @classmethod
-    def validate(cls, value_dict):
-        """Validates Svgdiagram component."""
-        super(Svgdiagram, cls).validate(value_dict)
-        filename_re = r'^[A-Za-z0-9+/_-]*\.(svg)$'
-        filename = value_dict['svg_filename-with-value']
-        if not re.match(filename_re, filename):
-            raise utils.ValidationError('Invalid filename')
-
-
 class Link(BaseRteComponent):
     """Class for Link component."""
 

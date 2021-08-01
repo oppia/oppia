@@ -61,5 +61,5 @@ require('objects/templates/set-of-unicode-string-editor.component.ts');
 require('objects/templates/skill-selector-editor.component.ts');
 require('objects/templates/subtitled-html-editor.component.ts');
 require('objects/templates/subtitled-unicode-editor.component.ts');
-require('objects/templates/svg-filename-editor.component.ts');
+require('objects/templates/svg-editor.component.ts');
 require('objects/templates/unicode-string-editor.component.ts');

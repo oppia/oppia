@@ -1180,42 +1180,31 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     html_string_with_filename_having_invalid_format)), sorted(
                         expected_output))
 
-    def test_check_for_math_component_in_html(self):
-        """Test that the check_for_math_component_in_html method checks for
-         math-tags in an HTML string and returns a boolean.
+    def test_check_for_svgdiagram_component_in_html(self):
+        """Test that the check_for_svgdiagram_component_in_html method checks
+        for math-tags in an HTML string and returns a boolean.
         """
         test_cases = [{
             'html_content': (
-                '<p>Feedback</p><oppia-noninteractive-math raw_latex-with-valu'
-                'e="&amp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>'
+                '<oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
+                '</oppia-noninteractive-svgdiagram>'
             ),
             'expected_output': True
         }, {
             'html_content': (
-                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;+,'
-                '+,+,+&amp;quot;"></oppia-noninteractive-math>'
-            ),
-            'expected_output': True
-        }, {
-            'html_content': (
-                '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
-                '(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;"></oppia-'
-                'noninteractive-math>'
-            ),
-            'expected_output': True
-        }, {
-            'html_content': (
-                '<p><oppia-noninteractive-image filepath-with-value="abc1.png">'
-                '</oppia-noninteractive-image>Hello this is test case to check'
-                ' that dimensions are added to the oppia noninteractive image '
-                'tags.</p>'
+                '<p><oppia-noninteractive-image filepath-with-value='
+                '"abc1.png"></oppia-noninteractive-image>Hello this is test '
+                'case to check that dimensions are added to the oppia '
+                'noninteractive image tags.</p>'
             ),
             'expected_output': False
         }]
 
         for test_case in test_cases:
             self.assertEqual(
-                html_validation_service.check_for_math_component_in_html(
+                html_validation_service.check_for_svgdiagram_component_in_html(
                     test_case['html_content']),
                 test_case['expected_output'])
 
@@ -1241,8 +1230,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         test_cases = [{
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img1.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
+                'svg_filename-with-value="&amp;quot;img1.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
             ),
             'expected_output': (
@@ -1255,16 +1244,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img12.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
+                'svg_filename-with-value="&amp;quot;img12.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img2.svg&quot;"'
-                ' alt-with-value="&quot;Image123&quot;">'
+                'svg_filename-with-value="&amp;quot;img2.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image123&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-svgdiagram '
-                'alt-with-value="&quot;Image12345&quot;"'
-                ' svg_filename-with-value="&quot;igage.svg&quot;">'
+                'alt-with-value="&amp;quot;Image12345&amp;quot;"'
+                ' svg_filename-with-value="&amp;quot;igage.svg&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
             ),
             'expected_output': (
@@ -1283,6 +1272,78 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'caption-with-value="&amp;quot;&amp;quot;" '
                 'filepath-with-value="&amp;quot;igage.svg&amp;quot;">'
                 '</oppia-noninteractive-image>'
+            )
+        }, {
+            'html_content': (
+                r'<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                r'quot;title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,'
+                r'&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;oppia-'
+                r'noninteractive-svgdiagram alt-with-value=\&amp;quot;'
+                r'&amp;amp;amp;quot;desc&amp;amp;amp;quot;\&amp;quot; '
+                r'svg_filename-with-value=\&amp;quot;&amp;amp;amp;quot;'
+                r'img_20210727_054514_9l3scri3mg_height_350_width_450.svg&amp;'
+                r'amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-svgdiagram&amp;gt;&amp;quot;},'
+                r'{&amp;quot;title&amp;quot;:'
+                r'&amp;quot;Hint 1&amp;quot;,&amp;quot;content&amp;quot;:&amp;'
+                r'quot;&amp;lt;oppia-noninteractive-svgdiagram alt-with-value='
+                r'\&amp;quot; \&amp;quot;&amp;amp;amp;quot;abc&amp;amp;'
+                r'amp;quot;ng-version=\&amp;quot;11.2.14\&amp;quot; svg_'
+                r'filename-with-value=\&amp;quot;&amp;amp;amp;quot;'
+                r'img_20210727_054530_g653s2p0af_height_350_width_450.svg'
+                r'&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-svgdiagram&amp;gt;&amp;quot;}]">'
+                r'</oppia-noninteractive-tabs>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                'quot;content&amp;quot;: &amp;quot;&amp;lt;oppia-'
+                'noninteractive-image alt-with-value=\\&amp;quot;&amp;amp;'
+                'amp;quot;desc&amp;amp;amp;quot;\\&amp;quot; '
+                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;'
+                'amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;'
+                '&amp;amp;amp;quot;img_20210727_054514_9l3scri3mg_'
+                'height_350_width_450.svg&amp;amp;amp;quot;\\&amp;quot;'
+                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;'
+                '&amp;quot;, &amp;quot;title&amp;quot;: &amp;quot;Hint '
+                'introduction&amp;quot;}, {&amp;quot;content&amp;quot;: '
+                '&amp;quot;&amp;lt;oppia-noninteractive-image &amp;amp;'
+                'amp;quot;abc&amp;amp;amp;quot;ng-version=\\&amp;quot;'
+                '11.2.14\\&amp;quot; alt-with-value=\\&amp;quot; '
+                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;'
+                'amp;quot;&amp;amp;amp;quot;\\&amp;quot; '
+                'filepath-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                'img_20210727_054530_g653s2p0af_height_350_width_450.svg'
+                '&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
+                '/oppia-noninteractive-image&amp;gt;&amp;quot;, '
+                '&amp;quot;title&amp;quot;: &amp;quot;Hint 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            )
+        }, {
+            'html_content': (
+                r'<oppia-noninteractive-collapsible content-with-value="&amp;'
+                r'quot;&amp;lt;oppia-noninteractive-svgdiagram alt-with-value='
+                r'\&amp;quot;&amp;amp;amp;quot;abc&amp;amp;amp;quot;\&amp;'
+                r'quot; ng-version=\&amp;quot;11.2.14\&amp;quot; '
+                r'svg_filename-with-value=\&amp;quot;&amp;amp;amp;quot;'
+                r'img_20210727_054955_a9it96co1j_height_350_width_450.svg'
+                r'&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                r'/oppia-noninteractive-svgdiagram&amp;gt;&amp;quot;" '
+                r'heading-with-value="&amp;quot;Sample Header&amp;quot;">'
+                r'</oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\\'
+                '&amp;quot;&amp;amp;amp;quot;abc&amp;amp;amp;quot;\\&amp;'
+                'quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;'
+                'amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot;'
+                '&amp;amp;amp;quot;img_20210727_054955_a9it96co1j_height_'
+                '350_width_450.svg&amp;amp;amp;quot;\\&amp;quot; '
+                'ng-version=\\&amp;quot;11.2.14\\&amp;quot;&amp;gt;&amp;'
+                'lt;/oppia-noninteractive-image&amp;gt;&amp;quot;" '
+                'heading-with-value="&amp;quot;Sample Header&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
             )
         }]
         for test_case in test_cases:
@@ -1313,8 +1374,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<oppia-noninteractive-svgdiagram '
-                'svg_filename-with-value="&quot;img11.svg&quot;"'
-                ' alt-with-value="&quot;Image&quot;">'
+                'svg_filename-with-value="&amp;quot;img11.svg&amp;quot;"'
+                ' alt-with-value="&amp;quot;Image&amp;quot;">'
                 '</oppia-noninteractive-svgdiagram>'
                 '<oppia-noninteractive-image '
                 'alt-with-value="&amp;quot;Image1&amp;quot;" '

@@ -33,6 +33,7 @@ import string
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -1906,6 +1907,27 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v46_dict_to_v47_dict(cls, states_dict):
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -1942,7 +1964,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 51
+    CURRENT_EXP_SCHEMA_VERSION = 52
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2059,6 +2081,29 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v51_dict_to_v52_dict(cls, exploration_dict):
+        """Converts a v51 exploration dict into a v52 exploration dict.
+        Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
+        existing occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v51.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v52.
+        """
+
+        exploration_dict['schema_version'] = 52
+
+        exploration_dict['states'] = cls._convert_states_v46_dict_to_v47_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 47
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2118,6 +2163,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v50_dict_to_v51_dict(
                 exploration_dict)
             exploration_schema_version = 51
+
+        if exploration_schema_version == 51:
+            exploration_dict = cls._convert_v51_dict_to_v52_dict(
+                exploration_dict)
+            exploration_schema_version = 52
 
         return exploration_dict
 

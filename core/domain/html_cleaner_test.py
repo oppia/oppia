@@ -228,14 +228,8 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             'filepath-with-value="&quot;img4.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image>',
-            '<oppia-noninteractive-svgdiagram '
-            'svg_filename-with-value="&quot;img5.svg&quot;"'
-            ' alt-with-value="&quot;Image&quot;">'
-            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-svgdiag'
-            'ram svg_filename-with-value="&quot;img6.svg&quot;"'
-            ' alt-with-value="&quot;Image&quot;">'
-            '</oppia-noninteractive-svgdiagram><oppia-noninteractive-image '
-            'filepath-with-value="&quot;img7.svg&quot;" caption-with-value='
+            '<oppia-noninteractive-image '
+            'filepath-with-value="&quot;img5.svg&quot;" caption-with-value='
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image>'
             '<oppia-noninteractive-math math_content-with-value="{&amp;quo'
@@ -254,6 +248,5 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [
                 'img.svg', 'img2.svg', 'img3.svg', 'img4.svg',
-                'img5.svg', 'img6.svg', 'img7.svg', 'math1.svg',
-                'math2.svg', 'math3.svg'],
+                'img5.svg', 'math1.svg', 'math2.svg', 'math3.svg'],
             html_cleaner.get_image_filenames_from_html_strings(html_strings))

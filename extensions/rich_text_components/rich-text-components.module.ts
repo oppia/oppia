@@ -28,7 +28,6 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
 import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.component';
-import { NoninteractiveSvgdiagram } from './Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from './Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-video.component';
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
@@ -56,7 +55,6 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent
@@ -67,7 +65,6 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent
@@ -79,7 +76,6 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveLink,
     NoninteractiveMath,
     NoninteractiveSkillreview,
-    NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent

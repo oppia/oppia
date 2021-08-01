@@ -298,33 +298,6 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Video, valid_items, invalid_items_with_error_messages)
 
-    def test_svg_diagram_validation(self):
-        """Tests svg diagram component validation."""
-        valid_items = [{
-            'svg_filename-with-value': 'random.svg',
-            'alt-with-value': '1234'
-        }, {
-            'svg_filename-with-value': 'xyz.svg',
-            'alt-with-value': 'hello'
-        }]
-        invalid_items_with_error_messages = [
-            ({
-                'svg_filename-with-value': 'random.png',
-                'alt-with-value': 'abc'
-            }, 'Invalid filename'),
-            ({
-                'svg_filename-with-value': 'xyz.svg.svg',
-                'alt-with-value': 'hello'
-            }, 'Invalid filename'),
-            ({
-                'svg_filename-with-value': 'xyz.png.svg',
-                'alt-with-value': 'hello'
-            }, 'Invalid filename')]
-
-        self.check_validation(
-            components.Svgdiagram, valid_items,
-            invalid_items_with_error_messages)
-
 
 class ComponentDefinitionTests(test_utils.GenericTestBase):
     """Tests definition of rich text components."""
