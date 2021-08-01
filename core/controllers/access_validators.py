@@ -50,6 +50,7 @@ class SplashPageAccessValidationHandler(base.BaseHandler):
         else:
             self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
+
 class ClassroomPageAccessValidationHandler(base.BaseHandler):
     """Validates whether request made to /learn route is valid.
     """
@@ -75,13 +76,15 @@ class ClassroomPageAccessValidationHandler(base.BaseHandler):
 
         if not classroom:
             self.render_json( # type: ignore[no-untyped-call]
-            {
-                'valid': False,
-                'redirect_url': '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT
-            })
+                {
+                    'valid': False,
+                    'redirect_url': '/learn/%s' %
+                        constants.DEFAULT_CLASSROOM_URL_FRAGMENT
+                })
             return
 
         self.render_json({'valid': True, 'redirect_url': None}) # type: ignore[no-untyped-call]
+
 
 class ManageOwnAccountValidationHandler(base.BaseHandler):
     """Validates access to preferences page.
@@ -96,6 +99,7 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         self.render_json({'valid': True}) # type: ignore[no-untyped-call]
+
 
 class ProfileExistsValidationHandler(base.BaseHandler):
     """The world-viewable profile page."""
@@ -126,7 +130,9 @@ class ProfileExistsValidationHandler(base.BaseHandler):
 
         self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
+
 class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
+    """Checks whether account deletion is enabled."""
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
 
@@ -144,7 +150,9 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
 
         self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
+
 class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
+    """Validates access to release coordinator page."""
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
 

@@ -559,6 +559,10 @@ p:last-child {
   vertical-align: middle;
 }
 
+.oppia-profile-user-stat span {
+  display: block;
+}
+
 /* This will prevent the enlargement of the text in the RTE. A span tag gets
    introduced when a user selects the text from the end of first line, goes to the
    second one and then writes some text to replace that. The span tag carries
@@ -4550,10 +4554,6 @@ div.oppia-issues-learner-action {
   width: 33%;
 }
 
-.oppia-profile-user-stat span {
-  display: block;
-}
-
 .oppia-profile-user-bio {
   display: block;
   font-size: 0.7em;
@@ -4644,9 +4644,9 @@ div.oppia-issues-learner-action {
     width: 100px;
   }
   .oppia-profile-picture-container {
-  float: left;
-  height: auto;
-  width: 130px;
+    float: left;
+    height: auto;
+    width: 130px;
   }
   .oppia-profile-user-card {
     float: none;
