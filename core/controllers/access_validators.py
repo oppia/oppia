@@ -115,7 +115,6 @@ class ProfileExistsValidationHandler(base.BaseHandler):
         'GET': {}
     } # type: Dict[Text, Any]
 
-
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, username):
         # type: (Text) -> None

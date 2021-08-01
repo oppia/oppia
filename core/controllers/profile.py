@@ -42,7 +42,7 @@ class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
     @acl_decorators.open_access
-    def get(self, username):
+    def get(self, username):  # pylint: disable=unused-argument
         """Handles GET requests for the publicly-viewable profile page."""
 
         self.render_template('oppia-root.mainpage.html')
