@@ -3295,7 +3295,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
         @acl_decorators.can_access_story_viewer_page
         def get(self, _):
-            self.render_template('story-viewer-page.mainpage.html')
+            self.render_template('oppia-root.mainpage.html')
 
     def setUp(self):
         super(StoryViewerTests, self).setUp()
