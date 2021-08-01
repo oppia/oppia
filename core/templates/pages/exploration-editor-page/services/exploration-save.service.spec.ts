@@ -22,7 +22,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { AlertsService } from 'services/alerts.service';
 import { EditabilityService } from 'services/editability.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
@@ -42,7 +41,6 @@ describe('when draft changes are present and there ' +
   let changeListService: ChangeListService = null;
   let ExplorationRightsService = null;
   let ExplorationTitleService = null;
-  let focusManagerService: FocusManagerService = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -56,16 +54,15 @@ describe('when draft changes are present and there ' +
           useValue: {
             save(changeList, message, successCb, errorCb) {
               successCb(false, [
-                { 
+                {
                   cmd: 'add_state',
                   state_name: 'StateName'
-              }]);  
+                }]);
             }
           }
         },
       ]
     });
-    focusManagerService = TestBed.inject(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -163,7 +160,6 @@ describe('when there are no pending draft changes it', function() {
   let $uibModal = null;
   let $rootScope = null;
   let explorationSaveService = null;
-  let alertsService: AlertsService = null;
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
   let changeListService: ChangeListService = null;
   let editabilityService: EditabilityService = null;
@@ -339,7 +335,6 @@ describe('in case of backend error while saving ' +
   let $uibModal = null;
   let $rootScope = null;
   let explorationSaveService = null;
-  let focusManagerService: FocusManagerService = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -352,13 +347,12 @@ describe('in case of backend error while saving ' +
           provide: ExplorationDataService,
           useValue: {
             save(changeList, message, successCb, errorCb) {
-              errorCb();  
+              errorCb();
             }
           }
         },
       ]
     });
-    focusManagerService = TestBed.inject(FocusManagerService);
   });
 
   beforeEach(angular.mock.inject(function($injector) {
