@@ -16,7 +16,7 @@
  * @fileoverview Service to check for the internet connection.
  */
 
-import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Subscription, timer } from 'rxjs';
 import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 // eslint-disable-next-line oppia/disallow-httpclient
@@ -47,7 +47,7 @@ export interface ConnectionCheckResponse {
 @Injectable({
   providedIn: 'root'
 })
-export class ConnectionService implements OnDestroy {
+export class ConnectionService {
   private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 3500;
   private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
   private checkConnectionUrl: string = '/connectivity/check';
@@ -95,7 +95,7 @@ export class ConnectionService implements OnDestroy {
   checkNetworkState(): void {
     this.windowRef.nativeWindow.ononline = () => {
       this.currentState.hasNetworkConnection = true;
-      this.checkInternetState();
+      this.emitEvent();
     };
 
     this.windowRef.nativeWindow.onoffline = () => {
@@ -107,13 +107,6 @@ export class ConnectionService implements OnDestroy {
 
   private emitEvent() {
     this._stateChangeEventEmitter.emit(this.currentState);
-  }
-
-  ngOnDestroy(): void {
-    try {
-      this.httpSubscription.unsubscribe();
-    } catch (e) {
-    }
   }
 
   /**

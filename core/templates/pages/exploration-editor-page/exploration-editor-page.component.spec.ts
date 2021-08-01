@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -53,7 +53,8 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
-import { ConnectionService } from 'services/connection-service.service';
+import { ConnectionService, ConnectionState } from 'services/connection-service.service';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -64,7 +65,6 @@ describe('Exploration editor page component', function() {
   importAllAngularServices();
 
   var ctrl = null;
-
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -100,7 +100,7 @@ describe('Exploration editor page component', function() {
   var refreshGraphEmitter = new EventEmitter();
 
   var autosaveIsInProgress = new EventEmitter();
-
+  var mockConnectionServiceEmitter = new EventEmitter<ConnectionState>();
   var mockOpenEditorTutorialEmitter = new EventEmitter();
   var mockOpenTranslationTutorialEmitter = new EventEmitter();
 
@@ -300,7 +300,6 @@ describe('Exploration editor page component', function() {
         mockOpenEditorTutorialEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter);
-
       explorationData.is_version_of_draft_valid = false;
 
       ctrl.$onInit();
@@ -489,6 +488,66 @@ describe('Exploration editor page component', function() {
       ctrl.showUserHelpModal();
       $rootScope.$apply();
       expect($uibModal.open).toHaveBeenCalled();
+    });
+  });
+  describe('Checking internet Connection', () => {
+    beforeEach(() => {
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
+      spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(efbas, 'fetchExplorationFeaturesAsync')
+        .and.returnValue($q.resolve({}));
+      spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend')
+        .and.returnValue(Promise.resolve());
+      spyOn(ews, 'updateWarnings').and.callThrough();
+      spyOn(gds, 'recompute').and.callThrough();
+      spyOn(pts, 'setPageTitle').and.callThrough();
+      spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
+      spyOn(ueps, 'getPermissionsAsync')
+        .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
+        mockOpenEditorTutorialEmitter);
+      spyOnProperty(cns, 'onInternetStateChange').and.returnValue(
+        mockConnectionServiceEmitter);
+      spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
+        mockOpenTranslationTutorialEmitter);
+      explorationData.is_version_of_draft_valid = false;
+
+      ctrl.$onInit();
+    });
+
+    afterEach(() => {
+      ctrl.$onDestroy();
+    });
+
+    it('should change status to ONLINE when internet is connected', () => {
+      ctrl.status = 'OFFLINE';
+      spyOn(cls, 'isExplorationLockedForEditing').and.returnValue(false);
+      spyOn(ctrl, 'countWarnings').and.returnValue(false);
+      spyOn(esaves, 'isExplorationSaveable').and.returnValue(true);
+      spyOn(cls, 'getChangeList').and.returnValue(
+        [{}, {}] as ExplorationChange[]);
+      spyOn($.fn, 'removeAttr');
+      mockConnectionServiceEmitter.emit({
+        hasInternetAccess: true,
+        hasNetworkConnection: true
+      });
+      $scope.$apply();
+      expect(ctrl.status).toBe('ONLINE');
+    });
+
+    it('should change status to OFFLINE when internet disconnects', () => {
+      ctrl.status = 'ONLINE';
+      spyOn($.fn, 'attr');
+      mockConnectionServiceEmitter.emit({
+        hasInternetAccess: false,
+        hasNetworkConnection: false
+      });
+      $scope.$apply();
+      expect(ctrl.status).toBe('OFFLINE');
     });
   });
 
