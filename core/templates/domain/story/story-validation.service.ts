@@ -38,8 +38,11 @@ export class StoryValidationService {
     // Variable nodesQueue stores the pending nodes to visit in a queue form.
     let nodesQueue = [];
     let nodeIsVisited = new Array(nodeIds.length).fill(false);
-    let startingNode = nodes[storyContents.getNodeIndex(
-      storyContents.getInitialNodeId())];
+    const _initialNodeId = storyContents.getInitialNodeId();
+    if (_initialNodeId === null) {
+      throw new Error('Starting Node does not exist');
+    }
+    let startingNode = nodes[storyContents.getNodeIndex(_initialNodeId)];
     nodesQueue.push(startingNode.getId());
 
     // The user is assumed to have all the prerequisite skills of the
