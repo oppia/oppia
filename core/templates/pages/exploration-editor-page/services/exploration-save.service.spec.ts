@@ -21,19 +21,14 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
-import { async, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { ChangeListService } from './change-list.service';
 import { ExplorationDataService } from './exploration-data.service';
-import { ExplorationDiffService } from './exploration-diff.service';
-import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
 import { ExplorationLanguageCodeService } from './exploration-language-code.service';
 import { ExplorationTagsService } from './exploration-tags.service';
 // ^^^ This block is to be removed.
@@ -42,29 +37,11 @@ describe('when draft changes are present and there ' +
   'is version mismatch it', function() {
   let $rootScope = null;
   let $uibModal = null;
-  let $q = null;
-  let $window = null;
   let explorationSaveService = null;
-  let alertsService: AlertsService = null;
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
   let changeListService: ChangeListService = null;
-  let editabilityService: EditabilityService = null;
-  let ExplorationCategoryService = null;
-  let explorationDataService = null;
-  let explorationDiffService: ExplorationDiffService = null;
-  let explorationInitStateNameService:
-    ExplorationInitStateNameService = null;
-  let explorationLanguageCodeService: ExplorationLanguageCodeService = null;
-  let ExplorationObjectiveService = null;
   let ExplorationRightsService = null;
-  let ExplorationStatesService = null;
-  let explorationTagsService: ExplorationTagsService = null;
   let ExplorationTitleService = null;
-  let ExplorationWarningsService = null;
-  let externalSaveService: ExternalSaveService = null;
-  let RouterService = null;
-  let siteAnalyticsService: SiteAnalyticsService = null;
-  let statesObjectFactory: StatesObjectFactory = null;
   let focusManagerService: FocusManagerService = null;
 
   importAllAngularServices();
@@ -103,28 +80,10 @@ describe('when draft changes are present and there ' +
     explorationSaveService = $injector.get('ExplorationSaveService');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    $window = $injector.get('$window');
-    alertsService = $injector.get('AlertsService');
     autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     changeListService = $injector.get('ChangeListService');
-    editabilityService = $injector.get('EditabilityService');
-    ExplorationCategoryService = $injector.get('ExplorationCategoryService');
-    explorationDataService = $injector.get('ExplorationDataService');
-    explorationDiffService = $injector.get('ExplorationDiffService');
-    explorationInitStateNameService = $injector.get(
-      'ExplorationInitStateNameService');
-    explorationLanguageCodeService = $injector.get(
-        'ExplorationLanguageCodeService');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
     ExplorationRightsService = $injector.get('ExplorationRightsService');
-    ExplorationStatesService = $injector.get('ExplorationStatesService');
-    explorationTagsService = $injector.get('ExplorationTagsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
-    ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    externalSaveService = $injector.get('ExternalSaveService');
-    RouterService= $injector.get('RouterService');
-    siteAnalyticsService = $injector.get('SiteAnalyticsService');
-    statesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
   it('should open version mismatch modal', fakeAsync(function() {
@@ -140,7 +99,7 @@ describe('when draft changes are present and there ' +
       });
     spyOn(ExplorationRightsService, 'isPrivate')
       .and.returnValue(true);
-  
+
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
     $rootScope.$apply();
@@ -163,7 +122,7 @@ describe('when draft changes are present and there ' +
         opened: Promise.resolve(),
         result: Promise.reject()
       });
-  
+
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
     $rootScope.$apply();
@@ -191,7 +150,7 @@ describe('when draft changes are present and there ' +
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should return \'initExplorationPageEventEmitter\'  ' +
+  it('should return \'initExplorationPageEventEmitter\' ' +
     'when calling \'onInitExplorationPage\'', fakeAsync(function() {
     let mockEventEmitter = new EventEmitter();
 
@@ -203,29 +162,17 @@ describe('when draft changes are present and there ' +
 describe('when there are no pending draft changes it', function() {
   let $uibModal = null;
   let $rootScope = null;
-  let $q = null;
   let explorationSaveService = null;
   let alertsService: AlertsService = null;
   let autosaveInfoModalsService: AutosaveInfoModalsService = null;
   let changeListService: ChangeListService = null;
   let editabilityService: EditabilityService = null;
   let ExplorationCategoryService = null;
-  let explorationDataService = null;
-  let explorationDiffService: ExplorationDiffService = null;
-  let explorationInitStateNameService:
-    ExplorationInitStateNameService = null;
   let explorationLanguageCodeService: ExplorationLanguageCodeService = null;
   let ExplorationObjectiveService = null;
   let ExplorationRightsService = null;
-  let ExplorationStatesService = null;
   let explorationTagsService: ExplorationTagsService = null;
   let ExplorationTitleService = null;
-  let ExplorationWarningsService = null;
-  let externalSaveService: ExternalSaveService = null;
-  let RouterService = null;
-  let siteAnalyticsService: SiteAnalyticsService = null;
-  let statesObjectFactory: StatesObjectFactory = null;
-  let focusManagerService: FocusManagerService = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
@@ -238,40 +185,28 @@ describe('when there are no pending draft changes it', function() {
           provide: ExplorationDataService,
           useValue: {
             save(changeList, message, successCb, errorCb) {
-              successCb(true, []);  
+              successCb(true, []);
             }
           }
         },
       ]
     });
-    focusManagerService = TestBed.inject(FocusManagerService);
   });
 
   beforeEach(angular.mock.inject(function($injector) {
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
-    alertsService = $injector.get('AlertsService');
     autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     changeListService = $injector.get('ChangeListService');
     editabilityService = $injector.get('EditabilityService');
     ExplorationCategoryService = $injector.get('ExplorationCategoryService');
-    explorationDataService = $injector.get('ExplorationDataService');
-    explorationDiffService = $injector.get('ExplorationDiffService');
-    explorationInitStateNameService = $injector.get(
-      'ExplorationInitStateNameService');
     explorationLanguageCodeService = $injector.get(
-        'ExplorationLanguageCodeService');
+      'ExplorationLanguageCodeService');
     ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
     ExplorationRightsService = $injector.get('ExplorationRightsService');
-    ExplorationStatesService = $injector.get('ExplorationStatesService');
     explorationTagsService = $injector.get('ExplorationTagsService');
     ExplorationTitleService = $injector.get('ExplorationTitleService');
-    ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    externalSaveService = $injector.get('ExternalSaveService');
-    RouterService= $injector.get('RouterService');
-    siteAnalyticsService = $injector.get('SiteAnalyticsService');
-    statesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
   it('should not open version mismatch modal', fakeAsync(function() {
@@ -289,7 +224,7 @@ describe('when there are no pending draft changes it', function() {
       });
     spyOn(ExplorationRightsService, 'isPrivate')
       .and.returnValue(true);
-  
+
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
     $rootScope.$apply();
@@ -303,17 +238,17 @@ describe('when there are no pending draft changes it', function() {
 
   it('should show congratulatory sharing modal', fakeAsync(function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
-    let endLoadingCb = jasmine.createSpy('endLoadingCb'); 
+    let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(changeListService, 'discardAllChanges')
       .and.returnValue(Promise.reject(null));
-    let modalSpy =  spyOn($uibModal, 'open').and.returnValue(
+    let modalSpy = spyOn($uibModal, 'open').and.returnValue(
       {
         opened: Promise.resolve(),
         result: Promise.resolve(['1'])
       });
     spyOn(ExplorationRightsService, 'publish')
       .and.resolveTo();
-  
+
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
     $rootScope.$apply();
@@ -332,7 +267,7 @@ describe('when there are no pending draft changes it', function() {
     });
     let publishSpy = spyOn(ExplorationRightsService, 'publish')
       .and.resolveTo();
-      
+
     ExplorationTitleService.savedMemento = true;
     ExplorationObjectiveService.savedMemento = true;
     ExplorationCategoryService.savedMemento = true;
@@ -351,7 +286,7 @@ describe('when there are no pending draft changes it', function() {
 
   it('should mark exploaration as editable', fakeAsync(function() {
     let editableSpy = spyOn(editabilityService, 'markNotEditable')
-      .and.returnValue(null)
+      .and.returnValue(null);
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     spyOn(changeListService, 'discardAllChanges')
@@ -402,29 +337,8 @@ describe('when there are no pending draft changes it', function() {
 describe('in case of backend error while saving ' +
   'exploration data it', function() {
   let $uibModal = null;
-  let $q = null;
   let $rootScope = null;
   let explorationSaveService = null;
-  let alertsService: AlertsService = null;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
-  let changeListService: ChangeListService = null;
-  let editabilityService: EditabilityService = null;
-  let ExplorationCategoryService = null;
-  let explorationDataService = null;
-  let explorationDiffService: ExplorationDiffService = null;
-  let explorationInitStateNameService:
-    ExplorationInitStateNameService = null;
-  let explorationLanguageCodeService: ExplorationLanguageCodeService = null;
-  let ExplorationObjectiveService = null;
-  let ExplorationRightsService = null;
-  let ExplorationStatesService = null;
-  let explorationTagsService: ExplorationTagsService = null;
-  let ExplorationTitleService = null;
-  let ExplorationWarningsService = null;
-  let externalSaveService: ExternalSaveService = null;
-  let RouterService = null;
-  let siteAnalyticsService: SiteAnalyticsService = null;
-  let statesObjectFactory: StatesObjectFactory = null;
   let focusManagerService: FocusManagerService = null;
 
   importAllAngularServices();
@@ -451,27 +365,6 @@ describe('in case of backend error while saving ' +
     explorationSaveService = $injector.get('ExplorationSaveService');
     $uibModal = $injector.get('$uibModal');
     $rootScope = $injector.get('$rootScope');
-    alertsService = $injector.get('AlertsService');
-    autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
-    changeListService = $injector.get('ChangeListService');
-    editabilityService = $injector.get('EditabilityService');
-    ExplorationCategoryService = $injector.get('ExplorationCategoryService');
-    explorationDataService = $injector.get('ExplorationDataService');
-    explorationDiffService = $injector.get('ExplorationDiffService');
-    explorationInitStateNameService = $injector.get(
-      'ExplorationInitStateNameService');
-    explorationLanguageCodeService = $injector.get(
-        'ExplorationLanguageCodeService');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
-    ExplorationRightsService = $injector.get('ExplorationRightsService');
-    ExplorationStatesService = $injector.get('ExplorationStatesService');
-    explorationTagsService = $injector.get('ExplorationTagsService');
-    ExplorationTitleService = $injector.get('ExplorationTitleService');
-    ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    externalSaveService = $injector.get('ExternalSaveService');
-    RouterService= $injector.get('RouterService');
-    siteAnalyticsService = $injector.get('SiteAnalyticsService');
-    statesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
   it('should call error callback', fakeAsync(function() {
@@ -501,25 +394,12 @@ describe('while saving changes', function() {
   let $timeout = null;
   let $rootScope = null;
   let explorationSaveService = null;
-  let alertsService: AlertsService = null;
-  let autosaveInfoModalsService: AutosaveInfoModalsService = null;
   let changeListService: ChangeListService = null;
-  let editabilityService: EditabilityService = null;
-  let ExplorationCategoryService = null;
-  let explorationDataService = null;
   let explorationDiffService = null;
-  let explorationInitStateNameService:
-    ExplorationInitStateNameService = null;
-  let explorationLanguageCodeService: ExplorationLanguageCodeService = null;
-  let ExplorationObjectiveService = null;
   let ExplorationRightsService = null;
   let ExplorationStatesService = null;
-  let explorationTagsService: ExplorationTagsService = null;
-  let ExplorationTitleService = null;
   let ExplorationWarningsService = null;
-  let externalSaveService: ExternalSaveService = null;
   let RouterService = null;
-  let siteAnalyticsService: SiteAnalyticsService = null;
   let statesObjectFactory = null;
   let focusManagerService: FocusManagerService = null;
 
@@ -703,7 +583,7 @@ describe('while saving changes', function() {
               });
             },
             save(changeList, message, successCb, errorCb) {
-              successCb(true, []);  
+              successCb(true, []);
             }
           }
         },
@@ -717,26 +597,12 @@ describe('while saving changes', function() {
     $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
     $rootScope = $injector.get('$rootScope');
-    alertsService = $injector.get('AlertsService');
-    autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     changeListService = $injector.get('ChangeListService');
-    editabilityService = $injector.get('EditabilityService');
-    ExplorationCategoryService = $injector.get('ExplorationCategoryService');
-    explorationDataService = $injector.get('ExplorationDataService');
     explorationDiffService = $injector.get('ExplorationDiffService');
-    explorationInitStateNameService = $injector.get(
-      'ExplorationInitStateNameService');
-    explorationLanguageCodeService = $injector.get(
-        'ExplorationLanguageCodeService');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
     ExplorationRightsService = $injector.get('ExplorationRightsService');
     ExplorationStatesService = $injector.get('ExplorationStatesService');
-    explorationTagsService = $injector.get('ExplorationTagsService');
-    ExplorationTitleService = $injector.get('ExplorationTitleService');
     ExplorationWarningsService = $injector.get('ExplorationWarningsService');
-    externalSaveService = $injector.get('ExternalSaveService');
-    RouterService= $injector.get('RouterService');
-    siteAnalyticsService = $injector.get('SiteAnalyticsService');
+    RouterService = $injector.get('RouterService');
     statesObjectFactory = $injector.get('StatesObjectFactory');
   }));
 
@@ -744,7 +610,7 @@ describe('while saving changes', function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict)
+      statesBackendDict);
     spyOn(RouterService, 'savePendingChanges')
       .and.returnValue(null);
     spyOn(ExplorationStatesService, 'getStates')
@@ -775,7 +641,7 @@ describe('while saving changes', function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict)
+      statesBackendDict);
     spyOn(RouterService, 'savePendingChanges')
       .and.returnValue(null);
     spyOn(ExplorationStatesService, 'getStates')
@@ -809,7 +675,7 @@ describe('while saving changes', function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict)
+      statesBackendDict);
     spyOn(RouterService, 'savePendingChanges')
       .and.returnValue(null);
     spyOn(ExplorationStatesService, 'getStates')
@@ -841,7 +707,7 @@ describe('while saving changes', function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict)
+      statesBackendDict);
     spyOn(RouterService, 'savePendingChanges')
       .and.returnValue(null);
     spyOn(ExplorationStatesService, 'getStates')
@@ -881,7 +747,7 @@ describe('while saving changes', function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
-      statesBackendDict)
+      statesBackendDict);
     spyOn(RouterService, 'savePendingChanges')
       .and.returnValue(null);
     spyOn(ExplorationStatesService, 'getStates')
