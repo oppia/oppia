@@ -50,20 +50,17 @@ export class UserExplorationPermissionsService {
   }
 
   async fetchPermissionsAsync(): Promise<ExplorationPermissions> {
-    UserExplorationPermissionsService.permissionsPromise = (
+    let permissionPromise = (
       this.explorationPermissionsBackendApiService.getPermissionsAsync());
+    UserExplorationPermissionsService.permissionsPromise = permissionPromise;
     return new Promise((resolve, reject) => {
-      let permissionPromise =
-       UserExplorationPermissionsService.permissionsPromise;
-      if (permissionPromise) {
-        permissionPromise.then(
-          (response) => {
-            this.userExplorationPermissionsFetched.emit();
-            resolve(response);
-          },
-          reject,
-        );
-      }
+      permissionPromise.then(
+        (response) => {
+          this.userExplorationPermissionsFetched.emit();
+          resolve(response);
+        },
+        reject,
+      );
     });
   }
 
