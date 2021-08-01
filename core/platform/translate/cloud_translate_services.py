@@ -29,7 +29,7 @@ from google.cloud import translate_v2 as translate
 CLIENT = translate.Client(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()))
+        if constants.EMULATOR_MODE else auth.default()[0]))
 
 # List of languages with adequate Google Translate accuracy.
 LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')

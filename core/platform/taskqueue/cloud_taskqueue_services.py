@@ -33,7 +33,7 @@ from google.protobuf import timestamp_pb2
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()))
+        if constants.EMULATOR_MODE else auth.default()[0]))
 
 
 def create_http_task(
