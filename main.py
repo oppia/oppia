@@ -98,7 +98,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        self.render_json({
+        self.render_json({ # type: ignore[no-untyped-call]
             'isInternetConnected': True
         })
 
