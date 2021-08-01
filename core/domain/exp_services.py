@@ -285,8 +285,6 @@ def export_to_zip_file(exploration_id, version=None):
         str. The contents of the ZIP archive of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
-    # Asset directories that need to be included in exploration download.
-    asset_dirs_to_include_in_downloads = ('image',)
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
@@ -302,15 +300,19 @@ def export_to_zip_file(exploration_id, version=None):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
-        dir_list = fs.listdir('')
-        for filepath in dir_list:
-            if not filepath.startswith(asset_dirs_to_include_in_downloads):
-                continue
+        html_string_list = exploration.get_all_html_content_strings()
+        image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                html_string_list))
+
+        for filename in image_filenames:
+            filepath = 'image/%s' % filename
             file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
             assert isinstance(str_filepath, python_utils.UNICODE)
             unicode_filepath = str_filepath.decode('utf-8')
+            logging.error(unicode_filepath)
             zfile.writestr(unicode_filepath, file_contents)
 
     return temp_file.getvalue()
