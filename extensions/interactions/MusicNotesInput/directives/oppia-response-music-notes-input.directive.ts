@@ -41,7 +41,6 @@ angular.module('oppia').directive('oppiaResponseMusicNotesInput', [
             }
           }
 
-
           if (_notes.length > 0) {
             ctrl.displayedAnswer = _notes.join(', ');
           } else {

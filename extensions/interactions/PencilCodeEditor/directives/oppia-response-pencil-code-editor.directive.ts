@@ -22,7 +22,6 @@
 
 require('services/html-escaper.service.ts');
 
-
 angular.module('oppia').directive('oppiaResponsePencilCodeEditor', [
   'HtmlEscaperService', function(HtmlEscaperService) {
     return {
