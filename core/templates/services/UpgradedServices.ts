@@ -545,6 +545,7 @@ export class UpgradedServices {
       new CollectionValidationService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['ConnectionService'] = new ConnectionService(
+      new WindowRef(),
       upgradedServices['HttpClient']);
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
