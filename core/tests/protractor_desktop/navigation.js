@@ -222,6 +222,7 @@ describe('Static Pages Tour', function() {
 
   it('should visit the Volunteer page', async function() {
     await browser.get('/volunteer');
+    await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       element(by.css('.protractor-test-volunteer-page')),
       'Volunteer page taking too long to appear');
