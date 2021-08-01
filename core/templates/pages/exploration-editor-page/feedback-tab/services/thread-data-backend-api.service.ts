@@ -185,7 +185,8 @@ export class ThreadDataBackendApiService {
       async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  async getMessagesAsync(thread: SuggestionAndFeedbackThread):
+  // A thread will be null if threadId is invalid.
+  async getMessagesAsync(thread: SuggestionAndFeedbackThread | null):
    Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -231,8 +232,9 @@ export class ThreadDataBackendApiService {
     });
   }
 
+  // A thread will be null if threadId is invalid.
   async markThreadAsSeenAsync(
-      thread: SuggestionAndFeedbackThread): Promise<void> {
+      thread: SuggestionAndFeedbackThread | null): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -243,8 +245,9 @@ export class ThreadDataBackendApiService {
     }).toPromise().then();
   }
 
+  // A thread will be null if threadId is invalid.
   async addNewMessageAsync(
-      thread: SuggestionAndFeedbackThread, newMessage: string,
+      thread: SuggestionAndFeedbackThread | null, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -275,8 +278,11 @@ export class ThreadDataBackendApiService {
     });
   }
 
+  // A thread will be null if threadId is invalid.
   async resolveSuggestionAsync(
-      thread: SuggestionAndFeedbackThread, action: string, commitMsg: string,
+      thread: SuggestionAndFeedbackThread | null,
+      action: string,
+      commitMsg: string,
       reviewMsg: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');

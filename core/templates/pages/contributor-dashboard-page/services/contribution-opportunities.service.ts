@@ -30,6 +30,7 @@ export interface SkillOpportunitiesDict {
   opportunities: SkillOpportunity[];
   more: boolean;
 }
+
 export interface ExplorationOpportunitiesDict {
   opportunities: ExplorationOpportunitySummary[];
   more: boolean;
@@ -46,6 +47,9 @@ export class ContributionOpportunitiesService {
 
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
+  // These properties are initialized using async methods
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _skillOpportunitiesCursor!: string;
   private _translationOpportunitiesCursor!: string;
   private _voiceoverOpportunitiesCursor!: string;

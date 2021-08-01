@@ -24,7 +24,7 @@ import { ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.
 import { FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
-import { SuggestionAndFeedbackThread, SuggestionAndFeedbackThreads, ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import { SuggestionAndFeedbackThreads, ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -138,11 +138,12 @@ describe('retrieving threads service', () => {
   });
 
   beforeEach(() => {
-    contextService = TestBed.get(ContextService);
-    csrfTokenService = TestBed.get(CsrfTokenService);
-    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
-    threadDataBackendApiService = TestBed.get(ThreadDataBackendApiService);
+    contextService = TestBed.inject(ContextService);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
+    suggestionThreadObjectFactory =
+      TestBed.inject(SuggestionThreadObjectFactory);
+    threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(csrfTokenService, 'getTokenAsync')
@@ -293,9 +294,8 @@ describe('retrieving threads service', () => {
 
   it('should throw error if trying to fetch messages of' +
     'null thread', async() => {
-    await expectAsync(threadDataBackendApiService.getMessagesAsync(
-        <SuggestionAndFeedbackThread> {})).toBeRejectedWithError(
-      'Trying to update a non-existent thread');
+    await expectAsync(threadDataBackendApiService.getMessagesAsync(null))
+      .toBeRejectedWithError('Trying to update a non-existent thread');
   });
 
   it(
@@ -434,9 +434,8 @@ describe('retrieving threads service', () => {
   }));
 
   it('should throw error if trying to mark null thread as seen', async() => {
-    await expectAsync(threadDataBackendApiService.markThreadAsSeenAsync(
-      <SuggestionAndFeedbackThread> {})).toBeRejectedWithError(
-      'Trying to update a non-existent thread');
+    await expectAsync(threadDataBackendApiService.markThreadAsSeenAsync(null))
+      .toBeRejectedWithError('Trying to update a non-existent thread');
   });
 
   it(
@@ -463,7 +462,7 @@ describe('retrieving threads service', () => {
 
   it('should use reject handler when passing a null thread', async() => {
     await expectAsync(threadDataBackendApiService.addNewMessageAsync(
-      <SuggestionAndFeedbackThread>{}, 'Message', 'open')
+      null, 'Message', 'open')
     ).toBeRejectedWithError(
       'Trying to update a non-existent thread');
   });
@@ -614,8 +613,7 @@ describe('retrieving threads service', () => {
 
   it('should throw an error if trying to resolve a null thread', async() => {
     await expectAsync(
-      threadDataBackendApiService.resolveSuggestionAsync(
-        <SuggestionAndFeedbackThread> {}, '', '', ''))
+      threadDataBackendApiService.resolveSuggestionAsync(null, '', '', ''))
       .toBeRejectedWithError('Trying to update a non-existent thread');
   });
 });

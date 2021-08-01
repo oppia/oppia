@@ -59,6 +59,7 @@ export class ExpressionInterpolationService {
     });
   }
 
+  // Function returns null if there is some error in the expression or syntax.
   processUnicode(
       sourceUnicode: string, envs: Record<string, string>[]): string | null {
     try {

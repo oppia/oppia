@@ -28,6 +28,7 @@ import {
   providedIn: 'root'
 })
 export class AdminDataService {
+  // 'dataPromise' is null initially.
   dataPromise: Promise<AdminPageData> | null;
 
   constructor(
