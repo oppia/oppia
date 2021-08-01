@@ -44,6 +44,9 @@ export interface AggregatedStats {
   };
 }
 
+type StatsReportingUrlsKey = (
+  keyof typeof ExplorationPlayerConstants.STATS_REPORTING_URLS);
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,7 +62,8 @@ export class StatsReportingBackendApiService {
       previousStateName: string, nextStateName: string): string {
     try {
       return this.urlInterpolationService.interpolateUrl(
-        ExplorationPlayerConstants.STATS_REPORTING_URLS[urlIdentifier], {
+        ExplorationPlayerConstants.STATS_REPORTING_URLS[
+          <StatsReportingUrlsKey> urlIdentifier], {
           exploration_id: explorationId
         });
     } catch (e) {

@@ -52,8 +52,13 @@ export class ExplorationRecommendationsBackendApiService {
   async getRecommendedSummaryDictsAsync(
       authorRecommendedExpIds: string[],
       includeSystemRecommendations: string,
-      collectionId: string, storyId: string, currentNodeId: string,
-      explorationId: string): Promise<LearnerExplorationSummary[]> {
+      // 'collectionId', 'storyId' and 'currentNodeId' can be null
+      // since they may not be present in the URL.
+      collectionId: string | null,
+      storyId: string | null,
+      currentNodeId: string | null,
+      explorationId: string
+  ): Promise<LearnerExplorationSummary[]> {
     let recommendationsUrlParams: RecommendationsUrlParams = {
       stringified_author_recommended_ids: JSON.stringify(
         authorRecommendedExpIds),
