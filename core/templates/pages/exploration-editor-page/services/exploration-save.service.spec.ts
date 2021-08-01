@@ -32,7 +32,8 @@ import { ExplorationLanguageCodeService } from './exploration-language-code.serv
 import { ExplorationTagsService } from './exploration-tags.service';
 // ^^^ This block is to be removed.
 
-describe('when draft changes are present and there ' +
+describe('Exploration save service ' +
+  'when draft changes are present and there ' +
   'is version mismatch it', function() {
   let $rootScope = null;
   let $uibModal = null;
@@ -156,7 +157,8 @@ describe('when draft changes are present and there ' +
   }));
 });
 
-describe('when there are no pending draft changes it', function() {
+describe('Exploration save service ' +
+  'when there are no pending draft changes it', function() {
   let $uibModal = null;
   let $rootScope = null;
   let explorationSaveService = null;
@@ -330,7 +332,8 @@ describe('when there are no pending draft changes it', function() {
   });
 });
 
-describe('in case of backend error while saving ' +
+describe('Exploration save service ' +
+  'in case of backend error while saving ' +
   'exploration data it', function() {
   let $uibModal = null;
   let $rootScope = null;
@@ -383,7 +386,8 @@ describe('in case of backend error while saving ' +
   }));
 });
 
-describe('while saving changes', function() {
+describe('Exploration save service ' +
+  'while saving changes', function() {
   let $uibModal = null;
   let $timeout = null;
   let $rootScope = null;
