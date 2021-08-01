@@ -215,7 +215,6 @@ export class EditableStoryBackendApiService {
      * the success callback, if one is provided to the returned promise
      * object. Errors are passed to the error callback, if one is provided.
      */
-
   async updateStoryAsync(
       storyId: string, storyVersion: number,
       commitMessage: string,

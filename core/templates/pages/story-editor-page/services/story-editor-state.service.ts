@@ -259,9 +259,9 @@ export class StoryEditorStateService {
   }
 
   /**
-    * Returns whether this service is currently attempting to save the
-    * story maintained by this service.
-    */
+  * Returns whether this service is currently attempting to save the
+  * story maintained by this service.
+  */
   isSavingStory(): boolean {
     return this._storyIsBeingSaved;
   }
