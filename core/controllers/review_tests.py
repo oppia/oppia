@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
@@ -26,6 +27,39 @@ import feconf
 
 class ReviewTestsPage(base.BaseHandler):
     """Renders the review tests page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+                }]
+            }
+        },
+        'story_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, _):
@@ -40,6 +74,38 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+                }]
+            }
+        },
+        'topic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+                }]
+            }
+        },
+        'story_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
