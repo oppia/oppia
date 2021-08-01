@@ -152,3 +152,80 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         }
         domain_objects_validator.validate_change_dict_for_blog_post(
             blog_post_change)
+
+
+class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
+    """Tests to validate state_dict of StateYamlHandler."""
+
+    def test_valid_object_raises_no_exception(self):
+        state_dict = {
+            'content': {'content_id': 'content', 'html': ''},
+            'param_changes': [],
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': 'default_outcome',
+                        'html': ''
+                    },
+                    'dest': 'State A',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {
+                    'rows': {
+                        'value': 1
+                    },
+                    'placeholder': {
+                        'value': {
+                            'unicode_str': '',
+                            'content_id': 'ca_placeholder_0'
+                        }
+                    }
+                },
+                'confirmed_unclassified_answers': [],
+                'id': 'TextInput',
+                'hints': []
+            },
+            'linked_skill_id': None,
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'classifier_model_id': None,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'next_content_id_index': 1,
+            'card_is_checkpoint': False,
+            'solicit_answer_details': False
+        }
+        domain_objects_validator.validate_state_dict(state_dict)
+
+    def test_invalid_object_raises_exception(self):
+        invalid_state_dict = {
+            'classifier_model_id': None,
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {},
+                    'default_outcome': {},
+                    'ca_placeholder_0': {}
+                }
+            },
+            'next_content_id_index': 1,
+            'card_is_checkpoint': False,
+            'solicit_answer_details': False
+        }
+        # The error is representing the keyerror.
+        with self.assertRaisesRegexp(Exception, 'content'):
+            domain_objects_validator.validate_state_dict(invalid_state_dict)

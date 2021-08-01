@@ -70,7 +70,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'No filename supplied')
+        self.assertEqual(
+            response_dict['error'], 'Missing key in handler args: filename.')
 
         self.logout()
 
@@ -99,7 +100,11 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
             expected_status_int=400)
 
-        self.assertEqual(response_dict['error'], 'Invalid filename')
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({u\'regex_pattern\': u\'\\\\w+[.]\\\\w+\'}) for '
+            'object .png')
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -345,6 +350,10 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
+        large_image_file = (
+            '<svg><path d="%s" /></svg>' % (
+                'M150 0 L75 200 L225 200 Z ' * 4000)
+        )
 
         # Upload an SVG image that exceeds the file size limit of 100 KB.
         response_dict = self.post_json(
@@ -355,12 +364,15 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=((
                 'image',
                 'unused_filename',
-                '<svg><path d="%s" /></svg>' % (
-                    'M150 0 L75 200 L225 200 Z ' * 4000)),)
+                large_image_file),)
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(
-            response_dict['error'], 'Image exceeds file size limit of 100 KB.')
+
+        error_msg = (
+            'Schema validation for \'image\' failed: Validation failed: '
+            'has_length_at_most ({u\'max_value\': 102400}) for object %s'
+            % large_image_file)
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -389,7 +401,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn('Filenames should not include', response_dict['error'])
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({u\'regex_pattern\': u\'\\\\w+[.]\\\\w+\'}) '
+            'for object test/a.png')
+        self.assertIn(error_msg, response_dict['error'])
 
         self.logout()
 
@@ -408,8 +425,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=(('image', 'unused_filename', raw_image),),
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn(
-            'Image filename with no extension', response_dict['error'])
+
+        error_msg = (
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({u\'regex_pattern\': u\'\\\\w+[.]\\\\w+\'}) '
+            'for object test')
+        self.assertIn(error_msg, response_dict['error'])
 
         self.logout()
 
