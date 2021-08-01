@@ -149,28 +149,22 @@ export class Interaction {
     const traverseSchemaAndConvertSubtitledToDicts = (
         value: Object[] | Object
     ): Object[] | Object => {
-      // Non-null assertion is used to make the strict typing happy
-      // while still keeping the value `undefined`, which is used
-      // in the return value of the function.
-      let result!: Object[] | Object;
-
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        result = value.toBackendDict();
+        return value.toBackendDict();
       } else if (value instanceof Array) {
-        result = value.map(
+        return value.map(
           element => traverseSchemaAndConvertSubtitledToDicts(element));
       } else if (value instanceof Object) {
         type KeyOfValue = keyof typeof value;
         let _result: Record<KeyOfValue, Object> = {};
-        result = {};
         let keys = <KeyOfValue[]>Object.keys(value);
         keys.forEach(key => {
           _result[key] = traverseSchemaAndConvertSubtitledToDicts(value[key]);
         });
-        result = _result as Object;
+        return _result as Object;
       }
 
-      return result || value;
+      return value;
     };
 
     const customizationArgsBackendDict: Record<string, Object> = {};
