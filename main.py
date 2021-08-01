@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-from constants import constants
 
-from core.controllers import acl_decorators
+from constants import constants
 from core.controllers import access_validators
+from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config
 from core.controllers import base
@@ -70,7 +70,6 @@ from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
-from core.domain import user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
