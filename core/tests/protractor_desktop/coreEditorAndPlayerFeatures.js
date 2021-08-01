@@ -420,10 +420,9 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
-    // NumberWithUnits input does not have any customization arguments.
-    // Therefore the customization modal and the save interaction button does
-    // not appear.
-    await explorationEditorMainTab.setInteraction('NumberWithUnits');
+    // Numeric input does not have any customization arguments. Therefore the
+    // customization modal and the save interaction button does not appear.
+    await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.deleteInteraction();
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
@@ -435,11 +434,11 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
-    // NumberWithUnits input does not have any customization arguments.
-    // Therefore, on re-clicking, a modal opens up informing the user that
-    // this interaction does not have any customization options. To dismiss
-    // this modal, user clicks 'Okay' implying that he/she has got the message.
-    await explorationEditorMainTab.setInteraction('NumberWithUnits');
+    // Numeric input does not have any customization arguments. Therefore, on
+    // re-clicking, a modal opens up informing the user that this interaction
+    // does not have any customization options. To dismiss this modal, user
+    // clicks 'Okay' implying that he/she has got the message.
+    await explorationEditorMainTab.setInteraction('NumericInput');
     var testInteractionButton = element(by.css('.protractor-test-interaction'));
     await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(

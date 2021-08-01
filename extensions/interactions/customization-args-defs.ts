@@ -410,18 +410,8 @@ export interface NumericExpressionInputCustomizationArgs {
   };
 }
 
-
-export interface NumericInputCustomizationArgsBackendDict {
-  inputGreaterThanZero: {
-    value: boolean;
-  };
-}
-export interface NumericInputCustomizationArgs {
-  inputGreaterThanZero: {
-    value: boolean;
-  };
-}
-
+export interface NumericInputCustomizationArgsBackendDict { }
+export interface NumericInputCustomizationArgs { }
 
 export interface NumberWithUnitsCustomizationArgsBackendDict { }
 export interface NumberWithUnitsCustomizationArgs { }
@@ -444,7 +434,6 @@ export type InteractionCustomizationArgsBackendDict = (
   MusicNotesInputCustomizationArgsBackendDict |
   NumberWithUnitsCustomizationArgsBackendDict |
   NumericExpressionInputCustomizationArgsBackendDict |
-  NumericInputCustomizationArgsBackendDict |
   PencilCodeEditorCustomizationArgsBackendDict |
   RatioExpressionInputCustomizationArgsBackendDict |
   SetInputCustomizationArgsBackendDict |
@@ -467,7 +456,6 @@ export type InteractionCustomizationArgs = (
   MusicNotesInputCustomizationArgs |
   NumberWithUnitsCustomizationArgs |
   NumericExpressionInputCustomizationArgs |
-  NumericInputCustomizationArgs |
   PencilCodeEditorCustomizationArgs |
   RatioExpressionInputCustomizationArgs |
   SetInputCustomizationArgs |

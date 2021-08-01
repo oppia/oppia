@@ -23,7 +23,6 @@
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumericInputCustomizationArgs } from 'interactions/customization-args-defs';
@@ -35,7 +34,6 @@ import { NumericInputValidationService } from './numeric-input-validation.servic
   templateUrl: './numeric-input-interaction.component.html'
 })
 export class InteractiveNumericInput implements OnInit {
-  @Input() inputGreaterThanZeroWithValue: string = '';
   @Input() savedSolution;
   @Input() labelForFocusTarget;
   errorString = '';
@@ -46,9 +44,7 @@ export class InteractiveNumericInput implements OnInit {
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
     private numericInputValidationService: NumericInputValidationService,
-    private changeDetectorRef: ChangeDetectorRef,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService
+    private changeDetectorRef: ChangeDetectorRef
   ) { }
 
   private isAnswerValid(): boolean {
@@ -69,12 +65,6 @@ export class InteractiveNumericInput implements OnInit {
     }
   }
 
-  private getAttributesObject() {
-    return {
-      inputGreaterThanZeroWithValue: this.inputGreaterThanZeroWithValue,
-    };
-  }
-
   onAnswerChange(answer: string | number): void {
     if (this.answer === answer) {
       return;
@@ -92,15 +82,6 @@ export class InteractiveNumericInput implements OnInit {
   }
 
   ngOnInit(): void {
-    const {
-      inputGreaterThanZero
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'NumericInput',
-      this.getAttributesObject()
-    ) as NumericInputCustomizationArgs;
-    this.inputGreaterThanZero = inputGreaterThanZero.value;
-    window.localStorage.setItem(
-      'checkInputGreaterThanZero', this.inputGreaterThanZeroWithValue);
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''

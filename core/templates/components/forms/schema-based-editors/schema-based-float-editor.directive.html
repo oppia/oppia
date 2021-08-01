@@ -3,7 +3,7 @@
     <span ng-if="!expressionMode">
       <input type="number" step="any" autocomplete="off" ng-model="$ctrl.localValue" class="form-control display-inline oppia-float-form-input protractor-test-float-form-input"
              name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>"
-             focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)" ng-keydown="$ctrl.onDownKeyPress($event)"
+             focus-on="<[$ctrl.labelForFocusTarget()]>" ng-keypress="$ctrl.onKeypress($event)"
              apply-validation validators="$ctrl.validators()"
              ng-blur="$ctrl.onBlur()" ng-focus="$ctrl.onFocus()"
              ng-change="$ctrl.generateErrors()">

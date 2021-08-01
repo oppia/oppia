@@ -355,21 +355,13 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {
-        inputGreaterThanZero: {
-          value: true
-        }
-      },
+      customization_args: {},
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
-    expect(testInteraction.customizationArgs).toEqual({
-      inputGreaterThanZero: {
-        value: true
-      }
-    });
+    expect(testInteraction.customizationArgs).toEqual({});
   });
 
   it('should correctly set customization arguments for ' +
@@ -377,22 +369,14 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {
-        inputGreaterThanZero: {
-          value: false
-        }
-      },
+      customization_args: {},
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({
-      inputGreaterThanZero: {
-        value: false
-      }
-    });
+    expect(testInteraction.customizationArgs).toEqual({});
   });
 
   it('should correctly set customization arguments for ' +

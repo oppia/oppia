@@ -74,7 +74,7 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(await forms.toRichText(
       'enter 6 to continue'));
-    await explorationEditorMainTab.setInteraction('NumericInput', false);
+    await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
     await (
@@ -133,7 +133,7 @@ describe('Exploration history', function() {
       },
       9: {
         text: '  customization_args: {}',
-        highlighted: true
+        highlighted: false
       },
       10: {
         text: '  default_outcome:',
@@ -155,7 +155,7 @@ describe('Exploration history', function() {
       },
       14: {
         text: '      html: \'\'',
-        highlighted: true
+        highlighted: false
       },
       15: {
         text: '    labelled_as_correct: false',
@@ -175,7 +175,7 @@ describe('Exploration history', function() {
       },
       19: {
         text: '  hints: []',
-        highlighted: true
+        highlighted: false
       },
       20: {
         text: '  id: null',
@@ -183,7 +183,7 @@ describe('Exploration history', function() {
       },
       21: {
         text: '  solution: null',
-        highlighted: true
+        highlighted: false
       },
       22: {
         text: 'linked_skill_id: null',
@@ -211,7 +211,7 @@ describe('Exploration history', function() {
       },
       28: {
         text: '    default_outcome: {}',
-        highlighted: false
+        highlighted: true
       },
       29: {
         text: 'solicit_answer_details: false',
@@ -333,170 +333,114 @@ describe('Exploration history', function() {
         highlighted: false
       },
       24: {
-        text: '  customization_args:',
-        highlighted: true
+        text: '  customization_args: {}',
+        highlighted: false
       },
       25: {
-        text: '    inputGreaterThanZero:',
-        highlighted: true
-      },
-      26: {
-        text: '      value: false',
-        highlighted: true
-      },
-      27: {
         text: '  default_outcome:',
         highlighted: false
       },
-      28: {
+      26: {
         text: '    dest: first',
         highlighted: true
       },
-      29: {
+      27: {
         text: '    feedback:',
         highlighted: false
       },
-      30: {
+      28: {
         text: '      content_id: default_outcome',
         highlighted: false
       },
-      31: {
-        text: '      html: <p>Try again</p>',
-        highlighted: true
+      29: {
+        text: '      html: \'\'',
+        highlighted: false
       },
-      32: {
+      30: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      33: {
+      31: {
         text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
-      34: {
+      32: {
         text: '    param_changes: []',
         highlighted: false
       },
-      35: {
+      33: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      36: {
-        text: '  hints:',
-        highlighted: true
+      34: {
+        text: '  hints: []',
+        highlighted: false
       },
-      37: {
-        text: '  - hint_content:',
-        highlighted: true
-      },
-      38: {
-        text: '      content_id: hint_2',
-        highlighted: true
-      },
-      39: {
-        text: '      html: <p>Hint 1</p>',
-        highlighted: true
-      },
-      40: {
+      35: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      41: {
-        text: '  solution:',
-        highlighted: true
+      36: {
+        text: '  solution: null',
+        highlighted: false
       },
-      42: {
-        text: '    answer_is_exclusive: false',
-        highlighted: true
-      },
-      43: {
-        text: '    correct_answer: 6.0',
-        highlighted: true
-      },
-      44: {
-        text: '    explanation:',
-        highlighted: true
-      },
-      45: {
-        text: '      content_id: solution',
-        highlighted: true
-      },
-      46: {
-        text: '      html: <p>It is correct</p>',
-        highlighted: true
-      },
-      47: {
+      37: {
         text: 'linked_skill_id: null',
         highlighted: false
       },
-      48: {
-        text: 'next_content_id_index: 3',
+      38: {
+        text: 'next_content_id_index: 2',
         highlighted: true
       },
-      49: {
+      39: {
         text: 'param_changes: []',
         highlighted: false
       },
-      50: {
+      40: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      51: {
+      41: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      52: {
+      42: {
         text: '    content: {}',
         highlighted: false
       },
-      53: {
+      43: {
         text: '    default_outcome: {}',
         highlighted: false
       },
-      54: {
+      44: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      55: {
-        text: '    hint_2: {}',
-        highlighted: true
-      },
-      56: {
-        text: '    solution: {}',
-        highlighted: true
-      },
-      57: {
+      45: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      58: {
+      46: {
         text: 'written_translations:',
         highlighted: false
       },
-      59: {
+      47: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      60: {
+      48: {
         text: '    content: {}',
         highlighted: false
       },
-      61: {
+      49: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      62: {
+      50: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      63: {
-        text: '    hint_2: {}',
-        highlighted: true
-      },
-      64: {
-        text: '    solution: {}',
-        highlighted: true
-      },
-      65: {
+      51: {
         text: '',
         highlighted: false
       }

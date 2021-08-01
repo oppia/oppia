@@ -112,17 +112,6 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.onDownKeyPress = function(event) {
-            var inputGreaterThanZeroWithValue = localStorage.getItem(
-              'checkInputGreaterThanZero');
-            if (inputGreaterThanZeroWithValue === 'true' &&
-             ctrl.localValue < 1) {
-              if (event.keyCode === 40) {
-                event.preventDefault();
-              }
-            }
-          };
-
           ctrl.$onInit = function() {
             ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;

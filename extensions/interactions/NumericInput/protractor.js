@@ -17,10 +17,8 @@
  * interaction.
  */
 
-var objects = require(process.cwd() + '/extensions/objects/protractor.js');
-var customizeInteraction = async function(elem, inputGreaterThanZero) {
-  await objects.BooleanEditor(elem.element(by.tagName(
-    'schema-based-bool-editor'))).setValue(inputGreaterThanZero);
+var customizeInteraction = function() {
+// There are no customizations.
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {
@@ -39,7 +37,7 @@ var submitAnswer = async function(elem, answer) {
 var answerObjectType = 'Real';
 
 var testSuite = [{
-  interactionArguments: [false],
+  interactionArguments: [],
   ruleArguments: ['IsWithinTolerance', 2, 143],
   expectedInteractionDetails: [],
   wrongAnswers: [146, 130],

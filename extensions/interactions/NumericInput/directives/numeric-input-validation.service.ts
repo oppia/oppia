@@ -99,17 +99,6 @@ export class NumericInputValidationService {
           'is greater than the first number.')
       });
     };
-    var raiseWarningForinputGreaterThanZero = function(
-        ruleIndex: number, input: number) {
-      if (input < 0 && customizationArgs.inputGreaterThanZero.value) {
-        warningsList.push({
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'Rule ' + (ruleIndex + 1) + ' input ' +
-            ' should be greater than or equal to zero. ')
-        });
-      }
-    };
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
@@ -126,7 +115,6 @@ export class NumericInputValidationService {
           case 'Equals':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
-            raiseWarningForinputGreaterThanZero(j, x);
             break;
           case 'IsInclusivelyBetween':
             var a = <number> rule.inputs.a;
@@ -135,14 +123,6 @@ export class NumericInputValidationService {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
-            if (a < 0 && customizationArgs.inputGreaterThanZero.value) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' upper bound of the range ' +
-                  ' should be greater than or equal to zero. ')
-              });
-            }
             break;
           case 'IsGreaterThan':
             var x = (<number>rule.inputs.x);
@@ -155,25 +135,15 @@ export class NumericInputValidationService {
           case 'IsLessThan':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
-            raiseWarningForinputGreaterThanZero(j, x);
             break;
           case 'IsLessThanOrEqualTo':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
-            raiseWarningForinputGreaterThanZero(j, x);
             break;
           case 'IsWithinTolerance':
             var x = (<number>rule.inputs.x);
             var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-            if ((x + tol) < 0 && customizationArgs.inputGreaterThanZero.value) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' Upper bound of the tolerance range ' +
-                  ' should be greater than or equal to zero. ')
-              });
-            }
             break;
           default:
         }

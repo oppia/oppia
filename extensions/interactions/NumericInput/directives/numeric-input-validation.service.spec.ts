@@ -22,8 +22,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { NumericInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
 import { NumericInputValidationService } from
   'interactions/NumericInput/directives/numeric-input-validation.service';
 import { Outcome, OutcomeObjectFactory } from
@@ -38,8 +36,7 @@ describe('NumericInputValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
 
   let currentState: string;
-  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome,
-    customizationArgs: NumericInputCustomizationArgs;
+  let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let equalsZeroRule: Rule, betweenNegativeOneAndOneRule: Rule,
     betweenFourAndTwoRule: Rule, lessThanOneRule: Rule,
     greaterThanNegativeOneRule: Rule, lessThanOrEqualToOneRule: Rule,
@@ -60,11 +57,6 @@ describe('NumericInputValidationService', () => {
     agof = TestBed.inject(AnswerGroupObjectFactory);
     rof = TestBed.inject(RuleObjectFactory);
 
-    customizationArgs = {
-      inputGreaterThanZero: {
-        value: true
-      }
-    };
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
@@ -138,7 +130,7 @@ describe('NumericInputValidationService', () => {
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 upper bound of the range  should be greater than' +
@@ -157,8 +149,7 @@ describe('NumericInputValidationService', () => {
       }, 'NumericInput');
       answerGroups[0].rules = [zeroWithinToleranceOfOneRule];
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-      expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 1 Upper bound of the tolerance range  should ' +
@@ -175,8 +166,7 @@ describe('NumericInputValidationService', () => {
     }, 'NumericInput');
     answerGroups[0].rules = [lessThanOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 input  should be greater than or equal to zero. '
@@ -192,8 +182,7 @@ describe('NumericInputValidationService', () => {
     }, 'NumericInput');
     answerGroups[0].rules = [equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 input  should be greater than or equal to zero. '
@@ -210,8 +199,7 @@ describe('NumericInputValidationService', () => {
       }, 'NumericInput');
       answerGroups[0].rules = [lessThanOrEqualToOneRule];
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-      expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 1 input  should be greater than or equal to zero. '
@@ -223,7 +211,7 @@ describe('NumericInputValidationService', () => {
   () => {
     answerGroups[0].rules = [betweenFourAndTwoRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'In Rule 1 from answer group 1, Please ensure ' +
@@ -234,7 +222,7 @@ describe('NumericInputValidationService', () => {
   it('should catch redundant rules', () => {
     answerGroups[0].rules = [betweenNegativeOneAndOneRule, equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 upper bound of the range  should be greater than or' +
@@ -249,7 +237,7 @@ describe('NumericInputValidationService', () => {
   it('should catch identical rules as redundant', () => {
     answerGroups[0].rules = [equalsZeroRule, equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -262,7 +250,7 @@ describe('NumericInputValidationService', () => {
     answerGroups[0].rules = [betweenNegativeOneAndOneRule];
     answerGroups[1].rules = [equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 upper bound of the range  should be greater than' +
@@ -279,7 +267,7 @@ describe('NumericInputValidationService', () => {
       var warnings: Warning[];
       answerGroups[0].rules = [lessThanOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -287,7 +275,7 @@ describe('NumericInputValidationService', () => {
       }]);
       answerGroups[0].rules = [greaterThanNegativeOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -300,7 +288,7 @@ describe('NumericInputValidationService', () => {
       var warnings: Warning[];
       answerGroups[0].rules = [lessThanOrEqualToOneRule, equalsZeroRule];
       warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -310,7 +298,7 @@ describe('NumericInputValidationService', () => {
         greaterThanOrEqualToNegativeOneRule, equalsZeroRule
       ];
       warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -322,7 +310,7 @@ describe('NumericInputValidationService', () => {
     () => {
       answerGroups[0].rules = [zeroWithinToleranceOfOneRule, equalsZeroRule];
       var warnings = validatorService.getAllWarnings(
-        currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+        currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
