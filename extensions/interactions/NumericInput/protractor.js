@@ -18,7 +18,7 @@
  */
 
 var customizeInteraction = function() {
-// There are no customizations.
+  // There are no customizations.
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {

@@ -25,7 +25,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { NumericInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { NumericInputRulesService } from './numeric-input-rules.service';
 import { NumericInputValidationService } from './numeric-input-validation.service';
 
@@ -37,7 +36,6 @@ export class InteractiveNumericInput implements OnInit {
   @Input() savedSolution;
   @Input() labelForFocusTarget;
   errorString = '';
-  inputGreaterThanZero: boolean = false;
   answer = null;
   NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
   constructor(

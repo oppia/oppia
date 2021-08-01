@@ -77,14 +77,6 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setFeedback(await forms.toRichText('Try again'));
-    await explorationEditorMainTab.addHint('Hint 1');
-    await explorationEditorMainTab.addSolution('NumericInput', {
-      correctAnswer: 6,
-      explanation: 'It is correct'
-    });
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('this is card 2'));

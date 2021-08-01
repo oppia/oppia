@@ -361,6 +361,7 @@ describe('Interaction object factory', () => {
       id: 'NumericInput',
       solution: solutionDict
     });
+
     expect(testInteraction.customizationArgs).toEqual({});
   });
 

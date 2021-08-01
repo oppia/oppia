@@ -131,80 +131,8 @@ describe('NumericInputValidationService', () => {
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 upper bound of the range  should be greater than' +
-      ' or equal to zero. '
-    }]);
+    expect(warnings).toEqual([]);
   });
-
-  it('should show warning if input less than zero for IsWithinTolerance',
-    () => {
-      zeroWithinToleranceOfOneRule = rof.createFromBackendDict({
-        rule_type: 'IsWithinTolerance',
-        inputs: {
-          x: -2,
-          tol: 1
-        }
-      }, 'NumericInput');
-      answerGroups[0].rules = [zeroWithinToleranceOfOneRule];
-      var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 Upper bound of the tolerance range  should ' +
-        'be greater than or equal to zero. '
-      }]);
-    });
-
-  it('should show warning if input less than zero for IsLessThan', () => {
-    lessThanOneRule = rof.createFromBackendDict({
-      rule_type: 'IsLessThan',
-      inputs: {
-        x: -1
-      }
-    }, 'NumericInput');
-    answerGroups[0].rules = [lessThanOneRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 input  should be greater than or equal to zero. '
-    }]);
-  });
-
-  it('should show warning if input less than zero for Equals', () => {
-    equalsZeroRule = rof.createFromBackendDict({
-      rule_type: 'Equals',
-      inputs: {
-        x: -1
-      }
-    }, 'NumericInput');
-    answerGroups[0].rules = [equalsZeroRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 input  should be greater than or equal to zero. '
-    }]);
-  });
-
-  it('should show warning if input less than zero for IsLessThanOrEqualTo',
-    () => {
-      lessThanOrEqualToOneRule = rof.createFromBackendDict({
-        rule_type: 'IsLessThanOrEqualTo',
-        inputs: {
-          x: -1
-        }
-      }, 'NumericInput');
-      answerGroups[0].rules = [lessThanOrEqualToOneRule];
-      var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Rule 1 input  should be greater than or equal to zero. '
-      }]);
-    });
 
   it('should raise warning for IsInclusivelyBetween rule ' +
   'caused by incorrect range',
@@ -224,10 +152,6 @@ describe('NumericInputValidationService', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range  should be greater than or' +
-      ' equal to zero. '
-    }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
@@ -252,10 +176,6 @@ describe('NumericInputValidationService', () => {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range  should be greater than' +
-      ' or equal to zero. '
-    }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 2 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
