@@ -58,6 +58,7 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
             self.RELEASE_COORDINATOR_USERNAME,
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
+
 class JobsHandlerTest(test_utils.GenericTestBase):
     """Test for the JobsHandler."""
 
