@@ -74,6 +74,23 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
     return normalized_value, errors
 
 
+def convert_string_to_bool(param):
+    # type: (Text) -> bool
+
+    """Converts a request param of type string into expected bool type.
+
+    Args:
+        param: Str. The params which needs normalization.
+
+    Returns:
+        bool. Converts the string param into its expected bool type.
+    """
+    if param == 'true':
+        return True
+    else:
+        return False
+
+
 # Handlers which require schema validation, but currently they do
 # not have schema. In order to add schema incrementally this list is
 # maintained. Please remove the name of the handlers if they already

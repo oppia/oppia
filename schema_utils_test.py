@@ -795,16 +795,16 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
             r'(exploration|collection)\.\w+\.\w+'))
 
-    def test_is_string_contained_within_parenthesis(self):
+    def is_string_contained_within_parenthesis_and_quotes(self):
         # type: () -> None
-        is_string_contained_within_parenthesis = schema_utils.get_validator(
-            'is_string_contained_within_parenthesis')
+        is_string_contained_within_parenthesis_and_quotes = schema_utils.get_validator(
+            'is_string_contained_within_parenthesis_and_quotes')
 
-        self.assertTrue(is_string_contained_within_parenthesis(
+        self.assertTrue(is_string_contained_within_parenthesis_and_quotes(
             '("A category")'))
-        self.assertFalse(is_string_contained_within_parenthesis(
+        self.assertFalse(is_string_contained_within_parenthesis_and_quotes(
             '(missing-inner-quotes)'))
-        self.assertFalse(is_string_contained_within_parenthesis(
+        self.assertFalse(is_string_contained_within_parenthesis_and_quotes(
             'missing-outer-parens'))
 
 

@@ -134,13 +134,13 @@ class ExplorationPage(base.BaseHandler):
             },
             'parent': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'bool'
                 },
                 'default_value': None
             },
             'iframed': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'bool'
                 },
                 'default_value': None
             },

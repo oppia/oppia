@@ -115,9 +115,9 @@ class ExplorationHandler(EditorHandler):
             },
             'apply_draft': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             }
         },
         'PUT': {

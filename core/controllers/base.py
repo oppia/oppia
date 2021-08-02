@@ -365,7 +365,14 @@ class BaseHandler(webapp2.RequestHandler):
                     handler_args.update(payload_args)
             else:
                 request_arg_keys.append(arg)
-                handler_args[arg] = self.request.get(arg)
+                param = self.request.get(arg)
+                # Normalization of params which are expected to be boolean
+                # but received as string.
+                if param in ['true', 'false']:
+                    handler_args[arg] = (
+                        payload_validator.convert_string_to_bool(param))
+                else:
+                    handler_args[arg] = param
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
