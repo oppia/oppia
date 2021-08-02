@@ -270,7 +270,7 @@ var RichTextEditor = async function(elem) {
       // the component is not overwritten by some other element.
       if (
         [
-          'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
+          'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
         await rteElements.first().sendKeys(protractor.Key.DOWN);
       }
