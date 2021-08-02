@@ -48,18 +48,11 @@ describe('Ck editor copy content service', () => {
   let execCommandSpy: jasmine.Spy<(commandName: string) => boolean>;
 
   beforeEach(() => {
-    // This throws "Type Type '{ id: string; insertHtml: (html: string) => void;
-    // execCommand: (commandName: string) => boolean; }' is missing the
-    // following properties from type 'editor': activeEnterMode, activeFilter,
-    // activeShiftEnterMode, blockless, and 92 more." We need to suppress this
-    // error because only the specified properties of the editor are required
-    // to test validations.
-    // @ts-ignore.
     ckEditorStub = {
       id: 'editor1',
       insertHtml: (html: string) => {},
       execCommand: (commandName: string): boolean => true,
-    };
+    } as CKEDITOR.editor;
     insertHtmlSpy = spyOn(ckEditorStub, 'insertHtml');
     execCommandSpy = spyOn(ckEditorStub, 'execCommand');
 
@@ -225,14 +218,7 @@ describe('Ck editor copy content service', () => {
 
     const pElement = generateContent('<p>Hello</p>');
 
-    // This throws "Type Type '{ id: string; insertHtml: (html: string) => void;
-    // execCommand: (commandName: string) => boolean; }' is missing the
-    // following properties from type 'editor': activeEnterMode, activeFilter,
-    // activeShiftEnterMode, blockless, and 92 more." We need to suppress this
-    // error because only the specified properties of the editor are required
-    // to test validations.
-    // @ts-ignore.
-    ckEditorStub = { ...ckEditorStub, status: 'destroyed' };
+    ckEditorStub = { ...ckEditorStub, status: 'destroyed' } as CKEDITOR.editor;
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
     expect(insertHtmlSpy).not.toHaveBeenCalled();
