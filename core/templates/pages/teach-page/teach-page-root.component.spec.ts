@@ -20,8 +20,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { PageMetadataService } from 'services/contextual/page-metadata.service';
-;
-
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TeachPageRootComponent } from './teach-page-root.component';
 
