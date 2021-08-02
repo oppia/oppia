@@ -30,7 +30,7 @@ from typing import Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, email_models, user_models
+    from mypy_imports import base_models, email_models, user_models # pylint: disable=unused-import
 
 (base_models, email_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.email, models.NAMES.user])

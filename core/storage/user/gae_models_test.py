@@ -34,7 +34,7 @@ from typing import Dict, List, Set, Text, Union # isort:skip # pylint: disable=u
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, user_models
+    from mypy_imports import base_models, user_models # pylint: disable=unused-import
 
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
@@ -794,22 +794,22 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration( # type: ignore[no-untyped-call]
             self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange( # type: ignore[no-untyped-call]
-            {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
+                {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'the objective'
+                })], 'Test edit')
 
         self.save_new_valid_exploration( # type: ignore[no-untyped-call]
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
         exp_services.update_exploration( # type: ignore[no-untyped-call]
             self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange( # type: ignore[no-untyped-call]
-            {
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
+                {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'the objective'
+                })], 'Test edit')
 
         user_models.UserContributionsModel(
             id=self.USER_C_ID,

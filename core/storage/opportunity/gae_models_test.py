@@ -27,7 +27,7 @@ from typing import Dict, List, Optional, Text, Tuple # isort:skip # pylint: disa
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, opportunity_models
+    from mypy_imports import base_models, opportunity_models # pylint: disable=unused-import
 
 (base_models, opportunity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.opportunity])

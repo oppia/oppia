@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from core.domain import feedback_domain # pylint: disable=unused-import
 from core.platform import models
 import feconf
 import python_utils
@@ -28,8 +29,7 @@ from typing import Dict, List, Optional, Text, Tuple, Union, cast # isort:skip #
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services, user_models
-    from core.domain import feedback_domain
+    from mypy_imports import base_models, datastore_services, user_models # pylint: disable=unused-import
 
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
