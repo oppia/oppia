@@ -33,7 +33,6 @@ class JobModelTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         # type: () -> None
-
         self.assertEqual(
             job_models.JobModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)

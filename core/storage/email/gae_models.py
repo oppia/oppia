@@ -249,9 +249,9 @@ class SentEmailModel(base_models.BaseModel):
         if sent_datetime_lower_bound is not None:
             query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
 
-        messages = query.fetch()
+        messages = cast(List[SentEmailModel], query.fetch())
 
-        return cast(List[SentEmailModel], messages)
+        return messages
 
     @classmethod
     def _generate_hash(cls, recipient_id, email_subject, email_body):

@@ -916,13 +916,14 @@ class ExpSummaryModel(base_models.BaseModel):
         Returns:
             iterable. An iterable with non-private ExpSummary models.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_top_rated(cls, limit):
@@ -937,15 +938,16 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with the top rated exp summaries that are
             public in descending order of scaled_average_rating.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).order(
-            -ExpSummaryModel.scaled_average_rating
-        ).fetch(limit)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).order(
+                -ExpSummaryModel.scaled_average_rating
+            ).fetch(limit)
+        )
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -960,19 +962,20 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with private exp summaries that are at least
             viewable by the given user.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            datastore_services.any_of(
-                ExpSummaryModel.owner_ids == user_id,
-                ExpSummaryModel.editor_ids == user_id,
-                ExpSummaryModel.voice_artist_ids == user_id,
-                ExpSummaryModel.viewer_ids == user_id)
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
+            ).filter(
+                datastore_services.any_of(
+                    ExpSummaryModel.owner_ids == user_id,
+                    ExpSummaryModel.editor_ids == user_id,
+                    ExpSummaryModel.voice_artist_ids == user_id,
+                    ExpSummaryModel.viewer_ids == user_id)
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -986,15 +989,16 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with exp summaries that are at least
             editable by the given user.
         """
-        results = ExpSummaryModel.query().filter(
-            datastore_services.any_of(
-                ExpSummaryModel.owner_ids == user_id,
-                ExpSummaryModel.editor_ids == user_id)
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                datastore_services.any_of(
+                    ExpSummaryModel.owner_ids == user_id,
+                    ExpSummaryModel.editor_ids == user_id)
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_recently_published(cls, limit):
@@ -1009,15 +1013,16 @@ class ExpSummaryModel(base_models.BaseModel):
             recently published. The returned list is sorted by the time of
             publication with latest being first in the list.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).order(
-            -ExpSummaryModel.first_published_msec
-        ).fetch(limit)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).order(
+                -ExpSummaryModel.first_published_msec
+            ).fetch(limit)
+        )
 
     @staticmethod
     def get_model_association_to_user():

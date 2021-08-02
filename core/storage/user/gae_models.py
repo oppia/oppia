@@ -362,9 +362,11 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel. The UserSettingsModel instance which contains
             the same normalized_username.
         """
-        result = cls.get_all().filter(
-            cls.normalized_username == normalized_username).get()
-        return cast(UserSettingsModel, result)
+        return cast(
+            UserSettingsModel,
+            cls.get_all().filter(
+                cls.normalized_username == normalized_username).get()
+        )
 
     @classmethod
     def get_by_email(cls, email):
@@ -396,8 +398,10 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-        results = cls.query(cls.roles == role).fetch()
-        return cast(List[UserSettingsModel], results)
+        return cast(
+            List[UserSettingsModel],
+            cls.query(cls.roles == role).fetch()
+        )
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
@@ -661,9 +665,10 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1162,9 +1167,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.creator_ids == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.creator_ids == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1204,8 +1210,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         assert user_model is not None
         creator_user_models = cast(
             List[UserSettingsModel],
-            UserSettingsModel.get_multi(user_model.creator_ids)
-        )
+            UserSettingsModel.get_multi(user_model.creator_ids))
         creator_usernames = [
             creator.username for creator in creator_user_models]
 
@@ -1247,9 +1252,10 @@ class UserSubscribersModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.subscriber_ids == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1558,9 +1564,10 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @staticmethod
     def get_model_association_to_user():
@@ -1794,10 +1801,10 @@ class CollectionProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
-
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1989,9 +1996,10 @@ class StoryProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2233,9 +2241,10 @@ class UserQueryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.submitter_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2383,9 +2392,10 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2430,8 +2440,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         user_data = dict()
         mastery_models = cast(
             List[UserSkillMasteryModel],
-            cls.get_all().filter(cls.user_id == user_id).fetch()
-        )
+            cls.get_all().filter(cls.user_id == user_id).fetch())
         for mastery_model in mastery_models:
             mastery_model_skill_id = mastery_model.skill_id
             user_data[mastery_model_skill_id] = {
@@ -2503,8 +2512,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         user_data = dict()
         scoring_models = cast(
             List[UserContributionProficiencyModel],
-            cls.query(cls.user_id == user_id).fetch()
-        )
+            cls.query(cls.user_id == user_id).fetch())
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
@@ -2520,9 +2528,10 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -2553,8 +2562,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         scoring_models = cast(
             List[UserContributionProficiencyModel],
             cls.get_all().filter(cls.user_id == user_id).filter(
-                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
-        )
+                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch())
         return (
             [scoring_model.score_category for scoring_model in scoring_models])
 
@@ -2570,8 +2578,9 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             list(UserContributionProficiencyModel). All instances for the given
             user.
         """
-        results = cls.get_all().filter(cls.user_id == user_id).fetch()
-        return cast(List[UserContributionProficiencyModel], results)
+        return cast(
+            List[UserContributionProficiencyModel],
+            cls.get_all().filter(cls.user_id == user_id).fetch())
 
     @classmethod
     def get_all_users_with_score_above_minimum_for_category(
@@ -2587,10 +2596,13 @@ class UserContributionProficiencyModel(base_models.BaseModel):
             list(UserContributionProficiencyModel). All instances for the given
             category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
         """
-        results = cls.get_all().filter(
-            cls.score_category == score_category).filter(
-                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
-        return cast(List[UserContributionProficiencyModel], results)
+        return cast(
+            List[UserContributionProficiencyModel],
+            cls.get_all().filter(
+                cls.score_category == score_category).filter(
+                    cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+                ).fetch()
+        )
 
     @classmethod
     def _get_instance_id(cls, user_id, score_category):
@@ -2805,8 +2817,7 @@ class UserContributionRightsModel(base_models.BaseModel):
         reviewer_keys = cast(
             List[datastore_services.Key],
             cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
-                keys_only=True)
-        )
+                keys_only=True))
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2821,8 +2832,7 @@ class UserContributionRightsModel(base_models.BaseModel):
         contributor_keys = cast(
             List[datastore_services.Key],
             cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
-                keys_only=True)
-        )
+                keys_only=True))
         return [contributor_key.id() for contributor_key in contributor_keys]
 
 

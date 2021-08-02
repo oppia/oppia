@@ -181,16 +181,18 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             list(ExplorationOpportunitySummaryModel)|None. A list of
             ExplorationOpportunitySummaryModel having given topic_id.
         """
-        results = cls.query(cls.topic_id == topic_id).fetch()
-        return cast(Optional[List[ExplorationOpportunitySummaryModel]], results)
+        return cast(
+            Optional[List[ExplorationOpportunitySummaryModel]],
+            cls.query(cls.topic_id == topic_id).fetch())
 
     @classmethod
     def delete_all(cls):
         # type: () -> None
         """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query().fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -272,6 +274,7 @@ class SkillOpportunityModel(base_models.BaseModel):
     def delete_all(cls):
         # type: () -> None
         """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query().fetch(keys_only=True))
+        datastore_services.delete_multi(keys)

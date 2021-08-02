@@ -254,7 +254,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     def test_get_new_id_under_normal_behaviour_returns_unique_ids(self):
         # type: () -> None
-        ids = set([]) # type: Set[Text]
+        ids = set() # type: Set[Text]
         for _ in python_utils.RANGE(100):
             new_id = user_models.UserSettingsModel.get_new_id('')
             self.assertNotIn(new_id, ids)
