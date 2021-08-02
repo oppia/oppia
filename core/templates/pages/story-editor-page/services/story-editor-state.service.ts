@@ -96,10 +96,10 @@ export class StoryEditorStateService {
   }
 
   /**
-  * Loads, or reloads, the story stored by this service given a
-  * specified story ID. See setStory() for more information on
-  * additional behavior of this function.
-  */
+   * Loads, or reloads, the story stored by this service given a
+   * specified story ID. See setStory() for more information on
+   * additional behavior of this function.
+   */
   loadStory(storyId: string): void {
     this._storyIsLoading = true;
     this.editableStoryBackendApiService.fetchStoryAsync(storyId).then(
@@ -121,17 +121,17 @@ export class StoryEditorStateService {
   }
 
   /**
-  * Returns whether this service is currently attempting to load the
-  * story maintained by this service.
-  */
+   * Returns whether this service is currently attempting to load the
+   * story maintained by this service.
+   */
   isLoadingStory(): boolean {
     return this._storyIsLoading;
   }
 
   /**
-  * Returns whether a story has yet been loaded using either
-  * loadStory() or setStory().
-  */
+   * Returns whether a story has yet been loaded using either
+   * loadStory() or setStory().
+   */
   hasLoadedStory(): boolean {
     return this._storyIsInitialized;
   }
@@ -149,13 +149,13 @@ export class StoryEditorStateService {
   }
 
   /**
-  * Returns the current story to be shared among the story
-  * editor. Please note any changes to this story will be propogated
-  * to all bindings to it. This story object will be retained for the
-  * lifetime of the editor. This function never returns null, though it may
-  * return an empty story object if the story has not yet been
-  * loaded for this editor instance.
-  */
+   * Returns the current story to be shared among the story
+   * editor. Please note any changes to this story will be propogated
+   * to all bindings to it. This story object will be retained for the
+   * lifetime of the editor. This function never returns null, though it may
+   * return an empty story object if the story has not yet been
+   * loaded for this editor instance.
+   */
   getStory(): Story {
     return this._story;
   }
@@ -165,13 +165,13 @@ export class StoryEditorStateService {
   }
 
   /**
-  * Sets the story stored within this service, propogating changes to
-  * all bindings to the story returned by getStory(). The first
-  * time this is called it will fire a global event based on the
-  * next() function of the _storyInitializedEventEmitter. All subsequent
-  * calls will similarly fire a next() function of the
-  * _storyReinitializedEventEmitter.
-  */
+   * Sets the story stored within this service, propogating changes to
+   * all bindings to the story returned by getStory(). The first
+   * time this is called it will fire a global event based on the
+   * next() function of the _storyInitializedEventEmitter. All subsequent
+   * calls will similarly fire a next() function of the
+   * _storyReinitializedEventEmitter.
+   */
   setStory(story: Story): void {
     this._setStory(story);
   }
@@ -185,13 +185,13 @@ export class StoryEditorStateService {
   }
 
   /**
-  * Attempts to save the current story given a commit message. This
-  * function cannot be called until after a story has been initialized
-  * in this service. Returns false if a save is not performed due to no
-  * changes pending, or true if otherwise. This function, upon success,
-  * will clear the UndoRedoService of pending changes. This function also
-  * shares behavior with setStory(), when it succeeds.
-  */
+   * Attempts to save the current story given a commit message. This
+   * function cannot be called until after a story has been initialized
+   * in this service. Returns false if a save is not performed due to no
+   * changes pending, or true if otherwise. This function, upon success,
+   * will clear the UndoRedoService of pending changes. This function also
+   * shares behavior with setStory(), when it succeeds.
+   */
   saveStory(
       commitMessage: string,
       successCallback: (value?: Object) => void,
@@ -259,9 +259,9 @@ export class StoryEditorStateService {
   }
 
   /**
-  * Returns whether this service is currently attempting to save the
-  * story maintained by this service.
-  */
+   * Returns whether this service is currently attempting to save the
+   * story maintained by this service.
+   */
   isSavingStory(): boolean {
     return this._storyIsBeingSaved;
   }
@@ -282,20 +282,20 @@ export class StoryEditorStateService {
     return this._recalculateAvailableNodesEventEmitter;
   }
   /**
-  * Returns whether the story URL fragment already exists on the server.
-  */
+   * Returns whether the story URL fragment already exists on the server.
+   */
   getStoryWithUrlFragmentExists(): boolean {
     return this._storyWithUrlFragmentExists;
   }
 
   /**
-  * Attempts to set the boolean variable _storyWithUrlFragmentExists based
-  * on the value returned by doesStoryWithUrlFragmentExistAsync and
-  * executes the success callback provided. No arguments are passed to the
-  * success callback. Execution of the success callback indicates that the
-  * async backend call was successful and that _storyWithUrlFragmentExists
-  * has been successfully updated.
-  */
+   * Attempts to set the boolean variable _storyWithUrlFragmentExists based
+   * on the value returned by doesStoryWithUrlFragmentExistAsync and
+   * executes the success callback provided. No arguments are passed to the
+   * success callback. Execution of the success callback indicates that the
+   * async backend call was successful and that _storyWithUrlFragmentExists
+   * has been successfully updated.
+   */
   updateExistenceOfStoryUrlFragment(
       storyUrlFragment: string,
       successCallback: (value?: Object) => void): void {
