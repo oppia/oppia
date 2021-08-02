@@ -316,36 +316,28 @@ def main(args=None):
     parsed_args = _PARSER.parse_args(args=args)
     policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
-    stack = python_utils.ExitStack()
-    proc = stack.enter_context(servers.managed_portserver())
-    return_code = 1
+    with servers.managed_portserver():
+        for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
+            python_utils.PRINT('***Attempt %d.***' % attempt_num)
+            output, return_code = run_tests(parsed_args)
 
-    for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
-        python_utils.PRINT('***Attempt %d.***' % attempt_num)
-        output, return_code = run_tests(parsed_args)
+            if not flake_checker.check_if_on_ci():
+                # Don't rerun off of CI.
+                python_utils.PRINT('No reruns because not running on CI.')
+                break
 
-        if not flake_checker.check_if_on_ci():
-            # Don't rerun off of CI.
-            python_utils.PRINT('No reruns because not running on CI.')
-            break
+            if return_code == 0:
+                # Don't rerun passing tests.
+                flake_checker.report_pass(parsed_args.suite)
+                break
 
-        if return_code == 0:
-            # Don't rerun passing tests.
-            flake_checker.report_pass(parsed_args.suite)
-            break
-
-        # Check whether we should rerun based on this suite's policy.
-        test_is_flaky = flake_checker.is_test_output_flaky(
-            output, parsed_args.suite)
-        if policy == RERUN_POLICY_NEVER:
-            break
-        if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
-            break
-
-    stack.close()
-    python_utils.PRINT('Portserver output:')
-    for line in iter(lambda: proc.stdout.readline() or None, None):
-        common.write_stdout_safe(line)
+            # Check whether we should rerun based on this suite's policy.
+            test_is_flaky = flake_checker.is_test_output_flaky(
+                output, parsed_args.suite)
+            if policy == RERUN_POLICY_NEVER:
+                break
+            if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
+                break
 
     sys.exit(return_code)
 

@@ -23,6 +23,7 @@ require(
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
+require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-category.service.ts');
@@ -62,21 +63,21 @@ angular.module('oppia').component('previewTab', {
     'EditableExplorationBackendApiService',
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
-    'ExplorationPlayerStateService',
+    'ExplorationParamChangesService', 'ExplorationPlayerStateService',
     'LearnerParamsService', 'NumberAttemptsService',
-    'ParamChangeObjectFactory', 'ParameterMetadataService',
-    'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
-    'StateEditorService',
+    'ParamChangeObjectFactory', 'ParamChangesObjectFactory',
+    'ParameterMetadataService', 'PlayerCorrectnessFeedbackEnabledService',
+    'RouterService', 'StateEditorService',
     function(
         $q, $rootScope, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
-        ExplorationPlayerStateService,
+        ExplorationParamChangesService, ExplorationPlayerStateService,
         LearnerParamsService, NumberAttemptsService,
-        ParamChangeObjectFactory, ParameterMetadataService,
-        PlayerCorrectnessFeedbackEnabledService, RouterService,
-        StateEditorService) {
+        ParamChangeObjectFactory, ParamChangesObjectFactory,
+        ParameterMetadataService, PlayerCorrectnessFeedbackEnabledService,
+        RouterService, StateEditorService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
@@ -177,29 +178,45 @@ angular.module('oppia').component('previewTab', {
           })
         );
         ctrl.isExplorationPopulated = false;
-        ExplorationDataService.getDataAsync().then(function() {
-          var initStateNameForPreview = StateEditorService
-            .getActiveStateName();
+        ExplorationDataService.getDataAsync().then(
+          async([explorationData, _, __]) => {
+            var initStateNameForPreview = StateEditorService
+              .getActiveStateName();
 
-          // Show a warning message if preview doesn't start from the first
-          // state.
-          if (initStateNameForPreview !==
-              ExplorationInitStateNameService.savedMemento) {
-            ctrl.previewWarning =
-              'Preview started from \"' + initStateNameForPreview + '\"';
-          } else {
-            ctrl.previewWarning = '';
+            // Show a warning message if preview doesn't start from the first
+            // state.
+            if (initStateNameForPreview !==
+                ExplorationInitStateNameService.savedMemento) {
+              ctrl.previewWarning =
+                'Preview started from \"' + initStateNameForPreview + '\"';
+            } else {
+              ctrl.previewWarning = '';
+            }
+
+            console.error(
+              `[DEBUGGING] ExplorationParamChangesService.savedMemento in prev
+              "${ExplorationParamChangesService.savedMemento}"`
+            );
+            if (!ExplorationParamChangesService.savedMemento) {
+              ExplorationParamChangesService.init(
+                ParamChangesObjectFactory.createFromBackendList(
+                  explorationData.param_changes));
+              console.error(
+                `[DEBUGGING] ExplorationParamChangesService.savedMemento 222
+                "${ExplorationParamChangesService.savedMemento}"`
+              );
+            }
+
+            // Prompt user to enter any unset parameters, then populate
+            // exploration.
+            ctrl.getManualParamChanges(initStateNameForPreview).then(
+              function(manualParamChanges) {
+                ctrl.loadPreviewState(
+                  initStateNameForPreview, manualParamChanges);
+              });
+            $rootScope.$applyAsync();
           }
-
-          // Prompt user to enter any unset parameters, then populate
-          // exploration.
-          ctrl.getManualParamChanges(initStateNameForPreview).then(
-            function(manualParamChanges) {
-              ctrl.loadPreviewState(
-                initStateNameForPreview, manualParamChanges);
-            });
-          $rootScope.$applyAsync();
-        });
+        );
         $rootScope.$applyAsync();
         ctrl.allParams = {};
       };
