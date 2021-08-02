@@ -19,9 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { PageMetadataService } from 'services/contextual/page-metadata.service';
-import { PageTitleService } from 'services/page-title.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { GetStartedPageRootComponent } from './get-started-page-root.component';
