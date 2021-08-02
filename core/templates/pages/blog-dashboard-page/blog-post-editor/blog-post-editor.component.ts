@@ -25,7 +25,6 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { BlogPostEditorData, BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
 import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
@@ -35,7 +34,7 @@ import { LoaderService } from 'services/loader.service';
 import { AppConstants } from 'app.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
-import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
+import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -64,6 +63,7 @@ export class BlogPostEditorComponent implements OnInit {
   localEdittedContent: string;
   thumbnailDataUrl: string;
   invalidImageWarningIsShown: boolean = false;
+  newChangesAreMade: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
@@ -85,7 +85,6 @@ export class BlogPostEditorComponent implements OnInit {
     private imageLocalStorageService: ImageLocalStorageService,
     private assetsBackendApiService: AssetsBackendApiService,
     private windowDimensionService: WindowDimensionsService,
-    private svgSanitizerService: SvgSanitizerService,
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +150,7 @@ export class BlogPostEditorComponent implements OnInit {
   updateLocalTitleValue(): void {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title);
+    this.newChangesAreMade = true;
   }
 
   cancelEdit(): void {
@@ -172,6 +172,7 @@ export class BlogPostEditorComponent implements OnInit {
     if (this.blogPostData.content !== '') {
       this.contentEditorIsActive = false;
     }
+    this.newChangesAreMade = true;
   }
 
   saveDraft(): void {
@@ -222,6 +223,7 @@ export class BlogPostEditorComponent implements OnInit {
           this.alertsService.addSuccessMessage(
             'Blog Post Saved Succesfully.');
         }
+        this.newChangesAreMade = false;
       }, (errorResponse) => {
         this.alertsService.addWarning(
           `Failed to save Blog Post. Internal Error: ${errorResponse}`);
@@ -262,53 +264,36 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   onTagChange(tag: string): void {
-    let selectedTags = this.blogPostData.tags;
-    if (selectedTags.includes(tag)) {
+    if ((this.blogPostData.tags).includes(tag)) {
       this.blogPostData.removeTag(tag);
-    } else {
-      if (selectedTags.length < this.maxAllowedTags) {
-        this.blogPostData.addTag(tag);
-      } else {
-        this.alertsService.addWarning(
-          'Max limit for assigning tags to blog post reached.');
-      }
+    } else if ((this.blogPostData.tags).length < this.maxAllowedTags) {
+      this.blogPostData.addTag(tag);
     }
-  }
-
-  onFileChanged(file: File): void {
-    this.filename = file.name;
-    this.invalidImageWarningIsShown = false;
-    let reader = new FileReader();
-    let uploadedImage;
-    reader.onload = (e) => {
-      uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (<FileReader>e.target).result as string);
-      if (!uploadedImage) {
-        this.uploadedImageDataUrl = decodeURIComponent(
-          (<FileReader>e.target).result as string);
-      }
-      this.changeDetectorRef.detectChanges();
-      this.imageLocalStorageService.saveImage(
-        this.filename, this.uploadedImageDataUrl);
-      this.thumbnailDataUrl = this.uploadedImageDataUrl;
-      this.postImageDataToServer();
-    };
-    reader.readAsDataURL(file);
+    if ((this.blogPostData.tags).length === this.maxAllowedTags) {
+      this.alertsService.addWarning(
+        'Max limit for assigning tags to blog post reached.');
+    }
+    this.newChangesAreMade = true;
   }
 
   showuploadThumbnailModal(): void {
-    let modalRef = this.ngbModal.open(UploadBlogPostThumbnailComponent, {
+    let modalRef = this.ngbModal.open(UploadBlogPostThumbnailModalComponent, {
       backdrop: 'static'
     });
 
     modalRef.result.then((imageDataUrl) => {
-      this.thumbnailDataUrl = imageDataUrl;
-      this.postImageDataToServer();
+      this.saveBlogPostThumbnail(imageDataUrl);
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
       // No further action is needed.
     });
+  }
+
+  saveBlogPostThumbnail(thumbnailDataUrl: string): void {
+    this.thumbnailDataUrl = thumbnailDataUrl;
+    this.postImageDataToServer();
+    this.newChangesAreMade = true;
   }
 
   showPreview(): void {

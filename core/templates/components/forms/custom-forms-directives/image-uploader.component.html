@@ -18,6 +18,7 @@
          [ngClass]="fileInputClassName" #imageInput>
   <label *ngIf="isBlogPostThumbnailUploader"
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
+         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow}"
          for="image-file-input">
     <mat-icon class="mx-auto">insert_photo</mat-icon>
     <span class="font-weight-light">{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
@@ -134,5 +135,31 @@
     font-size: 48px;
     height: 48px;
     width: 48px;
+  }
+
+  @media(max-width:768px) {
+    .blog-post-thumbnail-uploader {
+      height: 80px;
+      width: 100%;
+    }
+
+    .mat-icon {
+      font-size: 30px;
+      height: 30px;
+      width: 30px;
+    }
+
+    .font-weight-light {
+      font-size: 12px;
+      font-weight: 300 !important;
+    }
+
+    .blog-post-narrow-thumbnail-uploader {
+      height: 40px;
+    }
+
+    .narrow-image-uploader-area {
+      width: 66.667vw
+    }
   }
 </style>

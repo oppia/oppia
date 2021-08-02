@@ -16,88 +16,27 @@
  * @fileoverview Component for uploading thumbnail image modal.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
-import { SafeResourceUrl } from '@angular/platform-browser';
+import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import Cropper from 'cropperjs';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-blog-post-thumbnail-upload-modal',
   templateUrl: './upload-blog-post-thumbnail-modal.component.html'
 })
-export class UploadBlogPostThumbnailComponent extends ConfirmOrCancelModal {
-  uploadedImage: SafeResourceUrl;
-  cropppedImageDataUrl: string = '';
-  invalidImageWarningIsShown: boolean = false;
-  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  croppedFilename: string;
-  cropper;
-  @ViewChild('croppableImage') croppableImageRef: ElementRef;
-
+export class UploadBlogPostThumbnailModalComponent
+  extends ConfirmOrCancelModal {
   constructor(
       ngbActiveModal: NgbActiveModal,
-    private changeDetectorRef: ChangeDetectorRef,
-    private imageLocalStorageService: ImageLocalStorageService,
-    private svgSanitizerService: SvgSanitizerService,
   ) {
     super(ngbActiveModal);
   }
 
-  initializeCropper(): void {
-    let thumbnail = this.croppableImageRef.nativeElement;
-    this.cropper = new Cropper(thumbnail, {
-      minContainerWidth: 500,
-      minContainerHeight: 350,
-      aspectRatio: 4
-    });
+  cancel(): void {
+    super.cancel();
   }
 
-  onFileChanged(file: File): void {
-    let originalFilename = file.name;
-    // The cropper always returns a png file, thus the extension should be
-    // changed to png for the final image type to match the extension.
-    this.croppedFilename = (
-      originalFilename.replace(/\.([^.]*?)(?=\?|#|$)/, '.png'));
-    this.invalidImageWarningIsShown = false;
-    let reader = new FileReader();
-    reader.onload = (e) => {
-      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        (<FileReader>e.target).result as string);
-      if (!this.uploadedImage) {
-        this.uploadedImage = decodeURIComponent(
-          (<FileReader>e.target).result as string);
-      }
-      this.changeDetectorRef.detectChanges();
-      this.initializeCropper();
-    };
-    reader.readAsDataURL(file);
-  }
-
-  reset(): void {
-    this.uploadedImage = null;
-    this.cropppedImageDataUrl = '';
-  }
-
-  onInvalidImageLoaded(): void {
-    this.reset();
-    this.invalidImageWarningIsShown = true;
-  }
-
-
-  confirm(): void {
-    this.cropppedImageDataUrl = (
-      this.cropper.getCroppedCanvas({
-        height: 200,
-        width: 800,
-        fillColor: '#fff',
-      }).toDataURL());
-    this.imageLocalStorageService.saveImage(
-      this.croppedFilename, this.cropppedImageDataUrl);
-    super.confirm(this.cropppedImageDataUrl);
+  save(imageDataUrl: string): void {
+    super.confirm(imageDataUrl);
   }
 }

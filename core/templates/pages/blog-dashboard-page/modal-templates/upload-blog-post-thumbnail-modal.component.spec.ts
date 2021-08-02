@@ -17,20 +17,18 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail-modal.component';
+import { UploadBlogPostThumbnailModalComponent } from './upload-blog-post-thumbnail-modal.component';
 
 describe('Upload Blog Post Thumbnail Modal Component', () => {
-  let fixture: ComponentFixture<UploadBlogPostThumbnailComponent>;
-  let componentInstance: UploadBlogPostThumbnailComponent;
-
-  class MockChangeDetectorRef {
-    detectChanges(): void {}
-  }
+  let fixture: ComponentFixture<UploadBlogPostThumbnailModalComponent>;
+  let component: UploadBlogPostThumbnailModalComponent;
+  let ngbActiveModal: NgbActiveModal;
+  let confirmSpy: jasmine.Spy;
+  let dismissSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -38,72 +36,29 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
         HttpClientTestingModule,
       ],
       declarations: [
-        UploadBlogPostThumbnailComponent,
         MockTranslatePipe
       ],
       providers: [
         NgbActiveModal,
-        SvgSanitizerService,
-        {
-          provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
-        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
+    dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    confirmSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UploadBlogPostThumbnailComponent);
-    componentInstance = fixture.componentInstance;
+    fixture = TestBed.createComponent(UploadBlogPostThumbnailModalComponent);
+    component = fixture.componentInstance;
   });
 
-  it('should create', () => {
-    expect(componentInstance).toBeDefined();
+  it('should dismiss the modal on calling cancel function', () => {
+    component.cancel();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should initialize cropper', () => {
-    fixture.detectChanges();
-    componentInstance.croppableImageRef = (
-      new ElementRef(document.createElement('img')));
-    componentInstance.initializeCropper();
-    expect(componentInstance.cropper).toBeDefined();
-  });
-
-  it('should reset', () => {
-    componentInstance.reset();
-    expect(componentInstance.uploadedImage).toBeNull();
-    expect(componentInstance.cropppedImageDataUrl).toEqual('');
-  });
-
-  it('should handle image', () => {
-    spyOn(componentInstance, 'initializeCropper');
-    // This is just a mock base 64 in order to test the FileReader event.
-    let dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    let file = new File([arrayBuffer], 'filename.mp3');
-    componentInstance.onFileChanged(file);
-    expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-  });
-
-  it('should handle invalid image', () => {
-    spyOn(componentInstance, 'reset');
-    componentInstance.onInvalidImageLoaded();
-    expect(componentInstance.reset).toHaveBeenCalled();
-    expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
-  });
-
-  it('should confirm thumbnail picutre', () => {
-    let pictureDataUrl = 'picture_data';
-    componentInstance.cropper = {
-      getCroppedCanvas(options) {
-        return {
-          toDataURL: () => pictureDataUrl
-        };
-      }
-    };
-    componentInstance.confirm();
-    expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);
+  it('should close the modal on calling save function', () => {
+    component.confirm('sample-url');
+    expect(confirmSpy).toHaveBeenCalled();
   });
 });

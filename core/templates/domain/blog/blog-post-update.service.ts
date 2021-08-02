@@ -61,6 +61,10 @@ export class BlogPostUpdateService {
   getBlogPostChangeDict(): BlogPostChangeDict {
     return this.changeDict;
   }
+
+  setBlogPostChangeDictToDefault(): void {
+    this.changeDict = {};
+  }
 }
 
 angular.module('oppia').factory(
