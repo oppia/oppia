@@ -1862,8 +1862,8 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v45_dict_to_v46_dict(cls, exp_id, states_dict):
-        """Converts from version 45 to 46. Version 46 contains the attribute
+    def _convert_states_v47_dict_to_v48_dict(cls, exp_id, states_dict):
+        """Converts from version 47 to 48. Version 48 contains the attribute
         image_sizes_in_bytes for subtitled_html.
 
         Args:
@@ -2030,9 +2030,9 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _convert_v50_dict_to_v51_dict(cls, exp_id, exploration_dict):
-        """Converts a v50 exploration dict into a v51 exploration dict.
-        Version 51 contains image_sizes_in_bytes in exploration state content.
+    def _convert_v52_dict_to_v53_dict(cls, exp_id, exploration_dict):
+        """Converts a v52 exploration dict into a v53 exploration dict.
+        Version 53 contains image_sizes_in_bytes in exploration state content.
 
         Args:
             exp_id: str. ID of the exploration.
@@ -2109,10 +2109,10 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 50
 
-        if exploration_schema_version == 50:
-            exploration_dict = cls._convert_v50_dict_to_v51_dict(
+        if exploration_schema_version == 52:
+            exploration_dict = cls._convert_v52_dict_to_v53_dict(
                 exp_id, exploration_dict)
-            exploration_schema_version = 51
+            exploration_schema_version = 53
 
         return exploration_dict
 
