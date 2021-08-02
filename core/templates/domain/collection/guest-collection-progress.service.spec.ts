@@ -200,7 +200,7 @@ describe('Guest collection progress service', () => {
       var collection = _createCollection(null, '');
       expect(() => {
         guestCollectionProgressService.getCompletedExplorationIds(collection);
-      }).toThrowError();
+      }).toThrowError('Collection does not exist!');
     });
   });
 

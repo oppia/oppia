@@ -54,6 +54,10 @@ interface ThreadData {
   'suggestion_thread_dicts': FeedbackThreadBackendDict[];
 }
 
+interface ThreadMessages {
+  'messages': ThreadMessageBackendDict[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -179,7 +183,7 @@ export class ThreadDataBackendApiService {
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
               dict, suggestionBackendDictsByThreadId.get(
-                (dict.thread_id))))
+                (dict === null ? null : dict.thread_id))))
         };
       },
       async() => Promise.reject('Error on retrieving feedback threads.'));
@@ -193,10 +197,9 @@ export class ThreadDataBackendApiService {
     }
     let threadId = thread.threadId;
 
-    return this.http.get<ThreadMessageBackendDict[]>(
-      this.getThreadHandlerUrl(threadId)).toPromise()
-      .then((response: ThreadMessageBackendDict[]) => {
-        let threadMessageBackendDicts = response;
+    return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
+      .then((response: ThreadMessages) => {
+        let threadMessageBackendDicts = response.messages;
         thread.setMessages(threadMessageBackendDicts.map(
           m => ThreadMessage.createFromBackendDict(m)));
         return thread.getMessages();
@@ -256,22 +259,21 @@ export class ThreadDataBackendApiService {
     let oldStatus = thread.status;
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
-    return this.http.post<ThreadMessageBackendDict[]>(
-      this.getThreadHandlerUrl(threadId), {
-        updated_status: updatedStatus,
-        updated_subject: null,
-        text: newMessage
-      }).toPromise().then((response: ThreadMessageBackendDict[]) => {
+    return this.http.post(this.getThreadHandlerUrl(threadId), {
+      updated_status: updatedStatus,
+      updated_subject: null,
+      text: newMessage
+    }).toPromise().then((response: ThreadMessages) => {
       if (updatedStatus) {
         if (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) {
           this.openThreadsCount += 1;
         } else {
           this.openThreadsCount += (
-            oldStatus === ExplorationEditorPageConstants.STATUS_OPEN ? -1 : 0);
+          oldStatus === ExplorationEditorPageConstants.STATUS_OPEN ? -1 : 0);
         }
       }
       thread.status = newStatus;
-      let threadMessageBackendDicts = response;
+      let threadMessageBackendDicts = response.messages;
       thread.setMessages(threadMessageBackendDicts.map(
         m => ThreadMessage.createFromBackendDict(m)));
       return thread.messages;
@@ -293,13 +295,13 @@ export class ThreadDataBackendApiService {
       action: action,
       review_message: reviewMsg,
       commit_message: (
-        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-          commitMsg : null)
+      action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
+        commitMsg : null)
     }).toPromise().then(async() => {
       thread.status = (
-        action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-         ExplorationEditorPageConstants.STATUS_FIXED :
-          ExplorationEditorPageConstants.STATUS_IGNORED);
+      action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
+      ExplorationEditorPageConstants.STATUS_FIXED :
+        ExplorationEditorPageConstants.STATUS_IGNORED);
       this.openThreadsCount -= 1;
 
       return this.getMessagesAsync(thread);

@@ -121,7 +121,7 @@ export class BaseContentComponent {
       'oppia-main-content');
 
     if (!mainContentElement) {
-      throw new Error('Variable mainContentElement is undefined.');
+      throw new Error('Variable mainContentElement is null.');
     }
     mainContentElement.tabIndex = -1;
     mainContentElement.scrollIntoView();
