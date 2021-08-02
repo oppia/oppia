@@ -191,9 +191,8 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ctrl.directiveSubscriptions.add(
           ConnectionService.onInternetStateChange.subscribe(
             currentState => {
-              ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
-              ctrl.hasInternetAccess = currentState.hasInternetAccess;
-              if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
+              let {hasNetworkConnection, hasInternetAccess} = currentState;
+              if (hasNetworkConnection && hasInternetAccess) {
                 if (ctrl.connectionStatus ===
                     AppConstants.CONNECTION_STATUS_OFFLINE) {
                   $scope.isOffline = false;

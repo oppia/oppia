@@ -74,17 +74,18 @@ describe('Connection Service', () => {
     expect(connectionService).toBeTruthy();
   });
 
-  it('should return connection state when offline', () => {
-    connectionService.checkNetworkState();
-    spyOn(connectionService, 'checkNetworkState');
-    mockWindowRef.nativeWindow.onoffline();
-    expect(connectionStateSpy).toHaveBeenCalledWith({
-      hasNetworkConnection: false,
-      hasInternetAccess: false
+  it('should report network status false when disconnected from network',
+    () => {
+      connectionService.checkNetworkState();
+      spyOn(connectionService, 'checkNetworkState');
+      mockWindowRef.nativeWindow.onoffline();
+      expect(connectionStateSpy).toHaveBeenCalledWith({
+        hasNetworkConnection: false,
+        hasInternetAccess: false
+      });
     });
-  });
 
-  it('should return connection state when online', () => {
+  it('should report network status true when connected to network', () => {
     connectionService.checkNetworkState();
     spyOn(connectionService, 'checkNetworkState');
     mockWindowRef.nativeWindow.ononline();
@@ -94,46 +95,51 @@ describe('Connection Service', () => {
     });
   });
 
-  it('should return online when is connected to internet', fakeAsync(() => {
-    connectionService.checkInternetState();
-    tick(100);
-    discardPeriodicTasks();
-    let req = httpTestingController.expectOne('/connectivity/check');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      isInternetConnected: true,
-    });
-    flushMicrotasks();
-    expect(connectionStateSpy).toHaveBeenCalledWith({
-      hasNetworkConnection: true,
-      hasInternetAccess: true
-    });
-  }));
+  it('should report internet status as online when internet is available',
+    fakeAsync(() => {
+      connectionService.checkInternetState();
+      tick(100);
+      discardPeriodicTasks();
+      let req = httpTestingController.expectOne('/connectivity/check');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        isInternetConnected: true,
+      });
+      flushMicrotasks();
+      expect(connectionStateSpy).toHaveBeenCalledWith({
+        hasNetworkConnection: true,
+        hasInternetAccess: true
+      });
+    }));
 
-  it('should return online when reconnected after offline', fakeAsync(() => {
-    connectionService.checkInternetState();
-    connectionService.checkNetworkState();
-    tick(100);
-    let req = httpTestingController.expectOne('/connectivity/check');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      isInternetConnected: true,
-    });
-    flushMicrotasks();
-    mockWindowRef.nativeWindow.onoffline();
-    tick(5000);
-    mockWindowRef.nativeWindow.ononline();
-    tick(8000);
-    discardPeriodicTasks();
-    let req2 = httpTestingController.expectOne('/connectivity/check');
-    expect(req2.request.method).toEqual('GET');
-    req2.flush({
-      isInternetConnected: true,
-    });
-    flushMicrotasks();
-    expect(connectionStateSpy).toHaveBeenCalledWith({
-      hasNetworkConnection: true,
-      hasInternetAccess: true
-    });
-  }));
+  it('should report internet status as online when reconnected after offline',
+    fakeAsync(() => {
+      connectionService.checkInternetState();
+      connectionService.checkNetworkState();
+      tick(100);
+      let req = httpTestingController.expectOne('/connectivity/check');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        isInternetConnected: true,
+      });
+      flushMicrotasks();
+      // Disconnecting window from the network.
+      mockWindowRef.nativeWindow.onoffline();
+      // Delay timer to test for the network connection again after offline.
+      tick(5000);
+      // Connecting window to the network.
+      mockWindowRef.nativeWindow.ononline();
+      tick(8000);
+      discardPeriodicTasks();
+      let req2 = httpTestingController.expectOne('/connectivity/check');
+      expect(req2.request.method).toEqual('GET');
+      req2.flush({
+        isInternetConnected: true,
+      });
+      flushMicrotasks();
+      expect(connectionStateSpy).toHaveBeenCalledWith({
+        hasNetworkConnection: true,
+        hasInternetAccess: true
+      });
+    }));
 });

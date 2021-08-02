@@ -52,8 +52,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
-  hasNetworkConnection: boolean;
-  hasInternetAccess: boolean;
   connectionStatus: string = AppConstants.CONNECTION_STATUS_ONLINE;
   disableOnOfflineNames: string[] = [
     'image', 'skillreview', 'svgdiagram', 'video'];
@@ -68,9 +66,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
 
   ngOnInit(): void {
     this.connectionService.onInternetStateChange.subscribe(currentState => {
-      this.hasNetworkConnection = currentState.hasNetworkConnection;
-      this.hasInternetAccess = currentState.hasInternetAccess;
-      if (this.hasNetworkConnection && this.hasInternetAccess) {
+      let {hasNetworkConnection, hasInternetAccess} = currentState;
+      if (hasNetworkConnection && hasInternetAccess) {
         if (this.connectionStatus === AppConstants.CONNECTION_STATUS_OFFLINE) {
           this.enableRTEicons();
         }
@@ -377,6 +374,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
         $('.cke_combo_button')
           .css('display', 'none');
       }
+
       ck.setData(wrapComponents(this.value));
     });
 

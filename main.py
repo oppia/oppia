@@ -90,7 +90,8 @@ logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
 
 
 class InternetConnectivityHandler(base.BaseHandler):
-    """Returns whether the system to connected to the internet."""
+    """Handles the get request to the server from the
+    frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

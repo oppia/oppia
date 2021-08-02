@@ -21,6 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, OnInit, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { AppConstants } from 'app.constants';
 
 import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -35,9 +36,7 @@ import { ConnectionService } from 'services/connection-service.service';
   providedIn: 'root'
 })
 export class ChangeListService implements OnInit {
-  hasNetworkConnection: boolean;
-  hasInternetAccess: boolean;
-  status: string;
+  connectionStatus: string = AppConstants.CONNECTION_STATUS_ONLINE;
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
   undoneChangeStack: ExplorationChange[] = [];
@@ -45,7 +44,8 @@ export class ChangeListService implements OnInit {
   // undone change.
   ndoneChangeStack = [];
   loadingMessage: string = '';
-  tempChanges: ExplorationChange[] = [];
+  // Temporary list of the changes made to the exploration when offline.
+  temporaryListOfChanges: ExplorationChange[] = [];
 
   @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
     new EventEmitter<boolean>());
@@ -96,18 +96,17 @@ export class ChangeListService implements OnInit {
     private connectionService: ConnectionService,
   ) {
     this.connectionService.onInternetStateChange.subscribe(currentState => {
-      this.hasNetworkConnection = currentState.hasNetworkConnection;
-      this.hasInternetAccess = currentState.hasInternetAccess;
-      if (this.hasNetworkConnection && this.hasInternetAccess) {
-        this.status = 'ONLINE';
-        if (this.tempChanges.length > 0) {
-          for (let change of this.tempChanges) {
+      let {hasNetworkConnection, hasInternetAccess } = currentState;
+      if (hasNetworkConnection && hasInternetAccess) {
+        this.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
+        if (this.temporaryListOfChanges.length > 0) {
+          for (let change of this.temporaryListOfChanges) {
             this.addChange(change);
           }
-          this.tempChanges = [];
+          this.temporaryListOfChanges = [];
         }
       } else {
-        this.status = 'OFFLINE';
+        this.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
       }
     });
   }
@@ -158,8 +157,8 @@ export class ChangeListService implements OnInit {
     if (this.loadingMessage) {
       return;
     }
-    if (this.status === 'OFFLINE') {
-      this.tempChanges.push(changeDict);
+    if (this.connectionStatus === 'OFFLINE') {
+      this.temporaryListOfChanges.push(changeDict);
     } else {
       this.explorationChangeList.push(changeDict);
       this.undoneChangeStack = [];

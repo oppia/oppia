@@ -66,6 +66,7 @@ describe('Exploration editor page component', function() {
   importAllAngularServices();
 
   var ctrl = null;
+
   var $q = null;
   var $rootScope = null;
   var $scope = null;
@@ -304,6 +305,7 @@ describe('Exploration editor page component', function() {
         mockOpenEditorTutorialEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter);
+
       explorationData.is_version_of_draft_valid = false;
 
       ctrl.$onInit();

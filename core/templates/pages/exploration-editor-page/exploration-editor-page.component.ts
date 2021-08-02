@@ -205,6 +205,8 @@ angular.module('oppia').component('explorationEditorPage', {
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
+      var reconnectedMessageTimeoutMilliseconds = 4000;
+      var disconnectedMessageTimeoutMilliseconds = 5000;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectionService = ConnectionService;
@@ -278,6 +280,7 @@ angular.module('oppia').component('explorationEditorPage', {
             explorationData.auto_tts_enabled);
           ExplorationCorrectnessFeedbackService.init(
             explorationData.correctness_feedback_enabled);
+
           ctrl.alertsService = AlertsService;
           ctrl.explorationTitleService = ExplorationTitleService;
           ctrl.explorationCategoryService = ExplorationCategoryService;
@@ -381,6 +384,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
+
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
           $scope.$applyAsync();
@@ -517,7 +521,7 @@ angular.module('oppia').component('explorationEditorPage', {
                     AppConstants.CONNECTION_STATUS_OFFLINE) {
                   AlertsService.addSuccessMessage(
                     'Reconnected. Checking whether your changes are mergeable.',
-                    4000);
+                    reconnectedMessageTimeoutMilliseconds);
                 }
                 ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
               } else {
@@ -526,7 +530,8 @@ angular.module('oppia').component('explorationEditorPage', {
                   AlertsService.addInfoMessage(
                     'Looks like you are offline. ' +
                     'You can continue working, and can save ' +
-                    'your changes once reconnected.', 5000);
+                    'your changes once reconnected.',
+                    disconnectedMessageTimeoutMilliseconds);
                 }
                 ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
               }
