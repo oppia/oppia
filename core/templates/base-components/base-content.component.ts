@@ -115,6 +115,8 @@ export class BaseContentComponent {
   }
 
   skipToMainContent(): void {
+    // 'getElementById' can return null if the element provided as
+    // an argument is invalid.
     let mainContentElement: HTMLElement | null = document.getElementById(
       'oppia-main-content');
 

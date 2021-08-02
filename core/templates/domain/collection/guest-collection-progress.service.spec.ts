@@ -63,7 +63,7 @@ describe('Guest collection progress service', () => {
     window.localStorage.clear();
   });
 
-  var _createCollection = (collectionId: string, title: string) => {
+  var _createCollection = (collectionId: string | null, title: string) => {
     var collectionBackendObject = {
       id: collectionId,
       title: title,
@@ -194,6 +194,13 @@ describe('Guest collection progress service', () => {
       var completedIds = (
         guestCollectionProgressService.getCompletedExplorationIds(collection));
       expect(completedIds).toEqual([_expId0, _expId2]);
+    });
+
+    it('should throw error if collection id is invalid', () => {
+      var collection = _createCollection(null, '');
+      expect(() => {
+        guestCollectionProgressService.getCompletedExplorationIds(collection);
+      }).toThrowError();
     });
   });
 
