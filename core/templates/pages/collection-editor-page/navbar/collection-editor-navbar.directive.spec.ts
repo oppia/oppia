@@ -22,7 +22,6 @@
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UrlService } from 'services/contextual/url.service';
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
@@ -34,11 +33,10 @@ import { CollectionRightsBackendApiService } from 'domain/collection/collection-
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 // ^^^ This block is to be removed.
 
-fdescribe('Collection Editor Navbar directive', function() {
+describe('Collection Editor Navbar directive', function() {
   let $scope = null;
   let ctrl = null;
   let $rootScope = null;
-  let $timeout = null;
   let directive = null;
   let undoRedoService: UndoRedoService = null;
   let $uibModal = null;
@@ -71,7 +69,6 @@ fdescribe('Collection Editor Navbar directive', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
-    $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     undoRedoService = $injector.get('UndoRedoService');
@@ -154,7 +151,7 @@ fdescribe('Collection Editor Navbar directive', function() {
         next_exploration_id: 'expId',
         completed_exploration_ids: ['expId2']
       }
-    }
+    };
     sampleCollection = Collection.create(
       sampleCollectionBackendObject1);
     sampleCollectionRights = CollectionRights.createEmptyCollectionRights();
@@ -208,12 +205,12 @@ fdescribe('Collection Editor Navbar directive', function() {
     spyOn(collectionEditorStateService, 'getCollectionRights')
       .and.returnValue(
         new CollectionRights({
-        owner_names: [],
-        collection_id: 1,
-        can_edit: true,
-        can_unpublish: true,
-        is_private: true
-      }));
+          owner_names: [],
+          collection_id: 1,
+          can_edit: true,
+          can_unpublish: true,
+          is_private: true
+        }));
     spyOn(undoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
       mockUndoRedoChangeEventEmitter);
     spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
