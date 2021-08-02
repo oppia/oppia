@@ -16,18 +16,12 @@
  * @fileoverview Unit tests for the ExplorationTaskModel.
  */
 
-import { ExplorationTaskBackendDict, ExplorationTaskModel } from
-  'domain/improvements/exploration-task.model';
-import { HighBounceRateTask } from
-  'domain/improvements/high-bounce-rate-task.model';
-import { TaskEntryBackendDict } from
-  'domain/improvements/task-entry.model';
-import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/ineffective-feedback-loop-task.model';
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/needs-guiding-response-task.model';
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/successive-incorrect-answers-task.model';
+import { ExplorationTaskBackendDict, ExplorationTaskModel } from 'domain/improvements/exploration-task.model';
+import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
+import { TaskEntryBackendDict } from 'domain/improvements/task-entry.model';
+import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
+import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
+import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
 
 describe('Exploration task model', () => {
   let newTaskEntryBackendDict: {
