@@ -37,11 +37,11 @@ type FocusObj = { focused: boolean; };
   templateUrl: './algebraic-expression-editor.component.html'
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
-  // This property is initialized using Angular lifecycle hooks
+  // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
-  @Input() value: string = '';
+  @Input() value!: string;
   @Output() valueChanged: EventEmitter<string> = new EventEmitter<string>();
   warningText: string = '';
   hasBeenTouched: boolean = false;
@@ -60,7 +60,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value === null) {
+    if (this.value === undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
