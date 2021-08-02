@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import datetime
 
+import android_validation_constants
 from core.platform import models
 from core.tests import test_utils
 
@@ -122,8 +123,9 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             'app_version_code': str('bad_version_code'), # pylint: disable=disallowed-function-calls
         }
         response = self.post_json( # type: ignore[no-untyped-call]
-            feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL, self.payload,
-            headers=invalid_headers, csrf_token=token, expected_status_int=401)
+            android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
+            self.payload, headers=invalid_headers, csrf_token=token,
+            expected_status_int=401)
         self.assertEqual(
             response['error'],
             'The incoming request does not have valid authentication for '
@@ -133,8 +135,8 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         # type: () -> None
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
         self.post_json( # type: ignore[no-untyped-call]
-            feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL, self.payload,
-            csrf_token=token, expected_status_int=500)
+            android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
+            self.payload, csrf_token=token, expected_status_int=500)
 
     def _post_json_with_test_headers(self, payload, expected_status=200):
         # type: (Dict[Text, Any], int) -> Dict[Text, Any]
@@ -164,6 +166,6 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                         ANDROID_APP_VERSION_CODE_STRING):
                         return ( # type: ignore[no-any-return]
                             self.post_json( # type: ignore[no-untyped-call]
-                                feconf.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
+                                android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL, # pylint: disable=line-too-long
                                 payload, headers=self.headers, csrf_token=token,
                                 expected_status_int=expected_status))

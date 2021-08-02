@@ -49,3 +49,7 @@ MAX_CHARS_IN_STORY_TITLE = 39
 MAX_CHARS_IN_CHAPTER_TITLE = 36
 MAX_CHARS_IN_CHAPTER_DESCRIPTION = 152
 MAX_CHARS_IN_MISCONCEPTION_NAME = 100
+
+# The URL that Android feedback reports are sent to.
+INCOMING_ANDROID_FEEDBACK_REPORT_URL = (
+    '/appfeedbackreporthandler/incoming_android_report')
