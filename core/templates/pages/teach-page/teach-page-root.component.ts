@@ -18,8 +18,7 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { MetaAttribute, MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { PageTitleService } from 'services/page-title.service';
+import { PageMetadataService } from 'services/contextual/page-metadata.service';
 
 @Component({
   selector: 'oppia-teach-page-root',
@@ -27,24 +26,11 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class TeachPageRootComponent {
   constructor(
-    private pageTitleService: PageTitleService,
-    private metaTagCustomizationService: MetaTagCustomizationService
+    private pageMetadataService: PageMetadataService
   ) {}
 
   ngOnInit(): void {
-    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
-
-    let metaAttributes: MetaAttribute[] = [];
-    for (let i = 0; i < pageData.META.length; i++) {
-      metaAttributes.push({
-        propertyType: pageData.META[i].PROPERTY_TYPE,
-        propertyValue: pageData.META[i].PROPERTY_VALUE,
-        content: pageData.META[i].CONTENT
-      });
-    }
-    // Update meta tags.
-    this.metaTagCustomizationService.addOrReplaceMetaTags(metaAttributes);
+    this.pageMetadataService.updateMetadata(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH);
   }
 }

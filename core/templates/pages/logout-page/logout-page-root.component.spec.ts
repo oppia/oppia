@@ -18,7 +18,8 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { PageTitleService } from 'services/page-title.service';
+import { AppConstants } from 'app.constants';
+import { PageMetadataService } from 'services/contextual/page-metadata.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LogoutPageRootComponent } from './logout-page-root.component';
@@ -26,7 +27,7 @@ import { LogoutPageRootComponent } from './logout-page-root.component';
 describe('Logout Page Root', () => {
   let fixture: ComponentFixture<LogoutPageRootComponent>;
   let component: LogoutPageRootComponent;
-  let pageTitleService: PageTitleService;
+  let pageMetadataService: PageMetadataService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,7 +36,7 @@ describe('Logout Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService
+        PageMetadataService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -44,7 +45,7 @@ describe('Logout Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LogoutPageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
+    pageMetadataService = TestBed.inject(PageMetadataService);
   });
 
   it('should successfully instantiate the component',
@@ -53,8 +54,9 @@ describe('Logout Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageMetadataService, 'updateMetadata');
     component.ngOnInit();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT);
   });
 });

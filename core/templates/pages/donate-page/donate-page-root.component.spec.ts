@@ -18,7 +18,9 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
+import { PageMetadataService } from 'services/contextual/page-metadata.service';
 import { PageTitleService } from 'services/page-title.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -27,8 +29,7 @@ import { DonatePageRootComponent } from './donate-page-root.component';
 describe('Donate Page Root', () => {
   let fixture: ComponentFixture<DonatePageRootComponent>;
   let component: DonatePageRootComponent;
-  let pageTitleService: PageTitleService;
-  let metaTagCustomizationService: MetaTagCustomizationService;
+  let pageMetadataService: PageMetadataService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,8 +48,7 @@ describe('Donate Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(DonatePageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
-    metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
+    pageMetadataService = TestBed.inject(PageMetadataService);
   });
 
   it('should successfully instantiate the component',
@@ -57,10 +57,9 @@ describe('Donate Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setPageTitle');
-    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
+    spyOn(pageMetadataService, 'updateMetadata');
     component.ngOnInit();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
-    expect(metaTagCustomizationService.addOrReplaceMetaTags).toHaveBeenCalled();
+    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE);
   });
 });

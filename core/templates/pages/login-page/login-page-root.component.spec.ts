@@ -18,7 +18,8 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { PageTitleService } from 'services/page-title.service';
+import { AppConstants } from 'app.constants';
+import { PageMetadataService } from 'services/contextual/page-metadata.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { LoginPageRootComponent } from './login-page-root.component';
@@ -26,7 +27,7 @@ import { LoginPageRootComponent } from './login-page-root.component';
 describe('Login Page Root', () => {
   let fixture: ComponentFixture<LoginPageRootComponent>;
   let component: LoginPageRootComponent;
-  let pageTitleService: PageTitleService;
+  let pageMetadataService: PageMetadataService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,7 +36,7 @@ describe('Login Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService
+        PageMetadataService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -44,7 +45,7 @@ describe('Login Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LoginPageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
+    pageMetadataService = TestBed.inject(PageMetadataService);
   });
 
   it('should successfully instantiate the component',
@@ -53,8 +54,9 @@ describe('Login Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageMetadataService, 'updateMetadata');
     component.ngOnInit();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN);
   });
 });

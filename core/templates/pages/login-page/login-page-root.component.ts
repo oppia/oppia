@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { PageTitleService } from 'services/page-title.service';
+import { PageMetadataService } from 'services/contextual/page-metadata.service';
 
 @Component({
   selector: 'oppia-login-page-root',
@@ -26,12 +26,11 @@ import { PageTitleService } from 'services/page-title.service';
 })
 export class LoginPageRootComponent {
   constructor(
-    private pageTitleService: PageTitleService
+    private pageMetadataService: PageMetadataService
   ) {}
 
   ngOnInit(): void {
-    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
+    this.pageMetadataService.updateMetadata(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN);
   }
 }

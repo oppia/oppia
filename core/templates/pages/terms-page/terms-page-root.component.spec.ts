@@ -18,8 +18,8 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { PageTitleService } from 'services/page-title.service';
+import { AppConstants } from 'app.constants';
+import { PageMetadataService } from 'services/contextual/page-metadata.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TermsPageRootComponent } from './terms-page-root.component';
@@ -27,8 +27,7 @@ import { TermsPageRootComponent } from './terms-page-root.component';
 describe('Terms Page Root', () => {
   let fixture: ComponentFixture<TermsPageRootComponent>;
   let component: TermsPageRootComponent;
-  let pageTitleService: PageTitleService;
-  let metaTagCustomizationService: MetaTagCustomizationService;
+  let pageMetadataService: PageMetadataService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -37,8 +36,7 @@ describe('Terms Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService,
-        MetaTagCustomizationService
+        PageMetadataService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -47,8 +45,7 @@ describe('Terms Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TermsPageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
-    metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
+    pageMetadataService = TestBed.inject(PageMetadataService);
   });
 
   it('should successfully instantiate the component',
@@ -57,10 +54,9 @@ describe('Terms Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setPageTitle');
-    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
+    spyOn(pageMetadataService, 'updateMetadata');
     component.ngOnInit();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
-    expect(metaTagCustomizationService.addOrReplaceMetaTags).toHaveBeenCalled();
+    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS);
   });
 });
