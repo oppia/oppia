@@ -24,6 +24,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class PageTitleService {
+  // The following properties are 'null' when they are
+  // not set.
   pageTitleForMobile: string | null = null;
   pageSubtitleForMobile: string | null = null;
   constructor(
