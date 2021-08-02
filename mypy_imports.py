@@ -51,6 +51,7 @@ from core.storage.story import gae_models as story_models
 from core.storage.subtopic import gae_models as subtopic_models
 from core.storage.suggestion import gae_models as suggestion_models
 from core.storage.topic import gae_models as topic_models
+from core.storage.translation import gae_models as translation_models # pylint: disable=line-too-long
 from core.storage.user import gae_models as user_models
 
 __all__ = [
@@ -78,6 +79,7 @@ __all__ = [
     b'subtopic_models',
     b'suggestion_models',
     b'topic_models',
+    b'translation_models',
     b'transaction_services',
     b'user_models'
 ]

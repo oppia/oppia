@@ -22,6 +22,12 @@ from __future__ import unicode_literals
 from core.platform import models
 import utils
 
+from typing import Dict, Optional, Text # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, datastore_services
+
 (base_models,) = models.Registry.import_models(
     [models.NAMES.base_model])
 
@@ -66,6 +72,7 @@ class MachineTranslationModel(base_models.BaseModel):
     def create(
             cls, source_language_code, target_language_code, source_text,
             translated_text):
+        # type: (Text, Text, Text, Text) -> Optional[Text]
         """Creates a new MachineTranslationModel instance and returns its ID.
 
         Args:
@@ -103,6 +110,7 @@ class MachineTranslationModel(base_models.BaseModel):
     @staticmethod
     def _generate_id(
             source_language_code, target_language_code, hashed_source_text):
+        # type: (Text, Text, Text) -> Text
         """Generates a valid, deterministic key for a MachineTranslationModel
         instance.
 
@@ -129,6 +137,7 @@ class MachineTranslationModel(base_models.BaseModel):
     @classmethod
     def get_machine_translation(
             cls, source_language_code, target_language_code, source_text):
+        # type: (Text, Text, Text) -> Optional[MachineTranslationModel]
         """Gets MachineTranslationModel by language codes and source text.
 
         Args:
@@ -151,16 +160,19 @@ class MachineTranslationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model is not associated with users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is not associated with users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model is not associated with users."""
         return dict(super(cls, cls).get_export_policy(), **{
             'source_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
