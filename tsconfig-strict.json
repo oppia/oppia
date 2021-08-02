@@ -592,11 +592,11 @@
   ],
   "include": [
     "core/templates/components/code-mirror/*.ts",
+    "core/templates/components/forms/slider/*.ts",
     "core/templates/components/keyboard-shortcut-help/*.ts",
     "core/templates/components/profile-link-directives/*.ts",
-    "core/templates/components/skill-mastery/*.ts",
     "core/templates/components/ratings/rating-computation/*.ts",
-    "core/templates/components/forms/slider/*.ts",
+    "core/templates/components/skill-mastery/*.ts",
     "core/templates/domain/admin/*.ts",
     "core/templates/domain/classroom/*.ts",
     "core/templates/domain/email-dashboard/*.ts",
@@ -616,8 +616,8 @@
     "core/templates/pages/delete-account-page/services/*.ts",
     "core/templates/services/contextual/*.ts",
     "core/templates/services/stateful/*.ts",
-    "extensions/rich_text_components/Video/*.ts",
     "extensions/rich_text_components/Link/*.ts",
+    "extensions/rich_text_components/Video/*.ts",
     "typings/*.ts"
   ],
   "exclude": ["extensions/classifiers/proto"]
