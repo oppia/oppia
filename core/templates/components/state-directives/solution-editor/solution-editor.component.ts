@@ -60,9 +60,9 @@ angular.module('oppia').component('solutionEditor', {
     'StateCustomizationArgsService', 'StateInteractionIdService',
     'StateSolutionService',
     function(
-      EditabilityService, ExplorationHtmlFormatterService,
-      StateCustomizationArgsService, StateInteractionIdService,
-      StateSolutionService) {
+        EditabilityService, ExplorationHtmlFormatterService,
+        StateCustomizationArgsService, StateInteractionIdService,
+        StateSolutionService) {
       var ctrl = this;
       ctrl.getAnswerHtml = function() {
         return ExplorationHtmlFormatterService.getAnswerHtml(
