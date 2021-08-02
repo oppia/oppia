@@ -225,6 +225,31 @@ class SubtopicPage(python_utils.OBJECT):
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     @classmethod
+    def convert_html_fields_in_subtopic_page_contents(
+            cls, subtopic_page_contents_dict, conversion_fn):
+        """Applies a conversion function on all the html strings in subtopic
+        page contents to migrate them to a desired state.
+
+        Args:
+            subtopic_page_contents_dict: dict. The dict representation of
+                subtopic page contents.
+            conversion_fn: function. The conversion function to be applied on
+                the subtopic_page_contents_dict.
+
+        Returns:
+            dict. The converted subtopic_page_contents_dict.
+        """
+        subtopic_page_contents_dict['written_translations'] = (
+            state_domain.WrittenTranslations.
+            convert_html_in_written_translations(
+                subtopic_page_contents_dict['written_translations'],
+                conversion_fn))
+        subtopic_page_contents_dict['subtitled_html']['html'] = (
+            conversion_fn(
+                subtopic_page_contents_dict['subtitled_html']['html']))
+        return subtopic_page_contents_dict
+
+    @classmethod
     def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
         """Converts v1 SubtopicPage Contents schema to the v2 schema.
         v2 schema introduces the new schema for Math components.
@@ -236,17 +261,26 @@ class SubtopicPage(python_utils.OBJECT):
         Returns:
             dict. The converted page_contents_dict.
         """
-        page_contents_dict['written_translations'] = (
-            state_domain.WrittenTranslations.
-            convert_html_in_written_translations(
-                page_contents_dict['written_translations'],
-                html_validation_service.
-                add_math_content_to_math_rte_components))
-        page_contents_dict['subtitled_html']['html'] = (
-            html_validation_service.
-            add_math_content_to_math_rte_components(
-                page_contents_dict['subtitled_html']['html']))
-        return page_contents_dict
+        return cls.convert_html_fields_in_subtopic_page_contents(
+            page_contents_dict,
+            html_validation_service.add_math_content_to_math_rte_components)
+
+    @classmethod
+    def _convert_page_contents_v2_dict_to_v3_dict(cls, page_contents_dict):
+        """Converts v2 SubtopicPage Contents schema to the v3 schema.
+        v3 schema deprecates oppia-noninteractive-svgdiagram tag and converts
+        existing occurences of it to oppia-noninteractive-image tag.
+
+        Args:
+            page_contents_dict: dict. A dict used to initialize a SubtopicPage
+                domain object.
+
+        Returns:
+            dict. The converted page_contents_dict.
+        """
+        return cls.convert_html_fields_in_subtopic_page_contents(
+            page_contents_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
 
     @classmethod
     def update_page_contents_from_model(
