@@ -75,6 +75,6 @@ describe('rich-text components', function() {
   });
 
   afterEach(async function() {
-    await general.checkForConsoleErrors([], false);
+    await general.checkForConsoleErrors([]);
   });
 });

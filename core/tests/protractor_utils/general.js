@@ -68,10 +68,6 @@ var checkForConsoleErrors = async function(
   if (browser.isMobile) {
     errorsToIgnore.push(_.escapeRegExp(' Slow network is detected.'));
   }
-  // REMOVE_BEFORE_MERGE.
-  if (skipDebugging) {
-    errorsToIgnore.push(_.escapeRegExp('[DEBUGGING]'));
-  }
 
   var browserLogs = await browser.manage().logs().get('browser');
   var browserErrors = browserLogs.filter(logEntry => (
