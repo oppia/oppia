@@ -114,10 +114,10 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_all_non_private_commits(
-        cls,
-        page_size, # type: int
-        urlsafe_start_cursor, # type: Optional[Text]
-        max_age=None # type: Optional[datetime.timedelta]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            max_age=None # type: Optional[datetime.timedelta]
     ):
         # type: (...) -> Tuple[List[CollectionCommitLogEntryModel], Optional[Text], bool]
         """Fetches a list of all the non-private commits sorted by their last

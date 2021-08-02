@@ -281,9 +281,9 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_multi(
-        cls, # type: Type[SELF_BASE_MODEL]
-        entity_ids, # type: Sequence[Optional[Text]]
-        include_deleted=False # type: bool
+            cls, # type: Type[SELF_BASE_MODEL]
+            entity_ids, # type: Sequence[Optional[Text]]
+            include_deleted=False # type: bool
     ):
         # type: (...) -> List[Optional[SELF_BASE_MODEL]]
         """Gets list of entities by list of ids.
@@ -711,9 +711,9 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_all_commits(
-        cls, # type: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]
-        page_size, # type: int
-        urlsafe_start_cursor # type: Optional[Text]
+            cls, # type: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]
+            page_size, # type: int
+            urlsafe_start_cursor # type: Optional[Text]
     ):
         # type: (...) -> Tuple[List[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[Text], bool]
         """Fetches a list of all the commits sorted by their last updated
@@ -743,9 +743,9 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_commit(
-        cls, # type: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]
-        target_entity_id, # type: Text
-        version # type: int
+            cls, # type: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]
+            target_entity_id, # type: Text
+            version # type: int
     ):
         # type: (...) -> Optional[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]
         """Returns the commit corresponding to an instance id and
@@ -1162,11 +1162,11 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def revert(
-        cls, # type: Type[SELF_VERSIONED_MODEL]
-        model, # type: SELF_VERSIONED_MODEL
-        committer_id, # type: Text
-        commit_message, # type: Text
-        version_number # type: int
+            cls, # type: Type[SELF_VERSIONED_MODEL]
+            model, # type: SELF_VERSIONED_MODEL
+            committer_id, # type: Text
+            commit_message, # type: Text
+            version_number # type: int
     ):
         # type: (...) -> None
         """Reverts model to previous version.
@@ -1216,10 +1216,10 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_version( # type: ignore[return]
-        cls, # type: Type[SELF_VERSIONED_MODEL]
-        entity_id, # type: Text
-        version_number, # type: int
-        strict=True # type: bool
+            cls, # type: Type[SELF_VERSIONED_MODEL]
+            entity_id, # type: Text
+            version_number, # type: int
+            strict=True # type: bool
     ):
         # type: (...) -> Optional[SELF_VERSIONED_MODEL]
         """Gets model instance representing the given version.
@@ -1260,9 +1260,9 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_multi_versions(
-        cls, # type: Type[SELF_VERSIONED_MODEL]
-        entity_id, # type: Text
-        version_numbers # type: List[int]
+            cls, # type: Type[SELF_VERSIONED_MODEL]
+            entity_id, # type: Text
+            version_numbers # type: List[int]
     ):
         # type: (...) -> List[SELF_VERSIONED_MODEL]
         """Gets model instances for each version specified in version_numbers.
@@ -1314,10 +1314,10 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get(
-        cls, # type: Type[SELF_VERSIONED_MODEL]
-        entity_id, # type: Text
-        strict=True, # type: bool
-        version=None # type: Optional[int]
+            cls, # type: Type[SELF_VERSIONED_MODEL]
+            entity_id, # type: Text
+            strict=True, # type: bool
+            version=None # type: Optional[int]
     ):
         # type: (...) -> Optional[SELF_VERSIONED_MODEL]
         """Gets model instance.
@@ -1507,12 +1507,12 @@ class BaseSnapshotMetadataModel(BaseModel):
     # remove Any from type-annotation below.
     @classmethod
     def create(
-        cls, # type: Type[SELF_BASE_SNAPSHOT_METADATA_MODEL]
-        snapshot_id, # type: Text
-        committer_id, # type: Text
-        commit_type, # type: Text
-        commit_message, # type: Optional[Text]
-        commit_cmds # type: Union[Dict[Text, Any], List[Dict[Text, Any]], None]
+            cls, # type: Type[SELF_BASE_SNAPSHOT_METADATA_MODEL]
+            snapshot_id, # type: Text
+            committer_id, # type: Text
+            commit_type, # type: Text
+            commit_message, # type: Optional[Text]
+            commit_cmds # type: Union[Dict[Text, Any], List[Dict[Text, Any]], None]
     ):
         # type: (...) -> SELF_BASE_SNAPSHOT_METADATA_MODEL
         """This method returns an instance of the BaseSnapshotMetadataModel for
@@ -1609,9 +1609,9 @@ class BaseSnapshotContentModel(BaseModel):
     # remove Any from type-annotation below.
     @classmethod
     def create(
-        cls, # type: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL]
-        snapshot_id, # type: Text
-        content # type: Dict[Text, Any]
+            cls, # type: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL]
+            snapshot_id, # type: Text
+            content # type: Dict[Text, Any]
     ):
         # type: (...) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL
         """This method returns an instance of the BaseSnapshotContentModel for

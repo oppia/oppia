@@ -320,10 +320,10 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def get_models(
-        cls,
-        exp_id, # type: Text
-        exp_version, # type: int
-        state_names # type: List[Text]
+            cls,
+            exp_id, # type: Text
+            exp_version, # type: int
+            state_names # type: List[Text]
     ):
         # type: (...) -> List[Optional[StateTrainingJobsMappingModel]]
         """Retrieves the Classifier Exploration Mapping models given Exploration

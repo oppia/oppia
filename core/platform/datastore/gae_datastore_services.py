@@ -232,7 +232,7 @@ def make_cursor(urlsafe_cursor=None):
 
 
 def fetch_multiple_entities_by_ids_and_models(
-    ids_and_models # type: List[Tuple[Text, List[Text]]]
+        ids_and_models # type: List[Tuple[Text, List[Text]]]
 ):
     # type: (...) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
     """Fetches the entities from the datastore corresponding to the given ids
