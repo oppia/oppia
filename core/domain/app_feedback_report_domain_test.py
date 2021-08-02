@@ -629,7 +629,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
         # type: () -> None
         self.device_system_context.package_version_code = 'invalid_code' # type: ignore[assignment]
         self._assert_validation_error(
-            self.device_system_context, 'Package verion code must be an int')
+            self.device_system_context, 'Package version code must be an int')
 
     def test_validation_package_version_code_less_than_minimum_fails(self):
         # type: () -> None
@@ -637,15 +637,9 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE - 1)
         self._assert_validation_error(
             self.device_system_context,
-            'Package version code is not a valid int')
-
-    def test_validation_package_version_code_greater_than_maximum_fails(self):
-        # type: () -> None
-        self.device_system_context.package_version_code = (
-            feconf.MAXIMUM_ANDROID_PACKAGE_VERSION_CODE + 1)
-        self._assert_validation_error(
-            self.device_system_context,
-            'Package version code is not a valid int')
+            'The package version code is not a valid int. The minimum '
+            'supported version is %d' % (
+                feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE))
 
     def test_validation_country_locale_code_is_none_fails(self):
         # type: () -> None

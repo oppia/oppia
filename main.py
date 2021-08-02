@@ -18,9 +18,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
+
 import android_validation_constants
 from constants import constants
-
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config

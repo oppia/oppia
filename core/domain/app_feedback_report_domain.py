@@ -735,18 +735,14 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             raise utils.ValidationError('No package version code supplied.')
         if not isinstance(package_version_code, int):
             raise utils.ValidationError(
-                'Package verion code must be an int, received: %r.' % (
+                'Package version code must be an int, received: %r.' % (
                     package_version_code))
-        if not (
-                feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE <=
-                package_version_code <=
-                feconf.MAXIMUM_ANDROID_PACKAGE_VERSION_CODE):
+        if package_version_code < feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE:
             raise utils.ValidationError(
-                'Package version code is not a valid int, received: %d. The '
-                'supported version codes are within the range [%d, %d].' % (
-                    package_version_code,
+                'The package version code is not a valid int. The minimum '
+                'supported version is %d, received: %d.' % (
                     feconf.MINIMUM_ANDROID_PACKAGE_VERSION_CODE,
-                    feconf.MAXIMUM_ANDROID_PACKAGE_VERSION_CODE))
+                    package_version_code))
 
     @classmethod
     def require_valid_locale_code(cls, locale_type, locale_code):

@@ -624,7 +624,6 @@ EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
 
 # The minimum and maximum package version codes for Oppia Android.
 MINIMUM_ANDROID_PACKAGE_VERSION_CODE = 1
-MAXIMUM_ANDROID_PACKAGE_VERSION_CODE = 1
 
 # We generate images for existing math rich text components in batches. This
 # gives the maximum size for a batch of Math SVGs in bytes.
