@@ -95,6 +95,7 @@ export class Skill {
     this._allQuestionsMerged = skill.getAllQuestionsMerged();
     this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
   }
+
   getId(): string | null {
     return this._id;
   }
