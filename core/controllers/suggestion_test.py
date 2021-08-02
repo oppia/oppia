@@ -1025,7 +1025,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'skill_difficulty': 0.6
             }, csrf_token=csrf_token, upload_files=((
                 'file.svg', 'file.svg', large_image),),
-            expected_status_int=400)
+                expected_status_int=400)
 
         self.assertIn(
             'Image exceeds file size limit of 100 KB.',
