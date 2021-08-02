@@ -1020,13 +1020,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         response_dict = self.post_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
-            suggestion.suggestion_id), 
-            {
+            suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            },
-            csrf_token=csrf_token, expected_status_int=400,
-            upload_files=(
+            }, csrf_token=csrf_token, expected_status_int=400, upload_files=(
                 ('file.svg', 'file.svg', large_image),),)
 
         self.assertIn(
