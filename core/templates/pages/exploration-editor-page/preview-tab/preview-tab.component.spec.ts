@@ -25,7 +25,7 @@ import { EventEmitter } from '@angular/core';
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-fdescribe('Preview Tab Component', function() {
+describe('Preview Tab Component', function() {
   importAllAngularServices();
 
   var ctrl = null;
