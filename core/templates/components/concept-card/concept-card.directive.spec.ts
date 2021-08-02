@@ -28,7 +28,7 @@ describe('ConceptCardDirective', () => {
   let $scope = null;
   let $q = null;
 
-  let loadConceptCardsAsync :jasmine.Spy;
+  let loadConceptCardsAsync: jasmine.Spy;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -54,7 +54,7 @@ describe('ConceptCardDirective', () => {
     ctrl.index = 0;
     loadConceptCardsAsync.and.resolveTo([{
       getWorkedExamples: () => {
-        return ['1']
+        return ['1'];
       }
     }]);
 
@@ -78,8 +78,8 @@ describe('ConceptCardDirective', () => {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(ctrl.skillDeletedMessage).toBe('Oops, it looks like this skill has' +
-    ' been deleted.');
+    expect(ctrl.skillDeletedMessage).toBe(
+      'Oops, it looks like this skill has been deleted.');
   });
 
   it('should show more worked examples when user clicks on \'+ Worked ' +
@@ -119,7 +119,6 @@ describe('Upgraded component', () => {
       'conceptCard',
       [ConceptCardComponent]
     ).then(
-      async(textContext) => expect(textContext).toBe('Hello Oppia!')
-    )
+      async(textContext) => expect(textContext).toBe('Hello Oppia!'));
   }));
 });

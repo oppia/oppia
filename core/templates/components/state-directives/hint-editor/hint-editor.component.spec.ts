@@ -41,7 +41,7 @@ describe('HintEditorComponent', () => {
       $scope: $scope
     }, {
       getOnSaveFn: () => {
-        return () => {}
+        return () => {};
       },
       showMarkAllAudioAsNeedingUpdateModalIfRequired: () => {}
     });
@@ -49,7 +49,7 @@ describe('HintEditorComponent', () => {
 
   afterEach(() => {
     ctrl.$onDestroy();
-  })
+  });
 
   it('should set component properties on initialization', () => {
     spyOn(EditabilityService, 'isEditable').and.returnValue(true);

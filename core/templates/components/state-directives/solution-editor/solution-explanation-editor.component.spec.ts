@@ -54,13 +54,13 @@ describe('SolutionExplanationEditorComponent', () => {
   it('should set component properties on initialization', () => {
     spyOn(EditabilityService, 'isEditable').and.returnValue(true);
 
-    expect(ctrl.editSolutionForm).toEqual(undefined)
+    expect(ctrl.editSolutionForm).toEqual(undefined);
     expect(ctrl.isEditable).toBe(undefined);
     expect(ctrl.explanationEditorIsOpen).toBe(undefined);
 
     ctrl.$onInit();
 
-    expect(ctrl.editSolutionForm).toEqual({})
+    expect(ctrl.editSolutionForm).toEqual({});
     expect(ctrl.isEditable).toBe(true);
     expect(ctrl.explanationEditorIsOpen).toBe(false);
   });

@@ -31,7 +31,7 @@ describe('StateSolutionEditorComponent', () => {
   let solution;
 
   let ExplorationHtmlFormatterService = null;
-  let WindowDimensionsService= null;
+  let WindowDimensionsService = null;
   let StateEditorService = null;
   let StateSolutionService = null;
   let StateInteractionIdService = null;
@@ -89,7 +89,6 @@ describe('StateSolutionEditorComponent', () => {
   }));
 
   it('should set component properties on initialization', () => {
-
     ctrl.$onInit();
 
     expect($scope.solutionCardIsShown).toBe(true);
@@ -223,5 +222,5 @@ describe('StateSolutionEditorComponent', () => {
     $scope.$apply();
 
     expect($uibModal.open).toHaveBeenCalled();
-  })
+  });
 });
