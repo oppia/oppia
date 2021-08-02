@@ -112,9 +112,10 @@ export class AudioPlayerService {
           this._updateViewEventEmitter.emit();
         });
       });
-      if (this._currentTrack !== null) {
-        this._currentTrack.play();
+      if (this._currentTrack === null) {
+        throw new Error('Current Track is not set');
       }
+      this._currentTrack.play();
     });
   }
 
