@@ -125,6 +125,7 @@ class CheckConversionOfStringToBool(test_utils.GenericTestBase):
     """Test class to check behaviour of convert_string_to_bool method."""
 
     def test_convert_string_to_bool(self):
+        # type: () -> None
         """Test case to check behaviour of convert_string_to_bool method."""
         self.assertTrue(
             payload_validator.convert_string_to_bool('true'))
