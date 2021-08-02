@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ describe('isRegexMatched Filter', function() {
         regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
       };
       expect(filter('https://', args)).toBe(true);
-      expect(filter('https://jshjakhsak', args)).toBe(true);
+      expect(filter('https://any-string', args)).toBe(true);
       expect(filter('https://www.oppia.com', args)).toBe(true);
       expect(filter('www.oppia.com', args)).toBe(true);
     }));
