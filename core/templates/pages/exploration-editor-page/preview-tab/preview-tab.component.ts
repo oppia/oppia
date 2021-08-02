@@ -83,8 +83,6 @@ angular.module('oppia').component('previewTab', {
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
         var deferred = $q.defer();
 
-        console.error(
-          '[DEBUGGING] Called getUnsetParametersInfo from previewTab');
         var unsetParametersInfo = ParameterMetadataService
           .getUnsetParametersInfo([initStateNameForPreview]);
 
@@ -191,18 +189,10 @@ angular.module('oppia').component('previewTab', {
             ctrl.previewWarning = '';
           }
 
-          console.error(
-            `[DEBUGGING] ExplorationParamChangesService.savedMemento in prev
-            "${ExplorationParamChangesService.savedMemento}"`
-          );
           if (!ExplorationParamChangesService.savedMemento) {
             ExplorationParamChangesService.init(
               ParamChangesObjectFactory.createFromBackendList(
                 explorationData.param_changes));
-            console.error(
-              `[DEBUGGING] ExplorationParamChangesService.savedMemento 222
-              "${ExplorationParamChangesService.savedMemento}"`
-            );
           }
 
           // Prompt user to enter any unset parameters, then populate

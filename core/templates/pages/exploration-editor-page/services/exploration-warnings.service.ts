@@ -128,8 +128,6 @@ angular.module('oppia').factory('ExplorationWarningsService', [
     // Verify that all parameters referred to in a state are guaranteed to
     // have been set beforehand.
     var _verifyParameters = function(initNodeIds) {
-      console.error(
-        '[DEBUGGING] Called getUnsetParametersInfo from ExpWarnServ');
       var unsetParametersInfo = (
         ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
 
