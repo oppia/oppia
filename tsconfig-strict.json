@@ -147,8 +147,6 @@
     "core/templates/domain/collection/guest-collection-progress.model.spec.ts",
     "core/templates/domain/collection/guest-collection-progress.service.ts",
     "core/templates/domain/collection/guest-collection-progress.service.spec.ts",
-    "core/templates/domain/collection/read-only-collection-backend-api.service.ts",
-    "core/templates/domain/collection/read-only-collection-backend-api.service.spec.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-backend-api.service.ts",
