@@ -406,4 +406,4 @@ class RegistryUnitTest(test_utils.TestBase):
             re.escape(
                 'import_models() method is not overwritten in '
                 'derived classes')):
-            models.Platform().import_models([''])
+            models.Platform().import_models([models.NAMES.base_model])

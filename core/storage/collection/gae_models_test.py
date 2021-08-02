@@ -442,8 +442,8 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_invalid_status_is_successful(self):
         # type: () -> None
-        # TODO(#13523): Any here will be removed when model_dict is converted
-        # to TypedDicts.
+        # TODO(#13523): Use of Any in the type annotation below will be
+        # removed when model_dict is converted to TypedDicts/domain objects.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['status'] = 'publicized'
 
@@ -470,8 +470,8 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_translator_ids_field_is_successful(self):
         # type: () -> None
-        # TODO(#13523): Any here will be removed when model_dict is converted
-        # to TypedDicts.
+        # TODO(#13523): Use of Any in the type annotation below will be
+        # removed when model_dict is converted to TypedDicts/domain objects.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_2]

@@ -141,7 +141,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=False, indexed=True)
 
     # TODO(#13523): Change 'android_report_info' and 'web_report_info' to domain
-    # objects to remove Any here.
+    # objects/TypedDict to remove Any from type-annotation below.
     @classmethod
     def create(
             cls,
@@ -399,9 +399,14 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, ticket_name, github_issue_repo_name, github_issue_number,
-            newest_report_timestamp, report_ids):
-        # type: (Text, Optional[Text], Optional[int], datetime.datetime, List[Text]) -> Text
+            cls,
+            ticket_name, # type: Text
+            github_issue_repo_name, # type: Optional[Text]
+            github_issue_number, # type: Optional[int]
+            newest_report_timestamp, # type: datetime.datetime
+            report_ids # type: List[Text]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
@@ -543,9 +548,14 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, platform, ticket_id, stats_tracking_date,
-            total_reports_submitted, daily_param_stats):
-        # type: (Text, Text, datetime.date, int, Dict[Text, Dict[Text, int]]) -> Text
+            cls,
+            platform, # type: Text
+            ticket_id, # type: Text
+            stats_tracking_date, # type: datetime.date
+            total_reports_submitted, # type: int
+            daily_param_stats # type: Dict[Text, Dict[Text, int]]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 

@@ -80,7 +80,8 @@ class ConfigPropertyModel(base_models.VersionedModel):
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     # We have ignored [override] here because the signature of this method
     # doesn't match with VersionedModel.commit().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
@@ -142,7 +143,8 @@ class PlatformParameterModel(base_models.VersionedModel):
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'rule_dicts' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):
         # type: (Text, List[Dict[Text, Any]], int) -> PlatformParameterModel

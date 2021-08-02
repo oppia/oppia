@@ -220,7 +220,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         offset = offset + len(classifier_job_models)
         return classifier_job_models, offset
 
-    # TODO(#13523): Change 'job_dict' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'job_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @classmethod
     def create_multi(cls, job_dicts_list):
         # type: (List[Dict[Text, Any]]) -> List[Text]
@@ -318,8 +319,13 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         return cast(Text, python_utils.convert_to_bytes(new_id)) # type: ignore[no-untyped-call]
 
     @classmethod
-    def get_models(cls, exp_id, exp_version, state_names):
-        # type: (Text, int, List[Text]) -> List[Optional[StateTrainingJobsMappingModel]]
+    def get_models(
+        cls,
+        exp_id, # type: Text
+        exp_version, # type: int
+        state_names # type: List[Text]
+    ):
+        # type: (...) -> List[Optional[StateTrainingJobsMappingModel]]
         """Retrieves the Classifier Exploration Mapping models given Exploration
         attributes.
 

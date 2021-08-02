@@ -231,8 +231,10 @@ def make_cursor(urlsafe_cursor=None):
     return datastore_query.Cursor(urlsafe=urlsafe_cursor)
 
 
-def fetch_multiple_entities_by_ids_and_models(ids_and_models):
-    # type: (List[Tuple[Text, List[Text]]]) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
+def fetch_multiple_entities_by_ids_and_models(
+    ids_and_models # type: List[Tuple[Text, List[Text]]]
+):
+    # type: (...) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
 

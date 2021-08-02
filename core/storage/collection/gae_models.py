@@ -114,8 +114,12 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        # type: (int, Optional[Text], Optional[datetime.timedelta]) -> Tuple[List[CollectionCommitLogEntryModel], Optional[Text], bool]
+        cls,
+        page_size, # type: int
+        urlsafe_start_cursor, # type: Optional[Text]
+        max_age=None # type: Optional[datetime.timedelta]
+    ):
+        # type: (...) -> Tuple[List[CollectionCommitLogEntryModel], Optional[Text], bool]
         """Fetches a list of all the non-private commits sorted by their last
         updated attribute.
 
@@ -222,7 +226,8 @@ class CollectionModel(base_models.VersionedModel):
         """Returns the total number of collections."""
         return cls.get_all().count()
 
-    # TODO(#13523): Change 'model_dict' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @staticmethod
     def convert_to_valid_dict(model_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -253,7 +258,8 @@ class CollectionModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> CollectionModel
         """Populates the model instance with the snapshot.
@@ -275,7 +281,8 @@ class CollectionModel(base_models.VersionedModel):
             **CollectionModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -509,7 +516,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def save(self, committer_id, commit_message, commit_cmds):
         # type: (Text, Text, List[Dict[Text, Any]]) -> None
         """Updates the collection rights model by applying the given
@@ -528,7 +536,8 @@ class CollectionRightsModel(base_models.VersionedModel):
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
-    # TODO(#13523): Change 'model_dict' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @staticmethod
     def convert_to_valid_dict(model_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -571,7 +580,8 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> CollectionRightsModel
         """Populates the model instance with the snapshot.
@@ -593,7 +603,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict to remove Any here.
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
