@@ -104,9 +104,13 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-answer-description'));
   var deleteNodeLocator = by.css('.protractor-test-delete-node');
   var titleElement = element(by.css('.ng-joyride-title'));
-  var CkEditorElement = element(by.css('.protractor-test-ck-editor'));
+  var ckEditorElement = element(by.css('.protractor-test-ck-editor'));
   var interactionHtmlElement = element(
     by.css('.protractor-test-interaction-html'));
+  var answerTab = element(by.css('.protractor-test-answer-tab'));
+  var hintTextElement = element(by.css('.protractor-test-hint-text'));
+  var explanationTextAreaElement = element(
+    by.css('.protractor-test-explanation-textarea'));
 
   /*
    * Buttons
@@ -154,18 +158,13 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-submit'));
   var answerCorrectnessToggle = element(
     by.css('.protractor-test-editor-correctness-toggle'));
-  var buttons = element.all(by.css('.ng-joyride .skipBtn'));
+  var skipButtons = element.all(by.css('.ng-joyride .skipBtn'));
   var nextTutorialStageButtons = element.all(
     by.css('.ng-joyride .nextBtn'));
   var startTutorialButton = element(
     by.css('.protractor-test-start-tutorial'));
-  var answerTab = element(by.css('.protractor-test-answer-tab'));
   var submitSolutionButton = element(
     by.css('.protractor-test-submit-solution-button'));
-  var hintTextElement = element(
-    by.css('.protractor-test-hint-text'));
-  var explanationTextAreaElement = element(
-    by.css('.protractor-test-explanation-textarea'));
 
   /*
    * Symbols
@@ -187,9 +186,9 @@ var ExplorationEditorMainTab = function() {
       editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
-    if (await buttons.count() === 1) {
-      await action.click('Skip button', buttons.get(0));
-    } else if (await buttons.count() !== 0) {
+    if (await skipButtons.count() === 1) {
+      await action.click('Skip button', skipButtons.get(0));
+    } else if (await skipButtons.count() !== 0) {
       throw new Error(
         'Expected to find at most one \'exit tutorial\' button');
     }
@@ -554,7 +553,7 @@ var ExplorationEditorMainTab = function() {
       addHintModal, 'Add hint modal takes too long to appear');
     var hintTextButton = hintTextElement.all(by.tagName('p')).last();
     await action.click('Hint Text Button', hintTextButton);
-    var CKEditor = CkEditorElement.all(by.className(
+    var CKEditor = ckEditorElement.all(by.className(
       'oppia-rte-resizer')).first();
     await action.sendKeys('Text CKEditor', CKEditor, hint);
     await action.click('Save Hint Button', saveHintButton);
@@ -574,7 +573,7 @@ var ExplorationEditorMainTab = function() {
     var explanationTextArea = explanationTextAreaElement.all(
       by.tagName('p')).first();
     await action.click('Explanation Text Area', explanationTextArea);
-    var CKEditor = CkEditorElement.all(by.className(
+    var CKEditor = ckEditorElement.all(by.className(
       'oppia-rte-resizer')).first();
     await action.sendKeys(
       'Text CKEditor', CKEditor, solution.explanation);

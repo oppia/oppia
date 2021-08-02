@@ -182,7 +182,7 @@ var RealEditor = function(elem) {
 var RichTextEditor = async function(elem) {
   var rteElements = elem.all(by.css('.protractor-test-rte'));
   var modalDialogElements = element.all(by.css('.modal-dialog'));
-  var textComponentEditorLocator = by.css(
+  var closeRteComponentButtonLocator = by.css(
     '.protractor-test-close-rich-text-component-editor');
   // Set focus in the RTE.
   await waitFor.elementToBeClickable(rteElements.first());
@@ -259,7 +259,7 @@ var RichTextEditor = async function(elem) {
       }
       await richTextComponents.getComponent(componentName)
         .customizeComponent.apply(null, args);
-      var doneButton = modal.element(textComponentEditorLocator);
+      var doneButton = modal.element(closeRteComponentButtonLocator);
       await waitFor.elementToBeClickable(
         doneButton,
         'save button taking too long to be clickable');
@@ -591,8 +591,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   var lineContentElements = elem.all(by.css('.CodeMirror-line'));
   var lineNumberElements = elem.all(by.css('.CodeMirror-linenumber'));
   var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
-  var CodeMirrorLinenumberLocator = by.css('.CodeMirror-linenumber');
-  var CodeMirrorLinebackgroundLocator = by.css('.CodeMirror-linebackground');
+  var codeMirrorLineNumberLocator = by.css('.CodeMirror-linenumber');
+  var codeMirrorLineBackgroundLocator = by.css('.CodeMirror-linebackground');
   // The number of lines to scroll between reading different sections of
   // CodeMirror's text.
   var NUMBER_OF_LINES_TO_SCROLL = 15;
@@ -629,7 +629,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
         '().scrollTop(' + String(scrollTo) + ');');
       var lineHeight = await elem.element(
-        CodeMirrorLinenumberLocator).getAttribute('clientHeight');
+        codeMirrorLineNumberLocator).getAttribute('clientHeight');
       var currentScrollTop = await browser.executeScript(
         'return arguments[0].scrollTop;', scrollBarWebElement);
       if (currentScrollTop === prevScrollTop) {
@@ -649,7 +649,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
         var lineDivElement = await lineDivElements.get(i);
         var lineElement = await lineContentElements.get(i);
         var isHighlighted = await lineDivElement.element(
-          CodeMirrorLinebackgroundLocator).isPresent();
+          codeMirrorLineBackgroundLocator).isPresent();
         var text = await lineElement.getText();
         actualDiffDict[lineNumber] = {
           text: text,

@@ -52,18 +52,15 @@ var ExplorationEditorPage = function() {
     '.protractor-test-exploration-objective-input'));
   var expTags = element(by.css('.protractor-test-tags'));
   var expInput = expTags.element(by.tagName('input'));
-  var expCategory = element(
+  var expCategoryDropdownElement = element(
     by.css('.protractor-test-exploration-category-dropdown'));
-  var expLanguage = element(
+  var expLanguageSelectorElement = element(
     by.css('.protractor-test-exploration-language-select'));
-  var explorationMetaDataModalHeaderElement = element(
+  var explorationMetadataModalHeaderElement = element(
     by.css('.protractor-test-metadata-modal-header'));
   var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
-  var explorationTitle = element(by.css(
-    '.protractor-test-exploration-title-input'));
-  var explorationObjective = element(by.css(
-    '.protractor-test-exploration-objective-input'));
-  var explorationTags = element.all(by.css('.select2-selection__choice'));
+  var expTagsSelectionChoiceElements = element.all(
+    by.css('.select2-selection__choice'));
   var modalContentElement = element(by.css('.modal-content'));
   var sharePublishModalElement = element(
     by.css('.protractor-test-share-publish-modal'));
@@ -164,29 +161,32 @@ var ExplorationEditorPage = function() {
     await action.sendKeys('Exploration title', expTitle, title);
     await action.click(
       'Exploration metadata modal header',
-      explorationMetaDataModalHeaderElement);
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     await action.sendKeys('Exploration objective', expObjective, objective);
     await action.click(
       'Exploration metadata modal header',
-      explorationMetaDataModalHeaderElement);
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     await waitFor.presenceOf(
-      expCategory, 'Category input takes too long to be visible.');
+      expCategoryDropdownElement,
+      'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(expCategory)
+      await forms.AutocompleteDropdownEditor(expCategoryDropdownElement)
     ).setValue(category);
     await action.click(
       'Exploration metadata modal header',
-      explorationMetaDataModalHeaderElement);
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.select('Exploration Language', expLanguage, language);
+    await action.select(
+      'Exploration Language', expLanguageSelectorElement,
+      language);
     await action.click(
       'Exploration metadata modal header',
-      explorationMetaDataModalHeaderElement);
+      explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
     for (var elem of tags) {
@@ -194,7 +194,7 @@ var ExplorationEditorPage = function() {
       await action.sendKeys('Exploration input', expInput, elem + '\n');
       await action.click(
         'Exploration metadata modal header',
-        explorationMetaDataModalHeaderElement);
+        explorationMetadataModalHeaderElement);
       await action.waitForAutosave();
     }
 
@@ -221,16 +221,17 @@ var ExplorationEditorPage = function() {
   this.verifyExplorationSettingFields = async function(
       title, category, objective, language, tags) {
     var explorationCategory = await selectionRenderedElement.getText();
-    var explorationLanguage = await expLanguage.$('option:checked').getText();
+    var explorationLanguage = await expLanguageSelectorElement.$(
+      'option:checked').getText();
     await waitFor.visibilityOf(
-      explorationTitle, 'Exploration Goal taking too long to appear');
-    expect(await explorationTitle.getAttribute('value')).toMatch(title);
+      expTitle, 'Exploration Goal taking too long to appear');
+    expect(await expTitle.getAttribute('value')).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    expect(await explorationObjective.getAttribute('value')).toMatch(objective);
+    expect(await expObjective.getAttribute('value')).toMatch(objective);
     expect(explorationLanguage).toMatch(language);
-    for (var i = 0; i < await explorationTags.count(); i++) {
+    for (var i = 0; i < await expTagsSelectionChoiceElements.count(); i++) {
       expect(
-        await explorationTags.get(i).getText()
+        await expTagsSelectionChoiceElements.get(i).getText()
       ).toMatch(tags[i]);
     }
   };

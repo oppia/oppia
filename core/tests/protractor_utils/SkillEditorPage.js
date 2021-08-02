@@ -108,7 +108,7 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-changes-count-text'));
   var selectRubricDifficulty = element(
     by.css('.protractor-test-select-rubric-difficulty'));
-  var editor = element(
+  var rubricExplanationEditorElement = element(
     by.css('.protractor-test-rubric-explanation-text'));
   var addWorkedExampleModal = element(
     by.css('.protractor-test-add-worked-example-modal'));
@@ -145,7 +145,8 @@ var SkillEditorPage = function() {
       'Add Rubric Explanation button takes too long to be clickable');
     await addRubricExplanationButton.click();
     await waitFor.visibilityOf(
-      editor, 'Rubric explanation editor takes too long to appear');
+      rubricExplanationEditorElement,
+      'Rubric explanation editor takes too long to appear');
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
     await waitFor.elementToBeClickable(
       saveRubricExplanationButton,
@@ -169,7 +170,8 @@ var SkillEditorPage = function() {
       button, 'Edit Rubric Explanation button takes too long to be clickable');
     await button.click();
     await waitFor.visibilityOf(
-      editor, 'Rubric explanation editor takes too long to appear');
+      rubricExplanationEditorElement,
+      'Rubric explanation editor takes too long to appear');
     await deleteRubricExplanationButton.click();
   };
 
@@ -186,7 +188,8 @@ var SkillEditorPage = function() {
       'Edit Rubric Explanation button takes too long to be clickable');
     await editRubricExplanationButtons.get(explIndex).click();
     await waitFor.visibilityOf(
-      editor, 'Rubric explanation editor takes too long to appear');
+      rubricExplanationEditorElement,
+      'Rubric explanation editor takes too long to appear');
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
     await waitFor.elementToBeClickable(
       saveRubricExplanationButton,

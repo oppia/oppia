@@ -30,7 +30,7 @@ var ReleaseCoordinatorPage = function() {
     '.protractor-test-one-off-jobs-start-btn');
   var oneOffJobsStopBtnLocator = by.css(
     '.protractor-test-one-off-jobs-stop-btn');
-  var unfinishedOneOffJobsIdElement = element.all(
+  var unfinishedOneOffJobsIdElements = element.all(
     by.css('.protractor-test-unfinished-one-off-jobs-id'));
   var unfinishedJobsCardElement = element(
     by.css('.protractor-test-unfinished-jobs-card'));
@@ -82,7 +82,7 @@ var ReleaseCoordinatorPage = function() {
   };
 
   this.expectNumberOfRunningOneOffJobs = async function(count) {
-    var len = await unfinishedOneOffJobsIdElement.count();
+    var len = await unfinishedOneOffJobsIdElements.count();
     expect(len).toEqual(count);
   };
 
