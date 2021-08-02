@@ -64,6 +64,7 @@ export class BlogPostEditorComponent implements OnInit {
   thumbnailDataUrl: string;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
+  latestChangesarePublished: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
@@ -131,6 +132,9 @@ export class BlogPostEditorComponent implements OnInit {
               .getThumbnailUrlForPreview(
                 AppConstants.ENTITY_TYPE.BLOG_POST, this.blogPostId,
                 this.blogPostData.thumbnailFilename);
+          }
+          if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
+            this.latestChangesarePublished = true;
           }
         }, (errorResponse) => {
           if (
@@ -219,9 +223,11 @@ export class BlogPostEditorComponent implements OnInit {
           this.alertsService.addSuccessMessage(
             'Blog Post Saved and Published Succesfully.'
           );
+          this.latestChangesarePublished = true;
         } else {
           this.alertsService.addSuccessMessage(
             'Blog Post Saved Succesfully.');
+          this.latestChangesarePublished = false;
         }
         this.newChangesAreMade = false;
       }, (errorResponse) => {
@@ -268,10 +274,6 @@ export class BlogPostEditorComponent implements OnInit {
       this.blogPostData.removeTag(tag);
     } else if ((this.blogPostData.tags).length < this.maxAllowedTags) {
       this.blogPostData.addTag(tag);
-    }
-    if ((this.blogPostData.tags).length === this.maxAllowedTags) {
-      this.alertsService.addWarning(
-        'Max limit for assigning tags to blog post reached.');
     }
     this.newChangesAreMade = true;
   }

@@ -31,17 +31,17 @@ import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blo
   templateUrl: './blog-dashboard-page.component.html'
 })
 export class BlogDashboardPageComponent implements OnInit, OnDestroy {
-  blogDashboardData: BlogDashboardData;
-  authorProfilePictureUrl: string;
-  DEFAULT_PROFILE_PICTURE_URL: string = '';
   activeTab: string;
+  authorProfilePictureUrl: string;
+  blogDashboardData: BlogDashboardData;
   directiveSubscriptions = new Subscription();
+  DEFAULT_PROFILE_PICTURE_URL: string = '';
   constructor(
     private alertsService: AlertsService,
     private blogDashboardBackendService: BlogDashboardBackendApiService,
+    private blogDashboardPageService: BlogDashboardPageService,
     private loaderService: LoaderService,
     private urlInterpolationService: UrlInterpolationService,
-    private blogDashboardPageService: BlogDashboardPageService,
   ) {}
 
   ngOnInit(): void {

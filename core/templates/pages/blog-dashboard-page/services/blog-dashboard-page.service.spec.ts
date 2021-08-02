@@ -24,10 +24,10 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageService } from './blog-dashboard-page.service';
 
 describe('Blog Post Page service', () => {
-  let blogPostEditorBackendApiService: BlogPostEditorBackendApiService;
-  let blogDashboardPageService: BlogDashboardPageService;
-  let mockWindowRef: MockWindowRef;
   let alertsService: AlertsService;
+  let blogDashboardPageService: BlogDashboardPageService;
+  let blogPostEditorBackendApiService: BlogPostEditorBackendApiService;
+  let mockWindowRef: MockWindowRef;
   class MockWindowRef {
     nativeWindow = {
       location: {

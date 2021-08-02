@@ -16,29 +16,29 @@
  * @fileoverview Unit tests for Blog Dashboard page component.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { MatTabsModule } from '@angular/material/tabs';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LoaderService } from 'services/loader.service';
 import { AlertsService } from 'services/alerts.service';
-import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
 import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backend-api.service';
-import { MatTabsModule } from '@angular/material/tabs';
-import { BlogDashboardPageService } from './services/blog-dashboard-page.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { BlogDashboardPageService } from './services/blog-dashboard-page.service';
+import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
 
 describe('Blog Dashboard Page Component', () => {
+  let alertsService: AlertsService;
+  let blogDashboardBackendApiService: BlogDashboardBackendApiService;
+  let blogDashboardPageService: BlogDashboardPageService;
   let component: BlogDashboardPageComponent;
   let fixture: ComponentFixture<BlogDashboardPageComponent>;
-  let urlInterpolationService: UrlInterpolationService;
   let loaderService: LoaderService;
   let mockWindowRef: MockWindowRef;
-  let blogDashboardBackendApiService: BlogDashboardBackendApiService;
-  let alertsService: AlertsService;
-  let blogDashboardPageService: BlogDashboardPageService;
+  let urlInterpolationService: UrlInterpolationService;
 
   class MockWindowRef {
     nativeWindow = {
