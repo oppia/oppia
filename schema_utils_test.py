@@ -797,8 +797,18 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
 
     def is_string_contained_within_parenthesis_and_quotes(self):
         # type: () -> None
-        is_string_contained_within_parenthesis_and_quotes = schema_utils.get_validator(
-            'is_string_contained_within_parenthesis_and_quotes')
+
+        """Checks whether a given string is contained within parenthesis and
+        double quotes.
+
+        Returns:
+            bool. A boolean value representing whether a given string is
+            contained within parenthesis and double quotes.
+        """
+        is_string_contained_within_parenthesis_and_quotes = (
+            schema_utils.get_validator(
+                'is_string_contained_within_parenthesis_and_quotes')
+        )
 
         self.assertTrue(is_string_contained_within_parenthesis_and_quotes(
             '("A category")'))
