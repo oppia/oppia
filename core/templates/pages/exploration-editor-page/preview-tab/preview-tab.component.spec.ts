@@ -25,7 +25,7 @@ import { EventEmitter } from '@angular/core';
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-describe('Preview Tab Component', function() {
+fdescribe('Preview Tab Component', function() {
   importAllAngularServices();
 
   var ctrl = null;
@@ -40,6 +40,7 @@ describe('Preview Tab Component', function() {
   var explorationInitStateNameService = null;
   var explorationFeaturesService = null;
   var explorationPlayerStateService = null;
+  var explorationParamChangesService = null;
   var learnerParamsService = null;
   var numberAttemptsService = null;
   var routerService = null;
@@ -72,7 +73,11 @@ describe('Preview Tab Component', function() {
 
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
-      getDataAsync: () => $q.resolve()
+      getDataAsync: () => $q.resolve({
+        param_changes: [
+          paramChangeObjectFactory.createEmpty('a').toBackendDict()
+        ]
+      })
     });
   }));
 
@@ -91,6 +96,8 @@ describe('Preview Tab Component', function() {
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
       explorationPlayerStateService = $injector.get(
         'ExplorationPlayerStateService');
+      explorationParamChangesService = $injector.get(
+        'ExplorationParamChangesService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
@@ -130,6 +137,21 @@ describe('Preview Tab Component', function() {
         expect(ctrl.isExplorationPopulated).toBe(false);
         expect(ctrl.previewWarning).toBe('Preview started from \"State1\"');
       });
+
+    it('should init param changes if they are undefined', function() {
+      explorationParamChangesService.savedMemento = undefined;
+      spyOn(explorationParamChangesService, 'init').and.callThrough();
+
+      // Get data from exploration data service.
+      $scope.$apply();
+
+      expect(explorationParamChangesService.init).toHaveBeenCalledWith(
+        [paramChangeObjectFactory.createEmpty('a')]
+      );
+      expect(explorationParamChangesService.savedMemento).toEqual(
+        [paramChangeObjectFactory.createEmpty('a')]
+      );
+    });
 
     it('should set active state name when broadcasting' +
       ' updateActiveStateIfInEditor', function() {
@@ -189,7 +211,7 @@ describe('Preview Tab Component', function() {
       expect(
         explorationEngineService.initSettingsFromEditor).toHaveBeenCalledWith(
         stateName, expectedParamChanges);
-      expect(ctrl.isExplorationPopulated).toBe(true);
+      expect(ctrl.isExplorationPopulated).toBeTrue();
     });
 
     it('should go to main tab when dismissing set params modal', function() {
@@ -219,6 +241,8 @@ describe('Preview Tab Component', function() {
       explorationInitStateNameService = $injector.get(
         'ExplorationInitStateNameService');
       explorationEngineService = $injector.get('ExplorationEngineService');
+      explorationParamChangesService = $injector.get(
+        'ExplorationParamChangesService');
       numberAttemptsService = $injector.get('NumberAttemptsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
@@ -233,6 +257,7 @@ describe('Preview Tab Component', function() {
       spyOn(
         editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
+      explorationParamChangesService.savedMemento = undefined;
 
       // Mock init just to call the callback directly.
       spyOn(explorationEngineService, 'init').and.callFake(function(

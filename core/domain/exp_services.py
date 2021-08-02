@@ -311,7 +311,7 @@ def export_to_zip_file(exploration_id, version=None):
             filepath = 'image/%s' % filename
             file_contents = fs.get(filepath)
             str_filepath = 'assets/%s' % filepath
-            logging.error(unicode_filepath)
+            logging.error(str_filepath)
             zfile.writestr(str_filepath, file_contents)
 
     return temp_file
