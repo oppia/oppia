@@ -30,6 +30,9 @@ export interface BlogPostBackendDict {
   'published_on'?: string;
 }
 export class BlogPostData {
+  // The 'id' and 'thumbnailFilename' is 'null' for an interstitial
+  // blog post that is displayed in the editor until the actual
+  // is fetched from the backend.
   _id: string | null;
   _authorUsername: string;
   _title: string;
@@ -101,7 +104,7 @@ export class BlogPostData {
     return this._urlFragment;
   }
 
-  set thumbnailFilename(thumbnailFilename: string) {
+  set thumbnailFilename(thumbnailFilename: string | null) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
