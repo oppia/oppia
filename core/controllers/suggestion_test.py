@@ -1023,7 +1023,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
                 'skill_difficulty': 0.6
-            }, csrf_token=csrf_token,upload_files=(
+            }, csrf_token=csrf_token,
+            upload_files=(
                 ('file.svg', 'file.svg', large_image),),
             expected_status_int=400)
 
