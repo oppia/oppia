@@ -22,6 +22,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail.component';
+import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
 
 describe('Upload Blog Post Thumbnail Modal Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailComponent>;
@@ -38,6 +39,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
       ],
       declarations: [
         UploadBlogPostThumbnailComponent,
+        ImageUploaderComponent,
         MockTranslatePipe
       ],
       providers: [

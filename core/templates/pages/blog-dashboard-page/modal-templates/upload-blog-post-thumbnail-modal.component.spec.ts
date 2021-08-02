@@ -22,6 +22,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UploadBlogPostThumbnailModalComponent } from './upload-blog-post-thumbnail-modal.component';
+import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail.component';
 
 describe('Upload Blog Post Thumbnail Modal Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailModalComponent>;
@@ -36,7 +37,8 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
         HttpClientTestingModule,
       ],
       declarations: [
-        MockTranslatePipe
+        MockTranslatePipe,
+        UploadBlogPostThumbnailComponent
       ],
       providers: [
         NgbActiveModal,

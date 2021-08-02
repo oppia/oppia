@@ -41,8 +41,8 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { UploadBlogPostThumbnailComponent } from '../modal-templates/upload-blog-post-thumbnail.component';
 import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
-
 
 describe('Blog Post Editor Component', () => {
   let fixture: ComponentFixture<BlogPostEditorComponent>;
@@ -85,6 +85,7 @@ describe('Blog Post Editor Component', () => {
         BlogPostEditorComponent,
         SchemaBasedEditorDirective,
         AngularHtmlBindWrapperDirective,
+        UploadBlogPostThumbnailComponent,
         ImageUploaderComponent,
         MockTranslatePipe
       ],
@@ -483,3 +484,4 @@ describe('Blog Post Editor Component', () => {
         'Thumbnail Saved Successfully.');
     }));
 });
+
