@@ -16,8 +16,8 @@
 
 """Domain objects for configuration properties."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import caching_services
@@ -146,6 +146,11 @@ FLOAT_SCHEMA = {
 
 INT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_INT
+}
+
+POSITIVE_INT_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_CUSTOM,
+    'obj_type': 'PositiveInt'
 }
 
 
@@ -454,7 +459,7 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 
 MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST = ConfigProperty(
     'max_number_of_tags_assigned_to_blog_post',
-    INT_SCHEMA,
+    POSITIVE_INT_SCHEMA,
     'The maximum number of tags that can be selected to categorize the blog'
     ' post',
     10

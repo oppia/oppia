@@ -114,22 +114,28 @@ var createAndLoginUser = async function(
   await _completeSignup(username);
 };
 
-var createAndLoginAdminUser = async function(email, username) {
+var createAndLoginCurriculumAdminUser = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
   await adminPage.get();
-  await adminPage.updateRole(username, 'admin');
+  await adminPage.addRole(username, 'curriculum admin');
 };
 
-var createAndLoginAdminUserMobile = async function(email, username) {
+var createAndLoginSuperAdminUser = async function(email, username) {
+  await _createFirebaseAccount(email, true);
+  await login(email);
+  await _completeSignup(username);
+};
+
+var createAndLoginCurriculumAdminUserMobile = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
 };
 
 var createAdminMobile = async function(email, username) {
-  await createAndLoginAdminUserMobile(email, username);
+  await createAndLoginCurriculumAdminUserMobile(email, username);
   await logout();
 };
 
@@ -138,31 +144,38 @@ var createUser = async function(email, username) {
   await logout();
 };
 
-var createModerator = async function(email, username) {
+var createUserWithRole = async function(email, username, role) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
   await adminPage.get();
-  await adminPage.updateRole(username, 'moderator');
+  await adminPage.addRole(username, role);
   await logout();
+};
+
+var createModerator = async function(email, username) {
+  await createUserWithRole(email, username, 'moderator');
+};
+
+var createCollectionEditor = async function(email, username) {
+  await createUserWithRole(email, username, 'collection editor');
 };
 
 var createAdmin = async function(email, username) {
-  await createAndLoginAdminUser(email, username);
+  await createAndLoginCurriculumAdminUser(email, username);
   await logout();
 };
 
-var isAdmin = async function() {
-  return await element(by.css('.protractor-test-admin-text')).isPresent();
-};
-
-exports.isAdmin = isAdmin;
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;
 exports.createAndLoginUser = createAndLoginUser;
+exports.createUserWithRole = createUserWithRole;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
-exports.createAndLoginAdminUser = createAndLoginAdminUser;
+exports.createCollectionEditor = createCollectionEditor;
+exports.createAndLoginCurriculumAdminUser = createAndLoginCurriculumAdminUser;
+exports.createAndLoginSuperAdminUser = createAndLoginSuperAdminUser;
 exports.createAdminMobile = createAdminMobile;
-exports.createAndLoginAdminUserMobile = createAndLoginAdminUserMobile;
+exports.createAndLoginCurriculumAdminUserMobile = (
+  createAndLoginCurriculumAdminUserMobile);

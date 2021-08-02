@@ -23,8 +23,8 @@ TODO(#11475): Add lint checks that ensure all "jobs.*_jobs" modules are imported
 into this file.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from jobs import base_jobs
 from jobs import blog_validation_jobs # pylint: disable=unused-import

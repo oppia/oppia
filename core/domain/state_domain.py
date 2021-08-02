@@ -16,8 +16,8 @@
 
 """Domain object for states and their constituents."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import copy
@@ -3285,7 +3285,7 @@ class State(python_utils.OBJECT):
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
                 schema v36).
-            state_uses_old_rule_template_schema: bool. Wheter the rule inputs
+            state_uses_old_rule_template_schema: bool. Whether the rule inputs
                 contain html in the form of DragAndDropHtmlString,
                 SetOfHtmlString, or ListOfSetsOfHtmlString (shoud be True if
                 prior to state schema v42).

@@ -128,7 +128,9 @@
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/about'}">
-      <a href="/about" class="protractor-mobile-test-about-link">
+      <a href="/about"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
+         class="protractor-mobile-test-about-link">
         <i class="material-icons oppia-sidebar-menu-icon">&#xE887;</i>
         <span>{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
       </a>

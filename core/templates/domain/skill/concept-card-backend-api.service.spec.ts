@@ -22,19 +22,19 @@ import { HttpClientTestingModule, HttpTestingController } from
 
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
-import { ConceptCardObjectFactory } from
+import { ConceptCard, ConceptCardBackendDict, ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 
 describe('Concept card backend API service', () => {
-  let conceptCardBackendApiService: ConceptCardBackendApiService = null;
+  let conceptCardBackendApiService: ConceptCardBackendApiService;
   let httpTestingController: HttpTestingController;
   let conceptCardObjectFactory: ConceptCardObjectFactory;
-  let sampleResponse1 = null;
-  let sampleResponse2 = null;
-  let sampleResponse3 = null;
-  let conceptCardSampleResponse1 = null;
-  let conceptCardSampleResponse2 = null;
-  let conceptCardSampleResponse3 = null;
+  let sampleResponse1: Record<string, ConceptCardBackendDict[]>;
+  let sampleResponse2: Record<string, ConceptCardBackendDict[]>;
+  let sampleResponse3: Record<string, ConceptCardBackendDict[]>;
+  let conceptCardSampleResponse1: ConceptCard[];
+  let conceptCardSampleResponse2: ConceptCard[];
+  let conceptCardSampleResponse3: ConceptCard[];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,9 +42,9 @@ describe('Concept card backend API service', () => {
       providers: [ConceptCardBackendApiService]
     });
 
-    conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
+    conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
 
     var example1 = {
       question: {

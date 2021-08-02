@@ -16,10 +16,11 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { Component, Directive } from '@angular/core';
+import { ChangeDetectorRef, Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { CookieService } from 'ngx-cookie';
+import { Subscription } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -40,11 +41,13 @@ export class BaseContentComponent {
   DEV_MODE = AppConstants.DEV_MODE;
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private windowRef: WindowRef,
     private backgroundMaskService: BackgroundMaskService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
+    private changeDetectorRef: ChangeDetectorRef,
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
@@ -66,15 +69,23 @@ export class BaseContentComponent {
         this.windowRef.nativeWindow.location.hash);
     }
     this.iframed = this.urlService.isIframed();
-    this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => this.loadingMessage = message
-    );
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => {
+          this.loadingMessage = message;
+          this.changeDetectorRef.detectChanges();
+        }
+      ));
     this.keyboardShortcutService.bindNavigationShortcuts();
 
     // TODO(sll): Use 'touchstart' for mobile.
     this.windowRef.nativeWindow.document.addEventListener('click', () => {
       this.sidebarStatusService.onDocumentClick();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 
   getHeaderText(): string {
@@ -149,6 +160,14 @@ export class BaseContentComponent {
   selector: 'navbar-breadcrumb'
 })
 export class BaseContentNavBarBreadCrumbDirective {}
+
+/**
+ * This directive is used as selector for navbar pre logo action transclusion.
+ */
+@Directive({
+  selector: 'navbar-pre-logo-action'
+})
+export class BaseContentNavBarPreLogoActionDirective {}
 
 
 /**
