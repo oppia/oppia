@@ -36,7 +36,7 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
 export class BaseContentComponent {
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
-  iframed: boolean;
+  iframed: boolean = false;
   DEV_MODE = AppConstants.DEV_MODE;
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   ONE_YEAR_IN_MSECS = 31536000000;
@@ -115,7 +115,7 @@ export class BaseContentComponent {
   }
 
   skipToMainContent(): void {
-    let mainContentElement: HTMLElement = document.getElementById(
+    let mainContentElement: HTMLElement | null = document.getElementById(
       'oppia-main-content');
 
     if (!mainContentElement) {

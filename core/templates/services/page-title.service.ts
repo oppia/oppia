@@ -24,8 +24,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class PageTitleService {
-  pageTitleForMobile: string = null;
-  pageSubtitleForMobile: string = null;
+  pageTitleForMobile!: string;
+  pageSubtitleForMobile!: string;
   constructor(
     private metaTagService: Meta,
     private titleService: Title) {}
