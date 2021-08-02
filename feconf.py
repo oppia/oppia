@@ -1397,7 +1397,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
-}]
+}] # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, List[Text]]]]]
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
