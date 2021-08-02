@@ -19,10 +19,10 @@
 import { ChangeDetectorRef, Component, ElementRef, Output, ViewChild, EventEmitter, OnInit } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { AppConstants } from 'app.constants';
-import Cropper from 'cropperjs';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import Cropper from 'cropperjs';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
