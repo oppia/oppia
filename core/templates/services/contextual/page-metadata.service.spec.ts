@@ -48,6 +48,12 @@ describe('Page metadata service', () => {
     });
     expect(pageTitleService.setPageTitle).toHaveBeenCalledWith(title);
     expect(metaTagCustomizationService.addOrReplaceMetaTags)
-      .toHaveBeenCalledWith(meta);
+      .toHaveBeenCalledWith([
+        {
+          propertyType: meta.PROPERTY_TYPE,
+          propertyValue: meta.PROPERTY_VALUE,
+          content: meta.CONTENT
+        }
+      ]);
   });
 });
