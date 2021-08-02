@@ -529,6 +529,8 @@
     "core/templates/services/i18n-language-code.service.spec.ts",
     "core/templates/services/id-generation.service.ts",
     "core/templates/services/id-generation.service.spec.ts",
+    "core/templates/services/image-upload-helper.service.ts",
+    "core/templates/services/image-upload-helper.service.spec.ts",
     "core/templates/services/interaction-specs.service.ts",
     "core/templates/services/interaction-specs.service.spec.ts",
     "core/templates/services/loader.service.ts",
