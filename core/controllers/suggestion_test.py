@@ -967,6 +967,132 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             new_solution_dict)
         self.logout()
 
+    def test_update_question_suggestions_with_empty_image_data(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = suggestion.change.question_dict[
+            'question_state_data']
+        question_state_data['content'][
+            'html'] = (
+                '<p>Updated question</p>'
+                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+                'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+                'ractive-math>')
+        question_state_data['interaction'][
+            'solution'] = new_solution_dict
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        large_image = '<svg><path d="%s" /></svg>' % (
+            'M150 0 L75 200 L225 200 Z ' * 4000)
+
+        response_dict = self.post_json('%s/%s' % (
+            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'question_state_data': question_state_data,
+                'skill_difficulty': 0.6
+            }, csrf_token=csrf_token,upload_files=(
+                ('file.svg', 'file.svg', large_image),),
+            expected_status_int=400)
+
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
+        self.logout()
+
+    def test_update_question_suggestions_with_invalid_image_data(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = suggestion.change.question_dict[
+            'question_state_data']
+        question_state_data['content'][
+            'html'] = (
+                '<p>Updated question</p>'
+                '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+                '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+                'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+                'ractive-math>')
+        question_state_data['interaction'][
+            'solution'] = new_solution_dict
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response_dict = self.post_json('%s/%s' % (
+            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'question_state_data': question_state_data,
+                'skill_difficulty': 0.6
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertIn(
+            'No image data provided for file with name file.svg.',
+            response_dict['error'])
+        self.logout()
+
     def test_cannot_update_question_with_invalid_skill_difficulty(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
