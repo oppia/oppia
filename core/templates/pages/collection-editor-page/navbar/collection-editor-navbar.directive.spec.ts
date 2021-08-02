@@ -385,14 +385,14 @@ describe('Collection Editor Navbar directive', function() {
     expect(saveSpy).not.toHaveBeenCalled();
   }));
 
-  it('should return count of validation issues ' +
+  it('should return change list count ' +
     'when calling \'getChangeListCount\'', function() {
     spyOn(undoRedoService, 'getChangeCount')
       .and.returnValue(2);
     expect(ctrl.getChangeListCount()).toBe(2);
   });
 
-  it('should return change list count ' +
+  it('should return count of validation issues ' +
     'when calling \'getWarningsCount\'', function() {
     ctrl.validationIssues = [];
     expect(ctrl.getWarningsCount()).toBe(0);
