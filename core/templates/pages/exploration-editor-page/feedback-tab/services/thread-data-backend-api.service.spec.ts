@@ -462,8 +462,7 @@ describe('retrieving threads service', () => {
 
   it('should use reject handler when passing a null thread', async() => {
     await expectAsync(threadDataBackendApiService.addNewMessageAsync(
-      null, 'Message', 'open')
-    ).toBeRejectedWithError(
+      null, 'Message', 'open')).toBeRejectedWithError(
       'Trying to update a non-existent thread');
   });
 
