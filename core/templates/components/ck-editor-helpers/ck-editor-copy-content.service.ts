@@ -64,15 +64,9 @@ export class CkEditorCopyContentService {
   private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
     let containedWidgetTagName;
     let currentElement = target;
-    let parentElement = currentElement.parentElement;
-    let descendants = Array.from(target.childNodes);
+    let parentElement = <HTMLElement> currentElement.parentElement;
+    let descendants = <ChildNode[]> Array.from(target.childNodes);
 
-    if (parentElement === null || descendants === null) {
-      throw new Error(
-        'The element target should contain or be a descendant' +
-        'of a widget, or be a plain HTML element/group'
-      );
-    }
     while (true) {
       const currentTagName = currentElement.tagName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {

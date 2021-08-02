@@ -238,21 +238,4 @@ describe('Ck editor copy content service', () => {
     expect(insertHtmlSpy).not.toHaveBeenCalled();
     expect(execCommandSpy).not.toHaveBeenCalled();
   });
-
-  it('should throw error on invalid target html element', () => {
-    expect(service.copyModeActive).toBe(false);
-    service.toggleCopyMode();
-    expect(service.copyModeActive).toBe(true);
-
-    const noParentElement = document.createElement('html');
-    const noChildElement = document.createElement('dummy');
-    expect(() => service.broadcastCopy(noParentElement)).toThrowError(
-      'The element target should contain or be a descendant' +
-      'of a widget, or be a plain HTML element/group'
-    );
-    expect(() => service.broadcastCopy(noChildElement)).toThrowError(
-      'The element target should contain or be a descendant' +
-      'of a widget, or be a plain HTML element/group'
-    );
-  });
 });
