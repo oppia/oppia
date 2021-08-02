@@ -112,7 +112,7 @@ describe('HintEditorComponent', () => {
 
     ctrl.openHintEditor();
 
-    expect(ctrl.hintMemento).toBe(ctrl.hint);
+    expect(ctrl.hintMemento).toEqual(ctrl.hint);
     expect(ctrl.hintEditorIsOpen).toBe(true);
   });
 
