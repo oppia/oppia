@@ -16,8 +16,9 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
+import { AppConstants } from 'app.constants';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -36,6 +37,8 @@ import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { AlertsService } from 'services/alerts.service';
+import { ConnectionService, ConnectionState } from 'services/connection-service.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -53,8 +56,6 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
-import { ConnectionService, ConnectionState } from 'services/connection-service.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -71,6 +72,7 @@ describe('Exploration editor page component', function() {
   var $uibModal = null;
   let aims: AutosaveInfoModalsService = null;
   let cls: ChangeListService = null;
+  let as: AlertsService = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -200,6 +202,7 @@ describe('Exploration editor page component', function() {
         LostChangesModalComponent
       ],
       providers: [
+        AlertsService,
         AutosaveInfoModalsService,
         ChangeListService,
         ContextService,
@@ -241,6 +244,7 @@ describe('Exploration editor page component', function() {
 
     aims = TestBed.inject(AutosaveInfoModalsService);
     cls = TestBed.inject(ChangeListService);
+    as = TestBed.inject(AlertsService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -514,6 +518,8 @@ describe('Exploration editor page component', function() {
         mockConnectionServiceEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter);
+      spyOn(as, 'addInfoMessage');
+      spyOn(as, 'addSuccessMessage');
       explorationData.is_version_of_draft_valid = false;
 
       ctrl.$onInit();
@@ -524,30 +530,26 @@ describe('Exploration editor page component', function() {
     });
 
     it('should change status to ONLINE when internet is connected', () => {
-      ctrl.status = 'OFFLINE';
-      spyOn(cls, 'isExplorationLockedForEditing').and.returnValue(false);
-      spyOn(ctrl, 'countWarnings').and.returnValue(false);
-      spyOn(esaves, 'isExplorationSaveable').and.returnValue(true);
-      spyOn(cls, 'getChangeList').and.returnValue(
-        [{}, {}] as ExplorationChange[]);
-      spyOn($.fn, 'removeAttr');
+      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
       mockConnectionServiceEmitter.emit({
         hasInternetAccess: true,
         hasNetworkConnection: true
       });
       $scope.$apply();
-      expect(ctrl.status).toBe('ONLINE');
+      expect(as.addSuccessMessage).toHaveBeenCalled();
+      expect(ctrl.connectionStatus).toBe(AppConstants.CONNECTION_STATUS_ONLINE);
     });
 
     it('should change status to OFFLINE when internet disconnects', () => {
-      ctrl.status = 'ONLINE';
-      spyOn($.fn, 'attr');
+      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
       mockConnectionServiceEmitter.emit({
         hasInternetAccess: false,
         hasNetworkConnection: false
       });
       $scope.$apply();
-      expect(ctrl.status).toBe('OFFLINE');
+      expect(as.addInfoMessage).toHaveBeenCalled();
+      expect(ctrl.connectionStatus).toBe(
+        AppConstants.CONNECTION_STATUS_OFFLINE);
     });
   });
 

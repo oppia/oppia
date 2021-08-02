@@ -9,7 +9,7 @@
       <button type="button" class="btn btn-light oppia-editor-publish-button protractor-test-publish-exploration"
               ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
               ng-click="showPublishExplorationModal()"
-              ng-disabled="isExplorationLockedForEditing() || countWarnings()">
+              ng-disabled="isOffline || isExplorationLockedForEditing() || countWarnings()">
         <span ng-if="!publishIsInProcess">
           <i class="material-icons md-18 oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">
@@ -37,7 +37,7 @@
       <button id="tutorialSaveButton"
               class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
               ng-class="{'btn-success': isExplorationSaveable()}"
-              ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+              ng-click="saveChanges()" ng-disabled="isOffline || !isExplorationSaveable()">
         <span ng-if="!saveIsInProcess">
           <span class="oppia-draft-label-container" ng-if="isPrivate()">
             <i class="material-icons md-18 oppia-save-publish-button-icon"
@@ -67,10 +67,10 @@
         </span>
       </button>
       <button type="button" class="btn btn-light uib-dropdown-toggle oppia-discard-button protractor-test-save-discard-toggle dropdown-toggle"
-              ng-disabled="!getChangeListLength()" uib-dropdown-toggle aria-label="Discard Draft">
+              ng-disabled="isOffline || !getChangeListLength()" uib-dropdown-toggle aria-label="Discard Draft">
       </button>
       <ul uib-dropdown-menu ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="dropdown-item nav-item protractor-test-discard-changes">Discard Draft</a></li>
+        <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': isOffline || !getChangeListLength()}" class="dropdown-item nav-item protractor-test-discard-changes">Discard Draft</a></li>
       </ul>
     </div>
   </li>

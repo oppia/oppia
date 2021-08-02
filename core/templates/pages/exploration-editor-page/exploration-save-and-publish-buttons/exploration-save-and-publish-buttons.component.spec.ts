@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
+import { AppConstants } from 'app.constants';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
+import { ConnectionState } from 'services/connection-service.service';
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateInteractionIdService } from
@@ -60,6 +62,7 @@ describe('Exploration save and publish buttons component', function() {
   let changeListService: ChangeListService = null;
   var $uibModal = null;
   var contextService = null;
+  var cns = null;
   var explorationRightsService = null;
   var explorationSaveService = null;
   var explorationWarningsService = null;
@@ -67,6 +70,7 @@ describe('Exploration save and publish buttons component', function() {
   var userExplorationPermissionsService = null;
 
   var mockExternalSaveEventEmitter = null;
+  var mockConnectionServiceEmitter = new EventEmitter<ConnectionState>();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -126,6 +130,7 @@ describe('Exploration save and publish buttons component', function() {
     var $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
+    cns = $injector.get('ConnectionService');
     explorationRightsService = $injector.get('ExplorationRightsService');
     explorationSaveService = $injector.get('ExplorationSaveService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
@@ -134,6 +139,8 @@ describe('Exploration save and publish buttons component', function() {
       .returnValue($q.resolve({
         canPublish: true
       }));
+    spyOnProperty(cns, 'onInternetStateChange').and.returnValue(
+      mockConnectionServiceEmitter);
     spyOn(explorationSaveService, 'saveChanges').and
       .callFake((showCallback, hideCallback) => {
         showCallback();
@@ -151,6 +158,7 @@ describe('Exploration save and publish buttons component', function() {
     ctrl = $componentController('explorationSaveAndPublishButtons', {
       $scope: $scope,
       $uibModal: $uibModal,
+      ConnectionService: cns,
       EditabilityService: editabilityService,
       UserExplorationPermissionsService: userExplorationPermissionsService
     });
@@ -382,4 +390,30 @@ describe('Exploration save and publish buttons component', function() {
     expect($uibModal.open).not.toHaveBeenCalled();
     expect($scope.saveChanges).not.toHaveBeenCalled();
   });
+
+  it('should change connnection status to ONLINE when internet is connected',
+    () => {
+      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
+      $scope.isOffline = true;
+      mockConnectionServiceEmitter.emit({
+        hasInternetAccess: true,
+        hasNetworkConnection: true
+      });
+      $scope.$apply();
+      expect(ctrl.connectionStatus).toBe(AppConstants.CONNECTION_STATUS_ONLINE);
+      expect($scope.isOffline).toBe(false);
+    });
+  it('should change connnection status to OFFLINE when internet disconnects',
+    () => {
+      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
+      $scope.isOffline = false;
+      mockConnectionServiceEmitter.emit({
+        hasInternetAccess: false,
+        hasNetworkConnection: false
+      });
+      $scope.$apply();
+      expect(ctrl.connectionStatus).toBe(
+        AppConstants.CONNECTION_STATUS_OFFLINE);
+      expect($scope.isOffline).toBe(true);
+    });
 });

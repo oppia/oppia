@@ -16,6 +16,7 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
+import { AppConstants } from 'app.constants';
 import { Subscription } from 'rxjs';
 
 require(
@@ -35,21 +36,23 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require('services/editability.service.ts');
+require('services/connection-service.service.ts');
 
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$scope', '$uibModal', 'ChangeListService', 'EditabilityService',
-    'ExplorationRightsService', 'ExplorationSaveService',
+    '$scope', '$uibModal', 'ChangeListService', 'ConnectionService',
+    'EditabilityService', 'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationWarningsService',
     'UserExplorationPermissionsService',
     function(
-        $scope, $uibModal, ChangeListService, EditabilityService,
-        ExplorationRightsService, ExplorationSaveService,
+        $scope, $uibModal, ChangeListService, ConnectionService,
+        EditabilityService, ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.connectionState = AppConstants.CONNECTION_STATUS_ONLINE;
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
       };
@@ -167,6 +170,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
         $scope.explorationCanBePublished = false;
+        $scope.isOffline = false;
 
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
@@ -183,6 +187,28 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
                   });
               }
             )
+        );
+        ctrl.directiveSubscriptions.add(
+          ConnectionService.onInternetStateChange.subscribe(
+            currentState => {
+              ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
+              ctrl.hasInternetAccess = currentState.hasInternetAccess;
+              if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
+                if (ctrl.connectionStatus ===
+                    AppConstants.CONNECTION_STATUS_OFFLINE) {
+                  $scope.isOffline = false;
+                  $scope.$applyAsync();
+                }
+                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
+              } else {
+                if (ctrl.connectionStatus ===
+                    AppConstants.CONNECTION_STATUS_ONLINE) {
+                  $scope.isOffline = true;
+                  $scope.$applyAsync();
+                }
+                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
+              }
+            })
         );
       };
 

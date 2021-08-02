@@ -154,6 +154,7 @@ require('services/alerts.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
+import { AppConstants } from 'app.constants';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
@@ -209,7 +210,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.connectionService = ConnectionService;
       ctrl.hasNetworkConnection = true;
       ctrl.hasInternetAccess = true;
-      ctrl.status = '';
+      ctrl.connectionStatus = '';
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -512,39 +513,22 @@ angular.module('oppia').component('explorationEditorPage', {
               ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
               ctrl.hasInternetAccess = currentState.hasInternetAccess;
               if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
-                if (ctrl.status === 'OFFLINE') {
-                  if (
-                    !ChangeListService.isExplorationLockedForEditing() &&
-                    !ctrl.countWarnings()) {
-                    $(
-                      '.oppia-editor-publish-button'
-                    ).removeAttr('disabled');
-                  }
-                  if (ExplorationSaveService.isExplorationSaveable()) {
-                    $(
-                      '.oppia-save-draft-button'
-                    ).removeAttr('disabled');
-                  }
-                  if (ChangeListService.getChangeList().length) {
-                    $('.oppia-discard-button').removeAttr('disabled');
-                  }
+                if (ctrl.connectionStatus ===
+                    AppConstants.CONNECTION_STATUS_OFFLINE) {
                   AlertsService.addSuccessMessage(
                     'Reconnected. Checking whether your changes are mergeable.',
                     4000);
                 }
-                ctrl.status = 'ONLINE';
+                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
               } else {
-                if (ctrl.status === 'ONLINE') {
-                  $(
-                    '.oppia-save-draft-button, .oppia-editor-publish-button, ' +
-                    '.oppia-discard-button'
-                  ).attr('disabled', 'disabled');
+                if (ctrl.connectionStatus ===
+                    AppConstants.CONNECTION_STATUS_ONLINE) {
                   AlertsService.addInfoMessage(
                     'Looks like you are offline. ' +
-                    // eslint-disable-next-line max-len
-                    'You can continue working, and can save your changes once reconnected.', 5000);
+                    'You can continue working, and can save ' +
+                    'your changes once reconnected.', 5000);
                 }
-                ctrl.status = 'OFFLINE';
+                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
               }
             })
         );

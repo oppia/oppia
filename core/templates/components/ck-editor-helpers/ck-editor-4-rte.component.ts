@@ -54,7 +54,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
   ck: CKEDITOR.editor;
   hasNetworkConnection: boolean;
   hasInternetAccess: boolean;
-  status: string = 'ONLINE';
+  connectionStatus: string = AppConstants.CONNECTION_STATUS_ONLINE;
   disableOnOfflineNames: string[] = [
     'image', 'skillreview', 'svgdiagram', 'video'];
   constructor(
@@ -71,15 +71,15 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
       this.hasNetworkConnection = currentState.hasNetworkConnection;
       this.hasInternetAccess = currentState.hasInternetAccess;
       if (this.hasNetworkConnection && this.hasInternetAccess) {
-        if (this.status === 'OFFLINE') {
+        if (this.connectionStatus === AppConstants.CONNECTION_STATUS_OFFLINE) {
           this.enableRTEicons();
         }
-        this.status = 'ONLINE';
+        this.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
       } else {
-        if (this.status === 'ONLINE') {
+        if (this.connectionStatus === AppConstants.CONNECTION_STATUS_ONLINE) {
           this.disableRTEicons();
         }
-        this.status = 'OFFLINE';
+        this.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
       }
     });
   }
@@ -307,7 +307,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
     };
 
     ck.on('instanceReady', () => {
-      if (this.status === 'OFFLINE') {
+      if (this.connectionStatus === 'OFFLINE') {
         this.disableRTEicons();
       }
       // Show the editor now that it is fully loaded.
@@ -333,8 +333,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy, OnInit {
           .css('padding', '0px 0px');
       });
       $('.cke_inner').append(
-        // eslint-disable-next-line max-len
-        '<span id="offline-warning">* Tools with dark background can not be used while being offline.<span>');
+        '<span id="offline-warning">* Tools with dark background ' +
+        'can not be used when offline.<span>');
       $('#offline-warning').css('display', 'none');
 
       // TODO(#12882): Remove the use of jQuery.
