@@ -134,7 +134,7 @@ export class ThreadDataBackendApiService {
   // resulting the function to throw an error.
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict | undefined
+      suggestionBackendDict: SuggestionBackendDict | undefined | null
   ): SuggestionThread {
     if (!threadBackendDict || !suggestionBackendDict) {
       throw new Error('Missing input backend dicts');
@@ -171,11 +171,12 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-        let suggestionBackendDictsByThreadId = new Map(
-          suggestionBackendDicts.map(dict => [
-            this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
-            dict
-          ]));
+        let suggestionBackendDictsByThreadId:
+         Map<string | null, SuggestionBackendDict> = new Map(
+           suggestionBackendDicts.map(dict => [
+             this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
+             dict
+           ]));
 
         return {
           feedbackThreads: feedbackThreadBackendDicts.map(
@@ -183,7 +184,7 @@ export class ThreadDataBackendApiService {
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
               dict, suggestionBackendDictsByThreadId.get(
-                (dict.thread_id))))
+                (dict === null ? null : dict.thread_id))))
         };
       },
       async() => Promise.reject('Error on retrieving feedback threads.'));

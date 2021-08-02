@@ -28,7 +28,8 @@ import { SuggestionAndFeedbackThreads, ThreadDataBackendApiService } from 'pages
 import { ContextService } from 'services/context.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('retrieving threads service', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('retrieving threads service', () => {
   let httpTestingController: HttpTestingController;
   let contextService: ContextService;
   let csrfTokenService: CsrfTokenService;
