@@ -19,14 +19,14 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
-import { PageMetadataService } from 'services/contextual/page-metadata.service';
+import { PageHeadService } from 'services/page-head.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { TeachPageRootComponent } from './teach-page-root.component';
 
 describe('Teach Page Root', () => {
   let fixture: ComponentFixture<TeachPageRootComponent>;
   let component: TeachPageRootComponent;
-  let pageMetadataService: PageMetadataService;
+  let pageHeadService: PageHeadService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,7 +35,7 @@ describe('Teach Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageMetadataService
+        PageHeadService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -44,7 +44,7 @@ describe('Teach Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TeachPageRootComponent);
     component = fixture.componentInstance;
-    pageMetadataService = TestBed.inject(PageMetadataService);
+    pageHeadService = TestBed.inject(PageHeadService);
   });
 
   it('should successfully instantiate the component',
@@ -53,9 +53,9 @@ describe('Teach Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageMetadataService, 'updateMetadata');
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     component.ngOnInit();
-    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH);
   });
 });

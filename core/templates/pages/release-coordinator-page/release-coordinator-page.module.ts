@@ -46,7 +46,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
-import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 
 @NgModule({

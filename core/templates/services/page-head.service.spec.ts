@@ -13,26 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for PageMetadataService.
+ * @fileoverview Unit tests for PageHeadService.
  */
 
 import { TestBed } from '@angular/core/testing';
 import { PageTitleService } from 'services/page-title.service';
-import { MetaTagCustomizationService } from './meta-tag-customization.service';
-import { PageMetadataService } from './page-metadata.service';
+import { MetaTagCustomizationService } from './contextual/meta-tag-customization.service';
+import { PageHeadService } from './page-head.service';
 
-describe('Page metadata service', () => {
-  let pageMetadataService: PageMetadataService;
+describe('Page head service', () => {
+  let pageHeadService: PageHeadService;
   let pageTitleService: PageTitleService;
   let metaTagCustomizationService: MetaTagCustomizationService;
 
   beforeEach(() => {
-    pageMetadataService = TestBed.inject(PageMetadataService);
+    pageHeadService = TestBed.inject(PageHeadService);
     pageTitleService = TestBed.inject(PageTitleService);
     metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
   });
 
-  it('should updateMetadata', () => {
+  it('should updateTitleAndMetaTags', () => {
     let title = 'page_title';
     let meta = {
       PROPERTY_TYPE: '',
@@ -41,7 +41,7 @@ describe('Page metadata service', () => {
     };
     spyOn(pageTitleService, 'setPageTitle');
     spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
-    pageMetadataService.updateMetadata({
+    pageHeadService.updateTitleAndMetaTags({
       ROUTE: '',
       TITLE: title,
       META: [meta]

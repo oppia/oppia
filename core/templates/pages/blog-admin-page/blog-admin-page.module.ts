@@ -31,7 +31,7 @@ import { RolesAndActionsVisualizerComponent } from 'pages/admin-page/roles-tab/r
 import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 
 declare var angular: ng.IAngularStatic;

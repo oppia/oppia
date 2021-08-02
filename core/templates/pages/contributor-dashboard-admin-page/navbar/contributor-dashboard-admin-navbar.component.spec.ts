@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockRouterModule } from '../../../hybrid-router-module-provider';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 

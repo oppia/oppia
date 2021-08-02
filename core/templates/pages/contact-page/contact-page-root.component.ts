@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
-import { PageMetadataService } from 'services/contextual/page-metadata.service';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-contact-page-root',
@@ -26,11 +26,11 @@ import { PageMetadataService } from 'services/contextual/page-metadata.service';
 })
 export class ContactPageRootComponent {
   constructor(
-    private pageMetadataService: PageMetadataService
+    private pageHeadService: PageHeadService
   ) {}
 
   ngOnInit(): void {
-    this.pageMetadataService.updateMetadata(
+    this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT);
   }
 }

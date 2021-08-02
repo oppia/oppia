@@ -96,7 +96,7 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
-import { HybridRouterModuleProvider } from '../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [

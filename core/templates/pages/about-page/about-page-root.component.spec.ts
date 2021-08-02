@@ -20,7 +20,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { PageMetadataService } from 'services/contextual/page-metadata.service';
+import { PageHeadService } from 'services/page-head.service';
 import { PageTitleService } from 'services/page-title.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -29,7 +29,7 @@ import { AboutPageRootComponent } from './about-page-root.component';
 describe('About Root Page', () => {
   let fixture: ComponentFixture<AboutPageRootComponent>;
   let component: AboutPageRootComponent;
-  let pageMetadataService: PageMetadataService;
+  let pageHeadService: PageHeadService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,7 +48,7 @@ describe('About Root Page', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AboutPageRootComponent);
     component = fixture.componentInstance;
-    pageMetadataService = TestBed.inject(PageMetadataService);
+    pageHeadService = TestBed.inject(PageHeadService);
   });
 
   it('should successfully instantiate the component',
@@ -57,9 +57,9 @@ describe('About Root Page', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageMetadataService, 'updateMetadata');
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     component.ngOnInit();
-    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT);
   });
 });

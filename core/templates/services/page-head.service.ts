@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { PageTitleService } from 'services/page-title.service';
-import { MetaAttribute, MetaTagCustomizationService } from './meta-tag-customization.service';
+import { MetaAttribute, MetaTagCustomizationService } from './contextual/meta-tag-customization.service';
 
 interface MetaTagData {
   readonly PROPERTY_TYPE: string;
@@ -35,13 +35,13 @@ interface PageMetadata {
 @Injectable({
   providedIn: 'root'
 })
-export class PageMetadataService {
+export class PageHeadService {
   constructor(
     private pageTitleService: PageTitleService,
     private metaTagCustomizationService: MetaTagCustomizationService
   ) {}
 
-  updateMetadata(pageMetadata: PageMetadata): void {
+  updateTitleAndMetaTags(pageMetadata: PageMetadata): void {
     // Update default title.
     this.pageTitleService.setPageTitle(pageMetadata.TITLE);
 

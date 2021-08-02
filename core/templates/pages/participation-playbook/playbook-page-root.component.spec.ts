@@ -19,7 +19,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
-import { PageMetadataService } from 'services/contextual/page-metadata.service';
+import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PlaybookPageRootComponent } from './playbook-page-root.component';
@@ -27,7 +27,7 @@ import { PlaybookPageRootComponent } from './playbook-page-root.component';
 describe('Playbook Page Root', () => {
   let fixture: ComponentFixture<PlaybookPageRootComponent>;
   let component: PlaybookPageRootComponent;
-  let pageMetadataService: PageMetadataService;
+  let pageHeadService: PageHeadService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -36,7 +36,7 @@ describe('Playbook Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageMetadataService
+        PageHeadService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -45,7 +45,7 @@ describe('Playbook Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PlaybookPageRootComponent);
     component = fixture.componentInstance;
-    pageMetadataService = TestBed.inject(PageMetadataService);
+    pageHeadService = TestBed.inject(PageHeadService);
   });
 
   it('should successfully instantiate the component',
@@ -54,9 +54,9 @@ describe('Playbook Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageMetadataService, 'updateMetadata');
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     component.ngOnInit();
-    expect(pageMetadataService.updateMetadata).toHaveBeenCalledWith(
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK);
   });
 });

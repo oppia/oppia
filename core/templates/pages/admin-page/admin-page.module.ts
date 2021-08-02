@@ -42,7 +42,7 @@ import { AdminPageComponent } from './admin-page.component';
 import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [

@@ -21,7 +21,7 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
 import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
-import { MockRouterModule } from '../../../hybrid-router-module-provider';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 
 describe('Blog Admin navbar component', () => {

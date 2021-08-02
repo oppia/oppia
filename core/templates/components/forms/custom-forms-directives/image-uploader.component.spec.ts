@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MockRouterModule } from '../../../hybrid-router-module-provider';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';

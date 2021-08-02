@@ -45,8 +45,7 @@ export class ImageUploaderComponent {
   // The errorMessage will be null if the uploaded file is valid .
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   constructor(
     private idGenerationService: IdGenerationService,

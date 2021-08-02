@@ -38,8 +38,7 @@ export class AudioFileUploaderComponent {
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
   // 'null' implies not displaying an error message.
   errorMessage: string | null = null;
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
 
   // Returns 'null' when the uploaded file is valid.
   validateUploadedFile(file: File): string | null {

@@ -27,7 +27,7 @@ import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { ContributorDashboardAdminNavbarComponent } from './navbar/contributor-dashboard-admin-navbar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [

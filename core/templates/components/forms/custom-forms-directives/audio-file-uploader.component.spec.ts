@@ -17,7 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MockRouterModule } from '../../../hybrid-router-module-provider';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { AudioFileUploaderComponent } from './audio-file-uploader.component';
 
 describe('Audio File Uploader Component', () => {
