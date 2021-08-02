@@ -120,8 +120,6 @@ export class ContributionOpportunitiesService {
   async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
-    } else {
-      throw new Error('No more Skill opportunites exist');
     }
   }
 
@@ -130,8 +128,6 @@ export class ContributionOpportunitiesService {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
         languageCode, this._translationOpportunitiesCursor);
-    } else {
-      throw new Error('No more Translation opportunites exist');
     }
   }
 
@@ -140,8 +136,6 @@ export class ContributionOpportunitiesService {
     if (this._moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunitiesAsync(
         languageCode, this._voiceoverOpportunitiesCursor);
-    } else {
-      throw new Error('No more Voiceover opportunites exist');
     }
   }
 
