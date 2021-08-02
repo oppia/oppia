@@ -36,7 +36,6 @@
     }
   },
   "files": [
-    "extensions/classifiers/proto/text_classifier.ts",
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "core/templates/app-events/app-events.ts",
@@ -691,7 +690,6 @@
     "extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.spec.ts"
   ],
   "include": [
-    "extensions/objects/templates/*.ts",
     "core/templates/domain/improvements/*.ts",
     "core/templates/domain/feedback_message/*.ts",
     "core/templates/components/skill-mastery/*.ts",
