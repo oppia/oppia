@@ -1839,6 +1839,12 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                         'type': 'basestring'
                     },
                     'default_value': 'random_exp_id'
+                },
+                'apply_draft': {
+                    'schema': {
+                        'type': 'bool'
+                    },
+                    'default_value': 'false'
                 }
             }
         }
@@ -1929,7 +1935,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp3):
-            self.get_json('/mock_play_exploration')
+            self.get_json('/mock_play_exploration?apply_draft=true')
 
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp4):

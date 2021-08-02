@@ -119,3 +119,14 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 normalized_value_for_args, normalized_value_for_args)
             self.assertEqual(errors, [])
+
+
+class CheckConversionOfStringToBool(test_utils.GenericTestBase):
+    """Test class to check behaviour of convert_string_to_bool method."""
+
+    def test_convert_string_to_bool(self):
+        """Test case to check behaviour of convert_string_to_bool method."""
+        self.assertTrue(
+            payload_validator.convert_string_to_bool('true'))
+        self.assertFalse(
+            payload_validator.convert_string_to_bool('false'))
