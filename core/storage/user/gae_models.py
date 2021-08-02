@@ -1471,8 +1471,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         return entity
 
     @staticmethod
-    def export_data(user_id):
-        # type: (Text) -> Dict[Text, Union[float, List[Dict[Text, Dict[Text, float]]]]]
+    def export_data(
+            user_id # type: Text
+    ):
+        # type: (...) -> Dict[Text, Union[float, List[Dict[Text, Dict[Text, float]]]]]
         """(Takeout) Export the user-relevant properties of UserStatsModel.
 
         Args:
@@ -2261,8 +2263,12 @@ class UserQueryModel(base_models.BaseModel):
             keys_only=True) is not None
 
     @classmethod
-    def fetch_page(cls, page_size, cursor):
-        # type: (int, Optional[Text]) -> Tuple[List[UserQueryModel], Optional[Text], bool]
+    def fetch_page(
+            cls,
+            page_size, # type: int
+            cursor # type: Optional[Text]
+    ):
+        # type: (...) -> Tuple[List[UserQueryModel], Optional[Text], bool]
         """Fetches a list of all query_models sorted by creation date.
 
         Args:

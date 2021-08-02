@@ -178,7 +178,8 @@ class JobModel(base_models.BaseModel):
         return cast(
             List[JobModel],
             cls.query().filter(
-                JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
             ).order(-cls.time_queued_msec).fetch(limit)
         )
 

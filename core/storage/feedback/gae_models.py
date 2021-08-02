@@ -414,8 +414,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return self.id.split('.')[0]
 
     @classmethod
-    def create(cls, message_identifier):
-        # type: (feedback_domain.FullyQualifiedMessageIdentifier) -> GeneralFeedbackMessageModel
+    def create(
+            cls,
+            message_identifier # type: feedback_domain.FullyQualifiedMessageIdentifier
+    ):
+        # type: (...) -> GeneralFeedbackMessageModel
         """Creates a new GeneralFeedbackMessageModel entry.
 
         Args:
@@ -435,8 +438,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return cls.create_multi([message_identifier])[0]
 
     @classmethod
-    def create_multi(cls, message_identifiers):
-        # type: (List[feedback_domain.FullyQualifiedMessageIdentifier]) -> List[GeneralFeedbackMessageModel]
+    def create_multi(
+            cls,
+            message_identifiers # type: List[feedback_domain.FullyQualifiedMessageIdentifier]
+    ):
+        # type: (...) -> List[GeneralFeedbackMessageModel]
         """Creates a new GeneralFeedbackMessageModel entry for each
         (thread_id, message_id) pair.
 
@@ -584,8 +590,12 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return [thread_model.message_count for thread_model in thread_models]
 
     @classmethod
-    def get_all_messages(cls, page_size, urlsafe_start_cursor):
-        # type: (int, Optional[Text]) -> Tuple[List[GeneralFeedbackMessageModel], Optional[Text], bool]
+    def get_all_messages(
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor # type: Optional[Text]
+    ):
+        # type: (...) -> Tuple[List[GeneralFeedbackMessageModel], Optional[Text], bool]
         """Fetches a list of all the messages sorted by their last updated
         attribute.
 
@@ -755,8 +765,12 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
-    def get_multi(cls, user_id, thread_ids): # type: ignore[override]
-        # type: (Text, List[Text]) -> List[Optional[GeneralFeedbackThreadUserModel]]
+    def get_multi( # type: ignore[override]
+            cls,
+            user_id, # type: Text
+            thread_ids # type: List[Text]
+    ):
+        # type: (...) -> List[Optional[GeneralFeedbackThreadUserModel]]
         """Gets the ExplorationUserDataModel corresponding to the given user and
         the thread ids.
 

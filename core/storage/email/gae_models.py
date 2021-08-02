@@ -179,9 +179,17 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, recipient_id, recipient_email, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
-        # type: (Text, Text, Text, Text, Text, Text, Text, datetime.datetime) -> None
+            cls,
+            recipient_id, # type: Text
+            recipient_email, # type: Text
+            sender_id, # type: Text
+            sender_email, # type: Text
+            intent, # type: Text
+            subject, # type: Text
+            html_body, # type: Text
+            sent_datetime # type: datetime.datetime
+    ):
+        # type: (...) -> None
         """Creates a new SentEmailModel entry.
 
         Args:
@@ -397,9 +405,17 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, instance_id, recipient_ids, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
-        # type: (Text, Optional[List[Text]], Text, Text, Text, Text, Text, datetime.datetime) -> None
+            cls,
+            instance_id, # type: Text
+            recipient_ids, # type: Optional[List[Text]]
+            sender_id, # type: Text
+            sender_email, # type: Text
+            intent, # type: Text
+            subject, # type: Text
+            html_body, # type: Text
+            sent_datetime # type: datetime.datetime
+    ):
+        # type: (...) -> None
         """Creates a new BulkEmailModel entry.
 
         Args:

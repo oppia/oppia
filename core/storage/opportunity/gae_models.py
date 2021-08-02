@@ -89,8 +89,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_all_translation_opportunities(
-            cls, page_size, urlsafe_start_cursor, language_code):
-        # type: (int, Optional[Text], Text) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            language_code # type: Text
+    ):
+        # type: (...) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -132,8 +136,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_all_voiceover_opportunities(
-            cls, page_size, urlsafe_start_cursor, language_code):
-        # type: (int, Optional[Text], Text) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            language_code # type: Text
+    ):
+        # type: (...) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -234,8 +242,12 @@ class SkillOpportunityModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
-        # type: (int, Optional[Text]) -> Tuple[Optional[List[SkillOpportunityModel]], Optional[Text], bool]
+    def get_skill_opportunities(
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor # type: Optional[Text]
+    ):
+        # type: (...) -> Tuple[Optional[List[SkillOpportunityModel]], Optional[Text], bool]
         """Returns a list of skill opportunities available for adding questions.
 
         Args:

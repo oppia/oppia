@@ -99,8 +99,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
-    def get_multi(cls, exp_id, exp_versions): # type: ignore[override]
-        # type: (Text, List[int]) -> List[Optional[ExplorationCommitLogEntryModel]]
+    def get_multi( # type: ignore[override]
+            cls,
+            exp_id, # type: Text
+            exp_versions # type: List[int]
+    ):
+        # type: (...) -> List[Optional[ExplorationCommitLogEntryModel]]
         """Gets the ExplorationCommitLogEntryModels for the given exploration
         id and exploration versions.
 
@@ -136,8 +140,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        # type: (int, Optional[Text], Optional[datetime.timedelta]) -> Tuple[List[ExplorationCommitLogEntryModel], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            max_age=None # type: Optional[datetime.timedelta]
+    ):
+        # type: (...) -> Tuple[List[ExplorationCommitLogEntryModel], Optional[Text], bool]
         """Fetches a list of all the non-private commits sorted by their
         last updated attribute.
 
