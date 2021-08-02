@@ -134,7 +134,7 @@ export class ThreadDataBackendApiService {
   // resulting the function to throw an error.
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict | undefined | null
+      suggestionBackendDict: SuggestionBackendDict | undefined
   ): SuggestionThread {
     if (!threadBackendDict || !suggestionBackendDict) {
       throw new Error('Missing input backend dicts');
