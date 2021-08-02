@@ -64,16 +64,15 @@ export class CkEditorCopyContentService {
   private _handleCopy(target: HTMLElement): CkEditorCopyEvent {
     let containedWidgetTagName;
     let currentElement = target;
-    let parentElement = <HTMLElement> currentElement.parentElement;
     let descendants = <ChildNode[]> Array.from(target.childNodes);
 
     while (true) {
       const currentTagName = currentElement.tagName.toLowerCase();
+      const parentElement = <HTMLElement> currentElement.parentElement;
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
         containedWidgetTagName = currentTagName;
         break;
       }
-
       if (parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {
         break;
       }
