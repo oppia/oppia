@@ -214,11 +214,11 @@ URLS = MAPREDUCE_HANDLERS + [
     # Access Validators.
     get_redirect_route(
         r'%s/can_access_classroom_page' % feconf.ACCESS_VALIDATORS_PREFIX,
-        access_validators.ClassroomPageAccessValidationHandler),
+        access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
         r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATORS_PREFIX,
-        access_validators.SplashPageAccessValidationHandler),
+        access_validators.SplashAccessValidationHandler),
 
     get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATORS_PREFIX,

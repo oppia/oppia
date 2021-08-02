@@ -28,7 +28,7 @@ from typing import Dict # pylint: disable=unused-import
 from typing import Text # pylint: disable=unused-import
 
 
-class SplashPageAccessValidationHandler(base.BaseHandler):
+class SplashAccessValidationHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
@@ -51,7 +51,7 @@ class SplashPageAccessValidationHandler(base.BaseHandler):
             self.render_json({'valid': True}) # type: ignore[no-untyped-call]
 
 
-class ClassroomPageAccessValidationHandler(base.BaseHandler):
+class ClassroomAccessValidationHandler(base.BaseHandler):
     """Validates whether request made to /learn route is valid.
     """
 
