@@ -22,7 +22,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.component.ts');

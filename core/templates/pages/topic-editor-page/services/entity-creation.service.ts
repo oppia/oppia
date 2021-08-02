@@ -25,7 +25,7 @@ require(
 require(
   'components/review-material-editor/review-material-editor.directive.ts');
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require(

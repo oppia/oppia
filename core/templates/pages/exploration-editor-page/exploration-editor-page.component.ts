@@ -25,7 +25,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(

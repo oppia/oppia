@@ -19,7 +19,7 @@
 import { Subscription } from 'rxjs';
 
 require(
-  'components/forms/custom-forms-directives/select2-dropdown.component.ts');
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');

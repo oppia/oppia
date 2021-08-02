@@ -111,13 +111,6 @@ angular.module('oppia').component('stateSolutionEditor', {
         return StateEditorService.isCurrentSolutionValid();
       };
 
-      $scope.correctAnswerEditorHtml = (
-        ExplorationHtmlFormatterService.getInteractionHtml(
-          StateInteractionIdService.savedMemento,
-          StateCustomizationArgsService.savedMemento,
-          false,
-          $scope.SOLUTION_EDITOR_FOCUS_LABEL, null));
-
       $scope.toggleInlineSolutionEditorIsActive = function() {
         $scope.inlineSolutionEditorIsActive = (
           !$scope.inlineSolutionEditorIsActive);
@@ -155,7 +148,7 @@ angular.module('oppia').component('stateSolutionEditor', {
           StateSolutionService.displayed = result.solution;
           StateSolutionService.saveDisplayedValue();
           ctrl.onSaveSolution(StateSolutionService.displayed);
-          var solutionIsValid = SolutionVerificationService.verifySolution(
+          let solutionIsValid = SolutionVerificationService.verifySolution(
             StateEditorService.getActiveStateName(),
             StateEditorService.getInteraction(),
             StateSolutionService.savedMemento.correctAnswer
@@ -208,7 +201,6 @@ angular.module('oppia').component('stateSolutionEditor', {
         $scope.solutionCardIsShown = (
           !WindowDimensionsService.isWindowNarrow());
         $scope.correctAnswer = null;
-        $scope.correctAnswerEditorHtml = '';
         $scope.inlineSolutionEditorIsActive = false;
         $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
           'currentCorrectAnswerEditorHtmlForSolutionEditor');
@@ -216,6 +208,12 @@ angular.module('oppia').component('stateSolutionEditor', {
         $scope.StateInteractionIdService = StateInteractionIdService;
         $scope.StateSolutionService = StateSolutionService;
         StateEditorService.updateStateSolutionEditorInitialised();
+        $scope.correctAnswerEditorHtml = (
+          ExplorationHtmlFormatterService.getInteractionHtml(
+            StateInteractionIdService.savedMemento,
+            StateCustomizationArgsService.savedMemento,
+            false,
+            $scope.SOLUTION_EDITOR_FOCUS_LABEL, null));
       };
     }
   ]
