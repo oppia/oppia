@@ -923,7 +923,12 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         question_state_data = suggestion.change.question_dict[
             'question_state_data']
         question_state_data['content'][
-            'html'] = '<p>Updated question</p>'
+            'html'] = (
+                '<p>Updated question</p>'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>')
         question_state_data['interaction'][
             'solution'] = new_solution_dict
 
@@ -950,7 +955,12 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             new_question_state_data['content'][
                 'html'],
-            '<p>Updated question</p>')
+            (
+                '<p>Updated question</p>'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>'))
         self.assertEqual(
             new_question_state_data['interaction'][
                 'solution'],
