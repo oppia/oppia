@@ -23,6 +23,8 @@ from core.controllers import base
 from core.domain import classroom_services
 from core.domain import user_services
 
+import feconf
+
 from typing import Any # pylint: disable=unused-import
 from typing import Dict # pylint: disable=unused-import
 from typing import Text # pylint: disable=unused-import
@@ -32,6 +34,8 @@ class SplashAccessValidationHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
     HANDLER_ARGS_SCHEMAS = {
@@ -52,8 +56,10 @@ class SplashAccessValidationHandler(base.BaseHandler):
 
 
 class ClassroomAccessValidationHandler(base.BaseHandler):
-    """Validates whether request made to /learn route is valid.
+    """Validates whether request made to /learn route.
     """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
     HANDLER_ARGS_SCHEMAS = {
@@ -90,6 +96,8 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
     """Validates access to preferences page.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
@@ -103,6 +111,8 @@ class ManageOwnAccountValidationHandler(base.BaseHandler):
 
 class ProfileExistsValidationHandler(base.BaseHandler):
     """The world-viewable profile page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
         'username': {
@@ -133,6 +143,8 @@ class ProfileExistsValidationHandler(base.BaseHandler):
 class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
     """Checks whether account deletion is enabled."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
 
     HANDLER_ARGS_SCHEMAS = {
@@ -152,6 +164,8 @@ class AccountDeletionIsEnabledValidationHandler(base.BaseHandler):
 
 class ReleaseCoordinatorAccessValidationHandler(base.BaseHandler):
     """Validates access to release coordinator page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
 

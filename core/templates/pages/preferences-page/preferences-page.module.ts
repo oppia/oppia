@@ -29,6 +29,7 @@ import { CommonModule } from '@angular/common';
 import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
 import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     Error404PageModule
   ],
   declarations: [
+    EditProfilePictureModalComponent,
     PreferencesPageComponent,
     PreferencesPageRootComponent,
     PreferredLanguagesComponent,
@@ -50,6 +52,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     SubjectInterestsComponent
   ],
   entryComponents: [
+    EditProfilePictureModalComponent,
     PreferencesPageComponent,
     PreferencesPageRootComponent,
     PreferredLanguagesComponent,
