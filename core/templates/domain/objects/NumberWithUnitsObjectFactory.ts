@@ -68,12 +68,12 @@ export class NumberWithUnits {
   }
 
   toString(): string {
-    var numberWithUnitsString: string = '';
+    let numberWithUnitsString = '';
     // The NumberWithUnits class is allowed to have 4 properties namely
     // type, real, fraction and units. Hence, we cannot inject
     // UnitsObjectFactory, since that'll lead to creation of 5th property
     // which isn't allowed. Refer objects.py L#956.
-    var unitsString: string = (new UnitsObjectFactory()).fromList(
+    let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
@@ -99,8 +99,8 @@ export class NumberWithUnits {
   }
 
   toMathjsCompatibleString(): string {
-    var numberWithUnitsString: string = '';
-    var unitsString: string = (new UnitsObjectFactory()).fromList(
+    let numberWithUnitsString = '';
+    let unitsString = (new UnitsObjectFactory()).fromList(
       this.units).toString();
     unitsString = (new UnitsObjectFactory()).toMathjsCompatibleString(
       unitsString);
@@ -139,18 +139,18 @@ export class NumberWithUnitsObjectFactory {
 
   fromRawInputString(rawInput: string): NumberWithUnits {
     rawInput = rawInput.trim();
-    var type = '';
-    var real = 0.0;
+    let type = '';
+    let real = 0.0;
     // Default fraction value.
-    var fractionObj = Fraction.fromRawInputString('0/1');
-    var units = '';
-    var value = '';
+    let fractionObj = Fraction.fromRawInputString('0/1');
+    let units = '';
+    let value = '';
 
     // Allow validation only when rawInput is not null or an empty string.
     if (rawInput !== '' && rawInput !== null) {
       // Start with digit when there is no currency unit.
       if (rawInput.match(/^\d/)) {
-        var ind = rawInput.indexOf(String(rawInput.match(/[a-z(₹$]/i)));
+        let ind = rawInput.indexOf(String(rawInput.match(/[a-z(₹$]/i)));
         if (ind === -1) {
           // There is value with no units.
           value = rawInput;
@@ -160,32 +160,31 @@ export class NumberWithUnitsObjectFactory {
           units = rawInput.substr(ind).trim();
         }
 
-        var keys = (
+        const keys = (
           <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
         );
-        for (var i = 0; i < keys.length; i++) {
-          for (var j = 0;
-            j < (
-              ObjectsDomainConstants.CURRENCY_UNITS[
-                keys[i]].front_units.length); j++) {
+        for (let i = 0; i < keys.length; i++) {
+          let unitLength = (
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          for (let j = 0; j < unitLength; j++) {
             if (units.indexOf(
               ObjectsDomainConstants.CURRENCY_UNITS[
                 keys[i]].front_units[j]) !== -1) {
               throw new Error(
-                // eslint-disable-next-line max-len
-                ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
+                ObjectsDomainConstants
+                  .NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
             }
           }
         }
       } else {
-        var startsWithCorrectCurrencyUnit = false;
-        var keys = (
+        let startsWithCorrectCurrencyUnit = false;
+        const keys = (
           <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
         );
-        for (var i = 0; i < keys.length; i++) {
-          for (var j = 0;
-            j < ObjectsDomainConstants.CURRENCY_UNITS[
-              keys[i]].front_units.length; j++) {
+        for (let i = 0; i < keys.length; i++) {
+          let unitLength = (
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          for (let j = 0; j < unitLength; j++) {
             if (rawInput.startsWith(ObjectsDomainConstants.CURRENCY_UNITS[
               keys[i]].front_units[j])) {
               startsWithCorrectCurrencyUnit = true;
@@ -198,7 +197,7 @@ export class NumberWithUnitsObjectFactory {
             // eslint-disable-next-line max-len
             ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
         }
-        var ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
+        const ind = rawInput.indexOf(String(rawInput.match(/[0-9]/)));
         if (ind === -1) {
           throw new Error(
             // eslint-disable-next-line max-len
@@ -207,10 +206,10 @@ export class NumberWithUnitsObjectFactory {
         units = rawInput.substr(0, ind).trim();
 
         startsWithCorrectCurrencyUnit = false;
-        for (var i = 0; i < keys.length; i++) {
-          for (var j = 0;
-            j < ObjectsDomainConstants.CURRENCY_UNITS[
-              keys[i]].front_units.length; j++) {
+        for (let i = 0; i < keys.length; i++) {
+          let unitLength = (
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length);
+          for (let j = 0; j < unitLength; j++) {
             if (units === ObjectsDomainConstants.CURRENCY_UNITS[
               keys[i]].front_units[j].trim()) {
               startsWithCorrectCurrencyUnit = true;
@@ -225,7 +224,7 @@ export class NumberWithUnitsObjectFactory {
         }
         units = units + ' ';
 
-        var ind2 = rawInput.indexOf(String(
+        const ind2 = rawInput.indexOf(String(
           rawInput.substr(ind).match(/[a-z(]/i)));
         if (ind2 !== -1) {
           value = rawInput.substr(ind, ind2 - ind).trim();
@@ -259,7 +258,7 @@ export class NumberWithUnitsObjectFactory {
       }
     }
 
-    var unitsObj = this.unitsFactory.fromRawInputString(units);
+    const unitsObj = this.unitsFactory.fromRawInputString(units);
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
