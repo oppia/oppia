@@ -16,7 +16,7 @@
  * @fileoverview Directive for CK Editor.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -44,19 +44,47 @@ interface RteConfig extends CKEDITOR.config {
             '</div></div>',
   styleUrls: []
 })
-export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
+export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
+    OnDestroy {
   @Input() uiConfig: UiConfig;
   @Input() value;
   @Input() headersEnabled = false;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
+  currentValue: string;
+  // A RegExp for matching rich text components.
+  componentRe = (
+    /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
+  );
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private elementRef: ElementRef
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Ckeditor 'change' event gets triggered when a user types. In the
+    // change listener, value is set and it triggers the ngOnChanges
+    // lifecycle hook. This cannot be avoided so we check if the currentValue
+    // is the same as the detected change passed to ngOnChanges. If so, return.
+    if (this.currentValue === changes.value?.currentValue) {
+      return;
+    }
+    // If ngOnChanges is called first, it means that the input 'value' to
+    // this component has changed without a user manually typing something.
+    // In such cases, call ck.setData() to update ckeditor with the latest
+    // input value. This can happen, for example, if there exists a list of
+    // ck-editor-4-rte components on a page, and the list is reordered or
+    // certain elements are deleted, then the values passed to the individual
+    // components may change without re-rendering each of the components,
+    // in such cases, it is sufficient to update the ckeditor instance manually
+    // with the latest value.
+    if (this.ck && this.ck.status === 'ready' && changes.value) {
+      this.ck.setData(this.wrapComponents(this.value));
+    }
   }
 
   /**
@@ -145,6 +173,27 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     }
 
     return ckConfig;
+  }
+
+  /**
+   * Before data is loaded into CKEditor, we need to wrap every rte
+   * component in a span (inline) or div (block).
+   * For block elements, we add an overlay div as well.
+   */
+  wrapComponents(html: string): string {
+    if (html === undefined) {
+      return html;
+    }
+    return html.replace(this.componentRe, (match, p1, p2, p3) => {
+      if (this.rteHelperService.isInlineComponent(p3)) {
+        return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
+      } else {
+        return (
+          '<div type="oppia-noninteractive-' + p3 + '"' +
+          'class="oppia-rte-component-container">' + match +
+          '</div>');
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -255,32 +304,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
     // This div is placed as a child of `schema-based-editor`.
     this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
 
-    // A RegExp for matching rich text components.
-    var componentRe = (
-      /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
-    );
-
-    /**
-       * Before data is loaded into CKEditor, we need to wrap every rte
-       * component in a span (inline) or div (block).
-       * For block elements, we add an overlay div as well.
-       */
-    var wrapComponents = (html) => {
-      if (html === undefined) {
-        return html;
-      }
-      return html.replace(componentRe, (match, p1, p2, p3) => {
-        if (this.rteHelperService.isInlineComponent(p3)) {
-          return '<span type="oppia-noninteractive-' + p3 + '">' +
-                      match + '</span>';
-        } else {
-          return '<div type="oppia-noninteractive-' + p3 + '"' +
-                       'class="oppia-rte-component-container">' + match +
-                       '</div>';
-        }
-      });
-    };
-
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
       (
@@ -346,7 +369,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
           .css('display', 'none');
       }
 
-      ck.setData(wrapComponents(this.value));
+      ck.setData(this.wrapComponents(this.value));
     });
 
     // Angular rendering of components confuses CKEditor's undo system, so
@@ -355,7 +378,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       if (event.data === undefined) {
         return;
       }
-      event.data = event.data.replace(componentRe, (match, p1, p2) => {
+      event.data = event.data.replace(this.componentRe, (match, p1, p2) => {
         return p1 + '</' + p2 + '>';
       });
     }, null, null, 20);
@@ -392,6 +415,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       }
       this.valueChange.emit(elt.html());
       this.value = elt.html();
+      this.currentValue = this.value;
     });
     ck.setData(this.value);
     this.ck = ck;
