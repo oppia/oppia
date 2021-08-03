@@ -76,12 +76,10 @@ export class BlogDashboardPageService {
         blog_post_id: blogPostId
       });
     this.windowRef.nativeWindow.location.hash = blogPostEditorUrl;
-    this._setActiveTab(blogPostEditorUrl);
   }
 
   navigateToMainTab(): void {
     this.windowRef.nativeWindow.location.hash = '/';
-    this._setActiveTab('/');
   }
 
   set blogPostAction(action: string) {

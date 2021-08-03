@@ -41,8 +41,8 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { UploadBlogPostThumbnailComponent } from '../modal-templates/upload-blog-post-thumbnail.component';
 import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
-
 
 describe('Blog Post Editor Component', () => {
   let fixture: ComponentFixture<BlogPostEditorComponent>;
@@ -68,7 +68,7 @@ describe('Blog Post Editor Component', () => {
     thumbnail_filename: 'image.png',
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
-    last_updated: '11/21/2014, 09:45:00',
+    last_updated: '11/21/2014, 04:52:46:713463',
   };
 
   beforeEach(waitForAsync(() => {
@@ -85,6 +85,7 @@ describe('Blog Post Editor Component', () => {
         BlogPostEditorComponent,
         SchemaBasedEditorDirective,
         AngularHtmlBindWrapperDirective,
+        UploadBlogPostThumbnailComponent,
         ImageUploaderComponent,
         MockTranslatePipe
       ],
@@ -192,10 +193,10 @@ describe('Blog Post Editor Component', () => {
     expect(component.defaultTagsList).toEqual(['news', 'Learners']);
     expect(component.maxAllowedTags).toEqual(2);
     expect(component.thumbnailDataUrl).toEqual(
-      '/assetsdevhandler/blog_post/sampleBlogId/assets/blog_post' +
+      '/assetsdevhandler/blog_post/sampleBlogId/assets/thumbnail' +
       '/image.png');
     expect(component.dateTimeLastSaved).toEqual(
-      'November 21, 2014 at 12:00 AM');
+      'November 21, 2014 at 04:52 AM');
     expect(component.title).toEqual('sample_title');
     expect(component.contentEditorIsActive).toEqual(false);
   }));
@@ -331,18 +332,18 @@ describe('Blog Post Editor Component', () => {
 
   it('should get formatted date string from the timestamp in milliseconds',
     () => {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      let DATE = '11/21/2014';
+      // This corresponds to Fri, 21 Nov 2014 04:52 AM GMT.
+      let DATE = '11/21/2014, 04:52:46:713463';
       expect(component.getDateStringInWords(DATE))
-        .toBe('November 21, 2014 at 12:00 AM');
+        .toBe('November 21, 2014 at 04:52 AM');
 
-      DATE = '01/16/2027';
+      DATE = '01/16/2027, 09:45:46:600000';
       expect(component.getDateStringInWords(DATE))
-        .toBe('January 16, 2027 at 12:00 AM');
+        .toBe('January 16, 2027 at 09:45 AM');
 
-      DATE = '02/02/2018';
+      DATE = '02/02/2018, 12:30:46:608990';
       expect(component.getDateStringInWords(DATE))
-        .toBe('February 2, 2018 at 12:00 AM');
+        .toBe('February 2, 2018 at 12:30 PM');
     });
 
   it('should cancel delete blog post model', fakeAsync(() => {

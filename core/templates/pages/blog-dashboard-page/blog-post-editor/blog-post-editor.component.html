@@ -175,7 +175,7 @@
           {{ 'I18N_BLOG_POST_EDITOR_SAVE_DRAFT_BUTTON' | translate | uppercase }}
         </button>
         <button mat-button class="mx-2 my-2 publish-button"
-                [disabled]="(blogPostData.prepublishValidate(maxAllowedTags).length > 0) || !newChangesAreMade"
+                [disabled]="((blogPostData.prepublishValidate(maxAllowedTags).length > 0) || latestChangesarePublished) && !newChangesAreMade"
                 (click)="publishBlogPost()"
                 aria-label="Publish blog post."
                 [ngClass]="{'small-screen-button': windowIsNarrow}">
@@ -207,10 +207,10 @@
           </mat-button-toggle-group>
         </div>
         <button mat-button
-                class="d-block delete-button mx-auto"
+                class="d-block delete-button mx-auto mt-2"
                 (click)="deleteBlogPost()"
                 aria-label="Delete blog post."
-                [ngClass]="windowIsNarrow ? 'small-screen-button mt-2' : 'my-0'">
+                [ngClass]="{'small-screen-button': windowIsNarrow}">
           {{ 'I18N_BLOG_POST_EDITOR_DELETE_BUTTON' | translate | uppercase }}
         </button>
       </mat-card-actions>
@@ -260,7 +260,7 @@
 
   .delete-button {
     background-color: #dc3545;
-    color: #333;
+    color: #FFF;
   }
 
   .cancel-button {
@@ -389,6 +389,7 @@
     background-color: #AAA9;
     border-top-left-radius: inherit;
     border-top-right-radius: inherit;
+    cursor: pointer;
     height: 15.625vw;
     margin: -16px -16px 16px -16px;
     width: calc(100% + 32px);

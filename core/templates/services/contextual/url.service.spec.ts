@@ -126,12 +126,14 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve blog post id from url', () => {
-    mockLocation.pathname = '/blog-dashboard#/blog_post_editor/abcdefgijklm';
+    mockLocation.pathname = '/blog-dashboard';
+    mockLocation.hash = '/blog_post_editor/abcdefgijklm';
     expect(
       urlService.getBlogPostIdFromUrl()
     ).toBe('abcdefgijklm');
 
-    mockLocation.pathname = '/blog-dashboard#/blog_post_editor/abcdefgij';
+    mockLocation.pathname = '/blog-dashboard';
+    mockLocation.hash = '/blog_post_editor/abcdefgij';
     expect(function() {
       urlService.getBlogPostIdFromUrl();
     }).toThrowError('Invalid Blog Post Id.');
