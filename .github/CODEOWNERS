@@ -299,6 +299,7 @@
 /core/templates/services/contextual/window-ref.service*.ts @srijanreddy98
 /core/templates/services/connection-service.service*.ts @srijanreddy98
 
+
 # Global stylesheet.
 /core/templates/css/oppia.css @srijanreddy98
 /core/templates/css/oppia-material.css @srijanreddy98
