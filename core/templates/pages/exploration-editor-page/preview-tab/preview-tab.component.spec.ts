@@ -55,6 +55,7 @@ fdescribe('Preview Tab Component', function() {
 
   var explorationId = 'exp1';
   var stateName = 'State1';
+  var changeObjectName = 'change';
   var exploration = {
     init_state_name: stateName,
     param_changes: [],
@@ -79,9 +80,9 @@ fdescribe('Preview Tab Component', function() {
     $provide.value('ExplorationDataService', {
       getDataAsync: () => $q.resolve({
         param_changes: [
-          paramChangeObjectFactory.createEmpty('a').toBackendDict()
+          paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
         ],
-        states: [stateObjectFactory.createDefaultState('state')]
+        states: [stateObjectFactory.createDefaultState(stateName)]
       })
     });
   }));
@@ -115,6 +116,9 @@ fdescribe('Preview Tab Component', function() {
       spyOn(
         editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
+      explorationParamChangesService.savedMemento = [
+        paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
+      ];
       spyOnProperty(
         explorationEngineService,
         'onUpdateActiveStateIfInEditor').and.returnValue(
@@ -153,13 +157,13 @@ fdescribe('Preview Tab Component', function() {
       $scope.$apply();
 
       expect(explorationParamChangesService.init).toHaveBeenCalledWith(
-        [paramChangeObjectFactory.createEmpty('a')]
+        [paramChangeObjectFactory.createEmpty(changeObjectName)]
       );
       expect(explorationStatesService.init).toHaveBeenCalledWith(
-        [stateObjectFactory.createDefaultState('state')]
+        [stateObjectFactory.createDefaultState(stateName)]
       );
       expect(explorationParamChangesService.savedMemento).toEqual(
-        [paramChangeObjectFactory.createEmpty('a')]
+        [paramChangeObjectFactory.createEmpty(changeObjectName)]
       );
     });
 
@@ -267,7 +271,9 @@ fdescribe('Preview Tab Component', function() {
       spyOn(
         editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
-      explorationParamChangesService.savedMemento = undefined;
+      explorationParamChangesService.savedMemento = [
+        paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
+      ];
 
       // Mock init just to call the callback directly.
       spyOn(explorationEngineService, 'init').and.callFake(function(
