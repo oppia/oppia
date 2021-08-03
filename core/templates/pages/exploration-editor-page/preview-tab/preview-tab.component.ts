@@ -66,7 +66,7 @@ angular.module('oppia').component('previewTab', {
     'LearnerParamsService', 'NumberAttemptsService',
     'ParamChangeObjectFactory', 'ParameterMetadataService',
     'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
-    'StateEditorService', 'UrlInterpolationService',
+    'StateEditorService',
     function(
         $q, $rootScope, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
@@ -76,7 +76,7 @@ angular.module('oppia').component('previewTab', {
         LearnerParamsService, NumberAttemptsService,
         ParamChangeObjectFactory, ParameterMetadataService,
         PlayerCorrectnessFeedbackEnabledService, RouterService,
-        StateEditorService, UrlInterpolationService) {
+        StateEditorService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
@@ -113,8 +113,8 @@ angular.module('oppia').component('previewTab', {
 
       ctrl.showSetParamsModal = function(manualParamChanges, callback) {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/preview-tab/templates/' +
+          template: require(
+            'pages/exploration-editor-page/preview-tab/templates/' +
             'preview-set-parameters-modal.template.html'),
           backdrop: 'static',
           windowClass: 'oppia-preview-set-params-modal',

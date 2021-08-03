@@ -18,6 +18,7 @@
 
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { ContextService } from 'services/context.service';
 
 @Component({
@@ -25,8 +26,11 @@ import { ContextService } from 'services/context.service';
   templateUrl: './outcome-feedback-editor.component.html',
 })
 export class OutcomeFeedbackEditorComponent implements OnInit {
-  @Input() outcome;
-  OUTCOME_FEEDBACK_SCHEMA: object;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() outcome!: Outcome;
+  OUTCOME_FEEDBACK_SCHEMA!: object;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService) {}

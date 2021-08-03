@@ -16,8 +16,8 @@
 
 """Tests for blog post services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import blog_domain
 from core.domain import blog_services
@@ -89,8 +89,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         summary = blog_services.generate_summary_of_blog_post(html_content)
         self.assertEqual(expected_summary, summary)
 
-        content = '<p>abc</p>' * 85
-        expected_summary = 'abc' * 79 + '...'
+        content = '<p>abc</p>' * 150
+        expected_summary = 'abc' * 99 + '...'
         summary = blog_services.generate_summary_of_blog_post(content)
         self.assertEqual(expected_summary, summary)
 

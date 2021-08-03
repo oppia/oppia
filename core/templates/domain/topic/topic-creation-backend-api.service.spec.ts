@@ -29,11 +29,11 @@ import { TopicCreationBackendApiService } from
   'domain/topic/topic-creation-backend-api.service';
 
 describe('Topic creation backend api service', () => {
-  let csrfService: CsrfTokenService = null;
-  let httpTestingController: HttpTestingController = null;
-  let topicCreationBackendApiService: TopicCreationBackendApiService = null;
-  let topic: NewlyCreatedTopic = null;
-  let imagesData: ImageData[] = null;
+  let csrfService: CsrfTokenService;
+  let httpTestingController: HttpTestingController;
+  let topicCreationBackendApiService: TopicCreationBackendApiService;
+  let topic: NewlyCreatedTopic;
+  let imagesData: ImageData[];
   const thumbnailBgColor = '#e3e3e3';
   let postData = {
     name: 'topic-name',

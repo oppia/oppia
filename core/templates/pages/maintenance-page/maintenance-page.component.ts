@@ -25,7 +25,7 @@ import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
 
 @Component({
-  selector: 'maintenance-page',
+  selector: 'oppia-maintenance-page',
   templateUrl: './maintenance-page.component.html',
   styleUrls: []
 })

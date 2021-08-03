@@ -68,8 +68,8 @@ export class StateEditorService {
 
   activeStateName: string = null;
   stateNames: string[] = [];
-  correctnessFeedbackEnabled: boolean = null;
-  inQuestionMode: boolean = null;
+  correctnessFeedbackEnabled: boolean = false;
+  inQuestionMode: boolean = false;
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
@@ -78,8 +78,8 @@ export class StateEditorService {
   misconceptionsBySkill: {} = {};
   linkedSkillId: string = null;
   explorationIsWhitelisted: boolean = false;
-  solicitAnswerDetails: boolean = null;
-  cardIsCheckpoint: boolean = null;
+  solicitAnswerDetails: boolean = false;
+  cardIsCheckpoint: boolean = false;
   stateContentEditorInitialised: boolean = false;
   stateInteractionEditorInitialised: boolean = false;
   stateResponsesInitialised: boolean = false;

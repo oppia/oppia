@@ -239,8 +239,8 @@ angular.module('oppia').component('questionPlayer', {
             ctrl.scorePerSkillMapping[skillId].description);
         });
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/concept-card/concept-card-modal.template.html'
+          template: require(
+            'components/concept-card/concept-card-modal.template.html'
           ),
           backdrop: true,
           resolve: {
@@ -512,8 +512,8 @@ angular.module('oppia').component('questionPlayer', {
       ctrl.openSkillMasteryModal = function(skillId) {
         var masteryPerSkillMapping = ctrl.masteryPerSkillMapping;
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/question-directives/question-player/' +
+          template: require(
+            'components/question-directives/question-player/' +
             'skill-mastery-modal.template.html'),
           backdrop: true,
           resolve: {

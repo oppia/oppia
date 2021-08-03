@@ -32,8 +32,8 @@ import { TopicsAndSkillsDashboardFilter } from './topics-and-skills-dashboard-fi
 
 describe('Topics and Skills Dashboard backend API service', () => {
   let topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService = null;
-  let httpTestingController: HttpTestingController = null;
+    TopicsAndSkillsDashboardBackendApiService;
+  let httpTestingController: HttpTestingController;
   let topicAndSkillsDashboardDataBackendDict:
     TopicsAndSkillsDashboardDataBackendDict;
   let topicAndSkillsDashboardBackendResponse: TopicsAndSkillDashboardData;
@@ -93,14 +93,14 @@ describe('Topics and Skills Dashboard backend API service', () => {
           id: 'HLEn0XQiV9XE',
           topic_model_created_on: 1623851496406.576,
           subtopic_count: 0,
-          thumbnail_bg_color: null,
+          thumbnail_bg_color: '#FFFFFF',
           canonical_story_count: 0,
           name: 'Empty Topic',
-          classroom: null,
+          classroom: 'math',
           total_skill_count: 0,
           additional_story_count: 0,
           topic_model_last_updated: 1623851496406.582,
-          thumbnail_filename: null
+          thumbnail_filename: 'thumbnail_filename'
         },
         {
           version: 3,
@@ -114,14 +114,14 @@ describe('Topics and Skills Dashboard backend API service', () => {
           id: 'JS7lmbdZRoPc',
           topic_model_created_on: 1623851496107.91,
           subtopic_count: 1,
-          thumbnail_bg_color: null,
+          thumbnail_bg_color: '#FFFFFF',
           canonical_story_count: 1,
           name: 'Dummy Topic 1',
-          classroom: null,
+          classroom: 'math',
           total_skill_count: 2,
           additional_story_count: 0,
           topic_model_last_updated: 1623851737518.369,
-          thumbnail_filename: null
+          thumbnail_filename: 'thumbnail_filename'
         }
       ],
       can_delete_skill: true,

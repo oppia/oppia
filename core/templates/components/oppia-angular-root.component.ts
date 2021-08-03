@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateCacheService } from 'ngx-translate-cache';
@@ -86,7 +86,6 @@ import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia
 import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
 import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import { NoninteractiveSvgdiagram } from 'rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
 import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
 import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
@@ -113,9 +112,6 @@ const componentMap = {
   Skillreview: {
     component_class: NoninteractiveSkillreview,
   },
-  Svgdiagram: {
-    component_class: NoninteractiveSvgdiagram,
-  },
   Tabs: {
     component_class: NoninteractiveTabs,
   },
@@ -123,6 +119,7 @@ const componentMap = {
     component_class: NoninteractiveVideo,
   }
 };
+
 @Component({
   selector: 'oppia-angular-root',
   templateUrl: './oppia-angular-root.component.html'
@@ -138,6 +135,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
+  static rteElementsAreInitialized: boolean = false;
   static rteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
@@ -148,7 +146,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static injector: Injector;
 
   constructor(
-    private changeDetectorRef: ChangeDetectorRef,
     private classroomBackendApiService: ClassroomBackendApiService,
     private documentAttributeCustomizationService:
       DocumentAttributeCustomizationService,
@@ -167,6 +164,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private urlService: UrlService,
     private injector: Injector
   ) {
+    if (OppiaAngularRootComponent.rteElementsAreInitialized) {
+      return;
+    }
+
     for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
       const rteElement = createCustomElement(
         componentMap[rteKey].component_class,
@@ -177,6 +178,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
         rteElement
       );
     }
+    OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
   public ngAfterViewInit(): void {
@@ -208,7 +210,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.injector = this.injector;
 
     // Initialize dynamic meta tags.
-    this.metaTagCustomizationService.addMetaTags([
+    this.metaTagCustomizationService.addOrReplaceMetaTags([
       {
         propertyType: 'name',
         propertyValue: 'application-name',
@@ -262,7 +264,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           }
         }
         this.documentAttributeCustomizationService.addAttribute('lang', code);
-        this.changeDetectorRef.detectChanges();
       }
     );
     this.translateCacheService.init();

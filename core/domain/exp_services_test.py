@@ -16,8 +16,8 @@
 
 """Unit tests for core.domain.exp_services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import logging
@@ -90,18 +90,19 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
 
@@ -1826,6 +1827,11 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
+    DUMMY_IMAGE_TAG = (
+        '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
+        'caption-with-value="&quot;&quot;"\n        filepath-with-value="'
+        '&quot;abc.png&quot;"></oppia-noninteractive-image>'
+    )
     SAMPLE_YAML_CONTENT = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -1886,7 +1892,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: ''
+      html: %s
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1931,6 +1937,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
+    DUMMY_IMAGE_TAG,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = (
@@ -1993,7 +2000,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: ''
+      html: %s
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2038,6 +2045,7 @@ title: A title
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
+    DUMMY_IMAGE_TAG,
     feconf.CURRENT_STATE_SCHEMA_VERSION))
 
     def test_export_to_zip_file(self):
@@ -2087,13 +2095,35 @@ title: A title
                         exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
                     'state_name': 'New state',
                     'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'New state',
+                    'old_value': state_domain.SubtitledHtml(
+                        'content', '').to_dict(),
+                    'new_value': state_domain.SubtitledHtml(
+                        'content',
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&quot;abc.png&quot;" caption-with-value="&quot;'
+                        '&quot;" alt-with-value="&quot;Image&quot;">'
+                        '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
+        fs.commit('image/abc.png', raw_image)
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
         zf = zipfile.ZipFile(python_utils.string_io(
             buffer_value=zip_file_output))
 
-        self.assertEqual(zf.namelist(), ['A title.yaml'])
+        self.assertEqual(
+            zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
@@ -2155,6 +2185,19 @@ title: A title
                         exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
                     'state_name': 'New state',
                     'new_value': 1
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'state_name': 'New state',
+                    'old_value': state_domain.SubtitledHtml(
+                        'content', '').to_dict(),
+                    'new_value': state_domain.SubtitledHtml(
+                        'content',
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&quot;abc.png&quot;" caption-with-value="'
+                        '&quot;&quot;" alt-with-value="&quot;Image&quot;">'
+                        '</oppia-noninteractive-image>').to_dict()
                 })], 'Add state name')
 
         with python_utils.open_file(
@@ -2225,6 +2268,18 @@ title: A title
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
             'state_name': 'New state',
             'new_value': 1
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'New state',
+            'old_value': state_domain.SubtitledHtml(
+                'content', '').to_dict(),
+            'new_value': state_domain.SubtitledHtml(
+                'content',
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;abc.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>').to_dict()
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -2233,7 +2288,7 @@ title: A title
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
-        fs.commit('abc.png', raw_image)
+        fs.commit('image/abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
@@ -5983,10 +6038,10 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         super(EditorAutoSavingUnitTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
