@@ -25,7 +25,7 @@ from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
+from typing import Any, Optional, Type, Iterator, Tuple, List # isort:skip # pylint: disable=unused-import
 
 (subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic]) # type: ignore[no-untyped-call]
 
@@ -74,3 +74,11 @@ class ValidateSubtopicPageCommitLogEntryModel(
             return subtopic_page_domain.SubtopicPageChange
         else:
             return None
+
+
+@validation_decorators.RelationshipsOf( # type: ignore[no-untyped-call, misc, name-defined]
+    subtopic_models.SubtopicPageCommitLogEntryModel)
+def subtopic_page_commit_log_entry_model_relationships(model):
+    # type: (Any) -> Iterator[Tuple[Any, List[Type[subtopic_models.SubtopicPageModel]]]]
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.subtopic_page_id, [subtopic_models.SubtopicPageModel]

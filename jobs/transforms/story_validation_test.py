@@ -20,7 +20,9 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import story_validation
 from jobs.types import base_validation_errors
 
@@ -318,3 +320,19 @@ class ValidateStoryCommitLogEntryModelTests(job_test_utils.PipelinedTestBase):
                 base_validation_errors.CommitCmdsNoneError( # type: ignore[no-untyped-call]
                     invalid_commit_cmd_model)
             ])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+    def test_story_commit_log_entry_model_relationships(self):
+        # type: () -> None
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+                'StoryCommitLogEntryModel', 'story_id'),
+            ['StoryModel'])
+
+    def test_story_summary_model_relationships(self):
+        # type: () -> None
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+                'StorySummaryModel', 'id'),
+            ['StoryModel'])

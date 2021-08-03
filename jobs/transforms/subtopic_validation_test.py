@@ -20,7 +20,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from core.platform import models
+from core.tests import test_utils
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import subtopic_validation
 from jobs.types import base_validation_errors
 
@@ -278,3 +280,12 @@ class ValidateSubtopicPageCommitLogEntryModelTests(
                 base_validation_errors.CommitCmdsNoneError( # type: ignore[no-untyped-call]
                     invalid_commit_cmd_model)
             ])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+    def test_subtopic_page_commit_log_entry_model_relationships(self):
+        # type: () -> None
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+                'SubtopicPageCommitLogEntryModel', 'subtopic_page_id'),
+            ['SubtopicPageModel'])
