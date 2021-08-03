@@ -99,7 +99,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   PAGE_SIZE = 8;
   Math = window.Math;
   username: string = '';
-  newLearnerDashboardPageIsDisplayed: boolean = true;
+  newLearnerDashboardPageIsDisplayed: boolean = false;
 
   isCurrentExpSortDescending: boolean;
   isCurrentSubscriptionSortDescending: boolean;
