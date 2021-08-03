@@ -30,7 +30,7 @@ import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance = {
     activityId: null,
     activityTitle: null,
     activityType: null
@@ -38,7 +38,7 @@ class MockNgbModalRef {
 }
 
 class MockRemoveActivityNgbModalRef {
-  componentInstance: {
+  componentInstance = {
     sectionNameI18nId: null,
     subsectionName: null,
     activityId: null,
@@ -239,7 +239,6 @@ describe('Learner playlist Backend Api service ', () => {
         untracked_topic_ids: []
       });
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
@@ -253,7 +252,6 @@ describe('Learner playlist Backend Api service ', () => {
   it('should remove an exploration from learner playlist' +
     ' when calling removeFromLearnerPlaylistModal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
@@ -288,7 +286,6 @@ describe('Learner playlist Backend Api service ', () => {
   it('should remove a collection from learner playlist' +
     ' when calling removeFromLearnerPlaylistModal', fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.resolve('success')
@@ -324,7 +321,6 @@ describe('Learner playlist Backend Api service ', () => {
     'button is clicked when calling removeFromLearnerPlaylistModal',
   fakeAsync(() => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockNgbModalRef,
           result: Promise.reject('fail')
@@ -360,7 +356,6 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('url')
@@ -389,7 +384,6 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
@@ -417,7 +411,6 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('url')
@@ -446,7 +439,6 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.resolve('success')
@@ -474,7 +466,6 @@ describe('Learner playlist Backend Api service ', () => {
       .toBeUndefined;
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>(
         { componentInstance: MockRemoveActivityNgbModalRef,
           result: Promise.reject('fail')

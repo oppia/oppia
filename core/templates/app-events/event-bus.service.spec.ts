@@ -18,7 +18,7 @@
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subject, Subscription } from 'rxjs';
-import { EventBusGroup, EventBusService } from './event-bus.service';
+import { EventBusGroup, EventBusService, Newable } from './event-bus.service';
 import { BaseEvent } from './app-events';
 
 abstract class EventWithMessage<T> extends BaseEvent {
@@ -46,7 +46,10 @@ describe('Event Bus Group', () => {
 
   it('should listen to an event', waitForAsync(() => {
     let value = '';
-    eventbusGroup.on(CustomEvent, event => value = event.message);
+    eventbusGroup.on(
+      CustomEvent as Newable<CustomEvent>,
+      event => value = event.message
+    );
     eventbusGroup.emit(new CustomEvent('Event'));
     eventbusGroup.unsubscribe();
     expect(value).toBe('Event');
@@ -55,11 +58,21 @@ describe('Event Bus Group', () => {
   it('should throw uncaught errors', waitForAsync(() => {
     spyOn(Subject.prototype, 'subscribe').and.callFake(
       (f) => {
+        // This throws "Argument of type '(f: PartialObserver<void> |
+        // ((value: string) => void)) => Subscription' is not assignable
+        // to parameter of type '{ (observer?: PartialObserver<any> |
+        // undefined): Subscription; (next: null | undefined, error: null |
+        // undefined, complete: () => void): Subscription; (next: null |
+        // undefined, error: (error: any) => void, complete?: (() => void) |
+        // undefined): Subscription; (next: (value: any) => void, error: null |
+        // undefined, complet...'.". We need to suppress this error because of
+        // strict type checking.
+        // @ts-ignore
         expect(() => f()).toThrowError('Error in event bus\nRandom Error');
         return new Subscription();
       }
     );
-    eventbusGroup.on(CustomEvent, _ => {
+    eventbusGroup.on(CustomEvent as Newable<CustomEvent>, _ => {
       throw new Error('Random Error');
     });
     eventbusGroup.emit(new CustomEvent('Event'));

@@ -55,10 +55,13 @@ interface LearnerGoalsResponseObject {
   providedIn: 'root'
 })
 export class LearnerDashboardActivityBackendApiService {
-  successfullyAdded: boolean;
-  addToLearnerPlaylistUrl: string;
-  addToLearnerGoalsUrl: string;
-  removeActivityModalStatus: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  addToLearnerPlaylistUrl!: string;
+  addToLearnerGoalsUrl!: string;
+  removeActivityModalStatus!: string;
+  successfullyAdded: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -166,7 +169,6 @@ export class LearnerDashboardActivityBackendApiService {
   async removeActivityModalAsync(
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
-    this.removeActivityModalStatus = null;
     const modelRef = this.ngbModal.open(
       RemoveActivityModalComponent, {backdrop: true});
     modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;

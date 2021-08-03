@@ -84,7 +84,7 @@ describe('ExplorationCreationService', () => {
       spyOn(ecbas, 'registerNewExplorationAsync');
       ecs.explorationCreationInProgress = true;
 
-      expect(ecs.createNewExploration()).toBe(undefined);
+      expect(ecs.createNewExploration()).toBeUndefined();
       expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
     });
 

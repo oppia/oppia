@@ -49,8 +49,8 @@ interface GuppySymbols {
 
 declare class Guppy {
   activate: () => void;
-  asciimath: () => void;
-  configure: () => void;
+  asciimath: () => string;
+  configure: (arg0: string, arg1: string) => void;
   deactivate: () => void;
   doc: () => Object;
   equations: () => Object[];
@@ -72,7 +72,14 @@ declare class Guppy {
   text: () => string;
   vars: () => string[];
   xml: () => string;
-
+  engine: {
+    insert_string: (arg0: string) => void;
+    insert_symbol: (arg0: string) => void;
+    backspace: () => void;
+    left: () => void;
+    right: () => void;
+    end: () => void;
+  };
   constructor(id: string, config: GuppyConfig);
 }
 

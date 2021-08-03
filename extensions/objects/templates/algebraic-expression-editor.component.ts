@@ -30,14 +30,18 @@ import { GuppyConfigurationService } from 'services/guppy-configuration.service'
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { MathInteractionsService } from 'services/math-interactions.service';
 
+type FocusObj = { focused: boolean; };
+
 @Component({
   selector: 'algebraic-expression-editor',
   templateUrl: './algebraic-expression-editor.component.html'
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-
-  @Input() value;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged: EventEmitter<string> = new EventEmitter<string>();
   warningText: string = '';
   hasBeenTouched: boolean = false;
@@ -56,7 +60,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.value === null) {
+    if (this.value === undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
@@ -73,7 +77,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       // We need the 'focus' event while using the on screen keyboard (only
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: FocusObj) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -88,7 +92,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       // We need the 'focus' event while using the on screen keyboard (only
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
-      Guppy.event('change', (focusObj) => {
+      Guppy.event('change', (focusObj: FocusObj) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -100,7 +104,7 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
           this.isCurrentAnswerValid();
         }
       });
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: FocusObj) => {
         if (!focusObj.focused) {
           this.isCurrentAnswerValid();
         }
@@ -109,9 +113,6 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
   }
 
   isCurrentAnswerValid(): boolean {
-    if (this.currentValue === undefined) {
-      this.currentValue = '';
-    }
     // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
     // is not compatible with nerdamer or with the backend validations.
     this.currentValue = this.mathInteractionsService.replaceAbsSymbolWithText(
