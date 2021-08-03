@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient, HttpXhrBackend,
@@ -546,7 +546,8 @@ export class UpgradedServices {
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['ConnectionService'] = new ConnectionService(
       new WindowRef(),
-      upgradedServices['HttpClient']);
+      upgradedServices['HttpClient'],
+      new NgZone({}));
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();
