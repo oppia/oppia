@@ -485,6 +485,172 @@ class TranslationSuggestionUnicodeFixOneOffJobTests(
             valid_suggestion.change.translation_html, 'চালিয়ে যান')
 
 
+class TranslationSuggestionSvgDiagramOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID = 'question_id'
+
+    def setUp(self):
+        super(TranslationSuggestionSvgDiagramOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+    def _run_job_and_verify_output(self, expected_output):
+        """Runs the QuestionSuggestionMigrationJobManager and
+        verifies that the output matches the expected output.
+
+        Args:
+            expected_output: list(str). The expected output from the one off
+                job.
+        """
+        job_id = (
+            suggestion_jobs_one_off
+            .TranslationSuggestionSvgDiagramOneOffJob.create_new())
+        (
+            suggestion_jobs_one_off
+            .TranslationSuggestionSvgDiagramOneOffJob.enqueue(job_id)
+        )
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            suggestion_jobs_one_off
+            .TranslationSuggestionSvgDiagramOneOffJob.get_output(job_id))
+
+        self.assertItemsEqual(actual_output, expected_output)
+
+    def test_non_translation_suggestions_are_skipped(self):
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': [self.skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': self.skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.skill_id, 1,
+            self.albert_id, suggestion_change, 'test description')
+
+        self._run_job_and_verify_output([])
+
+    def test_replaces_svgdiagram_tag_with_image_tag(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'bn',
+            'content_html': '',
+            'translation_html': (
+                '<oppia-noninteractive-svgdiagram '
+                'svg_filename-with-value="&quot;img1.svg&quot;"'
+                ' alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-svgdiagram>'
+            ),
+            'data_format': 'html'
+        }
+
+        invalid_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        self.assertEqual(
+            invalid_suggestion.change.translation_html,
+            '<oppia-noninteractive-svgdiagram '
+            'svg_filename-with-value="&quot;img1.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-svgdiagram>')
+
+        expected_output = [
+            u'[u\'UPDATED\', [u\'%s | content\']]'
+            % invalid_suggestion.suggestion_id,
+        ]
+        self._run_job_and_verify_output(expected_output)
+
+        valid_suggestion = suggestion_services.get_suggestion_by_id(
+            invalid_suggestion.suggestion_id)
+        self.assertEqual(
+            valid_suggestion.change.translation_html,
+            '<oppia-noninteractive-image alt-with-value=\'\"Image\"\''
+            ' caption-with-value="&amp;quot;&amp;quot;" '
+            'filepath-with-value=\'\"img1.svg\"\'>'
+            '</oppia-noninteractive-image>')
+
+    def test_skips_modifying_suggestions_without_svgdiagram_tag(self):
+        exp_id = 'EXP_ID'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, title='title', category='category',
+            language_code='bn')
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'Continue')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'bn',
+            'content_html': '',
+            'translation_html': (
+                '<oppia-noninteractive-image '
+                'filename-with-value="&quot;img1.svg&quot;"'
+                ' alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>'
+            ),
+            'data_format': 'html'
+        }
+
+        valid_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id, exploration.version,
+            self.albert_id, add_translation_change_dict,
+            'test description')
+        self.assertEqual(
+            valid_suggestion.change.translation_html,
+            '<oppia-noninteractive-image '
+            'filename-with-value="&quot;img1.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+
+        expected_output = [u'[u\'SKIPPED\', 1]']
+        self._run_job_and_verify_output(expected_output)
+
+        valid_suggestion = suggestion_services.get_suggestion_by_id(
+            valid_suggestion.suggestion_id)
+        self.assertEqual(
+            valid_suggestion.change.translation_html,
+            '<oppia-noninteractive-image '
+            'filename-with-value="&quot;img1.svg&quot;"'
+            ' alt-with-value="&quot;Image&quot;">'
+            '</oppia-noninteractive-image>')
+
+
 class PopulateTranslationContributionStatsOneOffJobTests(
         test_utils.GenericTestBase):
 
