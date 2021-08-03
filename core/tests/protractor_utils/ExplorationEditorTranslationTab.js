@@ -28,6 +28,11 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
     by.css('.protractor-test-translation-tab-welcome-modal'));
+  var buttons = element.all(by.css('.ng-joyride .skipBtn'));
+  var nextTutorialStageButton = element.all(by.css('.ng-joyride .nextBtn'));
+  var translationTabStartTutorialElement = element(by.css(
+    '.protractor-test-translation-tab-start-tutorial'));
+  var titleElement = element(by.css('.ng-joyride-title'));
 
   this.exitTutorial = async function() {
     // If the translation welcome modal shows up, exit it.
@@ -38,7 +43,6 @@ var ExplorationEditorTranslationTab = function() {
       'Translation welcome modal takes too long to disappear');
 
     // Otherwise, if the translation tutorial shows up, exit it.
-    var buttons = element.all(by.css('.ng-joyride .skipBtn'));
     if (await buttons.count() === 1) {
       await action.click('Skip button', button.get(0));
     } else if (await buttons.count() !== 0) {
@@ -76,7 +80,6 @@ var ExplorationEditorTranslationTab = function() {
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + ' is not visible');
       // Progress to the next instruction in the tutorial.
-      var nextTutorialStageButton = element.all(by.css('.ng-joyride .nextBtn'));
       await waitFor.elementToBeClickable(
         nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
@@ -96,11 +99,9 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       translationWelcomeModal,
       'Translation welcome modal takes too long to appear');
-    await element(by.css(
-      '.protractor-test-translation-tab-start-tutorial')).click();
+    await translationTabStartTutorialElement.click();
     await waitFor.visibilityOf(
-      element(by.css('.ng-joyride-title')),
-      'Translation tutorial modal takes too long to appear');
+      titleElement, 'Translation tutorial modal takes too long to appear');
   };
 
   var startRecordButton = element(
@@ -185,6 +186,11 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-close-audio-upload-modal'));
   var audioUploadContainerElement = element(by.css(
     '.protractor-test-audio-upload-container'));
+  var nodeLabelLocator = by.css('.protractor-test-node-label');
+  var stateTranslationEditorLocator = by.css(
+    '.protractor-test-state-translation-editor');
+  var activeTranslationTabElement = element(
+    by.css('.protractor-test-active-translation-tab'));
   var translationFeedback = function(index) {
     return element(by.css('.protractor-test-feedback-' + index));
   };
@@ -206,7 +212,7 @@ var ExplorationEditorTranslationTab = function() {
     await action.click('Language button', languageButton);
   };
   var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
+    return nodeElement.element(nodeLabelLocator);
   };
 
   this.deleteAudioRecord = async function() {
@@ -280,7 +286,7 @@ var ExplorationEditorTranslationTab = function() {
     var stateTranslationEditorTag = element(
       by.tagName('state-translation-editor'));
     var stateTranslationEditor = stateTranslationEditorTag.element(
-      by.css('.protractor-test-state-translation-editor'));
+      stateTranslationEditorLocator);
     await waitFor.visibilityOf(
       stateTranslationEditor,
       'stateTranslationEditor taking too long to appear to set content');
@@ -537,8 +543,8 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectFeedbackTabToBeActive = function() {
     expect(
-      element(by.css('.protractor-test-translation-feedback-tab'))[0]
-    ).toEqual(element(by.css('.protractor-test-active-translation-tab'))[0]);
+      feedbackTabButton[0]
+    ).toEqual(activeTranslationTabElement[0]);
   };
 
   this.moveToState = async function(targetName) {
