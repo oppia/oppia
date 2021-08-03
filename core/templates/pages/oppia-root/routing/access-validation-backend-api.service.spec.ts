@@ -71,7 +71,8 @@ describe('Access validation backend api service', () => {
   }));
 
   it('should validate access to classroom page', fakeAsync(() => {
-    avbas.validateAccessToClassroomPage('').then(successSpy, failSpy);
+    let fragment = 'invalid';
+    avbas.validateAccessToClassroomPage(fragment).then(successSpy, failSpy);
 
     const resp = {
       valid: true,
@@ -79,7 +80,8 @@ describe('Access validation backend api service', () => {
     };
 
     const req = httpTestingController.expectOne(
-      '/access_validator/can_access_classroom_page');
+      '/access_validator/can_access_classroom_page?classroom_url_fragment=' +
+      fragment);
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
