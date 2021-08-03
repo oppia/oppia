@@ -29,15 +29,15 @@ describe('Player correctness feedback enabled service', () => {
   });
 
   it('should set correctness feedback value to true', () => {
-    // Initially the value is false
+    // Initially the value is false.
     expect(pcfes.isEnabled()).toBe(false);
     pcfes.init(true);
     expect(pcfes.isEnabled()).toBe(true);
   });
 
   it('should set correctness feedback value to false when set to true', () => {
-    // Initially the value is false
-    // it is set to true first
+    // Initially the value is false.
+    // So, it is set to true first.
     pcfes.init(true);
     expect(pcfes.isEnabled()).toBe(true);
     pcfes.init(false);
