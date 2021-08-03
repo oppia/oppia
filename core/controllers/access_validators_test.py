@@ -25,6 +25,7 @@ import feconf
 
 ACCESS_VALIDATORS_PREFIX = feconf.ACCESS_VALIDATORS_PREFIX
 
+
 class SplashPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks that the user is redirected according to login status when
     request is made to '/'."""
@@ -109,7 +110,7 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
 
 class ReleaseCoordinatorAccessValidationHandlerTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     """Test for release coordinator access validation."""
 
     def setUp(self):
@@ -139,13 +140,12 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
 
         response = self.get_json(
             '%s/can_access_release_coordinator_page' %
-                                 ACCESS_VALIDATORS_PREFIX)
+            ACCESS_VALIDATORS_PREFIX)
         self.assertTrue(response['valid'])
 
 
-
 class AccountDeletionIsEnabledValidationHandlerTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
 
     def setUp(self):
         super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp()
@@ -164,6 +164,7 @@ class AccountDeletionIsEnabledValidationHandlerTests(
                 '%s/account_deletion_is_enabled' % ACCESS_VALIDATORS_PREFIX)
             self.assertFalse(response['valid'])
 
+
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -176,7 +177,7 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(
             '%s/does_profile_exist/%s' % (
-              ACCESS_VALIDATORS_PREFIX, self.EDITOR_USERNAME))
+                ACCESS_VALIDATORS_PREFIX, self.EDITOR_USERNAME))
         self.assertTrue(response['valid'])
         self.logout()
 
@@ -185,18 +186,19 @@ class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.get_json(
             '%s/does_profile_exist/%s' % (
-              ACCESS_VALIDATORS_PREFIX, self.EDITOR_USERNAME))
+                ACCESS_VALIDATORS_PREFIX, self.EDITOR_USERNAME))
         self.assertTrue(response['valid'])
         self.logout()
 
-    def test_profile_validation_returns_false_if_user_views_non_existent_profile(self):
+    def test_profile_validation_returns_false_if_profile_doesnot_exist(self):
         # Editor looks at non-existing profile page.
         self.login(self.EDITOR_EMAIL)
         response = self.get_json(
             '%s/does_profile_exist/%s' % (
-              ACCESS_VALIDATORS_PREFIX, self.BLOG_ADMIN_USERNAME))
+                ACCESS_VALIDATORS_PREFIX, self.BLOG_ADMIN_USERNAME))
         self.assertFalse(response['valid'])
         self.logout()
+
 
 class ManageOwnAccountValidationHandlerTests(test_utils.GenericTestBase):
 
