@@ -1297,8 +1297,11 @@ class ExplorationStatsModel(base_models.BaseModel):
         return exploration_stats_models
 
     @classmethod
-    def get_multi_stats_models(cls, exp_version_references):
-        # type: (List[exp_domain.ExpVersionReference]) -> List[Optional[ExplorationStatsModel]]
+    def get_multi_stats_models(
+            cls,
+            exp_version_references # type: List[exp_domain.ExpVersionReference]
+    ):
+        # type: (...) -> List[Optional[ExplorationStatsModel]]
         """Gets stats model instances for each exploration and the corresponding
         version number.
 
@@ -1514,9 +1517,14 @@ class PlaythroughModel(base_models.BaseModel):
     # TypedDict/Domain Object to remove Any used below.
     @classmethod
     def create(
-            cls, exp_id, exp_version, issue_type, issue_customization_args,
-            actions):
-        # type: (Text, int, Text, Dict[Text, Any], List[Dict[Text, Any]]) -> Text
+            cls,
+            exp_id, # type: Text
+            exp_version, # type: int
+            issue_type, # type: Text
+            issue_customization_args, # type: Dict[Text, Any]
+            actions # type: List[Dict[Text, Any]]
+    ):
+        # type: (...) -> Text
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
 
@@ -2153,9 +2161,12 @@ class StateAnswersModel(base_models.BaseModel):
     # to remove Any used below.
     @classmethod
     def _shard_answers(
-            cls, current_answer_list, current_answer_list_size,
-            new_answer_list):
-        # type: (List[Dict[Text, Any]], int, List[Dict[Text, Any]]) -> Tuple[List[List[Dict[Text, Any]]], List[int]]
+            cls,
+            current_answer_list, # type: List[Dict[Text, Any]]
+            current_answer_list_size, # type: int
+            new_answer_list # type: List[Dict[Text, Any]]
+    ):
+        # type: (...) -> Tuple[List[List[Dict[Text, Any]]], List[int]]
         """Given a current answer list which can fit within one NDB entity and
         a list of new answers which need to try and fit in the current answer
         list, shard the answers such that a list of answer lists are returned.

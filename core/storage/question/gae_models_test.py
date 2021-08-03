@@ -517,8 +517,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
-        def mock_random_sample(alist, num):
-            # type: (List[question_models.QuestionSkillLinkModel], int) -> List[question_models.QuestionSkillLinkModel]
+        def mock_random_sample(
+                alist, # type: List[question_models.QuestionSkillLinkModel]
+                num # type: int
+        ):
+            # type: (...) -> List[question_models.QuestionSkillLinkModel]
             if num >= len(alist):
                 return alist
             alist.sort(key=lambda x: x.question_id)
@@ -721,8 +724,11 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
              questionskilllink_model3, questionskilllink_model4,
              questionskilllink_model5, questionskilllink_model6,
              questionskilllink_model7, questionskilllink_model8])
-        def mock_random_sample(alist, num):
-            # type: (List[question_models.QuestionSkillLinkModel], int) -> List[question_models.QuestionSkillLinkModel]
+        def mock_random_sample(
+                alist, # type: List[question_models.QuestionSkillLinkModel]
+                num # type: int
+        ):
+            # type: (...) -> List[question_models.QuestionSkillLinkModel]
             if num >= len(alist):
                 return alist
             alist.sort(key=lambda x: x.question_id)

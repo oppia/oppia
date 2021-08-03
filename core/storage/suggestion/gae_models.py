@@ -572,8 +572,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
     # to remove Any used below.
     @classmethod
-    def export_data(cls, user_id):
-        # type: (Text) -> Dict[Text, Dict[Text, Union[Text, int, bool, Dict[Text, Any], None]]]
+    def export_data(
+            cls,
+            user_id # type: Text
+    ):
+        # type: (...) -> Dict[Text, Dict[Text, Union[Text, int, bool, Dict[Text, Any], None]]]
         """Exports the data from GeneralSuggestionModel
         into dict format for Takeout.
 
@@ -819,6 +822,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     question_suggestion_count = (
         datastore_services.IntegerProperty(required=True))
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def get(cls): # type: ignore[override]
         # type: () -> Optional[CommunityContributionStatsModel]
@@ -991,9 +997,17 @@ class TranslationContributionStatsModel(base_models.BaseModel):
             '%s.%s.%s' % (language_code, contributor_user_id, topic_id)
         )
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.get().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(cls, language_code, contributor_user_id, topic_id): # type: ignore[override]
-        # type: (Text, Text, Text) -> Optional[TranslationContributionStatsModel]
+    def get(
+            cls,
+            language_code, # type: Text
+            contributor_user_id, # type: Text
+            topic_id # type: Text
+    ): # type: ignore[override]
+        # type: (...) -> Optional[TranslationContributionStatsModel]
         """Gets the TranslationContributionStatsModel matching the supplied
         language_code, contributor_user_id, topic_id.
 

@@ -236,10 +236,11 @@ class SkillModel(base_models.VersionedModel):
             SkillModel|None. The skill model of the skill or None if not
             found.
         """
-        results = SkillModel.query().filter(
-            cls.description == description).filter(
-                cls.deleted == False).get() # pylint: disable=singleton-comparison
-        return cast(Optional[SkillModel], results)
+        return cast(
+            Optional[SkillModel],
+            SkillModel.query().filter(
+                cls.description == description).filter(
+                    cls.deleted == False).get()) # pylint: disable=singleton-comparison
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -306,8 +307,13 @@ class SkillSummaryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def fetch_page(cls, page_size, urlsafe_start_cursor, sort_by):
-        # type: (int, Optional[Text], Optional[Text]) -> Tuple[List[SkillSummaryModel], Optional[Text], bool]
+    def fetch_page(
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            sort_by # type: Optional[Text]
+    ):
+        # type: (...) -> Tuple[List[SkillSummaryModel], Optional[Text], bool]
         """Returns the models according to values specified.
 
         Args:

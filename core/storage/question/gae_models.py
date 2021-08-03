@@ -224,9 +224,14 @@ class QuestionModel(base_models.VersionedModel):
     # to remove Any used below.
     @classmethod
     def create(
-            cls, question_state_data, language_code, version, linked_skill_ids,
-            inapplicable_skill_misconception_ids):
-        # type: (Dict[Text, Any], Text, int, List[Text], List[Text]) -> QuestionModel
+            cls,
+            question_state_data, # type: Dict[Text, Any]
+            language_code, # type: Text
+            version, # type: int
+            linked_skill_ids, # type: List[Text]
+            inapplicable_skill_misconception_ids # type: List[Text]
+    ):
+        # type: (...) -> QuestionModel
         """Creates a new QuestionModel entry.
 
         Args:
@@ -390,12 +395,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
         ) * question_count
 
-        question_skill_link_models = cls.query(
-            cls.skill_id.IN(skill_ids)
-        ).order(-cls.last_updated).fetch(
-            question_skill_count, offset=offset)
-
-        return cast(List[QuestionSkillLinkModel], question_skill_link_models)
+        return cast(
+            List[QuestionSkillLinkModel],
+            cls.query(
+                cls.skill_id.IN(skill_ids)
+            ).order(-cls.last_updated).fetch(
+                question_skill_count, offset=offset))
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
@@ -461,11 +466,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            results = equal_questions_query.fetch(
-                limit=question_count_per_skill * 2,
-                offset=get_offset(equal_questions_query))
             new_question_skill_link_models = cast(
-                List[QuestionSkillLinkModel], results)
+                List[QuestionSkillLinkModel],
+                equal_questions_query.fetch(
+                    limit=question_count_per_skill * 2,
+                    offset=get_offset(equal_questions_query)))
             for model in new_question_skill_link_models:
                 if model.question_id in question_skill_link_mapping:
                     new_question_skill_link_models.remove(model)
@@ -478,12 +483,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # requested difficulty.
                 easier_questions_query = query.filter(
                     cls.skill_difficulty < difficulty_requested)
-                results = (
+                easier_question_skill_link_models = cast(
+                    List[QuestionSkillLinkModel],
                     easier_questions_query.fetch(
                         limit=question_count_per_skill * 2,
                         offset=get_offset(easier_questions_query)))
-                easier_question_skill_link_models = cast(
-                    List[QuestionSkillLinkModel], results)
                 for model in easier_question_skill_link_models:
                     if model.question_id in question_skill_link_mapping:
                         easier_question_skill_link_models.remove(model)
@@ -510,10 +514,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                         harder_questions_query.fetch(
                             limit=question_count_per_skill * 2,
                             offset=get_offset(harder_questions_query)))
-                    results = (
-                        harder_questions_query.fetch())
                     harder_question_skill_link_models = cast(
-                        List[QuestionSkillLinkModel], results)
+                        List[QuestionSkillLinkModel],
+                        harder_questions_query.fetch())
                     for model in harder_question_skill_link_models:
                         if model.question_id in question_skill_link_mapping:
                             harder_question_skill_link_models.remove(model)
@@ -590,11 +593,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            results = query.fetch(
-                limit=question_count_per_skill * 2,
-                offset=get_offset(query))
+            results =
             new_question_skill_link_models = cast(
-                List[QuestionSkillLinkModel], results)
+                List[QuestionSkillLinkModel],
+                query.fetch(
+                    limit=question_count_per_skill * 2,
+                    offset=get_offset(query)))
             # Deduplicate if the same question is linked to multiple skills.
             for model in new_question_skill_link_models:
                 if model.question_id in existing_question_ids:
@@ -651,9 +655,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             domains that are linked to the skill ID. None if the skill
             ID doesn't exist.
         """
-        results = QuestionSkillLinkModel.query().filter(
-            cls.skill_id == skill_id).fetch()
-        return cast(Optional[List[QuestionSkillLinkModel]], results)
+        return cast(
+            Optional[List[QuestionSkillLinkModel]],
+            QuestionSkillLinkModel.query().filter(
+                cls.skill_id == skill_id).fetch())
 
     @classmethod
     def get_models_by_question_id(cls, question_id):
@@ -669,10 +674,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             models that are linked to the question ID, or None if there are no
             question skill link models associated with the question ID.
         """
-        results = QuestionSkillLinkModel.query().filter(
-            cls.question_id == question_id,
-            cls.deleted == False).fetch() #pylint: disable=singleton-comparison
-        return cast(Optional[List[QuestionSkillLinkModel]], results)
+        results =
+        return cast(
+            Optional[List[QuestionSkillLinkModel]],
+            QuestionSkillLinkModel.query().filter(
+                cls.question_id == question_id,
+                cls.deleted == False).fetch()) #pylint: disable=singleton-comparison
 
     @classmethod
     def put_multi_question_skill_links(cls, question_skill_links):
