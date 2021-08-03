@@ -150,6 +150,10 @@ describe('Base Content Component', () => {
     cookieService = TestBed.inject(CookieService);
   });
 
+  afterEach(() => {
+    componentInstance.ngOnDestroy();
+  });
+
   it('should create', () => {
     expect(componentInstance).toBeDefined();
   });
