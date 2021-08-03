@@ -16,13 +16,13 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
+import { ExplorationDraft, ExplorationChange } from 'domain/exploration/exploration-draft.model';
 
 describe('ExplorationDraft model', () => {
   describe('exploration draft model', () => {
-    var draftChangeListId = 2;
-    var changeList = [];
-    var draftDict = {
+    const draftChangeListId = 2;
+    const changeList: ExplorationChange[] = [];
+    const draftDict = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListId
     };

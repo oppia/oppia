@@ -33,7 +33,8 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
 
-type DataFormatToDefaultValuesKey = keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
+export type DataFormatToDefaultValuesKey = (
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
 
 export interface TranslationBackendDict {
   'data_format': string;
@@ -43,7 +44,7 @@ export interface TranslationBackendDict {
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: string,
+      public dataFormat: DataFormatToDefaultValuesKey,
       public translation: string|string[],
       public needsUpdate: boolean
   ) {}
@@ -105,14 +106,16 @@ export class WrittenTranslationObjectFactory {
     }
 
     return new WrittenTranslation(
-      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[
-        <DataFormatToDefaultValuesKey> dataFormat], false);
+      <DataFormatToDefaultValuesKey> dataFormat,
+      DATA_FORMAT_TO_DEFAULT_VALUES[<DataFormatToDefaultValuesKey> dataFormat],
+      false
+    );
   }
 
   createFromBackendDict(
       translationBackendDict: TranslationBackendDict): WrittenTranslation {
     return new WrittenTranslation(
-      translationBackendDict.data_format,
+      <DataFormatToDefaultValuesKey> translationBackendDict.data_format,
       translationBackendDict.translation,
       translationBackendDict.needs_update);
   }
