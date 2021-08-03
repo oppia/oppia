@@ -2033,6 +2033,7 @@ class StateAnswersModel(base_models.BaseModel):
                 exploration_id, exploration_version, state_name,
                 main_shard.shard_count)
 
+        # Ruling out the possibility of None for mypy type checking.
         assert last_shard is not None
         sharded_answer_lists, sharded_answer_list_sizes = cls._shard_answers(
             last_shard.submitted_answer_list,

@@ -535,6 +535,7 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
 
+        # Ruling out the possibility of None for mypy type checking.
         assert snapshot_metadata_model is not None
         snapshot_metadata_model.content_user_ids = list(sorted(set(
             self.manager_ids)))

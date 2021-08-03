@@ -39,9 +39,11 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             source_text='hello world',
             translated_text='hola mundo'
         )
+        # Ruling out the possibility of None for mypy type checking.
         assert model_id is not None
         translation_model = (
             translation_models.MachineTranslationModel.get(model_id))
+        # Ruling out the possibility of None for mypy type checking.
         assert translation_model is not None
         self.assertEqual(translation_model.translated_text, 'hola mundo')
 
@@ -73,6 +75,7 @@ class MachineTranslationModelTests(test_utils.GenericTestBase):
             )
         )
         self.assertIsNotNone(translation)
+        # Ruling out the possibility of None for mypy type checking.
         assert translation is not None
         self.assertEqual(translation.translated_text, 'hola mundo')
 

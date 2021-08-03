@@ -99,6 +99,7 @@ class StoryModelTest(test_utils.GenericTestBase):
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_url_fragment('unique-url')
 
+        # Ruling out the possibility of None for mypy type checking.
         assert story_by_id is not None
         self.assertEqual(story_by_id.description, 'description')
         self.assertEqual(story_by_id.id, 'id')

@@ -1375,6 +1375,7 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.CommunityContributionStatsModel.get()
         )
 
+        # Ruling out the possibility of None for mypy type checking.
         assert community_contribution_stats_model is not None
         self.assertEqual(
             community_contribution_stats_model.id,
@@ -1413,6 +1414,7 @@ class CommunityContributionStatsModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.CommunityContributionStatsModel.get()
         )
 
+        # Ruling out the possibility of None for mypy type checking.
         assert community_contribution_stats_model is not None
         self.assertEqual(
             community_contribution_stats_model.id,
@@ -1493,6 +1495,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
             )
         )
 
+        # Ruling out the possibility of None for mypy type checking.
         assert translation_contribution_stats_model is not None
         self.assertEqual(
             translation_contribution_stats_model.language_code,
