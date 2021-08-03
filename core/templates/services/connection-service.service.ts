@@ -16,7 +16,7 @@
  * @fileoverview Service to check for the network & internet connection.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, NgZone } from '@angular/core';
 import { Subscription, timer } from 'rxjs';
 import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 // eslint-disable-next-line oppia/disallow-httpclient
@@ -60,7 +60,8 @@ export class ConnectionService {
 
   constructor(
       private windowRef: WindowRef,
-      private http: HttpClient) {
+      private http: HttpClient,
+      private ngZone: NgZone) {
     this.httpSubscription = new Subscription();
   }
 
@@ -69,27 +70,29 @@ export class ConnectionService {
     // It sends a periodic GET request to the server to check if the
     // browser has Internet access and emits the current state of the
     // connection.
-    this.httpSubscription.add(timer(
-      0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
-      .pipe(
-        switchMap(() => {
-          if (this.currentState.hasNetworkConnection) {
-            return this.http.get<ConnectionCheckResponse>(
-              this.checkConnectionUrl).toPromise();
-          }
-        }),
-        retryWhen(errors => errors.pipe(
-          tap(val => {
-            this.currentState.hasInternetAccess = false;
-            this._connectionStateChangeEventEmitter.emit(this.currentState);
+    this.ngZone.runOutsideAngular(() => {
+      this.httpSubscription.add(timer(
+        0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
+        .pipe(
+          switchMap(() => {
+            if (this.currentState.hasNetworkConnection) {
+              return this.http.get<ConnectionCheckResponse>(
+                this.checkConnectionUrl).toPromise();
+            }
           }),
-          delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
-        )
-        )
-      ).subscribe(result => {
-        this.currentState.hasInternetAccess = true;
-        this._connectionStateChangeEventEmitter.emit(this.currentState);
-      }));
+          retryWhen(errors => errors.pipe(
+            tap(val => {
+              this.currentState.hasInternetAccess = false;
+              this._connectionStateChangeEventEmitter.emit(this.currentState);
+            }),
+            delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
+          )
+          )
+        ).subscribe(result => {
+          this.currentState.hasInternetAccess = true;
+          this._connectionStateChangeEventEmitter.emit(this.currentState);
+        }));
+    });
   }
 
   checkNetworkState(): void {

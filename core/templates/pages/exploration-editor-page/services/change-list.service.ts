@@ -157,7 +157,7 @@ export class ChangeListService implements OnInit {
     if (this.loadingMessage) {
       return;
     }
-    if (this.connectionStatus === 'OFFLINE') {
+    if (this.connectionStatus === AppConstants.CONNECTION_STATUS_OFFLINE) {
       this.temporaryListOfChanges.push(changeDict);
     } else {
       this.explorationChangeList.push(changeDict);
