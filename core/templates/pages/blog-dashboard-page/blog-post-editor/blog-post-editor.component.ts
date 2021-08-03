@@ -62,7 +62,7 @@ export class BlogPostEditorComponent implements OnInit {
   thumbnailDataUrl: string;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
-  latestChangesarePublished: boolean = false;
+  lastChangesWerePublished: boolean = false;
   MAX_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
@@ -132,7 +132,7 @@ export class BlogPostEditorComponent implements OnInit {
                 this.blogPostData.thumbnailFilename);
           }
           if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
-            this.latestChangesarePublished = true;
+            this.lastChangesWerePublished = true;
           }
         }, (errorResponse) => {
           if (
@@ -221,11 +221,11 @@ export class BlogPostEditorComponent implements OnInit {
           this.alertsService.addSuccessMessage(
             'Blog Post Saved and Published Succesfully.'
           );
-          this.latestChangesarePublished = true;
+          this.lastChangesWerePublished = true;
         } else {
           this.alertsService.addSuccessMessage(
             'Blog Post Saved Succesfully.');
-          this.latestChangesarePublished = false;
+          this.lastChangesWerePublished = false;
         }
         this.newChangesAreMade = false;
       }, (errorResponse) => {
@@ -303,6 +303,18 @@ export class BlogPostEditorComponent implements OnInit {
     this.ngbModal.open(BlogCardPreviewModalComponent, {
       backdrop: 'static'
     });
+  }
+
+  isPublishButtonDisabled(): boolean {
+    if (this.blogPostData.prepublishValidate(this.maxAllowedTags).length > 0) {
+      return true;
+    } else if (this.newChangesAreMade) {
+      return false;
+    } else if (!this.lastChangesWerePublished) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
 
