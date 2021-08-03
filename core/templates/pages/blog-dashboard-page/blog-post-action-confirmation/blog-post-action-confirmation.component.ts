@@ -42,29 +42,17 @@ export class BlogPostActionConfirmationModalComponent
   }
 
   isActionDelete(): boolean {
-    if (this.blogPostAction === (
-      BlogDashboardPageConstants.BLOG_POST_ACTIONS.DELETE)) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.blogPostAction === (
+      BlogDashboardPageConstants.BLOG_POST_ACTIONS.DELETE);
   }
 
   isActionPublish(): boolean {
-    if (this.blogPostAction === (
-      BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH)) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.blogPostAction === (
+      BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH);
   }
 
   isActionUnpublish(): boolean {
-    if (this.blogPostAction === (
-      BlogDashboardPageConstants.BLOG_POST_ACTIONS.UNPUBLISH)) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.blogPostAction === (
+      BlogDashboardPageConstants.BLOG_POST_ACTIONS.UNPUBLISH);
   }
 }

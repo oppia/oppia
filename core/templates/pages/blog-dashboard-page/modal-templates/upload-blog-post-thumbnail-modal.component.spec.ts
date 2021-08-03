@@ -19,7 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UploadBlogPostThumbnailModalComponent } from './upload-blog-post-thumbnail-modal.component';
 import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail.component';
@@ -35,23 +35,26 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
+        NgbModalModule,
       ],
       declarations: [
         MockTranslatePipe,
-        UploadBlogPostThumbnailComponent
+        UploadBlogPostThumbnailComponent,
+        UploadBlogPostThumbnailModalComponent
       ],
       providers: [
         NgbActiveModal,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    confirmSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UploadBlogPostThumbnailModalComponent);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     component = fixture.componentInstance;
+    dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    confirmSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
   });
 
   it('should dismiss the modal on calling cancel function', () => {

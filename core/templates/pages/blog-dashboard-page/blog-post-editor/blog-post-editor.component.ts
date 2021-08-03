@@ -58,8 +58,6 @@ export class BlogPostEditorComponent implements OnInit {
   defaultTagsList: string[];
   maxAllowedTags: number;
   contentEditorIsActive: boolean = true;
-  allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  filename: string;
   localEdittedContent: string;
   thumbnailDataUrl: string;
   invalidImageWarningIsShown: boolean = false;
@@ -75,16 +73,16 @@ export class BlogPostEditorComponent implements OnInit {
 
   constructor(
     private alertsService: AlertsService,
-    private blogPostEditorBackendService: BlogPostEditorBackendApiService,
-    private loaderService: LoaderService,
-    private urlInterpolationService: UrlInterpolationService,
+    private assetsBackendApiService: AssetsBackendApiService,
     private blogDashboardPageService: BlogDashboardPageService,
-    private ngbModal: NgbModal,
+    private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private blogPostUpdateService: BlogPostUpdateService,
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private assetsBackendApiService: AssetsBackendApiService,
+    private loaderService: LoaderService,
+    private ngbModal: NgbModal,
+    private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
   ) {}
 
