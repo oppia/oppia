@@ -140,7 +140,7 @@ describe('Progress tab Component', () => {
     [LearnerTopicSummary.createFromBackendDict(
       learnerTopicSummaryBackendDict1)];
     component.learntTopicsList = [];
-    spyOn(learnerDashboardBackendApiService, 'getFetchSubtopicMastery')
+    spyOn(learnerDashboardBackendApiService, 'fetchSubtopicMastery')
       .and.returnValue(Promise.resolve({}));
     component.displaySkills = [false];
     fixture.detectChanges();

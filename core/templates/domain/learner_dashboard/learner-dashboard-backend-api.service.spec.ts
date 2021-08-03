@@ -481,7 +481,7 @@ describe('Learner Dashboard Backend API Service', () => {
     let failHandler = jasmine.createSpy('fail');
     var topicIds = 'topic_id';
 
-    learnerDashboardBackendApiService.getFetchSubtopicMastery(topicIds)
+    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -502,7 +502,7 @@ describe('Learner Dashboard Backend API Service', () => {
     let failHandler = jasmine.createSpy('fail');
     var topicIds = 'topic_id';
 
-    learnerDashboardBackendApiService.getFetchSubtopicMastery(topicIds)
+    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(

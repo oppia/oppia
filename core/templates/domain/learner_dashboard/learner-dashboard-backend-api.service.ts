@@ -238,7 +238,7 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async _getFetchSubtopicMastery(
+  async _fetchSubtopicMastery(
       topicIds: string): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
     return new Promise((resolve, reject) => {
@@ -253,9 +253,9 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
-  async getFetchSubtopicMastery(topicIds: string): Promise<Record<string,
+  async fetchSubtopicMastery(topicIds: string): Promise<Record<string,
     SubtopicMasterySummaryBackendDict>> {
-    return this._getFetchSubtopicMastery(topicIds);
+    return this._fetchSubtopicMastery(topicIds);
   }
 }
 

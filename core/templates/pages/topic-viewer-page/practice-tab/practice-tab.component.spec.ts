@@ -167,8 +167,8 @@ describe('Practice tab component', function() {
   it('should open a new practice session containing the selected subtopic' +
     ' when start button is clicked for progressTab display area', function() {
     component.displayArea = 'progressTab';
-    component.topicUrl = 'topic_1';
-    component.classroomUrl = 'classroom_1';
+    component.topicUrlFragment = 'topic_1';
+    component.classroomUrlFragment = 'classroom_1';
     component.selectedSubtopicIndices[0] = true;
     component.openNewPracticeSession();
 
@@ -182,9 +182,14 @@ describe('Practice tab component', function() {
   });
 
   it('should get subtopic mastery position for capsule', () => {
+    component.clientWidth = 700;
     component.subtopicMasteryArray = [20, 99];
     expect(component.subtopicMasteryPosition(0)).toEqual(175);
     expect(component.subtopicMasteryPosition(1)).toEqual(12);
+
+    component.clientWidth = 400;
+    expect(component.subtopicMasteryPosition(0)).toEqual(150);
+    expect(component.subtopicMasteryPosition(1)).toEqual(7);
   });
 
   it('should get mastery text color', () => {
