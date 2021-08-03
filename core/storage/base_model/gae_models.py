@@ -937,9 +937,11 @@ class VersionedModel(BaseModel):
         snapshot_id = self.get_snapshot_id(self.id, self.version)
 
         snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
-            snapshot_id, committer_id, commit_type, commit_message, commit_cmds) # type: BaseSnapshotMetadataModel
+            snapshot_id, committer_id, commit_type, commit_message, commit_cmds
+        ) # type: BaseSnapshotMetadataModel
         snapshot_content_instance = (
-            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)) # type: BaseSnapshotContentModel
+            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot)
+        ) # type: BaseSnapshotContentModel
 
         entities = [snapshot_metadata_instance, snapshot_content_instance, self] # type: List[BaseModel]
         BaseModel.update_timestamps_multi(entities)
