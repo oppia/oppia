@@ -155,7 +155,7 @@ angular.module('oppia').directive('ruleEditor', [
                       function(choice) {
                         return {
                           id: choice.label,
-                          val: choice.label
+                          val: choice.val
                         };
                       }
                     );
