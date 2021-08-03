@@ -12,7 +12,12 @@
     <span class="drag-and-drop-select-container">
       <div class="row">
         <label>
-          <input class="mr-2" type="radio" [(ngModel)]="currentValue" (ngModelChange)="updateLocalValue($event)" [value]="choice.val" name="{{ name }}">
+          <input class="mr-2"
+                 type="radio"
+                 [(ngModel)]="currentValue"
+                 (ngModelChange)="updateLocalValue($event)"
+                 [value]="choice.val"
+                 name="{{ name }}">
           <angular-html-bind-wrapper [htmlData]="choice.id"></angular-html-bind-wrapper>
         </label>
       </div>
