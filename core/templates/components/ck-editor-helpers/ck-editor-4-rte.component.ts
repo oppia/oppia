@@ -70,7 +70,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // change listener, value is set and it triggers the ngOnChanges
     // lifecycle hook. This cannot be avoided so we check if the currentValue
     // is the same as the detected change passed to ngOnChanges. If so, return.
-    if (this.currentValue === changes.value.currentValue) {
+    if (this.currentValue === changes.value?.currentValue) {
       return;
     }
     // If ngOnChanges is called first, it means that the input 'value' to
@@ -82,7 +82,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // components may change without re-rendering each of the components,
     // in such cases, it is sufficient to update the ckeditor instance manually
     // with the latest value.
-    if (this.ck && this.ck.status === 'ready') {
+    if (this.ck && this.ck.status === 'ready' && changes.value) {
       this.ck.setData(this.wrapComponents(this.value));
     }
   }
