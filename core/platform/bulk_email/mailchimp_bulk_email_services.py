@@ -26,10 +26,13 @@ import feconf
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
+from typing import Text
+
 import python_utils
 
 
 def _get_subscriber_hash(email):
+    # type: (Text) -> Text
     """Returns Mailchimp subscriber hash from email.
 
     Args:
@@ -50,6 +53,7 @@ def _get_subscriber_hash(email):
 
 
 def _get_mailchimp_class():
+    # type: () -> mailchimp3.MailChimp
     """Returns the mailchimp api class. This is separated into a separate
     function to facilitate testing.
 
@@ -77,6 +81,7 @@ def _get_mailchimp_class():
 
 
 def _create_user_in_mailchimp_db(user_email):
+    # type: (Text) -> bool
     """Creates a new user in the mailchimp database and handles the case where
     the user was permanently deleted from the database.
 
@@ -117,6 +122,7 @@ def _create_user_in_mailchimp_db(user_email):
 
 
 def permanently_delete_user_from_list(user_email):
+    # type: (Text) -> None
     """Permanently deletes the user with the given email from the Mailchimp
     list.
 
@@ -155,6 +161,7 @@ def permanently_delete_user_from_list(user_email):
 
 
 def add_or_update_user_status(user_email, can_receive_email_updates):
+    # type: (Text, bool) -> bool
     """Subscribes/unsubscribes an existing user or creates a new user with
     correct status in the mailchimp DB.
 

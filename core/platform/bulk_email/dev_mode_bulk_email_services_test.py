@@ -22,13 +22,16 @@ import logging
 from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils
 
+from typing import Any, Text
 
 class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
     """Tests for mailchimp services."""
 
     def test_add_or_update_user_status(self):
+        # type: () -> None
         observed_log_messages = []
         def _mock_logging_function(msg, *args):
+            # type: (Text, *Any) -> None
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
@@ -51,8 +54,10 @@ class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
                  'access API, since this is a dev environment.'])
 
     def test_permanently_delete_user(self):
+        # type: () -> None
         observed_log_messages = []
         def _mock_logging_function(msg, *args):
+            # type: (Text, *Any) -> None
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
