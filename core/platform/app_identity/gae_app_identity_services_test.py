@@ -29,18 +29,21 @@ from google.appengine.api import app_identity
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(GaeAppIdentityServicesTests, self).setUp()
+        # type: () -> None
+        super(GaeAppIdentityServicesTests, self).setUp() # type: ignore[no-untyped-call]
         self.expected_application_id = (
             test_utils.GenericTestBase.EXPECTED_TEST_APP_ID)
         self.expected_bucket_name = (
             '%s-resources' % self.expected_application_id)
 
     def test_get_application_id(self):
+        # type: () -> None
         self.assertEqual(
             gae_app_identity_services.get_application_id(),
             self.expected_application_id)
 
     def test_get_gcs_resource_bucket_name_prod(self):
+        # type: () -> None
         # Turn off DEV_MODE.
         with self.swap(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
@@ -48,11 +51,13 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
                 self.expected_bucket_name)
 
     def test_get_gcs_resource_bucket_name_dev(self):
+        # type: () -> None
         self.assertEqual(
             gae_app_identity_services.get_gcs_resource_bucket_name(),
             app_identity.get_default_gcs_bucket_name())
 
     def test_get_default_gcs_bucket_name(self):
+        # type: () -> None
         self.assertEqual(
             gae_app_identity_services.get_default_gcs_bucket_name(),
             'app_default_bucket')

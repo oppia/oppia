@@ -22,11 +22,13 @@ from __future__ import unicode_literals
 from constants import constants
 
 from google.appengine.api import app_identity
+from typing import Text # isort:skip # pylint: disable=unused-import
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
 
 def get_application_id():
+    # type: () -> Text
     """Returns the application's App Engine ID.
 
     For more information, see
@@ -39,6 +41,7 @@ def get_application_id():
 
 
 def get_gcs_resource_bucket_name():
+    # type: () -> Text
     """Returns the application's bucket name for GCS resources, which depends
     on the application ID in production mode, or default bucket name in
     development mode.
@@ -60,5 +63,6 @@ def get_gcs_resource_bucket_name():
 
 
 def get_default_gcs_bucket_name():
+    # type: () -> Text
     """Gets the default Google Cloud Storage bucket name for the app."""
     return app_identity.get_default_gcs_bucket_name()
