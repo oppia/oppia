@@ -18,7 +18,7 @@
 
 require(
   'components/question-directives/questions-list/' +
-  'questions-list.directive.ts');
+  'questions-list.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(

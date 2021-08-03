@@ -192,6 +192,13 @@ describe('Static Pages Tour', function() {
       by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
   });
 
+  it('should visit the Partnerships page', async function() {
+    await browser.get('/partnerships');
+    await waitFor.pageToFullyLoad();
+    expect(await element(
+      by.css('.protractor-test-partnerships-page')).isPresent()).toBe(true);
+  });
+
   it('should visit the Privacy page', async function() {
     await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();

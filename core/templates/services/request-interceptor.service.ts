@@ -27,7 +27,8 @@ import { CsrfTokenService } from './csrf-token.service';
   providedIn: 'root'
 })
 export class MockCsrfTokenService {
-  tokenPromise: PromiseLike<string> = null;
+  // 'tokenPromise' will be null when token is not initialized .
+  tokenPromise: PromiseLike<string> | null = null;
 
   initializeToken(): void {
     if (this.tokenPromise !== null) {

@@ -48,19 +48,11 @@ describe('Lost Changes Modal Component', () => {
   let component: LostChangesModalComponent;
   let fixture: ComponentFixture<LostChangesModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let loggerService: LoggerService;
-  let logSpy = null;
 
   const lostChanges = [{
     cmd: 'add_state',
     state_name: 'State name',
   } as unknown as LostChange];
-
-  const lostChangesResponse = [{
-    utilsService: {},
-    cmd: 'add_state',
-    stateName: 'State name',
-  }];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -86,17 +78,7 @@ describe('Lost Changes Modal Component', () => {
     component.lostChanges = lostChanges;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    loggerService = TestBed.inject(LoggerService);
-    logSpy = spyOn(loggerService, 'error').and.callThrough();
-
     fixture.detectChanges();
-  });
-
-  it('should evaluates lostChanges when component is initialized', () => {
-    expect(component.lostChanges[0].cmd).toBe('add_state');
-    expect(component.lostChanges[0].stateName).toBe('State name');
-    expect(logSpy).toHaveBeenCalledWith(
-      'Lost changes: ' + JSON.stringify(lostChangesResponse));
   });
 
   it('should close the modal', () => {
@@ -135,7 +117,27 @@ describe('Lost Changes Modal Component', () => {
     fixture.detectChanges();
 
     expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to copy and ' +
-      'paste these changes before discarding them.');
+      'The lost changes are displayed below. You may want to export or ' +
+      'copy and paste these changes before discarding them.');
+  });
+
+  it('should export the lost changes and close the modal', () => {
+    spyOn(
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
+    ).withArgs('oppia-lost-changes').and.returnValue([
+      {
+        innerText: 'Dummy Inner Text'
+      }
+    ]);
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    const spyObj = jasmine.createSpyObj('a', ['click']);
+    spyOn(document, 'createElement').and.returnValue(spyObj);
+    component.exportChangesAndClose();
+    expect(document.createElement).toHaveBeenCalledTimes(1);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(spyObj.download).toBe('lostChanges.txt');
+    expect(spyObj.click).toHaveBeenCalledTimes(1);
+    expect(spyObj.click).toHaveBeenCalledWith();
+    expect(dismissSpy).toHaveBeenCalledWith();
   });
 });

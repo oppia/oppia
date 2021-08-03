@@ -42,11 +42,13 @@ describe('Learner Dashboard Backend API Service', () => {
       learnt_topic_ids: [],
       partially_learnt_topic_ids: [],
       topic_ids_to_learn: [],
+      all_topic_ids: [],
+      untracked_topic_ids: [],
       collection_playlist_ids: [],
       incomplete_collection_ids: []
     },
     user_email: 'test@example.com',
-    is_admin: false,
+    is_curriculum_admin: false,
     is_super_admin: false,
     is_moderator: false
   };

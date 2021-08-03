@@ -51,6 +51,12 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
     'relyingparty/verifyPassword?key=fake-api-key'),
+  // This error covers the case when the PencilCode site uses an
+  // invalid SSL certificate (which can happen when it expires).
+  // In such cases, we ignore the error since it is out of our control.
+  _.escapeRegExp(
+    'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
+    'load resource: net::ERR_CERT_DATE_INVALID'),
 ];
 
 var checkForConsoleErrors = async function(errorsToIgnore) {
@@ -154,7 +160,13 @@ var ensurePageHasNoTranslationIds = async function() {
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
-  var promiseValue = await oppiaBaseContainer.getAttribute('innerHTML');
+
+  // We try to avoid browser.executeScript whereas possible as it
+  // can introduce flakiness.
+  // The usage here is only allowed because this the recommended approach
+  // by protractor to read innerHTML.
+  let promiseValue = await browser.executeScript(
+    'return arguments[0].innerHTML;', oppiaBaseContainer);
   // First remove all the attributes translate and variables that are
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');

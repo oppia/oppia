@@ -14,8 +14,8 @@
 
 """Tests for the profile page."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import logging
@@ -23,6 +23,7 @@ import re
 import zipfile
 
 from constants import constants
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -50,7 +51,8 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(
-            '<oppia-profile-page></oppia-profile-page>', response.body)
+            '<oppia-profile-page-root></oppia-profile-page-root>',
+            response.body)
 
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
@@ -824,8 +826,8 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/delete-account')
             self.assertIn(
-                '<oppia-delete-account-page></oppia-delete-account-page>',
-                response.body)
+                '<oppia-delete-account-page-root>' +
+                '</oppia-delete-account-page-root>', response.body)
 
     def test_get_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
@@ -938,7 +940,7 @@ class DeleteAccountTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DeleteAccountTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
@@ -949,6 +951,15 @@ class DeleteAccountTests(test_utils.GenericTestBase):
         self.testapp_swap_2 = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
 
+        def _mock_send_mail_to_admin(unused_email_subject, unused_email_body):
+            """Mocks email_manager.send_mail_to_admin()"""
+            pass
+
+        self.send_mail_to_admin_swap_1 = self.swap(
+            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+        self.send_mail_to_admin_swap_2 = self.swap(
+            email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
+
     def _run_account_deletion(self):
         """Execute complete deletion for the user that is logged in."""
         with self.enable_deletion_swap:
@@ -956,14 +967,18 @@ class DeleteAccountTests(test_utils.GenericTestBase):
             self.assertEqual(data, {'success': True})
 
         self.logout()
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         with self.testapp_swap_1:
             self.get_html_response('/cron/users/user_deletion')
-        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.send_mail_to_admin_swap_1:
+            self.process_and_flush_pending_tasks()
 
         with self.testapp_swap_2:
             self.get_html_response('/cron/users/fully_complete_user_deletion')
-        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.send_mail_to_admin_swap_2:
+            self.process_and_flush_pending_tasks()
         self.logout()
 
     def test_delete_account_without_activities(self):
@@ -1028,7 +1043,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
-            role=user_settings.role,
+            roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
@@ -1092,7 +1107,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
-            role=user_settings.role,
+            roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
@@ -1263,8 +1278,9 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
+            'roles': ['EXPLORATION_EDITOR'],
             'is_moderator': False,
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_topic_manager': False,
             'is_super_admin': False,
             'can_create_collections': False,

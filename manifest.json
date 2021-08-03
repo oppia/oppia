@@ -31,13 +31,6 @@
           ]
         }
       },
-      "angularAudio": {
-        "version": "1.7.4",
-        "downloadFormat": "zip",
-        "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
-        "rootDirPrefix": "ngAudio-",
-        "targetDirPrefix": "angular-audio-"
-      },
       "lamejs": {
         "version": "1.2.0",
         "downloadFormat": "zip",
@@ -111,17 +104,6 @@
         "files": ["angular-translate-interpolation-messageformat.min.js"],
         "bundle": {
           "js": ["angular-translate-interpolation-messageformat.min.js"]
-        }
-      },
-      "angularToastr": {
-        "version": "1.7.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/Foxandxss/angular-toastr/archive/1.7.0.zip",
-        "rootDirPrefix": "angular-toastr-",
-        "targetDirPrefix": "angular-toastr-",
-        "bundle": {
-          "css": ["dist/angular-toastr.min.css"],
-          "js": ["dist/angular-toastr.tpls.min.js"]
         }
       },
       "popperJs": {
@@ -231,17 +213,6 @@
         "url": "https://github.com/oppia/guppy/archive/7509f31c3f6e1205763d605ab41098cf6ac9d738.zip",
         "rootDirPrefix": "guppy-",
         "targetDir": "guppy-7509f3"
-      },
-      "headroomJs": {
-        "version": "0.9.4",
-        "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
-        "rootDirPrefix": "headroom-js-",
-        "targetDirPrefix": "headroom-js-",
-        "files": ["angular.headroom.min.js", "headroom.min.js"],
-        "bundle": {
-          "js": ["headroom.min.js", "angular.headroom.min.js"]
-        }
       },
       "jquery": {
         "version": "3.5.1",

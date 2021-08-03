@@ -16,8 +16,8 @@
 
 """Tests for blog post domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import blog_domain
@@ -90,6 +90,21 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_url_fragment(url)
+
+    def _assert_valid_blog_post_id_for_blog_post(
+            self, expected_error_substring, blog_id):
+        """Checks that blog post passes validation for id."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            blog_domain.BlogPost.require_valid_blog_post_id(blog_id)
+
+    def test_blog_post_id_validation_for_blog_post(self):
+        self._assert_valid_blog_post_id_for_blog_post(
+            'Blog Post ID should be a string, received: 10', 10)
+        self._assert_valid_blog_post_id_for_blog_post(
+            r'Blog Post ID should be a string, received: \[10\]', [10])
+        self._assert_valid_blog_post_id_for_blog_post(
+            'Blog ID abcdef is invalid', 'abcdef')
 
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(

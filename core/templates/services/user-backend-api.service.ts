@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
 
-interface SubscriptionSummary {
+export interface SubscriptionSummary {
   'creator_picture_data_url': string;
   'creator_username': string;
   'creator_impact': number;
@@ -40,6 +40,10 @@ export interface PreferencesBackendDict {
   'can_receive_feedback_message_email': boolean;
   'can_receive_subscription_email': boolean;
   'subscription_list': SubscriptionSummary[];
+}
+
+export interface UpdatePreferencesResponse {
+  'bulk_email_signup_message_should_be_shown': boolean
 }
 
 interface LoginUrlResponseDict {
@@ -84,13 +88,9 @@ export class UserBackendApiService {
   }
 
   async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
-    const profileImageUpdateUrlData = {
-      update_type: 'profile_picture_data_url',
-      data: newProfileImageDataUrl
-    };
-    return this.http.put<PreferencesBackendDict>(
-      this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
+      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
+    return this.updatePreferencesDataAsync(
+      'profile_picture_data_url', newProfileImageDataUrl);
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
@@ -115,6 +115,21 @@ export class UserBackendApiService {
   ): Promise<Object> {
     return this.http.put(this.SITE_LANGUAGE_URL, {
       site_language_code: currentLanguageCode
+    }).toPromise();
+  }
+
+  async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+    return this.http.get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
+      .toPromise();
+  }
+
+  async updatePreferencesDataAsync(
+      updateType: string,
+      data: boolean | string | string[] | SubscriptionSummary[]):
+      Promise<UpdatePreferencesResponse> {
+    return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
+      update_type: updateType,
+      data: data
     }).toPromise();
   }
 }

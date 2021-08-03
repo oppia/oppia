@@ -25,7 +25,7 @@ require(
   'pages/exploration-player-page/learner-experience/tutor-card.directive.ts');
 require(
   'components/question-directives/question-player/' +
-    'question-player.directive.ts');
+    'question-player.component.ts');
 require('pages/review-test-page/review-test-page.constants.ajs.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');

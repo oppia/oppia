@@ -16,8 +16,8 @@
 
 """Commands for operations on topics, and related models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import collections
 import logging
@@ -72,6 +72,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         url_fragment=topic.url_fragment,
         thumbnail_bg_color=topic.thumbnail_bg_color,
         thumbnail_filename=topic.thumbnail_filename,
+        thumbnail_size_in_bytes=topic.thumbnail_size_in_bytes,
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
@@ -394,6 +395,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.url_fragment = topic.url_fragment
     topic_model.thumbnail_bg_color = topic.thumbnail_bg_color
     topic_model.thumbnail_filename = topic.thumbnail_filename
+    topic_model.thumbnail_size_in_bytes = topic.thumbnail_size_in_bytes
     topic_model.canonical_story_references = [
         reference.to_dict() for reference in topic.canonical_story_references
     ]
@@ -1052,6 +1054,32 @@ def deassign_user_from_all_topics(committer, user_id):
         save_topic_rights(
             topic_rights, committer.user_id,
             'Removed all assigned topics from %s' % (user_id), commit_cmds)
+
+
+def deassign_manager_role_from_topic(committer, user_id, topic_id):
+    """Deassigns given user from all topics assigned to them.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        user_id: str. The ID of the user.
+        topic_id: str. The ID of the topic.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+    """
+    topic_rights = topic_fetchers.get_topic_rights(topic_id)
+    if user_id not in topic_rights.manager_ids:
+        raise Exception('User does not have manager rights in topic.')
+
+    topic_rights.manager_ids.remove(user_id)
+    commit_cmds = [topic_domain.TopicRightsChange({
+        'cmd': topic_domain.CMD_REMOVE_MANAGER_ROLE,
+        'removed_user_id': user_id
+    })]
+    save_topic_rights(
+        topic_rights, committer.user_id,
+        'Removed all assigned topics from %s' % (user_id), commit_cmds)
 
 
 def assign_role(committer, assignee, new_role, topic_id):

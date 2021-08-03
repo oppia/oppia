@@ -47,6 +47,7 @@ export class TeachPageComponent implements OnInit {
   classroomUrlFragment: string;
   classroomUrl: string;
   displayedTestimonialId: number;
+  libraryUrl: string;
   testimonialCount: number;
   testimonials = [];
   userIsLoggedIn: boolean = null;
@@ -69,6 +70,7 @@ export class TeachPageComponent implements OnInit {
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
+    this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();

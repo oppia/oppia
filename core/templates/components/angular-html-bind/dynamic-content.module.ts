@@ -20,14 +20,12 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
 
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
   ],
   declarations: [
     AngularHtmlBindWrapperDirective

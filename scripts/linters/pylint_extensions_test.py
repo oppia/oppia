@@ -19,8 +19,8 @@
 
 """Unit tests for scripts/pylint_extensions."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import tempfile
 import unittest
@@ -1874,6 +1874,19 @@ class ImportOnlyModulesCheckerTests(unittest.TestCase):
         """, module_name='.constants')
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_importfrom(importfrom_node6)
+
+    def test_importing_internals_from_allowed_modules_does_not_raise_message(
+            self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ImportOnlyModulesChecker)
+        checker_test_object.setup_method()
+        importfrom_node = astroid.extract_node(
+            """
+            from __future__ import invalid_module #@
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node)
 
 
 class BackslashContinuationCheckerTests(unittest.TestCase):

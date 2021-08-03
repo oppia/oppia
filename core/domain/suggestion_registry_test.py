@@ -14,8 +14,8 @@
 
 """Tests for suggestion registry classes."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import os
@@ -678,7 +678,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
         new_content = state_domain.SubtitledHtml(
-            'content', '<p>new suggestion html</p>').to_dict()
+            'content', '<p>new suggestion html</p>', {}).to_dict()
 
         suggestion.change.new_value = new_content
 

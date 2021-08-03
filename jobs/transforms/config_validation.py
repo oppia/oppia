@@ -16,8 +16,8 @@
 
 """Beam DoFns and PTransforms to provide validation of config models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import config_domain
 from core.domain import platform_parameter_domain as parameter_domain
@@ -30,18 +30,20 @@ from jobs.transforms import base_validation
 
 @validation_decorators.AuditsExisting(
     config_models.ConfigPropertySnapshotMetadataModel)
-class ValidateConfigCommitCmdsSchema(
+class ValidateConfigPropertySnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for config models."""
+    """Overrides _get_change_domain_class for
+    ConfigPropertySnapshotMetadataModel.
+    """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
+            config_domain.ConfigPropertyChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return config_domain.ConfigPropertyChange
@@ -49,18 +51,20 @@ class ValidateConfigCommitCmdsSchema(
 
 @validation_decorators.AuditsExisting(
     config_models.PlatformParameterSnapshotMetadataModel)
-class ValidatePlatformParameterCommitCmdsSchema(
+class ValidatePlatformParameterSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for platform parameter models."""
+    """Overrides _get_change_domain_class for
+    PlatformParameterSnapshotMetadataModel.
+    """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
-            changes made by commit commands of the model.
+            parameter_domain.PlatformParameterChange. A domain object class
+            for the changes made by commit commands of the model.
         """
         return parameter_domain.PlatformParameterChange

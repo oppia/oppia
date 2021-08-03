@@ -8,25 +8,29 @@
                alt="">
         </li>
         <li class="hover-link"
-            (mouseenter)="hovering = true"
-            (mouseleave)="hovering = false"
+            (mouseenter)="hovering = true; dropUp.open()"
+            (mouseleave)="hovering = false; dropUp.close()"
             tabindex="0"
-            attr.aria-haspopup="true"
-            attr.aria-expanded="false">
-          <div ngbDropdown class="dropup" [ngClass]="{'open':hovering}">
-            <a ngbDropdownToggle id="dropdownMenu2"
-               [ngClass]="{'hovered-text':hovering}"
+            aria-haspopup="true"
+            aria-expanded="false">
+          <div ngbDropdown
+               class="dropup"
+               placement="top"
+               [ngClass]="{'open': hovering}"
+               #dropUp="ngbDropdown">
+            <a ngbDropdownAnchor id="dropdownMenu2"
+               [ngClass]="{'hovered-text': hovering}"
                *ngIf="contributorNames.length > 0"
-               attr.aria-haspopup="true"
-               attr.aria-expanded="false">
+               aria-haspopup="true"
+               aria-expanded="false">
               <h4 class="author-profile-text protractor-test-author-profile-text"
-                  [ngClass]="{'hovered-text':hovering, 'not-hovered' : !hovering}">
+                  [ngClass]="{'hovered-text': hovering, 'not-hovered' : !hovering}">
                   {{ 'I18N_FOOTER_AUTHOR_PROFILES' | translate }}
               </h4>
             </a>
-            <ul ngbDropdownMenu class="author-profile-dropdown-menu uib-dropdown-menu"
-                attr.aria-labelledby="dropdownMenu2">
-              <li *ngFor="let name of contributorNames | limitTo: 5">
+            <ul ngbDropdownMenu class="author-profile-dropdown-menu"
+                aria-labelledby="dropdownMenu2">
+              <li *ngFor="let name of contributorNames | limitTo: 5" ngbDropdownItem>
                 <a href="/profile/{{ name }}" target="_blank" rel="noopener">{{ name }}</a>
               </li>
             </ul>
@@ -95,17 +99,23 @@
     color: #094142;
   }
 
-  .oppia-exploration-footer .uib-dropdown-menu.author-profile-dropdown-menu {
+  .oppia-exploration-footer .author-profile-dropdown-menu {
     border: none;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
-    margin: 0 0 8px 0;
+    /** ngbDropdownMenu adds inline styles which conflicts with our own.
+     *  The usage of !important is unavoidable here to override inline styles.
+     */
+    top: auto !important;
+    transform: none !important;
+    will-change: auto !important;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li {
+    background: #fff;
     color: #094142;
     float: none;
     padding: 15px 0;

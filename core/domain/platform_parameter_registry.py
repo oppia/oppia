@@ -16,8 +16,8 @@
 
 """Registry for platform parameters."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import caching_services
 from core.domain import platform_parameter_domain

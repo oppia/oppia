@@ -14,8 +14,8 @@
 
 """Controllers for the platform feature handlers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core import platform_feature_list
 from core.controllers import acl_decorators

@@ -16,8 +16,8 @@
 
 """Tests for fetching skill domain objects."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -40,11 +40,12 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillFetchersUnitTests, self).setUp()
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', {})
         )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>', {}), [example_1],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -61,9 +62,10 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             '<p>default_feedback</p>', True)]
         self.SKILL_ID = skill_services.get_new_skill_id()
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, description='Description',
@@ -73,14 +75,14 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_multi_skills(self):
         example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', {})
         )
         self.save_new_skill(
             'skill_a', self.user_id_admin, description='Description A',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', {}),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
@@ -98,7 +100,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             'skill_b', self.user_id_admin, description='Description B',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', {}),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
@@ -166,6 +168,10 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', {})
+        )
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -176,7 +182,21 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             misconceptions_schema_version=0,
             rubric_schema_version=3,
             skill_contents_schema_version=2,
-            all_questions_merged=False
+            all_questions_merged=False,
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', {}),
+                [example_1],
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
+                        '1': {}, '2': {}, '3': {}
+                    }
+                }),
+                state_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
+                        '1': {}, '2': {}, '3': {}
+                    }
+                })
+            ).to_dict()
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(
@@ -192,6 +212,10 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>', {}),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>', {})
+        )
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -202,7 +226,21 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             misconceptions_schema_version=2,
             rubric_schema_version=0,
             skill_contents_schema_version=2,
-            all_questions_merged=False
+            all_questions_merged=False,
+            skill_contents=skill_domain.SkillContents(
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>', {}),
+                [example_1],
+                state_domain.RecordedVoiceovers.from_dict({
+                    'voiceovers_mapping': {
+                        '1': {}, '2': {}, '3': {}
+                    }
+                }),
+                state_domain.WrittenTranslations.from_dict({
+                    'translations_mapping': {
+                        '1': {}, '2': {}, '3': {}
+                    }
+                })
+            ).to_dict()
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(

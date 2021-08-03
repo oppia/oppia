@@ -30,7 +30,7 @@ describe('Collection rights backend API service', function() {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: CollectionRightsBackendDict;
-  let csrfService: CsrfTokenService = null;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

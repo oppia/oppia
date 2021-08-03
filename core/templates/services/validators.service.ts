@@ -66,7 +66,7 @@ export class ValidatorsService {
     return true;
   }
   isValidExplorationTitle(input: string, showWarnings: boolean): boolean {
-    if (!this.isValidEntityName(input, showWarnings, null)) {
+    if (!this.isValidEntityName(input, showWarnings, false)) {
       return false;
     }
 
@@ -83,7 +83,7 @@ export class ValidatorsService {
   // NB: this does not check whether the card name already exists in the
   // states dict.
   isValidStateName(input: string, showWarnings: boolean): boolean {
-    if (!this.isValidEntityName(input, showWarnings, null)) {
+    if (!this.isValidEntityName(input, showWarnings, false)) {
       return false;
     }
 

@@ -18,23 +18,21 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ConceptCardObjectFactory } from
-  'domain/skill/ConceptCardObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
-import { WorkedExampleObjectFactory } from
-  'domain/skill/WorkedExampleObjectFactory';
+import { ConceptCardBackendDict, ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Concept card object factory', () => {
   let conceptCardObjectFactory: ConceptCardObjectFactory;
-  let conceptCardDict;
-  let example1;
-  let example2;
+  let conceptCardDict: ConceptCardBackendDict;
+  let example1: WorkedExampleBackendDict;
+  let example2: WorkedExampleBackendDict;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     example1 = {
       question: {
@@ -65,7 +63,14 @@ describe('Concept card object factory', () => {
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_q_1: {},
+          worked_example_q_1: {
+            q1: {
+              filename: 'filename1.mp3',
+              file_size_bytes: 100000,
+              needs_update: false,
+              duration_secs: 10.0
+            }
+          },
           worked_example_e_1: {},
           worked_example_q_2: {},
           worked_example_e_2: {}
@@ -107,5 +112,33 @@ describe('Concept card object factory', () => {
       SubtitledHtml.createDefault(
         'Loading review material', 'explanation'));
     expect(conceptCard.getWorkedExamples()).toEqual([]);
+  });
+
+  it('should return recorded voice overs when called', () => {
+    let voiceover = {
+      voiceovers_mapping: {
+        content: {
+          en: {
+            filename: 'filename1.mp3',
+            file_size_bytes: 100000,
+            needs_update: false,
+            duration_secs: 10.0
+          },
+          hi: {
+            filename: 'filename2.mp3',
+            file_size_bytes: 11000,
+            needs_update: false,
+            duration_secs: 0.11
+          }
+        }
+      }
+    };
+
+    conceptCardDict.recorded_voiceovers = voiceover;
+    let conceptCard =
+          conceptCardObjectFactory.createFromBackendDict(conceptCardDict);
+
+    expect(conceptCard.getRecordedVoiceovers())
+      .toEqual(RecordedVoiceovers.createFromBackendDict(voiceover));
   });
 });

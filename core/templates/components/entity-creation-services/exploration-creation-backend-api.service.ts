@@ -25,7 +25,7 @@ interface ExplorationCreationBackendDict {
   'exploration_id': string
 }
 
-interface ExplorationCreationResponse {
+export interface ExplorationCreationResponse {
   explorationId: string
 }
 

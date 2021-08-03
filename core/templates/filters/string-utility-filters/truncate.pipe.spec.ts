@@ -21,7 +21,7 @@ import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 
 describe('Testing filters', function() {
-  let truncatePipe: TruncatePipe = null;
+  let truncatePipe: TruncatePipe;
   beforeEach(() => {
     truncatePipe = new TruncatePipe(new ConvertToPlainTextPipe());
   });

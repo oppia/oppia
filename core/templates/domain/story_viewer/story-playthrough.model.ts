@@ -90,6 +90,7 @@ export class StoryPlaythrough {
         return this.nodes[i].getId();
       }
     }
+    throw new Error('No story nodes found!');
   }
 
   hasStartedStory(): boolean {

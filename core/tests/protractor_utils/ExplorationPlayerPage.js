@@ -133,7 +133,7 @@ var ExplorationPlayerPage = function() {
     await action.click('Radio Button', radioButton);
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
-    let submitButton = element.all(by.tagName('button')).get(1);
+    let submitButton = element(by.css('.protractor-test-submit-report-button'));
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await element(
       by.css('.protractor-test-exploration-flagged-success-message')).getText();

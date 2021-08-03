@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { StorySummary, StorySummaryBackendDict } from 'domain/story/story-summary.model';
 import { DegreesOfMastery } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { SubtopicBackendDict, Subtopic, SkillIdToDescriptionMap } from './subtopic.model';
 
@@ -26,6 +27,8 @@ export interface LearnerTopicSummaryBackendDict {
   'description': string;
   'version': number;
   'story_titles': string[];
+  'total_published_node_count': number,
+  'canonical_story_summary_dict': StorySummaryBackendDict[];
   'thumbnail_filename': string;
   'thumbnail_bg_color': string;
   'classroom': string;
@@ -44,6 +47,8 @@ export class LearnerTopicSummary {
       public description: string,
       public version: number,
       public storyTitles: string[],
+      public totalPublishedNodeCount: number,
+      public canonicalStorySummaryDicts: StorySummary[],
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
       public classroom: string,
@@ -60,6 +65,10 @@ export class LearnerTopicSummary {
       return Subtopic.create(
         subtopic, topicSummaryBackendDict.skill_descriptions);
     });
+    let canonicalStorySummaries = (
+      topicSummaryBackendDict.canonical_story_summary_dict.map(story => {
+        return StorySummary.createFromBackendDict(story);
+      }));
 
     return new LearnerTopicSummary(
       topicSummaryBackendDict.id,
@@ -68,13 +77,14 @@ export class LearnerTopicSummary {
       topicSummaryBackendDict.description,
       topicSummaryBackendDict.version,
       topicSummaryBackendDict.story_titles,
+      topicSummaryBackendDict.total_published_node_count,
+      canonicalStorySummaries,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.practice_tab_is_displayed,
       topicSummaryBackendDict.degrees_of_mastery,
-      topicSummaryBackendDict.skill_descriptions,
-      subtopics,
+      topicSummaryBackendDict.skill_descriptions, subtopics,
       topicSummaryBackendDict.url_fragment);
   }
 
@@ -100,6 +110,14 @@ export class LearnerTopicSummary {
 
   getStoryTitles(): string[] {
     return this.storyTitles;
+  }
+
+  getTotalPublishedNodeCount(): number {
+    return this.totalPublishedNodeCount;
+  }
+
+  getCanonicalStorySummaryDicts(): StorySummary[] {
+    return this.canonicalStorySummaryDicts;
   }
 
   getThumbnailFilename(): string {

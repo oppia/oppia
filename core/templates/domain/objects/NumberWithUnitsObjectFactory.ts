@@ -28,6 +28,8 @@ import { Units, UnitsObjectFactory } from
 import { Unit, NumberWithUnitsAnswer } from
   'interactions/answer-defs';
 
+type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
   Simply add currency unit to the dict of CURRENCY_UNITS constant and it will
@@ -158,7 +160,9 @@ export class NumberWithUnitsObjectFactory {
           units = rawInput.substr(ind).trim();
         }
 
-        var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+        var keys = (
+          <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+        );
         for (var i = 0; i < keys.length; i++) {
           for (var j = 0;
             j < (
@@ -175,7 +179,9 @@ export class NumberWithUnitsObjectFactory {
         }
       } else {
         var startsWithCorrectCurrencyUnit = false;
-        var keys = Object.keys(ObjectsDomainConstants.CURRENCY_UNITS);
+        var keys = (
+          <CurrencyUnitsKeys> Object.keys(ObjectsDomainConstants.CURRENCY_UNITS)
+        );
         for (var i = 0; i < keys.length; i++) {
           for (var j = 0;
             j < ObjectsDomainConstants.CURRENCY_UNITS[

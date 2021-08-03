@@ -19,7 +19,8 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from 'components/material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from 'modules/material.module';
 
 import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -51,6 +52,7 @@ describe('Admin dev mode activities tab', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
         HttpClientTestingModule
@@ -119,7 +121,7 @@ describe('Admin dev mode activities tab', () => {
       const expId = component.demoExplorationIds[0];
 
       spyOn(adminBackendApiService, 'reloadExplorationAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
 
@@ -230,7 +232,7 @@ describe('Admin dev mode activities tab', () => {
       component.reloadingAllExplorationPossible = true;
 
       spyOn(adminBackendApiService, 'reloadExplorationAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
 
@@ -293,7 +295,7 @@ describe('Admin dev mode activities tab', () => {
       component.numDummyExpsToGenerate = 2;
 
       spyOn(adminBackendApiService, 'generateDummyExplorationsAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
 
       component.generateDummyExplorations();
@@ -331,7 +333,7 @@ describe('Admin dev mode activities tab', () => {
   describe('.loadNewStructuresData', () => {
     it('should generate structures data', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewStructuresDataAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
       component.loadNewStructuresData();
 
@@ -364,7 +366,7 @@ describe('Admin dev mode activities tab', () => {
   describe('.generateNewSkillData', () => {
     it('should generate structures data', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewSkillDataAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
       component.generateNewSkillData();
 
@@ -420,7 +422,7 @@ describe('Admin dev mode activities tab', () => {
 
     it('should reload collection', async(() => {
       spyOn(adminBackendApiService, 'reloadCollectionAsync')
-        .and.returnValue(Promise.resolve(null));
+        .and.returnValue(Promise.resolve());
       spyOn(component.setStatusMessage, 'emit');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
 

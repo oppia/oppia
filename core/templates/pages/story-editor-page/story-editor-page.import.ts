@@ -24,9 +24,9 @@ import uiValidate from 'angular-ui-validate';
 import 'third-party-imports/dnd-lists.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
+  require('angular-cookies'), 'dndLists', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable',
+  'ui.bootstrap', 'ui.sortable',
   uiValidate
 ]);
 

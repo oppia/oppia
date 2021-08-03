@@ -25,15 +25,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserModule } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LoginPageComponent } from 'pages/login-page/login-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
+import { LoginPageRootComponent } from './login-page-root.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class FirebaseErrorFilterHandler extends ErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
@@ -68,6 +67,7 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     MatAutocompleteModule,
     MatCardModule,
@@ -79,11 +79,11 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
   ],
   declarations: [
     LoginPageComponent,
-    OppiaAngularRootComponent,
+    LoginPageRootComponent,
   ],
   entryComponents: [
     LoginPageComponent,
-    OppiaAngularRootComponent,
+    LoginPageRootComponent,
   ],
   providers: [
     {
@@ -102,18 +102,6 @@ class FirebaseErrorFilterHandler extends ErrorHandler {
       multi: true,
     },
   ],
+  bootstrap: [LoginPageRootComponent]
 })
-class LoginPageModule {
-  ngDoBootstrap() {}
-}
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(
-  downgradeModule(async(providers) => {
-    return platformBrowserDynamic(providers).bootstrapModule(LoginPageModule);
-  }));
-
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}) as angular.IDirectiveFactory);
+export class LoginPageModule {}

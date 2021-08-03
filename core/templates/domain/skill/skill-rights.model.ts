@@ -22,11 +22,12 @@ export interface SkillRightsBackendDict {
 }
 
 export class SkillRights {
-  _skillId: string;
+  // SkillId will be null when creating interstitial SkillRights.
+  _skillId: string | null;
   _canEditSkillDescription: boolean;
 
   constructor(
-      skillId: string, canEditSkillDescription: boolean) {
+      skillId: string | null, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }
@@ -42,7 +43,7 @@ export class SkillRights {
     return new SkillRights(null, false);
   }
 
-  getSkillId(): string {
+  getSkillId(): string | null {
     return this._skillId;
   }
 

@@ -51,8 +51,8 @@ class MockWindowRef {
 }
 
 describe('Context service', () => {
-  let ecs: ContextService = null;
-  let urlService: UrlService = null;
+  let ecs: ContextService;
+  let urlService: UrlService;
   let windowRef: MockWindowRef;
 
   describe('behavior in the exploration learner view', () => {

@@ -54,8 +54,10 @@
         <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
              *ngIf="idx < chaptersDisplayed">
           <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
-            <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-            </span>{{ idx + 1 }}: {{ title }}
+            <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
+            </span>&nbsp;
+            <span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;
+            {{ title }}
           </a>
         </div>
       </div>
@@ -76,6 +78,11 @@
 
 </div>
 <style>
+  .chapter-identifier {
+    color: #00645C;
+    font-weight: 500;
+  }
+
   .story-progress-bar {
     float: left;
   }
@@ -195,6 +202,13 @@
     text-decoration: none;
   }
 
+  .title-text a:hover,
+  .pending-chapter a:hover,
+  .incomplete-chapter a:hover,
+  .complete-chapter a:hover {
+    text-decoration: underline;
+  }
+
   .oppia-chapters-count {
     color: #404040;
     font-size: 0.75em;
@@ -209,6 +223,7 @@
 
     .title-text,
     .pending-chapter,
+    .incomplete-chapter,
     .complete-chapter {
       text-decoration: underline;
     }
@@ -251,26 +266,5 @@
 
   .oppia-topic-viewer-container .background-banner-position {
     position: inherit;
-  }
-
-  .oppia-page-card {
-    border-radius: 0.25em;
-    margin-top: 5vh;
-    padding-bottom: 7.5vh;
-    width: 704px;
-  }
-
-  @media(max-width: 1024px) {
-    .oppia-page-card {
-      margin-top: 5vh;
-      width: 80vw;
-    }
-  }
-
-  @media(max-width: 500px) {
-    .oppia-page-card {
-      padding: 15px 24px 64px 24px;
-      width: 90vw;
-    }
   }
 </style>

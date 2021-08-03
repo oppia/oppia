@@ -33,6 +33,8 @@ export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
 };
 
+type DataFormatToDefaultValuesKey = keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
+
 export interface TranslationBackendDict {
   'data_format': string;
   'translation': string|string[];
@@ -75,7 +77,8 @@ export class WrittenTranslation {
 
   setTranslation(translation: string|string[]): void {
     if (typeof translation !==
-        typeof DATA_FORMAT_TO_DEFAULT_VALUES[this.dataFormat]) {
+        typeof DATA_FORMAT_TO_DEFAULT_VALUES[
+          <DataFormatToDefaultValuesKey> this.dataFormat]) {
       throw new Error(
         'This translation is not of the correct type for data format ' +
         this.dataFormat);
@@ -102,7 +105,8 @@ export class WrittenTranslationObjectFactory {
     }
 
     return new WrittenTranslation(
-      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat], false);
+      dataFormat, DATA_FORMAT_TO_DEFAULT_VALUES[
+        <DataFormatToDefaultValuesKey> dataFormat], false);
   }
 
   createFromBackendDict(

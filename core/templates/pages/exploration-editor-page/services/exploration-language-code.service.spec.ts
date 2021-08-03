@@ -16,29 +16,23 @@
  * @fileoverview Unit tests for the ExplorationLanguageCodeService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+import { ContextService } from 'services/context.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
+import { ExplorationLanguageCodeService } from './exploration-language-code.service';
 
-require(
-  'pages/exploration-editor-page/' +
-  'services/exploration-language-code.service.ts');
-require('services/context.service.ts');
+describe('Exploration Language Code Service', () => {
+  let elcs: ExplorationLanguageCodeService = null;
+  let cs: ContextService = null;
 
-describe('Exploration Language Code Service', function() {
-  let elcs = null;
-  let cs = null;
-
-  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-  beforeEach(angular.mock.inject(function($injector) {
-    elcs = $injector.get('ExplorationLanguageCodeService');
-    cs = $injector.get('ContextService');
-  }));
+  beforeEach(() => {
+    elcs = TestBed.inject(ExplorationLanguageCodeService);
+    cs = TestBed.inject(ContextService);
+  });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', () => {
     expect(elcs.propertyName).toBe('language_code');
     expect(elcs.getSupportedContentLanguages()).toBeInstanceOf(Object);
     elcs.displayed = 'en';

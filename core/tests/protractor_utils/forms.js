@@ -269,7 +269,7 @@ var RichTextEditor = async function(elem) {
       // the component is not overwritten by some other element.
       if (
         [
-          'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
+          'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
         await elem.all(
           by.css('.protractor-test-rte')).first().sendKeys(protractor.Key.DOWN);
@@ -391,7 +391,7 @@ var MultiSelectEditor = function(elem) {
     }
 
     if (filteredElementsCount !== texts.length) {
-      throw (
+      throw new Error(
         'Could not toggle element selection. Values requested: ' + texts +
       '. Found ' + filteredElementsCount + ' matching elements.');
     }

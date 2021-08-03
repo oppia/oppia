@@ -25,9 +25,9 @@ import { Units, UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 
 describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
-    var nwuof = null;
-    var uof = null;
-    var errors = null;
+    let nwuof: NumberWithUnitsObjectFactory;
+    let uof: UnitsObjectFactory;
+    let errors: typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
 
     beforeEach(() => {
       nwuof = new NumberWithUnitsObjectFactory(new UnitsObjectFactory());
@@ -193,7 +193,7 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     it('should create currency units', () => {
       const createCurrencyUnitsSpy = spyOn(
-        nwuof.unitsFactory, 'createCurrencyUnits');
+        nwuof, 'createCurrencyUnits');
       nwuof.createCurrencyUnits();
       expect(createCurrencyUnitsSpy).toHaveBeenCalled();
     });

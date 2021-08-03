@@ -147,6 +147,47 @@ describe('Remove Activity Modal Component', function() {
   }
   ));
 
+  it('should remove topic from current goals when clicking on' +
+    ' remove button', fakeAsync(() => {
+    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+
+    component.sectionNameI18nId = (
+      'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION');
+    component.subsectionName = 'I18N_DASHBOARD_LEARN_TOPIC';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnergoalshandler/topic/0');
+
+    component.remove();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(closeSpy).toHaveBeenCalledWith(
+      '/learnergoalshandler/topic/0');
+  }
+  ));
+
+  it('should not remove topic from current goals' +
+    ' when clicking on cancel button', fakeAsync(() => {
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
+    component.sectionNameI18nId = (
+      'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION');
+    component.subsectionName = 'I18N_DASHBOARD_LEARN_TOPIC';
+    component.activityId = '0';
+    component.activityTitle = 'Title';
+    component.removeActivityUrl = (
+      '/learnergoalshandler/topic/0');
+
+    component.cancel();
+    flushMicrotasks();
+    fixture.detectChanges();
+
+    expect(dismissSpy).toHaveBeenCalled();
+  }
+  ));
+
   it('should remove exploration in incomplete playlist when clicking on' +
     ' remove button', fakeAsync(() => {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
