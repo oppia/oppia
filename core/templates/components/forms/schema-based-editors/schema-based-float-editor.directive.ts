@@ -120,7 +120,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             ctrl.labelForErrorFocusTarget =
               FocusManagerService.generateFocusLabel();
             if (ctrl.localValue === undefined) {
-              ctrl.localValue = null;
+              ctrl.localValue = 0.0;
             }
             // So that focus is applied after all the functions in
             // main thread have executed.
