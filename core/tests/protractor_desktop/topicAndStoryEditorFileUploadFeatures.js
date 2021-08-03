@@ -20,6 +20,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var TopicsAndSkillsDashboardPage =
@@ -241,7 +242,7 @@ describe('Chapter editor functionality', function() {
     await storyEditorPage.saveStory('First save');
     // Check if the thumbnail images persist on reload.
     await browser.refresh();
-    await general.scrollToTop();
+    await waitFor.pageToFullyLoad();
     await storyEditorPage.navigateToStoryEditorTab();
     expect(await storyEditorPage.getStoryThumbnailSource()).not.toEqual(
       defaultThumbnailImageSrc);
