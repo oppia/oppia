@@ -350,10 +350,6 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        large_image_file = (
-            '<svg><path d="%s" /></svg>' % (
-                'M150 0 L75 200 L225 200 Z ' * 4000)
-        )
 
         # Upload an SVG image that exceeds the file size limit of 100 KB.
         response_dict = self.post_json(
