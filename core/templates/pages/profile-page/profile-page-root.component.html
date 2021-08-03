@@ -1,4 +1,4 @@
-<oppia-angular-root *ngIf="showProfile">
+<oppia-angular-root *ngIf="pageIsShown">
   <oppia-base-content>
     <navbar-breadcrumb>
       <profile-page-navbar></profile-page-navbar>
@@ -9,4 +9,4 @@
   </oppia-base-content>
 </oppia-angular-root>
 
-<oppia-error-page-root *ngIf="showError"></oppia-error-page-root>
+<oppia-error-page-root *ngIf="errorPageIsShown"></oppia-error-page-root>

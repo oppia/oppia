@@ -27,8 +27,8 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './pending-account-deletion-page-root.component.html'
 })
 export class PendingAccountDeletionPageRootComponent {
-  showPage: boolean = false;
-  showError: boolean = false;
+  pageIsShown: boolean = false;
+  errorPageIsShown: boolean = false;
 
   constructor(
     private accessValidationBackendApiService:
@@ -47,13 +47,13 @@ export class PendingAccountDeletionPageRootComponent {
     this.accessValidationBackendApiService.accountDeletionIsEnabled()
       .then((resp) => {
         if (resp.valid) {
-          this.showPage = true;
+          this.pageIsShown = true;
         } else {
-          this.showError = true;
+          this.errorPageIsShown = true;
         }
         this.loaderService.hideLoadingScreen();
       }, (err) => {
-        this.showError = true;
+        this.errorPageIsShown = true;
         this.loaderService.hideLoadingScreen();
       });
   }

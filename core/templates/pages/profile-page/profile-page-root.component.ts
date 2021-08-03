@@ -28,8 +28,8 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './profile-page-root.component.html'
 })
 export class ProfilePageRootComponent {
-  showProfile: boolean = false;
-  showError: boolean = false;
+  pageIsShown: boolean = false;
+  errorPageIsShown: boolean = false;
 
   constructor(
     private accessValidationBackendApiService:
@@ -48,13 +48,13 @@ export class ProfilePageRootComponent {
     this.accessValidationBackendApiService.doesProfileExist(username)
       .then((resp) => {
         if (!resp.valid) {
-          this.showError = true;
+          this.errorPageIsShown = true;
         } else {
-          this.showProfile = true;
+          this.pageIsShown = true;
         }
         this.loaderService.hideLoadingScreen();
       }, (err) => {
-        this.showError = true;
+        this.errorPageIsShown = true;
         this.loaderService.hideLoadingScreen();
       });
   }

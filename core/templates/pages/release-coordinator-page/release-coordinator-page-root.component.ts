@@ -27,8 +27,8 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './release-coordinator-page-root.component.html'
 })
 export class ReleaseCoordinatorPageRootComponent {
-  showPage: boolean = false;
-  showError: boolean = false;
+  errorPageIsShown: boolean = false;
+  pageIsShown: boolean = false;
 
   constructor(
     private accessValidationBackendApiService:
@@ -47,13 +47,13 @@ export class ReleaseCoordinatorPageRootComponent {
       .validateAccessToReleaseCoordinatorPage()
       .then((resp) => {
         if (!resp.valid) {
-          this.showError = true;
+          this.errorPageIsShown = true;
         } else {
-          this.showPage = true;
+          this.pageIsShown = true;
         }
         this.loaderService.hideLoadingScreen();
       }, (err) => {
-        this.showError = true;
+        this.errorPageIsShown = true;
         this.loaderService.hideLoadingScreen();
       });
   }

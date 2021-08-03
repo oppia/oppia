@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the pending account deletion root component.
+ * @fileoverview Unit tests for the preferences page root component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -25,11 +25,11 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
+import { PreferencesPageRootComponent } from './preferences-page-root.component';
 
-describe('Pending Account Deletion Page Root', () => {
-  let fixture: ComponentFixture<PendingAccountDeletionPageRootComponent>;
-  let component: PendingAccountDeletionPageRootComponent;
+describe('Preferences Page Root', () => {
+  let fixture: ComponentFixture<PreferencesPageRootComponent>;
+  let component: PreferencesPageRootComponent;
   let pageTitleService: PageTitleService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let loaderService: LoaderService;
@@ -40,7 +40,7 @@ describe('Pending Account Deletion Page Root', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        PendingAccountDeletionPageRootComponent,
+        PreferencesPageRootComponent,
         MockTranslatePipe
       ],
       providers: [
@@ -52,7 +52,7 @@ describe('Pending Account Deletion Page Root', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PendingAccountDeletionPageRootComponent);
+    fixture = TestBed.createComponent(PreferencesPageRootComponent);
     component = fixture.componentInstance;
     pageTitleService = TestBed.inject(PageTitleService);
     loaderService = TestBed.inject(LoaderService);
@@ -67,7 +67,7 @@ describe('Pending Account Deletion Page Root', () => {
 
   it('should initialize and show page when access is valid', fakeAsync(() => {
     spyOn(pageTitleService, 'setPageTitle');
-    spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
+    spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
       .and.returnValue(Promise.resolve({
         valid: true
       }));
@@ -77,8 +77,8 @@ describe('Pending Account Deletion Page Root', () => {
     tick();
     expect(pageTitleService.setPageTitle).toHaveBeenCalled();
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.accountDeletionIsEnabled).toHaveBeenCalled();
+    expect(accessValidationBackendApiService.validateCanManageOwnAccount)
+      .toHaveBeenCalled();
     expect(component.pageIsShown).toBeTrue();
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe('Pending Account Deletion Page Root', () => {
       spyOn(pageTitleService, 'setPageTitle');
       spyOn(
         accessValidationBackendApiService,
-        'accountDeletionIsEnabled')
+        'validateCanManageOwnAccount')
         .and.returnValue(Promise.resolve({
           valid: false
         }));
@@ -99,7 +99,7 @@ describe('Pending Account Deletion Page Root', () => {
       tick();
       expect(pageTitleService.setPageTitle).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.accountDeletionIsEnabled)
+      expect(accessValidationBackendApiService.validateCanManageOwnAccount)
         .toHaveBeenCalled();
       expect(component.pageIsShown).toBeFalse();
       expect(component.errorPageIsShown).toBeTrue();
@@ -109,7 +109,7 @@ describe('Pending Account Deletion Page Root', () => {
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {
       spyOn(pageTitleService, 'setPageTitle');
-      spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
+      spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
         .and.returnValue(Promise.reject());
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
@@ -117,7 +117,7 @@ describe('Pending Account Deletion Page Root', () => {
       tick();
       expect(pageTitleService.setPageTitle).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.accountDeletionIsEnabled)
+      expect(accessValidationBackendApiService.validateCanManageOwnAccount)
         .toHaveBeenCalled();
       expect(component.pageIsShown).toBeFalse();
       expect(component.errorPageIsShown).toBeTrue();

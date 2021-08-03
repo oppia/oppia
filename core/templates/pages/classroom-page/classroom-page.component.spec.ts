@@ -38,7 +38,6 @@ class MockCapitalizePipe {
   }
 }
 
-
 describe('Classroom Page Component', () => {
   let component: ClassroomPageComponent;
   let fixture: ComponentFixture<ClassroomPageComponent>;
@@ -117,7 +116,10 @@ describe('Classroom Page Component', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'Math', [], 'Course details', 'Topics covered');
     spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve({ valid: true, redirect_url: '' }));
+      .and.returnValues(
+        Promise.resolve({ valid: false, redirect_url: '' }),
+        Promise.resolve({ valid: true, redirect_url: '' })
+      );
     spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
       .and.returnValue(Promise.resolve(classroomData));
 

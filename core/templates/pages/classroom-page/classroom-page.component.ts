@@ -87,9 +87,7 @@ export class ClassroomPageComponent {
           }
         });
       }
-    }, () => {
-
-    });
+    }, () => {});
   }
 
   getStaticImageUrl(imagePath: string): string {
