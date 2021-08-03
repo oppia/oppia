@@ -102,7 +102,7 @@ class DeleteModels(beam.PTransform):
     def expand(self, entities):
         """Deletes the given models from the datastore.
 
-        This override the expand() method from the parent class.
+        This overrides the expand() method from the parent class.
 
         Args:
             entities: PCollection. The PCollection of NDB keys to delete

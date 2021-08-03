@@ -19,14 +19,14 @@
 import { TestBed } from '@angular/core/testing';
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { EventEmitter } from '@angular/core';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import {StateObjectFactory} from "domain/state/StateObjectFactory";
 
-fdescribe('Preview Tab Component', function() {
+describe('Preview Tab Component', function() {
   importAllAngularServices();
 
   var ctrl = null;
@@ -43,6 +43,7 @@ fdescribe('Preview Tab Component', function() {
   var explorationPlayerStateService = null;
   var explorationParamChangesService = null;
   var explorationStatesService = null;
+  var graphDataService = null;
   var learnerParamsService = null;
   var numberAttemptsService = null;
   var routerService = null;
@@ -82,7 +83,8 @@ fdescribe('Preview Tab Component', function() {
         param_changes: [
           paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict()
         ],
-        states: [stateObjectFactory.createDefaultState(stateName)]
+        states: [stateObjectFactory.createDefaultState(stateName)],
+        init_state_name: stateName
       })
     });
   }));
@@ -100,19 +102,22 @@ fdescribe('Preview Tab Component', function() {
         'EditableExplorationBackendApiService');
       explorationEngineService = $injector.get('ExplorationEngineService');
       explorationFeaturesService = $injector.get('ExplorationFeaturesService');
+      explorationInitStateNameService = $injector.get(
+        'ExplorationInitStateNameService');
       explorationPlayerStateService = $injector.get(
         'ExplorationPlayerStateService');
       explorationParamChangesService = $injector.get(
         'ExplorationParamChangesService');
       explorationStatesService = $injector.get('ExplorationStatesService');
+      graphDataService = $injector.get('GraphDataService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
       stateEditorService = $injector.get('StateEditorService');
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
-      spyOn(parameterMetadataService, 'getUnsetParametersInfo').and
-        .returnValue(parameters);
+      spyOn(parameterMetadataService, 'getUnsetParametersInfo').and.returnValue(
+        parameters);
       spyOn(
         editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
         .and.returnValue($q.resolve(exploration));
@@ -149,9 +154,11 @@ fdescribe('Preview Tab Component', function() {
       });
 
     it('should init param changes if they are undefined', function() {
-      explorationParamChangesService.savedMemento = undefined;
       spyOn(explorationParamChangesService, 'init').and.callThrough();
-      spyOn(explorationStatesService, 'init').and.callThrough();
+      spyOn(explorationStatesService, 'init');
+      spyOn(explorationInitStateNameService, 'init').and.callThrough();
+      spyOn(graphDataService, 'recompute').and.callThrough();
+      explorationParamChangesService.savedMemento = undefined;
 
       // Get data from exploration data service.
       $scope.$apply();
@@ -162,9 +169,14 @@ fdescribe('Preview Tab Component', function() {
       expect(explorationStatesService.init).toHaveBeenCalledWith(
         [stateObjectFactory.createDefaultState(stateName)]
       );
+      expect(explorationInitStateNameService.init).toHaveBeenCalledWith(
+        stateName
+      );
+      expect(graphDataService.recompute).toHaveBeenCalled();
       expect(explorationParamChangesService.savedMemento).toEqual(
         [paramChangeObjectFactory.createEmpty(changeObjectName)]
       );
+      expect(explorationInitStateNameService.savedMemento).toEqual(stateName);
     });
 
     it('should set active state name when broadcasting' +

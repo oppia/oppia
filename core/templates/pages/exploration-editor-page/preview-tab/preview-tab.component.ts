@@ -64,20 +64,22 @@ angular.module('oppia').component('previewTab', {
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
     'ExplorationParamChangesService', 'ExplorationPlayerStateService',
-    'ExplorationStatesService', 'LearnerParamsService', 'NumberAttemptsService',
-    'ParamChangeObjectFactory', 'ParamChangesObjectFactory',
-    'ParameterMetadataService', 'PlayerCorrectnessFeedbackEnabledService',
-    'RouterService', 'StateEditorService',
+    'ExplorationStatesService', 'GraphDataService', 'LearnerParamsService',
+    'NumberAttemptsService', 'ParamChangeObjectFactory',
+    'ParamChangesObjectFactory', 'ParameterMetadataService',
+    'PlayerCorrectnessFeedbackEnabledService', 'RouterService',
+    'StateEditorService',
     function(
         $q, $rootScope, $timeout, $uibModal, ContextService,
         EditableExplorationBackendApiService,
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
         ExplorationParamChangesService, ExplorationPlayerStateService,
-        ExplorationStatesService, LearnerParamsService, NumberAttemptsService,
-        ParamChangeObjectFactory, ParamChangesObjectFactory,
-        ParameterMetadataService, PlayerCorrectnessFeedbackEnabledService,
-        RouterService, StateEditorService) {
+        ExplorationStatesService, GraphDataService, LearnerParamsService,
+        NumberAttemptsService, ParamChangeObjectFactory,
+        ParamChangesObjectFactory, ParameterMetadataService,
+        PlayerCorrectnessFeedbackEnabledService, RouterService,
+        StateEditorService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getManualParamChanges = function(initStateNameForPreview) {
@@ -179,6 +181,19 @@ angular.module('oppia').component('previewTab', {
         ExplorationDataService.getDataAsync().then(async(explorationData) => {
           var initStateNameForPreview = StateEditorService.getActiveStateName();
 
+          // TODO(#13564): Remove this part of code and make sure that this
+          // function is executed only after the Promise in initExplorationPage
+          // is fully finished.
+          if (!ExplorationParamChangesService.savedMemento) {
+            ExplorationParamChangesService.init(
+              ParamChangesObjectFactory.createFromBackendList(
+                explorationData.param_changes));
+            ExplorationStatesService.init(explorationData.states);
+            ExplorationInitStateNameService.init(
+              explorationData.init_state_name);
+            GraphDataService.recompute();
+          }
+
           // Show a warning message if preview doesn't start from the first
           // state.
           if (initStateNameForPreview !==
@@ -187,14 +202,6 @@ angular.module('oppia').component('previewTab', {
               'Preview started from \"' + initStateNameForPreview + '\"';
           } else {
             ctrl.previewWarning = '';
-          }
-
-          // If some services are not initialized, initialize them here.
-          if (!ExplorationParamChangesService.savedMemento) {
-            ExplorationParamChangesService.init(
-              ParamChangesObjectFactory.createFromBackendList(
-                explorationData.param_changes));
-            ExplorationStatesService.init(explorationData.states);
           }
 
           // Prompt user to enter any unset parameters, then populate
