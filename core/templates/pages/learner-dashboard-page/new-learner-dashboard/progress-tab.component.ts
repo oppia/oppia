@@ -74,7 +74,7 @@ export class ProgressTabComponent implements OnInit {
       '/learner_dashboard/empty_badge.png');
     if (this.topicsInSkillProficiency.length !== 0) {
       this.subtopicMastery = await (
-        this.learnerDashboardBackendApiService.getFetchSubtopicMastery(
+        this.learnerDashboardBackendApiService.fetchSubtopicMastery(
           this.topicIdsInSkillProficiency.join(',')));
     }
     this.displaySkills = new Array(
