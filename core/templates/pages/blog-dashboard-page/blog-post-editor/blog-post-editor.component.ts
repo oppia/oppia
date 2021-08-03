@@ -122,7 +122,7 @@ export class BlogPostEditorComponent implements OnInit {
           this.title = this.blogPostData.title;
           this.dateTimeLastSaved = this.getDateStringInWords(
             this.blogPostData.lastUpdated);
-          if (this.blogPostData.content !== '') {
+          if (this.blogPostData.content.length > 0) {
             this.contentEditorIsActive = false;
           }
           if (this.blogPostData.thumbnailFilename) {
