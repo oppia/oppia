@@ -34,22 +34,26 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     @classmethod
     def setUpClass(cls):
+        # type: () -> None
         super(RedisCacheServicesUnitTests, cls).setUpClass()
-        cls._managed_redis_server = servers.managed_redis_server()
-        cls._managed_redis_server.__enter__()
+        cls._managed_redis_server = servers.managed_redis_server() # type: ignore[attr-defined]
+        cls._managed_redis_server.__enter__() # type: ignore[attr-defined]
 
     @classmethod
     def tearDownClass(cls):
-        cls._managed_redis_server.__exit__(None, None, None)
+        # type: () -> None
+        cls._managed_redis_server.__exit__(None, None, None) # type: ignore[attr-defined]
         super(RedisCacheServicesUnitTests, cls).tearDownClass()
 
     def test_memory_stats_returns_dict(self):
+        # type: () -> None
         memory_stats = redis_cache_services.get_memory_cache_stats()
         self.assertIsNotNone(memory_stats.total_allocated_in_bytes)
         self.assertIsNotNone(memory_stats.peak_memory_usage_in_bytes)
         self.assertIsNotNone(memory_stats.total_number_of_keys_stored)
 
     def test_flush_cache_wipes_cache_clean(self):
+        # type: () -> None
         redis_cache_services.flush_cache()
         key_value_mapping = {'a1': '1', 'b1': '2', 'c1': '3'}
         redis_cache_services.set_multi(key_value_mapping)
@@ -61,6 +65,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             [None, None, None])
 
     def test_get_multi_retrieves_cache_elements(self):
+        # type: () -> None
         redis_cache_services.flush_cache()
         self.assertEqual(
             redis_cache_services.get_multi(['a2', 'b2', 'c2']),
@@ -74,12 +79,14 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             redis_cache_services.get_multi(['a2', 'b2', 'c2']), ['1', '2', '3'])
 
     def test_set_multi_sets_elements(self):
+        # type: () -> None
         redis_cache_services.flush_cache()
         key_value_mapping = {'a3': '1', 'b3': '2', 'c3': '3'}
         response = redis_cache_services.set_multi(key_value_mapping)
         self.assertTrue(response)
 
     def test_delete_multi_deletes_cache_elements(self):
+        # type: () -> None
         redis_cache_services.flush_cache()
         key_value_mapping = {'a4': '1', 'b4': '2', 'c4': '3'}
         redis_cache_services.set_multi(key_value_mapping)
@@ -97,6 +104,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         self.assertEqual(return_number_of_keys_set, 0)
 
     def test_partial_fetches_returns_reasonable_output(self):
+        # type: () -> None
         redis_cache_services.flush_cache()
         self.assertEqual(
             redis_cache_services.get_multi(['a5', 'b5', 'c5']),
@@ -113,6 +121,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             [None, '2', None])
 
     def test_partial_deletes_deletes_correct_elements(self):
+        # type: () -> None
         redis_cache_services.flush_cache()
         key_value_mapping = {'a6': '1', 'b6': '2', 'c6': '3'}
         redis_cache_services.set_multi(key_value_mapping)
@@ -126,16 +135,17 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
             [None, '2', '3'])
 
     def test_redis_configuration_file_matches_feconf_redis_configuration(self):
+        # type: () -> None
         """Tests that the redis configuration file and feconf variables have
         the same port definition.
         """
         self.assertTrue(os.path.exists(
             os.path.join(common.CURR_DIR, 'redis.conf')))
 
-        with python_utils.open_file(
+        with python_utils.open_file( # type: ignore[no-untyped-call]
             os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)
             self.assertEqual(
-                elements[1], python_utils.convert_to_bytes(feconf.REDISPORT))
+                elements[1], python_utils.convert_to_bytes(feconf.REDISPORT)) # type: ignore[no-untyped-call]

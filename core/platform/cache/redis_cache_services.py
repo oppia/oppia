@@ -24,11 +24,14 @@ import feconf
 import python_utils
 import redis
 
+from typing import Dict, List, Optional, Text, cast
+
 REDIS_CLIENT = redis.Redis(
     host=feconf.REDISHOST, port=feconf.REDISPORT)
 
 
 def get_memory_cache_stats():
+    # type: () -> caching_domain.MemoryCacheStats
     """Returns a memory profile of the redis cache. Visit
     https://redis.io/commands/memory-stats for more details on what exactly is
     returned.
@@ -38,8 +41,8 @@ def get_memory_cache_stats():
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = REDIS_CLIENT.memory_stats()
-    memory_stats = caching_domain.MemoryCacheStats(
+    redis_full_profile = REDIS_CLIENT.memory_stats() # type: ignore[attr-defined]
+    memory_stats = caching_domain.MemoryCacheStats( # type: ignore[no-untyped-call]
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
         redis_full_profile.get('keys.count'))
@@ -48,25 +51,30 @@ def get_memory_cache_stats():
 
 
 def flush_cache():
+    # type: () -> None
     """Wipes the Redis cache clean."""
     REDIS_CLIENT.flushdb()
 
 
 def get_multi(keys):
+    # type: (List[Text]) -> List[Optional[Text]]
     """Looks up a list of keys in Redis cache.
 
     Args:
         keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-        list(str). A list of values in the cache corresponding to the keys that
+        list(str|None). A list of values in the cache corresponding to the keys that
         are passed in.
     """
     assert isinstance(keys, list)
-    return REDIS_CLIENT.mget(keys)
+    return cast(
+        List[Optional[Text]],
+        REDIS_CLIENT.mget(keys))
 
 
 def set_multi(key_value_mapping):
+    # type: (Dict[Text, Text]) -> bool
     """Sets multiple keys' values at once in the Redis cache.
 
     Args:
@@ -82,6 +90,7 @@ def set_multi(key_value_mapping):
 
 
 def delete_multi(keys):
+    # type: (List[Text]) -> int
     """Deletes multiple keys in the Redis cache.
 
     Args:
