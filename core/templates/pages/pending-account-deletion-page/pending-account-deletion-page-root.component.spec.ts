@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 
@@ -44,8 +43,7 @@ describe('Pending Account Deletion Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService,
-        MetaTagCustomizationService
+        PageTitleService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -78,7 +76,8 @@ describe('Pending Account Deletion Page Root', () => {
     expect(pageTitleService.setPageTitle).toHaveBeenCalled();
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
-      accessValidationBackendApiService.accountDeletionIsEnabled).toHaveBeenCalled();
+      accessValidationBackendApiService.accountDeletionIsEnabled)
+      .toHaveBeenCalled();
     expect(component.pageIsShown).toBeTrue();
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
