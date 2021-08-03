@@ -25,6 +25,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 export interface ImagesData {
   filename: string;
+  // 'imageBlob' will be null when filenames
+  // are not present in localStorage.
   imageBlob: Blob | null;
 }
 
@@ -45,6 +47,7 @@ export class ImageLocalStorageService {
     private imageUploadHelperService: ImageUploadHelperService,
     private windowRef: WindowRef) {}
 
+  // Function returns null if filename doesn't exist in local storage.
   getRawImageData(filename: string): string | null {
     return this.windowRef.nativeWindow.sessionStorage.getItem(filename);
   }

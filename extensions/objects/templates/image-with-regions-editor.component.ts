@@ -30,11 +30,12 @@ import { UtilsService } from 'services/utils.service';
 import { ImageWithRegionsResetConfirmationModalComponent } from './image-with-regions-reset-confirmation.component';
 
 interface Region {
-    region: {
-      regionType: string;
-      area: number[][];
-    };
-    label: string | null;
+  region: {
+    regionType: string;
+    area: number[][];
+  };
+  // 'label' is null until a valid label is found.
+  label: string | null;
 }
 
 // TODO(czx): Uniquify the labels of image regions.
@@ -44,11 +45,12 @@ interface Region {
   styleUrls: []
 })
 export class ImageWithRegionsEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() value!: { labeledRegions: Region[]; imagePath: string; };
   @Output() valueChanged = new EventEmitter();
-  // Selected Region will be null if no region is selected.
-  selectedRegion: number | null = null;
   errorText!: string;
   SCHEMA!: { type: string; 'obj_type': string; };
   mouseX!: number;
@@ -72,7 +74,11 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   userIsCurrentlyDragging: boolean = false;
   userIsCurrentlyResizing: boolean = false;
   alwaysEditable: boolean = false;
-  hoveredRegion: null | number = null;
+  // Hovered Region will be the index of region that the mouse is currently in.
+  // It will be null if the mouse is not in a region.
+  hoveredRegion: number | null = null;
+  // Selected Region will be null if no region is selected.
+  selectedRegion: number | null = null;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -143,7 +149,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   private resizeRegion() {
     const labeledRegions = this.value.labeledRegions;
     const resizedRegion =
-     this.selectedRegion ? labeledRegions[this.selectedRegion].region : null;
+      this.selectedRegion ? labeledRegions[this.selectedRegion].region : null;
     const deltaX = this.mouseX - this.originalMouseX;
     const deltaY = this.mouseY - this.originalMouseY;
     let x = this.originalRectArea.x;
@@ -344,7 +350,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     } else if (this.userIsCurrentlyDragging) {
       const labeledRegions = this.value.labeledRegions;
       const draggedRegion =
-       this.selectedRegion ? labeledRegions[this.selectedRegion].region : null;
+        this.selectedRegion ? labeledRegions[this.selectedRegion].region : null;
       const deltaX = this.mouseX - this.originalMouseX;
       const deltaY = this.mouseY - this.originalMouseY;
       let newX1 = this.originalRectArea.x + deltaX;

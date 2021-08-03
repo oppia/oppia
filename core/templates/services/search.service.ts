@@ -40,6 +40,7 @@ interface FilterDetails {
 }
 
 export interface SelectionDetails {
+  [key: string]: FilterDetails;
   categories: FilterDetails;
   languageCodes: FilterDetails;
 }

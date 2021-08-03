@@ -610,7 +610,7 @@
     "extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component.spec.ts",
     "extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component.ts",
     "extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.ts",
-    "extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.spec.ts",
+    "extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component.spec.ts"
   ],
   "include": [
     "core/templates/components/code-mirror/*.ts",
