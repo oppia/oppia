@@ -47,7 +47,7 @@ class GetModels(beam.PTransform):
     def expand(self, initial_pipeline):
         """Returns a PCollection with models matching the corresponding query.
 
-        This overrides expand from parent class.
+        This overrides the expand() method from the parent class.
 
         Args:
             initial_pipeline: PValue. The initial pipeline. This pipeline
@@ -75,15 +75,15 @@ class PutModels(beam.PTransform):
     def expand(self, entities):
         """Writes the given models to the datastore.
 
-        This overrides expand from parent class.
+        This overrides the expand() method from the parent class.
 
         Args:
             entities: PCollection. A PCollection of NDB models to write
                 to the datastore. Can also contain just one model.
 
         Returns:
-            PCollection. An empty PCollection. This is needed because all expand
-            methods need to return some PCollection.
+            PCollection. An empty PCollection. This is needed because all
+            expand() methods need to return some PCollection.
         """
         return (
             entities
@@ -102,15 +102,15 @@ class DeleteModels(beam.PTransform):
     def expand(self, entities):
         """Deletes the given models from the datastore.
 
-        This overrides expand from parent class.
+        This override the expand() method from the parent class.
 
         Args:
             entities: PCollection. The PCollection of NDB keys to delete
                 from the datastore. Can also contain just one model.
 
         Returns:
-            PCollection. An empty PCollection. This is needed because all expand
-            methods need to return some PCollection.
+            PCollection. An empty PCollection. This is needed because all
+            expand() methods need to return some PCollection.
         """
         return (
             entities
