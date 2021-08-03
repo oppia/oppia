@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -33,6 +32,7 @@ import { DragAndDropPositiveIntEditorComponent } from './templates/drag-and-drop
 import { FractionEditorComponent } from './templates/fraction-editor.component';
 import { FormsModule } from '@angular/forms';
 import { FilepathEditorComponent } from './templates/filepath-editor.component';
+import { ImageEditorComponent } from './templates/image-editor.component';
 import { GraphInputInteractionModule } from 'interactions/GraphInput/graph-input-interactions.module';
 import { GraphEditorComponent } from './templates/graph-editor.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
@@ -64,7 +64,7 @@ import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-alge
 import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
-import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.component';
+import { SvgEditorComponent } from './templates/svg-editor.component';
 import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
 import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
 import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
@@ -78,7 +78,6 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     CommonElementsModule,
     FormsModule,
     LeafletModule,
@@ -101,6 +100,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -130,7 +130,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
-    SvgFilenameEditorComponent,
+    SvgEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -143,6 +143,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -172,7 +173,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
-    SvgFilenameEditorComponent,
+    SvgEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -185,6 +186,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     CustomOskLettersEditorComponent,
     DragAndDropPositiveIntEditorComponent,
     FilepathEditorComponent,
+    ImageEditorComponent,
     FractionEditorComponent,
     GraphEditorComponent,
     HtmlEditorComponent,
@@ -214,7 +216,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
-    SvgFilenameEditorComponent,
+    SvgEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent

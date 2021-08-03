@@ -36,6 +36,12 @@ import { Schema } from 'services/schema-default-value.service';
 
 
 export interface UserRolesBackendResponse {
+  roles: string[];
+  'managed_topic_ids': string[];
+  banned: boolean;
+}
+
+export interface UpdatableRolesBackendResponse {
   [role: string]: string;
 }
 
@@ -47,18 +53,7 @@ export interface ConfigPropertiesBackendResponse {
   [key: string]: ConfigProperty;
 }
 
-export interface ViewContributionBackendResponse {
-  usernames: string[];
-}
-
-export interface ContributionRightsBackendResponse {
-  'can_review_questions': boolean,
-  'can_review_translation_for_language_codes': string[],
-  'can_review_voiceover_for_language_codes': string[],
-  'can_submit_questions': boolean
-}
-
-export interface PendingDeletionRequestBackendResponse {
+interface PendingDeletionRequestBackendResponse {
   'number_of_pending_deletion_models': string
 }
 
@@ -125,10 +120,10 @@ export interface AdminPageDataBackendDict {
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
   'human_readable_current_time': string;
-  'updatable_roles': UserRolesBackendResponse;
+  'updatable_roles': UpdatableRolesBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': UserRolesBackendResponse;
+  'viewable_roles': UpdatableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
@@ -137,10 +132,10 @@ export interface AdminPageData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  updatableRoles: UserRolesBackendResponse;
+  updatableRoles: UpdatableRolesBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
-  viewableRoles: UserRolesBackendResponse;
+  viewableRoles: UpdatableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }
@@ -215,15 +210,13 @@ export class AdminBackendApiService {
     });
   }
 
-  async updateUserRoleAsync(
-      newRole: string, username: string, topicId: string
-  ): Promise<void> {
+  async addUserRoleAsync(
+      newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
+      this.http.put<void>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           role: newRole,
-          username: username,
-          topic_id: topicId
+          username: username
         }
       ).toPromise().then(response => {
         resolve(response);
@@ -233,81 +226,47 @@ export class AdminBackendApiService {
     });
   }
 
-  async addContributionReviewerAsync(
-      category: string, username: string, languageCode: string
-  ): Promise<void> {
+  async removeUserRoleAsync(
+      roleToRemove: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
-          category: category,
-          username: username,
-          language_code: languageCode
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async viewContributionReviewersAsync(
-      category: string, languageCode: string
-  ): Promise<ViewContributionBackendResponse> {
-    let params = {};
-    if (languageCode === null) {
-      params = { category: category };
-    } else {
-      params = {
-        category: category,
-        language_code: languageCode
-      };
-    }
-    return new Promise((resolve, reject) => {
-      this.http.get<ViewContributionBackendResponse>(
-        AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
-          params
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async contributionReviewerRightsAsync(
-      username: string): Promise<ContributionRightsBackendResponse> {
-    return new Promise((resolve, reject) => {
-      this.http.get<ContributionRightsBackendResponse>(
-        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
+            role: roleToRemove,
             username: username
           }
         }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
+      ).toPromise().then(resolve, errorResponse => {
         reject(errorResponse.error.error);
       });
     });
   }
 
-  async removeContributionReviewerAsync(
-      username: string, method: string,
-      category: string, languageCode: string
-  ): Promise<void> {
+  async assignManagerToTopicAsync(
+      username: string, topicId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put<void>(
-        AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
           username: username,
-          removal_type: method,
-          category: category,
-          language_code: languageCode
+          topic_id: topicId,
+          action: 'assign'
         }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
+      ).toPromise().then(resolve, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async deassignManagerFromTopicAsync(
+      username: string, topicId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+          username: username,
+          topic_id: topicId,
+          action: 'deassign'
+        }
+      ).toPromise().then(resolve, errorResponse => {
         reject(errorResponse.error.error);
       });
     });
@@ -484,6 +443,32 @@ export class AdminBackendApiService {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
       collection_id: String(collectionId)
+    });
+  }
+
+  async markUserBannedAsync(username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put<void>(
+        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
+        { username }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
+    });
+  }
+
+  async unmarkUserBannedAsync(username: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.delete<void>(
+        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
+        { params: { username } }).toPromise()
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 }

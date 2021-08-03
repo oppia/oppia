@@ -16,8 +16,8 @@
 
 """Job registries."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
@@ -44,10 +44,15 @@ ONE_OFF_JOB_MANAGERS = [
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.PopulateStoryThumbnailSizeOneOffJob,
+    story_jobs_one_off.StoryThumbnailSizeAuditOneOffJob,
     suggestion_jobs_one_off.PopulateTranslationContributionStatsOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
+    suggestion_jobs_one_off.TranslationSuggestionSvgDiagramOneOffJob,
+    suggestion_jobs_one_off.TranslationSuggestionUnicodeAuditOneOffJob,
+    suggestion_jobs_one_off.TranslationSuggestionUnicodeFixOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
-    topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob
+    topic_jobs_one_off.PopulateTopicThumbnailSizeOneOffJob,
+    topic_jobs_one_off.SubtopicThumbnailSizeAuditOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

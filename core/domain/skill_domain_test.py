@@ -14,8 +14,8 @@
 
 """Tests for skill domain objects and methods defined on them."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -223,7 +223,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected misconceptions schema version to be an integer')
 
-        self.skill.misconceptions_schema_version = 3
+        self.skill.misconceptions_schema_version = 4
         self.skill.rubric_schema_version = 100
         self._assert_validation_error(
             'Expected rubric schema version to be %s' %

@@ -14,8 +14,8 @@
 
 """Tests the methods defined in skill services."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -75,13 +75,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.SKILL_ID3 = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('admin2@example.com', 'adm2')
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
-        self.set_admins([self.ADMIN_USERNAME, 'adm2'])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME, 'adm2'])
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
@@ -579,6 +580,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -622,6 +624,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -655,6 +658,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_ids': [self.SKILL_ID],
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
+            'thumbnail_size_in_bytes': None,
             'url_fragment': 'subtopic-one'
         })
         self.save_new_topic(
@@ -1429,12 +1433,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 2)
+            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 3)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.skill_contents_schema_version, 2)
+        self.assertEqual(skill.skill_contents_schema_version, 3)
 
         self.assertEqual(
             skill.skill_contents.explanation.html,
@@ -1497,12 +1501,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 3)
+        self.assertEqual(skill.misconceptions_schema_version, 4)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, expected_html_content)
         self.assertEqual(
@@ -1562,12 +1566,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 3)
+            feconf, 'CURRENT_RUBRIC_SCHEMA_VERSION', 4)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.rubric_schema_version, 3)
+        self.assertEqual(skill.rubric_schema_version, 4)
         self.assertEqual(skill.rubrics[0].difficulty, 'Easy')
         self.assertEqual(skill.rubrics[0].explanations, ['Easy explanation'])
         self.assertEqual(skill.rubrics[1].difficulty, 'Medium')

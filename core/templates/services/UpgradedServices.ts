@@ -19,9 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import {
-  HttpClient,
-  HttpXhrBackend,
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpXhrBackend,
   // eslint-disable-next-line camelcase, oppia/disallow-flags
   ɵangular_packages_common_http_http_d
 } from '@angular/common/http';

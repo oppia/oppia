@@ -27,12 +27,15 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
   styleUrls: []
 })
 export class LearnerPlaylistModalComponent implements OnInit {
-  @Input() activityId: string;
-  @Input() activityTitle: string;
-  @Input() activityType: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activityId!: string;
+  @Input() activityTitle!: string;
+  @Input() activityType!: string;
 
-  sectionNameI18nId: string;
-  removeFromLearnerPlaylistUrl: string;
+  sectionNameI18nId!: string;
+  removeFromLearnerPlaylistUrl!: string;
 
   constructor(
     private activeModal: NgbActiveModal,

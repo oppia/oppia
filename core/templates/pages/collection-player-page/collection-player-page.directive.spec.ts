@@ -31,6 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { Collection } from 'domain/collection/collection.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
+import { UserInfo } from 'domain/user/user-info.model';
 
 describe('Collection player page directive', function() {
   let $scope = null;
@@ -55,26 +56,11 @@ describe('Collection player page directive', function() {
   let collectionNodesList = null;
   let collectionNodeBackendObject = null;
 
-  const userInfoForCollectionCreator = {
-    _isModerator: true,
-    _isAdmin: false,
-    _isTopicManager: false,
-    _isSuperAdmin: false,
-    _canCreateCollections: true,
-    _preferredSiteLanguageCode: 'en',
-    _username: 'username1',
-    _email: 'tester@example.org',
-    _isLoggedIn: false,
-    isModerator: () => true,
-    isAdmin: () => false,
-    isSuperAdmin: () => false,
-    isTopicManager: () => false,
-    canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
-    getUsername: () => 'username1',
-    getEmail: () => 'tester@example.org',
-    isLoggedIn: () => false
-  };
+  const userInfoForCollectionCreator = new UserInfo(
+    ['USER_ROLE'], true, false, false, false, true,
+    'en', 'username1', 'tester@example.com', true
+  );
+
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();

@@ -33,7 +33,7 @@
         <span>Exploration ID*</span>
       </div>
       <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control protractor-test-chapter-exploration-input">
-      <span class="new-chapter-error-msg protractor-test-invalid-exp-id" ng-if="invalidExpId">
+      <span class="new-chapter-error-msg protractor-test-invalid-exp-id" ng-if="invalidExpId || explorationId && !validateExplorationId()">
         <span><[invalidExpErrorString]></span>
       </span>
     </div>

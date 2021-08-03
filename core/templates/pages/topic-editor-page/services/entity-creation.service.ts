@@ -43,15 +43,13 @@ require('pages/topic-editor-page/services/create-new-skill-modal.service');
 angular.module('oppia').factory('EntityCreationService', [
   '$uibModal', 'CreateNewSkillModalService',
   'TopicEditorRoutingService', 'TopicEditorStateService',
-  'UrlInterpolationService',
   function(
       $uibModal, CreateNewSkillModalService,
-      TopicEditorRoutingService, TopicEditorStateService,
-      UrlInterpolationService) {
+      TopicEditorRoutingService, TopicEditorStateService) {
     var createSubtopic = function(topic) {
       $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topic-editor-page/modal-templates/' +
+        template: require(
+          'pages/topic-editor-page/modal-templates/' +
           'create-new-subtopic-modal.template.html'),
         backdrop: 'static',
         resolve: {

@@ -14,8 +14,8 @@
 
 """Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -26,6 +26,11 @@ import python_utils
 class ForumRedirectPage(base.BaseHandler):
     """A handler to redirect to Oppia's Google group."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -35,6 +40,11 @@ class ForumRedirectPage(base.BaseHandler):
 class AboutRedirectPage(base.BaseHandler):
     """A page that redirects to the main About page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -43,6 +53,11 @@ class AboutRedirectPage(base.BaseHandler):
 
 class FoundationRedirectPage(base.BaseHandler):
     """A page that redirects to the separate Oppia Foundation site."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):
@@ -54,6 +69,11 @@ class FoundationRedirectPage(base.BaseHandler):
 class TeachRedirectPage(base.BaseHandler):
     """A page that redirects to the main Teach page."""
 
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
@@ -62,6 +82,11 @@ class TeachRedirectPage(base.BaseHandler):
 
 class ConsoleErrorPage(base.BaseHandler):
     """Page with missing resources to test cache slugs."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
 
     @acl_decorators.open_access
     def get(self):

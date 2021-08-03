@@ -116,7 +116,7 @@ angular.module('oppia').controller(
           language_code;
         UserService.getUserInfoAsync().then(userInfo => {
           $scope.username = userInfo.getUsername();
-          $scope.isAdmin = userInfo.isAdmin();
+          $scope.isCurriculumAdmin = userInfo.isCurriculumAdmin();
         });
         UserService.getUserContributionRightsDataAsync().then(
           userContributionRights => {

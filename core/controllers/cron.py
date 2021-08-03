@@ -14,8 +14,8 @@
 
 """Controllers for the cron jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -27,6 +27,7 @@ from core.domain import config_domain
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
+from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_jobs_one_off
@@ -277,7 +278,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 config_domain
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
             admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_ADMIN)
+                feconf.ROLE_ID_CURRICULUM_ADMIN)
             suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
@@ -289,7 +290,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
                 .value):
             admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_ADMIN)
+                feconf.ROLE_ID_CURRICULUM_ADMIN)
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
                 .get_info_about_suggestions_waiting_too_long_for_review()
@@ -300,3 +301,20 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                     admin_ids,
                     info_about_suggestions_waiting_too_long_for_review)
             )
+
+
+class CronTranslationContributionStatsHandler(base.BaseHandler):
+    """Handler for running the translation contribution stats populate job."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        (
+            suggestion_jobs_one_off
+            .PopulateTranslationContributionStatsOneOffJob.enqueue(
+                suggestion_jobs_one_off
+                .PopulateTranslationContributionStatsOneOffJob.create_new())
+        )
