@@ -593,7 +593,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # We fetch more questions here in order to try and ensure that the
             # eventual number of returned questions is sufficient to meet the
             # number requested, even after deduplication.
-            results =
             new_question_skill_link_models = cast(
                 List[QuestionSkillLinkModel],
                 query.fetch(
@@ -674,7 +673,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             models that are linked to the question ID, or None if there are no
             question skill link models associated with the question ID.
         """
-        results =
         return cast(
             Optional[List[QuestionSkillLinkModel]],
             QuestionSkillLinkModel.query().filter(

@@ -1001,12 +1001,12 @@ class TranslationContributionStatsModel(base_models.BaseModel):
     # doesn't match with BaseModel.get().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
-    def get(
+    def get( # type: ignore[override]
             cls,
             language_code, # type: Text
             contributor_user_id, # type: Text
             topic_id # type: Text
-    ): # type: ignore[override]
+    ):
         # type: (...) -> Optional[TranslationContributionStatsModel]
         """Gets the TranslationContributionStatsModel matching the supplied
         language_code, contributor_user_id, topic_id.
