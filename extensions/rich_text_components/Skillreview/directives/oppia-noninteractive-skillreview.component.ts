@@ -90,7 +90,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     const target = <HTMLElement> event.currentTarget;
     const offsetParent = <HTMLElement> target.offsetParent;
     return (
-      offsetParent.dataset.ckeWidgetId ? true : false ||
+      Boolean(offsetParent.dataset.ckeWidgetId) ||
       this.ckEditorCopyContentService.copyModeActive
     );
   }

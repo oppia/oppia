@@ -187,8 +187,8 @@ export class Skill {
     return this._misconceptions[idx];
   }
 
-  // It will return 'null' if the passed difficulty does not match
-  // any difficulty in the rubrics.
+  // This will return 'null' if the passed difficulty
+  // does not match any difficulty in the rubrics.
   getRubricExplanations(difficulty: string): string[] | null {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
@@ -217,7 +217,7 @@ export class Skill {
 
   toBackendDict(): SkillBackendDict {
     if (this._id === null || this._supersedingSkillId === null) {
-      throw new Error('The SkillIds are not defined');
+      throw new Error('The skill IDs are not defined');
     }
     return {
       id: this._id,

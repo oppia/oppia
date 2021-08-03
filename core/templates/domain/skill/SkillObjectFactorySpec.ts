@@ -251,7 +251,7 @@ describe('Skill object factory', () => {
       expect(skill.getSupersedingSkillId()).toEqual(null);
       expect(() => {
         skill.toBackendDict();
-      }).toThrowError('The SkillIds are not defined');
+      }).toThrowError('The skill IDs are not defined');
     });
 
   it('should get misconception id', () => {

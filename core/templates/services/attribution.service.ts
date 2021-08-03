@@ -45,7 +45,8 @@ export class AttributionService {
         let contributorSummary = (
           summaries.length ?
           summaries[0].human_readable_contributors_summary :
-            <HumanReadableContributorsSummary> {});
+          <HumanReadableContributorsSummary> {}
+        );
         this.authors = (
           Object.keys(contributorSummary).sort(
             (contributorUsername1, contributorUsername2) => {

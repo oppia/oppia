@@ -55,9 +55,9 @@ export class AudioPlayerService {
 
   private async _loadAsync(
       filename: string,
-      successCallback: (
-        value: void | PromiseLike<void>) => void,
-      errorCallback: (reason?: string[]) => void) {
+      successCallback: (value: void | PromiseLike<void>) => void,
+      errorCallback: (reason?: string[]) => void
+  ) {
     if (this._loadingTrack) {
       throw new Error('Already loading a track... Please try again!');
     }
@@ -124,7 +124,8 @@ export class AudioPlayerService {
       return;
     }
     this._lastPauseOrSeekPos = this.getCurrentTime();
-    // 'currentTrack' is not null since the track is playing.
+    // 'currentTrack' is not null since the track is playing
+    // and that is why we use '?'.
     this._currentTrack?.pause();
     this._stopIntervalSubject.next();
   }

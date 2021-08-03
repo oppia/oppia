@@ -88,7 +88,7 @@ export class AttributionGuideComponent implements OnInit {
     range.setStartBefore(<Node>(<HTMLDivElement>codeDiv).firstChild);
     range.setEndAfter(<Node>(<HTMLDivElement>codeDiv).lastChild);
     // 'getSelection()' will not return 'null' since it is not called on an
-    // undisplayed <iframe>.
+    // undisplayed <iframe>. That is why we can use '?'.
     const selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(range);
