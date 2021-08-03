@@ -145,6 +145,8 @@ class StoryModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None

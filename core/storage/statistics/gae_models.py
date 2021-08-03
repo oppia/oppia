@@ -1227,6 +1227,8 @@ class ExplorationStatsModel(base_models.BaseModel):
         exploration_stats_model = cls.get(instance_id, strict=False)
         return exploration_stats_model
 
+    # TODO(#13523): Change 'state_stats_mapping' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create(
             cls,
@@ -1392,6 +1394,8 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_model = cls.get(instance_id, strict=False)
         return exp_issues_model
 
+    # TODO(#13523): Change 'unresolved_issues' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create(cls, exp_id, exp_version, unresolved_issues):
         # type: (Text, int, List[Dict[Text, Any]]) -> Text
@@ -1506,6 +1510,8 @@ class PlaythroughModel(base_models.BaseModel):
             'The id generator for PlaythroughModel is producing too many '
             'collisions.')
 
+    # TODO(#13523): Change 'issue_customization_args' and 'actions' to
+    # TypedDict/Domain Object to remove Any used below.
     @classmethod
     def create(
             cls, exp_id, exp_version, issue_type, issue_customization_args,
@@ -1641,6 +1647,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             '%s:%s' % (entity_type, state_reference))
         return instance_id
 
+    # TODO(#13523): Change 'learner_answer_info_list' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create_model_instance(
             cls, entity_type, state_reference, interaction_id,
@@ -1659,7 +1667,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 the form 'question_id'.
             interaction_id: str. The ID of the interaction for which the
                 answer details are received.
-            learner_answer_info_list: list(LearnerAnswerInfo). The list of
+            learner_answer_info_list: list(dict). The list of
                 LearnerAnswerInfo objects in dict format, which is defined in
                 the stats_domain.
             learner_answer_info_schema_version: int. The version of
@@ -1778,7 +1786,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     def create(
             cls, exp_id, version, num_starts, num_completions,
             state_hit_counts):
-        # type: (Text, int, int, int, Dict[Text, Any]) -> None
+        # type: (Text, int, int, int, Dict[Text, int]) -> None
         """Creates a new ExplorationAnnotationsModel and
         then writes it to the datastore.
 
@@ -1995,7 +2003,7 @@ class StateAnswersModel(base_models.BaseModel):
     def _insert_submitted_answers_unsafe_transactional(
             cls, exploration_id, exploration_version, state_name,
             interaction_id, new_submitted_answer_dict_list):
-        # type: (Text, int, Text, Text, List[Dict[Text, Any]]) -> None
+        # type: (Text, int, Text, Text, List[Dict[Text, Text]]) -> None
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
@@ -2091,6 +2099,8 @@ class StateAnswersModel(base_models.BaseModel):
         cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
+    # TODO(#13523): Change 'new_submitted_answer' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def insert_submitted_answers(
             cls, exploration_id, exploration_version, state_name,
@@ -2139,6 +2149,8 @@ class StateAnswersModel(base_models.BaseModel):
             exploration_id, python_utils.UNICODE(exploration_version),
             state_name, python_utils.UNICODE(shard_id)])
 
+    # TODO(#13523): Change answer lists to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def _shard_answers(
             cls, current_answer_list, current_answer_list_size,
@@ -2190,6 +2202,8 @@ class StateAnswersModel(base_models.BaseModel):
                 sharded_answer_list_sizes.append(answer_size)
         return sharded_answer_lists, sharded_answer_list_sizes
 
+    # TODO(#13523): Change answer dict to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def _get_answer_dict_size(cls, answer_dict):
         # type: (Dict[Text, Any]) -> int

@@ -44,6 +44,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
     target_id = 'exp1'
     target_version_at_submission = 1
+    # TODO(#13523): Use of Any here in the type annotation below will
+    # be removed when change_cmd will be changed to
+    # TypedDict/Domain Object.
     change_cmd = {} # type: Dict[Text, Any]
     # Language code that would normally be derived from the change_cmd.
     translation_language_code = 'en'

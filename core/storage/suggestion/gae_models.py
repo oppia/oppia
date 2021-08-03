@@ -213,6 +213,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.author_id == user_id, cls.final_reviewer_id == user_id
         )).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create(
             cls,
@@ -567,6 +569,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.query(projection=['score_category'], distinct=True))
         return [data.score_category for data in query_set]
 
+    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def export_data(cls, user_id):
         # type: (Text) -> Dict[Text, Dict[Text, Union[Text, int, bool, Dict[Text, Any], None]]]

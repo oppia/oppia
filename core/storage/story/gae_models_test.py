@@ -24,8 +24,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import Any # isort:skip # pylint: disable=unused-import
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models, story_models

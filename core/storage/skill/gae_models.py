@@ -164,6 +164,8 @@ class SkillModel(base_models.VersionedModel):
             skill.superseding_skill_id is not None and (
                 len(skill.superseding_skill_id) > 0))]
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None

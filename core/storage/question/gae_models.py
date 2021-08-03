@@ -188,6 +188,8 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -218,6 +220,8 @@ class QuestionModel(base_models.VersionedModel):
         question_commit_log.update_timestamps()
         question_commit_log.put()
 
+    # TODO(#13523): Change 'question_state_data' to TypedDict/Domain Object
+    # to remove Any used below.
     @classmethod
     def create(
             cls, question_state_data, language_code, version, linked_skill_ids,
