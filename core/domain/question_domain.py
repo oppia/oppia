@@ -1114,6 +1114,26 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v46_dict_to_v47_dict(cls, question_state_dict):
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
