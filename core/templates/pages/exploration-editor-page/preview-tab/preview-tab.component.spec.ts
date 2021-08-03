@@ -114,8 +114,6 @@ describe('Preview Tab Component', function() {
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
       stateEditorService = $injector.get('StateEditorService');
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
       spyOn(parameterMetadataService, 'getUnsetParametersInfo').and.returnValue(
         parameters);
       spyOn(
@@ -146,6 +144,9 @@ describe('Preview Tab Component', function() {
 
     it('should initialize controller properties after its initialization',
       function() {
+        spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+          stateName);
+
         // Get data from exploration data service.
         $scope.$apply();
 
@@ -157,7 +158,9 @@ describe('Preview Tab Component', function() {
       spyOn(explorationParamChangesService, 'init').and.callThrough();
       spyOn(explorationStatesService, 'init');
       spyOn(explorationInitStateNameService, 'init').and.callThrough();
-      spyOn(graphDataService, 'recompute').and.callThrough();
+      spyOn(graphDataService, 'recompute');
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+      spyOn(stateEditorService, 'setActiveStateName');
       explorationParamChangesService.savedMemento = undefined;
 
       // Get data from exploration data service.
@@ -173,6 +176,9 @@ describe('Preview Tab Component', function() {
         stateName
       );
       expect(graphDataService.recompute).toHaveBeenCalled();
+      expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
+        stateName
+      );
       expect(explorationParamChangesService.savedMemento).toEqual(
         [paramChangeObjectFactory.createEmpty(changeObjectName)]
       );
@@ -182,7 +188,8 @@ describe('Preview Tab Component', function() {
     it('should set active state name when broadcasting' +
       ' updateActiveStateIfInEditor', function() {
       spyOn(stateEditorService, 'setActiveStateName');
-
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        stateName);
       mockUpdateActiveStateIfInEditorEventEmitter.emit('State2');
 
       expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
@@ -214,6 +221,8 @@ describe('Preview Tab Component', function() {
     });
 
     it('should open set params modal', function() {
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        stateName);
       spyOn($uibModal, 'open').and.callThrough();
 
       // Get data from exploration data service.
@@ -227,7 +236,8 @@ describe('Preview Tab Component', function() {
         result: $q.resolve()
       });
       spyOn(explorationEngineService, 'initSettingsFromEditor');
-
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        stateName);
       // Get data from exploration data service and resolve promise in open
       // modal.
       $scope.$apply();
@@ -245,6 +255,8 @@ describe('Preview Tab Component', function() {
         result: $q.reject()
       });
       spyOn(routerService, 'navigateToMainTab');
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        stateName);
 
       // Get data from exploration data service and resolve promise in open
       // modal.
