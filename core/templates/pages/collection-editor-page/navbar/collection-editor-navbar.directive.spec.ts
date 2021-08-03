@@ -227,14 +227,14 @@ describe('Collection Editor Navbar directive', function() {
     spyOn(collectionEditorStateService, 'getCollection')
       .and.returnValue(sampleCollection);
     spyOn(collectionEditorStateService, 'getCollectionRights')
-    .and.returnValue(
-      new CollectionRights({
-        owner_names: [],
-        collection_id: 1,
-        can_edit: true,
-        can_unpublish: true,
-        is_private: true
-      }));
+      .and.returnValue(
+        new CollectionRights({
+          owner_names: [],
+          collection_id: 1,
+          can_edit: true,
+          can_unpublish: true,
+          is_private: true
+        }));
     spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
       .and.returnValue(mockCollectionInitializedEventEmitter);
     let validationSpy = spyOn(
