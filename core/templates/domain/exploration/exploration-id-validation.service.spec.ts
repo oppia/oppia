@@ -49,9 +49,7 @@ describe('Exploration id validation service', () => {
       summaries: [{
         id: '0',
         num_views: 0,
-        human_readable_contributors_summary: {
-          num_commits: 0,
-        },
+        human_readable_contributors_summary: {},
         created_on_msec: 1581965806278.269,
         ratings: {
           5: 0,
