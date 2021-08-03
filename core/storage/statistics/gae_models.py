@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # p
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import (
+    from mypy_imports import ( # pylint: disable=unused-import
         base_models, datastore_services, transaction_services)
     from core.domain import exp_domain
 

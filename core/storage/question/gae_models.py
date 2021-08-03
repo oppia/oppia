@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Optional, Text, cast # isort:skip # pylint: 
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services, skill_models
+    from mypy_imports import base_models, datastore_services, skill_models # pylint: disable=unused-import
 
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
