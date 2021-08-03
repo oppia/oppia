@@ -40,7 +40,9 @@ export class ImageUploadHelperService {
       Math.random().toString(36).substr(2, 10);
   }
 
-  convertImageDataToImageFile(dataURI: string | null): Blob | null {
+  // Image file returned will be null when blob is not of type
+  // 'image' or blob size is zero.
+  convertImageDataToImageFile(dataURI: string): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     if (dataURI) {
