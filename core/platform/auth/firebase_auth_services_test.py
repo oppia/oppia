@@ -38,6 +38,12 @@ from firebase_admin import exceptions as firebase_exceptions
 import mock
 import webapp2
 
+from typing import Any, Dict, List, Optional, Text
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import auth_models, user_models
+
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
@@ -99,6 +105,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     ]
 
     def __init__(self):
+        # type: () -> None
         self._users_by_uid = {}
         self._uid_by_session_cookie = {}
         self._swap_stack = None
@@ -129,12 +136,14 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             self._swap_stack = swap_stack.pop_all()
 
     def uninstall(self):
+        # type: () -> None
         """Uninstalls the stub. Idempotent."""
         if self._swap_stack:
             self._swap_stack.close()
             self._swap_stack = None
 
     def create_session_cookie(self, id_token, unused_max_age):
+        # type: (Text, datetime.timedelta) -> Text
         """Creates a new session cookie which expires after given duration.
 
         Args:
@@ -157,6 +166,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return session_cookie
 
     def create_user(self, uid, email=None, disabled=False):
+        # type: (Text, Optional[Text], bool) -> Text
         """Adds user to storage if new, otherwise raises an error.
 
         Args:
@@ -178,6 +188,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._encode_user_claims(uid)
 
     def delete_user(self, uid):
+        # type: (Text) -> Text
         """Removes user from storage if found, otherwise raises an error.
 
         Args:
@@ -191,6 +202,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         del self._users_by_uid[uid]
 
     def delete_users(self, uids, force_delete=False):
+        # type: (List[Text], bool) -> None
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -232,6 +244,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._create_delete_users_result_fragile(errors)
 
     def get_user(self, uid):
+        # type: (Text) -> firebase_auth.UserRecord
         """Returns user with given ID if found, otherwise raises an error.
 
         Args:
@@ -248,6 +261,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._users_by_uid[uid]
 
     def get_user_by_email(self, email):
+        # type: (Text) -> firebase_auth.UserRecord
         """Returns user with given email if found, otherwise raises an error.
 
         Args:
@@ -266,6 +280,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return user
 
     def import_users(self, records):
+        # type: (List[firebase_admin.auth.ImportUserRecord]) -> firebase_admin.auth.UserImportResult
         """Adds the given user records to the stub's storage.
 
         Args:
@@ -282,6 +297,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._create_user_import_result_fragile(len(records), [])
 
     def list_users(self, page_token=None, max_results=1000):
+        # type: (Optional[Text], Optional[Text]) -> firebase_admin.auth.ListUsersPage
         """Retrieves a page of user accounts from a Firebase project.
 
         The `page_token` argument governs the starting point of the page. The
@@ -330,6 +346,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             raise ValueError('page_token=%r is invalid' % page_token)
 
     def revoke_refresh_tokens(self, uid):
+        # type: (Text) -> None
         """Revokes all refresh tokens for an existing user.
 
         Args:
@@ -345,6 +362,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         }
 
     def set_custom_user_claims(self, uid, custom_claims):
+        # type: (Text, Optional[Text]) -> Text
         """Updates the custom claims of the given user.
 
         Args:
@@ -361,6 +379,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self.update_user(uid, custom_claims=custom_claims)
 
     def update_user(self, uid, email=None, disabled=False, custom_claims=None):
+        # type: (Text, Optional[Text], bool, Optional[Text]) -> Text
         """Updates the user in storage if found, otherwise raises an error.
 
         Args:
@@ -382,6 +401,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return uid
 
     def verify_id_token(self, token):
+        # type: (Text) -> Dict[Text, Any]
         """Returns claims for the corresponding user if the ID token is valid.
 
         Args:
@@ -397,6 +417,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return claims
 
     def verify_session_cookie(self, session_cookie, check_revoked=False):
+        # type: (Text, bool) -> Dict[Text, Any]
         """Returns claims for the corresponding user if the cookie is valid.
 
         Args:
@@ -418,6 +439,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return claims
 
     def assert_is_user(self, uid):
+        # type: (Text) -> None
         """Asserts that an account with the given id exists.
 
         NOTE: This method can only be called after the stub has been installed
@@ -431,6 +453,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             msg='Firebase account not found: uid=%r' % uid)
 
     def assert_is_not_user(self, uid):
+        # type: (Text) -> None
         """Asserts that an account with the given id does not exist.
 
         NOTE: This method can only be called after the stub has been installed
@@ -444,6 +467,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             msg='Unexpected Firebase account exists: uid=%r' % uid)
 
     def assert_is_super_admin(self, uid):
+        # type: (Text) -> None
         """Asserts that the given ID has super admin privileges.
 
         NOTE: This method can only be called after the stub has been installed
@@ -458,6 +482,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
     def assert_is_not_super_admin(self, uid):
+        # type: (Text) -> None
         """Asserts that the given ID does not have super admin privileges.
 
         NOTE: This method can only be called after the stub has been installed
@@ -472,6 +497,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             custom_claims.get('role', None), feconf.FIREBASE_ROLE_SUPER_ADMIN)
 
     def assert_is_disabled(self, uid):
+        # type: (Text) -> None
         """Asserts that the given ID is a disabled account.
 
         NOTE: This method can only be called after the stub has been installed
@@ -484,6 +510,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._test.assertTrue(self.get_user(uid).disabled)
 
     def assert_is_not_disabled(self, uid):
+        # type: (Text) -> None
         """Asserts that the given ID is not a disabled account.
 
         NOTE: This method can only be called after the stub has been installed
@@ -496,6 +523,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._test.assertFalse(self.get_user(uid).disabled)
 
     def assert_is_user_multi(self, uids):
+        # type: (List[Text]) -> None
         """Asserts that every account with the given ids exist.
 
         NOTE: This method can only be called after the stub has been installed
@@ -510,6 +538,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             msg='Firebase accounts not found: uids=%r' % (not_found,))
 
     def assert_is_not_user_multi(self, uids):
+        # type: (List[Text]) -> None
         """Asserts that every account with the given ids do not exist.
 
         NOTE: This method can only be called after the stub has been installed
@@ -526,6 +555,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def mock_delete_users_error(
             self,
             batch_error_pattern=(None,), individual_error_pattern=(None,)):
+        # type: (Tuple[Optional[Exception]], Tuple[bool]) -> Iterator[Any]
         """Returns a context in which `delete_users` fails according to the
         given patterns.
 
@@ -575,6 +605,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def mock_import_users_error(
             self,
             batch_error_pattern=(None,), individual_error_pattern=(None,)):
+        # type: (Tuple[Optional[Exception]], Tuple[Optional[Text]]) -> Iterator[Any]
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
@@ -621,6 +652,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return self._test.swap(firebase_auth, 'import_users', mock_import_users)
 
     def _encode_user_claims(self, uid):
+        # type: (Text) -> Text
         """Returns encoded claims for the given user.
 
         Args:
@@ -638,6 +670,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return json.dumps(claims)
 
     def _decode_user_claims(self, encoded_claims):
+        # type: (Text) -> Dict[Text, Any]
         """Returns the given decoded claims.
 
         Args:
@@ -652,6 +685,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             return None
 
     def _set_user_fragile(self, uid, email, disabled, custom_claims):
+        # type: (Text, Text, bool, Text) -> None
         """Sets the given properties for the corresponding user.
 
         FRAGILE! The dict keys used by the UserRecord constructor are an
@@ -670,6 +704,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         })
 
     def _create_list_users_page_fragile(self, page_list, page_index):
+        # type: (List[List[firebase_auth.UserRecord]], int) -> mock.Mock
         """Creates a new ListUsersPage mock.
 
         FRAGILE! The mock is not from the real SDK, so it's vulnerable to
@@ -703,6 +738,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         return page
 
     def _create_delete_users_result_fragile(self, errors):
+        # type: (List[Tuple[int, Text]]) -> firebase_auth.BatchDeleteAccountsResponse
         """Creates a new BatchDeleteAccountsResponse instance with the given
         values.
 
@@ -720,6 +756,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             errors=[{'index': i, 'message': error} for i, error in errors])
 
     def _create_user_import_result_fragile(self, total, errors):
+        # type: (int, List[Tuple[int, Text]]) -> firebase_auth.UserImportResult
         """Creates a new UserImportResult instance with the given values.
 
         FRAGILE! The dict keys used by the UserImportResult constructor are an
