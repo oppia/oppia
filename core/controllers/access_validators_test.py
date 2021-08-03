@@ -38,7 +38,7 @@ class SplashPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_redirection_if_user_is_not_fully_registered(self):
         response = self.get_json(
-          '%s/can_access_splash_page' %ACCESS_VALIDATORS_PREFIX)
+            '%s/can_access_splash_page' % ACCESS_VALIDATORS_PREFIX)
         self.assertTrue(response['valid'])
         self.logout()
 
@@ -74,7 +74,7 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ClassroomPageAccessValidationHandlerTests, self).setUp()
         self.signup(
-          self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.user_id_admin = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
@@ -92,22 +92,24 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_validation_returns_true_if_classroom_is_available(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_json(
-          '%s/can_access_classroom_page?classroom_url_fragment=%s' %
-          (ACCESS_VALIDATORS_PREFIX, 'math'))
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATORS_PREFIX, 'math'))
         self.assertTrue(response['valid'])
         self.assertIsNone(response['redirect_url'])
 
-    def test_validation_returns_false_and_redirects_if_classroom_is_not_valid(self):
+    def test_validation_returns_false_if_classroom_doesnot_exists(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_json(
-          '%s/can_access_classroom_page?classroom_url_fragment=%s' %
-          (ACCESS_VALIDATORS_PREFIX, 'not_valid'))
+            '%s/can_access_classroom_page?classroom_url_fragment=%s' %
+            (ACCESS_VALIDATORS_PREFIX, 'not_valid'))
         self.assertFalse(response['valid'])
-        self.assertEqual(response['redirect_url'], '/learn/%s' %
-                                    constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
+        self.assertEqual(
+            response['redirect_url'], '/learn/%s' %
+            constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-class ReleaseCoordinatorAccessValidationHandlerTests(test_utils.GenericTestBase):
+class ReleaseCoordinatorAccessValidationHandlerTests(
+    test_utils.GenericTestBase):
     """Test for release coordinator access validation."""
 
     def setUp(self):
@@ -135,13 +137,15 @@ class ReleaseCoordinatorAccessValidationHandlerTests(test_utils.GenericTestBase)
     def test_release_coordinator_passes_validation(self):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
-        response = self.get_json('%s/can_access_release_coordinator_page' %
-            ACCESS_VALIDATORS_PREFIX)
+        response = self.get_json(
+            '%s/can_access_release_coordinator_page' %
+                                 ACCESS_VALIDATORS_PREFIX)
         self.assertTrue(response['valid'])
 
 
 
-class AccountDeletionIsEnabledValidationHandlerTests(test_utils.GenericTestBase):
+class AccountDeletionIsEnabledValidationHandlerTests(
+    test_utils.GenericTestBase):
 
     def setUp(self):
         super(AccountDeletionIsEnabledValidationHandlerTests, self).setUp()
@@ -150,14 +154,14 @@ class AccountDeletionIsEnabledValidationHandlerTests(test_utils.GenericTestBase)
 
     def test_delete_account_validation_returns_true_if_enabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            response = self.get_json('%s/account_deletion_is_enabled' %
-            ACCESS_VALIDATORS_PREFIX,)
+            response = self.get_json(
+                '%s/account_deletion_is_enabled' % ACCESS_VALIDATORS_PREFIX)
             self.assertTrue(response['valid'])
 
     def test_delete_account_validation_returns_false_if_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            response = self.get_json('%s/account_deletion_is_enabled' %
-            ACCESS_VALIDATORS_PREFIX,)
+            response = self.get_json(
+                '%s/account_deletion_is_enabled' % ACCESS_VALIDATORS_PREFIX)
             self.assertFalse(response['valid'])
 
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
