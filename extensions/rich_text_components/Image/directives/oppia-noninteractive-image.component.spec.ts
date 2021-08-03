@@ -55,6 +55,12 @@ describe('NoninteractiveImage', () => {
     }
   }
 
+  class MockSvgSanitizerService {
+    getTrustedSvgResourceUrl(str: string): string {
+      return str;
+    }
+  }
+
   let mockImageLocalStorageService = {
     getRawImageData: (filename) => {
       return dataUrlSvg;
@@ -83,6 +89,10 @@ describe('NoninteractiveImage', () => {
           provide: ImageLocalStorageService,
           useValue: mockImageLocalStorageService
         },
+        {
+          provide: SvgSanitizerService,
+          useClass: MockSvgSanitizerService
+        }
       ]
     }).compileComponents();
   }));
@@ -105,6 +115,7 @@ describe('NoninteractiveImage', () => {
 
   it('should initialise component when exploration loads', fakeAsync(() => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
 
     component.ngOnInit();
@@ -237,10 +248,6 @@ describe('NoninteractiveImage', () => {
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
-    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and
-      .callFake((data) => {
-        return data;
-      });
     let changes: SimpleChanges = {
       altWithValue: {
         currentValue: 'new image label',
