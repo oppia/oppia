@@ -31,6 +31,20 @@ describe('isRegexMatched Filter', function() {
     angular.mock.inject(function($filter) {
       let filter = $filter(filterName);
       let args = {
+        regexPattern: 'a.$'
+      };
+      expect(filter('a ', args)).toBe(true);
+      expect(filter('a$', args)).toBe(true);
+      expect(filter('a2', args)).toBe(true);
+
+      args = {
+        regexPattern: 'g(oog)+le'
+      };
+      expect(filter('google ', args)).toBe(true);
+      expect(filter('googoogle', args)).toBe(true);
+      expect(filter('googoogoogoogle', args)).toBe(true);
+
+      args = {
         regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
       };
       expect(filter('https://', args)).toBe(true);
@@ -43,6 +57,20 @@ describe('isRegexMatched Filter', function() {
     angular.mock.inject(function($filter) {
       let filter = $filter(filterName);
       let args = {
+        regexPattern: 'a.$'
+      };
+      expect(filter('a', args)).toBe(false);
+      expect(filter('a$a', args)).toBe(false);
+      expect(filter('bb', args)).toBe(false);
+
+      args = {
+        regexPattern: 'g(oog)+le'
+      };
+      expect(filter('gooogle ', args)).toBe(false);
+      expect(filter('gle', args)).toBe(false);
+      expect(filter('goole', args)).toBe(false);
+
+      args = {
         regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
       };
       expect(filter('http://', args)).toBe(false);
