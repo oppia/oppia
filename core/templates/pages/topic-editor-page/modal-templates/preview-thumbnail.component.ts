@@ -52,8 +52,9 @@ export class PreviewThumbnailComponent {
           this.filename,
           entityType,
           this.contextService.getEntityId()));
+    } else {
+      throw new Error('No image present for preview');
     }
-    throw new Error('No image present for preview');
   }
 }
 

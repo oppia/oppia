@@ -98,7 +98,10 @@ describe('TextInputValidationService', () => {
   });
 
   it('should catch non-string value for placeholder', () => {
-    customizationArguments.placeholder.value = new SubtitledUnicode('', '');
+    // This throws "Type 'number' is not assignable to type 'SubtitledUnicode'".
+    // We need to suppress this error because we need to test validations.
+    // @ts-ignore
+    customizationArguments.placeholder.value = 1;
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
@@ -110,7 +113,11 @@ describe('TextInputValidationService', () => {
 
   it('should catch non-string value for placeholder', () => {
     customizationArguments.placeholder.value = (
-      new SubtitledUnicode('', null));
+    // This throws "Argument of type 'undefined' is not assignable to
+    // parameter of type 'string''". We need to suppress this error
+    // because we need to test validations.
+    // @ts-ignore
+      new SubtitledUnicode(undefined, undefined));
     let warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,
       goodDefaultOutcome);
