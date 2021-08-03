@@ -24,11 +24,19 @@ import textwrap
 
 import python_utils
 
+from typing import Any, Dict, List, Optional, Text
 
 def send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
+        sender_email, # type: Text
+        recipient_emails, # type: List[Text]
+        subject, # type: Text
+        plaintext_body, # type: Text
+        html_body, # type: Text
+        bcc=None, # type: Optional[List[Text]]
+        reply_to=None, # type: Optional[Text]
+        recipient_variables=None # type: Optional[Dict[Text, Dict[Text, Any]]]
+):
+    # type: (...) -> bool
     """Prints information about sent emails to the terminal console, in order
     to model sending an email in development mode.
 
@@ -71,7 +79,7 @@ def send_email_to_recipients(
     if len(recipient_emails) > 3:
         recipient_email_list_str += (
             '... Total: ' +
-            python_utils.convert_to_bytes(len(recipient_emails)) + ' emails.')
+            python_utils.convert_to_bytes(len(recipient_emails)) + ' emails.') # type: ignore[no-untyped-call]
 
     # Show the first 3 emails in bcc email list.
     if bcc:
@@ -81,7 +89,7 @@ def send_email_to_recipients(
         if len(bcc) > 3:
             bcc_email_list_str += (
                 '... Total: ' +
-                python_utils.convert_to_bytes(len(bcc)) + ' emails.')
+                python_utils.convert_to_bytes(len(bcc)) + ' emails.') # type: ignore[no-untyped-call]
 
     msg = (
         """

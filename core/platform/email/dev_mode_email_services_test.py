@@ -26,17 +26,20 @@ from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 import feconf
 
+from typing import Text
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
     def test_send_mail_logs_to_terminal(self):
+        # type: () -> None
         """In DEV Mode, platforms email_service API that sends a singular email
         logs the correct email info to terminal.
         """
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
+            # type: (Text, *Text) -> None
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
@@ -78,12 +81,14 @@ class EmailTests(test_utils.GenericTestBase):
             [logging_info_email_body, logging_info_notification])
 
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self):
+        # type: () -> None
         """In DEV Mode, platform email_services that sends mail to multiple
         recipients logs the correct info to terminal.
         """
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
+            # type: (Text, *Text) -> None
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 

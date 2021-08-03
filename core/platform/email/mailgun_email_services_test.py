@@ -24,6 +24,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+from typing import Dict, Text, Tuple
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
@@ -31,11 +32,17 @@ class EmailTests(test_utils.GenericTestBase):
     class Response(python_utils.OBJECT):
         """Class to mock python_utils.url_open responses."""
 
-        def __init__(self, url, expected_url):
+        def __init__(
+                self,
+                url, # type: Tuple[Text, Text, Dict[Text, Text]]
+                expected_url # type: Tuple[Text, Text, Dict[Text, Text]]
+        ):
+            # type: (...) -> None
             self.url = url
             self.expected_url = expected_url
 
         def getcode(self):
+            # type: () -> int
             """Gets the status code of this url_open mock.
 
             Returns:
@@ -44,6 +51,7 @@ class EmailTests(test_utils.GenericTestBase):
             return 200 if self.url == self.expected_url else 500
 
     def test_send_email_to_mailgun(self):
+        # type: () -> None
         """Test for sending HTTP POST request."""
         # Test sending email without bcc, reply_to or recipient_variables.
         expected_query_url = (
@@ -137,6 +145,7 @@ class EmailTests(test_utils.GenericTestBase):
             self.assertTrue(resp)
 
     def test_batch_send_to_mailgun(self):
+        # type: () -> None
         """Test for sending HTTP POST request."""
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
@@ -165,11 +174,12 @@ class EmailTests(test_utils.GenericTestBase):
             self.assertTrue(resp)
 
     def test_mailgun_key_or_domain_name_not_set_raises_exception(self):
+        # type: () -> None
         """Test that exceptions are raised when API key or domain name are
         unset.
         """
         # Testing no mailgun api key.
-        mailgun_exception = self.assertRaisesRegexp(
+        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailgun API key is not available.')
         with mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -182,7 +192,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         # Testing no mailgun domain name.
         swap_api = self.swap(feconf, 'MAILGUN_API_KEY', 'key')
-        mailgun_exception = self.assertRaisesRegexp(
+        mailgun_exception = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Mailgun domain name is not set.')
         with swap_api, mailgun_exception:
             mailgun_email_services.send_email_to_recipients(
@@ -194,6 +204,7 @@ class EmailTests(test_utils.GenericTestBase):
                 'Hi abc,<br> 😂'.encode(encoding='utf-8'))
 
     def test_invalid_status_code_returns_false(self):
+        # type: () -> None
         expected_query_url = (
             'https://api.mailgun.net/v3/domain/messages',
             (

@@ -24,11 +24,19 @@ import base64
 import feconf
 import python_utils
 
+from typing import Any, Dict, List, Optional, Text
 
 def send_email_to_recipients(
-        sender_email, recipient_emails, subject,
-        plaintext_body, html_body, bcc=None, reply_to=None,
-        recipient_variables=None):
+        sender_email, # type: Text
+        recipient_emails, # type: List[Text]
+        subject, # type: Text
+        plaintext_body, # type: Text
+        html_body, # type: Text
+        bcc=None, # type: Optional[List[Text]]
+        reply_to=None, # type: Optional[Text]
+        recipient_variables=None # type: Optional[Dict[Text, Dict[Text, Any]]]
+):
+    # type: (...) -> bool
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
 
