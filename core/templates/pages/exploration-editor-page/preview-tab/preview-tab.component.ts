@@ -64,7 +64,7 @@ angular.module('oppia').component('previewTab', {
     'ExplorationDataService', 'ExplorationEngineService',
     'ExplorationFeaturesService', 'ExplorationInitStateNameService',
     'ExplorationParamChangesService', 'ExplorationPlayerStateService',
-    'LearnerParamsService', 'NumberAttemptsService',
+    'ExplorationStatesService', 'LearnerParamsService', 'NumberAttemptsService',
     'ParamChangeObjectFactory', 'ParamChangesObjectFactory',
     'ParameterMetadataService', 'PlayerCorrectnessFeedbackEnabledService',
     'RouterService', 'StateEditorService',
@@ -74,7 +74,7 @@ angular.module('oppia').component('previewTab', {
         ExplorationDataService, ExplorationEngineService,
         ExplorationFeaturesService, ExplorationInitStateNameService,
         ExplorationParamChangesService, ExplorationPlayerStateService,
-        LearnerParamsService, NumberAttemptsService,
+        ExplorationStatesService, LearnerParamsService, NumberAttemptsService,
         ParamChangeObjectFactory, ParamChangesObjectFactory,
         ParameterMetadataService, PlayerCorrectnessFeedbackEnabledService,
         RouterService, StateEditorService) {
@@ -189,10 +189,12 @@ angular.module('oppia').component('previewTab', {
             ctrl.previewWarning = '';
           }
 
+          // If some services are not initialized, initialize them here.
           if (!ExplorationParamChangesService.savedMemento) {
             ExplorationParamChangesService.init(
               ParamChangesObjectFactory.createFromBackendList(
                 explorationData.param_changes));
+            ExplorationStatesService.init(explorationData.states);
           }
 
           // Prompt user to enter any unset parameters, then populate

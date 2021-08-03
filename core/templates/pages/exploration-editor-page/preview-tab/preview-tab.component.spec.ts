@@ -24,8 +24,9 @@ import { EventEmitter } from '@angular/core';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import {StateObjectFactory} from "domain/state/StateObjectFactory";
 
-describe('Preview Tab Component', function() {
+fdescribe('Preview Tab Component', function() {
   importAllAngularServices();
 
   var ctrl = null;
@@ -41,10 +42,12 @@ describe('Preview Tab Component', function() {
   var explorationFeaturesService = null;
   var explorationPlayerStateService = null;
   var explorationParamChangesService = null;
+  var explorationStatesService = null;
   var learnerParamsService = null;
   var numberAttemptsService = null;
   var routerService = null;
   var stateEditorService = null;
+  var stateObjectFactory = null;
   var paramChangeObjectFactory = null;
   var parameterMetadataService = null;
   var mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
@@ -68,7 +71,8 @@ describe('Preview Tab Component', function() {
   }];
 
   beforeEach(function() {
-    paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
+    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
   beforeEach(angular.mock.module(function($provide) {
@@ -76,7 +80,8 @@ describe('Preview Tab Component', function() {
       getDataAsync: () => $q.resolve({
         param_changes: [
           paramChangeObjectFactory.createEmpty('a').toBackendDict()
-        ]
+        ],
+        states: [stateObjectFactory.createDefaultState('state')]
       })
     });
   }));
@@ -98,6 +103,7 @@ describe('Preview Tab Component', function() {
         'ExplorationPlayerStateService');
       explorationParamChangesService = $injector.get(
         'ExplorationParamChangesService');
+      explorationStatesService = $injector.get('ExplorationStatesService');
       learnerParamsService = $injector.get('LearnerParamsService');
       parameterMetadataService = $injector.get('ParameterMetadataService');
       routerService = $injector.get('RouterService');
@@ -141,12 +147,16 @@ describe('Preview Tab Component', function() {
     it('should init param changes if they are undefined', function() {
       explorationParamChangesService.savedMemento = undefined;
       spyOn(explorationParamChangesService, 'init').and.callThrough();
+      spyOn(explorationStatesService, 'init').and.callThrough();
 
       // Get data from exploration data service.
       $scope.$apply();
 
       expect(explorationParamChangesService.init).toHaveBeenCalledWith(
         [paramChangeObjectFactory.createEmpty('a')]
+      );
+      expect(explorationStatesService.init).toHaveBeenCalledWith(
+        [stateObjectFactory.createDefaultState('state')]
       );
       expect(explorationParamChangesService.savedMemento).toEqual(
         [paramChangeObjectFactory.createEmpty('a')]
