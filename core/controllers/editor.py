@@ -659,8 +659,7 @@ class StateYamlHandler(EditorHandler):
                         'id': 'is_at_least',
                         'min_value': 1 # Width must be greater than zero.
                     }]
-                },
-                'default_value': 80
+                }
             }
         }
     }
@@ -670,6 +669,9 @@ class StateYamlHandler(EditorHandler):
         """Handles POST requests."""
         state_dict = self.normalized_payload.get('state_dict')
         width = self.normalized_payload.get('width')
+
+        if not width or not state_dict:
+            raise self.PageNotFoundException
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
@@ -947,10 +949,7 @@ class ImageUploadHandler(EditorHandler):
         'POST': {
             'image': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most'
-                    }]
+                    'type': 'basestring'
                 }
             },
             'filename': {

@@ -364,15 +364,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=((
                 'image',
                 'unused_filename',
-                large_image_file),)
+                '<svg><path d="%s" /></svg>' % (
+                    'M150 0 L75 200 L225 200 Z ' * 4000)),)
         )
         self.assertEqual(response_dict['status_code'], 400)
-
-        error_msg = (
-            'Schema validation for \'image\' failed: Validation failed: '
-            'has_length_at_most ({u\'max_value\': 102400}) for object %s'
-            % large_image_file)
-        self.assertEqual(response_dict['error'], error_msg)
+        self.assertEqual(
+            response_dict['error'], 'Image exceeds file size limit of 100 KB.')
 
         self.logout()
 
