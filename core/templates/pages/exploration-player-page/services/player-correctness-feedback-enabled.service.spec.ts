@@ -28,10 +28,18 @@ describe('Player correctness feedback enabled service', () => {
     pcfes = TestBed.get(PlayerCorrectnessFeedbackEnabledService);
   });
 
-  it('should set correctness feedback is enabled to given value', () => {
-    pcfes.init(false);
+  it('should set correctness feedback enabled to true', () => {
+    // Since initially, the value is false
     expect(pcfes.isEnabled()).toBe(false);
     pcfes.init(true);
     expect(pcfes.isEnabled()).toBe(true);
+  });
+
+  it('should set correctness feedback enabled to false when it is set to true', () => {
+    // Since initially, the value is false, it is set to true first 
+    pcfes.init(true);
+    expect(pcfes.isEnabled()).toBe(true);
+    pcfes.init(false);
+    expect(pcfes.isEnabled()).toBe(false);
   });
 });
