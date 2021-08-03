@@ -8,8 +8,7 @@
         <span>
           <div class="badge-info">
             <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image">
-            <p class="badge-type">
-              Gold
+            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_GOLD_BADGE' | translate">
             </p>
             <p class="badge-percent">
               100%
@@ -17,8 +16,7 @@
           </div>
           <div class="badge-info">
             <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image">
-            <p class="badge-type">
-              Silver
+            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_SILVER_BADGE' | translate">
             </p>
             <p class="badge-percent">
               80-99%
@@ -26,8 +24,7 @@
           </div>
           <div class="badge-info">
             <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image">
-            <p class="badge-type">
-              Bronze
+            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_BRONZE_BADGE' | translate">
             </p>
             <p class="badge-percent">
               60-79%
@@ -58,19 +55,20 @@
               </div>
             </div>
             <span class="progress-text">
-              Progress: {{topicMastery[i]}}%
+              <p class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate">
+              </p>
+              {{topicMastery[i]}}%
             </span>
           </div>
         </div>
         <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
-          <span class="skills-text">
-            Skills
-          </span>
+          <p class="skills-text" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILLS' | translate">
+          </p>
           <practice-tab [topicName]="tile.name"
                         [subtopicsList]="tile.subtopics"
                         [displayArea]="'progressTab'"
-                        [topicUrl]="tile.urlFragment"
-                        [classroomUrl]="tile.classroom"
+                        [topicUrlFragment]="tile.urlFragment"
+                        [classroomUrlFragment]="tile.classroom"
                         [subtopicMastery]="subtopicMastery[tile.id]">
           </practice-tab>
         </div>
@@ -200,6 +198,9 @@
     color: black;
     display: none;
   }
+  .progress-tab .progress-translate {
+    display: inline-block;
+  }
   .progress-tab .info-tooltip span img {
     float: left;
     margin: 0 8px 8px 0;
@@ -270,6 +271,7 @@
   .progress-tab .skills-text {
     color: #333;
     font-size: 18px;
+    margin-bottom: 0;
     text-align: left;
     text-transform: uppercase;
   }
