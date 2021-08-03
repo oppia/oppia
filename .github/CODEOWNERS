@@ -48,7 +48,7 @@
 
 
 # Angular Migration team
-/core/controllers/access_validators.py @srijanreddy98 @darksun27
+/core/controllers/access_validators*.py @srijanreddy98 @darksun27
 /core/controllers/oppia_root*.py @srijanreddy98 @darksun27
 /core/templates/components/shared-component.module.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
