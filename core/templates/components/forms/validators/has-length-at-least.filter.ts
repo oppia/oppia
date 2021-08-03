@@ -17,8 +17,8 @@
  * least some value.
  */
 
- angular.module('oppia').filter('hasLengthAtLeast', [function() {
-    return function(input, args) {
-      return (input.length >= args.minValue);
-    };
-  }]);
+angular.module('oppia').filter('hasLengthAtLeast', [function() {
+  return function(input, args) {
+    return (input.length >= args.minValue);
+  };
+}]);
