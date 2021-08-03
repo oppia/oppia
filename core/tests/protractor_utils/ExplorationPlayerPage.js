@@ -78,6 +78,9 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-audio-lang-select'));
   var playButton = element(by.css('.protractor-test-play-circle'));
   var pauseButton = element(by.css('.protractor-test-pause-circle'));
+  let submitButton = element(by.css('.protractor-test-submit-report-button'));
+  var flaggedSuccessElement = element(
+    by.css('.protractor-test-exploration-flagged-success-message'));
 
   this.expandAudioBar = async function() {
     await action.click('Audio Bar Expand Button', audioBarExpandButton);
@@ -133,10 +136,8 @@ var ExplorationPlayerPage = function() {
     await action.click('Radio Button', radioButton);
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
-    let submitButton = element(by.css('.protractor-test-submit-report-button'));
     await action.click('Submit Button', submitButton);
-    let afterSubmitText = await element(
-      by.css('.protractor-test-exploration-flagged-success-message')).getText();
+    let afterSubmitText = await flaggedSuccessElement.getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };

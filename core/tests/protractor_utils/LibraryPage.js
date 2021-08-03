@@ -27,6 +27,8 @@ var LibraryPage = function() {
     by.css('.protractor-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(
     by.css('.protractor-test-exp-summary-tile'));
+  var expSummaryTileTitleLocator = by.css(
+    '.protractor-test-exp-summary-tile-title');
   var allCollectionsTitled = function(collectionName) {
     return element.all(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', collectionName));
@@ -49,14 +51,20 @@ var LibraryPage = function() {
     by.css('.protractor-test-search-input'));
   var mainHeader = element(by.css('.protractor-test-library-main-header'));
   var searchButton = element(by.css('.protractor-test-search-button'));
+  var addToPlayLaterListButton = element(
+    by.css('.protractor-test-add-to-playlist-btn'));
+  var expHoverElement = element(by.css('.protractor-test-exp-hover'));
+  var expSummaryTileObjectiveLocator = by.css(
+    '.protractor-test-exp-summary-tile-objective');
+  var expSummaryTileRatingLocator = by.css(
+    '.protractor-test-exp-summary-tile-rating');
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = async function(name) {
-    return await element.all(
-      by.css('.protractor-test-exp-summary-tile')).filter(
+    return await allExplorationSummaryTile.filter(
       async function(tile) {
         var tileTitle = await tile.element(
-          by.css('.protractor-test-exp-summary-tile-title')).getText();
+          expSummaryTileTitleLocator).getText();
         return (tileTitle === name);
       }
     );
@@ -88,12 +96,7 @@ var LibraryPage = function() {
   };
 
   this.addSelectedExplorationToPlaylist = async function() {
-    var addToPlayLaterListButton = element(by.css(
-      '.protractor-test-add-to-playlist-btn')
-    );
-
-    await browser.actions().mouseMove(element(by.css(
-      '.protractor-test-exp-hover'))).perform();
+    await browser.actions().mouseMove(expHoverElement).perform();
 
     await waitFor.elementToBeClickable(
       addToPlayLaterListButton,
@@ -173,16 +176,14 @@ var LibraryPage = function() {
 
   this.getExplorationObjective = async function(name) {
     var elems = await _getExplorationElements(name);
-    return await elems[0].element(by.css(
-      '.protractor-test-exp-summary-tile-objective')).getText();
+    return await elems[0].element(expSummaryTileObjectiveLocator).getText();
   };
 
   this.expectExplorationRatingToEqual = async function(name, ratingValue) {
     var elems = await _getExplorationElements(name);
     await waitFor.visibilityOf(
       elems[0], 'Rating card takes too long to appear');
-    var value = await elems[0].element(by.css(
-      '.protractor-test-exp-summary-tile-rating')).getText();
+    var value = await elems[0].element(expSummaryTileRatingLocator).getText();
     expect(value).toBe(ratingValue);
   };
 

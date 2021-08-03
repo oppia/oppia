@@ -121,6 +121,14 @@
       }
     },
     {
+      "files": [
+        "core/tests/protractor_utils/*.js",
+      ],
+      "rules": {
+        "oppia/check-element-selector-at-top": "error"
+      }
+    },
+    {
       // We exclude spec files to the no-testonly check
       "files": ["*spec.js", "*spec.ts"],
       "rules": {

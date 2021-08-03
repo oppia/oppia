@@ -34,6 +34,9 @@ var thumbnailResetButton = element(by.css(
   '.protractor-test-thumbnail-reset-button'));
 var stateNameText = element(
   by.css('.protractor-test-state-name-text'));
+var activityCreationModal = element(by.css('.protractor-test-creation-modal'));
+var createExplorationButton = element(
+  by.css('.protractor-test-create-exploration'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -84,13 +87,9 @@ var createExplorationAndStartTutorial = async function(isCollectionEditor) {
 
   await creatorDashboardPage.clickCreateActivityButton();
   if (isCollectionEditor) {
-    var activityCreationModal = element(
-      by.css('.protractor-test-creation-modal'));
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
-    var createExplorationButton = element(
-      by.css('.protractor-test-create-exploration'));
     await action.click('Create Exploration Button', createExplorationButton);
   }
 
@@ -106,8 +105,6 @@ var createCollectionAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
-  var activityCreationModal = element(
-    by.css('.protractor-test-creation-modal'));
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
@@ -120,8 +117,6 @@ var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
-  var activityCreationModal = element(
-    by.css('.protractor-test-creation-modal'));
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateExplorationButton();
