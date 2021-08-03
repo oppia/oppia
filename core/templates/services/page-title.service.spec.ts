@@ -32,19 +32,6 @@ describe('Page title service', () => {
     pts = TestBed.inject(PageTitleService);
   });
 
-  it('should throw error if title for mobile is not set', () => {
-    expect(() => {
-      pts.getPageTitleForMobileView();
-    }).toThrowError('Page Title for mobile is not set');
-  });
-
-
-  it('should throw error if subtitle for mobile is not set', () => {
-    expect(() => {
-      pts.getPageSubtitleForMobileView();
-    }).toThrowError('Page Subtitle for mobile is not set');
-  });
-
   it('should correctly set the page title', () => {
     pts.setPageTitle('First Title');
     expect(titleService.getTitle()).toEqual('First Title');
