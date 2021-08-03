@@ -43,7 +43,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
     var getMetadataFromParamChanges = function(paramChanges) {
       var result = [];
-      console.error(`[DEBUGGING] paramChanges ${paramChanges}`);
+      console.error(`[DEBUGGING] paramChanges [${paramChanges}]`);
       for (var i = 0; i < paramChanges.length; i++) {
         var pc = paramChanges[i];
         if (pc.generatorId === 'Copier') {
@@ -54,7 +54,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
             var paramsReferenced = (
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
-            console.error(`[DEBUGGING] paramChanges ${paramsReferenced}`);
+            console.error(`[DEBUGGING] paramChanges [${paramsReferenced}]`);
             for (var j = 0; j < paramsReferenced.length; j++) {
               result.push(ParamMetadata.createWithGetAction(
                 paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, String(i)));
@@ -153,7 +153,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
             states.getState(stateName));
           console.error(
             `[DEBUGGING] stateParamMetadatas[stateName] 
-            ${stateParamMetadatas[stateName]}`
+            [${stateParamMetadatas[stateName]}]`
           );
           for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
             var pName = stateParamMetadatas[stateName][i].paramName;
@@ -168,7 +168,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
         // through any nodes that set this parameter.
         var unsetParametersInfo = [];
 
-        console.error(`[DEBUGGING] allParamNames ${allParamNames}`);
+        console.error(`[DEBUGGING] allParamNames [${allParamNames}]`);
         for (var paramInd = 0; paramInd < allParamNames.length; paramInd++) {
           var paramName = allParamNames[paramInd];
           var tmpUnsetParameter = null;
@@ -189,7 +189,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
           var queue = [];
           var seen = {};
-          console.error(`[DEBUGGING] initNodeIds ${initNodeIds}`);
+          console.error(`[DEBUGGING] initNodeIds [${initNodeIds}]`);
           for (var i = 0; i < initNodeIds.length; i++) {
             seen[initNodeIds[i]] = true;
             var paramStatus = getParamStatus(
@@ -210,10 +210,10 @@ angular.module('oppia').factory('ParameterMetadataService', [
             continue;
           }
 
-          console.error(`[DEBUGGING] queue ${queue}`);
+          console.error(`[DEBUGGING] queue [${queue}]`);
           while (queue.length > 0) {
             var currNodeId = queue.shift();
-            console.error(`[DEBUGGING] graphData.links ${graphData.links}`);
+            console.error(`[DEBUGGING] graphData.links [${graphData.links}]`);
             for (var edgeInd = 0; edgeInd < graphData.links.length; edgeInd++) {
               var edge = graphData.links[edgeInd];
               if (edge.source === currNodeId &&

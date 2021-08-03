@@ -179,8 +179,6 @@ angular.module('oppia').component('previewTab', {
         );
         ctrl.isExplorationPopulated = false;
         ExplorationDataService.getDataAsync().then(async(explorationData) => {
-          var initStateNameForPreview = StateEditorService.getActiveStateName();
-
           // TODO(#13564): Remove this part of code and make sure that this
           // function is executed only after the Promise in initExplorationPage
           // is fully finished.
@@ -192,7 +190,17 @@ angular.module('oppia').component('previewTab', {
             ExplorationInitStateNameService.init(
               explorationData.init_state_name);
             GraphDataService.recompute();
+            if (
+              !StateEditorService.getActiveStateName() ||
+              !ExplorationStatesService.getState(
+                StateEditorService.getActiveStateName()
+              )
+            ) {
+              StateEditorService.setActiveStateName(
+                ExplorationInitStateNameService.displayed);
+            }
           }
+          var initStateNameForPreview = StateEditorService.getActiveStateName();
 
           // Show a warning message if preview doesn't start from the first
           // state.
