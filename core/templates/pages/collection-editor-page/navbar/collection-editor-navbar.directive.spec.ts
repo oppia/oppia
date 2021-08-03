@@ -31,6 +31,7 @@ import { EventEmitter } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 // ^^^ This block is to be removed.
 
 describe('Collection Editor Navbar directive', function() {
@@ -46,6 +47,7 @@ describe('Collection Editor Navbar directive', function() {
     CollectionRightsBackendApiService = null;
   let urlInterpolationService: UrlInterpolationService = null;
   let RouterService = null;
+  let collectionValidationService: CollectionValidationService = null;
 
   let testSubscriptions: Subscription;
   let sampleCollectionBackendObject1: CollectionBackendDict;
@@ -81,6 +83,8 @@ describe('Collection Editor Navbar directive', function() {
       'CollectionRightsBackendApiService');
     urlInterpolationService = $injector.get('UrlInterpolationService');
     RouterService = $injector.get('RouterService');
+    collectionValidationService = $injector.get(
+      'CollectionValidationService');
 
     learnerExplorationSummaryBackendDict = {
       activity_type: 'exploration',
@@ -188,13 +192,61 @@ describe('Collection Editor Navbar directive', function() {
 
     ctrl.$onInit();
     $rootScope.$apply();
+
+    expect(ctrl.collectionId).toBe('collectionId');
+    expect(ctrl.collectionRights).toBe(sampleCollectionRights);
+  });
+
+  it('should validate issues when undo redo change ' +
+    'event is emitted', function() {
+    spyOn(urlService, 'getCollectionIdFromEditorUrl')
+      .and.returnValue('collectionId');
+    spyOn(collectionEditorStateService, 'getCollection')
+      .and.returnValue(sampleCollection);
+    spyOn(collectionEditorStateService, 'getCollectionRights')
+      .and.returnValue(sampleCollectionRights);
+    spyOn(undoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
+      mockUndoRedoChangeEventEmitter);
+    let validationSpy = spyOn(
+      collectionValidationService, 'findValidationIssuesForPublicCollection')
+      .and.callThrough();
+
+    ctrl.$onInit();
+    $rootScope.$apply();
     mockUndoRedoChangeEventEmitter.emit();
+    $rootScope.$apply();
+
+    expect(validationSpy).toHaveBeenCalled();
+  });
+
+
+  it('should validate issues when collection initialize ' +
+    'event is emitted', function() {
+    spyOn(urlService, 'getCollectionIdFromEditorUrl')
+      .and.returnValue('collectionId');
+    spyOn(collectionEditorStateService, 'getCollection')
+      .and.returnValue(sampleCollection);
+    spyOn(collectionEditorStateService, 'getCollectionRights')
+    .and.returnValue(
+      new CollectionRights({
+        owner_names: [],
+        collection_id: 1,
+        can_edit: true,
+        can_unpublish: true,
+        is_private: true
+      }));
+    spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
+      .and.returnValue(mockCollectionInitializedEventEmitter);
+    let validationSpy = spyOn(
+      collectionValidationService, 'findValidationIssuesForPrivateCollection')
+      .and.callThrough();
+
+    ctrl.$onInit();
     $rootScope.$apply();
     mockCollectionInitializedEventEmitter.emit();
     $rootScope.$apply();
 
-    expect(ctrl.collectionId).toBe('collectionId');
-    expect(ctrl.collectionRights).toBe(sampleCollectionRights);
+    expect(validationSpy).toHaveBeenCalled();
   });
 
   it('should fetch collection when initialized', function() {
@@ -211,22 +263,15 @@ describe('Collection Editor Navbar directive', function() {
           can_unpublish: true,
           is_private: true
         }));
-    spyOn(undoRedoService, 'onUndoRedoChangeApplied$').and.returnValue(
-      mockUndoRedoChangeEventEmitter);
-    spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
-      .and.returnValue(mockCollectionInitializedEventEmitter);
 
     ctrl.$onInit();
-    $rootScope.$apply();
-    mockUndoRedoChangeEventEmitter.emit();
-    $rootScope.$apply();
-    mockCollectionInitializedEventEmitter.emit();
     $rootScope.$apply();
 
     expect(ctrl.collection).toBe(sampleCollection);
   });
 
-  it('should unpublish collection successfully', fakeAsync(function() {
+  it('should unpublish collection successfully ' +
+    'when unpublish button is clicked', fakeAsync(function() {
     ctrl.collection = sampleCollection;
     ctrl.collectionRights = new CollectionRights({
       owner_names: [],
@@ -349,7 +394,6 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.saveChanges();
     $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(saveSpy).toHaveBeenCalled();
   }));

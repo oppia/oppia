@@ -698,10 +698,12 @@ describe('Exploration save service ' +
     $rootScope.$apply();
     flush();
     $rootScope.$apply();
+
     expect(modalSpy).toHaveBeenCalledTimes(1);
   }));
 
-  it('should focus on the exploration save modal', fakeAsync(function() {
+  it('should focus on the exploration save modal ' +
+    'when modal is opened', fakeAsync(function() {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
     let sampleStates = statesObjectFactory.createFromBackendDict(
