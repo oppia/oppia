@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Story Editor Save Modal Component.
+ * @fileoverview Component for the Story Editor Unpublish Modal Component.
  */
 
 import { Component } from '@angular/core';
