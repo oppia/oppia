@@ -117,7 +117,7 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9+/]*$'
+                    'regex_pattern': r'^[a-zA-Z0-9+/]+$'
                 }]
             }
         }
@@ -159,7 +159,7 @@ class ExplorationImprovementsConfigHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9+/]*$'
+                    'regex_pattern': r'^[a-zA-Z0-9+/]+$'
                 }]
             }
         }
