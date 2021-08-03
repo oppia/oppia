@@ -58,10 +58,8 @@ def _require_valid_version(version_from_payload, exploration_version):
 SCHEMA_FOR_EXPLORATION_ID = {
     'type': 'basestring',
     'validators': [{
-        'id': 'has_length_at_most',
-        'max_value': 12 # Max length of an exploration_id
-    }, {
-        'id': 'is_nonempty'
+        'id': 'is_regex_matched',
+        'regex_pattern': r'^[a-zA-Z0-9+/]+$'
     }]
 }
 SCHEMA_FOR_VERSION = {
@@ -76,7 +74,8 @@ SCHEMA_FOR_VERSION = {
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
 
-    pass
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {}
 
 
 class ExplorationPage(EditorHandler):
@@ -155,7 +154,7 @@ class ExplorationHandler(EditorHandler):
         # exploration history tab also uses this handler, and these parameters
         # are not used by that tab.
         version = self.normalized_request.get('v')
-        apply_draft = self.normalized_request.get('apply_draft', False)
+        apply_draft = self.normalized_request.get('apply_draft')
 
         user_settings = user_services.get_user_settings(self.user_id)
         has_seen_editor_tutorial = False
@@ -953,8 +952,7 @@ class ImageUploadHandler(EditorHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': 100 * 1024
+                        'id': 'has_length_at_most'
                     }]
                 }
             },
@@ -1063,9 +1061,9 @@ class EditorAutosaveHandler(ExplorationHandler):
             },
             'apply_draft': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             }
         },
         'DELETE': {}

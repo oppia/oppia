@@ -105,7 +105,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'EditableStoryDataHandler',
     'EditableSubtopicPageDataHandler',
     'EditableTopicDataHandler',
-    'EditorHandler',
     'EmailDashboardDataHandler',
     'EmailDashboardPage',
     'EmailDashboardResultPage',

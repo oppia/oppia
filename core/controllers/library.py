@@ -266,8 +266,7 @@ class SearchHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': (
-                            'is_string_contained_within_parenthesis_and_quotes')
+                        'id': 'is_gae_search_query_string'
                     }]
                 },
                 'default_value': ''
@@ -276,8 +275,7 @@ class SearchHandler(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': (
-                            'is_string_contained_within_parenthesis_and_quotes')
+                        'id': 'is_gae_search_query_string'
                     }]
                 },
                 'default_value': ''

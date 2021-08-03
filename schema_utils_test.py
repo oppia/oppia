@@ -795,7 +795,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'WzEuNjI2NTgxNDQwOTVlKzEyXQ==WzE3NThd',
             r'(exploration|collection)\.\w+\.\w+'))
 
-    def is_string_contained_within_parenthesis_and_quotes(self):
+    def is_gae_search_query_string(self):
         # type: () -> None
 
         """Checks whether a given string is contained within parenthesis and
@@ -805,17 +805,13 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             bool. A boolean value representing whether a given string is
             contained within parenthesis and double quotes.
         """
-        is_string_contained_within_parenthesis_and_quotes = (
-            schema_utils.get_validator(
-                'is_string_contained_within_parenthesis_and_quotes')
-        )
+        is_gae_search_query_string = (
+            schema_utils.get_validator('is_gae_search_query_string'))
 
-        self.assertTrue(is_string_contained_within_parenthesis_and_quotes(
-            '("A category")'))
-        self.assertFalse(is_string_contained_within_parenthesis_and_quotes(
-            '(missing-inner-quotes)'))
-        self.assertFalse(is_string_contained_within_parenthesis_and_quotes(
-            'missing-outer-parens'))
+        self.assertTrue(is_gae_search_query_string('("A category")'))
+
+        self.assertFalse(is_gae_search_query_string('(missing-inner-quotes)'))
+        self.assertFalse(is_gae_search_query_string('missing-outer-parens'))
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):

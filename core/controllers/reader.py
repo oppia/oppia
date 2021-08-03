@@ -116,10 +116,8 @@ class ExplorationPage(base.BaseHandler):
             'schema': {
                 'type': 'basestring',
                 'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'^[a-zA-Z0-9+/]+$'
                 }]
             }
         }
@@ -148,10 +146,8 @@ class ExplorationPage(base.BaseHandler):
                 'schema': {
                     'type': 'basestring',
                     'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': 12 # Max length of an exploration_id
-                    }, {
-                        'id': 'is_nonempty'
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'^[a-zA-Z0-9+/]+$'
                     }]
                 },
                 'default_value': None
@@ -198,10 +194,8 @@ class ExplorationHandler(base.BaseHandler):
             'schema': {
                 'type': 'basestring',
                 'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': 12 # Max length of an exploration_id
-                }, {
-                    'id': 'is_nonempty'
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'^[a-zA-Z0-9+/]+$'
                 }]
             }
         }
