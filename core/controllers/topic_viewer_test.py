@@ -45,19 +45,17 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic_id = 'topic'
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
-        self.topic_id_1 = 'topic1'
-        self.topic_id_2 = 'topic2'
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', 'description', self.topic_id_1,
+            self.story_id_1, 'story_title', 'description', self.topic_id,
             'story-frag-one')
         self.story_1.description = 'story_description'
         self.story_1.node_titles = []
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', 'description', self.topic_id_2,
+            self.story_id_2, 'story_title', 'description', self.topic_id,
             'story-frag-two')
         self.story_2.description = 'story_description'
         self.story_2.node_titles = []
