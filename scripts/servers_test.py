@@ -617,6 +617,40 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(proc.terminate_count, 0)
         self.assertEqual(proc.kill_count, 0)
 
+    def test_managed_portserver_removes_existing_socket(self):
+        original_os_remove = os.remove
+        original_os_path_exists = os.path.exists
+
+        @test_utils.CallCounter
+        def mock_os_remove(path):
+            if path == common.PORTSERVER_SOCKET_FILEPATH:
+                return
+            original_os_remove(path)
+
+        def mock_os_path_exists(path):
+            if path == common.PORTSERVER_SOCKET_FILEPATH:
+                return True
+            original_os_path_exists(path)
+
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os.path, 'exists', mock_os_path_exists))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            os, 'remove', mock_os_remove))
+
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].program_args,
+            'python -m scripts.run_portserver '
+            '--portserver_unix_socket_address %s' % (
+                common.PORTSERVER_SOCKET_FILEPATH),
+        )
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(mock_os_remove.times_called, 1)
+
     def test_managed_portserver_when_signals_are_rejected(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
