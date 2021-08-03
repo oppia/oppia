@@ -366,9 +366,9 @@ class ExplorationSummariesHandler(base.BaseHandler):
             },
             'include_private_explorations': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'bool'
                 },
-                'default_value': None
+                'default_value': False
             }
         }
     }
@@ -381,11 +381,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
                 'stringified_exp_ids'))
         except Exception:
             raise self.PageNotFoundException
-        include_private_exps_str = self.normalized_request.get(
+        include_private_exps = self.normalized_request.get(
             'include_private_explorations')
-        include_private_exps = (
-            include_private_exps_str.lower() == 'true'
-            if include_private_exps_str else False)
 
         editor_user_id = self.user_id if include_private_exps else None
         if not editor_user_id:

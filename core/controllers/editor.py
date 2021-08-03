@@ -472,10 +472,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         'PUT': {
             'email_body': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }]
+                    'type': 'basestring'
                 }
             },
             'version': {
