@@ -31,15 +31,14 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   choices = [];
   @Output() valueChanged = new EventEmitter();
   name: string;
+  currentValue: string;
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.name = Math.random().toString(36).substring(7);
     this.choices = this.initArgs.choices;
 
-    if (!this.value || this.value === '') {
-      this.value = this.choices[0].val;
-    }
+    this.currentValue = this.value || this.choices[0].val;
   }
 
   updateLocalValue(value: unknown): void {

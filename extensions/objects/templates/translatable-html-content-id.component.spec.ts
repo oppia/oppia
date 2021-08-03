@@ -47,7 +47,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
 
     expect(component.name).not.toBeNull();
     expect(component.choices).toEqual(choices);
-    expect(component.value).toBe('random val');
+    expect(component.currentValue).toBe('random val');
   });
 
   it('should update the local value when user enter a new value', () => {
@@ -81,13 +81,13 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
   });
 
   it('should update the local value if empty string on initialization', () => {
-    component.value = '';
+    component.currentValue = '';
 
-    expect(component.value).toBe('');
+    expect(component.currentValue).toBe('');
 
     component.ngOnInit();
 
-    expect(component.value).toBe('random val');
+    expect(component.currentValue).toBe('random val');
   });
 
   it('should not update the local value if same as new value', () => {
@@ -95,7 +95,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
 
     expect(component.value).toBe('');
 
-    component.ngOnInit();
+    component.updateLocalValue('random val');
 
     expect(component.value).toBe('random val');
   });
