@@ -175,7 +175,7 @@
           {{ 'I18N_BLOG_POST_EDITOR_SAVE_DRAFT_BUTTON' | translate | uppercase }}
         </button>
         <button mat-button class="mx-2 my-2 publish-button"
-                [disabled]="((blogPostData.prepublishValidate(maxAllowedTags).length > 0) || latestChangesarePublished) && !newChangesAreMade"
+                [disabled]="isPublishButtonDisabled()"
                 (click)="publishBlogPost()"
                 aria-label="Publish blog post."
                 [ngClass]="{'small-screen-button': windowIsNarrow}">

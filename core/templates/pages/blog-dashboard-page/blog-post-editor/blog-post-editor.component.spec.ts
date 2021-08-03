@@ -483,4 +483,24 @@ describe('Blog Post Editor Component', () => {
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Thumbnail Saved Successfully.');
     }));
+
+  it('should correctly return if the publish button is disabled or not', () => {
+    spyOn(component.blogPostData, 'prepublishValidate').and.returnValues(
+      [], [], [], ['some issues']);
+    component.newChangesAreMade = true;
+    component.lastChangesWerePublished = true;
+
+    expect(component.isPublishButtonDisabled()).toBe(false);
+
+    component.newChangesAreMade = false;
+
+    expect(component.isPublishButtonDisabled()).toBe(true);
+
+    component.lastChangesWerePublished = false;
+
+    expect(component.isPublishButtonDisabled()).toBe(false);
+
+    // As prepublish validation fails.
+    expect(component.isPublishButtonDisabled()).toBe(true);
+  });
 });
