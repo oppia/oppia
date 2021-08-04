@@ -301,7 +301,8 @@ class RegistryUnitTest(test_utils.TestBase):
         with self.swap(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
             feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
-                self.swap(constants, 'EMULATOR_MODE', False)):
+                self.swap(constants, 'EMULATOR_MODE', False)), (
+                    self.swap(feconf, 'CAN_SEND_EMAILS', True)):
             from core.platform.bulk_email import mailchimp_bulk_email_services
             self.assertEqual(
                 mailchimp_bulk_email_services,
@@ -314,7 +315,8 @@ class RegistryUnitTest(test_utils.TestBase):
         with self.swap(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
             'invalid service provider'), (
-                self.swap(constants, 'EMULATOR_MODE', False)):
+                self.swap(constants, 'EMULATOR_MODE', False)), (
+                    self.swap(feconf, 'CAN_SEND_EMAILS', True)):
             with self.assertRaisesRegexp(
                 Exception,
                 'Invalid bulk email service provider: invalid service '
