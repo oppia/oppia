@@ -36,7 +36,7 @@ class OppiaRootPage(base.BaseHandler):
     } # type: Dict[Text, Any]
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
+    def get(self, **kwargs): # pylint: disable=unused-argument
         # type: () -> None
         """Handles GET requests."""
         self.render_template( # type: ignore[no-untyped-call]

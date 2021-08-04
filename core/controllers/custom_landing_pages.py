@@ -74,20 +74,3 @@ class TopicLandingPage(base.BaseHandler):
         """Handles GET requests."""
 
         self.render_template('topic-landing-page.mainpage.html')
-
-
-class StewardsLandingPage(base.BaseHandler):
-    """Page showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.render_template(
-            'stewards-landing-page.mainpage.html')

@@ -26,27 +26,6 @@ from core.domain import topic_fetchers
 import feconf
 
 
-class ClassroomPage(base.BaseHandler):
-    """Renders the classroom page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self, classroom_url_fragment):  # pylint: disable=unused-argument
-        """Handles GET requests."""
-
-        self.render_template('oppia-root.mainpage.html')
-
-
 class ClassroomDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the classroom
     page.

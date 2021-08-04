@@ -351,11 +351,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    # Usually all frontend pages are served using OppiaRootPage handler
-    # but this is a special case as this route contains a url fragment.
-    get_redirect_route(
-        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        story_viewer.StoryPage),
+
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
@@ -475,9 +471,6 @@ URLS = MAPREDUCE_HANDLERS + [
         feconf.COLLECTION_SUMMARIES_DATA_URL,
         library.CollectionSummariesHandler),
 
-    # Usually all frontend pages are served using OppiaRootPage handler
-    # but this is a special case as this route contains a url fragment.
-    get_redirect_route(r'/profile/<username>', profile.ProfilePage),
     get_redirect_route(
         r'/profilehandler/data/<username>', profile.ProfileHandler),
     get_redirect_route(
@@ -890,11 +883,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/platform_feature_dummy_handler',
         platform_feature.PlatformFeatureDummyHandler),
 
-    # Usually all frontend pages are served using OppiaRootPage handler
-    # but this is a special case as this route contains a url fragment.
-    get_redirect_route(
-        r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
-
     get_redirect_route(
         r'/voice_artist_management_handler/<entity_type>/<entity_id>',
         voice_artist.VoiceArtistManagementHandler),
@@ -926,6 +914,16 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
         URLS.append(
             get_redirect_route(
                 r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+
+# Manually redirect routes with url fragments to the oppia root page.
+URLS = URLS + [
+    get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage)
+]
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
