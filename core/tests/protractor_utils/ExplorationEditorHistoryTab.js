@@ -27,11 +27,19 @@ var ExplorationEditorHistoryTab = function() {
    */
   var historyGraph = element(by.css('.protractor-test-history-graph'));
   var stateNodes = historyGraph.all(by.css('.protractor-test-node'));
+  var codeMirrorElement = element.all(by.css('.CodeMirror-code'));
+  var nodeBackgroundLocator = by.css('.protractor-test-node-background');
+  var nodeLabelLocator = by.css('.protractor-test-node-label');
+  var toastSuccessElement = element(by.css('.toast-success'));
+  var firstVersionDropdown = element(
+    by.css('.protractor-test-history-version-dropdown-first'));
+  var secondVersionDropdown = element(
+    by.css('.protractor-test-history-version-dropdown-second'));
   var stateNodeBackground = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-background'));
+    return nodeElement.element(nodeBackgroundLocator);
   };
   var stateNodeLabel = function(nodeElement) {
-    return nodeElement.element(by.css('.protractor-test-node-label'));
+    return nodeElement.element(nodeLabelLocator);
   };
 
   /*
@@ -113,7 +121,6 @@ var ExplorationEditorHistoryTab = function() {
           'Close State History button takes too long to disappear.');
       },
       deselectVersion: async function() {
-        var toastSuccessElement = element(by.css('.toast-success'));
         await waitFor.invisibilityOf(
           toastSuccessElement,
           'Toast message is taking too long to disappear after saving changes');
@@ -127,14 +134,10 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
-        var firstVersionDropdown = element(
-          by.css('.protractor-test-history-version-dropdown-first'));
         var versionNumber1Button = firstVersionDropdown.element(
           by.cssContainingText('option', versionNumber1));
         await action.click('Version Number1 Button', versionNumber1Button);
 
-        var secondVersionDropdown = element(
-          by.css('.protractor-test-history-version-dropdown-second'));
         var versionNumber2Button = secondVersionDropdown.element(
           by.cssContainingText('option', versionNumber2));
         await action.click('Version Number2 Button', versionNumber2Button);
@@ -220,11 +223,11 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextToMatch: async function(v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).first(),
+          codeMirrorElement.first(),
           'first'
         ).expectTextToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).last(),
+          codeMirrorElement.last(),
           'last'
         ).expectTextToBe(v2StateContents);
       },
@@ -242,11 +245,11 @@ var ExplorationEditorHistoryTab = function() {
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
         await forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).first(),
+          codeMirrorElement.first(),
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
         await forms.CodeMirrorChecker(
-          element.all(by.css('.CodeMirror-code')).last(),
+          codeMirrorElement.last(),
           'last'
         ).expectTextWithHighlightingToBe(v2StateContents);
       }
