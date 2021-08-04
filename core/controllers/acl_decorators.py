@@ -1297,9 +1297,6 @@ def can_view_feedback_thread(handler):
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
-        if '.' not in thread_id:
-            raise self.InvalidInputException('Thread ID must contain a .')
-
         entity_type = feedback_services.get_thread(thread_id).entity_type
         entity_types_with_unrestricted_view_suggestion_access = (
             feconf.ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS)
