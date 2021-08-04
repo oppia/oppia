@@ -38,13 +38,14 @@ export class RatingComputationService {
 
     return totalNumber >= MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS;
   }
-  // Returns 'undefined' if the ratings are less than the
+
+  // Returns 'null' if the ratings are less than the
   // minimum acceptable number of ratings. The average should
   // not be computed in this case.
   computeAverageRating(
-      ratingFrequencies: ExplorationRatings): number | undefined {
+      ratingFrequencies: ExplorationRatings): number | null {
     if (!RatingComputationService.areRatingsShown(ratingFrequencies)) {
-      return undefined;
+      return null;
     } else {
       var totalNumber = 0;
       var totalValue = 0.0;
