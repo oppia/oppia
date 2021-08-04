@@ -151,10 +151,8 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
-            _redirect_based_on_return_type(
-                self, '/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return
+            if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
+                raise self.PageNotFoundException
 
         return handler(self, classroom_url_fragment, **kwargs)
     test_does_classroom_exist.__wrapped__ = True

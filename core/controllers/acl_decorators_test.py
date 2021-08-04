@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import blog_services
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -349,6 +350,59 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_collection/%s' % self.private_col_id)
         self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
+
+
+class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
+    """Tests for does_classroom_exist decorator"""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+
+        @acl_decorators.does_classroom_exist
+        def get(self, classroom_url_fragment):
+            self.render_json({'success': True})
+
+    def setUp(self):
+        super(ClassroomExistDecoratorTests, self).setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        config_services.set_property(
+            self.user_id_admin, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math',
+                'topic_ids': [],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_classroom/<classroom_url_fragment>', self.MockHandler)],
+                debug=feconf.DEBUG
+        ))
+
+    def test_any_user_can_access_a_valid_classroom(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_classroom/math', expected_status_int=200)
+
+    def test_redirects_user_to_default_classroom_if_given_not_available(
+        self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_classroom/invalid', expected_status_int=404)
 
 
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
