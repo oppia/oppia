@@ -31,6 +31,7 @@ import { AlertsService } from 'services/alerts.service';
 export class AdminRolesTabComponent implements OnInit {
   UPDATABLE_ROLES = null;
   VIEWABLE_ROLES = null;
+  HUMAN_READABLE_ROLES = null;
   topicSummaries = null;
   roleToActions = null;
   rolesFetched = false;
@@ -64,7 +65,7 @@ export class AdminRolesTabComponent implements OnInit {
   startEditing(): void {
     this.roleIsCurrentlyBeingEdited = true;
     this.adminBackendApiService.viewUsersRoleAsync(
-      'username', null, this.username).then((userRoles) => {
+      this.username).then((userRoles) => {
       this.rolesFetched = true;
       this.userRoles = userRoles.roles;
       this.managedTopicIds = userRoles.managed_topic_ids;
@@ -73,7 +74,7 @@ export class AdminRolesTabComponent implements OnInit {
   }
 
   showNewRoleSelector(): void {
-    this.possibleRolesToAdd = Object.keys(this.UPDATABLE_ROLES).filter(
+    this.possibleRolesToAdd = this.UPDATABLE_ROLES.filter(
       role => !this.userRoles.includes(role)).sort();
     this.roleSelectorIsShown = true;
   }
@@ -165,6 +166,7 @@ export class AdminRolesTabComponent implements OnInit {
     this.adminDataService.getDataAsync().then(adminDataObject => {
       this.UPDATABLE_ROLES = adminDataObject.updatableRoles;
       this.VIEWABLE_ROLES = adminDataObject.viewableRoles;
+      this.HUMAN_READABLE_ROLES = adminDataObject.humanReadableRoles;
       this.topicSummaries = adminDataObject.topicSummaries;
       this.roleToActions = adminDataObject.roleToActions;
     });

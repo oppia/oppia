@@ -149,6 +149,7 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/user.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
@@ -177,7 +178,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'WindowDimensionsService',
+    'UserService', 'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
@@ -200,7 +201,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateTutorialFirstTimeService,
         ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        WindowDimensionsService) {
+        UserService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
@@ -240,8 +241,10 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync()
-        ]).then(async([explorationData, featuresData, openThreadsCount]) => {
+          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          UserService.getUserInfoAsync()
+        ]).then(async(
+            [explorationData, featuresData, openThreadsCount, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
@@ -279,9 +282,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsCurriculumAdmin = (
-            explorationData.is_curriculum_admin);
-          ctrl.currentUserIsModerator = explorationData.is_moderator;
+          ctrl.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
+          ctrl.currentUserIsModerator = userInfo.isModerator();
 
           ctrl.currentUser = explorationData.user;
           ctrl.currentVersion = explorationData.version;

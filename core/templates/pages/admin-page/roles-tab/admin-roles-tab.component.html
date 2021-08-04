@@ -128,7 +128,7 @@
               <mat-list-item  class="oppia-flex"  *ngFor="let role of userRoles">
                 <div class="d-flex align-items-center oppia-user-role">
                   <span class="oppia-user-role-description protractor-test-user-role-description">
-                    <strong>{{ UPDATABLE_ROLES[role] | titlecase }}</strong>
+                    <strong>{{ HUMAN_READABLE_ROLES[role] | titlecase }}</strong>
                   </span>
                   <div class="oppia-progress-spinner protractor-test-progress-spinner" *ngIf="roleCurrentlyBeingUpdatedInBackend === role">
                     <mat-spinner [diameter]="24"></mat-spinner>
@@ -137,8 +137,8 @@
                     <button *ngIf="role === 'TOPIC_MANAGER'" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="openTopicManagerRoleEditor()">
                       <mat-icon matListIcon>edit</mat-icon>
                     </button>
-                    <div class="protractor-test-{{UPDATABLE_ROLES[role].split(' ').join('-')}}-remove-button-container">
-                      <button *ngIf="VIEWABLE_ROLES.hasOwnProperty(role)"
+                    <div class="protractor-test-{{HUMAN_READABLE_ROLES[role].split(' ').join('-')}}-remove-button-container">
+                      <button *ngIf="VIEWABLE_ROLES.includes(role)"
                               mat-button matSuffix mat-icon-button
                               aria-label="Clear"
                               (click)="removeRole(role)">
@@ -153,7 +153,7 @@
                   <mat-form-field>
                     <mat-select (selectionChange)="addNewRole($event.value)" class="protractor-test-new-role-selector">
                       <mat-option [value]="role" *ngFor="let role of possibleRolesToAdd">
-                        {{UPDATABLE_ROLES[role]}}
+                        {{HUMAN_READABLE_ROLES[role]}}
                       </mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -178,7 +178,7 @@
     <div class="col-md-4">
       <div class="oppia-page-card oppia-long-text" *ngIf="roleToActions !== null">
         <legend class="text-center">Roles</legend>
-        <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions"></oppia-roles-and-actions-visualizer>
+        <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions" [viewableRoles]="VIEWABLE_ROLES" [humanReadableRoles]="HUMAN_READABLE_ROLES"></oppia-roles-and-actions-visualizer>
       </div>
     </div>
   </div>

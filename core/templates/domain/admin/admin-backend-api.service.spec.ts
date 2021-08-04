@@ -59,7 +59,8 @@ describe('Admin backend api service', () => {
         url_fragment: ''
       }
     ],
-    updatable_roles: {
+    updatable_roles: ['TOPIC_MANAGER'],
+    human_readable_roles: {
       TOPIC_MANAGER: 'topic manager'
     },
     demo_collections: [],
@@ -79,9 +80,7 @@ describe('Admin backend api service', () => {
         'welcome.yaml'
       ]
     ],
-    viewable_roles: {
-      TOPIC_MANAGER: 'topic manager'
-    },
+    viewable_roles: ['TOPIC_MANAGER'],
     feature_flags: [{
       name: 'dummy_feature',
       description: 'this is a dummy feature',
@@ -161,6 +160,7 @@ describe('Admin backend api service', () => {
       roleToActions: adminBackendResponse.role_to_actions,
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
+      humanReadableRoles: adminBackendResponse.human_readable_roles,
       topicSummaries: adminBackendResponse.topic_summaries.map(
         dict => CreatorTopicSummary.createFromBackendDict(dict)),
       featureFlags: adminBackendResponse.feature_flags.map(
@@ -212,18 +212,14 @@ describe('Admin backend api service', () => {
   // Test cases for Admin Roles Tab.
   it('should get the data of user given the username' +
     'when calling viewUsersRoleAsync', fakeAsync(() => {
-    let filterCriterion = 'username';
-    let role = 'admin';
     let username = 'validUser';
     let result = {
       validUser: 'ADMIN'
     };
-    abas.viewUsersRoleAsync(filterCriterion, role, username)
-      .then(successHandler, failHandler);
+    abas.viewUsersRoleAsync(username).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/adminrolehandler' +
-      '?filter_criterion=username&role=admin&username=validUser');
+      '/adminrolehandler?filter_criterion=username&username=validUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -237,42 +233,54 @@ describe('Admin backend api service', () => {
   ));
 
   it('should get the data of user given the role' +
-    'when calling viewUsersRoleAsync', fakeAsync(() => {
-    let filterCriterion = 'role';
+    'when calling fetchUsersAssignedToRoleAsync', fakeAsync(() => {
     let role = 'ADMIN';
-    let username = 'validUser';
     let result = {
-      validUser: 'ADMIN'
+      usernames: ['validUser']
     };
-    abas.viewUsersRoleAsync(filterCriterion, role, username)
-      .then(successHandler, failHandler);
+    abas.fetchUsersAssignedToRoleAsync(role).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/adminrolehandler' +
-      '?filter_criterion=role&role=ADMIN&username=validUser');
+      '/adminrolehandler?filter_criterion=role&role=ADMIN');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
-      { validUser: 'ADMIN'},
+      { usernames: ['validUser'] },
       { status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(result);
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
+
+  it('should handle failing request when calling ' +
+      'fetchUsersAssignedToRoleAsync', fakeAsync(() => {
+    let role = 'invalidRole';
+    abas.fetchUsersAssignedToRoleAsync(role).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/adminrolehandler?filter_criterion=role&role=invalidRole');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      error: 'Invalid role!'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Invalid role!');
+  }));
 
   it('should fail to get the data of user when user does' +
     'not exists when calling viewUsersRoleAsync', fakeAsync(() => {
-    let filterCriterion = 'username';
-    let role = 'admin';
     let username = 'InvalidUser';
-    abas.viewUsersRoleAsync(filterCriterion, role, username)
-      .then(successHandler, failHandler);
+    abas.viewUsersRoleAsync(username).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/adminrolehandler' +
-      '?filter_criterion=username&role=admin&username=InvalidUser');
+      '?filter_criterion=username&username=InvalidUser');
     expect(req.request.method).toEqual('GET');
 
     req.flush({

@@ -201,19 +201,11 @@ class AdminHandler(base.BaseHandler):
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
-            'updatable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.UPDATABLE_ROLES
-            },
-            'viewable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.VIEWABLE_ROLES
-            },
+            'updatable_roles': role_services.UPDATABLE_ROLES,
+            'viewable_roles': role_services.VIEWABLE_ROLES,
+            'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
+            'role_to_actions': role_services.get_role_actions(),
             'topic_summaries': topic_summary_dicts,
-            'role_to_actions': {
-                role_services.HUMAN_READABLE_ROLES[role]: actions
-                for role, actions in role_services.get_role_actions().items()
-            },
             'feature_flags': feature_flag_dicts,
         })
 
@@ -687,7 +679,8 @@ class AdminRoleHandler(base.BaseHandler):
             },
             'role': {
                 'schema': {
-                    'type': 'basestring'
+                    'type': 'basestring',
+                    'choices': role_services.VIEWABLE_ROLES
                 },
                 'default_value': None
             },
@@ -733,14 +726,12 @@ class AdminRoleHandler(base.BaseHandler):
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
             role = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_ROLE)
-            users_by_role = {
-                username: role
-                for username in user_services.get_usernames_by_role(role)
-            }
             role_services.log_role_query(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
                 role=role)
-            self.render_json(users_by_role)
+            self.render_json({
+                'usernames': user_services.get_usernames_by_role(role)
+            })
         elif filter_criterion == feconf.USER_FILTER_CRITERION_USERNAME:
             username = self.normalized_request.get(
                 feconf.USER_FILTER_CRITERION_USERNAME)

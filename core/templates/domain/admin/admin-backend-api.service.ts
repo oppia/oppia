@@ -41,7 +41,11 @@ export interface UserRolesBackendResponse {
   banned: boolean;
 }
 
-export interface UpdatableRolesBackendResponse {
+export interface AssignedUsersBackendResponse {
+  usernames: string[];
+}
+
+export interface HumanReadableRolesBackendResponse {
   [role: string]: string;
 }
 
@@ -120,10 +124,11 @@ export interface AdminPageDataBackendDict {
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
   'human_readable_current_time': string;
-  'updatable_roles': UpdatableRolesBackendResponse;
+  'updatable_roles': string[];
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': UpdatableRolesBackendResponse;
+  'viewable_roles': string[];
+  'human_readable_roles': HumanReadableRolesBackendResponse;
   'topic_summaries': CreatorTopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
@@ -132,10 +137,11 @@ export interface AdminPageData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  updatableRoles: UpdatableRolesBackendResponse;
+  updatableRoles: string[];
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
-  viewableRoles: UpdatableRolesBackendResponse;
+  viewableRoles: string[];
+  humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
   featureFlags: PlatformParameter[];
 }
@@ -159,6 +165,7 @@ export class AdminBackendApiService {
           updatableRoles: response.updatable_roles,
           roleToActions: response.role_to_actions,
           configProperties: response.config_properties,
+          humanReadableRoles: response.human_readable_roles,
           viewableRoles: response.viewable_roles,
           topicSummaries: response.topic_summaries.map(
             CreatorTopicSummary.createFromBackendDict),
@@ -191,15 +198,31 @@ export class AdminBackendApiService {
 
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
-      filterCriterion: string, role: string, username: string
-  ): Promise<UserRolesBackendResponse> {
+      username: string): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
       this.http.get<UserRolesBackendResponse>(
         AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
-            filter_criterion: filterCriterion,
-            role: role,
+            filter_criterion: 'username',
             username: username
+          }
+        }
+      ).toPromise().then(response => {
+        resolve(response);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async fetchUsersAssignedToRoleAsync(
+      role: string): Promise<AssignedUsersBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this.http.get<AssignedUsersBackendResponse>(
+        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+          params: {
+            filter_criterion: 'role',
+            role: role
           }
         }
       ).toPromise().then(response => {

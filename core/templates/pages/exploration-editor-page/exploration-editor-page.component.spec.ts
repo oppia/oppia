@@ -53,6 +53,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
 import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
 import { ChangeListService } from './services/change-list.service';
 import { ExplorationDataService } from './services/exploration-data.service';
+import { UserInfo } from 'domain/user/user-info.model';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -89,6 +90,7 @@ describe('Exploration editor page component', function() {
   var sts = null;
   var stfts = null;
   var tds = null;
+  var userService = null;
   var ueps = null;
   var mockEnterEditorForTheFirstTime = null;
   var registerAcceptTutorialModalEventSpy;
@@ -177,8 +179,6 @@ describe('Exploration editor page component', function() {
     auto_tts_enabled: {},
     correctness_feedback_enabled: {},
     state_classifier_mapping: [],
-    is_curriculum_admin: true,
-    is_moderator: true,
     user: {},
     version: '1',
     rights: {},
@@ -263,6 +263,7 @@ describe('Exploration editor page component', function() {
     sts = $injector.get('StateTutorialFirstTimeService');
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
+    userService = $injector.get('UserService');
     ueps = $injector.get('UserExplorationPermissionsService');
     focusManagerService = $injector.get('FocusManagerService');
 
@@ -292,6 +293,10 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(0));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve(new UserInfo(
+          ['USER_ROLE'], true, true, false, false, false, null, null, null,
+          false)));
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
         mockOpenEditorTutorialEmitter);
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
@@ -510,6 +515,10 @@ describe('Exploration editor page component', function() {
       spyOn(tds, 'getOpenThreadsCountAsync').and.returnValue($q.resolve(1));
       spyOn(ueps, 'getPermissionsAsync')
         .and.returnValue($q.resolve({canEdit: false}));
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve(new UserInfo(
+          ['USER_ROLE'], true, true, false, false, false, null, null, null,
+          false)));
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
       spyOnProperty(cls, 'autosaveIsInProgress$').and.returnValue(
         autosaveIsInProgress);
