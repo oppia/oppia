@@ -280,11 +280,14 @@ export class TranslationModalComponent {
   hasSomeDuplicateElements(
       originalElements: string[],
       translatedElements: string[]): boolean {
+    const mathEquationRegex = new RegExp(
+      /(?:(?:^|[-+_*/=])(?:\s*-?\d+(\.\d+)?(?:[eE][+-]?\d+)?\s*))+$/);
     if (originalElements.length === 0) {
       return false;
     }
     const hasMatchingTranslatedElement = element => (
-      translatedElements.includes(element) && originalElements.length > 0);
+      translatedElements.includes(element) && originalElements.length > 0 &&
+      !mathEquationRegex.test(element));
     return originalElements.some(hasMatchingTranslatedElement);
   }
 
