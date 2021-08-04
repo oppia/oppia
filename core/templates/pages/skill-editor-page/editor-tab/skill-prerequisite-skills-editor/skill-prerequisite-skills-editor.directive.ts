@@ -33,109 +33,101 @@ require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/ngb-modal.service.ts');
 
-angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
-  'NgbModal', 'SkillEditorStateService', 'SkillUpdateService',
-  'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
-  'WindowDimensionsService',
-  function(
-      NgbModal, SkillEditorStateService, SkillUpdateService,
-      TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
-      WindowDimensionsService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/editor-tab/' +
-        'skill-prerequisite-skills-editor/' +
-        'skill-prerequisite-skills-editor.directive.html'),
-      controller: [
-        '$scope', 'AlertsService',
-        function(
-            $scope, AlertsService) {
-          var ctrl = this;
-          var categorizedSkills = null;
-          var untriagedSkillSummaries = null;
-          TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-            .then(function(response) {
-              categorizedSkills = response.categorizedSkillsDict;
-              untriagedSkillSummaries = response.untriagedSkillSummaries;
-            });
-          var groupedSkillSummaries =
-            SkillEditorStateService.getGroupedSkillSummaries();
+angular.module('oppia').component('skillPrerequisiteSkillsEditor', {
+  bindings: {},
+  template: require('./skill-prerequisite-skills-editor.directive.html'),
+  controller: [
+    '$scope', 'AlertsService',
+    'NgbModal', 'SkillEditorStateService', 'SkillUpdateService',
+    'TopicsAndSkillsDashboardBackendApiService', 'WindowDimensionsService',
+    function(
+        $scope, AlertsService,
+        NgbModal, SkillEditorStateService, SkillUpdateService,
+        TopicsAndSkillsDashboardBackendApiService, WindowDimensionsService,
+        ) {
+      var ctrl = this;
+      var categorizedSkills = null;
+      var untriagedSkillSummaries = null;
+      TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+        .then(function(response) {
+          categorizedSkills = response.categorizedSkillsDict;
+          untriagedSkillSummaries = response.untriagedSkillSummaries;
+        });
+      var groupedSkillSummaries =
+        SkillEditorStateService.getGroupedSkillSummaries();
 
-          $scope.removeSkillId = function(skillId) {
-            SkillUpdateService.deletePrerequisiteSkill($scope.skill, skillId);
-          };
+      $scope.removeSkillId = function(skillId) {
+        SkillUpdateService.deletePrerequisiteSkill($scope.skill, skillId);
+      };
 
-          $scope.getSkillEditorUrl = function(skillId) {
-            return '/skill_editor/' + skillId;
-          };
+      $scope.getSkillEditorUrl = function(skillId) {
+        return '/skill_editor/' + skillId;
+      };
 
-          $scope.addSkill = function() {
-            // This contains the summaries of skill in the same topic as
-            // the current skill as the initial entries followed by the others.
-            var skillsInSameTopicCount =
-              groupedSkillSummaries.current.length;
-            var sortedSkillSummaries = groupedSkillSummaries.current.concat(
-              groupedSkillSummaries.others);
-            var allowSkillsFromOtherTopics = true;
-            let modalRef: NgbModalRef = NgbModal.open(
-              SelectSkillModalComponent, {
-                backdrop: 'static',
-                windowClass: 'skill-select-modal',
-                size: 'xl'
-              });
-            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-            modalRef.componentInstance.skillsInSameTopicCount = (
-              skillsInSameTopicCount);
-            modalRef.componentInstance.categorizedSkills = categorizedSkills;
-            modalRef.componentInstance.allowSkillsFromOtherTopics = (
-              allowSkillsFromOtherTopics);
-            modalRef.componentInstance.untriagedSkillSummaries = (
-              untriagedSkillSummaries);
-            modalRef.result.then(function(summary) {
-              var skillId = summary.id;
-              if (skillId === $scope.skill.getId()) {
-                AlertsService.addInfoMessage(
-                  'A skill cannot be a prerequisite of itself', 5000);
-                return;
-              }
-              for (var idx in $scope.skill.getPrerequisiteSkillIds()) {
-                if ($scope.skill.getPrerequisiteSkillIds()[idx] === skillId) {
-                  AlertsService.addInfoMessage(
-                    'Given skill is already a prerequisite skill', 5000);
-                  return;
-                }
-              }
-              SkillUpdateService.addPrerequisiteSkill($scope.skill, skillId);
-            }, function() {
-              // Note to developers:
-              // This callback is triggered when the Cancel button is clicked.
-              // No further action is needed.
-            });
-          };
-
-          $scope.togglePrerequisiteSkills = function() {
-            if (WindowDimensionsService.isWindowNarrow()) {
-              $scope.prerequisiteSkillsAreShown = (
-                !$scope.prerequisiteSkillsAreShown);
+      $scope.addSkill = function() {
+        // This contains the summaries of skill in the same topic as
+        // the current skill as the initial entries followed by the others.
+        var skillsInSameTopicCount =
+          groupedSkillSummaries.current.length;
+        var sortedSkillSummaries = groupedSkillSummaries.current.concat(
+          groupedSkillSummaries.others);
+        var allowSkillsFromOtherTopics = true;
+        let modalRef: NgbModalRef = NgbModal.open(
+          SelectSkillModalComponent, {
+            backdrop: 'static',
+            windowClass: 'skill-select-modal',
+            size: 'xl'
+          });
+        modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+        modalRef.componentInstance.skillsInSameTopicCount = (
+          skillsInSameTopicCount);
+        modalRef.componentInstance.categorizedSkills = categorizedSkills;
+        modalRef.componentInstance.allowSkillsFromOtherTopics = (
+          allowSkillsFromOtherTopics);
+        modalRef.componentInstance.untriagedSkillSummaries = (
+          untriagedSkillSummaries);
+        modalRef.result.then(function(summary) {
+          var skillId = summary.id;
+          if (skillId === $scope.skill.getId()) {
+            AlertsService.addInfoMessage(
+              'A skill cannot be a prerequisite of itself', 5000);
+            return;
+          }
+          for (var idx in $scope.skill.getPrerequisiteSkillIds()) {
+            if ($scope.skill.getPrerequisiteSkillIds()[idx] === skillId) {
+              AlertsService.addInfoMessage(
+                'Given skill is already a prerequisite skill', 5000);
+              return;
             }
-          };
-          ctrl.$onInit = function() {
-            $scope.skill = SkillEditorStateService.getSkill();
-            $scope.prerequisiteSkillsAreShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.skillIdToSummaryMap = {};
+          }
+          SkillUpdateService.addPrerequisiteSkill($scope.skill, skillId);
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        });
+      };
 
-            for (var name in groupedSkillSummaries) {
-              var skillSummaries = groupedSkillSummaries[name];
-              for (var idx in skillSummaries) {
-                $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
-                  skillSummaries[idx].description;
-              }
-            }
-          };
-        }]
-    };
+      $scope.togglePrerequisiteSkills = function() {
+        if (WindowDimensionsService.isWindowNarrow()) {
+          $scope.prerequisiteSkillsAreShown = (
+            !$scope.prerequisiteSkillsAreShown);
+        }
+      };
+      ctrl.$onInit = function() {
+        $scope.skill = SkillEditorStateService.getSkill();
+        $scope.prerequisiteSkillsAreShown = (
+          !WindowDimensionsService.isWindowNarrow());
+        $scope.skillIdToSummaryMap = {};
+
+        for (var name in groupedSkillSummaries) {
+          var skillSummaries = groupedSkillSummaries[name];
+          for (var idx in skillSummaries) {
+            $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
+              skillSummaries[idx].description;
+          }
+        }
+      };
+    }]
   }
-]);
+);

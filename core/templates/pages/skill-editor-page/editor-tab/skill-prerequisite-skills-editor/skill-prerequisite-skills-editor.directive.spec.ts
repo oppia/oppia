@@ -23,16 +23,17 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 // ^^^ This block is to be removed.
 
 fdescribe('Skill editor main tab directive', function() {
-  var $scope = null;
-  var ctrl = null;
-  var $rootScope = null;
+  let $scope = null;
+  let ctrl = null;
+  let $rootScope = null;
   let $timeout = null;
-  var directive = null;
-  var UndoRedoService = null;
-  var $uibModal = null;
+  let UndoRedoService = null;
+  let $uibModal = null;
+  let ngbModal: NgbModal = null;
 
 
   beforeEach(angular.mock.module('oppia'));
@@ -45,23 +46,24 @@ fdescribe('Skill editor main tab directive', function() {
   });
 
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
     $scope = $rootScope.$new();
     $uibModal = $injector.get('$uibModal');
     UndoRedoService = $injector.get('UndoRedoService');
-    directive = $injector.get('skillPrerequisiteSkillsEditorDirective')[0];
+    ngbModal = TestBed.inject(NgbModal);
 
 
-    ctrl = $injector.instantiate(directive.controller, {
+    ctrl = $componentController('skillPrerequisiteSkillsEditor', {
       $rootScope: $scope,
-      $scope: $scope
+      $scope: $scope,
+      NgbModal: ngbModal
     });
     ctrl.$onInit();
   }));
 
-  it('should initialize the variables', function() {
+  it('should set properties when initialized', function() {
 
   });
 });
