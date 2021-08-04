@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import skill_fetchers
@@ -25,20 +26,39 @@ import feconf
 import python_utils
 
 
+SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS = {
+    'schema': {
+        'type': 'basestring',
+        'validators': [{
+            'id': 'is_regex_matched',
+            'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+        }, {
+            'id': 'has_length_at_most',
+            'max_value': constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+        }]
+    }
+}
+
+SCHEMA_FOR_TPOIC_URL_FRAGMENTS = {
+    'schema': {
+        'type': 'basestring',
+        'validators': [{
+            'id': 'is_regex_matched',
+            'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+        }, {
+            'id': 'has_length_at_most',
+            'max_value': constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        }]
+    }
+}
+
+
 class PracticeSessionsPage(base.BaseHandler):
     """Renders the practice sessions page."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'topic_url_fragment': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'classroom_url_fragment': SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': SCHEMA_FOR_TPOIC_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {}
@@ -56,16 +76,8 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'topic_url_fragment': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'classroom_url_fragment': SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': SCHEMA_FOR_TPOIC_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
