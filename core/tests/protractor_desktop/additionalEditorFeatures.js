@@ -31,6 +31,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+const { browser } = require('protractor');
 
 var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
 
@@ -784,6 +785,42 @@ describe('Full exploration editor', function() {
         }
       );
 
+      await users.logout();
+    });
+
+  it(
+    'should show discard changes modal when the changes are conflicting',
+    async function() {
+      await users.createUser('user16@editor.com', 'user16Editor');
+
+      // Create an exploration as user user11Editor with title, category, and
+      // objective set and add user user12Editor as a collaborator.
+      await users.login('user16@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorMainTab.setStateName('first card');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setTitle('Testing lost changes modal');
+      await explorationEditorSettingsTab.setCategory('Algebra');
+      await explorationEditorSettingsTab.setObjective('To assess happiness.');
+      await explorationEditorSettingsTab.openAndClosePreviewSummaryTile();
+      await explorationEditorPage.saveChanges();
+      await workflow.addExplorationManager('user12Editor');
+      await explorationEditorPage.navigateToMainTab();
+      // Set network connection to offline.
+      await general.setNetworkConnectionStatus(0);
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      // Set network connection to online.
+      await general.setNetworkConnectionStatus(1);
+      await action.waitForAutosave();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
       await users.logout();
     });
 
