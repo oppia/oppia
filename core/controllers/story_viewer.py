@@ -33,15 +33,6 @@ import feconf
 import utils
 
 
-class StoryPage(base.BaseHandler):
-    """Page describing a single story."""
-
-    @acl_decorators.open_access
-    def get(self, **kwargs):  # pylint: disable=unused-argument
-        """Handles GET requests."""
-        self.render_template('oppia-root.mainpage.html')
-
-
 class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
