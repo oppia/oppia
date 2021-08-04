@@ -214,7 +214,6 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.$onInit();
     $rootScope.$apply();
     mockUndoRedoChangeEventEmitter.emit();
-    $rootScope.$apply();
 
     expect(validationSpy).toHaveBeenCalled();
   });
@@ -244,7 +243,6 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.$onInit();
     $rootScope.$apply();
     mockCollectionInitializedEventEmitter.emit();
-    $rootScope.$apply();
 
     expect(validationSpy).toHaveBeenCalled();
   });
@@ -333,7 +331,6 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.publishCollection();
     $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(saveSpy).toHaveBeenCalled();
   }));
@@ -361,7 +358,6 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.publishCollection();
     $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(collectionRightsSpy).toHaveBeenCalled();
   }));
@@ -424,7 +420,6 @@ describe('Collection Editor Navbar directive', function() {
     ctrl.saveChanges();
     $rootScope.$apply();
     tick();
-    $rootScope.$apply();
 
     expect(saveSpy).not.toHaveBeenCalled();
   }));

@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,6 +100,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -139,6 +141,8 @@ describe('Exploration save service ' +
       .and.returnValue(Promise.resolve(null));
 
     explorationSaveService.discardChanges();
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -225,6 +229,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -249,6 +255,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -273,6 +281,8 @@ describe('Exploration save service ' +
     explorationTagsService.savedMemento = 'invalid';
 
     explorationSaveService.showPublishExplorationModal();
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -297,6 +307,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -313,6 +325,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.showPublishExplorationModal(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -375,6 +389,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.showPublishExplorationModal(
       successCb, errorCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     $rootScope.$apply();
     tick();
     $rootScope.$apply();
@@ -625,6 +641,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.saveChanges(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     flush();
     $rootScope.$apply();
     $timeout.flush();
@@ -694,6 +712,8 @@ describe('Exploration save service ' +
     // Opening modal second time.
     explorationSaveService.saveChanges(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     flush();
     $rootScope.$apply();
     flush();
@@ -732,6 +752,8 @@ describe('Exploration save service ' +
 
     explorationSaveService.saveChanges(
       startLoadingCb, endLoadingCb);
+    // We need multiple '$rootScope.$apply()' here since, the source code
+    // consists of nested promises.
     flush();
     $rootScope.$apply();
     $timeout.flush();
