@@ -17,7 +17,6 @@
  */
 
 import { Injectable, EventEmitter } from '@angular/core';
-import { Location } from '@angular/common';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -38,14 +37,14 @@ export class BlogDashboardPageService {
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
   private _blogPostAction: string;
-  private _updateViewEventEmitter= new EventEmitter<void>();
+  private _updateViewEventEmitter = new EventEmitter<void>();
+  private _updateNavTitleEventEmitter = new EventEmitter<string>();
 
   constructor(
     private alertsService: AlertsService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private location: Location,
     private windowRef: WindowRef,
   ) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
@@ -98,6 +97,10 @@ export class BlogDashboardPageService {
     return this._blogPostId;
   }
 
+  set blogPostId(id: string) {
+    this._blogPostId = id;
+  }
+
   set blogPostData(data: BlogPostData) {
     this._blogPostData = data;
   }
@@ -118,6 +121,10 @@ export class BlogDashboardPageService {
     return this._updateViewEventEmitter;
   }
 
+  get updateNavTitleEventEmitter(): EventEmitter<string> {
+    return this._updateNavTitleEventEmitter;
+  }
+
   deleteBlogPost(): void {
     this.blogPostEditorBackendService.deleteBlogPostAsync(this._blogPostId)
       .then(
@@ -129,6 +136,19 @@ export class BlogDashboardPageService {
           this.alertsService.addWarning('Failed to delete blog post.');
         }
       );
+  }
+
+  setNavTitle(
+      blogPostIsPublished: boolean, title: string): void {
+    if (title) {
+      if (blogPostIsPublished) {
+        return this.updateNavTitleEventEmitter.emit(`Published - ${title}`);
+      } else {
+        return this.updateNavTitleEventEmitter.emit(`Draft - ${title}`);
+      }
+    } else {
+      return this.updateNavTitleEventEmitter.emit('New Post - Untitled');
+    }
   }
 }
 

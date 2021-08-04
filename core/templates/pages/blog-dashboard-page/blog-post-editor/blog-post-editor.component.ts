@@ -134,6 +134,8 @@ export class BlogPostEditorComponent implements OnInit {
           if (this.blogPostData.lastUpdated === this.blogPostData.publishedOn) {
             this.lastChangesWerePublished = true;
           }
+          this.blogDashboardPageService.setNavTitle(
+            this.lastChangesWerePublished, this.title);
         }, (errorResponse) => {
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(
@@ -153,6 +155,8 @@ export class BlogPostEditorComponent implements OnInit {
     this.blogPostUpdateService.setBlogPostTitle(
       this.blogPostData, this.title);
     this.newChangesAreMade = true;
+    this.blogDashboardPageService.setNavTitle(
+      this.lastChangesWerePublished, this.title);
   }
 
   cancelEdit(): void {
@@ -228,6 +232,8 @@ export class BlogPostEditorComponent implements OnInit {
           this.lastChangesWerePublished = false;
         }
         this.newChangesAreMade = false;
+        this.blogDashboardPageService.setNavTitle(
+          this.lastChangesWerePublished, this.title);
       }, (errorResponse) => {
         this.alertsService.addWarning(
           `Failed to save Blog Post. Internal Error: ${errorResponse}`);

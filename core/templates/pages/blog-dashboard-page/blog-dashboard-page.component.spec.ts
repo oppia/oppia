@@ -29,6 +29,9 @@ import { BlogDashboardBackendApiService } from 'domain/blog/blog-dashboard-backe
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BlogDashboardPageService } from './services/blog-dashboard-page.service';
 import { BlogDashboardPageComponent } from './blog-dashboard-page.component';
+import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { of } from 'rxjs';
 
 describe('Blog Dashboard Page Component', () => {
   let alertsService: AlertsService;
@@ -39,6 +42,8 @@ describe('Blog Dashboard Page Component', () => {
   let loaderService: LoaderService;
   let mockWindowRef: MockWindowRef;
   let urlInterpolationService: UrlInterpolationService;
+  let windowDimensionsService: WindowDimensionsService;
+  let resizeEvent = new Event('resize');
 
   class MockWindowRef {
     nativeWindow = {
@@ -73,6 +78,13 @@ describe('Blog Dashboard Page Component', () => {
           provide: WindowRef,
           useClass: MockWindowRef
         },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
         BlogDashboardBackendApiService,
         BlogDashboardPageService,
         LoaderService,
@@ -91,6 +103,7 @@ describe('Blog Dashboard Page Component', () => {
     loaderService = TestBed.inject(LoaderService);
     blogDashboardBackendApiService = TestBed.inject(
       BlogDashboardBackendApiService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     alertsService = TestBed.inject(AlertsService);
   });
 
@@ -140,6 +153,8 @@ describe('Blog Dashboard Page Component', () => {
       .toHaveBeenCalled();
     expect(component.authorProfilePictureUrl).toEqual('sample_url');
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
+    expect(component.windowIsNarrow).toBe(true);
   }));
 
   it('should display alert when unable to fetch blog dashboard data',
@@ -197,4 +212,32 @@ describe('Blog Dashboard Page Component', () => {
         'Unable to create new blog post.Error: ' +
         'To many collisions with existing blog post ids.');
     }));
+
+  it('should remove unpublish blog post from published list and' +
+  ' add it to drafts list', () => {
+    let summaryObject = BlogPostSummary.createFromBackendDict(
+      { id: 'sampleId',
+        author_username: 'test_user',
+        title: 'Title',
+        summary: 'Hello World',
+        tags: ['news'],
+        thumbnail_filename: 'image.png',
+        url_fragment: 'title',
+        last_updated: '3232323',
+        published_on: '3232323',
+      });
+    component.blogDashboardData.publishedBlogPostSummaryDicts = [summaryObject];
+    component.blogDashboardData.draftBlogPostSummaryDicts = [];
+    component.blogDashboardData.numOfDraftBlogPosts = 0;
+    component.blogDashboardData.numOfPublishedBlogPosts = 1;
+
+    component.unpublishedBlogPost(summaryObject);
+
+    expect(component.blogDashboardData.draftBlogPostSummaryDicts)
+      .toEqual([summaryObject]);
+    expect(component.blogDashboardData.publishedBlogPostSummaryDicts)
+      .toEqual([]);
+    expect(component.blogDashboardData.numOfPublishedBlogPosts).toEqual(0);
+    expect(component.blogDashboardData.numOfDraftBlogPosts).toEqual(1);
+  });
 });
