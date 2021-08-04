@@ -43,7 +43,7 @@ class ExplorationImprovementsHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': feconf.REGEX_FOR_ENTITY_ID
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }
@@ -117,7 +117,7 @@ class ExplorationImprovementsHistoryHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': feconf.REGEX_FOR_ENTITY_ID
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }
@@ -159,7 +159,7 @@ class ExplorationImprovementsConfigHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': feconf.REGEX_FOR_ENTITY_ID
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }

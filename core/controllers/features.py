@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -33,7 +34,7 @@ class ExplorationFeaturesHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': feconf.REGEX_FOR_ENTITY_ID
+                    'regex_pattern': constants.ENTITY_ID_REGEX
                 }]
             }
         }
