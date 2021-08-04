@@ -1794,20 +1794,20 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     def create(
             cls, exp_id, version, num_starts, num_completions,
             state_hit_counts):
-        # type: (Text, int, int, int, Dict[Text, int]) -> None
+        # type: (Text, Text, int, int, Dict[Text, int]) -> None
         """Creates a new ExplorationAnnotationsModel and
         then writes it to the datastore.
 
         Args:
             exp_id: str. ID of the exploration currently being played.
-            version: int. Version of exploration.
+            version: str. Version of exploration.
             num_starts: int. Number of students who started the exploration.
             num_completions: int. Number of students who have completed
                 the exploration.
             state_hit_counts: dict. Describes the number of hits
                 for each state.
         """
-        entity_id = cls.get_entity_id(exp_id, version)
+        entity_id = cls.get_entity_id(exp_id, int(version))
         cls(
             id=entity_id,
             exploration_id=exp_id,
@@ -1818,7 +1818,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_versions(cls, exploration_id):
-        # type: (Text) -> List[int]
+        # type: (Text) -> List[Text]
         """This function returns a list containing versions of
         ExplorationAnnotationsModel for a specific exploration_id.
 
@@ -1826,7 +1826,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id: str. ID of the exploration currently being played.
 
         Returns:
-            list(int). List of versions corresponding to annotation models
+            list(str). List of versions corresponding to annotation models
             with given exp_id.
         """
         return [

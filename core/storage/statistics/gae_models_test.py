@@ -610,7 +610,7 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_models(self):
         # type: () -> None
         stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', 1, 5, 4, {})
+            'exp_id1', '1', 5, 4, {})
 
         model1 = stats_models.ExplorationAnnotationsModel.get('exp_id1:1')
 
@@ -625,9 +625,9 @@ class ExplorationAnnotationsModelUnitTests(test_utils.GenericTestBase):
     def test_get_versions(self):
         # type: () -> None
         stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', 1, 5, 4, {})
+            'exp_id1', '1', 5, 4, {})
         stats_models.ExplorationAnnotationsModel.create(
-            'exp_id1', 2, 5, 4, {})
+            'exp_id1', '2', 5, 4, {})
 
         versions = stats_models.ExplorationAnnotationsModel.get_versions(
             'exp_id1')
