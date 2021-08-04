@@ -90,6 +90,7 @@ angular.module('oppia').component('previewTab', {
 
         // Construct array to hold required parameter changes.
         var manualParamChanges = [];
+        console.error('[DEBUGGING] unsetParametersInfo');
         for (var i = 0; i < unsetParametersInfo.length; i++) {
           var newParamChange = ParamChangeObjectFactory.createEmpty(
             unsetParametersInfo[i].paramName);
@@ -97,6 +98,7 @@ angular.module('oppia').component('previewTab', {
         }
 
         // Use modal to populate parameter change values.
+        console.error(`[DEBUGGING] manualParamChanges ${manualParamChanges}`);
         if (manualParamChanges.length > 0) {
           ctrl.showSetParamsModal(manualParamChanges, function() {
             deferred.resolve(manualParamChanges);

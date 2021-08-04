@@ -52,6 +52,7 @@ export class ComputeGraphService {
       nodes[stateName] = stateName;
       if (interaction.id) {
         let groups = interaction.answerGroups;
+        console.error('[DEBUGGING] groups');
         for (let h = 0; h < groups.length; h++) {
           links.push({
             source: stateName,
