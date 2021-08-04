@@ -48,11 +48,12 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
-# NOTE: These handlers manage user sessions. Thus, we should never reject or
-# replace them when running in maintenance mode; otherwise admins will be unable
-# to access the site.
+# NOTE: These handlers manage user sessions and serve auth pages. Thus, we
+# should never reject or replace them when running in maintenance mode;
+# otherwise admins will be unable to access the site.
 AUTH_HANDLER_PATHS = (
     '/csrfhandler',
+    '/login',
     '/session_begin',
     '/session_end',
 )
@@ -241,13 +242,6 @@ class BaseHandler(webapp2.RequestHandler):
             auth_services.destroy_auth_session(self.response)
             return
 
-        # TODO(#13447): Remove populating response values with `is_moderator`,
-        # `is_curriculum_admin` & `is_topic_manager`.
-        self.values['is_moderator'] = user_services.is_moderator(self.user_id)
-        self.values['is_curriculum_admin'] = (
-            user_services.is_curriculum_admin(self.user_id))
-        self.values['is_topic_manager'] = (
-            user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):

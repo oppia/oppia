@@ -866,12 +866,12 @@ URLS = [
 ]
 
 # Adding redirects for topic landing pages.
-for subject, topics in feconf.AVAILABLE_LANDING_PAGES.items():
+for subject, topics in constants.AVAILABLE_LANDING_PAGES.items():
     for topic in topics:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
-                custom_landing_pages.TopicLandingPage))
+                oppia_root.OppiaRootPage))
 
 if constants.DEV_MODE:
     URLS.append(
