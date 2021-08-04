@@ -241,13 +241,6 @@ class BaseHandler(webapp2.RequestHandler):
             auth_services.destroy_auth_session(self.response)
             return
 
-        # TODO(#13447): Remove populating response values with `is_moderator`,
-        # `is_curriculum_admin` & `is_topic_manager`.
-        self.values['is_moderator'] = user_services.is_moderator(self.user_id)
-        self.values['is_curriculum_admin'] = (
-            user_services.is_curriculum_admin(self.user_id))
-        self.values['is_topic_manager'] = (
-            user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):
