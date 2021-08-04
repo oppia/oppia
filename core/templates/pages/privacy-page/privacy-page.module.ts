@@ -16,24 +16,18 @@
  * @fileoverview Module for the privacy page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { PrivacyPageComponent } from './privacy-page.component';
 import { PrivacyPageRootComponent } from './privacy-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
+import { PrivacyPageRoutingModule } from './privacy-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    PrivacyPageRoutingModule
   ],
   declarations: [
     PrivacyPageRootComponent,
@@ -42,20 +36,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   entryComponents: [
     PrivacyPageRootComponent,
     PrivacyPageComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [PrivacyPageRootComponent]
+  ]
 })
 export class PrivacyPageModule {}

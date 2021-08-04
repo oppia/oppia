@@ -62,6 +62,7 @@
 /core/templates/services/angular-services.index.ts @srijanreddy98 @darksun27
 /core/templates/services/contextual/logger.service.ts @srijanreddy98 @darksun27
 /core/templates/services/contextual/logger.service.spec.ts @srijanreddy98 @darksun27
+/core/templates/services/page-head.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/i18n-language-code.service.ts @srijanreddy98 @darksun27
 /core/templates/services/loader.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/question-validation.service*.ts @srijanreddy98 @darksun27
@@ -136,7 +137,6 @@
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/privacy-page.component.ts @seanlip @BenHenning
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
 /core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
 

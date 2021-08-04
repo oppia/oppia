@@ -60,7 +60,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   userIsLoggedIn: boolean;
   username: string;
   currentUrl: string;
-  logoutUrl: string;
   userMenuIsShown: boolean;
   inClassroomPage: boolean;
   showLanguageSelector: boolean;
@@ -133,7 +132,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.windowRef.nativeWindow.location.pathname.split('/')[1];
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
-    this.logoutUrl = AppConstants.LOGOUT_URL;
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
     this.inClassroomPage = false;
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(

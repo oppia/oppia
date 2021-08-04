@@ -40,7 +40,10 @@
     <p>
       For more information about how we use your personal information and what
       types of information we collect and why, please refer to our
-      <a href="/privacy-policy">Privacy Policy</a>.
+      <a href="/privacy-policy"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE">
+         Privacy Policy
+      </a>.
     </p>
 
     <a class="oppia-privacy-terms-anchor" #hostedCreatedContent></a>

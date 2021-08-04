@@ -16,25 +16,18 @@
  * @fileoverview Module for the donate page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
+import { NgModule } from '@angular/core';
 import { DonatePageComponent } from './donate-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { DonatePageRootComponent } from './donate-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
+import { DonatePageRoutingModule } from './donate-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    DonatePageRoutingModule
   ],
   declarations: [
     DonatePageComponent,
@@ -43,20 +36,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   entryComponents: [
     DonatePageComponent,
     DonatePageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [DonatePageRootComponent]
+  ]
 })
 export class DonatePageModule {}

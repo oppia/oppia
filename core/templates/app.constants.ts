@@ -148,8 +148,6 @@ export const AppConstants = {
 
   DEFAULT_PROFILE_IMAGE_PATH: '/avatar/user_blue_72px.webp',
 
-  LOGOUT_URL: '/logout',
-
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (

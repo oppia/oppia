@@ -19,6 +19,7 @@
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],
+      "hybrid-router-module-provider": ["core/templates/hybrid-router-module-provider"],
       "app-events/*": ["core/templates/app-events/*"],
       "components/*": ["core/templates/components/*"],
       "directives/*": ["core/templates/directives/*"],

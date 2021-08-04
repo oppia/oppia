@@ -95,6 +95,9 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
 // Services.
 import { AuthService } from 'services/auth.service';
 
+// Miscellaneous.
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+
 @NgModule({
   imports: [
     BaseModule,
@@ -102,6 +105,9 @@ import { AuthService } from 'services/auth.service';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,

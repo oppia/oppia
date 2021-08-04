@@ -7,7 +7,12 @@
   </form>
   <div class="license-warning">
     Please only upload audio files that you created yourself and that you are willing to license under the site's
-    <a href="/license" target="_blank" rel="noopener">license terms</a>.
+    <a href="/license"
+       [routerLink]="'/' + licenseUrl"
+       target="_blank"
+       rel="noopener">
+      license terms
+    </a>.
     Audio translation files should be less than <b>five minutes</b> long.
   </div>
 

@@ -1180,15 +1180,6 @@ RTE_CONTENT_SPEC = {
     }
 }
 
-# A dict representing available landing pages, having subject as a key and list
-# of topics as the value.
-# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
-# oppia constant defined in
-# core/templates/pages/landing-pages/TopicLandingPage.js file.
-AVAILABLE_LANDING_PAGES = {
-    'math': ['fractions', 'negative-numbers', 'ratios']
-}
-
 # Classroom page names for generating URLs. These need to be kept in sync with
 # CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']

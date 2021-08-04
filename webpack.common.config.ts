@@ -70,7 +70,6 @@ module.exports = {
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.import.ts',
-    contact: commonPrefix + '/pages/contact-page/contact-page.import.ts',
     console_errors: commonPrefix + '/tests/console_errors.import.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
@@ -84,7 +83,6 @@ module.exports = {
     delete_account:
       commonPrefix + '/pages/delete-account-page/' +
         'delete-account-page.import.ts',
-    donate: commonPrefix + '/pages/donate-page/donate-page.import.ts',
     email_dashboard:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-page.import.ts',
@@ -100,34 +98,22 @@ module.exports = {
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
       'exploration-player-page.import.ts',
-    get_started:
-      commonPrefix + '/pages/get-started-page/get-started-page.import.ts',
-    landing:
-      commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-      'topic-landing-page.import.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
     library: commonPrefix + '/pages/library-page/library-page.import.ts',
-    license: commonPrefix + '/pages/license-page/license.import.ts',
-    login: commonPrefix + '/pages/login-page/login-page.import.ts',
-    logout: commonPrefix + '/pages/logout-page/logout-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
       commonPrefix + '/pages/moderator-page/moderator-page.import.ts',
     oppia_root:
       commonPrefix + '/pages/oppia-root/index.ts',
-    partnerships:
-      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
-    playbook: commonPrefix + '/pages/participation-playbook/playbook.import.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.import.ts',
-    privacy: commonPrefix + '/pages/privacy-page/privacy-page.import.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.import.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.import.ts',
@@ -149,9 +135,6 @@ module.exports = {
     subtopic_viewer:
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-    teach: commonPrefix + '/pages/teach-page/teach-page.import.ts',
-    terms: commonPrefix + '/pages/terms-page/terms-page.import.ts',
-    thanks: commonPrefix + '/pages/thanks-page/thanks-page.import.ts',
     topic_editor:
       commonPrefix + '/pages/topic-editor-page/topic-editor-page.import.ts',
     topics_and_skills_dashboard: (
@@ -270,18 +253,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['contact'],
-      filename: 'contact-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.'
-      },
-      template: commonPrefix + '/pages/contact-page/contact-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['creator_dashboard'],
       filename: 'creator-dashboard-page.mainpage.html',
       hybrid: true,
@@ -321,18 +292,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/delete-account-page/' +
           'delete-account-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['donate'],
-      filename: 'donate-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Donate to The Oppia Foundation to enable more ' +
-        'students to receive the quality education they deserve.'
-      },
-      template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -421,28 +380,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['get_started'],
-      filename: 'get-started-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Learn how to get started using Oppia.'
-      },
-      template:
-        commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['landing'],
-      filename: 'topic-landing-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-        'topic-landing-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['learner_dashboard'],
       filename: 'learner-dashboard-page.mainpage.html',
       hybrid: true,
@@ -464,34 +401,6 @@ module.exports = {
           'level you want.'
       },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['license'],
-      filename: 'license.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'License terms that Oppia is attributed under.'
-      },
-      template:
-        commonPrefix + '/pages/license-page/license.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['login'],
-      filename: 'login-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/login-page/login-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['logout'],
-      filename: 'logout-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/logout-page/logout-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -524,36 +433,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['partnerships'],
-      filename: 'partnerships-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-          commonPrefix + '/pages/partnerships-page/' +
-          'partnerships-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['pending_account_deletion'],
       filename: 'pending-account-deletion-page.mainpage.html',
       meta: defaultMeta,
       template:
           commonPrefix + '/pages/pending-account-deletion-page/' +
           'pending-account-deletion-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['playbook'],
-      filename: 'playbook.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'The Oppia library is full of user-created lessons ' +
-        'called \'explorations\'. Read about how to participate in the ' +
-        'community and begin creating explorations.'
-      },
-      template:
-        commonPrefix + '/pages/participation-playbook/playbook.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -577,14 +462,6 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['privacy'],
-      filename: 'privacy-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -700,43 +577,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/subtopic-viewer-page/' +
         'subtopic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['teach'],
-      filename: 'teach-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'The Oppia library is full of user-created lessons ' +
-        'called \'explorations\'. Read about how to participate in the ' +
-        'community and begin creating explorations.'
-      },
-      template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['terms'],
-      filename: 'terms-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
-        ' e-learning platform. Learn about our terms and conditions for ' +
-        'creating and distributing learning material.'
-      },
-      template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['thanks'],
-      filename: 'thanks-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Thank you for donating to The Oppia Foundation!'
-      },
-      template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

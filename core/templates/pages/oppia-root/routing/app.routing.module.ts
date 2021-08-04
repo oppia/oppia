@@ -21,7 +21,7 @@ import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
 import { AppConstants } from 'app.constants';
 
-// All paths should be defined in constants.ts file.
+// All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
@@ -30,12 +30,94 @@ const routes: Route[] = [
       .then(m => m.AboutPageModule)
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE,
+    loadChildren: () => import('pages/contact-page/contact-page.module')
+      .then(m => m.ContactPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE,
+    loadChildren: () => import('pages/donate-page/donate-page.module')
+      .then(m => m.DonatePageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.ROUTE,
+    loadChildren: () => import('pages/get-started-page/get-started-page.module')
+      .then(m => m.GetStartedPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE,
+    loadChildren: () => import('pages/license-page/license.module')
+      .then(m => m.LicensePageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE,
+    loadChildren: () => import('pages/login-page/login-page.module')
+      .then(m => m.LoginPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE,
+    loadChildren: () => import('pages/logout-page/logout-page.module')
+      .then(m => m.LogoutPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE,
+    loadChildren: () => import(
+      'pages/partnerships-page/partnerships-page.module')
+      .then(m => m.PartnershipsPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE,
+    loadChildren: () => import('pages/participation-playbook/playbook.module')
+      .then(m => m.PlaybookPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE,
+    loadChildren: () => import('pages/privacy-page/privacy-page.module')
+      .then(m => m.PrivacyPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE,
+    loadChildren: () => import('pages/teach-page/teach-page.module')
+      .then(m => m.TeachPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE,
+    loadChildren: () => import('pages/terms-page/terms-page.module')
+      .then(m => m.TermsPageModule)
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.THANKS.ROUTE,
+    loadChildren: () => import('pages/thanks-page/thanks-page.module')
+      .then(m => m.ThanksPageModule)
+  },
+  {
     path: '**',
     loadChildren: () => import(
       'pages/error-pages/error-404/error-404-page.module').then(
       m => m.Error404PageModule)
   }
 ];
+
+// Register all routes for topic landing page.
+for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
+  for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
+    routes.push({
+      path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
+      loadChildren: () => import(
+        'pages/landing-pages/topic-landing-page/topic-landing-page.module')
+        .then(m => m.TopicLandingPageModule)
+    });
+  }
+}
+
+// '**' wildcard route must be kept at the end,as it can override all other
+// routes.
+routes.push({
+  path: '**',
+  loadChildren: () => import(
+    'pages/error-pages/error-404/error-404-page.module').then(
+    m => m.Error404PageModule)
+});
 
 @NgModule({
   imports: [

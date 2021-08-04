@@ -46,6 +46,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 
 @NgModule({
@@ -56,6 +57,9 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
     ClipboardModule,
     FormsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     MatAutocompleteModule,
     MatButtonModule,
     MatCardModule,
