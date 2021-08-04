@@ -604,6 +604,8 @@
     "extensions/objects/templates/boolean-editor.component.ts",
     "extensions/objects/templates/code-string-editor.component.ts",
     "extensions/objects/templates/coord-two-dim-editor.component.ts",
+    "extensions/objects/templates/custom-osk-letters-editor.component.ts",
+    "extensions/objects/templates/custom-osk-letters-editor.component.spec.ts",
     "extensions/objects/templates/drag-and-drop-positive-int-editor.component.ts",
     "extensions/objects/templates/graph-editor.component.ts",
     "extensions/objects/templates/html-editor.component.ts",
