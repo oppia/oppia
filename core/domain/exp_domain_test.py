@@ -3897,7 +3897,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 52
+schema_version: 53
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4019,7 +4019,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 47
+states_schema_version: 48
 tags: []
 title: Title
 """)
