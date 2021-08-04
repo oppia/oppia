@@ -18,6 +18,7 @@
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
@@ -37,10 +38,11 @@ describe('ImageUploaderComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         MatIconModule,
+        MockRouterModule
       ],
       declarations: [
         ImageUploaderComponent,
-        MockTranslatePipe,
+        MockTranslatePipe
       ],
       providers: [
         {provide: WindowRef, useValue: windowRef}
