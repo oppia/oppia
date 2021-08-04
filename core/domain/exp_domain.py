@@ -1931,7 +1931,8 @@ class Exploration(python_utils.OBJECT):
             if interaction_customisation_args:
                 state_domain.State.convert_html_fields_in_state(
                     state_dict,
-                    html_validation_service.convert_svg_diagram_tags_to_image_tags)
+                    html_validation_service
+                    .convert_svg_diagram_tags_to_image_tags)
         return states_dict
 
     @classmethod
