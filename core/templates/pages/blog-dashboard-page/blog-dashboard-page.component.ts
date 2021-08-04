@@ -119,6 +119,23 @@ export class BlogDashboardPageComponent implements OnInit, OnDestroy {
     this.blogDashboardData.numOfDraftBlogPosts += 1;
     this.blogDashboardData.numOfPublishedBlogPosts -= 1;
   }
+
+  removeBlogPost(
+      blogPostSummary: BlogPostSummary, blogPostWasPublished: boolean): void {
+    let summaryDicts: BlogPostSummary[];
+    if (blogPostWasPublished) {
+      summaryDicts = this.blogDashboardData.publishedBlogPostSummaryDicts;
+      this.blogDashboardData.numOfPublishedBlogPosts -= 1;
+    } else {
+      summaryDicts = this.blogDashboardData.draftBlogPostSummaryDicts;
+      this.blogDashboardData.numOfDraftBlogPosts -= 1;
+    }
+    let index = summaryDicts.indexOf(
+      blogPostSummary);
+    if (index > -1) {
+      summaryDicts.splice(index, 1);
+    }
+  }
 }
 
 angular.module('oppia').directive('oppiaBlogDashboardPage',

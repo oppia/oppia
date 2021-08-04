@@ -47,7 +47,8 @@
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
                                          [activeView]="activeView"
-                                         class="d-flex flex-grow-1">
+                                         class="d-flex flex-grow-1"
+                                         (deletedBlogPost)="removeBlogPost(blogPostSummary, false)">
               </oppia-blog-dashboard-tile>
             </div>
           </div>
@@ -79,7 +80,8 @@
                                          [blogPostIsPublished]="true"
                                          [activeView]="activeView"
                                          class="d-flex flex-grow-1"
-                                         (unpublisedBlogPost)="unpublishedBlogPost(blogPostSummary)">
+                                         (unpublisedBlogPost)="unpublishedBlogPost(blogPostSummary)"
+                                         (deletedBlogPost)="removeBlogPost(blogPostSummary, true)">
               </oppia-blog-dashboard-tile>
             </div>
           </div>

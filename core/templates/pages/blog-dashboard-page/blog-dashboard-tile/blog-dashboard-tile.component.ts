@@ -34,6 +34,7 @@ export class BlogDashboardTileComponent implements OnInit {
   @Input() activeView: string;
   lastUpdatedDateString: string = '';
   @Output() unpublisedBlogPost: EventEmitter<void> = new EventEmitter();
+  @Output() deletedBlogPost: EventEmitter<void> = new EventEmitter();
   constructor(
     private blogDashboardPageService: BlogDashboardPageService,
     private blogPostEditorBackendService: BlogPostEditorBackendApiService,
@@ -64,6 +65,7 @@ export class BlogDashboardTileComponent implements OnInit {
     }).result.then(() => {
       this.blogDashboardPageService.blogPostId = this.blogPostSummary.id;
       this.blogDashboardPageService.deleteBlogPost();
+      this.deletedBlogPost.emit();
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
