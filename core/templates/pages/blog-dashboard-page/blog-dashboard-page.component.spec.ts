@@ -117,13 +117,6 @@ describe('Blog Dashboard Page Component', () => {
     component.ngOnInit();
     expect(component.activeTab).toBe('main');
     expect(component.initMainTab).toHaveBeenCalled();
-
-    mockWindowRef.nativeWindow.location.hash = '/blog_post_editor/123456ABCEFG';
-    blogDashboardPageService.detectUrlChange();
-    mockWindowRef.nativeWindow.onhashchange();
-    component.ngOnInit();
-    expect(component.activeTab).toBe('editor_tab');
-    expect(component.initMainTab).not.toHaveBeenCalled();
   }));
 
   it('should initialize main tab', fakeAsync(() => {
@@ -192,7 +185,6 @@ describe('Blog Dashboard Page Component', () => {
       .toHaveBeenCalled();
     expect(blogDashboardPageService.navigateToEditorTabWithId)
       .toHaveBeenCalledWith('123456abcdef');
-    expect(component.activeTab).toBe('editor_tab');
   }));
 
   it('should display alert when unable to create new blog post.',

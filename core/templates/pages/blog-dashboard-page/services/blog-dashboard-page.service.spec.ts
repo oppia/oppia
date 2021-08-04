@@ -68,9 +68,15 @@ describe('Blog Post Page service', () => {
 
   it('should navigate to different tabs', function() {
     expect(blogDashboardPageService.activeTab).toEqual('main');
+
     blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
+    mockWindowRef.nativeWindow.onhashchange();
+
     expect(blogDashboardPageService.activeTab).toEqual('editor_tab');
+
     blogDashboardPageService.navigateToMainTab();
+    mockWindowRef.nativeWindow.onhashchange();
+
     expect(blogDashboardPageService.activeTab).toEqual('main');
   });
 
