@@ -34,8 +34,7 @@ describe('InteractiveNumericInput', () => {
     getValuesFromAttributes(interactionId, attributes) {
       return {
         inputGreaterThanOrEqualToZero: {
-          value: JSON.parse(
-            attributes.inputGreaterThanOrEqualToZeroValWithValue)
+          value: false
         }
       };
     }

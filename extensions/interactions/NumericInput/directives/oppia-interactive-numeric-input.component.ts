@@ -72,7 +72,7 @@ export class InteractiveNumericInput implements OnInit {
   private getAttributesObject() {
     return {
       inputGreaterThanOrEqualToZeroWithValue:
-        this.inputGreaterThanOrEqualToZeroWithValue,
+        this.inputGreaterThanOrEqualToZeroWithValue
     };
   }
 
