@@ -31,7 +31,11 @@ class ThreadListHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+                }]
             }
         }
     }
@@ -81,7 +85,11 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+                }]
             }
         }
     }
@@ -106,7 +114,11 @@ class ThreadHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'thread_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'(exploration|collection)\.\w+\.\w+'
+                }]
             }
         }
     }
@@ -220,7 +232,11 @@ class FeedbackStatsHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
+                }]
             }
         }
     }
@@ -251,7 +267,11 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     URL_PATH_ARGS_SCHEMAS = {
         'thread_id': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': r'(exploration|collection)\.\w+\.\w+'
+                }]
             }
         }
     }
