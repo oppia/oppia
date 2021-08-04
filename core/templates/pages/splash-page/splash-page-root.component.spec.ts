@@ -18,8 +18,7 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { PageTitleService } from 'services/page-title.service';
+import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SplashPageRootComponent } from './splash-page-root.component';
@@ -28,8 +27,7 @@ import { SplashPageRootComponent } from './splash-page-root.component';
 describe('Splash Page Root', () => {
   let fixture: ComponentFixture<SplashPageRootComponent>;
   let component: SplashPageRootComponent;
-  let pageTitleService: PageTitleService;
-  let metaTagCustomizationService: MetaTagCustomizationService;
+  let pageHeadService: PageHeadService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -38,8 +36,7 @@ describe('Splash Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService,
-        MetaTagCustomizationService
+        PageHeadService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -48,8 +45,7 @@ describe('Splash Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SplashPageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
-    metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
+    pageHeadService = TestBed.inject(PageHeadService);
   });
 
   it('should successfully instantiate the component',
@@ -58,10 +54,8 @@ describe('Splash Page Root', () => {
     });
 
   it('should initialize', () => {
-    spyOn(pageTitleService, 'setPageTitle');
-    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags');
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     component.ngOnInit();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
-    expect(metaTagCustomizationService.addOrReplaceMetaTags).toHaveBeenCalled();
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
   });
 });

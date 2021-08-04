@@ -374,6 +374,7 @@ import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/s
 import { LibraryPageBackendApiService } from 'pages/library-page/services/library-page-backend-api.service';
 import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-page-backend-api.service';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import { PageHeadService } from './page-head.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -597,6 +598,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
   ['OutcomeObjectFactory', OutcomeObjectFactory],
+  ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],
   ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],

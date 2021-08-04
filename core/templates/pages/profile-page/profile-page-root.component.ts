@@ -21,6 +21,7 @@ import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { LoaderService } from 'services/loader.service';
+import { PageHeadService } from 'services/page-head.service';
 import { PageTitleService } from 'services/page-title.service';
 
 @Component({
@@ -35,14 +36,14 @@ export class ProfilePageRootComponent {
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,
     private loaderService: LoaderService,
-    private pageTitleService: PageTitleService,
+    private pageHeadService: PageHeadService,
     private urlService: UrlService,
   ) {}
 
   ngOnInit(): void {
-    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
+    this.pageHeadService.updateTitleAndMetaTags(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE);
+
     let username = this.urlService.getPathname().split('/')[2];
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.doesProfileExist(username)

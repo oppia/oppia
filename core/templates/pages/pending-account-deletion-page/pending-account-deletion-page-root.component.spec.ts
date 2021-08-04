@@ -21,7 +21,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
+import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
@@ -29,7 +29,7 @@ import { PendingAccountDeletionPageRootComponent } from './pending-account-delet
 describe('Pending Account Deletion Page Root', () => {
   let fixture: ComponentFixture<PendingAccountDeletionPageRootComponent>;
   let component: PendingAccountDeletionPageRootComponent;
-  let pageTitleService: PageTitleService;
+  let pageHeadService: PageHeadService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let loaderService: LoaderService;
 
@@ -43,7 +43,7 @@ describe('Pending Account Deletion Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService
+        PageHeadService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -52,7 +52,7 @@ describe('Pending Account Deletion Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PendingAccountDeletionPageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
+    pageHeadService = TestBed.inject(PageHeadService);
     loaderService = TestBed.inject(LoaderService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
@@ -64,7 +64,7 @@ describe('Pending Account Deletion Page Root', () => {
     });
 
   it('should initialize and show page when access is valid', fakeAsync(() => {
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
       .and.returnValue(Promise.resolve({
         valid: true
@@ -73,7 +73,7 @@ describe('Pending Account Deletion Page Root', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();
     tick();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
       accessValidationBackendApiService.accountDeletionIsEnabled)
@@ -85,7 +85,7 @@ describe('Pending Account Deletion Page Root', () => {
 
   it('should initialize and show error page when access is not valid',
     fakeAsync(() => {
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(pageHeadService, 'updateTitleAndMetaTags');
       spyOn(
         accessValidationBackendApiService,
         'accountDeletionIsEnabled')
@@ -96,7 +96,7 @@ describe('Pending Account Deletion Page Root', () => {
       spyOn(loaderService, 'hideLoadingScreen');
       component.ngOnInit();
       tick();
-      expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(accessValidationBackendApiService.accountDeletionIsEnabled)
         .toHaveBeenCalled();
@@ -107,14 +107,14 @@ describe('Pending Account Deletion Page Root', () => {
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(pageHeadService, 'updateTitleAndMetaTags');
       spyOn(accessValidationBackendApiService, 'accountDeletionIsEnabled')
         .and.returnValue(Promise.reject());
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
       component.ngOnInit();
       tick();
-      expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(accessValidationBackendApiService.accountDeletionIsEnabled)
         .toHaveBeenCalled();

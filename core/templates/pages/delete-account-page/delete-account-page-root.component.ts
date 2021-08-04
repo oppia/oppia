@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-delete-account-page-root',
@@ -34,13 +34,12 @@ export class DeleteAccountPageRootComponent {
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,
     private loaderService: LoaderService,
-    private pageTitleService: PageTitleService
+    private pageHeadService: PageHeadService
   ) {}
 
   ngOnInit(): void {
-    let pageData = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE;
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
+    this.pageHeadService.updateTitleAndMetaTags(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE);
 
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.validateCanManageOwnAccount()

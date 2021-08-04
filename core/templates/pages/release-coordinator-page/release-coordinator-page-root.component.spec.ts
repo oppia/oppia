@@ -22,7 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
 import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
+import { PageHeadService } from 'services/page-head.service';
 
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
@@ -30,7 +30,7 @@ import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-
 describe('Release Coordinator Page Root', () => {
   let fixture: ComponentFixture<ReleaseCoordinatorPageRootComponent>;
   let component: ReleaseCoordinatorPageRootComponent;
-  let pageTitleService: PageTitleService;
+  let pageHeadService: PageHeadService;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let loaderService: LoaderService;
 
@@ -44,7 +44,7 @@ describe('Release Coordinator Page Root', () => {
         MockTranslatePipe
       ],
       providers: [
-        PageTitleService,
+        PageHeadService,
         MetaTagCustomizationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -54,7 +54,7 @@ describe('Release Coordinator Page Root', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ReleaseCoordinatorPageRootComponent);
     component = fixture.componentInstance;
-    pageTitleService = TestBed.inject(PageTitleService);
+    pageHeadService = TestBed.inject(PageHeadService);
     loaderService = TestBed.inject(LoaderService);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
@@ -66,7 +66,7 @@ describe('Release Coordinator Page Root', () => {
     });
 
   it('should initialize and show page when access is valid', fakeAsync(() => {
-    spyOn(pageTitleService, 'setPageTitle');
+    spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToReleaseCoordinatorPage')
@@ -77,7 +77,7 @@ describe('Release Coordinator Page Root', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     component.ngOnInit();
     tick();
-    expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+    expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
       accessValidationBackendApiService.validateAccessToReleaseCoordinatorPage)
@@ -89,7 +89,7 @@ describe('Release Coordinator Page Root', () => {
 
   it('should initialize and show error page when access is not valid',
     fakeAsync(() => {
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(pageHeadService, 'updateTitleAndMetaTags');
       spyOn(
         accessValidationBackendApiService,
         'validateAccessToReleaseCoordinatorPage')
@@ -100,7 +100,7 @@ describe('Release Coordinator Page Root', () => {
       spyOn(loaderService, 'hideLoadingScreen');
       component.ngOnInit();
       tick();
-      expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(
         accessValidationBackendApiService
@@ -113,7 +113,7 @@ describe('Release Coordinator Page Root', () => {
 
   it('should initialize and show error page when server respond with error',
     fakeAsync(() => {
-      spyOn(pageTitleService, 'setPageTitle');
+      spyOn(pageHeadService, 'updateTitleAndMetaTags');
       spyOn(
         accessValidationBackendApiService,
         'validateAccessToReleaseCoordinatorPage')
@@ -122,7 +122,7 @@ describe('Release Coordinator Page Root', () => {
       spyOn(loaderService, 'hideLoadingScreen');
       component.ngOnInit();
       tick();
-      expect(pageTitleService.setPageTitle).toHaveBeenCalled();
+      expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalled();
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(
         accessValidationBackendApiService

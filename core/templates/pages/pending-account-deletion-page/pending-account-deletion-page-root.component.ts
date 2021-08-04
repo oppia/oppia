@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
+import { PageHeadService } from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-pending-account-deletion-page-root',
@@ -34,14 +34,12 @@ export class PendingAccountDeletionPageRootComponent {
     private accessValidationBackendApiService:
     AccessValidationBackendApiService,
     private loaderService: LoaderService,
-    private pageTitleService: PageTitleService
+    private pageHeadService: PageHeadService
   ) {}
 
   ngOnInit(): void {
-    let pageData = (
+    this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION);
-    // Update default title.
-    this.pageTitleService.setPageTitle(pageData.TITLE);
 
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService.accountDeletionIsEnabled()
