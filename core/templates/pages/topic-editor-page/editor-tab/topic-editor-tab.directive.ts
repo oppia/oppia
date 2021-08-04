@@ -37,7 +37,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/entity-creation.service.ts');
 require(
-  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
+  'pages/topic-editor-page/editor-tab/topic-editor-stories-list.component.ts');
 require(
   'pages/topic-editor-page/modal-templates/preview-thumbnail.component.ts');
 
