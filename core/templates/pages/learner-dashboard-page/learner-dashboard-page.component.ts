@@ -160,6 +160,8 @@ export class LearnerDashboardPageComponent implements OnInit {
   threadId: string;
   messageSummaries: FeedbackMessageSummary[];
   threadSummary: FeedbackThreadSummary;
+  communityLibraryUrl = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
 
   constructor(
     private alertsService: AlertsService,

@@ -29,6 +29,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlaybookPageRootComponent } from './playbook-page-root.component';
 import { ToastrModule } from 'ngx-toastr';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 const toastrConfig = {
@@ -51,6 +52,9 @@ const toastrConfig = {
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
