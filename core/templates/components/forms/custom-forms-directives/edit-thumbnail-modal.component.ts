@@ -39,26 +39,30 @@ interface InvalidTagsAndAttributes {
   ]
 })
 export class EditThumbnailModalComponent implements OnInit {
-  @Input() bgColor: string;
-  @Input() uploadedImage: string | null;
-  @Input() aspectRatio: string;
-  @Input() previewDescription: string;
-  @Input() previewDescriptionBgColor: string;
-  @Input() previewFooter: string;
-  @Input() previewTitle: string;
-  @Input() allowedBgColors: string[];
-  @Input() tempBgColor: string;
-  @Input() dimensions: { height: number; width: number; };
-  @Input() openInUploadMode: boolean;
-  @Input() uploadedImageMimeType: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() bgColor!: string;
+  // 'uploadedImage' will be null when an invalid image has
+  // been uploaded.
+  @Input() uploadedImage!: string | null;
+  @Input() aspectRatio!: string;
+  @Input() previewDescription!: string;
+  @Input() previewDescriptionBgColor!: string;
+  @Input() previewFooter!: string;
+  @Input() previewTitle!: string;
+  @Input() allowedBgColors!: string[];
+  @Input() tempBgColor!: string;
+  @Input() dimensions!: { height: number; width: number; };
+  @Input() openInUploadMode!: boolean;
+  @Input() uploadedImageMimeType!: string;
+  tags!: string[];
+  attrs!: string[];
+  imgSrc!: string;
+  invalidTagsAndAttributes!: InvalidTagsAndAttributes;
 
   invalidImageWarningIsShown = false;
   allowedImageFormats = ['svg'];
-  file: Blob;
-  tags: string[];
-  attrs: string[];
-  imgSrc: string;
-  invalidTagsAndAttributes: InvalidTagsAndAttributes;
 
   constructor(
     private svgSanitizerService: SvgSanitizerService,

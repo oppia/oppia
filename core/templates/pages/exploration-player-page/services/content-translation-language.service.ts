@@ -41,7 +41,8 @@ export class ContentTranslationLanguageService {
     private urlService: UrlService
   ) {}
 
-  private currentContentLanguageCode: string;
+  // The 'currentContentLanguageCode' is set to null initially.
+  private currentContentLanguageCode: string | null = null;
   private languageOptions: ExplorationLanguageInfo[] = [];
 
   _init(
@@ -95,7 +96,7 @@ export class ContentTranslationLanguageService {
         // the latter refers to the language that the exploration is written
         // in.)
         let languageDescription =
-            this.languageUtilService.getContentLanguageDescription(
+            <string> this.languageUtilService.getContentLanguageDescription(
               languageCode);
         this.languageOptions.push({
           value: languageCode,
@@ -117,7 +118,7 @@ export class ContentTranslationLanguageService {
   /**
    * @return {string} The current audio language code (eg. en).
    */
-  getCurrentContentLanguageCode(): string {
+  getCurrentContentLanguageCode(): string | null {
     return this.currentContentLanguageCode;
   }
 

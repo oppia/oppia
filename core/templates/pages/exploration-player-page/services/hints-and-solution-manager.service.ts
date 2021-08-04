@@ -29,7 +29,11 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
   providedIn: 'root'
 })
 export class HintsAndSolutionManagerService {
-  timeout = null;
+  // The following are set to null when the timeouts are cleared
+  // or when the service is reset.
+  timeout: NodeJS.Timeout | null = null;
+  tooltipTimeout: NodeJS.Timeout | null = null;
+
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
   WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
 
@@ -42,7 +46,8 @@ export class HintsAndSolutionManagerService {
   solutionReleased: boolean = false;
   solutionConsumed: boolean = false;
   hintsForLatestCard: Hint[] = [];
-  solutionForLatestCard: Solution = null;
+  // 'solutionForLatestCard' is null initially until the solution is released.
+  solutionForLatestCard: Solution | null = null;
   wrongAnswersSinceLastHintConsumed: number = 0;
   correctAnswerSubmitted: boolean = false;
 
@@ -54,7 +59,6 @@ export class HintsAndSolutionManagerService {
   // This is set to true as soon as a hint/solution is clicked or when the
   // tooltip has been triggered.
   hintsDiscovered: boolean = false;
-  tooltipTimeout = null;
 
   constructor(private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -170,7 +174,7 @@ export class HintsAndSolutionManagerService {
     return null;
   }
 
-  displaySolution(): Solution {
+  displaySolution(): Solution | null {
     this.hintsDiscovered = true;
     this.solutionConsumed = true;
     this._solutionViewedEventEmitter.emit();

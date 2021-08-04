@@ -34,9 +34,13 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
+type InteractionSpecsKey = keyof typeof INTERACTION_SPECS;
+
 export interface InputResponsePair {
   learnerInput: string,
-  oppiaResponse: string,
+  // 'oppiaResponse' is null when the response for the input has
+  // not been received yet.
+  oppiaResponse: string | null,
   isHint: boolean
 }
 
@@ -113,22 +117,28 @@ export class StateCard {
   isTerminal(): boolean {
     let interactionId = this.getInteractionId();
     return (
-      interactionId && INTERACTION_SPECS[interactionId].is_terminal);
+      Boolean(interactionId) && INTERACTION_SPECS[
+        <InteractionSpecsKey>interactionId].is_terminal);
   }
 
   getHints(): Hint[] {
     return this.getInteraction().hints;
   }
 
-  getSolution(): Solution {
+  // A null 'solution' indicates that this Interaction does not have a hint
+  // or there is a hint, but no solution.
+  getSolution(): Solution | null {
     return this.getInteraction().solution;
   }
 
   doesInteractionSupportHints(): boolean {
     let interactionId = this.getInteractionId();
     return (
-      !INTERACTION_SPECS[interactionId].is_terminal &&
-        !INTERACTION_SPECS[interactionId].is_linear);
+      interactionId ? (
+        !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_terminal &&
+        !INTERACTION_SPECS[<InteractionSpecsKey>interactionId].is_linear
+      ) : false
+    );
   }
 
   isCompleted(): boolean {
@@ -143,13 +153,16 @@ export class StateCard {
     this._completed = false;
   }
 
-  getInteractionInstructions(): string {
+  // Some interaction specifications do not have instructions.
+  getInteractionInstructions(): string | null {
     let interactionId = this.getInteractionId();
     return (
-        interactionId ? INTERACTION_SPECS[interactionId].instructions : '');
+        interactionId ? INTERACTION_SPECS[
+          <InteractionSpecsKey>interactionId].instructions : '');
   }
 
-  getInteractionCustomizationArgs(): InteractionCustomizationArgs {
+  // This returns 'null' when no interaction is set for the card.
+  getInteractionCustomizationArgs(): InteractionCustomizationArgs | null {
     let interaction = this.getInteraction();
     if (!interaction) {
       return null;
@@ -161,7 +174,7 @@ export class StateCard {
     let interactionId = this.getInteractionId();
     return (
       !interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
+        INTERACTION_SPECS[<InteractionSpecsKey>interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
 
@@ -173,7 +186,7 @@ export class StateCard {
     return this._interactionHtml;
   }
 
-  getOppiaResponse(index: number): string {
+  getOppiaResponse(index: number): string | null {
     return this._inputResponsePairs[index].oppiaResponse;
   }
 
@@ -181,25 +194,29 @@ export class StateCard {
     return this._inputResponsePairs;
   }
 
-  getLastInputResponsePair(): InputResponsePair {
+  // This will return null if there are no input response pairs present.
+  getLastInputResponsePair(): InputResponsePair | null {
     if (this._inputResponsePairs.length === 0) {
       return null;
     }
     return this._inputResponsePairs[this._inputResponsePairs.length - 1];
   }
 
-  getLastAnswer(): string {
-    if (this.getLastInputResponsePair() === null) {
+  // This will return null when there is no input response pair.
+  getLastAnswer(): string | null {
+    const lastInputResponsePair = this.getLastInputResponsePair();
+    if (lastInputResponsePair === null) {
       return null;
     }
-    return this.getLastInputResponsePair().learnerInput;
+    return lastInputResponsePair.learnerInput;
   }
 
-  getLastOppiaResponse(): string {
-    if (this.getLastInputResponsePair() === null) {
+  getLastOppiaResponse(): string | null {
+    const lastInputResponsePair = this.getLastInputResponsePair();
+    if (lastInputResponsePair === null) {
       return null;
     }
-    return this.getLastInputResponsePair().oppiaResponse;
+    return lastInputResponsePair.oppiaResponse;
   }
 
   addInputResponsePair(inputResponsePair: InputResponsePair): void {

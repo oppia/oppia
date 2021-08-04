@@ -41,8 +41,9 @@ export class PlayerPositionService {
     new EventEmitter<HelpCardEventResponse>();
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
 
-  displayedCardIndex = null;
-  onChangeCallback = null;
+  // The following properties are set to null initially.
+  displayedCardIndex: number | null = null;
+  onChangeCallback: Function | null = null;
   learnerJustSubmittedAnAnswer = false;
 
   init(callback: Function): void {
@@ -55,6 +56,9 @@ export class PlayerPositionService {
    * @return {string} a string that shows the name of current state.
    */
   getCurrentStateName(): string {
+    if (this.displayedCardIndex === null) {
+      throw new Error('Displayed Card Index has not been set');
+    }
     return (
       this.playerTranscriptService.getCard(
         this.displayedCardIndex).getStateName());
@@ -69,6 +73,9 @@ export class PlayerPositionService {
     this.displayedCardIndex = index;
 
     if (oldIndex !== this.displayedCardIndex) {
+      if (this.onChangeCallback === null) {
+        throw new Error('The callback function has not been initialized');
+      }
       this.onChangeCallback();
     }
   }
@@ -77,7 +84,7 @@ export class PlayerPositionService {
    * This function is used to find the index of the displayed card.
    * @return {number} The index of the displayed card.
    */
-  getDisplayedCardIndex(): number {
+  getDisplayedCardIndex(): number | null {
     return this.displayedCardIndex;
   }
 

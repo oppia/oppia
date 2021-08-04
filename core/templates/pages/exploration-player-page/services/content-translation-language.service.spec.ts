@@ -31,9 +31,9 @@ describe('Content translation language service', () => {
   let availableLanguageCodes: string[];
 
   beforeEach(() => {
-    ctls = TestBed.get(ContentTranslationLanguageService);
-    ctms = TestBed.get(ContentTranslationManagerService);
-    us = TestBed.get(UrlService);
+    ctls = TestBed.inject(ContentTranslationLanguageService);
+    ctms = TestBed.inject(ContentTranslationManagerService);
+    us = TestBed.inject(UrlService);
     availableLanguageCodes = ['fr', 'zh'];
   });
 
