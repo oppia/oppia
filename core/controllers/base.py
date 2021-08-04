@@ -54,7 +54,6 @@ CSRF_SECRET = config_domain.ConfigProperty(
 AUTH_HANDLER_PATHS = (
     '/csrfhandler',
     '/login',
-    '/signup',
     '/session_begin',
     '/session_end',
 )
