@@ -94,7 +94,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             urlsafe_start_cursor, # type: Optional[Text]
             language_code # type: Text
     ):
-        # type: (...) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
+        # type: (...) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[Text], bool]
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -111,7 +111,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(ExplorationOpportunitySummaryModel)|None. A list
+                results: list(ExplorationOpportunitySummaryModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -131,7 +131,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 cls.incomplete_translation_language_codes).fetch_page(
                     page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[ExplorationOpportunitySummaryModel]], results),
+            cast(List[ExplorationOpportunitySummaryModel], results),
             (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
@@ -141,7 +141,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             urlsafe_start_cursor, # type: Optional[Text]
             language_code # type: Text
     ):
-        # type: (...) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
+        # type: (...) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[Text], bool]
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -158,7 +158,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(ExplorationOpportunitySummaryModel)|None. A list
+                results: list(ExplorationOpportunitySummaryModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -177,20 +177,20 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.language_codes_needing_voice_artists == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[ExplorationOpportunitySummaryModel]], results),
+            cast(List[ExplorationOpportunitySummaryModel], results),
             (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_by_topic(cls, topic_id):
-        # type: (Text) -> Optional[List[ExplorationOpportunitySummaryModel]]
+        # type: (Text) -> List[ExplorationOpportunitySummaryModel]
         """Returns all the models corresponding to the specific topic.
 
         Returns:
-            list(ExplorationOpportunitySummaryModel)|None. A list of
+            list(ExplorationOpportunitySummaryModel). A list of
             ExplorationOpportunitySummaryModel having given topic_id.
         """
         return cast(
-            Optional[List[ExplorationOpportunitySummaryModel]],
+            List[ExplorationOpportunitySummaryModel],
             cls.query(cls.topic_id == topic_id).fetch())
 
     @classmethod
@@ -247,7 +247,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             page_size, # type: int
             urlsafe_start_cursor # type: Optional[Text]
     ):
-        # type: (...) -> Tuple[Optional[List[SkillOpportunityModel]], Optional[Text], bool]
+        # type: (...) -> Tuple[List[SkillOpportunityModel], Optional[Text], bool]
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -261,7 +261,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(SkillOpportunityModel)|None. A list
+                results: list(SkillOpportunityModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -279,7 +279,7 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[SkillOpportunityModel]], results),
+            cast(List[SkillOpportunityModel], results),
             (cursor.urlsafe() if cursor else None), more)
 
     @classmethod

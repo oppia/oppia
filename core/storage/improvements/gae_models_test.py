@@ -32,12 +32,6 @@ base_models, improvements_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.improvements])
 
 
-def _always_returns(value):
-    # type: (Any) -> Callable[..., Any]
-    """Creates a function which always returns the input value."""
-    return lambda: value
-
-
 class TaskEntryModelTests(test_utils.GenericTestBase):
     """Unit tests for TaskEntryModel instances."""
 

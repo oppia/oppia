@@ -380,11 +380,11 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel | None. The UserSettingsModel instance which
             contains the same email.
         """
-        filtered_users = cast(
-            List[UserSettingsModel],
-            cls.query(cls.email == email).fetch()
+        filtered_user = cast(
+            Optional[UserSettingsModel],
+            cls.query(cls.email == email).get()
         )
-        return None if not filtered_users else filtered_users[0]
+        return filtered_user
 
     @classmethod
     def get_by_role(cls, role):
@@ -1672,10 +1672,10 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str|None. The id of the exploration.
+            exploration_id: str. The id of the exploration.
 
         Returns:
-            ExplorationUserDataModel. The ExplorationUserDataModel instance
+            ExplorationUserDataModel|None. The ExplorationUserDataModel instance
             which matches with the given user_id and exploration_id.
         """
         instance_id = cls._generate_id(user_id, exploration_id)
@@ -2785,8 +2785,8 @@ class UserContributionRightsModel(base_models.BaseModel):
         reviewer_keys = cast(
             List[datastore_services.Key],
             cls.query(
-                cls.can_review_translation_for_language_codes == language_code)
-            .fetch(keys_only=True)
+                cls.can_review_translation_for_language_codes == language_code
+            ).fetch(keys_only=True)
         )
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -2806,8 +2806,8 @@ class UserContributionRightsModel(base_models.BaseModel):
         reviewer_keys = cast(
             List[datastore_services.Key],
             cls.query(
-                cls.can_review_voiceover_for_language_codes == language_code)
-            .fetch(keys_only=True)
+                cls.can_review_voiceover_for_language_codes == language_code
+            ).fetch(keys_only=True)
         )
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -2822,8 +2822,10 @@ class UserContributionRightsModel(base_models.BaseModel):
         """
         reviewer_keys = cast(
             List[datastore_services.Key],
-            cls.query(cls.can_review_questions == True).fetch( # pylint: disable=singleton-comparison
-                keys_only=True))
+            cls.query(
+                cls.can_review_questions == True # pylint: disable=singleton-comparison
+            ).fetch(keys_only=True)
+        )
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
     @classmethod
@@ -2837,8 +2839,10 @@ class UserContributionRightsModel(base_models.BaseModel):
         """
         contributor_keys = cast(
             List[datastore_services.Key],
-            cls.query(cls.can_submit_questions == True).fetch( # pylint: disable=singleton-comparison
-                keys_only=True))
+            cls.query(
+                cls.can_submit_questions == True # pylint: disable=singleton-comparison
+            ).fetch(keys_only=True)
+        )
         return [contributor_key.id() for contributor_key in contributor_keys]
 
 
