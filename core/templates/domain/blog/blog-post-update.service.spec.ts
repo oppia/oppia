@@ -119,8 +119,10 @@ describe('Blog Post update service', () => {
     });
 
 
-  it('should set change dict to default', () => {
+  it('should set change dict to default when' +
+  ' setBlogPostChangeDictToDefault is called.', () => {
     blogPostUpdateService.setBlogPostChangeDictToDefault();
+
     expect(blogPostUpdateService.changeDict).toEqual({});
   });
 });

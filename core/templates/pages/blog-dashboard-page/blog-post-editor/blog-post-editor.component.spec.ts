@@ -161,7 +161,7 @@ describe('Blog Post Editor Component', () => {
     expect(component.initEditor).toHaveBeenCalled;
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
-    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled();
+    expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
   });
 
