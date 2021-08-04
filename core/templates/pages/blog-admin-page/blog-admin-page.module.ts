@@ -32,6 +32,7 @@ import { BlogAdminPageComponent } from 'pages/blog-admin-page/blog-admin-page.co
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 const toastrConfig = {
@@ -56,6 +57,9 @@ declare var angular: ng.IAngularStatic;
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     MatCardModule,
     ReactiveFormsModule,
     SharedComponentsModule,

@@ -6095,6 +6095,10 @@ export default {
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
       "TITLE": "Profile | Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
     "RELEASE_COORDINATOR_PAGE": {
@@ -6137,6 +6141,10 @@ export default {
       // eslint-disable-next-line max-len
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
       "TITLE": "Oppia",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     }
   },

@@ -65,6 +65,9 @@ const toastrConfig = {
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     SharedComponentsModule,
     SharedFormsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -115,6 +118,7 @@ class AdminPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

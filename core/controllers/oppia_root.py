@@ -30,11 +30,6 @@ class OppiaRootPage(base.BaseHandler):
        with angular router.
     """
 
-    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    } # type: Dict[Text, Any]
-
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, **kwargs): # pylint: disable=unused-argument
         # type: (Any) -> None
