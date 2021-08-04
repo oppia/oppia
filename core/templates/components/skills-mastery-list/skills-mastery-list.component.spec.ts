@@ -69,14 +69,14 @@ describe('Skills Mastery List Component', () => {
     }, {
       getDegreesOfMastery: () => {
         return {
-          'skill1': 0.50,
-          'skill2': 0.29
+          'skill1' : 0.50,
+          'skill2' : 0.29
         };
       },
       getSkillDescriptions: () => {
         return {
           skill1: 'Skill 1 description'
-        }
+        };
       }
     });
   }));

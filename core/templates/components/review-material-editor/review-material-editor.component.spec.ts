@@ -23,16 +23,12 @@ describe('Review Material Editor Component', () => {
   let ctrl = null;
   let $scope = null;
   let $rootScope = null;
-  let $q = null;
-  let $uibModal = null;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
-    $uibModal = $injector.get('$uibModal');
     $scope = $rootScope.$new();
 
     ctrl = $componentController('reviewMaterialEditor', {
@@ -89,7 +85,7 @@ describe('Review Material Editor Component', () => {
     ctrl.saveConceptCardExplanation();
 
     expect(ctrl.onSaveExplanation)
-    .toHaveBeenCalledWith(SubtitledHtml.createDefault(
-      ctrl.editableExplanation, 'explanation'));
+      .toHaveBeenCalledWith(SubtitledHtml.createDefault(
+        ctrl.editableExplanation, 'explanation'));
   });
 });

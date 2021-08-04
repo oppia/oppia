@@ -67,4 +67,4 @@ angular.module('oppia').component('scoreRing', {
       };
     }
   ]
-  });
+});

@@ -39,7 +39,7 @@ describe('Story Creation Service', () => {
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{
-        filename:'Image1',
+        filename: 'Image1',
         imageBlob: new Blob(['data:image/png;base64,xyz'], {type: 'image/png'})
       }]);
     spyOn(ImageLocalStorageService, 'getThumbnailBgColor').and.returnValue(

@@ -46,7 +46,7 @@ describe('Topic Creation Service', () => {
 
     spyOn(ImageLocalStorageService, 'getStoredImagesData').and.returnValue(
       [{
-        filename:'Image1',
+        filename: 'Image1',
         imageBlob: new Blob(['data:image/png;base64,xyz'], {type: 'image/png'})
       }]);
     spyOn(ImageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
@@ -59,10 +59,7 @@ describe('Topic Creation Service', () => {
   it('should create topic when user clicks on create', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        story_url_fragment: 'url'
+        isValid: () => true
       })
     });
     spyOn(TopicCreationBackendApiService, 'createTopicAsync')
@@ -78,10 +75,7 @@ describe('Topic Creation Service', () => {
   it('should show alert message when topic creation fails', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        story_url_fragment: 'url'
+        isValid: () => true
       })
     });
     spyOn(TopicCreationBackendApiService, 'createTopicAsync')
@@ -95,20 +89,17 @@ describe('Topic Creation Service', () => {
       .toHaveBeenCalledWith('Topic creation failed');
   });
 
-  it('should not initiate new story creation if another is in process', () => {
+  it('should not initiate new topic creation if another is in process', () => {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        story_url_fragment: 'url'
+        isValid: () => true
       })
     });
 
     TopicCreationService.createNewTopic();
     $rootScope.$apply();
 
-    // Creating a new story while previous was in creation process.
+    // Creating a new topic while previous was in creation process.
     expect(TopicCreationService.createNewTopic()).toBe(undefined);
   });
 });

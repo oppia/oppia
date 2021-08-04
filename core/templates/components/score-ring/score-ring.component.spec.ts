@@ -41,6 +41,10 @@ describe('Score Ring Component', () => {
 
   it('should set component properties on initialization', () => {
     spyOn(document, 'querySelector').and.returnValue({
+      // This throws "Argument of type '{ r: { baseVal: { value: number; };
+      // }; style: { strokeDasharray: string; strokeDashoffset: string; }; }'
+      // is not assignable to parameter of type 'Element'.". We need to
+      // suppress this error because we need these values for testing the file.
       // @ts-expect-error
       r: {
         baseVal: {
