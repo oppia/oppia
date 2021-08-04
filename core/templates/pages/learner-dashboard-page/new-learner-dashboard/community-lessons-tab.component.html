@@ -255,9 +255,9 @@
   <div *ngIf="totalLessonsInPlaylist.length === 0">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></p>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
-      [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-      href="/community-library"
-      [routerLink]="communityLibraryUrl">
+       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+       href="/community-library"
+       [routerLink]="communityLibraryUrl">
     </a>
   </div>
   <div *ngIf="checkMobileView() && displayLessonsInPlaylist.length !== 0">
@@ -356,9 +356,9 @@
   <div *ngIf="subscriptionsList.length === 0">
     <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUBSCRIPTIONS' | translate" class="empty-section"></p>
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
-      [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-      href="/community-library"
-      [routerLink]="communityLibraryUrl">
+       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+       href="/community-library"
+       [routerLink]="communityLibraryUrl">
     </a>
   </div>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
