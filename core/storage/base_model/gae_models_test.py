@@ -333,11 +333,9 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
                 self.last_updated = datetime.datetime.utcnow()
 
             super(base_models.BaseHumanMaintainedModel, self).put()
-            return
 
         with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
             self.model_instance.put()
-        return
 
     def test_put(self):
         # type: () -> None
