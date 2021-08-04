@@ -69,7 +69,12 @@ describe('Blog Post Editor Component', () => {
     tags: ['learners', 'news'],
     url_fragment: 'sample#url',
     last_updated: '11/21/2014, 04:52:46:713463',
+    published_on: '11/21/2014, 04:52:46:713463',
   };
+
+  class MockChangeDetectorRef {
+    detectChanges(): void { }
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -101,10 +106,13 @@ describe('Blog Post Editor Component', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
+        {
+          provide: ChangeDetectorRef,
+          useClass: MockChangeDetectorRef
+        },
         BlogDashboardPageService,
         BlogPostUpdateService,
         BlogPostEditorBackendApiService,
-        ChangeDetectorRef,
         LoaderService,
         UrlInterpolationService,
         AlertsService,
@@ -199,6 +207,7 @@ describe('Blog Post Editor Component', () => {
       'November 21, 2014 at 04:52 AM');
     expect(component.title).toEqual('sample_title');
     expect(component.contentEditorIsActive).toEqual(false);
+    expect(component.lastChangesWerePublished).toBe(true);
   }));
 
   it('should display alert when unable to fetch blog post editor data',
@@ -225,7 +234,15 @@ describe('Blog Post Editor Component', () => {
 
     expect(blogPostUpdateService.setBlogPostTitle).toHaveBeenCalledWith(
       component.blogPostData, component.title);
-    expect(component.blogPostData.title).toBe('Sample title changed');
+  });
+
+  it('should update local editted content', () => {
+    component.localEdittedContent = '';
+    component.updateLocalEdittedContent('<p>Hello World</p>');
+
+    expect(component.localEdittedContent).toEqual(
+      '<p>Hello Worls</p>');
+    fixture.detectChanges();
   });
 
   it('should update local content value', fakeAsync(() => {
@@ -236,9 +253,8 @@ describe('Blog Post Editor Component', () => {
     component.updateContentValue();
     tick();
 
-    expect(blogPostUpdateService.setBlogPostContent).toHaveBeenCalled();
-    expect(component.blogPostData.content).toBe(
-      '<p>Sample content changed</p>');
+    expect(blogPostUpdateService.setBlogPostContent).toHaveBeenCalledWith(
+      component.blogPostData, component.localEdittedContent);
     expect(component.contentEditorIsActive).toBe(false);
   }));
 
@@ -371,6 +387,21 @@ describe('Blog Post Editor Component', () => {
 
       expect(blogDashboardPageService.deleteBlogPost).toHaveBeenCalled();
     }));
+
+
+  it('should open preview of the blog post model', () => {
+    spyOn(ngbModal, 'open');
+    component.blogPostData = sampleBlogPostData;
+    component.authorProfilePictureUrl = 'sample-url';
+
+    component.showPreview();
+
+    expect(blogDashboardPageService.blogPostData).toEqual(
+      sampleBlogPostData);
+    expect(blogDashboardPageService.authorPictureUrl).toEqual(
+      'sample-url');
+    expect(ngbModal.open).toHaveBeenCalled();
+  });
 
   it('should cancel publishing blog post model', fakeAsync(
     () => {
