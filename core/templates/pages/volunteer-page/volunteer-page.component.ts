@@ -198,7 +198,3 @@ export class VolunteerPageComponent implements OnInit {
     this.ngbCarouselConfig.pauseOnFocus = true;
   }
 }
-
-angular.module('oppia').directive(
-  'volunteerPage',
-  downgradeComponent({component: VolunteerPageComponent}));
