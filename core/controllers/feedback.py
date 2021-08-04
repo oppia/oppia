@@ -167,6 +167,7 @@ class ThreadHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(thread_id)
         text = self.normalized_payload.get('text')
         updated_status = self.normalized_payload.get('updated_status')
+        updated_subject = self.normalized_payload.get('updated_subject')
 
         if suggestion and updated_status:
             raise self.InvalidInputException(
@@ -174,8 +175,7 @@ class ThreadHandler(base.BaseHandler):
 
         messages = feedback_services.get_messages(thread_id)
         new_message = feedback_services.create_message(
-            thread_id, self.user_id, updated_status,
-            self.normalized_payload.get('updated_subject'), text)
+            thread_id, self.user_id, updated_status, updated_subject, text)
 
         # Currently we are manually adding new message to the messages list as
         # the feedback_services.get_messages is not returning a correct list of

@@ -133,7 +133,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
             self.get_html_response('/emaildashboard')
         with self.assertRaisesRegexp(Exception, '401 Unauthorized'):
             self.get_html_response(
-                '/querystatuscheck?query_id=%s' % 'random_query_id')
+                '/querystatuscheck?query_id=%s' % 'valid_query_id')
         self.logout()
 
     def test_that_exception_is_raised_for_invalid_input(self):
@@ -299,9 +299,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         csrf_token = self.get_new_csrf_token()
         params = {
-            'email_body': 'random_email_body',
-            'email_subject': 'random_email_subject',
-            'email_intent': 'random_email_intent',
+            'email_body': 'valid_email_body',
+            'email_subject': 'valid_email_subject',
+            'email_intent': 'bulk_email_create_exploration',
             'max_recipients': 0
         }
         response = self.post_json(
@@ -343,9 +343,9 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         csrf_token = self.get_new_csrf_token()
         params = {
-            'email_body': 'random_email_body',
-            'email_subject': 'random_email_subject',
-            'email_intent': 'random_email_intent',
+            'email_body': 'valid_email_body',
+            'email_subject': 'valid_email_subject',
+            'email_intent': 'bulk_email_create_exploration',
             'max_recipients': 0
         }
         # Raises authorization error when passing a query id whose associated
@@ -461,8 +461,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         csrf_token = self.get_new_csrf_token()
         params = {
-            'email_body': 'random_email_body',
-            'email_subject': 'random_email_subject'
+            'email_body': 'valid_email_body',
+            'email_subject': 'valid_email_subject'
         }
         response = self.post_json(
             '/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id',
@@ -502,8 +502,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         csrf_token = self.get_new_csrf_token()
         params = {
-            'email_body': 'random_email_body',
-            'email_subject': 'random_email_subject'
+            'email_body': 'valid_email_body',
+            'email_subject': 'valid_email_subject'
         }
 
         # Raises authorization error when passing a query id whose associated
