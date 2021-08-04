@@ -12,7 +12,7 @@
       <p ng-if="key === 'publication_status'" class="text-center">Published?</p>
     </th>
   </tr>
-  <tr ng-repeat="summary in storySummaries track by $index"
+  <tr ng-repeat="summary in $ctrl.storySummaries track by $index"
       dnd-list="storySummaries"
       dnd-dragstart="onMoveStoryStart($index)"
       dnd-drop="onMoveStoryFinish($index)"
