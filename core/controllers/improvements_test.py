@@ -151,7 +151,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_get_with_invalid_exploration_returns_invalid_input_page(self):
         with self.login_context(self.OWNER_EMAIL):
             self.get_json(
-                self.get_url(exp_id='BadExpId'), expected_status_int=404)
+                self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_with_non_creator_returns_401_error(self):
         with self.login_context(self.VIEWER_EMAIL):
@@ -207,7 +207,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
     def test_post_invalid_exploration_returns_invalid_input_page(self):
         with self.login_context(self.OWNER_EMAIL):
-            self.post_json(self.get_url(exp_id='BadExpId'), {
+            self.post_json(self.get_url(exp_id='bad_exp_id'), {
                 'task_entries': [{
                     'entity_version': 1,
                     'task_type': 'high_bounce_rate',
@@ -472,7 +472,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
     def test_get_with_invalid_exploration_returns_invalid_input_page(self):
         with self.login_context(self.OWNER_EMAIL):
             self.get_json(
-                self.get_url(exp_id='BadExpId'), expected_status_int=404)
+                self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_with_non_creator_returns_401_error(self):
         with self.login_context(self.VIEWER_EMAIL):
@@ -572,7 +572,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
     def test_get_for_non_existing_exploration_fails(self):
         with self.login_context(self.OWNER_EMAIL):
             self.get_json(
-                self.get_url(exp_id='BadExpId'), expected_status_int=404)
+                self.get_url(exp_id='bad_exp_id'), expected_status_int=404)
 
     def test_get_returns_exploration_id(self):
         self.set_config_property(

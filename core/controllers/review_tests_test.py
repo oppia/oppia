@@ -127,7 +127,7 @@ class ReviewTestsPageTests(BaseReviewTestsControllerTests):
     def test_get_fails_when_story_doesnt_exist(self):
         self.get_html_response(
             '/learn/staging/topic/review-test/%s'
-            % 'non-existent',
+            % 'non-existent-story',
             expected_status_int=302)
 
 
