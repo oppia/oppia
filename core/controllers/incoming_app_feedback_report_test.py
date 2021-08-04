@@ -25,8 +25,6 @@ import android_validation_constants
 from core.platform import models
 from core.tests import test_utils
 
-import feconf
-
 from typing import Dict, Any, Text # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
@@ -75,10 +73,15 @@ REPORT_JSON = {
 }
 
 # Webtest requires explicit str-types rather than UNICODE for headers.
-ANDROID_API_KEY_STRING = str(feconf.ANDROID_API_KEY) # pylint: disable=disallowed-function-calls
-ANDROID_APP_PACKAGE_NAME_STRING = str(feconf.ANDROID_APP_PACKAGE_NAME) # pylint: disable=disallowed-function-calls
-ANDROID_APP_VERSION_NAME_STRING = str(feconf.ANDROID_APP_VERSION_NAME) # pylint: disable=disallowed-function-calls
-ANDROID_APP_VERSION_CODE_STRING = str(feconf.ANDROID_APP_VERSION_CODE) # pylint: disable=disallowed-function-calls
+ANDROID_API_KEY_STRING = str(android_validation_constants.ANDROID_API_KEY) # pylint: disable=disallowed-function-calls
+ANDROID_APP_PACKAGE_NAME_STRING = str( # pylint: disable=disallowed-function-calls
+    android_validation_constants.ANDROID_APP_PACKAGE_NAME)
+ANDROID_APP_VERSION_NAMES_STRING = [
+    str(version_name) for version_name in # pylint: disable=disallowed-function-calls
+    android_validation_constants.ALLOWED_ANDROID_APP_VERSION_NAMES]
+ANDROID_APP_VERSION_CODES_STRING = [
+    str(version_code) for version_code in # pylint: disable=disallowed-function-calls
+    android_validation_constants.ALLOWED_ANDROID_APP_VERSION_CODES]
 
 
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
@@ -89,28 +92,30 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         self.payload = {
             'report': REPORT_JSON
         }
-        # Webapp header values must be Python str types otherwise an
-        # AssertionError for "not a string" is thrown.
-        self.headers = {
-            'api_key': ANDROID_API_KEY_STRING,
-            'app_package_name': ANDROID_APP_PACKAGE_NAME_STRING,
-            'app_version_name': ANDROID_APP_VERSION_NAME_STRING,
-            'app_version_code': ANDROID_APP_VERSION_CODE_STRING
-        }
 
     def test_incoming_report_saves_to_storage(self):
         # type: () -> None
-        self._post_json_with_test_headers(self.payload)
+        report_model_class = app_feedback_report_models.AppFeedbackReportModel
+        for string_version_name in ANDROID_APP_VERSION_NAMES_STRING:
+            for string_version_code in ANDROID_APP_VERSION_CODES_STRING:
+                # Webapp header values must be Python str types otherwise an
+                # AssertionError for "not a string" is thrown.
+                headers = {
+                    'api_key': ANDROID_API_KEY_STRING,
+                    'app_package_name': ANDROID_APP_PACKAGE_NAME_STRING,
+                    'app_version_name': string_version_name,
+                    'app_version_code': string_version_code
+                }
+                self._post_json_with_test_headers(self.payload, headers)
 
-        all_reports = (
-            app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
-        self.assertEqual(len(all_reports), 1)
-        report_model = all_reports[0]
+                all_reports = report_model_class.get_all().fetch()
+                self.assertEqual(len(all_reports), 1)
+                report_model = all_reports[0]
 
-        self.assertEqual(report_model.platform, 'android')
-        self.assertEqual(
-            report_model.submitted_on,
-            datetime.datetime.fromtimestamp(1615519337))
+                self.assertEqual(report_model.platform, 'android')
+                self.assertEqual(
+                    report_model.submitted_on,
+                    datetime.datetime.fromtimestamp(1615519337))
 
     def test_incoming_report_with_invalid_headers_raises_exception(self):
         # type: () -> None
@@ -128,8 +133,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'The incoming request does not have valid authentication for '
-            'Oppia Android.')
+            'The incoming request is not a valid Oppia Android request.')
 
     def test_incoming_report_with_no_headers_raises_exception(self):
         # type: () -> None
@@ -138,13 +142,16 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL,
             self.payload, csrf_token=token, expected_status_int=500)
 
-    def _post_json_with_test_headers(self, payload, expected_status=200):
-        # type: (Dict[Text, Any], int) -> Dict[Text, Any]
+    def _post_json_with_test_headers(
+            self, payload, headers, expected_status=200):
+        # type: (Dict[Text, Any], Dict[Text, str], int) -> Dict[Text, Any]
         """Sends a post request usint str-type representations of the header
         values so that header validation is successful.
 
         Args:
             payload: dict. The request payload of a feedback report.
+            headers: dict. The request headers; values must be str-type for
+                webtest to properly parse them.
             expected_status: int. The expected response status of the
                 request.
 
@@ -152,20 +159,24 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             dict. The JSON response for the request in dict form.
         """
         # Webapp requires the header values to be str-types, so they must have
-        # parity for the tests correctly check these fields.
+        # parity for the tests to correctly check these fields.
         token = self.get_new_csrf_token() # type: ignore[no-untyped-call]
-        with self.swap(feconf, 'ANDROID_API_KEY', ANDROID_API_KEY_STRING):
+        with self.swap(
+            android_validation_constants, 'ANDROID_API_KEY',
+            ANDROID_API_KEY_STRING):
             with self.swap(
-                feconf, 'ANDROID_APP_PACKAGE_NAME',
+                android_validation_constants, 'ANDROID_APP_PACKAGE_NAME',
                 ANDROID_APP_PACKAGE_NAME_STRING):
                 with self.swap(
-                    feconf, 'ANDROID_APP_VERSION_NAME',
-                    ANDROID_APP_VERSION_NAME_STRING):
+                    android_validation_constants,
+                    'ALLOWED_ANDROID_APP_VERSION_NAMES',
+                    ANDROID_APP_VERSION_NAMES_STRING):
                     with self.swap(
-                        feconf, 'ANDROID_APP_VERSION_CODE',
-                        ANDROID_APP_VERSION_CODE_STRING):
+                        android_validation_constants,
+                        'ALLOWED_ANDROID_APP_VERSION_CODES',
+                        ANDROID_APP_VERSION_CODES_STRING):
                         return ( # type: ignore[no-any-return]
                             self.post_json( # type: ignore[no-untyped-call]
                                 android_validation_constants.INCOMING_ANDROID_FEEDBACK_REPORT_URL, # pylint: disable=line-too-long
-                                payload, headers=self.headers, csrf_token=token,
+                                payload, headers=headers, csrf_token=token,
                                 expected_status_int=expected_status))

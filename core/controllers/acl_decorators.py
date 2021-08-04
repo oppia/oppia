@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import functools
 import logging
 
+import android_validation_constants
 from constants import constants
 from core.controllers import base
 from core.domain import blog_services
@@ -3558,13 +3559,16 @@ def is_from_oppia_android(handler):
         app_version_name = headers['app_version_name']
         app_version_code = headers['app_version_code']
         if (
-                api_key != feconf.ANDROID_API_KEY or
-                app_package_name != feconf.ANDROID_APP_PACKAGE_NAME or
-                app_version_name != feconf.ANDROID_APP_VERSION_NAME or
-                app_version_code != feconf.ANDROID_APP_VERSION_CODE):
+                api_key != android_validation_constants.ANDROID_API_KEY or
+                app_package_name != (
+                    android_validation_constants.ANDROID_APP_PACKAGE_NAME) or
+                app_version_name not in (
+                    android_validation_constants.ALLOWED_ANDROID_APP_VERSION_NAMES) or # pylint: disable=line-too-long
+                app_version_code not in (
+                    android_validation_constants.ALLOWED_ANDROID_APP_VERSION_CODES)): # pylint: disable=line-too-long
+
             raise self.UnauthorizedUserException(
-                'The incoming request does not have valid authentication for '
-                'Oppia Android.')
+                'The incoming request is not a valid Oppia Android request.')
         return handler(self, **kwargs)
 
     test_is_from_oppia_android.__wrapped__ = True

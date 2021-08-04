@@ -53,3 +53,9 @@ MAX_CHARS_IN_MISCONCEPTION_NAME = 100
 # The URL that Android feedback reports are sent to.
 INCOMING_ANDROID_FEEDBACK_REPORT_URL = (
     '/appfeedbackreporthandler/incoming_android_report')
+
+# Constants used to validate Android message request headers.
+ANDROID_API_KEY = ''
+ANDROID_APP_PACKAGE_NAME = 'org.oppia.android'
+ALLOWED_ANDROID_APP_VERSION_NAMES = ['1.0']
+ALLOWED_ANDROID_APP_VERSION_CODES = ['1']
