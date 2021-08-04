@@ -72,9 +72,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'is_curriculum_admin': False,
-            'is_topic_manager': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'search_cursor': None
@@ -131,8 +128,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertDictContainsSubset({
-            'is_curriculum_admin': True,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'user_email': self.CURRICULUM_ADMIN_EMAIL,
@@ -202,9 +197,6 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_handler_with_exceeding_query_limit_logs_error(self):
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
-            'is_curriculum_admin': False,
-            'is_topic_manager': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'search_cursor': None
@@ -444,8 +436,6 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
         self.assertDictContainsSubset({
-            'is_curriculum_admin': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'preferred_language_codes': ['en'],
@@ -481,8 +471,6 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_TOP_RATED})
         self.assertDictContainsSubset({
-            'is_curriculum_admin': False,
-            'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
             'preferred_language_codes': ['en'],
