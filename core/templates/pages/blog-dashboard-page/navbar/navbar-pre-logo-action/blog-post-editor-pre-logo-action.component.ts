@@ -44,6 +44,7 @@ implements OnInit, OnDestroy {
       )
     );
   }
+
   ngOnDestroy(): void {
     return this.directiveSubscriptions.unsubscribe();
   }

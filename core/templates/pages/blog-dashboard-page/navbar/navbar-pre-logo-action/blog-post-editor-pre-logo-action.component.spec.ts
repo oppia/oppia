@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,85 +13,87 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the story viewer pre logo action
+ * @fileoverview Unit tests for the blog post editor navbar pre logo action.
  */
 
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, waitForAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StoryViewerNavbarPreLogoActionComponent } from './story-viewer-navbar-pre-logo-action.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-class MockUrlService {
-  getTopicUrlFragmentFromLearnerUrl() {
-    return 'topic_1';
+
+describe('Blog Dashboard Page Component', () => {
+  let blogDashboardPageService: BlogDashboardPageService;
+  let component: BlogPostEditorNavbarPreLogoActionComponent;
+  let fixture: ComponentFixture<BlogPostEditorNavbarPreLogoActionComponent>;
+  let mockWindowRef: MockWindowRef;
+
+  class MockWindowRef {
+    nativeWindow = {
+      location: {
+        href: '',
+        hash: '/'
+      },
+      open: (url) => { },
+      onhashchange() {
+        return this.location._hashChange;
+      },
+    };
   }
 
-  getClassroomUrlFragmentFromLearnerUrl() {
-    return 'classroom_1';
-  }
-
-  getStoryUrlFragmentFromLearnerUrl() {
-    return 'story';
-  }
-}
-
-let component: StoryViewerNavbarPreLogoActionComponent;
-let fixture: ComponentFixture<StoryViewerNavbarPreLogoActionComponent>;
-
-describe('Subtopic viewer navbar breadcrumb component', () => {
-  beforeEach(fakeAsync(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [StoryViewerNavbarPreLogoActionComponent],
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+      ],
+      declarations: [
+        BlogPostEditorNavbarPreLogoActionComponent,
+      ],
       providers: [
+        BlogDashboardPageService,
         {
-          provide: StoryViewerBackendApiService,
-          useValue: {
-            fetchStoryDataAsync: async() => (
-              new Promise((resolve) => {
-                resolve(
-                  StoryPlaythrough.createFromBackendDict({
-                    story_id: 'id',
-                    story_nodes: [],
-                    story_title: 'title',
-                    story_description: 'description',
-                    topic_name: 'topic_1',
-                    meta_tag_content: 'this is a meta tag content'
-                  }));
-              })
-            )
-          }
+          provide: WindowRef,
+          useClass: MockWindowRef
         },
-        { provide: UrlService, useClass: MockUrlService },
-        UrlInterpolationService,
       ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StoryViewerNavbarPreLogoActionComponent);
+    fixture = TestBed.createComponent(
+      BlogPostEditorNavbarPreLogoActionComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
+    blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
   });
 
   afterEach(() => {
     component.ngOnDestroy();
   });
 
-  it('should set topic name when component is initialized', fakeAsync(() => {
+
+  it('should create', () => {
+    expect(component).toBeDefined();
+  });
+
+  it('should intialize and set active tab according to url', fakeAsync(() => {
     component.ngOnInit();
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
-      expect(component.topicName).toBe('topic_1');
-    });
+    expect(component.activeTab).toBe('main');
+
+    blogDashboardPageService.navigateToEditorTabWithId('123456sample');
+    mockWindowRef.nativeWindow.onhashchange();
+    tick();
+
+    expect(component.activeTab).toBe('editor_tab');
   }));
 
-  it('should get topic url after component is initialized', () => {
+  it('should add subscriptions on initialization', () => {
+    spyOn(blogDashboardPageService.updateViewEventEmitter, 'subscribe');
+
     component.ngOnInit();
-    expect(component.getTopicUrl()).toBe(
-      '/learn/classroom_1/topic_1/story');
+
+    expect(blogDashboardPageService.updateViewEventEmitter.subscribe)
+      .toHaveBeenCalled();
   });
 });
