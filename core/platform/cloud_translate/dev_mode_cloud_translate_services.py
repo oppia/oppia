@@ -26,10 +26,13 @@ from __future__ import unicode_literals
 from core.platform.cloud_translate import cloud_translate_emulator
 from core.platform.cloud_translate import cloud_translate_services
 
+from typing import Text, cast
+
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
 def translate_text(text, source_language, target_language):
+    # type: (Text, Text, Text) -> Text
     """Translates text into the target language.
 
     For more information on ISO 639-1 see:

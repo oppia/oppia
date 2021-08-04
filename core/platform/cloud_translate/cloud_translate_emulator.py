@@ -24,6 +24,7 @@ from __future__ import unicode_literals
 import python_utils
 import utils
 
+from typing import Text
 
 class CloudTranslateEmulator(python_utils.OBJECT):
     """The emulator mocks the translate_text function from the Cloud Translate
@@ -63,6 +64,7 @@ class CloudTranslateEmulator(python_utils.OBJECT):
     )
 
     def __init__(self):
+        # type: () -> None
         """Initializes the emulator with pregenerated responses."""
 
         # Pre-generated translations for the following phrases:
@@ -70,6 +72,7 @@ class CloudTranslateEmulator(python_utils.OBJECT):
         self.expected_responses = self.PREGENERATED_TRANSLATIONS
 
     def translate(self, text, source_language_code, target_language_code):
+        # type: (Text, Text, Text) -> Text
         """Returns the saved expected response for a given input. If no
         response exists for the given input, returns a default response.
 
@@ -98,6 +101,7 @@ class CloudTranslateEmulator(python_utils.OBJECT):
     def add_expected_response(
             self, source_language_code, target_language_code, source_text,
             response):
+        # type: (Text, Text, Text,  Text) -> None
         """Adds an expected response for a given set of inputs.
 
         Args:

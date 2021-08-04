@@ -23,6 +23,8 @@ from __future__ import unicode_literals
 # cloud_translate_emulator.
 from google.cloud import translate_v2 as translate
 
+from typing import Text
+
 CLIENT = translate.Client()
 
 # List of languages with adequate Google Translate accuracy.
@@ -30,6 +32,7 @@ LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 
 
 def translate_text(text, source_language, target_language):
+    # type: (Text, Text, Text) -> Text
     """Translates text into the target language.
 
     This method uses ISO 639-1 compliant language codes to specify languages.
@@ -59,5 +62,5 @@ def translate_text(text, source_language, target_language):
 
     result = CLIENT.translate(
         text, target_language=target_language, source_language=source_language)
-    translated_text = result['translatedText']
+    translated_text = result['translatedText'] # type: Text
     return translated_text
