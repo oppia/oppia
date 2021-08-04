@@ -54,14 +54,15 @@ describe('Preview Thumbnail Component', function() {
     spyOn(
       imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
       .and.returnValue(testUrl);
-    spyOn(contextService, 'getEntityType').and.returnValue('topic');
   });
 
   it('should create', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('topic');
     expect(componentInstance).toBeDefined();
   });
 
   it('should initialize', () => {
+    spyOn(contextService, 'getEntityType').and.returnValue('topic');
     componentInstance.ngOnInit();
     expect(componentInstance.editableThumbnailDataUrl).toEqual(testUrl);
   });

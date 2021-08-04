@@ -108,7 +108,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     };
   }
 
-  private hasDuplicates(originalArray: unknown[]): boolean {
+  private hasDuplicates(originalArray: (string | null)[]): boolean {
     const array = originalArray.slice(0).sort();
     for (let i = 1; i < array.length; i++) {
       if (array[i - 1] === array[i]) {
@@ -318,8 +318,10 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   regionLabelSetter(label: string): void {
-    if (this.utilsService.isDefined(label) && this.selectedRegion) {
-      this.value.labeledRegions[this.selectedRegion].label = label;
+    if (this.utilsService.isDefined(label)) {
+      if (this.selectedRegion) {
+        this.value.labeledRegions[this.selectedRegion].label = label;
+      }
       this.valueChanged.emit(this.value);
       const labels = this.value.labeledRegions.map(
         region => {
