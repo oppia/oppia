@@ -20,14 +20,14 @@ import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MaterialModule } from 'modules/material.module';
 import { MatCardModule } from '@angular/material/card';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
+import { MaterialModule } from 'modules/material.module';
 import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { BlogPostEditorComponent } from './blog-post-editor.component';
-import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
 import { LoaderService } from 'services/loader.service';
@@ -72,10 +72,6 @@ describe('Blog Post Editor Component', () => {
     published_on: '11/21/2014, 04:52:46:713463',
   };
 
-  class MockChangeDetectorRef {
-    detectChanges(): void { }
-  }
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -108,7 +104,6 @@ describe('Blog Post Editor Component', () => {
         },
         {
           provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
         },
         BlogDashboardPageService,
         BlogPostUpdateService,
@@ -166,7 +161,7 @@ describe('Blog Post Editor Component', () => {
     expect(component.initEditor).toHaveBeenCalled;
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     expect(component.DEFAULT_PROFILE_PICTURE_URL).toEqual(defaultImageUrl);
-    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled();
     expect(component.windowIsNarrow).toBe(true);
   });
 
@@ -237,25 +232,29 @@ describe('Blog Post Editor Component', () => {
       component.blogPostData, component.title);
   });
 
-  it('should update local editted content', () => {
-    component.localEdittedContent = '';
-    component.updateLocalEdittedContent('<p>Hello World</p>');
+  it('should update local edited content', () => {
+    const changeDetectorRef =
+    fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy =
+      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    component.localEditedContent = '';
+    component.updateLocalEditedContent('<p>Hello Worlds</p>');
 
-    expect(component.localEdittedContent).toEqual(
-      '<p>Hello Worls</p>');
-    fixture.detectChanges();
+    expect(component.localEditedContent).toEqual(
+      '<p>Hello Worlds</p>');
+    expect(detectChangesSpy).toHaveBeenCalled();
   });
 
   it('should update local content value', fakeAsync(() => {
     spyOn(blogPostUpdateService, 'setBlogPostContent');
-    component.localEdittedContent = '<p>Sample content changed</p>';
+    component.localEditedContent = '<p>Sample content changed</p>';
 
     component.blogPostData = sampleBlogPostData;
     component.updateContentValue();
     tick();
 
     expect(blogPostUpdateService.setBlogPostContent).toHaveBeenCalledWith(
-      component.blogPostData, component.localEdittedContent);
+      component.blogPostData, component.localEditedContent);
     expect(component.contentEditorIsActive).toBe(false);
   }));
 

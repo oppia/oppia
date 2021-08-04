@@ -105,16 +105,42 @@ describe('Blog Dashboard Page Component', () => {
       BlogDashboardBackendApiService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     alertsService = TestBed.inject(AlertsService);
+    component.ngOnInit();
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   it('should create', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize tab according to url', (() => {
+  it('should add subscriptions on initialization', () => {
+    spyOn(blogDashboardPageService.updateViewEventEmitter, 'subscribe');
+
+    component.ngOnInit();
+
+    expect(blogDashboardPageService.updateViewEventEmitter.subscribe)
+      .toHaveBeenCalled();
+  });
+
+  it('should initialize tab according to active tab', fakeAsync(() => {
     spyOn(component, 'initMainTab');
 
     component.ngOnInit();
+    expect(component.activeTab).toBe('main');
+    expect(component.initMainTab).toHaveBeenCalled();
+
+    blogDashboardPageService.navigateToEditorTabWithId('123456sample');
+    mockWindowRef.nativeWindow.onhashchange();
+    tick();
+
+    expect(component.activeTab).toBe('editor_tab');
+
+    blogDashboardPageService.navigateToMainTab();
+    mockWindowRef.nativeWindow.onhashchange();
+    tick();
     expect(component.activeTab).toBe('main');
     expect(component.initMainTab).toHaveBeenCalled();
   }));
@@ -176,8 +202,6 @@ describe('Blog Dashboard Page Component', () => {
       .and.returnValue(Promise.resolve('123456abcdef'));
     spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
 
-    blogDashboardPageService.detectUrlChange();
-    mockWindowRef.nativeWindow.onhashchange();
     component.createNewBlogPost();
     tick();
 

@@ -23,10 +23,14 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail.component';
 import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { of } from 'rxjs';
 
 describe('Upload Blog Post Thumbnail Modal Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailComponent>;
   let componentInstance: UploadBlogPostThumbnailComponent;
+  let windowDimensionsService: WindowDimensionsService;
+  let resizeEvent = new Event('resize');
 
   class MockChangeDetectorRef {
     detectChanges(): void { }
@@ -47,7 +51,14 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
         {
           provide: ChangeDetectorRef,
           useClass: MockChangeDetectorRef
-        }
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
+          }
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -55,6 +66,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UploadBlogPostThumbnailComponent);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     componentInstance = fixture.componentInstance;
   });
 
@@ -62,7 +74,19 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should initialize cropper', () => {
+  it('should initialize cropper when window is not narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(false);
+    fixture.detectChanges();
+    componentInstance.croppableImageRef = (
+      new ElementRef(document.createElement('img')));
+    componentInstance.initializeCropper();
+    expect(componentInstance.cropper).toBeDefined();
+  });
+
+  it('should initialize cropper when window is narrow', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow')
+      .and.returnValue(true);
     fixture.detectChanges();
     componentInstance.croppableImageRef = (
       new ElementRef(document.createElement('img')));
@@ -105,5 +129,28 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     };
     componentInstance.save();
     expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);
+  });
+
+  it('should initialize', () => {
+    const windowResizeSpy = spyOn(
+      windowDimensionsService, 'getResizeEvent').and.callThrough();
+    spyOn(windowDimensionsService, 'isWindowNarrow');
+
+    componentInstance.ngOnInit();
+    fixture.detectChanges();
+
+    expect(windowResizeSpy).toHaveBeenCalled();
+    expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
+    expect(componentInstance.windowIsNarrow).toBe(true);
+  });
+
+  it('should cancel', () => {
+    spyOn(componentInstance.cancelThumbnailUpload, 'emit');
+    componentInstance.uploadedImage = true,
+
+    componentInstance.cancel();
+
+    expect(componentInstance.uploadedImage).toEqual(false);
+    expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();
   });
 });

@@ -74,7 +74,7 @@
       <div class="d-block flex-grow-1">
         <input class="form-control required general-text-format"
                [(ngModel)]="title"
-               [ngClass]="{'blog-title-input-field': blogPostData.title !== ''}"
+               [ngClass]="{'blog-title-input-field': blogPostData.title.lenght > 0}"
                maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
                aria-label="Title"
                (focusout)="updateLocalTitleValue()"
@@ -102,7 +102,7 @@
                                [schema]="getSchema.bind(this)"
                                [headersEnabled]="headersAreEnabledCallBack.bind(this)"
                                [localValue]="this.blogPostData.content"
-                               (localValueChange)="this.updateLocalEdittedContent($event)">
+                               (localValueChange)="this.updateLocalEditedContent($event)">
           </schema-based-editor>
           <div class="mt-2">
             <button mat-button
