@@ -16,7 +16,7 @@
  * @fileoverview Component for blog post editor.
  */
 
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from '@angular/core/testing';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -117,7 +117,8 @@ describe('Blog Post Editor Component', () => {
         UrlInterpolationService,
         AlertsService,
         UrlService,
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
