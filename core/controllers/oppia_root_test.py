@@ -30,4 +30,4 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
             if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
                 response = self.get_html_response( # type: ignore[no-untyped-call]
                     '/%s' % page['ROUTE'], expected_status_int=200)
-            response.mustcontain('<oppia-root></oppia-root>')
+                response.mustcontain('<oppia-root></oppia-root>')
