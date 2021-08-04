@@ -58,7 +58,7 @@ export class BlogPostEditorComponent implements OnInit {
   defaultTagsList: string[];
   maxAllowedTags: number;
   contentEditorIsActive: boolean = true;
-  localEdittedContent: string;
+  localEditedContent: string;
   thumbnailDataUrl: string;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
@@ -156,22 +156,22 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   cancelEdit(): void {
-    if (this.blogPostData.content !== '') {
+    if (this.blogPostData.content.length > 0) {
       this.contentEditorIsActive = false;
     }
   }
 
-  updateLocalEdittedContent($event: string): void {
-    if (this.localEdittedContent !== $event) {
-      this.localEdittedContent = $event;
+  updateLocalEditedContent($event: string): void {
+    if (this.localEditedContent !== $event) {
+      this.localEditedContent = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
 
   updateContentValue(): void {
     this.blogPostUpdateService.setBlogPostContent(
-      this.blogPostData, this.localEdittedContent);
-    if (this.blogPostData.content !== '') {
+      this.blogPostData, this.localEditedContent);
+    if (this.blogPostData.content.length > 0) {
       this.contentEditorIsActive = false;
     }
     this.newChangesAreMade = true;
