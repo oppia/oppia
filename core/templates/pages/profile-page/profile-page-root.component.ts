@@ -22,7 +22,6 @@ import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/acce
 import { UrlService } from 'services/contextual/url.service';
 import { LoaderService } from 'services/loader.service';
 import { PageHeadService } from 'services/page-head.service';
-import { PageTitleService } from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-profile-page-root',
