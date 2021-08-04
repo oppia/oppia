@@ -25,6 +25,7 @@ import sys
 import zipfile
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+YARN_INSTALL_MAX_RETRY = 2
 
 # These libraries need to be installed before running or importing any script.
 
@@ -326,8 +327,18 @@ def main():
     if common.is_windows_os():
         tweak_yarn_executable()
 
-    # Install third-party node modules needed for the build process.
-    subprocess.check_call([get_yarn_command(), 'install', '--pure-lockfile'])
+    attempt_count = 1
+    while True:
+        try:
+            # Install third-party node modules needed for the build process.
+            subprocess.check_call(
+                [get_yarn_command(), 'install', '--pure-lockfile'])
+            break
+        except subprocess.CalledProcessError as e:
+            if attempt_count == YARN_INSTALL_MAX_RETRY:
+                raise Exception(e)
+
+            attempt_count += 1
 
     # Compile protobuf files.
     python_utils.PRINT('Installing buf and protoc binary.')
