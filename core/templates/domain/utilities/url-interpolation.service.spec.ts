@@ -40,7 +40,7 @@ describe('URL Interpolation Service', () => {
     spyOnProperty(uis, 'DEV_MODE', 'get').and.returnValue(false);
     spyOn(urlService, 'getCurrentLocation').and.returnValue(
       <Location> mockLocation);
-    alertsObject.alertsService = alertsService;
+    alertsObject = { alertsService: alertsService };
   });
 
   it('should add hash to url if hash is set', () => {
