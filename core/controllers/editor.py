@@ -472,10 +472,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         'PUT': {
             'email_body': {
                 'schema': {
-                    'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }]
+                    'type': 'basestring'
                 }
             },
             'version': {
@@ -497,6 +494,10 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         # If moderator emails can be sent, check that all the prerequisites are
         # satisfied, otherwise do nothing.
         if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            if not email_body:
+                raise self.InvalidInputException(
+                    'Moderator actions should include an email to the '
+                    'recipient.')
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.

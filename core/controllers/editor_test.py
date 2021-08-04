@@ -2025,8 +2025,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             error_msg = (
-                'Schema validation for \'email_body\' failed: Validation '
-                'failed: is_nonempty ({}) for object '
+                'Moderator actions should include an email to the recipient.'
             )
             self.assertIn(error_msg, response_dict['error'])
 
