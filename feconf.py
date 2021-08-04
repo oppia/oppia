@@ -253,7 +253,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 46
+CURRENT_STATE_SCHEMA_VERSION = 47
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -265,13 +265,13 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 3
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 3
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 4
 
 # The current version of rubric dict in the skill schema.
-CURRENT_RUBRIC_SCHEMA_VERSION = 3
+CURRENT_RUBRIC_SCHEMA_VERSION = 4
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
@@ -280,7 +280,7 @@ CURRENT_SUBTOPIC_SCHEMA_VERSION = 4
 CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
-CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 2
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 3
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -687,9 +687,6 @@ ALLOWED_RTE_EXTENSIONS = {
     },
     'Math': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
-    },
-    'Svgdiagram': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'svgdiagram')
     },
     'Tabs': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
@@ -1119,8 +1116,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-svgdiagram': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1138,8 +1134,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgdiagram'
+            'oppia-noninteractive-tabs'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -1157,9 +1152,6 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-svgdiagram': [
-                'blockquote', 'li', '[document]'
-            ],
             'oppia-noninteractive-collapsible': [
                 'blockquote', 'li', '[document]'
             ],
@@ -1182,8 +1174,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-svgdiagram'
+            'oppia-noninteractive-tabs'
         ]
 
     }
