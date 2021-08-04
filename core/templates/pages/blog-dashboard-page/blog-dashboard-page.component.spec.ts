@@ -141,7 +141,7 @@ describe('Blog Dashboard Page Component', () => {
     expect(component.initMainTab).toHaveBeenCalled();
   });
 
-  it('should not call initMainTab if active tab is editor_tab', 
+  it('should not call initMainTab if active tab is editor_tab',
     fakeAsync(() => {
       spyOn(component, 'initMainTab');
       // Changing active tab to blog post editor.
