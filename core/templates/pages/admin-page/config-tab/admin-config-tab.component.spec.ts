@@ -67,7 +67,7 @@ describe('Admin config tab component ', () => {
     demoCollections: [
       ['collectionId']
     ],
-    updatableRoles: {updatableRole: 'user1'},
+    updatableRoles: ['MODERATOR'],
     roleToActions: {
       Admin: ['Accept any suggestion', 'Access creator dashboard']
     },
@@ -88,9 +88,9 @@ describe('Admin config tab component ', () => {
         value: 'val3'
       }
     },
-    viewableRoles: {
-      MODERATOR: 'moderator',
-      TOPIC_MANAGER: 'topic manager'
+    viewableRoles: ['MODERATOR'],
+    humanReadableRoles: {
+      MODERATOR: 'moderator'
     },
     topicSummaries: [],
     featureFlags: []

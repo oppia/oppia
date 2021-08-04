@@ -71,6 +71,7 @@ import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.
 import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
 import { MatCardModule } from '@angular/material/card';
 import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-editor.component';
+import { TranslatableHtmlContentIdEditorComponent } from './templates/translatable-html-content-id.component';
 import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
 import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
 
@@ -131,6 +132,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
     SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -174,6 +176,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
     SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -217,6 +220,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
     SvgEditorComponent,
+    TranslatableHtmlContentIdEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
