@@ -21,12 +21,25 @@ import { ChangeDetectorRef } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractiveNumericInput } from './oppia-interactive-numeric-input.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('InteractiveNumericInput', () => {
   let component: InteractiveNumericInput;
   let fixture: ComponentFixture<InteractiveNumericInput>;
   let currentInteractionService: CurrentInteractionService;
+
+  class mockInteractionAttributesExtractorService {
+    getValuesFromAttributes(interactionId, attributes) {
+      return {
+        inputGreaterThanOrEqualToZero: {
+          value: JSON.parse(
+            attributes.inputGreaterThanOrEqualToZeroValWithValue)
+        }
+      };
+    }
+  }
 
   let mockCurrentInteractionService = {
     onSubmit: (answer, rulesService) => {},
@@ -40,7 +53,19 @@ describe('InteractiveNumericInput', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveNumericInput],
+      imports: [
+        TranslateModule.forRoot({
+          useDefaultLang: true,
+          isolate: false,
+          extend: false,
+          defaultLanguage: 'en'
+        })
+      ],
       providers: [
+        {
+          provide: InteractionAttributesExtractorService,
+          useClass: mockInteractionAttributesExtractorService
+        },
         {
           provide: CurrentInteractionService,
           useValue: mockCurrentInteractionService
@@ -54,6 +79,7 @@ describe('InteractiveNumericInput', () => {
     currentInteractionService = TestBed.get(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveNumericInput);
     component = fixture.componentInstance;
+    component.inputGreaterThanOrEqualToZeroWithValue = 'false';
   });
 
   it('should initialise component when user adds interaction', () => {
@@ -61,12 +87,16 @@ describe('InteractiveNumericInput', () => {
       .callThrough();
 
     component.ngOnInit();
+    component.inputGreaterThanOrEqualToZero = false;
 
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBeNull();
+    expect(component.inputGreaterThanOrEqualToZero).toEqual(false);
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
-      ui_config: {}
+      ui_config: {
+        checkinputGreaterThanOrEqualToZero: false
+      }
     });
     expect(currentInteractionService.registerCurrentInteraction)
       .toHaveBeenCalled();
@@ -82,9 +112,14 @@ describe('InteractiveNumericInput', () => {
 
     expect(component.savedSolution).toBe(20);
     expect(component.labelForFocusTarget).toBe('label');
+    expect(component.inputGreaterThanOrEqualToZero).toEqual(false);
+    expect(component.inputGreaterThanOrEqualToZeroWithValue).toEqual(
+      'false');
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
-      ui_config: {}
+      ui_config: {
+        checkinputGreaterThanOrEqualToZero: false
+      }
     });
     expect(currentInteractionService.registerCurrentInteraction)
       .toHaveBeenCalled();
@@ -99,9 +134,12 @@ describe('InteractiveNumericInput', () => {
   it('should return SCHEMA when called', () => {
     component.ngOnInit();
 
+    expect(component.inputGreaterThanOrEqualToZero).toEqual(false);
     expect(component.getSchema()).toEqual({
       type: 'float',
-      ui_config: {}
+      ui_config: {
+        checkinputGreaterThanOrEqualToZero: false
+      }
     });
   });
 

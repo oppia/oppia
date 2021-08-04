@@ -41,9 +41,7 @@ export class InteractiveNumericInput implements OnInit {
   errorString = '';
   inputGreaterThanOrEqualToZero: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {
-    checkinputGreaterThanOrEqualToZero: boolean
-  }; };
+  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -86,8 +84,7 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {
-    checkinputGreaterThanOrEqualToZero: boolean }; } {
+  getSchema(): { type: string; 'ui_config': {}; } {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 
@@ -102,17 +99,17 @@ export class InteractiveNumericInput implements OnInit {
       'NumericInput',
       this.getAttributesObject()
     ) as NumericInputCustomizationArgs;
+    this.inputGreaterThanOrEqualToZero = inputGreaterThanOrEqualToZero.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
     );
-    this.inputGreaterThanOrEqualToZero = inputGreaterThanOrEqualToZero.value;
     this.labelForFocusTarget = this.labelForFocusTarget || null;
 
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
       ui_config: {
-        checkinputGreaterThanOrEqualToZero: inputGreaterThanOrEqualToZero.value
+        checkinputGreaterThanOrEqualToZero: this.inputGreaterThanOrEqualToZero
       }
     };
 
