@@ -26,6 +26,14 @@ var ReleaseCoordinatorPage = function() {
     '.protractor-test-unfinished-one-off-jobs-rows'));
   var unfinishedOffJobIDClassName = (
     '.protractor-test-unfinished-one-off-jobs-id');
+  var oneOfJobsStartBtnLocator = by.css(
+    '.protractor-test-one-off-jobs-start-btn');
+  var oneOffJobsStopBtnLocator = by.css(
+    '.protractor-test-one-off-jobs-stop-btn');
+  var unfinishedOneOffJobsIdElements = element.all(
+    by.css('.protractor-test-unfinished-one-off-jobs-id'));
+  var unfinishedJobsCardElement = element(
+    by.css('.protractor-test-unfinished-jobs-card'));
 
   this.get = async function() {
     await browser.get('/release-coordinator');
@@ -45,7 +53,7 @@ var ReleaseCoordinatorPage = function() {
     var text = await oneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
-        by.css('.protractor-test-one-off-jobs-start-btn'));
+        oneOfJobsStartBtnLocator);
       await action.click('One Off Job Rows Button', oneOffJobRowsButton);
     } else {
       await this._startOneOffJob(jobName, ++i);
@@ -63,7 +71,7 @@ var ReleaseCoordinatorPage = function() {
     var text = await unfinishedOneOffJobRows.get(i).getText();
     if (text.toLowerCase().startsWith(jobName.toLowerCase())) {
       var unfinishedOffJobRowsButton = unfinishedOneOffJobRows.get(i).element(
-        by.css('.protractor-test-one-off-jobs-stop-btn'));
+        oneOffJobsStopBtnLocator);
       await action.click(
         'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
       await browser.refresh();
@@ -74,17 +82,15 @@ var ReleaseCoordinatorPage = function() {
   };
 
   this.expectNumberOfRunningOneOffJobs = async function(count) {
-    var len = await element.all(by.css(
-      '.protractor-test-unfinished-one-off-jobs-id')).count();
+    var len = await unfinishedOneOffJobsIdElements.count();
     expect(len).toEqual(count);
   };
 
   this.expectJobToBeRunning = async function(jobName) {
     await browser.refresh();
     await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(element(
-      by.css('.protractor-test-unfinished-jobs-card')),
-    'Unfinished Jobs taking too long to appear');
+    await waitFor.visibilityOf(
+      unfinishedJobsCardElement, 'Unfinished Jobs taking too long to appear');
     let regex = new RegExp(`^${jobName.toLowerCase()}.*`, 'i');
     let unfinishedJob = element(
       by.cssContainingText(unfinishedOffJobIDClassName, regex));
