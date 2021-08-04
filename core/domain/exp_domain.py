@@ -33,6 +33,7 @@ import string
 from constants import constants
 from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
@@ -1911,7 +1912,28 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v46_dict_to_v47_dict(cls, states_dict):
-        """Converts from version 46 to 47. Version 47 adds
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_domain.State.convert_html_fields_in_state(
+                state_dict,
+                html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
+        """Converts from version 47 to 48. Version 48 adds
         inputGreaterThanOrEqualToZero customization arg to NumericInput
         interaction which allows creators to set input should be greater
         than or equal to zero.
@@ -1974,7 +1996,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 52
+    CURRENT_EXP_SCHEMA_VERSION = 53
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2091,8 +2113,8 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v51_dict_to_v52_dict(cls, exploration_dict):
         """Converts a v51 exploration dict into a v52 exploration dict.
-        Adds a new customization arg to NumericInput interaction
-        which allows creators to set input greator than or equal to zero.
+        Version 52 deprecates oppia-noninteractive-svgdiagram tag and converts
+        existing occurences of it to oppia-noninteractive-image tag.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
@@ -2107,6 +2129,28 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states'] = cls._convert_states_v46_dict_to_v47_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 47
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v52_dict_to_v53_dict(cls, exploration_dict):
+        """Converts a v52 exploration dict into a v53 exploration dict.
+        Adds a new customization arg to NumericInput interaction
+        which allows creators to set input greator than or equal to zero.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v52.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v53.
+        """
+        exploration_dict['schema_version'] = 53
+
+        exploration_dict['states'] = cls._convert_states_v47_dict_to_v48_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 48
 
         return exploration_dict
 
@@ -2175,6 +2219,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v51_dict_to_v52_dict(
                 exploration_dict)
             exploration_schema_version = 52
+
+        if exploration_schema_version == 52:
+            exploration_dict = cls._convert_v52_dict_to_v53_dict(
+                exploration_dict)
+            exploration_schema_version = 53
 
         return exploration_dict
 

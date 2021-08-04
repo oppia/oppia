@@ -41,7 +41,9 @@ export class InteractiveNumericInput implements OnInit {
   errorString = '';
   inputGreaterThanOrEqualToZero: boolean = false;
   answer = null;
-  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
+  NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {
+    checkinputGreaterThanOrEqualToZero: boolean
+  }; };
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private numericInputRulesService: NumericInputRulesService,
@@ -52,8 +54,6 @@ export class InteractiveNumericInput implements OnInit {
   ) { }
 
   private isAnswerValid(): boolean {
-    console.error(this.answer);
-    console.error(this.inputGreaterThanOrEqualToZero);
     return (
       this.answer !== undefined &&
       this.answer !== null &&
@@ -86,7 +86,8 @@ export class InteractiveNumericInput implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): { type: string; 'ui_config': {}; } {
+  getSchema(): { type: string; 'ui_config': {
+    checkinputGreaterThanOrEqualToZero: boolean }; } {
     return this.NUMERIC_INPUT_FORM_SCHEMA;
   }
 

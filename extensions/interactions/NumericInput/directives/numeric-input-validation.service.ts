@@ -231,23 +231,15 @@ export class NumericInputValidationService {
         stringValue = str + z;
       }
     }
-    let retvalue: string | undefined;
     const stringValueRegExp = stringValue.match(/\d/g);
-    console.error(stringValueRegExp);
-    console.error(customizationArgs);
-    if (customizationArgs && customizationArgs !== undefined &&
-      (stringValue<0 || stringValueRegExp.length > 15)) {
-      retvalue =  'The answer should be greater than or equal to zero and ' +
+    if (customizationArgs &&
+      (stringValueRegExp === null || stringValueRegExp.length > 15)) {
+      return 'The answer should be greater than or equal to zero and ' +
       'can contain at most 15 digits (0-9) or symbols(.).';
     } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {
-      retvalue = 'The answer can contain at most 15 digits (0-9) or symbols ' +
+      return 'The answer can contain at most 15 digits (0-9) or symbols ' +
         '(. or -).';
-    } else
-    {
-      retvalue = undefined;
     }
-    console.error(retvalue);
-    return retvalue;
   }
 }
 

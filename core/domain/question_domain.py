@@ -1115,7 +1115,27 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v46_dict_to_v47_dict(cls, question_state_dict):
-        """Converts from version 46 to 47. Version 47 adds
+        """Converts from version 46 to 47. Version 52 deprecates
+        oppia-noninteractive-svgdiagram tag and converts existing occurences of
+        it to oppia-noninteractive-image tag.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v47_dict_to_v48_dict(cls, question_state_dict):
+        """Converts from version 47 to 48. Version 48 adds
         inputGreaterThanOrEqualToZero customization arg to NumericInput
         interaction which allows creators to set input range greater than
         or equal to zero.
