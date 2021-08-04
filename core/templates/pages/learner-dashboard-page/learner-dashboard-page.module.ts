@@ -36,6 +36,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HybridRouterModuleProvider } from 'core/templates/hybrid-router-module-provider';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 const toastrConfig = {
@@ -58,6 +59,9 @@ const toastrConfig = {
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // migrated to angular router.
+    HybridRouterModuleProvider.provide(),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
