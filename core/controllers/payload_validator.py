@@ -85,7 +85,7 @@ def convert_string_to_bool(param):
     Returns:
         bool. Converts the string param into its expected bool type.
     """
-    return bool(param == 'true')
+    return bool(param in ['true', 'True'])
 
 
 # Handlers which require schema validation, but currently they do

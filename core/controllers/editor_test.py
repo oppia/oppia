@@ -2723,7 +2723,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
             self.get_json(
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, illegal_id),
-                expected_status_int=404)
+                expected_status_int=400)
 
     def test_get_missing_exploration_id(self):
         with self.login_context(self.OWNER_EMAIL):
