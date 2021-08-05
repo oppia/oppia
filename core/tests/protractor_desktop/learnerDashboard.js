@@ -225,9 +225,8 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display all the topics on server in edit goals and suggested ' +
-    'for you section and selected topics in current goals and continue where ' +
-    'you left off section', async function() {
+  it('should display correct topics in edit goals, suggested for you section,' +
+    ' current goals and continue where you left off section', async function() {
     var driver = browser.driver;
     var TOPIC_NAME = 'Topic 1';
     var TOPIC_URL_FRAGMENT_NAME = 'topic-one';
@@ -293,6 +292,10 @@ describe('Learner dashboard functionality', function() {
     await topicEditorPage.saveTopic('Added meta tag.');
 
     await topicEditorPage.publishTopic();
+    /**  There is one topic on the server named Topic 1 which is linked to a
+     * subtopic named Subtopic 1 and a story called Story Title.
+     * Subtopic 1 has one skill in it named Skill 1.
+     */
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToHomeSection();
     await learnerDashboardPage.expectCountOfTopicInSuggestedForYou(1);
@@ -311,7 +314,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should display all the topics on that are partially learnt or learnt ' +
+  it('should display all the topics that are partially learnt or learnt ' +
     'in skill proficiency section, learnt topics in completed goals section ' +
     'and completed stories in completed stories section', async function() {
     await users.createAndLoginCurriculumAdminUser(
@@ -419,6 +422,12 @@ describe('Learner dashboard functionality', function() {
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await topicAndStoryViewerPage.goToChapterIndex(2);
     await explorationPlayerPage.submitAnswer('Continue', null);
+    /**  There are two topics on the server named Topic 1 which is linked to a
+     * subtopic named Subtopic 1 and a story called Story Title and Topic TASV1
+     * which is linked to a subtopic named Subtopic TASV1 and a story called
+     * Story TASV1. Subtopic 1 has one skill in it named Skill 1 and
+     * Subtopic TASV1 has one skill in it named Skill TASV1.
+     */
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(3);
