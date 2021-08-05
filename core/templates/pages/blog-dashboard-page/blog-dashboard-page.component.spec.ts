@@ -173,7 +173,9 @@ describe('Blog Dashboard Page Component', () => {
       .and.returnValue(Promise.resolve(blogDashboardData));
 
     component.initMainTab();
+
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+
     tick();
 
     expect(component.blogDashboardData).toEqual(blogDashboardData);

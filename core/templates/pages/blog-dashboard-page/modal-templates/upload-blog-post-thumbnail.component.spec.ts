@@ -116,6 +116,8 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     componentInstance.onFileChanged(file);
 
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+
+    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {
@@ -159,7 +161,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
     componentInstance.cancel();
 
-    expect(componentInstance.uploadedImage).toEqual(false);
+    expect(componentInstance.uploadedImage).toBe(false);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();
   });
 });
