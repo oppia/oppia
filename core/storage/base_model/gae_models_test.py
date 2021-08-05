@@ -29,11 +29,11 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -218,8 +218,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
-        models_2 = base_models.BaseModel.get_multi(model_ids)
-        models_2_without_none = cast(List[base_models.BaseModel], models_2)
+        models_2_without_none = cast(
+            List[base_models.BaseModel],
+            base_models.BaseModel.get_multi(model_ids)
+        )
         base_models.BaseModel.update_timestamps_multi(
             models_2_without_none, update_last_updated_time=False)
         base_models.BaseModel.put_multi(models_2_without_none)
@@ -230,8 +232,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
-        models_3 = base_models.BaseModel.get_multi(model_ids)
-        models_3_without_none = cast(List[base_models.BaseModel], models_3)
+        models_3_without_none = cast(
+            List[base_models.BaseModel],
+            base_models.BaseModel.get_multi(model_ids)
+        )
         base_models.BaseModel.update_timestamps_multi(models_3_without_none)
         base_models.BaseModel.put_multi(models_3_without_none)
         for model_id, last_updated in python_utils.ZIP(
@@ -316,7 +320,10 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
         super(BaseHumanMaintainedModelTests, self).setUp() # type: ignore[no-untyped-call]
         self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
         def mock_put(self):
-            # type: (Any) -> None
+            # type: (base_models.BaseHumanMaintainedModel) -> None
+            """Function to make changes in datastore entities used for
+            testing.
+            """
             self._last_updated_timestamp_is_fresh = True
             self.last_updated_by_human = datetime.datetime.utcnow()
 
@@ -328,12 +335,14 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             if self.last_updated is None:
                 self.last_updated = datetime.datetime.utcnow()
 
-            super(base_models.BaseHumanMaintainedModel, self).put() # type: ignore[misc]
-            return
+            # We have not used BaseHumanMaintainedModel.put() because it is
+            # not implemented and throws error rather than saving the changes.
+            # We have used BaseModel.put() because we wanted the
+            # changes made above to be saved.
+            base_models.BaseModel.put(self)
 
         with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
             self.model_instance.put()
-        return
 
     def test_put(self):
         # type: () -> None
@@ -513,7 +522,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
         # type: () -> None
         user_data = (
             base_models.BaseSnapshotMetadataModel.export_data('trivial_user'))
-        expected_data = {} # type: Dict[Text, Any]
+        expected_data = {} # type: Dict[Text, Text]
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_nontrivial(self):
@@ -634,12 +643,18 @@ class VersionedModelTests(test_utils.GenericTestBase):
     def test_trusted_commit_with_no_snapshot_metadata_raises_error(self):
         # type: () -> None
         model1 = TestVersionedModel(id='model_id1')
+        # TODO(#13528): Remove this test after the backend is fully
+        # type-annotated. Here ignore[assignment] is used to test method
+        # commit() for invalid SNAPSHOT_METADATA_CLASS.
         model1.SNAPSHOT_METADATA_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'No snapshot metadata class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
         model1 = TestVersionedModel(id='model_id1')
+        # TODO(#13528): Remove this test after the backend is fully
+        # type-annotated. Here ignore[assignment] is used to test method
+        # commit() for invalid SNAPSHOT_CONTENT_CLASS.
         model1.SNAPSHOT_CONTENT_CLASS = None # type: ignore[assignment]
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'No snapshot content class defined.'):
@@ -648,11 +663,17 @@ class VersionedModelTests(test_utils.GenericTestBase):
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            # TODO(#13528): Remove this test after the backend is fully
+            # type-annotated. Here ignore[arg-type] is used to test method
+            # commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {}) # type: ignore[arg-type]
 
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            # TODO(#13528): Remove this test after the backend is fully
+            # type-annotated. Here ignore[list-item] is used to test method
+            # commit() for invalid input type.
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]]) # type: ignore[list-item]
 
     def test_put_raises_not_implemented_error_for_versioned_models(self):
@@ -823,6 +844,9 @@ class VersionedModelTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             ValueError,
             'At least one version number is invalid'):
+            # TODO(#13528): Remove this test after the backend is fully
+            # type-annotated. Here ignore[list-item] is used to test method
+            # get_multi_versions() for invalid input type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
 

@@ -25,8 +25,8 @@ import core.storage.base_model.gae_models as base_models
 from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -80,6 +80,11 @@ class ConfigPropertyModel(base_models.VersionedModel):
             'value': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with VersionedModel.commit().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def commit(self, committer_id, commit_cmds): # type: ignore[override]
         # type: (Text, List[Dict[Text, Any]]) -> None
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
@@ -138,6 +143,8 @@ class PlatformParameterModel(base_models.VersionedModel):
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    # TODO(#13523): Change 'rule_dicts' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @classmethod
     def create(cls, param_name, rule_dicts, rule_schema_version):
         # type: (Text, List[Dict[Text, Any]], int) -> PlatformParameterModel

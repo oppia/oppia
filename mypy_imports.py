@@ -25,8 +25,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.datastore import gae_datastore_services as datastore_services
-from core.platform.transactions import gae_transaction_services as transaction_services # pylint: disable=line-too-long
-
+from core.platform.transactions import (
+    gae_transaction_services as transaction_services)
 from core.storage.activity import gae_models as activity_models
 from core.storage.app_feedback_report import (
     gae_models as app_feedback_report_models)

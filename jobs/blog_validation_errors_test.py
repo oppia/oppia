@@ -25,8 +25,8 @@ from jobs.types import base_validation_errors_test
 import utils
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models, datastore_services # pylint: disable=unused-import
 
 (blog_models,) = models.Registry.import_models(
     [models.NAMES.blog, ])
