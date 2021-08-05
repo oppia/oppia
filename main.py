@@ -93,8 +93,8 @@ class InternetConnectivityHandler(base.BaseHandler):
     """Handles the get request to the server from the
     frontend to check for internet connection."""
 
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self):
