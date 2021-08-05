@@ -1441,5 +1441,8 @@ CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_ADD_QUESTION
 ]
 
-# Prefix for all acl validation handlers.
-ACCESS_VALIDATORS_PREFIX = '/access_validator'
+# Prefix for all access validation handlers.
+# The naming scheme for access validation handlers is
+# '/access_validation_handler/<handler_name>'
+# example: '/access_validation_handler/validate_access_to_splash_page'
+ACCESS_VALIDATION_HANDLER_PREFIX = '/access_validation_handler'

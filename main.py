@@ -213,28 +213,31 @@ URLS = MAPREDUCE_HANDLERS + [
 
     # Access Validators.
     get_redirect_route(
-        r'%s/can_access_classroom_page' % feconf.ACCESS_VALIDATORS_PREFIX,
+        r'%s/can_access_classroom_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ClassroomAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATORS_PREFIX,
+        r'%s/can_access_splash_page' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.SplashAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATORS_PREFIX,
+        r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
 
     get_redirect_route(
-        r'%s/does_profile_exist/<username>' % feconf.ACCESS_VALIDATORS_PREFIX,
+        r'%s/does_profile_exist/<username>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ProfileExistsValidationHandler),
 
     get_redirect_route(
-        r'%s/account_deletion_is_enabled' % feconf.ACCESS_VALIDATORS_PREFIX,
+        r'%s/account_deletion_is_enabled' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.AccountDeletionIsEnabledValidationHandler),
 
     get_redirect_route(
         r'%s/can_access_release_coordinator_page' %
-        feconf.ACCESS_VALIDATORS_PREFIX,
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ReleaseCoordinatorAccessValidationHandler
     ),
 

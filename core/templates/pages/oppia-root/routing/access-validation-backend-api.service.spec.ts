@@ -61,7 +61,7 @@ describe('Access validation backend api service', () => {
     };
 
     const req = httpTestingController.expectOne(
-      '/access_validator/can_access_splash_page');
+      '/access_validation_handler/can_access_splash_page');
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
@@ -80,8 +80,8 @@ describe('Access validation backend api service', () => {
     };
 
     const req = httpTestingController.expectOne(
-      '/access_validator/can_access_classroom_page?classroom_url_fragment=' +
-      fragment);
+      '/access_validation_handler/can_access_classroom_page?' +
+      'classroom_url_fragment=' + fragment);
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
@@ -98,7 +98,7 @@ describe('Access validation backend api service', () => {
     };
 
     const req = httpTestingController.expectOne(
-      '/access_validator/can_manage_own_account');
+      '/access_validation_handler/can_manage_own_account');
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
@@ -115,13 +115,13 @@ describe('Access validation backend api service', () => {
     };
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/access_validator/does_profile_exist/' + username
+      '/access_validation_handler/does_profile_exist/' + username
     );
 
     avbas.doesProfileExist(username).then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validator/does_profile_exist/' + username);
+      '/access_validation_handler/does_profile_exist/' + username);
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
@@ -138,7 +138,7 @@ describe('Access validation backend api service', () => {
     };
 
     const req = httpTestingController.expectOne(
-      '/access_validator/account_deletion_is_enabled');
+      '/access_validation_handler/account_deletion_is_enabled');
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
@@ -155,7 +155,7 @@ describe('Access validation backend api service', () => {
     };
 
     const req = httpTestingController.expectOne(
-      '/access_validator/can_access_release_coordinator_page');
+      '/access_validation_handler/can_access_release_coordinator_page');
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 
