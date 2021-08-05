@@ -84,15 +84,6 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story_1)
         story_services.save_new_story(self.admin_id, self.story_2)
 
-        self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name',
-            'private_topic_name', 'description')
-        self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
-        self.topic.url_fragment = 'private'
-        topic_services.save_new_topic(self.admin_id, self.topic)
-
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id_1, self.admin_id)
@@ -115,6 +106,15 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
         self.get_html_response('/learn/staging/%s' % 'public')
 
     def test_accessibility_of_unpublished_topic_viewer_page(self):
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'private_topic_name',
+            'private_topic_name', 'description')
+        topic.thumbnail_filename = 'Image.svg'
+        topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic.url_fragment = 'private'
+        topic_services.save_new_topic(self.admin_id, topic)
+
         self.get_html_response(
             '/learn/staging/%s' % 'private',
             expected_status_int=404)
