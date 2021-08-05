@@ -27,11 +27,11 @@ import { SubtopicSummaryTileComponent } from './subtopic-summary-tile.component'
 
 class MockWindowRef {
   nativeWindow = {
-   open: (url: string) => {}
+    open: (url: string) => {}
   };
 }
 
-fdescribe('SubtopicSummaryTileComponent', () => {
+describe('SubtopicSummaryTileComponent', () => {
   let component: SubtopicSummaryTileComponent;
   let fixture: ComponentFixture<SubtopicSummaryTileComponent>;
   let abas: AssetsBackendApiService;

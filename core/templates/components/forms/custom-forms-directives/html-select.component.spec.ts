@@ -19,7 +19,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
  */
 
 describe('HTML Select Component', () => {
-  let ctrl = null;
   let $scope = null;
   let $rootScope = null;
 
@@ -30,7 +29,7 @@ describe('HTML Select Component', () => {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
-    ctrl = $componentController('htmlSelect', {
+    $componentController('htmlSelect', {
       $scope: $scope
     });
   }));
