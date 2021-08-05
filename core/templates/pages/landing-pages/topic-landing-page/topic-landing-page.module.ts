@@ -16,26 +16,19 @@
  * @fileoverview Module for the topic landing page.
  */
 
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicLandingPageComponent } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { TopicLandingPageRootComponent } from './topic-landing-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule } from '@angular/common';
+import { TopicLandingPageRoutingModule } from './topic-landing-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    TopicLandingPageRoutingModule
   ],
   declarations: [
     TopicLandingPageComponent,
@@ -44,20 +37,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   entryComponents: [
     TopicLandingPageComponent,
     TopicLandingPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [TopicLandingPageRootComponent]
+  ]
 })
 export class TopicLandingPageModule {}

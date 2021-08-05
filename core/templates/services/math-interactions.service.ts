@@ -307,13 +307,12 @@ export class MathInteractionsService {
     // Note: We don't wanna insert signs before opening parens that are part of
     // functions, for eg., we want to convert a(b) to a*(b) but not sqrt(4) to
     // sqrt*(4).
-    let removeExtraMultiSymbol = expressionString[0] === '(';
+    expressionString = expressionString.replace(
+      /([^\*|\+|\/|\-|\^|\(])\(/g, '$1*(');
+    // Removing the '*' added before math function parens.
     expressionString = expressionString.replace(new RegExp(
-      '(?<!\\*|\\+|\\/|\\-|\\^|\\(|' + this.mathFunctionNames.join(
-        '|') + ')\\(', 'g'), '*(');
-    if (removeExtraMultiSymbol) {
-      expressionString = expressionString.slice(1);
-    }
+      '(' + this.mathFunctionNames.join('|') + ')\\*\\(', 'g'), '$1(');
+
     return expressionString;
   }
 
