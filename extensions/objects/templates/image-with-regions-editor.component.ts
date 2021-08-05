@@ -190,7 +190,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     }
     // Whenever the direction changes the value of newHeight and
     // newWidth computed is negative, hence the absolute value is taken.
-    if (resizedRegion) {
+    if (resizedRegion !== null) {
       resizedRegion.area = this.regionAreaFromCornerAndDimensions(
         x, y, Math.abs(newWidth), Math.abs(newHeight));
     }
@@ -319,7 +319,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
 
   regionLabelSetter(label: string): void {
     if (this.utilsService.isDefined(label)) {
-      if (this.selectedRegion) {
+      if (this.selectedRegion !== null) {
         this.value.labeledRegions[this.selectedRegion].label = label;
       }
       this.valueChanged.emit(this.value);
@@ -375,7 +375,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
         newY2 = this.getImageHeight();
         newY1 = newY2 - this.originalRectArea.height;
       }
-      if (draggedRegion) {
+      if (draggedRegion !== null) {
         draggedRegion.area = this.regionAreaFromCornerAndDimensions(
           newX1,
           newY1,
