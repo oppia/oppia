@@ -16,26 +16,20 @@
  * @fileoverview Module for the volunteer page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { VolunteerPageComponent } from './volunteer-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { VolunteerPageRootComponent } from './volunteer-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { VolunteerPageRootComponent } from
+  './volunteer-page-root.component';
+import { CommonModule } from '@angular/common';
+import { VolunteerPageRoutingModule } from './volunteer-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
+    VolunteerPageRoutingModule,
     NgbModule
   ],
   declarations: [
@@ -45,20 +39,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   entryComponents: [
     VolunteerPageComponent,
     VolunteerPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [VolunteerPageRootComponent]
+  ]
 })
 export class VolunteerPageModule {}

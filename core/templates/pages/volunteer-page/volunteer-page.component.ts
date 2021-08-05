@@ -17,7 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { ViewEncapsulation } from '@angular/core';
 import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 

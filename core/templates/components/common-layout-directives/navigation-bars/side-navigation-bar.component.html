@@ -165,7 +165,10 @@
     </li>
 
     <li>
-      <a href="https://www.oppiafoundation.org/volunteer" target="_blank" rel="noopener">
+      <a href="/volunteer"
+         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+         target="_blank"
+         rel="noopener">
         <i class="material-icons oppia-sidebar-menu-icon">&#xF233;</i>
         <span>{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
       </a>

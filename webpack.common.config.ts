@@ -617,16 +617,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new HtmlWebpackPlugin({
-      chunks: ['volunteer'],
-      filename: 'volunteer-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/volunteer-page/' +
-        'volunteer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
     }),

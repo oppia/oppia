@@ -13,24 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Root Component for volunteer page.
+ * @fileoverview Routing module for volunteer page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import { NgModule } from '@angular/core';
+import { Route, RouterModule } from '@angular/router';
+import { VolunteerPageRootComponent } from './volunteer-page-root.component';
 
-@Component({
-  selector: 'oppia-volunteer-page-root',
-  templateUrl: './volunteer-page-root.component.html'
-})
-export class VolunteerPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
-
-  ngOnInit(): void {
-    this.pageHeadService.updateTitleAndMetaTags(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER);
+const routes: Route[] = [
+  {
+    path: '',
+    component: VolunteerPageRootComponent
   }
-}
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class VolunteerPageRoutingModule {}
