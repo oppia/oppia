@@ -26,6 +26,11 @@ import feconf
 import python_utils
 import utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import (
+        base_models, app_feedback_report_models)
+
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
 
@@ -81,8 +86,9 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     WEB_REPORT_INFO_SCHEMA_VERSION = 1
 
     def setUp(self):
+        # type: () -> None
         """Set up  models in datastore for use in testing."""
-        super(AppFeedbackReportModelTests, self).setUp()
+        super(AppFeedbackReportModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         self.feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
@@ -117,6 +123,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.feedback_report_model.put()
 
     def test_create_and_get_android_report_model(self):
+        # type: () -> None
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2))
@@ -132,6 +139,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_ANDROID)
         self.assertEqual(
@@ -141,6 +150,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(report_model.web_report_info, None)
 
     def test_create_and_get_web_report_model(self):
+        # type: () -> None
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 self.PLATFORM_WEB, self.REPORT_SUBMITTED_TIMESTAMP_2))
@@ -155,6 +165,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
         report_model = app_feedback_report_models.AppFeedbackReportModel.get(
             report_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert report_model is not None
 
         self.assertEqual(report_model.platform, self.PLATFORM_WEB)
         self.assertEqual(
@@ -164,9 +176,10 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(report_model.android_report_info, None)
 
     def test_create_raises_exception_by_mocking_collision(self):
+        # type: () -> None
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # Test Exception for AppFeedbackReportModel.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The id generator for AppFeedbackReportModel is '
             'producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -190,12 +203,14 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                     None)
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(
             model.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_export_data_nontrivial(self):
+        # type: () -> None
         exported_data = (
             app_feedback_report_models.AppFeedbackReportModel.export_data(
                 self.USER_ID))
@@ -260,11 +275,13 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(model_entities[0].id, expired_model.id)
 
     def test_get_lowest_supported_role(self):
+        # type: () -> None
         model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(
             model.get_lowest_supported_role(), feconf.ROLE_ID_MODERATOR)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # The only user references will be those who have scrubbed a report.
         report_id = '%s.%s.%s' % (
@@ -272,6 +289,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             int(self.REPORT_SUBMITTED_TIMESTAMP_1_MSEC),
             'randomInteger123')
         model_entity = model_class.get(report_id)
+        # Ruling out the possibility of None for mypy type checking.
+        assert model_entity is not None
         model_entity.scrubbed_by = 'scrubber_user'
         model_entity.update_timestamps()
         model_entity.put()
@@ -326,6 +345,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         'randomInteger123')]
 
     def test_create_and_get_ticket_model(self):
+        # type: () -> None
         ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
                 self.TICKET_NAME))
@@ -339,6 +359,8 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get(
                 ticket_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert ticket_model is not None
 
         self.assertEqual(ticket_model.id, ticket_id)
         self.assertEqual(ticket_model.platform, self.PLATFORM)
@@ -348,9 +370,10 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
         self.assertEqual(ticket_model.report_ids, self.REPORT_IDS)
 
     def test_create_raises_exception_by_mocking_collision(self):
+        # type: () -> None
         model_class = app_feedback_report_models.AppFeedbackReportTicketModel
         # Test Exception for AppFeedbackReportTicketModel.
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'The id generator for AppFeedbackReportTicketModel is producing too'
             'many collisions.'
@@ -367,12 +390,14 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
                     report_ids=self.REPORT_IDS)
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         model = app_feedback_report_models.AppFeedbackReportTicketModel()
         self.assertEqual(
             model.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_lowest_supported_role(self):
+        # type: () -> None
         model = app_feedback_report_models.AppFeedbackReportTicketModel
         self.assertEqual(
             model.get_lowest_supported_role(), feconf.ROLE_ID_MODERATOR)
@@ -396,6 +421,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
     TOTAL_REPORTS_SUBMITTED = 3
 
     def test_create_and_get_stats_model(self):
+        # type: () -> None
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 'android', self.TICKET_ID, self.STATS_DATE))
@@ -410,6 +436,8 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         stats_model = (
             app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
                 entity_id))
+        # Ruling out the possibility of None for mypy type checking.
+        assert stats_model is not None
 
         self.assertEqual(stats_model.id, '%s:%s:%s' % (
             'android', self.TICKET_ID, self.STATS_DATE.isoformat()))
@@ -431,6 +459,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         self.assertEqual(entity_id, entity_id_copy)
 
     def test_get_stats_for_ticket(self):
+        # type: () -> None
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
                 'android', self.TICKET_ID, self.STATS_DATE))
@@ -454,13 +483,15 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         self.assertEqual(stats_models[0], expected_stats_model)
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         model = app_feedback_report_models.AppFeedbackReportStatsModel()
         self.assertEqual(
             model.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_lowest_supported_role(self):
-        model = app_feedback_report_models.AppFeedbackReportStatsModel()
+        # type: () -> None
+        model = app_feedback_report_models.AppFeedbackReportStatsModel
         self.assertEqual(
             model.get_lowest_supported_role(),
             feconf.ROLE_ID_MODERATOR)

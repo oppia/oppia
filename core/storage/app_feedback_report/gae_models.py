@@ -24,6 +24,13 @@ import feconf
 import python_utils
 import utils
 
+from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import ( # pylint: disable=unused-import
+        base_models, datastore_services, transaction_services)
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -146,16 +153,32 @@ class AppFeedbackReportModel(base_models.BaseModel):
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
 
+    # TODO(#13523): Change 'android_report_info' and 'web_report_info' to domain
+    # objects/TypedDict to remove Any from type-annotation below.
     @classmethod
     def create(
-            cls, entity_id, platform, submitted_on, local_timezone_offset_hrs,
-            report_type, category, platform_version,
-            android_device_country_locale_code,
-            android_sdk_version, android_device_model, entry_point,
-            entry_point_topic_id, entry_point_story_id,
-            entry_point_exploration_id, entry_point_subtopic_id,
-            text_language_code, audio_language_code, android_report_info,
-            web_report_info):
+            cls,
+            entity_id, # type: Text
+            platform, # type: Text
+            submitted_on, # type: datetime.datetime
+            local_timezone_offset_hrs, # type: int
+            report_type, # type: Text
+            category, # type: Text
+            platform_version, # type: Text
+            android_device_country_locale_code, # type: Optional[Text]
+            android_sdk_version, # type: Optional[int]
+            android_device_model, # type: Optional[Text]
+            entry_point, # type: Text
+            entry_point_topic_id, # type: Optional[Text]
+            entry_point_story_id, # type: Optional[Text]
+            entry_point_exploration_id, # type: Optional[Text]
+            entry_point_subtopic_id, # type: Optional[Text]
+            text_language_code, # type: Text
+            audio_language_code, # type: Text
+            android_report_info, # type: Optional[Dict[Text, Any]]
+            web_report_info # type: Optional[Dict[Text, Any]]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 
         Args:
@@ -231,6 +254,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def generate_id(cls, platform, submitted_on_datetime):
+        # type: (Text, datetime.datetime) -> Text
         """Generates key for the instance of AppFeedbackReportModel class in the
         required format with the arguments provided.
 
@@ -321,6 +345,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model stores the user ID of who has scrubbed this report for auditing
         purposes but otherwise does not contain data directly corresponding to
         the user themselves.
@@ -329,6 +354,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data referencing user and will be exported."""
         return dict(super(cls, cls).get_export_policy(), **{
             'platform': base_models.EXPORT_POLICY.EXPORTED,
@@ -361,6 +387,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Dict[Text, Text]]
         """Exports the data from AppFeedbackReportModel into dict format for
         Takeout.
 
@@ -372,9 +399,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
         user_data = dict()
-        report_models = cls.get_all().filter(
-            cls.scrubbed_by == user_id).fetch()
-
+        report_models = cast(
+            List[AppFeedbackReportModel],
+            cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
+        )
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
@@ -394,6 +422,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model is exported as multiple instances per user since there
         are multiple reports relevant to a user.
         """
@@ -401,11 +430,13 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @staticmethod
     def get_lowest_supported_role():
+        # type: () -> Text
         """The lowest supported role for feedback reports will be moderator."""
         return feconf.ROLE_ID_MODERATOR
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether AppFeedbackReportModel exists for user.
 
         Args:
@@ -455,8 +486,16 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, entity_id, ticket_name, platform, github_issue_repo_name,
-            github_issue_number, newest_report_timestamp, report_ids):
+            cls,
+            entity_id, # type: Text
+            ticket_name, # type: Text
+            platform, # type: Text
+            github_issue_repo_name, # type: Optional[Text]
+            github_issue_number, # type: Optional[int]
+            newest_report_timestamp, # type: datetime.datetime
+            report_ids # type: List[Text]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
@@ -491,6 +530,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def generate_id(cls, ticket_name):
+        # type: (Text) -> Text
         """Generates key for the instance of AppFeedbackReportTicketModel
         class in the required format with the arguments provided.
 
@@ -522,6 +562,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any information directly corresponding to a
         user.
         """
@@ -529,6 +570,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -542,11 +584,13 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @staticmethod
     def get_lowest_supported_role():
+        # type: () -> Text
         """The lowest supported role for feedback report tickets will be
         moderator.
         """
@@ -596,8 +640,15 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, entity_id, platform, ticket_id, stats_tracking_date,
-            total_reports_submitted, daily_param_stats):
+            cls,
+            entity_id, # type: Text
+            platform, # type: Text
+            ticket_id, # type: Text
+            stats_tracking_date, # type: datetime.date
+            total_reports_submitted, # type: int
+            daily_param_stats # type: Dict[Text, Dict[Text, int]]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 
@@ -630,7 +681,8 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def calculate_id(cls, platform, ticket_id, stats_tracking_date):
-        """Gets the key for the instance of AppFeedbackReportStatsModel
+        # type: (Text, Text, datetime.date) -> Text
+        """Generates key for the instance of AppFeedbackReportStatsModel
         class in the required format with the arguments provided.
 
         Args:
@@ -649,6 +701,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_stats_for_ticket(cls, ticket_id):
+        # type: (Text) -> List[AppFeedbackReportStatsModel]
         """Fetches the stats for a single ticket.
 
         Args:
@@ -659,10 +712,12 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             AppFeedbackReportStatsModel entities that record stats on the
             ticket.
         """
-        return cls.query(cls.ticket_id == ticket_id).fetch()
+        ticket_models = cls.query(cls.ticket_id == ticket_id).fetch()
+        return cast(List[AppFeedbackReportStatsModel], ticket_models)
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model doesn't contain any information directly corresponding to a
         user.
         """
@@ -670,6 +725,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'ticket_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -683,11 +739,13 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @staticmethod
     def get_lowest_supported_role():
+        # type: () -> Text
         """The lowest supported role for feedback reports stats will be
         moderator.
         """
