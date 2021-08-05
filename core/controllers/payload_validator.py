@@ -130,7 +130,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'ImageUploadHandler',
     'IncomingReplyEmailHandler',
     'InstantFeedbackMessageEmailHandler',
-    'InternetConnectivityHandler',
     'JobOutputHandler',
     'JobsHandler',
     'LearnerAnswerDetailsSubmissionHandler',
