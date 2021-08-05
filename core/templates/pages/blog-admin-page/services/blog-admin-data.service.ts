@@ -25,12 +25,12 @@ import { BlogAdminPageData, BlogAdminBackendApiService } from 'domain/blog-admin
   providedIn: 'root'
 })
 export class BlogAdminDataService {
-  // 'dataPromise' is initialized before it is used in the class.
-  // We need to do non-null assertion.
-  dataPromise!: Promise<BlogAdminPageData>;
+  // 'dataPromise' is null initially.
+  dataPromise: Promise<BlogAdminPageData> | null;
 
   constructor(
     private BackendApiService: BlogAdminBackendApiService) {
+    this.dataPromise = null;
   }
 
   async _getDataAsync(): Promise<BlogAdminPageData> {
