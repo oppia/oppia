@@ -167,14 +167,16 @@ class AccountDeletionIsEnabledValidationHandlerTests(
         # type: () -> None
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_json( # type: ignore[no-untyped-call]
-                '%s/account_deletion_is_enabled' % ACCESS_VALIDATION_HANDLER_PREFIX)
+                '%s/account_deletion_is_enabled' %
+                ACCESS_VALIDATION_HANDLER_PREFIX)
             self.assertTrue(response['valid'])
 
     def test_delete_account_validation_returns_false_if_disabled(self):
         # type: () -> None
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             response = self.get_json( # type: ignore[no-untyped-call]
-                '%s/account_deletion_is_enabled' % ACCESS_VALIDATION_HANDLER_PREFIX)
+                '%s/account_deletion_is_enabled' %
+                ACCESS_VALIDATION_HANDLER_PREFIX)
             self.assertFalse(response['valid'])
 
 
