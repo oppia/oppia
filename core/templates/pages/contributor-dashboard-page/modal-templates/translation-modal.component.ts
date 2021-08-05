@@ -303,7 +303,7 @@ export class TranslationModalComponent {
     // To match, e.g. "{{x|TranslatableSetOfNormalizedString}},".
     const descriptionPattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     const ruleDescription = INTERACTION_SPECS[
-      interactionId].rule_descriptions[rule];
+      interactionId].rule_descriptions[ruleType];
     return 'Answer ' + ruleDescription.replace(
       descriptionPattern, 'the following choices:');
   }
@@ -391,9 +391,9 @@ export class TranslationModalComponent {
     if (!this.isSetOfStringDataFormat()) {
       const domParser = new DOMParser();
       const originalElements = domParser.parseFromString(
-        this.textToTranslate, 'text/html');
+        this.textToTranslate as string, 'text/html');
       const translatedElements = domParser.parseFromString(
-        this.activeWrittenTranslation, 'text/html');
+        this.activeWrittenTranslation as string, 'text/html');
 
       const translationError = this.validateTranslation(
         originalElements.getElementsByTagName('*'),
