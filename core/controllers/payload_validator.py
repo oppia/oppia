@@ -90,7 +90,7 @@ def convert_string_to_bool(param):
     if case_insensitive_param == 'true':
         return True
     elif case_insensitive_param == 'false':
-        return  False
+        return False
     else:
         return False
 
