@@ -53,8 +53,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
-  disableOnOfflineNames: string[] = [
-    'image', 'skillreview', 'svgdiagram', 'video'];
+  internetRequiringComponents: string[] = [
+    'image', 'skillreview', 'svgdiagram', 'video', 'math'];
   currentValue: string;
   // A RegExp for matching rich text components.
   componentRe = (
@@ -448,7 +448,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   disableRTEicons(): void {
     // Add disabled cursor pointer to the icons.
     // TODO(#12882): Remove the use of jQuery.
-    this.disableOnOfflineNames.forEach((name) => {
+    this.internetRequiringComponents.forEach((name) => {
       $('.cke_button__oppia' + name)
         .css('background-color', '#cccccc')
         .css('pointer-events', 'none');
@@ -460,7 +460,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   }
   enableRTEicons(): void {
     // TODO(#12882): Remove the use of jQuery.
-    this.disableOnOfflineNames.forEach((name) => {
+    this.internetRequiringComponents.forEach((name) => {
       $('.cke_button__oppia' + name)
         .css('background-color', '')
         .css('pointer-events', '');
