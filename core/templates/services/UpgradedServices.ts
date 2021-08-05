@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient, HttpXhrBackend,
