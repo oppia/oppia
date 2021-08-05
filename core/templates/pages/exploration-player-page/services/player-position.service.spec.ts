@@ -110,7 +110,6 @@ describe('Player position service', () => {
 
   it('should throw error if callback ftn is not defined on changing index',
     () => {
-      pps.setDisplayedCardIndex(2);
       expect(() => {
         pps.setDisplayedCardIndex(3);
       }).toThrowError('The callback function has not been initialized');

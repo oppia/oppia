@@ -49,7 +49,7 @@ type InteractionSpecKey = (
   providedIn: 'root'
 })
 export class ContentTranslationManagerService {
-  private explorationLanguageCode: string = '';
+  private explorationLanguageCode: string | undefined;
   private onStateCardContentUpdateEmitter: EventEmitter<void> = (
     new EventEmitter());
   // The 'originalTranscript' is a copy of the transcript in the exploration

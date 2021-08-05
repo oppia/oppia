@@ -165,7 +165,9 @@ describe('State card object factory', () => {
     expect(_sampleCard.getOppiaResponse(0)).toEqual('response');
     expect(_sampleCard.getLastOppiaResponse()).toEqual('response');
     expect(_sampleCard.getLastInputResponsePair()).toEqual({
-      oppiaResponse: 'response'
+      oppiaResponse: 'response',
+      learnerInput: '',
+      isHint: false
     });
   });
 
