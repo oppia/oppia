@@ -218,6 +218,17 @@ describe('Translation Modal Component', () => {
     it('should get the unicode schema', () => {
       expect(component.getUnicodeSchema()).toEqual({type: 'unicode'});
     });
+
+    it('should get the set of strings schema', () => {
+      expect(component.getSetOfStringsSchema()).toEqual(
+        {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          }
+        }
+      );
+    });
   });
 
   describe('when clicking on the translatable content', () => {
@@ -334,6 +345,13 @@ describe('Translation Modal Component', () => {
         stateName1: {contentId1: getContentTranslatableItemWithText('text1')},
         stateName2: {
           contentId2: {
+            data_format: 'unicode',
+            content: 'Continue',
+            content_type: 'interaction',
+            interaction_id: null,
+            rule_type: null
+          },
+          contentId3: {
             data_format: 'set_of_normalized_string',
             content: ['answer1', 'answer2', 'answer3'],
             content_type: 'rule',
@@ -486,7 +504,7 @@ describe('Translation Modal Component', () => {
           target_version_at_submission: 1,
           change: {
             cmd: 'add_written_translation',
-            content_id: 'contentId2',
+            content_id: 'contentId3',
             state_name: 'stateName2',
             language_code: 'es',
             content_html: ['answer1', 'answer2', 'answer3'],
@@ -494,6 +512,7 @@ describe('Translation Modal Component', () => {
             data_format: 'set_of_normalized_string'
           }
         };
+        component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.activeWrittenTranslation = [
           'answero1', 'answero2', 'answero3'];
