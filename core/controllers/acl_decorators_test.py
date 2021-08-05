@@ -774,6 +774,15 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 'exploration feedback.')
         self.logout()
 
+    def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_view_feedback_thread/invalid_thread_id',
+                expected_status_int=400)
+            self.assertEqual(response['error'], 'Thread ID must contain a .')
+        self.logout()
+
     def test_viewer_can_view_non_exploration_related_feedback(self):
         self.login(self.viewer_email)
         skill_thread_id = feedback_services.create_thread(
