@@ -25,8 +25,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class PreventPageUnloadEventService {
   private listenerActive: boolean;
-  validationCallback: Function;
-  _preventPageUnloadEventHandlerBind = undefined;
+  validationCallback: undefined | (() => boolean);
+  _preventPageUnloadEventHandlerBind?: (
+    this: Window, ev: BeforeUnloadEvent) => void;
   constructor(private windowRef: WindowRef) {
     this.listenerActive = false;
     this.validationCallback = undefined;
@@ -47,6 +48,9 @@ export class PreventPageUnloadEventService {
   }
 
   removeListener(): void {
+    if (this._preventPageUnloadEventHandlerBind === undefined) {
+      return;
+    }
     this.windowRef.nativeWindow.removeEventListener(
       'beforeunload', this._preventPageUnloadEventHandlerBind, true);
     this.listenerActive = false;

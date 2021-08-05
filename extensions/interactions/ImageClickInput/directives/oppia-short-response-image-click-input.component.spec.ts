@@ -24,7 +24,7 @@ describe('ShortResponseImageClickInput', () => {
   let component: ShortResponseImageClickInput;
   let fixture: ComponentFixture<ShortResponseImageClickInput>;
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function(answer: string) {
       return JSON.parse(answer);
     }
   };

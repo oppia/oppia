@@ -27,6 +27,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AggregatedStats, StatsReportingBackendApiService } from
   'domain/exploration/stats-reporting-backend-api.service';
 import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import { ServicesConstants } from 'services/services.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -192,7 +193,7 @@ export class StatsReportingService {
     });
 
     this.messengerService.sendMessage(
-      this.messengerService.EXPLORATION_LOADED, {
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED, {
         explorationVersion: this.explorationVersion,
         explorationTitle: this.explorationTitle
       });
@@ -301,7 +302,7 @@ export class StatsReportingService {
 
     // Broadcast information about the state transition to listeners.
     this.messengerService.sendMessage(
-      this.messengerService.STATE_TRANSITION, {
+      ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION, {
         explorationVersion: this.explorationVersion,
         jsonAnswer: JSON.stringify(answer),
         newStateName: newStateName,
@@ -370,7 +371,7 @@ export class StatsReportingService {
     });
 
     this.messengerService.sendMessage(
-      this.messengerService.EXPLORATION_COMPLETED, {
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED, {
         explorationVersion: this.explorationVersion,
         paramValues: params
       });

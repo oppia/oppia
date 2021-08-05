@@ -28,10 +28,10 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Collection Creation service', () => {
-  let collectionCreationService: CollectionCreationService = null;
-  let loaderService: LoaderService = null;
-  let analyticsService: SiteAnalyticsService = null;
-  let windowRef: WindowRef = null;
+  let collectionCreationService: CollectionCreationService;
+  let loaderService: LoaderService;
+  let analyticsService: SiteAnalyticsService;
+  let windowRef: WindowRef;
   let httpTestingController: HttpTestingController;
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
   let ERROR_STATUS_CODE = 500;
@@ -43,11 +43,11 @@ describe('Collection Creation service', () => {
       ],
     });
 
-    collectionCreationService = TestBed.get(CollectionCreationService);
-    loaderService = TestBed.get(LoaderService);
-    analyticsService = TestBed.get(SiteAnalyticsService);
-    windowRef = TestBed.get(WindowRef);
-    httpTestingController = TestBed.get(HttpTestingController);
+    collectionCreationService = TestBed.inject(CollectionCreationService);
+    loaderService = TestBed.inject(LoaderService);
+    analyticsService = TestBed.inject(SiteAnalyticsService);
+    windowRef = TestBed.inject(WindowRef);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

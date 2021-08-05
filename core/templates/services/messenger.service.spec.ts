@@ -23,6 +23,7 @@ import { TestBed } from '@angular/core/testing';
 import { MessengerService } from './messenger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LoggerService } from './contextual/logger.service';
+import { ServicesConstants } from './services.constants';
 
 describe('BannerComponent', () => {
   let messengerService: MessengerService;
@@ -69,8 +70,8 @@ describe('BannerComponent', () => {
   });
 
   beforeEach(() => {
-    messengerService = TestBed.get(MessengerService);
-    loggerService = TestBed.get(LoggerService);
+    messengerService = TestBed.inject(MessengerService);
+    loggerService = TestBed.inject(LoggerService);
   });
 
   it('should post height change when the user changes the height of the' +
@@ -79,10 +80,11 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.2&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
-      height: 100,
-      scroll: true
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+        height: 100,
+        scroll: true
+      });
 
     expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
       '{"title":"heightChange",' +
@@ -97,10 +99,11 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.2&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.EXPLORATION_LOADED, {
-      explorationVersion: 1,
-      explorationTitle: 'exploration title'
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED, {
+        explorationVersion: 1,
+        explorationTitle: 'exploration title'
+      });
 
     expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
       '{"title":"explorationLoaded",' +
@@ -115,12 +118,13 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.2&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.STATE_TRANSITION, {
-      explorationVersion: 1,
-      oldStateName: 'old state',
-      jsonAnswer: '{answer: 0}',
-      newStateName: 'new state'
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION, {
+        explorationVersion: 1,
+        oldStateName: 'old state',
+        jsonAnswer: '{answer: 0}',
+        newStateName: 'new state'
+      });
 
     expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
       '{"title":"stateTransition","payload":{"explorationVersion":1,' +
@@ -134,9 +138,10 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.2&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.EXPLORATION_COMPLETED, {
-      explorationVersion: 1
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED, {
+        explorationVersion: 1
+      });
 
     expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
       '{"title":"explorationCompleted","payload":{"explorationVersion":1},' +
@@ -149,9 +154,10 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.2&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.EXPLORATION_RESET, {
-      stateName: 'state name'
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_RESET, {
+        stateName: 'state name'
+      });
 
     expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
       '{"title":"explorationReset","payload":{"stateName":' +
@@ -164,10 +170,11 @@ describe('BannerComponent', () => {
       mockWindowRef.nativeWindow.location.hash =
         '/version=0.0.0&secret=secret1&tagid=1';
 
-      messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
-        height: 100,
-        scroll: true
-      });
+      messengerService.sendMessage(
+        ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+          height: 100,
+          scroll: true
+        });
 
       expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
         '{"title":"heightChange",' +
@@ -180,10 +187,11 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version0.0.0';
 
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
-      height: 100,
-      scroll: true
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+        height: 100,
+        scroll: true
+      });
 
     expect(loggerService.error)
       .toHaveBeenCalledWith('Invalid hash for embedding: version0.0.0');
@@ -195,10 +203,11 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.0';
 
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
-      height: 100,
-      scroll: true
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+        height: 100,
+        scroll: true
+      });
 
     expect(loggerService.error)
       .toHaveBeenCalledWith('Invalid hash for embedding: version=0.0.0');
@@ -209,10 +218,11 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.0&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
-      height: 100,
-      scroll: 100
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+        height: 100,
+        scroll: 100
+      });
 
     expect(loggerService.error)
       .toHaveBeenCalledWith('Error validating payload: [object Object]');
@@ -223,10 +233,11 @@ describe('BannerComponent', () => {
     mockWindowRef.nativeWindow.location.hash =
       '/version=0.0.10&secret=secret1&tagid=1';
 
-    messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
-      height: 100,
-      scroll: true
-    });
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+        height: 100,
+        scroll: true
+      });
 
     expect(loggerService.error)
       .toHaveBeenCalledWith('Unknown version for embedding: 0.0.10');

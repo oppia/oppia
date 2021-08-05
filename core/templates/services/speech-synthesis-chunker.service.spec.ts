@@ -22,14 +22,15 @@ import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
 
 describe('Speech Synthesis Chunker Service', () => {
-  let speechSynthesisChunkerService: SpeechSynthesisChunkerService = null;
+  let speechSynthesisChunkerService: SpeechSynthesisChunkerService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [SpeechSynthesisChunkerService]
     });
 
-    speechSynthesisChunkerService = TestBed.get(SpeechSynthesisChunkerService);
+    speechSynthesisChunkerService = TestBed.inject(
+      SpeechSynthesisChunkerService);
   });
 
   describe('formatLatexToSpeakableText', () => {
