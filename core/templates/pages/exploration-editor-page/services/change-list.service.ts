@@ -21,7 +21,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, OnInit, Output } from '@angular/core';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppConstants } from 'app.constants';
 
 import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -36,7 +35,6 @@ import { ConnectionService } from 'services/connection-service.service';
   providedIn: 'root'
 })
 export class ChangeListService implements OnInit {
-  connectionStatus: string = AppConstants.CONNECTION_STATUS_ONLINE;
   // Temporary buffer for changes made to the exploration.
   explorationChangeList: ExplorationChange[] = [];
   undoneChangeStack: ExplorationChange[] = [];
@@ -95,20 +93,17 @@ export class ChangeListService implements OnInit {
     private loggerService: LoggerService,
     private connectionService: ConnectionService,
   ) {
-    this.connectionService.onInternetStateChange.subscribe(currentState => {
-      let {hasNetworkConnection, hasInternetAccess } = currentState;
-      if (hasNetworkConnection && hasInternetAccess) {
-        this.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
-        if (this.temporaryListOfChanges.length > 0) {
-          for (let change of this.temporaryListOfChanges) {
-            this.addChange(change);
+    this.connectionService.onInternetStateChange.subscribe(
+      internetAccessible => {
+        if (internetAccessible) {
+          if (this.temporaryListOfChanges.length > 0) {
+            for (let change of this.temporaryListOfChanges) {
+              this.addChange(change);
+            }
+            this.temporaryListOfChanges = [];
           }
-          this.temporaryListOfChanges = [];
         }
-      } else {
-        this.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
-      }
-    });
+      });
   }
 
   ngOnInit(): void {
@@ -157,7 +152,7 @@ export class ChangeListService implements OnInit {
     if (this.loadingMessage) {
       return;
     }
-    if (this.connectionStatus === AppConstants.CONNECTION_STATUS_OFFLINE) {
+    if (!this.connectionService.isOnline()) {
       this.temporaryListOfChanges.push(changeDict);
     } else {
       this.explorationChangeList.push(changeDict);

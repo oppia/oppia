@@ -16,7 +16,6 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
-import { AppConstants } from 'app.constants';
 import { Subscription } from 'rxjs';
 
 require(
@@ -52,7 +51,6 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
-      ctrl.connectionState = AppConstants.CONNECTION_STATUS_ONLINE;
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
       };
@@ -190,22 +188,13 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         );
         ctrl.directiveSubscriptions.add(
           ConnectionService.onInternetStateChange.subscribe(
-            currentState => {
-              let {hasNetworkConnection, hasInternetAccess} = currentState;
-              if (hasNetworkConnection && hasInternetAccess) {
-                if (ctrl.connectionStatus ===
-                    AppConstants.CONNECTION_STATUS_OFFLINE) {
-                  $scope.isOffline = false;
-                  $scope.$applyAsync();
-                }
-                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
+            internetAccessible => {
+              if (internetAccessible) {
+                $scope.isOffline = false;
+                $scope.$applyAsync();
               } else {
-                if (ctrl.connectionStatus ===
-                    AppConstants.CONNECTION_STATUS_ONLINE) {
-                  $scope.isOffline = true;
-                  $scope.$applyAsync();
-                }
-                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
+                $scope.isOffline = true;
+                $scope.$applyAsync();
               }
             })
         );

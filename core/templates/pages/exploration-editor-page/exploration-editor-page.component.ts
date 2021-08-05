@@ -155,7 +155,6 @@ require('services/user.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
-import { AppConstants } from 'app.constants';
 
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
@@ -211,9 +210,6 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectionService = ConnectionService;
-      ctrl.hasNetworkConnection = true;
-      ctrl.hasInternetAccess = true;
-      ctrl.connectionStatus = '';
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -515,27 +511,17 @@ angular.module('oppia').component('explorationEditorPage', {
         );
         ctrl.directiveSubscriptions.add(
           ConnectionService.onInternetStateChange.subscribe(
-            currentState => {
-              ctrl.hasNetworkConnection = currentState.hasNetworkConnection;
-              ctrl.hasInternetAccess = currentState.hasInternetAccess;
-              if (ctrl.hasNetworkConnection && ctrl.hasInternetAccess) {
-                if (ctrl.connectionStatus ===
-                    AppConstants.CONNECTION_STATUS_OFFLINE) {
-                  AlertsService.addSuccessMessage(
-                    'Reconnected. Checking whether your changes are mergeable.',
-                    reconnectedMessageTimeoutMilliseconds);
-                }
-                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
+            hasInternetAccess => {
+              if (hasInternetAccess) {
+                AlertsService.addSuccessMessage(
+                  'Reconnected. Checking whether your changes are mergeable.',
+                  reconnectedMessageTimeoutMilliseconds);
               } else {
-                if (ctrl.connectionStatus ===
-                    AppConstants.CONNECTION_STATUS_ONLINE) {
-                  AlertsService.addInfoMessage(
-                    'Looks like you are offline. ' +
-                    'You can continue working, and can save ' +
-                    'your changes once reconnected.',
-                    disconnectedMessageTimeoutMilliseconds);
-                }
-                ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
+                AlertsService.addInfoMessage(
+                  'Looks like you are offline. ' +
+                  'You can continue working, and can save ' +
+                  'your changes once reconnected.',
+                  disconnectedMessageTimeoutMilliseconds);
               }
             })
         );

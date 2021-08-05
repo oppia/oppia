@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to check for the network & internet connection.
+ * @fileoverview Service to check for the network & Internet connection.
  */
 
 import { EventEmitter, Injectable, NgZone } from '@angular/core';
@@ -23,18 +23,6 @@ import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
-/**
- * Instance of this interface is used to report current connection status.
- */
-export interface ConnectionState {
-  // "True" if browser has network connection. Determined by Window
-  // objects "online" / "offline" events.
-  hasNetworkConnection: boolean;
-  // "True" if browser has Internet access. Determined by sending
-  // periodically GET requests to the server.
-  hasInternetAccess: boolean;
-}
 
 export interface ConnectionCheckResponse {
   isInternetConnected: boolean;
@@ -46,15 +34,13 @@ export interface ConnectionCheckResponse {
 export class ConnectionService {
   private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 3500;
   private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
-  private checkConnectionUrl: string = '/connectivity/check';
+  private checkConnectionUrl: string = '/internetconnectivityhandler';
+  private _internetAccessible: boolean = true;
+  private _connectedToNetwork = window.navigator.onLine;
 
   private _connectionStateChangeEventEmitter = (
-    new EventEmitter<ConnectionState>());
+    new EventEmitter<boolean>());
 
-  private currentState: ConnectionState = {
-    hasInternetAccess: true,
-    hasNetworkConnection: window.navigator.onLine
-  };
   private httpSubscription: Subscription;
 
 
@@ -75,22 +61,28 @@ export class ConnectionService {
         0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
         .pipe(
           switchMap(() => {
-            if (this.currentState.hasNetworkConnection) {
+            if (this._connectedToNetwork) {
               return this.http.get<ConnectionCheckResponse>(
                 this.checkConnectionUrl).toPromise();
             }
           }),
           retryWhen(errors => errors.pipe(
             tap(val => {
-              this.currentState.hasInternetAccess = false;
-              this._connectionStateChangeEventEmitter.emit(this.currentState);
+              if (this._internetAccessible) {
+                this._internetAccessible = false;
+                this._connectionStateChangeEventEmitter.emit(
+                  this._internetAccessible);
+              }
             }),
             delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
           )
           )
         ).subscribe(result => {
-          this.currentState.hasInternetAccess = true;
-          this._connectionStateChangeEventEmitter.emit(this.currentState);
+          if (!this._internetAccessible) {
+            this._internetAccessible = true;
+            this._connectionStateChangeEventEmitter.emit(
+              this._internetAccessible);
+          }
         }));
     });
   }
@@ -100,22 +92,26 @@ export class ConnectionService {
     // It checks if the browser is connected to the network or not
     // and then emits the current state of the connection.
     this.windowRef.nativeWindow.ononline = () => {
-      this.currentState.hasNetworkConnection = true;
-      this._connectionStateChangeEventEmitter.emit(this.currentState);
+      this._connectedToNetwork = true;
     };
 
     this.windowRef.nativeWindow.onoffline = () => {
-      this.currentState.hasNetworkConnection = false;
-      this.currentState.hasInternetAccess = false;
-      this._connectionStateChangeEventEmitter.emit(this.currentState);
+      this._connectedToNetwork = false;
+      this._internetAccessible = false;
+      this._connectionStateChangeEventEmitter.emit(
+        this._internetAccessible);
     };
+  }
+
+  isOnline(): boolean {
+    return this._internetAccessible;
   }
 
   /**
    * Monitor Network & Internet connection status by subscribing to this
    * observable.
    */
-  get onInternetStateChange(): EventEmitter<ConnectionState> {
+  get onInternetStateChange(): EventEmitter<boolean> {
     return this._connectionStateChangeEventEmitter;
   }
 }

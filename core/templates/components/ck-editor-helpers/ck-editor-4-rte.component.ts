@@ -53,7 +53,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
-  connectionStatus: string = AppConstants.CONNECTION_STATUS_ONLINE;
   disableOnOfflineNames: string[] = [
     'image', 'skillreview', 'svgdiagram', 'video'];
   currentValue: string;
@@ -71,20 +70,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   }
 
   ngOnInit(): void {
-    this.connectionService.onInternetStateChange.subscribe(currentState => {
-      let {hasNetworkConnection, hasInternetAccess} = currentState;
-      if (hasNetworkConnection && hasInternetAccess) {
-        if (this.connectionStatus === AppConstants.CONNECTION_STATUS_OFFLINE) {
+    this.connectionService.onInternetStateChange.subscribe(
+      internetAccessible => {
+        if (internetAccessible) {
           this.enableRTEicons();
-        }
-        this.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
-      } else {
-        if (this.connectionStatus === AppConstants.CONNECTION_STATUS_ONLINE) {
+        } else {
           this.disableRTEicons();
         }
-        this.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
-      }
-    });
+      });
   }
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
@@ -326,9 +319,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
 
     ck.on('instanceReady', () => {
-      if (this.connectionStatus === 'OFFLINE') {
-        this.disableRTEicons();
-      }
       // Show the editor now that it is fully loaded.
       (
         <HTMLElement> this.elementRef.nativeElement
@@ -351,10 +341,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           .css('width', '24px')
           .css('padding', '0px 0px');
       });
-      $('.cke_inner').append(
-        '<span id="offline-warning">* Tools with dark background ' +
-        'can not be used when offline.<span>');
-      $('#offline-warning').css('display', 'none');
+      let offline = document.createElement('span');
+      offline.innerText = (
+        '* Tools with dark background can not be used when offline.');
+      offline.className = 'cke-offline-warning';
+      offline.style.display = 'none';
+      // eslint-disable-next-line max-len
+      this.elementRef.nativeElement.children[0].children[0].children[0].appendChild(offline);
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')
@@ -396,7 +389,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         $('.cke_combo_button')
           .css('display', 'none');
       }
-
+      if (!this.connectionService.isOnline()) {
+        this.disableRTEicons();
+      }
       ck.setData(this.wrapComponents(this.value));
     });
 
@@ -454,22 +449,26 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // Add disabled cursor pointer to the icons.
     // TODO(#12882): Remove the use of jQuery.
     this.disableOnOfflineNames.forEach((name) => {
-      // TODO(#12882): Remove the use of jQuery.
       $('.cke_button__oppia' + name)
         .css('background-color', '#cccccc')
         .css('pointer-events', 'none');
-      $('#offline-warning').css('display', '');
     });
+    let offline = document.getElementsByClassName('cke-offline-warning');
+    for (let i = 0; i < offline.length; i++) {
+      offline[i].setAttribute('style', 'display: block');
+    }
   }
   enableRTEicons(): void {
     // TODO(#12882): Remove the use of jQuery.
     this.disableOnOfflineNames.forEach((name) => {
-      // TODO(#12882): Remove the use of jQuery.
       $('.cke_button__oppia' + name)
         .css('background-color', '')
         .css('pointer-events', '');
-      $('#offline-warning').css('display', 'none');
     });
+    let offline = document.getElementsByClassName('cke-offline-warning');
+    for (let i = 0; i < offline.length; i++) {
+      offline[i].setAttribute('style', 'display: none');
+    }
   }
 
   ngOnDestroy(): void {
