@@ -32,7 +32,11 @@
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTED_FOR_YOU_SECTION' | translate">
     </p>
     <div class="empty-suggested-for-you-section" *ngIf="!isNonemptyObject(untrackedTopics)">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION_BEFORE_LINK' | translate" class="empty-suggested-for-you-section-text">
+      </p>
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION_LINK' | translate" class="empty-suggested-for-you-section-text">
+      </p>
+      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION_AFTER_LINK' | translate" class="empty-suggested-for-you-section-text">
       </p>
     </div>
     <div class="suggested-for-you-section" *ngIf="isNonemptyObject(untrackedTopics)">
@@ -101,6 +105,11 @@
     font-family: 'Capriola', 'Roboto', Arial, sans-serif;
     font-size: 24px;
     margin: 0;
+    text-align: left;
+  }
+  .home-tab .empty-suggested-for-you-section-text {
+    display: contents;
+    margin-bottom: 0;
     text-align: left;
   }
   .home-tab .continue-where-you-left-off .empty-continue-where-you-left-off-section {

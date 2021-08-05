@@ -34,7 +34,13 @@
       </a>
     </div>
     <div *ngIf="emptySkillProficiency">
-      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
+      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_BEFORE_LINK' | translate">
+      </p>
+      <p class="empty-skill-proficiency"
+        [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_LINK' | translate">
+      </p>
+      <p class="empty-skill-proficiency"
+        [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_AFTER_LINK' | translate">
       </p>
     </div>
     <div *ngIf="!emptySkillProficiency">
@@ -118,11 +124,13 @@
     width: 736px;
   }
   .progress-tab .empty-section {
-    padding: 0 113px 30px 40px;
+    padding: 0 90px 30px 40px;
   }
   .progress-tab .empty-skill-proficiency {
     color: #333;
+    display: contents;
     font-size: 18px;
+    margin-bottom: 0;
     text-align: left;
   }
   .oppia-badge-image {
