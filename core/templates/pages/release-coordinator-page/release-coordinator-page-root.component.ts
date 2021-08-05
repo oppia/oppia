@@ -32,7 +32,7 @@ export class ReleaseCoordinatorPageRootComponent {
 
   constructor(
     private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+      AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService
   ) {}

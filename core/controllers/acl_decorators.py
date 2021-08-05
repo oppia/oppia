@@ -151,6 +151,11 @@ def does_classroom_exist(handler):
             classroom_url_fragment)
 
         if not classroom:
+            # This decorator is only used for JSON Handlers as it is not
+            # supposed to be used for page handlers as all pages are expected
+            # to migrated to angular router and access validation for the pages
+            # registered with angular router is expected to be done using
+            # access validation handlers.
             if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
                 raise self.PageNotFoundException
 

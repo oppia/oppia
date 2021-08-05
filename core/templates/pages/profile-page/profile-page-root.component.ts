@@ -33,7 +33,7 @@ export class ProfilePageRootComponent {
 
   constructor(
     private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+      AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private urlService: UrlService,

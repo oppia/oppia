@@ -28,7 +28,7 @@ import { AccessValidationBackendApiService } from '../access-validation-backend-
 export class CanAccessSplashPageGuard implements CanLoad {
   constructor(
     private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+      AccessValidationBackendApiService,
     private router: Router,
     private windowRef: WindowRef
   ) {}

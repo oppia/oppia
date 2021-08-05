@@ -25,9 +25,7 @@ import { PageHeadService } from 'services/page-head.service';
   templateUrl: './splash-page-root.component.html'
 })
 export class SplashPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
+  constructor(private pageHeadService: PageHeadService) {}
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(

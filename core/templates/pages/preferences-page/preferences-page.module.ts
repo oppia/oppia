@@ -27,7 +27,7 @@ import { SubjectInterestsComponent } from './form-fields/subject-interests.compo
 import { PreferencesPageRootComponent } from './preferences-page-root.component';
 import { CommonModule } from '@angular/common';
 import { PreferencesPageRoutingModule } from './preferences-page-routing.module';
-import { HybridRouterModuleProvider } from '../../hybrid-router-module-provider';
+import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 

@@ -43,7 +43,7 @@ export class ClassroomPageComponent {
 
   constructor(
     private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+      AccessValidationBackendApiService,
     private alertsService: AlertsService,
     private capitalizePipe: CapitalizePipe,
     private classroomBackendApiService: ClassroomBackendApiService,
