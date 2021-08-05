@@ -120,6 +120,34 @@ export class TranslateTextService {
     );
   }
 
+  private _getUpdatedTextToTranslate(
+    text: string | string[],
+    more: boolean,
+    status: Status,
+    translation: string): TranslatableItem {
+    const {
+      dataFormat,
+      contentType,
+      interactionId,
+      ruleType
+    }: {
+      dataFormat?: string,
+      contentType?: string,
+      interactionId?: string,
+      ruleType?: string
+    } = this.stateAndContent[this.activeIndex] || {};
+    return {
+      text: text,
+      more: more,
+      status: status,
+      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
+      dataFormat: dataFormat,
+      contentType: contentType,
+      interactionId: interactionId,
+      ruleType: ruleType
+    };
+  }
+
   init(expId: string, languageCode: string, successCallback: () => void): void {
     this.stateWiseContentIds = {};
     this.stateNamesList = [];
@@ -178,27 +206,8 @@ export class TranslateTextService {
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     const text = this._getNextText();
-    const {
-      dataFormat,
-      contentType,
-      interactionId,
-      ruleType
-    }: {
-      dataFormat?: string,
-      contentType?: string,
-      interactionId?: string,
-      ruleType?: string
-    } = this.stateAndContent[this.activeIndex] || {};
-    return {
-      text: text,
-      more: this._isMoreTextAvailableForTranslation(),
-      status: status,
-      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
-      dataFormat: dataFormat,
-      contentType: contentType,
-      interactionId: interactionId,
-      ruleType: ruleType
-    };
+    return this._getUpdatedTextToTranslate(
+      text, this._isMoreTextAvailableForTranslation(), status, translation);
   }
 
   getPreviousTextToTranslate(): TranslatableItem {
@@ -207,27 +216,8 @@ export class TranslateTextService {
       translation = ''
     } = { ...this.stateAndContent[this.activeIndex] };
     const text = this._getPreviousText();
-    const {
-      dataFormat,
-      contentType,
-      interactionId,
-      ruleType
-    }: {
-      dataFormat?: string,
-      contentType?: string,
-      interactionId?: string,
-      ruleType?: string
-    } = this.stateAndContent[this.activeIndex] || {};
-    return {
-      text: text,
-      more: this._isPreviousTextAvailableForTranslation(),
-      status: status,
-      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
-      dataFormat: dataFormat,
-      contentType: contentType,
-      interactionId: interactionId,
-      ruleType: ruleType
-    };
+    return this._getUpdatedTextToTranslate(
+      text, this._isPreviousTextAvailableForTranslation(), status, translation);
   }
 
   suggestTranslatedText(
