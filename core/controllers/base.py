@@ -361,7 +361,7 @@ class BaseHandler(webapp2.RequestHandler):
                 param = self.request.get(arg)
                 # Normalization of params which are expected to be boolean
                 # but received as string.
-                if param in ['true', 'True', 'false', 'False']:
+                if param.lower() in ['true', 'false']:
                     handler_args[arg] = (
                         payload_validator.convert_string_to_bool(param))
                 else:

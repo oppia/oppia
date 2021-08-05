@@ -326,7 +326,7 @@ class ExplorationRightsHandler(EditorHandler):
                 'schema': {
                     'type': 'bool'
                 },
-                'default_value': False
+                'default_value': None
             }
         },
         'DELETE': {
@@ -376,7 +376,7 @@ class ExplorationRightsHandler(EditorHandler):
             rights_manager.release_ownership_of_exploration(
                 self.user, exploration_id)
 
-        elif viewable_if_private:
+        elif viewable_if_private is not None:
             rights_manager.set_private_viewability_of_exploration(
                 self.user, exploration_id, viewable_if_private)
 
@@ -781,7 +781,7 @@ class StateInteractionStatsHandler(EditorHandler):
         'exploration_id': {
             'schema': SCHEMA_FOR_EXPLORATION_ID
         },
-        'escaped_state_name': {
+        'state_name': {
             'schema': {
                 'type': 'basestring'
             }
@@ -790,12 +790,11 @@ class StateInteractionStatsHandler(EditorHandler):
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id, escaped_state_name):
+    def get(self, exploration_id, state_name):
         """Handles GET requests."""
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
 
-        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
             logging.exception('Could not find state: %s' % state_name)
             logging.exception('Available states: %s' % (

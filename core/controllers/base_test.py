@@ -1844,7 +1844,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                     'schema': {
                         'type': 'bool'
                     },
-                    'default_value': 'false'
+                    'default_value': False
                 }
             }
         }

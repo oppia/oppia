@@ -85,7 +85,14 @@ def convert_string_to_bool(param):
     Returns:
         bool. Converts the string param into its expected bool type.
     """
-    return bool(param in ['true', 'True'])
+    case_insensitive_param = param.lower()
+
+    if case_insensitive_param == 'true':
+        return True
+    elif case_insensitive_param == 'false':
+        return  False
+    else:
+        return False
 
 
 # Handlers which require schema validation, but currently they do
