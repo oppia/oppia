@@ -47,7 +47,7 @@ describe('Un-customized profile page', function() {
   it('should display photo, default bio, and interest placeholder when ' +
     'logged in',
   async function() {
-    await users.login(TEST_EMAIL, true);
+    await users.login(TEST_EMAIL);
     await profilePage.get(TEST_USERNAME);
     await profilePage.expectCurrUserToHaveProfilePhoto();
     await profilePage.expectUserToHaveBio(DEFAULT_BIO);

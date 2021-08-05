@@ -48,7 +48,7 @@ describe('Subscriptions functionality', function() {
     // Create a learner who subscribes to both the creators.
     await users.createUser(
       'learner1@subscriptions.com', 'learner1subscriptions');
-    await users.login('learner1@subscriptions.com', true);
+    await users.login('learner1@subscriptions.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
       'creator1Idsubscriptions');
     await subscriptionDashboardPage.navigateToSubscriptionButton();

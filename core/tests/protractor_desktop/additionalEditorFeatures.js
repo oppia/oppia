@@ -252,7 +252,7 @@ describe('Full exploration editor', function() {
         'user6@editorAndPlayer.com', 'user6EditorAndPlayer');
       await users.createUser(
         'user7@editorAndPlayer.com', 'user7EditorAndPlayer');
-      await users.login('user6@editorAndPlayer.com', true);
+      await users.login('user6@editorAndPlayer.com');
 
       await workflow.createExploration(true);
 

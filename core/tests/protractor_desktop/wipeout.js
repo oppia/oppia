@@ -110,7 +110,7 @@ describe('When account is deleted it', function() {
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
-    await users.login('user@check.com', true);
+    await users.login('user@check.com');
     await general.openEditor(explorationId, true);
     await workflow.isExplorationCommunityOwned();
     await users.logout();
