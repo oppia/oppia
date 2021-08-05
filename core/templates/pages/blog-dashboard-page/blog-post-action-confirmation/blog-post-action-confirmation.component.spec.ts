@@ -63,6 +63,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should close the modal when confirmed', () => {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+
     component.confirm(1);
 
     expect(closeSpy).toHaveBeenCalled();
@@ -70,6 +71,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should close the modal when dismissed', () => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+
     component.cancel(1);
 
     expect(dismissSpy).toHaveBeenCalled();
@@ -77,6 +79,7 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should initialize with correct action', () => {
     blogDashboardPageService.blogPostAction = 'delete';
+
     component.ngOnInit();
 
     expect(component.blogPostAction).toBe('delete');
@@ -84,16 +87,19 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should return correct boolean value if action is delete', () => {
     component.blogPostAction = 'delete';
+
     component.isActionDelete();
 
     expect(component.isActionDelete()).toBe(true);
 
     component.blogPostAction = 'publish';
+
     component.isActionDelete();
 
     expect(component.isActionDelete()).toBe(false);
 
     component.blogPostAction = 'unpublish';
+
     component.isActionDelete();
 
     expect(component.isActionDelete()).toBe(false);
@@ -101,16 +107,19 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should return correct boolean value if action is publish', () => {
     component.blogPostAction = 'publish';
+
     component.isActionPublish();
 
     expect(component.isActionPublish()).toBe(true);
 
     component.blogPostAction = 'delete';
+
     component.isActionPublish();
 
     expect(component.isActionPublish()).toBe(false);
 
     component.blogPostAction = 'unpublish';
+
     component.isActionPublish();
 
     expect(component.isActionPublish()).toBe(false);
@@ -118,16 +127,19 @@ describe('Blog Post Action Confirmation Modal Component', () => {
 
   it('should return correct boolean value if action is unpublish', () => {
     component.blogPostAction = 'unpublish';
+
     component.isActionUnpublish();
 
     expect(component.isActionUnpublish()).toBe(true);
 
     component.blogPostAction = 'delete';
+
     component.isActionUnpublish();
 
     expect(component.isActionUnpublish()).toBe(false);
 
     component.blogPostAction = 'publish';
+
     component.isActionUnpublish();
 
     expect(component.isActionUnpublish()).toBe(false);

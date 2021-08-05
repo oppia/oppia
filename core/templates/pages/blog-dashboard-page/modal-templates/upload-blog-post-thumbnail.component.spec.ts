@@ -80,7 +80,9 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     fixture.detectChanges();
     componentInstance.croppableImageRef = (
       new ElementRef(document.createElement('img')));
+
     componentInstance.initializeCropper();
+
     expect(componentInstance.cropper).toBeDefined();
   });
 
@@ -90,12 +92,15 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     fixture.detectChanges();
     componentInstance.croppableImageRef = (
       new ElementRef(document.createElement('img')));
+
     componentInstance.initializeCropper();
+
     expect(componentInstance.cropper).toBeDefined();
   });
 
   it('should reset', () => {
     componentInstance.reset();
+
     expect(componentInstance.uploadedImage).toBeNull();
     expect(componentInstance.cropppedImageDataUrl).toEqual('');
   });
@@ -107,13 +112,19 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     const arrayBuffer = Uint8Array.from(
       window.atob(dataBase64Mock), c => c.charCodeAt(0));
     let file = new File([arrayBuffer], 'filename.mp3');
+
     componentInstance.onFileChanged(file);
+
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+
+    fixture.detectChanges();
   });
 
   it('should handle invalid image', () => {
     spyOn(componentInstance, 'reset');
+
     componentInstance.onInvalidImageLoaded();
+
     expect(componentInstance.reset).toHaveBeenCalled();
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
   });
@@ -127,21 +138,21 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
         };
       }
     };
+
     componentInstance.save();
+
     expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);
   });
 
   it('should initialize', () => {
     const windowResizeSpy = spyOn(
       windowDimensionsService, 'getResizeEvent').and.callThrough();
-    spyOn(windowDimensionsService, 'isWindowNarrow');
 
     componentInstance.ngOnInit();
+    expect(componentInstance.windowIsNarrow).toBe(true);
     fixture.detectChanges();
 
     expect(windowResizeSpy).toHaveBeenCalled();
-    expect(windowDimensionsService.isWindowNarrow).toHaveBeenCalled();
-    expect(componentInstance.windowIsNarrow).toBe(true);
   });
 
   it('should cancel', () => {
@@ -150,7 +161,7 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
     componentInstance.cancel();
 
-    expect(componentInstance.uploadedImage).toEqual(false);
+    expect(componentInstance.uploadedImage).toBe(false);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();
   });
 });

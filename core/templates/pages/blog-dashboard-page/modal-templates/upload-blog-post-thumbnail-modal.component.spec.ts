@@ -59,11 +59,13 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
   it('should dismiss the modal on calling cancel function', () => {
     component.cancel();
+
     expect(dismissSpy).toHaveBeenCalled();
   });
 
   it('should close the modal on calling save function', () => {
     component.save('sample-url');
+
     expect(confirmSpy).toHaveBeenCalledWith('sample-url');
   });
 });

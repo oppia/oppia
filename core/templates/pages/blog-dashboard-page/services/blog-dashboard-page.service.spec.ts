@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Blog Dashboard Page service.
+ * @fileoverview Unit Tests for Blog Dashboard Page service.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
