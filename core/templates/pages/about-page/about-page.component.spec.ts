@@ -25,34 +25,43 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      href: '',
+    },
+  };
+}
 
 describe('About Page', () => {
+  let windowRef: MockWindowRef;
+  let component: AboutPageComponent;
   const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
+
   beforeEach(async() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [AboutPageComponent,
-        MockTranslatePipe],
+      declarations: [
+        AboutPageComponent,
+        MockTranslatePipe
+      ],
       providers: [
-        { provide: SiteAnalyticsService, useValue: siteAnalyticsService },
+        {
+          provide: SiteAnalyticsService,
+          useValue: siteAnalyticsService
+        },
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              }
-            }
-          }
-        }
+          useValue: windowRef
+        },
       ]
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     component = aboutPageComponent.componentInstance;
   });
   beforeEach(angular.mock.module('oppia'));
-  let component: AboutPageComponent;
 
   it('should successfully instantiate the component',
     () => {
@@ -74,11 +83,7 @@ describe('About Page', () => {
 
     expect(siteAnalyticsService.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
-    // The bracket notation has been used as an escape hatch to
-    // access the private property 'windowRef'.
-    // see https://www.typescriptlang.org/play#example/private-class-fields
-    // eslint-disable-next-line dot-notation
-    expect(component['windowRef'].nativeWindow.location.href).toBe(
+    expect(windowRef.nativeWindow.location.href).toBe(
       '/creator-dashboard?mode=create');
   });
 
@@ -91,11 +96,7 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
         .toHaveBeenCalledWith();
-      // The bracket notation has been used as an escape hatch to
-      // access the private property 'windowRef'.
-      // see https://www.typescriptlang.org/play#example/private-class-fields
-      // eslint-disable-next-line dot-notation
-      expect(component['windowRef'].nativeWindow.location.href).toBe(
+      expect(windowRef.nativeWindow.location.href).toBe(
         '/learn/math');
     });
 
@@ -109,11 +110,7 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
         .toHaveBeenCalledWith();
-      // The bracket notation has been used as an escape hatch to
-      // access the private property 'windowRef'.
-      // see https://www.typescriptlang.org/play#example/private-class-fields
-      // eslint-disable-next-line dot-notation
-      expect(component['windowRef'].nativeWindow.location.href)
+      expect(windowRef.nativeWindow.location.href)
         .toBe('/community-library');
     });
 });
