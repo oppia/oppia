@@ -21,9 +21,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 interface SanitizedUrlSchema {
   type: string;
-  validators: [{
-    id: string;
-  },
+  validators: [
+    {
+      id: string;
+    },
     {
       id: string;
       regexPattern: string;
@@ -65,7 +66,7 @@ export class SanitizedUrlEditorComponent {
     }
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   getSchema(): SanitizedUrlSchema {
     return this.schema;
