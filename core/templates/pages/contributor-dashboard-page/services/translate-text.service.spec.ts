@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateAndContent, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 
-fdescribe('TranslateTextService', () => {
+describe('TranslateTextService', () => {
   let translateTextService: TranslateTextService;
   let stateContent: StateAndContent;
   let httpTestingController;
