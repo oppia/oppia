@@ -130,7 +130,7 @@ RERUN_POLICIES = {
     'explorationimprovementstab': RERUN_POLICY_ALWAYS,
     'explorationstatisticstab': RERUN_POLICY_KNOWN_FLAKES,
     'explorationtranslationtab': RERUN_POLICY_KNOWN_FLAKES,
-    'extensions': RERUN_POLICY_ALWAYS,
+    'extensions': RERUN_POLICY_NEVER,
     'featuregating': RERUN_POLICY_ALWAYS,
     'fileuploadextensions': RERUN_POLICY_NEVER,
     'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
