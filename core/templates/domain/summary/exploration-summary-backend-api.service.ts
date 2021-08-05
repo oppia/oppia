@@ -85,8 +85,7 @@ export class ExplorationSummaryBackendApiService {
           include_private_explorations: JSON.stringify(
             includePrivateExplorations)
         }
-      }
-    ).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
+      }).toPromise().then((summaries: ExplorationSummaryBackendDict) => {
       if (summaries === null) {
         const summariesError = (
           'Summaries fetched are null for explorationIds: ' + explorationIds
