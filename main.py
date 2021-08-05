@@ -940,6 +940,7 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
             get_redirect_route(
                 r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
+# 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
