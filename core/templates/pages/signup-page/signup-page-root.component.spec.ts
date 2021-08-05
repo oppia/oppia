@@ -60,6 +60,6 @@ describe('Signup Page Root', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     component.ngOnInit();
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP);
   });
 });
