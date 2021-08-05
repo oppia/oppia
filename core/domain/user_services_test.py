@@ -416,7 +416,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        logging_swap = self.swap(logging, 'info', _mock_logging_function)
+        send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        with logging_swap, send_mail_swap:
             user_services.update_email_preferences(
                 user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -433,9 +435,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """Mocks bulk_email_services.add_or_update_user_status()."""
             return False
 
-        with self.swap(
+        send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        bulk_email_swap = self.swap(
             bulk_email_services, 'add_or_update_user_status',
-            _mock_add_or_update_user_status):
+            _mock_add_or_update_user_status)
+        with send_mail_swap, bulk_email_swap:
             bulk_email_signup_message_should_be_shown = (
                 user_services.update_email_preferences(
                     user_id, True, feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
