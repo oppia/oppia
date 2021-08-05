@@ -29,8 +29,20 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
   templateUrl: './on-screen-keyboard.component.html'
 })
 export class OnScreenKeyboardComponent {
-  engine;
-  guppyInstance;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  engine!: {
+    'insert_string': (arg0: string) => void;
+    'insert_symbol': (arg0: string) => void;
+    backspace: () => void;
+    left: () => void;
+    right: () => void;
+    end: () => void;
+  };
+  guppyInstance!: Guppy;
+  interactionType!: string;
+  customLetters!: string[];
   functionsTab: string = constants.OSK_FUNCTIONS_TAB;
   lettersTab: string = constants.OSK_LETTERS_TAB;
   mainTab: string = constants.OSK_MAIN_TAB;
@@ -42,8 +54,6 @@ export class OnScreenKeyboardComponent {
   functions: string[] = [
     'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
     'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
-  interactionType: string;
-  customLetters: string[];
 
   constructor(
     private deviceInfoService: DeviceInfoService,

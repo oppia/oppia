@@ -117,6 +117,7 @@ describe('NoninteractiveImage', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
 
     component.ngOnInit();
     tick();
