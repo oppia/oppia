@@ -62,6 +62,7 @@ describe('Translate Custom Parser', () => {
   });
 
   it ('should handle cases when params is not defined', () => {
+    expect(translateCustomParser.interpolate('<[ KEY ]>')).toEqual('<[ KEY ]>');
     expect(translateCustomParser.interpolate('<[ KEY ]>', {}))
       .toEqual('<[ KEY ]>');
   });
