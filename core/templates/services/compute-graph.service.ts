@@ -43,8 +43,8 @@ interface GraphData {
 })
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
-    let nodes = {};
-    let links = [];
+    let nodes: { [x: string]: string; } = {};
+    let links: { source: string; target: string; }[] = [];
     let finalStateIds = states.getFinalStateNames();
 
     states.getStateNames().forEach(function(stateName) {
@@ -79,14 +79,16 @@ export class ComputeGraphService {
   _computeBfsTraversalOfStates(
       initStateId: string, states: States, sourceStateName: string): string[] {
     let stateGraph = this._computeGraphData(initStateId, states);
-    let stateNamesInBfsOrder = [];
-    let queue = [];
-    let seen = {};
+    let stateNamesInBfsOrder: string[] = [];
+    let queue: string[] = [];
+    let seen: { [x: string]: boolean } = {};
     seen[sourceStateName] = true;
     queue.push(sourceStateName);
     while (queue.length > 0) {
       let currStateName = queue.shift();
-      stateNamesInBfsOrder.push(currStateName);
+      if (currStateName) {
+        stateNamesInBfsOrder.push(currStateName);
+      }
       for (let e = 0; e < stateGraph.links.length; e++) {
         let edge = stateGraph.links[e];
         let dest = edge.target;

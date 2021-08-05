@@ -127,7 +127,7 @@ describe('State Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
-      linked_skill_id: null,
+      linked_skill_id: '',
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -173,7 +173,9 @@ describe('State Object Factory', () => {
   it('should create a default state object', () => {
     const stateName = 'Default state';
     const stateObjectDefault = sof.createDefaultState(stateName);
-    stateObject.interaction.default_outcome.dest = stateName;
+    if (stateObject.interaction.default_outcome) {
+      stateObject.interaction.default_outcome.dest = stateName;
+    }
 
     expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);
   });
@@ -199,7 +201,7 @@ describe('State Object Factory', () => {
 
   it('should correctly get required written translation content ids', () => {
     const state = sof.createFromBackendDict('State name', stateObject);
-    state.interaction.id = null;
+    state.interaction.id = '';
     expect(
       state.getRequiredWrittenTranslationContentIds()
     ).toEqual(new Set(['content', 'rule_input_2']));

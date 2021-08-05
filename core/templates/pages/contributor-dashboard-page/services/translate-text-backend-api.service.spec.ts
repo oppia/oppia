@@ -21,12 +21,13 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { TranslatableTexts } from 'domain/opportunity/translatable-texts.model';
+import { ImagesData } from 'services/image-local-storage.service';
 import { TranslateTextBackendApiService } from './translate-text-backend-api.service';
 
 describe('TranslateTextBackendApiService', () => {
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let httpTestingController: HttpTestingController;
-  const getTranslatableItem = (text) => {
+  const getTranslatableItem = (text: string) => {
     return {
       data_format: 'html',
       content: text,
@@ -47,7 +48,9 @@ describe('TranslateTextBackendApiService', () => {
   });
 
   describe('getTranslatableTextsAsync', () => {
-    let successHandler, failHandler;
+    let successHandler: jasmine.Spy<jasmine.Func>;
+    let failHandler: (error: HttpErrorResponse) => void;
+
     it('should correctly request translatable texts for a given exploration ' +
     'id and language code', fakeAsync(() => {
       successHandler = jasmine.createSpy('success');
@@ -92,13 +95,15 @@ describe('TranslateTextBackendApiService', () => {
   });
 
   describe('suggestTranslatedTextAsync', () => {
-    let successHandler, failHandler, imagesData;
+    let successHandler: jasmine.Spy<jasmine.Func>;
+    let failHandler: (error: HttpErrorResponse) => void;
+    let imagesData: ImagesData[];
     beforeEach(() => {
       successHandler = jasmine.createSpy('success');
       failHandler = jasmine.createSpy('error');
       imagesData = [{
         filename: 'imageFilename',
-        imageBlob: 'imageBlob'
+        imageBlob: 'imageBlob' as unknown as Blob
       }];
     });
 
@@ -164,16 +169,16 @@ describe('TranslateTextBackendApiService', () => {
     it('should handle multiple image blobs per filename', fakeAsync(() => {
       imagesData = [{
         filename: 'imageFilename1',
-        imageBlob: 'imageBlob1'
+        imageBlob: 'imageBlob1' as unknown as Blob
       }, {
         filename: 'imageFilename1',
-        imageBlob: 'imageBlob2'
+        imageBlob: 'imageBlob2' as unknown as Blob
       }, {
         filename: 'imageFilename2',
-        imageBlob: 'imageBlob1'
+        imageBlob: 'imageBlob1' as unknown as Blob
       }, {
         filename: 'imageFilename2',
-        imageBlob: 'imageBlob2'
+        imageBlob: 'imageBlob2' as unknown as Blob
       }];
       translateTextBackendApiService.suggestTranslatedTextAsync(
         'activeExpId',
