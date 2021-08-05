@@ -22,6 +22,13 @@ from __future__ import unicode_literals
 from core.platform import models
 import feconf
 
+from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import (
+        base_models, datastore_services, user_models)
+
 base_models, user_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
@@ -49,6 +56,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id, gae_id,
         firebase_auth_id, and parent_user_id fields.
         """
@@ -56,6 +64,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Currently, the model holds authentication details relevant only for
         backend. Currently the only relevant user data is the username of the
         parent.
@@ -64,6 +73,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_field_names_for_takeout():
+        # type: () -> Dict[Text, Text]
         """We do not want to export the internal user id for the parent, so we
         export the username instead.
         """
@@ -73,6 +83,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in the
@@ -86,6 +97,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def export_data(cls, user_id):
+        # type: (Text) -> Dict[Text, Text]
         """Exports the username of the parent."""
         user_auth_model = cls.get(user_id, strict=False)
         if user_auth_model and user_auth_model.parent_user_id:
@@ -98,6 +110,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserAuthDetailsModel for the user.
 
         Args:
@@ -107,6 +120,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserAuthDetailsModel exists for the given user.
 
         Args:
@@ -119,6 +133,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_by_auth_id(cls, provider_id, auth_id):
+        # type: (Text, Text) -> Optional[UserAuthDetailsModel]
         """Fetch a user entry by auth_id of a particular auth service.
 
         Args:
@@ -133,10 +148,13 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
 
         if provider_id == feconf.GAE_AUTH_PROVIDER_ID:
-            return cls.query(cls.gae_id == auth_id).get()
+            model = cls.query(cls.gae_id == auth_id).get()
         elif provider_id == feconf.FIREBASE_AUTH_PROVIDER_ID:
-            return cls.query(cls.firebase_auth_id == auth_id).get()
-        return None
+            model = cls.query(cls.firebase_auth_id == auth_id).get()
+        else:
+            return None
+
+        return cast(Optional[UserAuthDetailsModel], model)
 
 
 class UserIdentifiersModel(base_models.BaseModel):
@@ -149,6 +167,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data to delete corresponding to a user: id, and
         user_id fields.
         """
@@ -156,6 +175,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Currently, the model holds identifiers relevant only for backend that
         should not be exported.
         """
@@ -163,6 +183,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in the
@@ -174,16 +195,20 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserIdentifiersModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(
+            cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserIdentifiersModel exists for the given user.
 
         Args:
@@ -196,6 +221,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @classmethod
     def get_by_gae_id(cls, gae_id):
+        # type: (Text) -> Optional[UserIdentifiersModel]
         """Fetch an entry by GAE ID.
 
         Args:
@@ -209,6 +235,7 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user_id(cls, user_id):
+        # type: (Text) -> Optional[UserIdentifiersModel]
         """Fetch an entry by user ID.
 
         Args:
@@ -218,7 +245,8 @@ class UserIdentifiersModel(base_models.BaseModel):
             UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
-        return cls.query(cls.user_id == user_id).get()
+        model = cls.query(cls.user_id == user_id).get()
+        return cast(Optional[UserIdentifiersModel], model)
 
 
 class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
@@ -231,11 +259,13 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model has data to delete corresponding to users: id and user_id."""
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Currently, the model holds IDs relevant only for backend that should
         not be exported.
         """
@@ -243,6 +273,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
         backend, and no exportable user data. It may contain user data in the
@@ -254,16 +285,20 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        # type: (Text) -> None
         """Delete instances of UserIdByFirebaseAuthIdModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
+        keys = cls.query(
+            cls.user_id == user_id).fetch(keys_only=True)
         datastore_services.delete_multi(
-            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+            cast(List[datastore_services.Key], keys))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether UserIdByFirebaseAuthIdModel exists for given user.
 
         Args:
@@ -277,6 +312,7 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_user_id(cls, user_id):
+        # type: (Text) -> Optional[UserIdByFirebaseAuthIdModel]
         """Fetch an entry by user ID.
 
         Args:
@@ -286,7 +322,8 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
             UserIdByFirebaseAuthIdModel. The model with user_id field equal
             to user_id argument.
         """
-        return cls.query(cls.user_id == user_id).get()
+        model = cls.query(cls.user_id == user_id).get()
+        return cast(Optional[UserIdByFirebaseAuthIdModel], model)
 
 
 class FirebaseSeedModel(base_models.BaseModel):
@@ -294,15 +331,18 @@ class FirebaseSeedModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model should never be erased."""
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Model does not correspond to any users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
+        # type: (Text) -> bool
         """Model does not correspond to any users."""
         return False

@@ -24,8 +24,11 @@ import main
 
 import webapp2
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import transaction_services
 
-transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
+transaction_services = models.Registry.import_transaction_services()
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [

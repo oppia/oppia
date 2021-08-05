@@ -26,7 +26,11 @@ from jobs.types import base_validation_errors
 
 import apache_beam as beam
 
-(base_models, story_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, story_models
+
+(base_models, story_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.story])
 
 

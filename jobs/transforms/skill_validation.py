@@ -27,7 +27,11 @@ from jobs.transforms import base_validation
 
 from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])  # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import skill_models
+
+(skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
 @validation_decorators.AuditsExisting(skill_models.SkillSnapshotMetadataModel)  # type: ignore[no-untyped-call]

@@ -27,7 +27,11 @@ from jobs.transforms import base_validation
 
 from typing import Any, Optional, Type # isort:skip # pylint: disable=unused-import
 
-(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic]) # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import subtopic_models
+
+(subtopic_models,) = models.Registry.import_models([models.NAMES.subtopic])
 
 
 @validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]

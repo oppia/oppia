@@ -23,6 +23,10 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, config_models
+
 (base_models, config_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.config])
 
@@ -30,6 +34,7 @@ import feconf
 class ConfigPropertySnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self):
+        # type: () -> None
         self.assertEqual(
             config_models.ConfigPropertySnapshotContentModel
             .get_deletion_policy(),
@@ -40,32 +45,42 @@ class ConfigPropertyModelUnitTests(test_utils.GenericTestBase):
     """Test ConfigPropertyModel class."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             config_models.ConfigPropertyModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_model(self):
+        # type: () -> None
         config_model = config_models.ConfigPropertyModel(
             value='b')
         self.assertEqual(config_model.value, 'b')
 
     def test_commit(self):
+        # type: () -> None
         config_model1 = config_models.ConfigPropertyModel(
             id='config_model1', value='c')
         config_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model1 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_model1 is not None
+
         self.assertEqual(retrieved_model1.value, 'c')
         retrieved_model1.value = 'd'
         retrieved_model1.commit(feconf.SYSTEM_COMMITTER_ID, [])
         retrieved_model2 = config_models.ConfigPropertyModel.get_version(
             'config_model1', 2)
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_model2 is not None
+
         self.assertEqual(retrieved_model2.value, 'd')
 
 
 class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self):
+        # type: () -> None
         self.assertEqual(
             config_models.PlatformParameterSnapshotContentModel
             .get_deletion_policy(),
@@ -76,11 +91,13 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     """Test PlatformParameterModel class."""
 
     def test_get_deletion_policy_is_not_applicable(self):
+        # type: () -> None
         self.assertEqual(
             config_models.PlatformParameterModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_model(self):
+        # type: () -> None
         param_model = config_models.PlatformParameterModel.create(
             param_name='parameter_name',
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
@@ -96,6 +113,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             [{'filters': [], 'value_when_matched': False}])
 
     def test_commit(self):
+        # type: () -> None
         parameter_name = 'parameter_name'
         rule_dicts = [{'filters': [], 'value_when_matched': False}]
 
@@ -110,6 +128,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
             parameter_name, 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_model1 is not None
+
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
         new_rules = [
@@ -127,10 +148,13 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model2 = config_models.PlatformParameterModel.get_version(
             parameter_name, 2)
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_model2 is not None
 
         self.assertEqual(retrieved_model2.rules, new_rules)
 
     def test_commit_is_persistent_in_storage(self):
+        # type: () -> None
         parameter_name = 'parameter_name'
         rule_dicts = [{'filters': [], 'value_when_matched': False}]
 
@@ -145,9 +169,12 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
             parameter_name, 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.rules, rule_dicts)
 
     def test_commit_with_updated_rules(self):
+        # type: () -> None
         parameter_name = 'parameter_name'
         rule_dicts = [{'filters': [], 'value_when_matched': False}]
 
@@ -173,5 +200,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model = config_models.PlatformParameterModel.get_version(
             parameter_name, 2)
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_model is not None
 
         self.assertEqual(retrieved_model.rules, new_rules)
