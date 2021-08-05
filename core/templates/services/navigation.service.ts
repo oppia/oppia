@@ -32,15 +32,17 @@ interface KeyboardEventToCodes {
     keyCode: number;
   };
   tab: {
-    shiftKeyIsPressed: boolean; keyCode: number; }
-    shiftTab: {
+    shiftKeyIsPressed: boolean;
+    keyCode: number;
+  };
+  shiftTab: {
     shiftKeyIsPressed: boolean;
     keyCode: number;
   };
 }
 
 export interface EventToCodes {
- [keys: string]: string;
+  [keys: string]: string;
   enter: string,
   tab: string,
   shiftTab: string,
@@ -50,7 +52,9 @@ export interface EventToCodes {
   providedIn: 'root'
 })
 export class NavigationService {
-  constructor() {}
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeMenuName!: string;
   ACTION_OPEN: string = 'open';
   ACTION_CLOSE: string = 'close';
@@ -68,6 +72,8 @@ export class NavigationService {
       keyCode: 9
     }
   };
+
+  constructor() {}
 
   /**
   * Opens the submenu.

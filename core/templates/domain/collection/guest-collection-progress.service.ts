@@ -28,10 +28,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { Collection } from
-  'domain/collection/collection.model';
-import { GuestCollectionProgress } from
-  'domain/collection/guest-collection-progress.model';
+import { Collection } from 'domain/collection/collection.model';
+import { GuestCollectionProgress } from 'domain/collection/guest-collection-progress.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
@@ -82,7 +80,8 @@ export class GuestCollectionProgressService {
   }
 
   // This method corresponds to collection_domain.get_next_exploration_id.
-  // A null value will be returned if no explorationIds exist.
+  // A null value will be returned if no explorationIds exist or all
+  // explorations are completed.
   _getNextExplorationId(
       collection: Collection, completedIds: string[]): string | null {
     var explorationIds = collection.getExplorationIds();

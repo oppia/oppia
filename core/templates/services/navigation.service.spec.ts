@@ -64,7 +64,7 @@ describe('Navigation Service', () => {
       shiftKey: false
     } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
-      enter: 'open',
+      enter: 'open'
     } as EventToCodes;
 
     let openSubmenuSpy = spyOn(navigationService, 'openSubmenu')

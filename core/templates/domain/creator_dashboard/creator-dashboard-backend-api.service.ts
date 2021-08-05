@@ -74,8 +74,7 @@ interface CreatorDashboardDataBackendDict {
 
 interface CreatorDashboardData {
   dashboardStats: CreatorDashboardStats;
-  // 'lastWeekStats' is null if 'get_last_week_dashboard_stats()' returns
-  // more than one key-value pair in the backend.
+  // 'lastWeekStats' is null for a new creater.
   lastWeekStats: CreatorDashboardStats | null;
   displayPreference: 'card' | 'list';
   subscribersList: ProfileSummary[];
