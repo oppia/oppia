@@ -125,7 +125,7 @@ export class ContentTranslationManagerService {
       languageCode: string,
       content: SubtitledHtml|SubtitledUnicode
   ): void {
-    const writtenTranslation = (
+    const writtenTranslation: WrittenTranslation | null = (
       content.contentId ? writtenTranslations.translationsMapping[
         content.contentId][languageCode] : null);
 
@@ -138,9 +138,9 @@ export class ContentTranslationManagerService {
     let valueName = '';
     // Note: The content can only be of type SubtitledHtml|SubtitledUnicode.
     if (content instanceof SubtitledHtml) {
-      valueName = 'html';
+      valueName = '_html';
     } else if (content instanceof SubtitledUnicode) {
-      valueName = 'unicode';
+      valueName = '_unicode';
     }
 
     Object.defineProperty(content, valueName, {
