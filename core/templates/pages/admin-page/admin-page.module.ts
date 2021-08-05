@@ -43,6 +43,7 @@ import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { ToastrModule } from 'ngx-toastr';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 const toastrConfig = {
@@ -118,8 +119,6 @@ class AdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
