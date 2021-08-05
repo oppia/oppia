@@ -30,11 +30,14 @@ class MockWindowRef {
   };
 }
 
-fdescribe('Can access splash page guard', () => {
+class MockRouterModule {
+  navigate(fragments: string[]): void {}
+}
+
+describe('Can access splash page guard', () => {
   let caspg: CanAccessSplashPageGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let windowRef: MockWindowRef;
-  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,7 +49,7 @@ fdescribe('Can access splash page guard', () => {
         AccessValidationBackendApiService,
         {
           provide: Router,
-          useClass: MockouterModule
+          useClass: MockRouterModule
         }
       ]
     }).compileComponents();
@@ -55,7 +58,7 @@ fdescribe('Can access splash page guard', () => {
   });
 
   it('should redirect user to default dashboard', fakeAsync(() => {
-    let defaultDashboard =
+    let defaultDashboard = 'learner';
     spyOn(accessValidationBackendApiService, 'validateAccessToSplashPage')
       .and.returnValue(Promise.resolve({
         valid: false,
