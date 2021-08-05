@@ -132,40 +132,40 @@ export class TranslateTextService {
     this.activeExpId = expId;
     this.translateTextBackedApiService.getTranslatableTextsAsync(
       expId, languageCode).then((translatableTexts: TranslatableTexts) => {
-        this.stateWiseContents = translatableTexts.stateWiseContents;
-        this.activeExpVersion = translatableTexts.explorationVersion;
-        for (const stateName in this.stateWiseContents) {
-          let stateHasText: boolean = false;
-          const contentIds = [];
-          const contentIdToContentMapping = this.stateWiseContents[stateName];
-          for (const contentId in contentIdToContentMapping) {
-            const translatableItem = contentIdToContentMapping[contentId];
-            if (translatableItem.content === '') {
-              continue;
-            }
-            contentIds.push(contentId);
-            this.stateAndContent.push(
-              new StateAndContent(
-                stateName, contentId,
-                translatableItem.content,
-                this.PENDING as Status,
-                this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
-                translatableItem.dataFormat,
-                translatableItem.contentType,
-                translatableItem.interactionId,
-                translatableItem.ruleType
-              )
-            );
-            stateHasText = true;
+      this.stateWiseContents = translatableTexts.stateWiseContents;
+      this.activeExpVersion = translatableTexts.explorationVersion;
+      for (const stateName in this.stateWiseContents) {
+        let stateHasText: boolean = false;
+        const contentIds = [];
+        const contentIdToContentMapping = this.stateWiseContents[stateName];
+        for (const contentId in contentIdToContentMapping) {
+          const translatableItem = contentIdToContentMapping[contentId];
+          if (translatableItem.content === '') {
+            continue;
           }
-
-          if (stateHasText) {
-            this.stateNamesList.push(stateName);
-            this.stateWiseContentIds[stateName] = contentIds;
-          }
+          contentIds.push(contentId);
+          this.stateAndContent.push(
+            new StateAndContent(
+              stateName, contentId,
+              translatableItem.content,
+              this.PENDING as Status,
+              this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
+              translatableItem.dataFormat,
+              translatableItem.contentType,
+              translatableItem.interactionId,
+              translatableItem.ruleType
+            )
+          );
+          stateHasText = true;
         }
-        successCallback();
-      });
+
+        if (stateHasText) {
+          this.stateNamesList.push(stateName);
+          this.stateWiseContentIds[stateName] = contentIds;
+        }
+      }
+      successCallback();
+    });
   }
 
   getActiveIndex(): number {
@@ -231,9 +231,9 @@ export class TranslateTextService {
   }
 
   suggestTranslatedText(
-    translation: string | string[], languageCode: string, imagesData:
+      translation: string | string[], languageCode: string, imagesData:
       ImagesData[], dataFormat: string, successCallback: () => void,
-    errorCallback: () => void): void {
+      errorCallback: () => void): void {
     this.translateTextBackedApiService.suggestTranslatedTextAsync(
       this.activeExpId,
       this.activeExpVersion,

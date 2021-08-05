@@ -2358,9 +2358,9 @@ class TranslatableItem(python_utils.OBJECT):
         Args:
             content: str|list(str). The translatable content text.
             data_format: str. The data format of the translatable content.
-            content_type. str. One of `Content`, `Interaction`, ‘Rule`,
+            content_type: str. One of `Content`, `Interaction`, ‘Rule`,
                 `Feedback`, `Hint`, `Solution`.
-            interaction_id. str|None. Interaction ID, e.g. `TextInput`, if the
+            interaction_id: str|None. Interaction ID, e.g. `TextInput`, if the
                 content corresponds to an InteractionInstance, else None.
             rule_type: str|None. Rule type if content_type == `Rule`, e.g.
                 “Equals”, “IsSubsetOf”, “Contains” else None.
@@ -3164,7 +3164,7 @@ class State(python_utils.OBJECT):
                             self.interaction.id
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
                     if not issubclass(
-                        param_type, objects.BaseTranslatableObject):
+                            param_type, objects.BaseTranslatableObject):
                         continue
                     if 'normalizedStrSet' in input_value:
                         content_id_to_translatable_item[

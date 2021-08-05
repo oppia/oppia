@@ -280,14 +280,14 @@ export class TranslationModalComponent {
 
   isSetOfStringDataFormat(): boolean {
     return (
-      this.activeDataFormat === TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
-      ||
+      this.activeDataFormat ===
+        TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING ||
       this.activeDataFormat === TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
     );
   }
 
   getFormattedContentType(
-    contentType: string, interactionId: string): string {
+      contentType: string, interactionId: string): string {
     if (contentType === 'interaction') {
       return interactionId + ' interaction';
     } else if (contentType === 'rule') {
@@ -300,12 +300,12 @@ export class TranslationModalComponent {
     if (!ruleType || !interactionId) {
       return '';
     }
-    // To match, e.g. "{{x|TranslatableSetOfNormalizedString}},".\
-    const description_type_pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    const rule_description = INTERACTION_SPECS[
-      interactionId].rule_descriptions[ruleType];
-    return 'Answer ' + rule_description.replace(
-      description_type_pattern, 'the following choices:');
+    // To match, e.g. "{{x|TranslatableSetOfNormalizedString}},".
+    const descriptionPattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    const ruleDescription = INTERACTION_SPECS[
+      interactionId].rule_descriptions[rule];
+    return 'Answer ' + ruleDescription.replace(
+      descriptionPattern, 'the following choices:');
   }
 
   getElementAttributeTexts(

@@ -146,8 +146,7 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.change.data_format ===
             'set_of_normalized_string' ||
           $scope.activeSuggestion.change.data_format ===
-            'set_of_unicode_string'
-          ? true : false
+            'set_of_unicode_string' ? true : false
         );
         // The 'html' value is passed as an object as it is required for
         // schema-based-editor.

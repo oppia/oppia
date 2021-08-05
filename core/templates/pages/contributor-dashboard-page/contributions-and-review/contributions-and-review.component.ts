@@ -159,11 +159,11 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var getTranslationSuggestionHeading = function(suggestion) {
-        const change_translation = suggestion.change.translation_html;
-        if (Array.isArray(change_translation)) {
-          return $filter('formatRtePreview')(change_translation.join(', '));
+        const changeTranslation = suggestion.change.translation_html;
+        if (Array.isArray(changeTranslation)) {
+          return $filter('formatRtePreview')(changeTranslation.join(', '));
         }
-        return $filter('formatRtePreview')(change_translation);
+        return $filter('formatRtePreview')(changeTranslation);
       };
 
       var resolveSuggestionSuccess = function(suggestionId) {

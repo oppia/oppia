@@ -654,8 +654,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         # If the translation is for a set of strings, we don't want to process
         # the HTML strings for images.
         if (
-            self.change.data_format == 'set_of_normalized_string' or
-            self.change.data_format == 'set_of_unicode_string'
+                self.change.data_format == 'set_of_normalized_string' or
+                self.change.data_format == 'set_of_unicode_string'
         ):
             exp_services.update_exploration(
                 self.final_reviewer_id, self.target_id, [self.change],
@@ -674,11 +674,11 @@ class SuggestionTranslateContent(BaseSuggestion):
             list(str). The list of html content strings.
         """
         content_strings = []
-        if (isinstance(self.change.translation_html, list)):
+        if isinstance(self.change.translation_html, list):
             content_strings.extend(self.change.translation_html)
         else:
             content_strings.append(self.change.translation_html)
-        if (isinstance(self.change.content_html, list)):
+        if isinstance(self.change.content_html, list):
             content_strings.extend(self.change.content_html)
         else:
             content_strings.append(self.change.content_html)
