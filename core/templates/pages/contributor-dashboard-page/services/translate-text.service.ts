@@ -121,10 +121,11 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-    text: string | string[],
-    more: boolean,
-    status: Status,
-    translation: string): TranslatableItem {
+      text: string | string[],
+      more: boolean,
+      status: Status,
+      translation: string
+    ): TranslatableItem {
     const {
       dataFormat,
       contentType,
