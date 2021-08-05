@@ -332,7 +332,9 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             if self.last_updated is None:
                 self.last_updated = datetime.datetime.utcnow()
 
-            super(base_models.BaseHumanMaintainedModel, self).put()
+            # TODO(#13581): Fix the code so that the pylint: disable below can
+            # be removed.
+            super(base_models.BaseHumanMaintainedModel, self).put() # pylint: disable=bad-super-call
 
         with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
             self.model_instance.put()
