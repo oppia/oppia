@@ -106,7 +106,7 @@ export class NumericInputValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
             'Rule ' + (ruleIndex + 1) + ' input ' +
-            'should be greater than or equal to zero. ')
+            'should be greater than or equal to zero.')
         });
       }
     };
@@ -142,8 +142,8 @@ export class NumericInputValidationService {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' upper bound of the range' +
-                  ' should be greater than or equal to zero. ')
+                  'Rule ' + (j + 1) + ' upper bound of the range ' +
+                  'should be greater than or equal to zero.')
               });
             }
             break;
@@ -177,7 +177,7 @@ export class NumericInputValidationService {
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' Upper bound of the tolerance range ' +
-                  'should be greater than or equal to zero. ')
+                  'should be greater than or equal to zero.')
               });
             }
             break;
