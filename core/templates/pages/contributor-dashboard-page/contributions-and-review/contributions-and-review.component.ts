@@ -144,10 +144,9 @@ angular.module('oppia').component('contributionsAndReview', {
               ' / ' + details.chapter_title);
           }
 
-          var change = suggestion.change;
           var requiredData = {
             id: suggestion.suggestion_id,
-            heading: $filter('formatRtePreview')(change.translation_html),
+            heading: getTranslationSuggestionHeading(suggestion),
             subheading: subheading,
             labelText: SUGGESTION_LABELS[suggestion.status].text,
             labelColor: SUGGESTION_LABELS[suggestion.status].color,
@@ -157,6 +156,14 @@ angular.module('oppia').component('contributionsAndReview', {
           translationContributionsSummaryList.push(requiredData);
         });
         return translationContributionsSummaryList;
+      };
+
+      var getTranslationSuggestionHeading = function(suggestion) {
+        const change_translation = suggestion.change.translation_html;
+        if (Array.isArray(change_translation)) {
+          return $filter('formatRtePreview')(change_translation.join(', '));
+        }
+        return $filter('formatRtePreview')(change_translation);
       };
 
       var resolveSuggestionSuccess = function(suggestionId) {

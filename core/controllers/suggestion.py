@@ -110,6 +110,21 @@ class SuggestionHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
+        suggestion_change = suggestion.change
+        if (
+            suggestion_change.cmd == 'add_written_translation' and
+            (
+                suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_NORMALIZED_STRING or
+                suggestion_change.data_format ==
+                    state_domain.WrittenTranslation
+                    .DATA_FORMAT_SET_OF_UNICODE_STRING
+            )
+        ):
+            self.render_json(self.values)
+            return
+
         # TODO(#10513) : Find a way to save the images before the suggestion is
         # created.
         suggestion_image_context = suggestion.image_context

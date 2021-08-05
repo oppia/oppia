@@ -59,6 +59,12 @@ angular.module('oppia').controller(
       $scope.HTML_SCHEMA = {
         type: 'html'
       };
+      $scope.SET_OF_STRINGS_SCHEMA = {
+        type: 'list',
+        items: {
+          type: 'unicode'
+        }
+      };
       $scope.canEditTranslation = false;
 
       $scope.updateSuggestion = function() {
@@ -136,6 +142,13 @@ angular.module('oppia').controller(
         $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
+        $scope.isSetOfStringsContent = (
+          $scope.activeSuggestion.change.data_format ===
+            'set_of_normalized_string' ||
+          $scope.activeSuggestion.change.data_format ===
+            'set_of_unicode_string'
+          ? true : false
+        );
         // The 'html' value is passed as an object as it is required for
         // schema-based-editor.
         $scope.editedContent = {

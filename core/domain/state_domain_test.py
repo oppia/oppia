@@ -1387,7 +1387,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     {
                         'x': {
                             'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
+                            'normalizedStrSet': ['Input1', 'Input2']
                             }
                     })
             ],
@@ -1471,6 +1471,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             ].content,
             'Placeholder'
         )
+        rule_translatable_item = content_id_mapping_needing_translations[
+            'rule_input_4'
+        ]
+        self.assertEqual(rule_translatable_item.content, ['Input1', 'Input2'])
+        self.assertEqual(rule_translatable_item.interaction_id, 'TextInput')
+        self.assertEqual(rule_translatable_item.rule_type, 'Contains')
 
     def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(self): # pylint: disable=line-too-long
         exploration = exp_domain.Exploration.create_default_exploration('0')
