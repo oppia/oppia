@@ -23,7 +23,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractiveNumericInput } from './oppia-interactive-numeric-input.component';
-import { TranslateModule } from '@ngx-translate/core';
 
 describe('InteractiveNumericInput', () => {
   let component: InteractiveNumericInput;
@@ -52,14 +51,6 @@ describe('InteractiveNumericInput', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveNumericInput],
-      imports: [
-        TranslateModule.forRoot({
-          useDefaultLang: true,
-          isolate: false,
-          extend: false,
-          defaultLanguage: 'en'
-        })
-      ],
       providers: [
         {
           provide: InteractionAttributesExtractorService,

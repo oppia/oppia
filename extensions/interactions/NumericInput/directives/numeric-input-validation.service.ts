@@ -106,7 +106,7 @@ export class NumericInputValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
             'Rule ' + (ruleIndex + 1) + ' input ' +
-            ' should be greater than or equal to zero. ')
+            'should be greater than or equal to zero. ')
         });
       }
     };
@@ -135,12 +135,14 @@ export class NumericInputValidationService {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
-            if (a < 0 &&
-              customizationArgs.inputGreaterThanOrEqualToZero.value) {
+            if (
+              a < 0 &&
+              customizationArgs.inputGreaterThanOrEqualToZero.value
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
-                  'Rule ' + (j + 1) + ' upper bound of the range ' +
+                  'Rule ' + (j + 1) + ' upper bound of the range' +
                   ' should be greater than or equal to zero. ')
               });
             }
@@ -167,13 +169,15 @@ export class NumericInputValidationService {
             var x = (<number>rule.inputs.x);
             var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-            if ((x + tol) < 0 &&
-              customizationArgs.inputGreaterThanOrEqualToZero.value) {
+            if (
+              (x + tol) < 0 &&
+              customizationArgs.inputGreaterThanOrEqualToZero.value
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' Upper bound of the tolerance range ' +
-                  ' should be greater than or equal to zero. ')
+                  'should be greater than or equal to zero. ')
               });
             }
             break;
@@ -232,8 +236,10 @@ export class NumericInputValidationService {
       }
     }
     const stringValueRegExp = stringValue.match(/\d/g);
-    if (customizationArgs &&
-      (stringValueRegExp === null || stringValueRegExp.length > 15)) {
+    if (
+      customizationArgs &&
+      (stringValueRegExp === null || stringValueRegExp.length > 15)
+    ) {
       return 'The answer should be greater than or equal to zero and ' +
       'can contain at most 15 digits (0-9) or symbols(.).';
     } else if (stringValueRegExp === null || stringValueRegExp.length > 15) {

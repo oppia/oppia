@@ -57,8 +57,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
           ctrl.validate = function(localValue, customizationArg) {
             let { checkinputGreaterThanOrEqualToZero } = customizationArg || {};
             let checkInput = checkinputGreaterThanOrEqualToZero;
-            let inputValue;
-            inputValue = checkInput === undefined ? false : checkInput;
+            let inputValue = checkInput === undefined ? false : checkInput;
             return (
               !angular.isUndefined(localValue) &&
               localValue !== null &&
@@ -129,9 +128,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             if (ctrl.localValue === undefined) {
               ctrl.localValue = 0.0;
             }
+            // Check customization arg valur of numeric input interaction.
             let { checkinputGreaterThanOrEqualToZero } = ctrl.uiConfig() || {};
             let custValue = checkinputGreaterThanOrEqualToZero;
             ctrl.customizationVal = custValue === undefined ? false : custValue;
+            // If customization arg of numeric input interaction is true set
+            // Min value as 0 to not let value go below 0.
             ctrl.minValue = checkinputGreaterThanOrEqualToZero && 0;
             // So that focus is applied after all the functions in
             // main thread have executed.
