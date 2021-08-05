@@ -125,7 +125,7 @@ export class TranslateTextService {
       more: boolean,
       status: Status,
       translation: string
-    ): TranslatableItem {
+  ): TranslatableItem {
     const {
       dataFormat,
       contentType,
