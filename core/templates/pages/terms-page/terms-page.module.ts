@@ -16,43 +16,19 @@
  * @fileoverview Module for the terms page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
+import { NgModule } from '@angular/core';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TermsPageComponent } from
   'pages/terms-page/terms-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { TermsPageRootComponent } from './terms-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { TermsPageRoutingModule } from './terms-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    TermsPageRoutingModule
   ],
   declarations: [
     TermsPageComponent,
@@ -61,20 +37,6 @@ const toastrConfig = {
   entryComponents: [
     TermsPageComponent,
     TermsPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [TermsPageRootComponent]
+  ]
 })
 export class TermsPageModule {}

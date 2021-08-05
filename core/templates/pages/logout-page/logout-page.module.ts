@@ -16,41 +16,19 @@
  * @fileoverview Module for the logout page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LogoutPageRootComponent } from './logout-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { LogoutPageRoutingModule } from './logout-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    LogoutPageRoutingModule
   ],
   declarations: [
     LogoutPageComponent,
@@ -59,20 +37,6 @@ const toastrConfig = {
   entryComponents: [
     LogoutPageComponent,
     LogoutPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-  ],
-  bootstrap: [LogoutPageRootComponent]
+  ]
 })
 export class LogoutPageModule {}

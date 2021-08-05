@@ -16,43 +16,18 @@
  * @fileoverview Module for the license page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-
 import { LicensePageComponent } from './license-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LicensePageRootComponent } from './license-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { LicensePageRoutingModule } from './license-page-routing.module';
+import { NgModule } from '@angular/core';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    LicensePageRoutingModule
   ],
   declarations: [
     LicensePageComponent,
@@ -61,20 +36,6 @@ const toastrConfig = {
   entryComponents: [
     LicensePageComponent,
     LicensePageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [LicensePageRootComponent]
+  ]
 })
 export class LicensePageModule {}

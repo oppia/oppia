@@ -16,44 +16,19 @@
  * @fileoverview Module for the partnerships page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
+import { NgModule } from '@angular/core';
 import { PartnershipsPageComponent } from './partnerships-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { PartnershipsPageRootComponent } from
   './partnerships-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { PartnershipsPageRoutingModule } from './partnerships-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    PartnershipsPageRoutingModule
   ],
   declarations: [
     PartnershipsPageComponent,
@@ -62,20 +37,6 @@ const toastrConfig = {
   entryComponents: [
     PartnershipsPageComponent,
     PartnershipsPageRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [PartnershipsPageRootComponent]
+  ]
 })
 export class PartnershipsPageModule {}

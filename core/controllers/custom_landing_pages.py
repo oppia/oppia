@@ -59,18 +59,3 @@ class TopicLandingRedirectPage(base.BaseHandler):
             topic: str. Topic of page to be redirected to.
         """
         self.redirect('/math/%s' % topic)
-
-
-class TopicLandingPage(base.BaseHandler):
-    """Page showing the topic landing page."""
-
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-
-        self.render_template('topic-landing-page.mainpage.html')

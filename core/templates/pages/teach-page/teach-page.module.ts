@@ -16,43 +16,18 @@
  * @fileoverview Module for the teach page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-
+import { NgModule } from '@angular/core';
 import { TeachPageComponent } from './teach-page.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { TeachPageRootComponent } from './teach-page-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { TeachPageRoutingModule } from './teach-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    TeachPageRoutingModule
   ],
   declarations: [
     TeachPageComponent,
@@ -61,20 +36,6 @@ const toastrConfig = {
   entryComponents: [
     TeachPageComponent,
     TeachPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [TeachPageRootComponent]
+  ]
 })
 export class TeachPageModule {}

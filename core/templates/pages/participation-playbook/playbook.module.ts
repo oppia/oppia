@@ -16,47 +16,18 @@
  * @fileoverview Module for the participation playbook page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-
+import { NgModule } from '@angular/core';
 import { PlaybookPageComponent } from './playbook.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlaybookPageRootComponent } from './playbook-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
-
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
+import { CommonModule } from '@angular/common';
+import { PlaybookPageRoutingModule } from './playbook-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
-    // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    CommonModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    PlaybookPageRoutingModule
   ],
   declarations: [
     PlaybookPageComponent,
@@ -65,20 +36,6 @@ const toastrConfig = {
   entryComponents: [
     PlaybookPageComponent,
     PlaybookPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [PlaybookPageRootComponent]
+  ]
 })
 export class PlaybookPageModule {}
