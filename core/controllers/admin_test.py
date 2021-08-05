@@ -1065,7 +1065,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'filter_criterion': 'role',
                 'role': feconf.ROLE_ID_MODERATOR
             })
-        self.assertEqual(response_dict, {'user1': feconf.ROLE_ID_MODERATOR})
+        self.assertEqual(response_dict, {
+            'usernames': ['user1']
+        })
         self.logout()
 
     def test_invalid_username_in_filter_criterion_and_update_role(self):
