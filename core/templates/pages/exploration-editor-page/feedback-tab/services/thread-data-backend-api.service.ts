@@ -157,7 +157,8 @@ export class ThreadDataBackendApiService {
           target_type: 'exploration',
           target_id: this.contextService.getExplorationId()
         }
-      });
+      }
+    );
 
     let threads$ = this.http.get<ThreadData>(
       this.getThreadListHandlerUrl());
@@ -171,12 +172,16 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
+        // Key values for this property will be null if the thread is not found
+        // or threadId is invalid.
         let suggestionBackendDictsByThreadId:
-         Map<string | null, SuggestionBackendDict> = new Map(
-           suggestionBackendDicts.map(dict => [
-             this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
-             dict
-           ]));
+          Map<string | null, SuggestionBackendDict> = new Map(
+            suggestionBackendDicts.map(dict => [
+              this.suggestionsService
+                .getThreadIdFromSuggestionBackendDict(dict),
+              dict
+            ])
+          );
 
         return {
           feedbackThreads: feedbackThreadBackendDicts.map(
@@ -199,21 +204,21 @@ export class ThreadDataBackendApiService {
     let threadId = thread.threadId;
 
     return this.http.get<ThreadMessages>(
-      this.getThreadHandlerUrl(threadId)).toPromise()
-      .then((response: ThreadMessages) => {
-        let threadMessageBackendDicts = response.messages;
-        thread.setMessages(threadMessageBackendDicts.map(
-          m => ThreadMessage.createFromBackendDict(m)));
-        return thread.getMessages();
-      });
+      this.getThreadHandlerUrl(threadId)
+    ).toPromise().then((response: ThreadMessages) => {
+      let threadMessageBackendDicts = response.messages;
+      thread.setMessages(threadMessageBackendDicts.map(
+        m => ThreadMessage.createFromBackendDict(m)));
+      return thread.getMessages();
+    });
   }
 
   async getOpenThreadsCountAsync(): Promise<number> {
     return this.http.get<NumberOfOpenThreads>(
-      this.getFeedbackStatsHandlerUrl()).toPromise()
-      .then((response: NumberOfOpenThreads) => {
-        return this.openThreadsCount = response.num_open_threads;
-      });
+      this.getFeedbackStatsHandlerUrl()
+    ).toPromise().then((response: NumberOfOpenThreads) => {
+      return this.openThreadsCount = response.num_open_threads;
+    });
   }
 
   getOpenThreadsCount(): number {
@@ -227,7 +232,8 @@ export class ThreadDataBackendApiService {
         state_name: null,
         subject: newSubject,
         text: newText
-      }).toPromise().then(async() => {
+      }
+    ).toPromise().then(async() => {
       this.openThreadsCount += 1;
       return this.getThreadsAsync();
     },
@@ -303,7 +309,8 @@ export class ThreadDataBackendApiService {
       thread.status = (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
         ExplorationEditorPageConstants.STATUS_FIXED :
-          ExplorationEditorPageConstants.STATUS_IGNORED);
+        ExplorationEditorPageConstants.STATUS_IGNORED
+      );
       this.openThreadsCount -= 1;
 
       return this.getMessagesAsync(thread);
