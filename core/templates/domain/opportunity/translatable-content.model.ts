@@ -20,8 +20,8 @@ export interface TranslatableItemBackendDict {
   'content': string | string[],
   'data_format': string,
   'content_type': string,
-  'interaction_id': string,
-  'rule_type': string
+  'interaction_id'?: string,
+  'rule_type'?: string
 }
 
 export class TranslatableItem {
@@ -29,8 +29,8 @@ export class TranslatableItem {
     readonly content: string | string[],
     readonly dataFormat: string,
     readonly contentType: string,
-    readonly interactionId: string,
-    readonly ruleType: string
+    readonly interactionId?: string,
+    readonly ruleType?: string
   ) {}
 
   static createFromBackendDict(
