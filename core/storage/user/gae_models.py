@@ -380,11 +380,10 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel | None. The UserSettingsModel instance which
             contains the same email.
         """
-        filtered_user = cast(
+        return cast(
             Optional[UserSettingsModel],
             cls.query(cls.email == email).get()
         )
-        return filtered_user
 
     @classmethod
     def get_by_role(cls, role):
