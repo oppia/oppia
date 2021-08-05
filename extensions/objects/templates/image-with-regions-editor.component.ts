@@ -514,10 +514,9 @@ export class ImageWithRegionsEditorComponent implements OnInit {
       this.userIsCurrentlyDragging = true;
     }
     this.selectedRegion = this.hoveredRegion;
-    if (this.hoveredRegion) {
+    if (this.hoveredRegion !== null) {
       this.originalRectArea = this.cornerAndDimensionsFromRegionArea(
-        this.value.labeledRegions[
-          this.hoveredRegion].region.area
+        this.value.labeledRegions[this.hoveredRegion].region.area
       );
     }
   }
