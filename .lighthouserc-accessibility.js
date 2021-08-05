@@ -50,7 +50,6 @@ module.exports = {
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
         'http://127.0.0.1:8181/volunteer',
-        'http://127.0.0.1:8181/volunteers',
         `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
         `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_id}`,
         `http://127.0.0.1:8181/topic_editor/${process.env.topic_id}`,
@@ -215,12 +214,6 @@ module.exports = {
           'assertions': {
             // TODO(iamprayush): Improve the accessibility score to 1.
             'categories:accessibility': ['error', {'minScore': 0.91}]
-          }
-        },
-        {
-          'matchingUrlPattern': '^http://127.0.0.1:8181/volunteers$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
           }
         },
         {

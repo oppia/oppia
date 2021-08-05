@@ -450,19 +450,19 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARENTS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
+        custom_landing_pages.OldStewardsRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_PARTNERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
+        custom_landing_pages.OldStewardsRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
+        custom_landing_pages.OldStewardsRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
+        custom_landing_pages.OldStewardsRedirectPage),
     get_redirect_route(
         r'%s' % feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL,
-        custom_landing_pages.StewardsLandingPage),
+        custom_landing_pages.OldStewardsRedirectPage),
 
     get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(

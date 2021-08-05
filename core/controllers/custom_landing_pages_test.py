@@ -56,7 +56,7 @@ class TopicLandingRedirectPageTest(test_utils.GenericTestBase):
             'http://localhost/math/fractions', response.headers['location'])
 
 
-class StewardsLandingPageTest(test_utils.GenericTestBase):
+class OldStewardsRedirectPageTest(test_utils.GenericTestBase):
     """Test for showing the landing page for stewards (parents, teachers,
     volunteers, or NGOs).
     """

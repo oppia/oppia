@@ -53,11 +53,6 @@ describe('Oppia landing pages tour', function() {
     await waitFor.pageToFullyLoad();
   });
 
-  it('should visit the Volunteers landing page', async function() {
-    await browser.get('/volunteers');
-    await waitFor.pageToFullyLoad();
-  });
-
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
