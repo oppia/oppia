@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MockRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
@@ -39,7 +40,10 @@ describe('Admin Navbar component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        MockRouterModule
+      ],
       declarations: [AdminNavbarComponent]
     }).compileComponents();
 
