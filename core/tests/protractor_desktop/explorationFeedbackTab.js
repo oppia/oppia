@@ -77,7 +77,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration.
-    await users.login('user1@ExplorationFeedback.com');
+    await users.login('user1@ExplorationFeedback.com', true);
     await workflow.createAndPublishExploration(
       EXPLORATION_TITLE_1,
       EXPLORATION_CATEGORY,

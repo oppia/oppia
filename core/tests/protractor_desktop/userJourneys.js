@@ -71,7 +71,7 @@ describe('Basic user journeys', function() {
     it('should create moderators', async function() {
       await users.createModerator(
         'mod@userManagement.com', 'moderatorUserManagement');
-      await users.login('mod@userManagement.com');
+      await users.login('mod@userManagement.com', true);
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await moderatorPage.get();
