@@ -35,11 +35,11 @@ import { NumericInputValidationService } from './numeric-input-validation.servic
   templateUrl: './numeric-input-interaction.component.html'
 })
 export class InteractiveNumericInput implements OnInit {
-  @Input() inputGreaterThanOrEqualToZeroWithValue: string = '';
+  @Input() requireNonnegativeInputWithValue: string = '';
   @Input() savedSolution;
   @Input() labelForFocusTarget;
   errorString = '';
-  inputGreaterThanOrEqualToZero: boolean = false;
+  requireNonnegativeInput: boolean = false;
   answer = null;
   NUMERIC_INPUT_FORM_SCHEMA: { type: string; 'ui_config': {}; };
   constructor(
@@ -58,7 +58,7 @@ export class InteractiveNumericInput implements OnInit {
       this.answer !== '' &&
       isUndefined(
         this.numericInputValidationService.getErrorString(
-          this.answer, this.inputGreaterThanOrEqualToZero)));
+          this.answer, this.requireNonnegativeInput)));
   }
 
   submitAnswer(answer: number): void {
@@ -71,8 +71,8 @@ export class InteractiveNumericInput implements OnInit {
 
   private getAttributesObject() {
     return {
-      inputGreaterThanOrEqualToZeroWithValue:
-        this.inputGreaterThanOrEqualToZeroWithValue
+      requireNonnegativeInputWithValue:
+        this.requireNonnegativeInputWithValue
     };
   }
 
@@ -94,12 +94,12 @@ export class InteractiveNumericInput implements OnInit {
 
   ngOnInit(): void {
     const {
-      inputGreaterThanOrEqualToZero
+      requireNonnegativeInput
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
       'NumericInput',
       this.getAttributesObject()
     ) as NumericInputCustomizationArgs;
-    this.inputGreaterThanOrEqualToZero = inputGreaterThanOrEqualToZero.value;
+    this.requireNonnegativeInput = requireNonnegativeInput.value;
     this.answer = (
       this.savedSolution !== undefined ?
       this.savedSolution : ''
@@ -109,7 +109,7 @@ export class InteractiveNumericInput implements OnInit {
     this.NUMERIC_INPUT_FORM_SCHEMA = {
       type: 'float',
       ui_config: {
-        checkinputGreaterThanOrEqualToZero: this.inputGreaterThanOrEqualToZero
+        checkrequireNonnegativeInput: this.requireNonnegativeInput
       }
     };
 

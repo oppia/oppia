@@ -209,7 +209,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v47_dict_to_v48_dict(cls, draft_change_list):
         """Converts draft change list from state version 47 to 48. State
-        version 48 adds inputGreaterThanOrEqualToZero customization_arg to
+        version 48 adds requireNonnegativeInput customization_arg to
         NumericInput interaction.
 
         Args:

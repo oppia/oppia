@@ -1938,7 +1938,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v47_dict_to_v48_dict(cls, states_dict):
         """Converts from version 47 to 48. Version 48 adds
-        inputGreaterThanOrEqualToZero customization arg to NumericInput
+        requireNonnegativeInput customization arg to NumericInput
         interaction which allows creators to set input should be greater
         than or equal to zero.
 
@@ -1956,7 +1956,7 @@ class Exploration(python_utils.OBJECT):
                 customization_args = state_dict['interaction'][
                     'customization_args']
                 customization_args.update({
-                    'inputGreaterThanOrEqualToZero': {
+                    'requireNonnegativeInput': {
                         'value': False
                     }
                 })

@@ -359,7 +359,7 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        inputGreaterThanOrEqualToZero: {
+        requireNonnegativeInput: {
           value: true
         }
       },
@@ -369,7 +369,7 @@ describe('Interaction object factory', () => {
       solution: solutionDict
     });
     expect(testInteraction.customizationArgs).toEqual({
-      inputGreaterThanOrEqualToZero: {
+      requireNonnegativeInput: {
         value: true
       }
     });
@@ -381,7 +381,7 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        inputGreaterThanOrEqualToZero: {
+        requireNonnegativeInput: {
           value: false
         }
       },
@@ -392,7 +392,7 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      inputGreaterThanOrEqualToZero: {
+      requireNonnegativeInput: {
         value: false
       }
     });

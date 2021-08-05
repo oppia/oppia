@@ -32,7 +32,7 @@ describe('InteractiveNumericInput', () => {
   class mockInteractionAttributesExtractorService {
     getValuesFromAttributes(interactionId, attributes) {
       return {
-        inputGreaterThanOrEqualToZero: {
+        requireNonnegativeInput: {
           value: false
         }
       };
@@ -69,7 +69,7 @@ describe('InteractiveNumericInput', () => {
     currentInteractionService = TestBed.get(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveNumericInput);
     component = fixture.componentInstance;
-    component.inputGreaterThanOrEqualToZeroWithValue = 'false';
+    component.requireNonnegativeInputWithValue = 'false';
   });
 
   it('should initialise component when user adds interaction', () => {
@@ -77,15 +77,15 @@ describe('InteractiveNumericInput', () => {
       .callThrough();
 
     component.ngOnInit();
-    component.inputGreaterThanOrEqualToZero = false;
+    component.requireNonnegativeInput = false;
 
     expect(component.answer).toBe('');
     expect(component.labelForFocusTarget).toBeNull();
-    expect(component.inputGreaterThanOrEqualToZero).toEqual(false);
+    expect(component.requireNonnegativeInput).toEqual(false);
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
       ui_config: {
-        checkinputGreaterThanOrEqualToZero: false
+        checkrequireNonnegativeInput: false
       }
     });
     expect(currentInteractionService.registerCurrentInteraction)
@@ -102,13 +102,13 @@ describe('InteractiveNumericInput', () => {
 
     expect(component.savedSolution).toBe(20);
     expect(component.labelForFocusTarget).toBe('label');
-    expect(component.inputGreaterThanOrEqualToZero).toEqual(false);
-    expect(component.inputGreaterThanOrEqualToZeroWithValue).toEqual(
+    expect(component.requireNonnegativeInput).toEqual(false);
+    expect(component.requireNonnegativeInputWithValue).toEqual(
       'false');
     expect(component.NUMERIC_INPUT_FORM_SCHEMA).toEqual({
       type: 'float',
       ui_config: {
-        checkinputGreaterThanOrEqualToZero: false
+        checkrequireNonnegativeInput: false
       }
     });
     expect(currentInteractionService.registerCurrentInteraction)
@@ -124,11 +124,11 @@ describe('InteractiveNumericInput', () => {
   it('should return SCHEMA when called', () => {
     component.ngOnInit();
 
-    expect(component.inputGreaterThanOrEqualToZero).toEqual(false);
+    expect(component.requireNonnegativeInput).toEqual(false);
     expect(component.getSchema()).toEqual({
       type: 'float',
       ui_config: {
-        checkinputGreaterThanOrEqualToZero: false
+        checkrequireNonnegativeInput: false
       }
     });
   });

@@ -99,9 +99,9 @@ export class NumericInputValidationService {
           'is greater than the first number.')
       });
     };
-    var raiseWarningForinputGreaterThanOrEqualToZero = function(
+    var raiseWarningForrequireNonnegativeInput = function(
         ruleIndex: number, input: number) {
-      if (input < 0 && customizationArgs.inputGreaterThanOrEqualToZero.value) {
+      if (input < 0 && customizationArgs.requireNonnegativeInput.value) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message: (
@@ -126,7 +126,7 @@ export class NumericInputValidationService {
           case 'Equals':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
-            raiseWarningForinputGreaterThanOrEqualToZero(j, x);
+            raiseWarningForrequireNonnegativeInput(j, x);
             break;
           case 'IsInclusivelyBetween':
             var a = <number> rule.inputs.a;
@@ -137,7 +137,7 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, a, b, true, true);
             if (
               a < 0 &&
-              customizationArgs.inputGreaterThanOrEqualToZero.value
+              customizationArgs.requireNonnegativeInput.value
             ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
@@ -158,12 +158,12 @@ export class NumericInputValidationService {
           case 'IsLessThan':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
-            raiseWarningForinputGreaterThanOrEqualToZero(j, x);
+            raiseWarningForrequireNonnegativeInput(j, x);
             break;
           case 'IsLessThanOrEqualTo':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
-            raiseWarningForinputGreaterThanOrEqualToZero(j, x);
+            raiseWarningForrequireNonnegativeInput(j, x);
             break;
           case 'IsWithinTolerance':
             var x = (<number>rule.inputs.x);
@@ -171,7 +171,7 @@ export class NumericInputValidationService {
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
             if (
               (x + tol) < 0 &&
-              customizationArgs.inputGreaterThanOrEqualToZero.value
+              customizationArgs.requireNonnegativeInput.value
             ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
