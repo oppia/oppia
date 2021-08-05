@@ -66,7 +66,7 @@ export class StateEditorService {
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
-  activeStateName: string = null;
+  activeStateName!: string;
   stateNames: string[] = [];
   correctnessFeedbackEnabled: boolean = false;
   inQuestionMode: boolean = false;
@@ -74,9 +74,9 @@ export class StateEditorService {
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
   // interaction.
-  interaction: Interaction = null;
+  interaction!: Interaction;
   misconceptionsBySkill: {} = {};
-  linkedSkillId: string = null;
+  linkedSkillId!: string;
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = false;
   cardIsCheckpoint: boolean = false;
@@ -137,7 +137,7 @@ export class StateEditorService {
   }
 
   setActiveStateName(newActiveStateName: string): void {
-    if (newActiveStateName === '' || newActiveStateName === null) {
+    if (newActiveStateName === '') {
       console.error('Invalid active state name: ' + newActiveStateName);
       return;
     }
@@ -172,7 +172,7 @@ export class StateEditorService {
     this.linkedSkillId = newLinkedSkillId;
   }
 
-  getLinkedSkillId(): string {
+  getLinkedSkillId(): string | null {
     return this.linkedSkillId;
   }
 
@@ -203,13 +203,14 @@ export class StateEditorService {
 
   getAnswerChoices(
       interactionId: string,
-      customizationArgs: InteractionCustomizationArgs): AnswerChoice[] {
+      customizationArgs: InteractionCustomizationArgs): AnswerChoice[] | null {
     if (!interactionId) {
       return null;
     }
     // Special cases for multiple choice input and image click input.
     if (interactionId === 'MultipleChoiceInput') {
-      return (<MultipleChoiceInputCustomizationArgs> customizationArgs)
+      return <AnswerChoice[]>(
+        <MultipleChoiceInputCustomizationArgs> customizationArgs)
         .choices.value.map((val, ind) => ({ val: ind, label: val.html }));
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
@@ -228,7 +229,7 @@ export class StateEditorService {
       interactionId === 'ItemSelectionInput' ||
       interactionId === 'DragAndDropSortInput'
     ) {
-      return (
+      return <AnswerChoice[]>(
         <
           ItemSelectionInputCustomizationArgs|
           DragAndDropSortInputCustomizationArgs

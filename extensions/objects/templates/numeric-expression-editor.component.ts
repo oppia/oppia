@@ -34,15 +34,15 @@ import { MathInteractionsService } from 'services/math-interactions.service';
   templateUrl: './numeric-expression-editor.component.html'
 })
 export class NumericExpressionEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
 
   warningText = '';
   hasBeenTouched = false;
-  currentValue: string;
-  alwaysEditable: boolean;
-  eventBusGroup: EventBusGroup;
+  currentValue!: string;
+  alwaysEditable: boolean = false;
+  eventBusGroup!: EventBusGroup;
 
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -75,7 +75,7 @@ export class NumericExpressionEditorComponent implements OnInit {
     // for touch-based devices) to capture input from user and the 'change'
     // event while using the normal keyboard.
     if (eventType === 'focus') {
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: { focused: boolean; }) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -87,7 +87,7 @@ export class NumericExpressionEditorComponent implements OnInit {
         }
       });
     } else {
-      Guppy.event('change', (focusObj) => {
+      Guppy.event('change', (focusObj: { focused: boolean; }) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -98,7 +98,7 @@ export class NumericExpressionEditorComponent implements OnInit {
           this.isCurrentAnswerValid();
         }
       });
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: { focused: boolean; }) => {
         if (!focusObj.focused) {
           this.isCurrentAnswerValid();
         }

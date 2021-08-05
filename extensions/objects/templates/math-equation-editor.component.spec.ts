@@ -65,14 +65,16 @@ describe('MathEquationEditor', () => {
       MathEquationEditorComponent);
     component = fixture.componentInstance;
     window.Guppy = MockGuppy;
-    component.currentValue = '';
   });
 
   afterEach(() => {
+    // This throws "...". We need to suppress this error because ...
+    // @ts-ignore
     delete window.Guppy;
   });
 
   it('should add the change handler to guppy', () => {
+    component.currentValue = '';
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
     component.ngOnInit();
@@ -82,16 +84,15 @@ describe('MathEquationEditor', () => {
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
-    component.currentValue = undefined;
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
   });
 
   it('should initialize component.value with an empty string', () => {
+    component.currentValue = '';
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
       mockGuppyObject as GuppyObject);
-    component.value = null;
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
@@ -118,6 +119,7 @@ describe('MathEquationEditor', () => {
   });
 
   it('should set the value of showOSK to true', () => {
+    component.currentValue = '';
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
 

@@ -36,14 +36,14 @@ import { MathInteractionsService } from 'services/math-interactions.service';
 })
 
 export class MathEquationEditorComponent implements OnInit, OnDestroy {
-  @Input() modalId;
-  @Input() value;
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
-  eventBusGroup: EventBusGroup;
+  eventBusGroup!: EventBusGroup;
+  currentValue!: string;
   warningText: string = '';
-  hasBeenTouched = false;
-  currentValue: string;
-  alwaysEditable: boolean;
+  hasBeenTouched: boolean = false;
+  alwaysEditable: boolean = false;
 
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -58,7 +58,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.alwaysEditable = true;
     this.hasBeenTouched = false;
-    if (this.value === null) {
+    if (this.value === null || this.value === undefined) {
       this.value = '';
       this.valueChanged.emit(this.value);
     }
@@ -74,7 +74,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
       // We need the 'focus' event while using the on screen keyboard (only
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: { focused: boolean; }) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -89,7 +89,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
       // We need the 'focus' event while using the on screen keyboard (only
       // for touch-based devices) to capture input from user and the 'change'
       // event while using the normal keyboard.
-      Guppy.event('change', (focusObj) => {
+      Guppy.event('change', (focusObj: { focused: boolean; }) => {
         const activeGuppyObject = (
           this.guppyInitializationService.findActiveGuppyObject());
         if (activeGuppyObject !== undefined) {
@@ -100,7 +100,7 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
           this.isCurrentAnswerValid();
         }
       });
-      Guppy.event('focus', (focusObj) => {
+      Guppy.event('focus', (focusObj: { focused: boolean; }) => {
         if (!focusObj.focused) {
           this.isCurrentAnswerValid();
         }

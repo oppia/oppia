@@ -35,14 +35,19 @@ import 'mathjaxConfig.ts';
   styleUrls: []
 })
 export class MathExpressionContentEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() alwaysEditable: boolean;
-  @Input() value;
+  @Input() modalId!: symbol;
+  @Input() alwaysEditable: boolean = false;
+  @Input() value!: {
+     'svg_filename': string;
+     'raw_latex': string;
+     mathExpressionSvgIsBeingProcessed: boolean;
+     svgFile: string;
+    };
   @Output() valueChanged = new EventEmitter();
   placeholderText = '\\frac{x}{y}';
-  numberOfElementsInQueue: number;
-  svgString: string;
-  active: boolean;
+  numberOfElementsInQueue!: number;
+  svgString!: string;
+  active: boolean = false;
   localValue: {label: string} = {label: ''};
 
   constructor(
@@ -87,7 +92,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   // TODO(#10197): Upgrade to MathJax 3, after proper investigation
   // and testing. MathJax 3 provides a faster and more cleaner way to
   // convert a LaTeX string to an SVG.
-  private convertLatexStringToSvg(inputLatexString) {
+  private convertLatexStringToSvg(inputLatexString: string) {
     const outputElement = document.createElement('div');
     // We need to append the element with a script tag so that Mathjax
     // can typeset and convert this element. The typesetting is not

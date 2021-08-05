@@ -28,18 +28,18 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 
 export class RatioExpressionEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value;
+  @Input() modalId!: symbol;
+  @Input() value!: number[];
   @Output() valueChanged = new EventEmitter();
   warningText: string = '';
-  localValue: { label: string; };
+  localValue!: { label: string; };
   eventBusGroup: EventBusGroup;
   constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
   ngOnInit(): void {
-    if (this.value === null) {
+    if (this.value) {
       this.value = [1, 1];
       this.valueChanged.emit(this.value);
     }
