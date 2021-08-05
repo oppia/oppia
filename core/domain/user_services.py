@@ -1468,7 +1468,9 @@ def update_email_preferences(
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
     email = get_email_from_user_id(user_id)
-    if not bulk_email_db_already_updated:
+    # Mailchimp database should not be updated in servers where sending
+    # emails is not allowed.
+    if not bulk_email_db_already_updated and feconf.CAN_SEND_EMAILS:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
                 email, can_receive_email_updates))
