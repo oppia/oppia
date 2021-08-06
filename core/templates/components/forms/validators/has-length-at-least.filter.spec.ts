@@ -21,7 +21,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
 require('components/forms/validators/has-length-at-least.filter.ts');
 
-describe('Normalizer tests', function() {
+describe('hasLengthAtLeast filter', function() {
   var filterName = 'hasLengthAtLeast';
 
   beforeEach(angular.mock.module('oppia'));
