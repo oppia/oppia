@@ -234,7 +234,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         Returns:
             list(str). List of job IDs.
         """
-        models = []
+        job_models = []
         job_ids = []
         for job_dict in job_dicts_list:
             instance_id = cls._generate_id(job_dict['exp_id'])
@@ -248,10 +248,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 training_data=job_dict['training_data'],
                 algorithm_version=job_dict['algorithm_version'])
 
-            models.append(training_job_instance)
+            job_models.append(training_job_instance)
             job_ids.append(instance_id)
-        cls.update_timestamps_multi(models)
-        cls.put_multi(models)
+        cls.update_timestamps_multi(job_models)
+        cls.put_multi(job_models)
         return job_ids
 
 
