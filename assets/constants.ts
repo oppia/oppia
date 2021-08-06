@@ -5972,9 +5972,5 @@ export default {
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
-  "ASSET_TYPE_THUMBNAIL": "thumbnail",
-
-  // Connection statuses.
-  "CONNECTION_STATUS_ONLINE": "online",
-  "CONNECTION_STATUS_OFFLINE": "offline"
+  "ASSET_TYPE_THUMBNAIL": "thumbnail"
 } as const;
