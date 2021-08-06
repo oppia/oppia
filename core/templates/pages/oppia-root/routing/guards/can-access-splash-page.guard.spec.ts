@@ -31,7 +31,7 @@ class MockWindowRef {
   };
 }
 
-class MockRouterModule {
+class MockRouter {
   navigate(fragments: string[]): void {}
 }
 
@@ -39,6 +39,7 @@ describe('Can access splash page guard', () => {
   let caspg: CanAccessSplashPageGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let windowRef: MockWindowRef;
+  let router: MockRouter;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -53,7 +54,7 @@ describe('Can access splash page guard', () => {
         AccessValidationBackendApiService,
         {
           provide: Router,
-          useClass: MockRouterModule
+          useClass: MockRouter
         }
       ]
     }).compileComponents();
@@ -61,6 +62,7 @@ describe('Can access splash page guard', () => {
     windowRef = TestBed.inject(WindowRef);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService);
+    router = TestBed.inject(Router);
   });
 
   it('should redirect user to default dashboard', fakeAsync(() => {
@@ -75,4 +77,24 @@ describe('Can access splash page guard', () => {
     expect(windowRef.nativeWindow.location.href).toEqual(
       '/' + defaultDashboard + '-dashboard');
   }));
+
+  it('should allow user to access page if validation succeds', fakeAsync(() => {
+    spyOn(accessValidationBackendApiService, 'validateAccessToSplashPage')
+      .and.returnValue(Promise.resolve({
+        valid: true,
+        default_dashboard: ''
+      }));
+    caspg.canLoad(null, null);
+    tick();
+  }));
+
+  it('should redirect user to not found page if validation fails',
+    fakeAsync(() => {
+      spyOn(accessValidationBackendApiService, 'validateAccessToSplashPage')
+        .and.returnValue(Promise.reject());
+      spyOn(router, 'navigate');
+      caspg.canLoad(null, null);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/not-found']);
+    }));
 });
