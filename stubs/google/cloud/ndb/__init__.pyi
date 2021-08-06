@@ -139,7 +139,3 @@ class TransactionOptions(object):
     MANDATORY = 2  # join=True
     ALLOWED = 3  # join=True
     INDEPENDENT = 4  # join=False
-
-
-# Misc stubs
-def toplevel(*args: Any, **kwargs: Any) -> Callable[..., Any]: ...

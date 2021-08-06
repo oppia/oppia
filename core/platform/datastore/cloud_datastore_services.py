@@ -56,8 +56,8 @@ TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
 CLIENT = ndb.Client()
 
 
-def get_ndb_context(**kwargs):
-    # type: () -> ndb.context.Context
+def get_ndb_context(namespace=None, global_cache=None):
+    # type: (Optional[str], Optional[RedisCache]) -> ndb.context.Context
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
@@ -69,8 +69,9 @@ def get_ndb_context(**kwargs):
     # places we need a context but we are unsure if it exists.
     context = ndb.get_context(raise_context_error=False)
     return (
-        CLIENT.context(**kwargs) if context is None else
-        contextlib.nullcontext(enter_result=context))
+        CLIENT.context(namespace=namespace, global_cache=global_cache)
+        if context is None else contextlib.nullcontext(enter_result=context)
+    )
 
 
 def get_multi(keys):

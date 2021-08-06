@@ -308,7 +308,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
-        # type: (Text, int, Text) -> Text
+        # type: (Text, int, Text) -> str
         """Generates a unique ID for the Classifier Exploration Mapping of the
         form [exp_id].[exp_version].[state_name].
 
@@ -322,8 +322,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         Returns:
             str. ID of the new Classifier Exploration Mapping instance.
         """
-        new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return cast(Text, python_utils.convert_to_bytes(new_id))
+        return '%s.%s.%s' % (exp_id, exp_version, state_name)
 
     @classmethod
     def get_models(

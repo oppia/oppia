@@ -27,7 +27,9 @@ import python_utils
 
 import redis
 
-from typing import Dict, List, Mapping, Optional, Union  # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Mapping, Optional, TypeVar, Union  # isort:skip # pylint: disable=unused-import
+
+T = TypeVar("T", str, bytes)
 
 
 REDIS_CLIENT = redis.StrictRedis(
@@ -116,7 +118,7 @@ class EmulatorBlob(python_utils.OBJECT):
         return blob_dict
 
     @classmethod
-    def from_dict(cls, blob_dict: Dict[bytes, bytes]) -> EmulatorBlob:
+    def from_dict(cls, blob_dict: Dict[T, T]) -> EmulatorBlob:
         """Transform dictionary from Redis into EmulatorBlob.
 
         Args:
@@ -204,6 +206,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
             EmulatorBlob. The blob.
         """
         blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
+        reveal_type(blob_dict)
         return EmulatorBlob.from_dict(blob_dict) if blob_dict else None
 
     def upload_blob(self, filepath: str, blob: EmulatorBlob) -> None:

@@ -29,7 +29,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, List, Set, Text, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import cast, Dict, List, Set, Text, Union  # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -123,9 +123,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.put()
         all_models = base_models.BaseModel.get_all()
         self.assertEqual(all_models.count(), 1)
-        self.assertEqual(all_models.get(), model)
+        base_model = cast(base_models.BaseModel, all_models.get())
+        self.assertEqual(base_model, model)
 
-        model_id = all_models.get().id
+        model_id = base_model.id
         self.assertEqual(model, base_models.BaseModel.get(model_id))
 
         model.delete()

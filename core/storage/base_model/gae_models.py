@@ -160,7 +160,7 @@ class BaseModel(datastore_services.Model):
 
     @property
     def id(self):
-        # type: () -> Text
+        # type: () -> str
         """A unique id for this model instance."""
         return self.key.id()
 

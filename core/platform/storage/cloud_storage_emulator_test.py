@@ -161,12 +161,12 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
             'namespace:/file/path2.png', mapping=self.blob2.to_dict())
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/different/path.png', mapping=self.blob3.to_dict())
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             self.emulator.list_blobs('/'),
             [self.blob1, self.blob2, self.blob3])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             self.emulator.list_blobs('/file'), [self.blob1, self.blob2])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             self.emulator.list_blobs('/different'), [self.blob3])
 
     def test_reset_removes_all_values_from_redis(self) -> None:
