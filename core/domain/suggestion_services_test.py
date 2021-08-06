@@ -918,7 +918,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '<p>old content html</p>',
-            'translation_html': '<p>Translation for original content.</p>'
+            'translation_html': '<p>Translation for original content.</p>',
+            'data_format': 'html'
         }
         suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
