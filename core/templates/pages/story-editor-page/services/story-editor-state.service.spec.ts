@@ -24,6 +24,7 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { importAllAngularServices, TranslatorProviderForTests } from 'tests/unit-test-utils.ajs';
+import { AlertsService } from 'services/alerts.service';
 
 require('domain/story/story-update.service.ts');
 
@@ -41,7 +42,9 @@ class MockEditableStoryBackendApiService {
           skillSummaries: [{
             id: 'Skill 1',
             description: 'Skill Description'
-          }]
+          }],
+          classroomUrlFragment: 'classroomUrlFragment',
+          topicUrlFragment: 'topicUrlFragment'
         });
       } else {
         reject();
@@ -68,9 +71,21 @@ class MockEditableStoryBackendApiService {
       }
     });
   }
+
+  async doesStoryWithUrlFragmentExistAsync() {
+    return new Promise((resolve, reject) => {
+      if (!this.failure) {
+        console.error('test');
+        resolve(false);
+      } else {
+        reject();
+      }
+    });
+  }
 }
 
 describe('Story editor state service', () => {
+  var alertsService = null;
   var storyEditorStateService = null;
   var storyObjectFactory = null;
   var storyUpdateService = null;
@@ -131,6 +146,7 @@ describe('Story editor state service', () => {
       ]
     }).compileComponents();
 
+    alertsService = TestBed.get(AlertsService);
     storyEditorStateService = TestBed.get(StoryEditorStateService);
     storyObjectFactory = TestBed.get(StoryObjectFactory);
   });
@@ -265,6 +281,7 @@ describe('Story editor state service', () => {
     spyOn(
       fakeEditableStoryBackendApiService,
       'updateStoryAsync').and.callThrough();
+    var successCallback = jasmine.createSpy('successCallback');
 
     storyEditorStateService.loadStory('storyId_0');
     storyUpdateService.setStoryTitle(
@@ -272,7 +289,7 @@ describe('Story editor state service', () => {
     tick(1000);
 
     expect(
-      storyEditorStateService.saveStory('Commit message')
+      storyEditorStateService.saveStory('Commit message', successCallback)
     ).toBe(true);
     tick(1000);
 
@@ -284,20 +301,22 @@ describe('Story editor state service', () => {
     expect(updateStorySpy).toHaveBeenCalledWith(
       expectedId, expectedVersion,
       expectedCommitMessage, jasmine.any(Object));
+    expect(successCallback).toHaveBeenCalled();
   }));
 
   it('should be able to publish the story', fakeAsync(() => {
     spyOn(
       fakeEditableStoryBackendApiService,
       'changeStoryPublicationStatusAsync').and.callThrough();
+    var successCallback = jasmine.createSpy('successCallback');
 
     storyEditorStateService.loadStory('topicId_1', 'storyId_0');
     tick(1000);
 
     expect(storyEditorStateService.isStoryPublished()).toBe(false);
     expect(
-      storyEditorStateService.changeStoryPublicationStatus(true)
-    ).toBe(true);
+      storyEditorStateService.changeStoryPublicationStatus(
+        true, successCallback)).toBe(true);
     tick(1000);
 
     var expectedId = 'storyId_0';
@@ -306,7 +325,46 @@ describe('Story editor state service', () => {
     expect(publishStorySpy).toHaveBeenCalledWith(
       expectedId, true);
     expect(storyEditorStateService.isStoryPublished()).toBe(true);
+    expect(successCallback).toHaveBeenCalled();
   }));
+
+  it('should warn user when story is not published', fakeAsync(() => {
+    spyOn(
+      fakeEditableStoryBackendApiService,
+      'changeStoryPublicationStatusAsync').and.callThrough();
+    spyOn(alertsService, 'addWarning');
+
+    storyEditorStateService.loadStory('topicId_1', 'storyId_0');
+    tick(1000);
+    fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
+
+    expect(storyEditorStateService.isStoryPublished()).toBe(false);
+    expect(
+      storyEditorStateService.changeStoryPublicationStatus(
+        true)).toBe(true);
+    tick(1000);
+
+    var expectedId = 'storyId_0';
+    var publishStorySpy = (
+      fakeEditableStoryBackendApiService.changeStoryPublicationStatusAsync);
+    expect(publishStorySpy).toHaveBeenCalledWith(
+      expectedId, true);
+    expect(storyEditorStateService.isStoryPublished()).toBe(false);
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when publishing/unpublishing the story.'
+    );
+  }));
+
+  it('should warn user when user attepts to publish story before it loads',
+    fakeAsync(() => {
+      spyOn(alertsService, 'fatalWarning');
+      storyEditorStateService._storyIsInitialized = false;
+
+      storyEditorStateService.changeStoryPublicationStatus(true);
+
+      expect(alertsService.fatalWarning)
+        .toHaveBeenCalledWith('Cannot publish a story before one is loaded.');
+    }));
 
   it('should fire an update event after saving the story', fakeAsync(() => {
     storyEditorStateService.loadStory('storyId_0');
@@ -333,6 +391,26 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.isSavingStory()).toBe(false);
   }));
 
+  it('should warn user when story fails to save', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    var successCallback = jasmine.createSpy('successCallback');
+    var errorCallback = jasmine.createSpy('errorCallback');
+    storyEditorStateService.loadStory('storyId_0');
+    storyUpdateService.setStoryTitle(
+      storyEditorStateService.getStory(), 'New title');
+    tick(1000);
+    fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
+
+    storyEditorStateService.saveStory(
+      'Commit message', successCallback, errorCallback);
+    tick(1000);
+
+    expect(alertsService.addWarning)
+      .toHaveBeenCalledWith('There was an error when saving the story.');
+    expect(errorCallback)
+      .toHaveBeenCalledWith('There was an error when saving the story.');
+  }));
+
   it('should indicate a story is no longer saving after an error',
     fakeAsync(() => {
       storyEditorStateService.loadStory('storyId_0');
@@ -349,4 +427,97 @@ describe('Story editor state service', () => {
       tick(1000);
       expect(storyEditorStateService.isSavingStory()).toBe(false);
     }));
+
+  it('should update stories URL when user updates the storie\'s URL',
+    fakeAsync(() => {
+      var newStory = storyObjectFactory.createFromBackendDict(
+        secondBackendStoryObject);
+      storyEditorStateService.setStory(newStory);
+
+      fakeEditableStoryBackendApiService.failure = '';
+      storyEditorStateService._storyWithUrlFragmentExists = true;
+
+      storyEditorStateService.updateExistenceOfStoryUrlFragment(
+        'test_url', () =>{});
+      tick(1000);
+
+      expect(storyEditorStateService.getStoryWithUrlFragmentExists())
+        .toBe(false);
+    }));
+
+  it('should warn user when user updates the storie\'s URL to an URL' +
+  ' that already exits', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    var newStory = storyObjectFactory.createFromBackendDict(
+      secondBackendStoryObject);
+    storyEditorStateService.setStory(newStory);
+
+    fakeEditableStoryBackendApiService.failure = 'Story URL exists';
+    storyEditorStateService._storyWithUrlFragmentExists = false;
+
+    storyEditorStateService.updateExistenceOfStoryUrlFragment(
+      'test_url', () =>{});
+    tick(1000);
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when checking if the story url fragment ' +
+      'exists for another story.');
+  }));
+
+  it('should return classroom url fragment when called', fakeAsync(() => {
+    storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
+
+    expect(storyEditorStateService.getClassroomUrlFragment())
+      .toBe('classroomUrlFragment');
+  }));
+
+  it('should return topic url fragment when called', fakeAsync(() => {
+    storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
+
+    expect(storyEditorStateService.getTopicUrlFragment())
+      .toBe('topicUrlFragment');
+  }));
+
+  it('should return event emitters when called', () => {
+    expect(storyEditorStateService.onStoryInitialized).toBe(
+      storyEditorStateService._storyInitializedEventEmitter);
+    expect(storyEditorStateService.onStoryReinitialized).toBe(
+      storyEditorStateService._storyReinitializedEventEmitter);
+    expect(storyEditorStateService.onViewStoryNodeEditor).toBe(
+      storyEditorStateService._viewStoryNodeEditorEventEmitter);
+    expect(storyEditorStateService.onRecalculateAvailableNodes).toBe(
+      storyEditorStateService._recalculateAvailableNodesEventEmitter);
+  });
+
+  it('should set _expIdsChanged to true when setExpIdsChanged is ' +
+  'called', () => {
+    expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+
+    storyEditorStateService.setExpIdsChanged();
+
+    expect(storyEditorStateService.areAnyExpIdsChanged()).toBeTrue();
+  });
+
+  it('should set _expIdsChanged to false when resetExpIdsChanged is ' +
+  'called', () => {
+    storyEditorStateService.setExpIdsChanged();
+
+    expect(storyEditorStateService.areAnyExpIdsChanged()).toBeTrue();
+
+    storyEditorStateService.resetExpIdsChanged();
+
+    expect(storyEditorStateService.areAnyExpIdsChanged()).toBeFalse();
+  });
+
+  it('should return skill summaries when called', fakeAsync(() => {
+    storyEditorStateService.loadStory('storyId_0');
+    tick(1000);
+
+    expect(storyEditorStateService.getSkillSummaries()).toEqual([{
+      id: 'Skill 1',
+      description: 'Skill Description'
+    }]);
+  }));
 });
