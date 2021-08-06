@@ -127,7 +127,7 @@ export class States {
   getFinalStateNames(): string[] {
     let finalStateNames = [];
     let interactionSpecs: {
-      [x: string]: {
+      [interaction: string]: {
         'is_terminal': boolean;
      }
    } = INTERACTION_SPECS;

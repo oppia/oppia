@@ -125,7 +125,7 @@ export class State {
   getRequiredWrittenTranslationContentIds(): Set<string> {
     let interactionId = this.interaction.id;
     let interactionSpecs: {
-      [key: string]: {
+      [interaction: string]: {
         'is_linear': boolean;
         'is_terminal': boolean;
       };
@@ -163,6 +163,8 @@ export class StateObjectFactory {
     private paramchangesObject: ParamChangesObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
+  // Type of Constanst here doesn't match with the type StateBackendDict,
+  // so we will have to typecast it as unknown first.
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE as unknown as StateBackendDict;
   }
@@ -183,6 +185,8 @@ export class StateObjectFactory {
     });
     if (newState.interaction.defaultOutcome) {
       newState.interaction.defaultOutcome.dest = newStateName;
+    } else {
+      throw new Error('Default Outcome doesn\'t exist');
     }
     return newState;
   }

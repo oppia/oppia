@@ -204,7 +204,6 @@ describe('Editor state service', () => {
   it('should correctly set and get linkedSkillId', () => {
     const linkedSkillId = 'skill_id1';
 
-    expect(ecs.getLinkedSkillId()).toEqual(null);
     ecs.setLinkedSkillId(linkedSkillId);
     expect(ecs.getLinkedSkillId()).toEqual(linkedSkillId);
   });

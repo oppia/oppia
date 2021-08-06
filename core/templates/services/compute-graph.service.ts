@@ -43,7 +43,7 @@ interface GraphData {
 })
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
-    let nodes: { [x: string]: string; } = {};
+    let nodes: Record<string, string> = {};
     let links: { source: string; target: string; }[] = [];
     let finalStateIds = states.getFinalStateNames();
 
@@ -81,14 +81,12 @@ export class ComputeGraphService {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder: string[] = [];
     let queue: string[] = [];
-    let seen: { [x: string]: boolean } = {};
+    let seen: Record<string, boolean> = {};
     seen[sourceStateName] = true;
     queue.push(sourceStateName);
     while (queue.length > 0) {
-      let currStateName = queue.shift();
-      if (currStateName) {
-        stateNamesInBfsOrder.push(currStateName);
-      }
+      let currStateName = <string>queue.shift();
+      stateNamesInBfsOrder.push(currStateName);
       for (let e = 0; e < stateGraph.links.length; e++) {
         let edge = stateGraph.links[e];
         let dest = edge.target;

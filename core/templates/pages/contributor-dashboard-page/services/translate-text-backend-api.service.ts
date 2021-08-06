@@ -64,11 +64,8 @@ export class TranslateTextBackendApiService {
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
     imagesData.forEach(obj => {
-      if (obj.imageBlob) {
-        body.append(
-          obj.filename, obj.imageBlob
-        );
-      }
+      const imageBlob = <Blob>obj.imageBlob;
+      body.append(obj.filename, imageBlob);
     });
     return this.http.post(
       '/suggestionhandler/', body).toPromise();

@@ -29,26 +29,32 @@ import { ExternalRteSaveService } from 'services/external-rte-save.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import 'mathjaxConfig.ts';
+
+interface MathExpression { 
+  'svg_filename': string;
+  'raw_latex': string;
+  mathExpressionSvgIsBeingProcessed: boolean;
+  svgFile: string;
+
+}
 @Component({
   selector: 'math-expression-content-editor',
   templateUrl: './math-expression-content-editor.component.html',
   styleUrls: []
 })
 export class MathExpressionContentEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() alwaysEditable: boolean = false;
-  @Input() value!: {
-     'svg_filename': string;
-     'raw_latex': string;
-     mathExpressionSvgIsBeingProcessed: boolean;
-     svgFile: string;
-    };
-  @Output() valueChanged = new EventEmitter();
-  placeholderText = '\\frac{x}{y}';
+  @Input() value!: MathExpression;
   numberOfElementsInQueue!: number;
   svgString!: string;
+  @Output() valueChanged = new EventEmitter();
+  placeholderText = '\\frac{x}{y}';
   active: boolean = false;
-  localValue: {label: string} = {label: ''};
+  localValue: { label: string } = {label: ''};
 
   constructor(
     private alertsService: AlertsService,

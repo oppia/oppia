@@ -63,6 +63,9 @@ export interface LostChangeBackendDict {
   'language_code'?: string;
 }
 
+// Properties are optional in 'LostChangeBackendDict' because all of them may
+// not be present in the dict and may change according to the cmd. Therefore,
+// they can be undefined.
 export class LostChange {
   cmd: string;
   stateName: string | undefined;

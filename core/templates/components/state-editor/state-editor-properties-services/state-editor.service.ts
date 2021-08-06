@@ -66,17 +66,20 @@ export class StateEditorService {
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeStateName!: string;
-  stateNames: string[] = [];
-  correctnessFeedbackEnabled: boolean = false;
-  inQuestionMode: boolean = false;
   // Currently, the only place where this is used in the state editor
   // is in solution verification. So, once the interaction is set in this
   // service, the given solutions would be automatically verified for the set
   // interaction.
   interaction!: Interaction;
-  misconceptionsBySkill: {} = {};
   linkedSkillId!: string;
+  stateNames: string[] = [];
+  correctnessFeedbackEnabled: boolean = false;
+  inQuestionMode: boolean = false;
+  misconceptionsBySkill: {} = {};
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = false;
   cardIsCheckpoint: boolean = false;
@@ -137,7 +140,7 @@ export class StateEditorService {
   }
 
   setActiveStateName(newActiveStateName: string): void {
-    if (newActiveStateName === '') {
+    if (newActiveStateName === '' || newActiveStateName === null) {
       console.error('Invalid active state name: ' + newActiveStateName);
       return;
     }
@@ -172,7 +175,7 @@ export class StateEditorService {
     this.linkedSkillId = newLinkedSkillId;
   }
 
-  getLinkedSkillId(): string | null {
+  getLinkedSkillId(): string {
     return this.linkedSkillId;
   }
 
@@ -201,6 +204,7 @@ export class StateEditorService {
     return cloneDeep(this.interaction);
   }
 
+  // Function will return null if interactionId does not exist.
   getAnswerChoices(
       interactionId: string,
       customizationArgs: InteractionCustomizationArgs): AnswerChoice[] | null {
