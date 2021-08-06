@@ -997,6 +997,13 @@ describe('QuestionsListComponent', () => {
   });
 
   it('should update skill linkage correctly', () => {
+    ctrl.skillLinkageModificationsArray = [
+      {
+        id: 'skillId1',
+        task: 'update_difficulty',
+        difficulty: 0.9
+      }
+    ];
     spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
       .and.returnValue($q.resolve());
 
@@ -1004,7 +1011,7 @@ describe('QuestionsListComponent', () => {
     $scope.$apply();
     $timeout.flush(500);
 
-    expect(ctrl.skillLinkageModificationsArray).toBe([]);
+    expect(ctrl.skillLinkageModificationsArray).toEqual([]);
   });
 
   it('should open question editor save modal if question' +

@@ -29,6 +29,7 @@ import { HintsAndSolutionManagerService } from '../services/hints-and-solution-m
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplaySolutionModalComponent } from './display-solution-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Display Solution Modal', () => {
   let fixture: ComponentFixture<DisplaySolutionModalComponent>;
@@ -64,7 +65,8 @@ describe('Display Solution Modal', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         DisplaySolutionModalComponent,
-        AngularHtmlBindWrapperDirective
+        AngularHtmlBindWrapperDirective,
+        MockTranslatePipe
       ],
       providers: [
         NgbActiveModal,

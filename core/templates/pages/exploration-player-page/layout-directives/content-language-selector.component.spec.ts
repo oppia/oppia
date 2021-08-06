@@ -43,8 +43,10 @@ import { AudioTranslationLanguageService} from
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 class MockContentTranslationLanguageService {
+  currentLanguageCode: string;
+
   getCurrentContentLanguageCode() {
-    return 'en';
+    return this.currentLanguageCode;
   }
   getLanguageOptionsForDropdown() {
     return [
@@ -53,7 +55,9 @@ class MockContentTranslationLanguageService {
       {value: 'en', displayed: 'English'}
     ];
   }
-  setCurrentContentLanguageCode(languageCode: string) {}
+  setCurrentContentLanguageCode(languageCode: string) {
+    this.currentLanguageCode = languageCode;
+  }
 }
 
 class MockI18nLanguageCodeService {
