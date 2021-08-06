@@ -93,6 +93,7 @@ class InternetConnectivityHandler(base.BaseHandler):
     """Handles the get request to the server from the
     frontend to check for internet connection."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
     HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
 
