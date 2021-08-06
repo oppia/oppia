@@ -23,6 +23,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
+import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
@@ -38,13 +40,15 @@ describe('ImageUploaderComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         MatIconModule,
-        MockRouterModule
+        MockRouterModule,
+        HttpClientTestingModule
       ],
       declarations: [
         ImageUploaderComponent,
         MockTranslatePipe
       ],
       providers: [
+        BlogDashboardPageService,
         {provide: WindowRef, useValue: windowRef}
       ]
     }).compileComponents();
