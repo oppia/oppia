@@ -5,7 +5,7 @@
     <div class="btn-group oppia-publish-button-container"
          uib-tooltip="<[getPublishExplorationButtonTooltip()]>"
          tooltip-placement="bottom"
-         ng-class="{'disable-publish-button': isExplorationLockedForEditing() || countWarnings()}">
+         ng-class="{'disable-publish-button': isOffline || isExplorationLockedForEditing() || countWarnings()}">
       <button type="button" class="btn btn-light oppia-editor-publish-button protractor-test-publish-exploration"
               ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
               ng-click="showPublishExplorationModal()"
@@ -33,7 +33,7 @@
 
   <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
     <div uib-dropdown class="btn-group oppia-publish-button-container"
-         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
+         title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': isOffline || !isExplorationSaveable()}">
       <button id="tutorialSaveButton"
               class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
               ng-class="{'btn-success': isExplorationSaveable()}"
