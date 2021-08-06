@@ -50,8 +50,8 @@ def get(unused_bucket_name: str, filepath: str) -> bytes:
         bytes. Returns data of the file as bytes.
     """
     blob = CLIENT.get_blob(filepath)
-    if blob is None:
-        raise IOError("File at %s does not exist." % filepath)
+    # Make sure that we found the blob.
+    assert blob is not None
     return blob.download_as_bytes()
 
 

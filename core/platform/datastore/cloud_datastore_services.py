@@ -30,7 +30,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, transaction_services # pylint: disable=unused-import
+    from mypy_imports import base_models  # isort:skip pylint: disable=unused-import
+    from mypy_imports import transaction_services  # isort:skip pylint: disable=unused-import
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -50,7 +51,7 @@ JsonProperty = ndb.JsonProperty
 StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
-TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
+TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)  # pylint: disable=invalid-name
 
 
 CLIENT = ndb.Client()

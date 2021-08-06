@@ -30,7 +30,7 @@ from typing import Text, List, Tuple, Optional, Type # isort:skip # pylint: disa
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from core.storage.base_model.gae_models import BaseModel # pylint: disable=import-only-modules,unused-import
+    from mypy_imports import base_models  # pylint: disable=unused-import
 
 # Valid model names.
 NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
@@ -101,83 +101,92 @@ class _Gae(Platform):
         # separate imports for mypy anyway.
         for name in model_names:
             if name == NAMES.activity:
-                from core.storage.activity import gae_models
-                returned_models.append(gae_models)
+                from core.storage.activity import gae_models as activity_models
+                returned_models.append(activity_models)
             elif name == NAMES.app_feedback_report:
-                from core.storage.app_feedback_report import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.app_feedback_report import (
+                    gae_models as app_feedback_report_models)
+                returned_models.append(app_feedback_report_models)
             elif name == NAMES.audit:
-                from core.storage.audit import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.audit import gae_models as audit_models
+                returned_models.append(audit_models)
             elif name == NAMES.auth:
-                from core.storage.auth import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.auth import gae_models as auth_models
+                returned_models.append(auth_models)
             elif name == NAMES.base_model:
-                from core.storage.base_model import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.base_model import gae_models as base_model
+                returned_models.append(base_model)
             elif name == NAMES.beam_job:
-                from core.storage.beam_job import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.beam_job import gae_models as beam_job_models
+                returned_models.append(beam_job_models)
             elif name == NAMES.blog:
-                from core.storage.blog import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.blog import gae_models as blog_models
+                returned_models.append(blog_models)
             elif name == NAMES.classifier:
-                from core.storage.classifier import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.classifier import (
+                    gae_models as classifier_models)
+                returned_models.append(classifier_models)
             elif name == NAMES.collection:
-                from core.storage.collection import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.collection import (
+                    gae_models as collection_models)
+                returned_models.append(collection_models)
             elif name == NAMES.config:
-                from core.storage.config import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.config import gae_models as config_models
+                returned_models.append(config_models)
             elif name == NAMES.email:
-                from core.storage.email import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.email import gae_models as email_models
+                returned_models.append(email_models)
             elif name == NAMES.exploration:
-                from core.storage.exploration import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.exploration import gae_models as exp_models
+                returned_models.append(exp_models)
             elif name == NAMES.feedback:
-                from core.storage.feedback import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.feedback import gae_models as feedback_models
+                returned_models.append(feedback_models)
             elif name == NAMES.improvements:
-                from core.storage.improvements import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.improvements import (
+                    gae_models as improvements_models)
+                returned_models.append(improvements_models)
             elif name == NAMES.job:
-                from core.storage.job import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.job import gae_models as job_models
+                returned_models.append(job_models)
             elif name == NAMES.opportunity:
-                from core.storage.opportunity import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.opportunity import (
+                    gae_models as opportunity_models)
+                returned_models.append(opportunity_models)
             elif name == NAMES.question:
-                from core.storage.question import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.question import gae_models as question_models
+                returned_models.append(question_models)
             elif name == NAMES.recommendations:
-                from core.storage.recommendations import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.recommendations import (
+                    gae_models as recommendations_models)
+                returned_models.append(recommendations_models)
             elif name == NAMES.skill:
-                from core.storage.skill import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.skill import gae_models as skill_models
+                returned_models.append(skill_models)
             elif name == NAMES.statistics:
-                from core.storage.statistics import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.statistics import (
+                    gae_models as statistics_models)
+                returned_models.append(statistics_models)
             elif name == NAMES.story:
-                from core.storage.story import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.story import gae_models as story_models
+                returned_models.append(story_models)
             elif name == NAMES.subtopic:
-                from core.storage.subtopic import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.subtopic import gae_models as subtopic_models
+                returned_models.append(subtopic_models)
             elif name == NAMES.suggestion:
-                from core.storage.suggestion import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.suggestion import (
+                    gae_models as suggestion_models)
+                returned_models.append(suggestion_models)
             elif name == NAMES.topic:
-                from core.storage.topic import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.topic import gae_models as topic_models
+                returned_models.append(topic_models)
             elif name == NAMES.translation:
-                from core.storage.translation import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.translation import (
+                    gae_models as translation_models)
+                returned_models.append(translation_models)
             elif name == NAMES.user:
-                from core.storage.user import gae_models # type: ignore[no-redef]
-                returned_models.append(gae_models)
+                from core.storage.user import gae_models as user_models
+                returned_models.append(user_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
 
@@ -185,7 +194,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_storage_model_classes(cls, model_names):
-        # type: (List[Text]) -> List[BaseModel]
+        # type: (List[Text]) -> List[base_models.BaseModel]
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -210,7 +219,7 @@ class _Gae(Platform):
 
     @classmethod
     def get_all_storage_model_classes(cls):
-        # type: () -> List[BaseModel]
+        # type: () -> List[base_models.BaseModel]
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).
@@ -429,7 +438,7 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def get_storage_model_classes(cls, model_names):
-        # type: (List[Text]) -> List[BaseModel]
+        # type: (List[Text]) -> List[base_models.BaseModel]
         """Get the storage model classes that are in the modules listed in
         model_names.
 
@@ -443,7 +452,7 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def get_all_storage_model_classes(cls):
-        # type: () -> List[BaseModel]
+        # type: () -> List[base_models.BaseModel]
         """Get all model classes that are saved in the storage, NOT model
         classes that are just inherited from (BaseModel,
         BaseCommitLogEntryModel, etc.).

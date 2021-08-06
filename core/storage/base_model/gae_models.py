@@ -27,26 +27,26 @@ import python_utils
 import utils
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Dict, Iterable, List, Optional, Sequence, Text, Tuple, Type, Union,
+    Any, Dict, List, Optional, Sequence, Text, Tuple, Type, Union,
     TypeVar, cast)
 
-SELF_BASE_MODEL = TypeVar(
+SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')
-SELF_BASE_HUMAN_MAINTAINED_MODEL = TypeVar(
+SELF_BASE_HUMAN_MAINTAINED_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_HUMAN_MAINTAINED_MODEL', bound='BaseHumanMaintainedModel')
-SELF_BASE_COMMIT_LOG_ENTRY_MODEL = TypeVar(
+SELF_BASE_COMMIT_LOG_ENTRY_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_COMMIT_LOG_ENTRY_MODEL', bound='BaseCommitLogEntryModel')
-SELF_VERSIONED_MODEL = TypeVar(
+SELF_VERSIONED_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_VERSIONED_MODEL', bound='VersionedModel')
-SELF_BASE_SNAPSHOT_METADATA_MODEL = TypeVar(
+SELF_BASE_SNAPSHOT_METADATA_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_SNAPSHOT_METADATA_MODEL', bound='BaseSnapshotMetadataModel')
-SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(
+SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_SNAPSHOT_CONTENT_MODEL', bound='BaseSnapshotContentModel')
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import (
-        datastore_services, transaction_services)
+    from mypy_imports import datastore_services
+    from mypy_imports import transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()

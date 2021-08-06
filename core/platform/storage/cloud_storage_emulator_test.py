@@ -148,7 +148,12 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
         )
 
         orig_blob = self.emulator.get_blob('/file/path.png')
+        # Ruling out the possibility of None for mypy type checking.
+        assert orig_blob is not None
         copy_blob = self.emulator.get_blob('/different/path2.png')
+        # Ruling out the possibility of None for mypy type checking.
+        assert copy_blob is not None
+
         self.assertNotEqual(orig_blob.name, copy_blob.name)
         self.assertEqual(
             orig_blob.download_as_bytes(), copy_blob.download_as_bytes())

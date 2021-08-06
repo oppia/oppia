@@ -939,7 +939,7 @@ class NdbWsgiMiddleware:
             start_response: webapp2.Response
     ) -> Any:
         global_cache = datastore_services.RedisCache(
-            cache_services.CLOUD_NDB_REDIS_CLIENT)
+            cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
         with datastore_services.get_ndb_context(global_cache=global_cache):
             return self.wsgi_app(environ, start_response)
 

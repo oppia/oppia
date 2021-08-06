@@ -23,10 +23,9 @@ import functools
 
 from google.cloud import datastore
 
+from typing import Any, Callable # isort:skip # pylint: disable=unused-import
 
 CLIENT = datastore.Client()
-
-from typing import Any, Callable # isort:skip # pylint: disable=unused-import
 
 
 def run_in_transaction_wrapper(fn):

@@ -28,7 +28,8 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, story_models
+    from mypy_imports import base_models
+    from mypy_imports import story_models
 
 (base_models, story_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.story])

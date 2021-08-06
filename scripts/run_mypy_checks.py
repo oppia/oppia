@@ -458,6 +458,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/search/elastic_search_services_test.py',
     'core/platform/search/gae_search_services.py',
     'core/platform/search/gae_search_services_test.py',
+    'core/platform/storage/cloud_storage_emulator.py',
+    'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform/taskqueue/cloud_taskqueue_services.py',
     'core/platform/taskqueue/cloud_taskqueue_services_test.py',
     'core/platform/taskqueue/cloud_tasks_emulator.py',

@@ -68,7 +68,7 @@ class MockBucket:
     def __init__(self) -> None:
         self.blobs: Dict[str, MockBlob] = {}
 
-    def get_blob(self, filepath: str) -> MockBlob:
+    def get_blob(self, filepath: str) -> Optional[MockBlob]:
         """Gets a blob object by filepath. This will return None if the
         blob doesn't exist.
 

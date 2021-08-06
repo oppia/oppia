@@ -29,8 +29,6 @@ import redis
 
 from typing import Dict, List, Mapping, Optional, TypeVar, Union  # isort:skip # pylint: disable=unused-import
 
-T = TypeVar("T", str, bytes)
-
 
 REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
@@ -118,7 +116,7 @@ class EmulatorBlob(python_utils.OBJECT):
         return blob_dict
 
     @classmethod
-    def from_dict(cls, blob_dict: Dict[T, T]) -> EmulatorBlob:
+    def from_dict(cls, blob_dict: Dict[bytes, bytes]) -> EmulatorBlob:
         """Transform dictionary from Redis into EmulatorBlob.
 
         Args:
@@ -206,7 +204,6 @@ class CloudStorageEmulator(python_utils.OBJECT):
             EmulatorBlob. The blob.
         """
         blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
-        reveal_type(blob_dict)
         return EmulatorBlob.from_dict(blob_dict) if blob_dict else None
 
     def upload_blob(self, filepath: str, blob: EmulatorBlob) -> None:
@@ -217,7 +214,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
             blob: EmulatorBlob. The blob to upload.
         """
         REDIS_CLIENT.hset(
-            key=self._get_redis_key(filepath), mapping=blob.to_dict())
+            self._get_redis_key(filepath), mapping=blob.to_dict())
 
     def delete_blob(self, filepath: str) -> None:
         """Delete the blob at the given filepath.

@@ -27,7 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from types import ModuleType  # isort:skip # pylint: disable=unused-import
+from types import ModuleType  # isort:skip # pylint: disable=import-only-modules,unused-import
 from typing import cast  # isort:skip # pylint: disable=unused-import
 
 
