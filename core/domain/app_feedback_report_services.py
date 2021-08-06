@@ -22,10 +22,12 @@ from __future__ import unicode_literals
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
 from core.platform import models
-
 import feconf
 import python_utils
 import utils
+
+from mypy_imports import ( # isort:skip
+    app_feedback_report_models, transaction_services) # isort:skip
 
 from typing import Dict, Text, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
 
@@ -37,8 +39,8 @@ PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
 PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB
 
 
-def get_report_models(report_ids): # type: ignore[name-defined]
-    # type: (List[Text]) -> app_feedback_report_models.AppFeedbackReportModel
+def get_report_models(report_ids):
+    # type: (List[Text]) -> List[Optional[app_feedback_report_models.AppFeedbackReportModel]]
     """Fetches and returns the AppFeedbackReportModels with the given ids.
 
     Args:
@@ -232,7 +234,7 @@ def calculate_new_stats_count_for_parameter(
     return current_stats_map
 
 
-def get_report_from_model(report_model): # type: ignore[name-defined]
+def get_report_from_model(report_model):
     # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Create and return a domain object AppFeedbackReport given a model loaded
     from the the data.
@@ -256,7 +258,7 @@ def get_report_from_model(report_model): # type: ignore[name-defined]
             'Web app feedback report domain objects must be defined.')
 
 
-def get_ticket_from_model(ticket_model): # type: ignore[name-defined]
+def get_ticket_from_model(ticket_model):
     # type: (app_feedback_report_models.AppFeedbackReportTicketModel) -> app_feedback_report_domain.AppFeedbackReportTicket
     """Create and return a domain object AppFeedbackReportTicket given a model
     loaded from the the data.
@@ -276,7 +278,7 @@ def get_ticket_from_model(ticket_model): # type: ignore[name-defined]
         ticket_model.report_ids)
 
 
-def get_stats_from_model(stats_model): # type: ignore[name-defined]
+def get_stats_from_model(stats_model):
     # type: (app_feedback_report_models.AppFeedbackReportStatsModel) -> app_feedback_report_domain.AppFeedbackReportDailyStats
     """Create and return a domain object AppFeedbackReportDailyStats given a
     model loaded from the the storage.
@@ -329,7 +331,7 @@ def create_app_daily_stats_from_model_json(daily_param_stats):
     return stats_dict
 
 
-def get_android_report_from_model(android_report_model): # type: ignore[name-defined]
+def get_android_report_from_model(android_report_model):
     # type: (app_feedback_report_models.AppFeedbackReportModel) -> app_feedback_report_domain.AppFeedbackReport
     """Creates a domain object that represents an Android feedback report from
     the given model.
@@ -578,7 +580,11 @@ def reassign_ticket(report, new_ticket):
             if old_ticket_obj.newest_report_creation_timestamp == (
                     report.submitted_on_timestamp):
                 # Update the newest report timestamp.
-                report_models = get_report_models(old_ticket_obj.reports)
+                optional_report_models = get_report_models(
+                    old_ticket_obj.reports)
+                report_models = cast(
+                    List[app_feedback_report_models.AppFeedbackReportModel],
+                    optional_report_models)
                 latest_timestamp = report_models[0].submitted_on
                 for index in python_utils.RANGE(1, len(report_models)):
                     if report_models[index].submitted_on > (

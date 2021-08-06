@@ -25,7 +25,10 @@ import android_validation_constants
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Any, Text # isort:skip # pylint: disable=unused-import
+from mypy_imports import (
+    app_feedback_report_models) # pylint: disable=unused-import
+
+from typing import Dict, Any, Text, cast # isort:skip # pylint: disable=unused-import
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -104,7 +107,8 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         all_reports = (
             app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
         self.assertEqual(len(all_reports), 1)
-        report_model = all_reports[0]
+        report_model = cast(
+            app_feedback_report_models.AppFeedbackReportModel, all_reports[0])
 
         self.assertEqual(report_model.platform, 'android')
         self.assertEqual(

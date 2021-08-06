@@ -26,10 +26,9 @@ import feconf
 import python_utils
 import utils
 
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import (
-        base_models, app_feedback_report_models)
+from mypy_imports import app_feedback_report_models, base_models # isort:skip
+
+from typing import List, Any # isort:skip # pylint: disable=unused-import
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
@@ -314,8 +313,9 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 model_class.get_filter_options_for_field(
                     invalid_filter.invalid_field)
 
-    def _mock_query_filters_returns_empy_list(self, projection, distinct): # pylint: disable=unused-argument
-        # type: () -> None
+    def _mock_query_filters_returns_empy_list(
+            self, unused_projection, unused_distinct):
+        # type: (bool, bool) -> List[Any]
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the
         query function.

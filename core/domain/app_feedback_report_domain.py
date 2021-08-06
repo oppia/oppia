@@ -29,6 +29,7 @@ from core.domain import topic_domain
 from core.platform import models
 
 import feconf
+from mypy_imports import app_feedback_report_models
 import python_utils
 import utils
 

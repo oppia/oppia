@@ -20,11 +20,13 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+from mypy_imports import (
+    app_feedback_report_models) # pylint: disable=unused-import
 
 import python_utils
 
-(base_models, app_feedback_report_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.app_feedback_report])
+(app_feedback_report_models,) = models.Registry.import_models(
+    [models.NAMES.app_feedback_report])
 
 
 PLATFORM_CHOICE_ANDROID = app_feedback_report_models.PLATFORM_CHOICE_ANDROID

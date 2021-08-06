@@ -27,6 +27,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+from mypy_imports import app_feedback_report_models
 import python_utils
 import utils
 

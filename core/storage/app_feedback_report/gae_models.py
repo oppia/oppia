@@ -24,7 +24,8 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # pylint: disable=unused-import
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Sequence, Text, Type, cast) # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -285,13 +286,13 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unscrubbed_expiring_report_models(cls):
-        # type: () -> List[AppFeedbackReportModel]
+        # type: () -> Sequence[AppFeedbackReportModel]
         """Fetches the reports that are past their 90-days in storage and must
         be scrubbed.
 
         Returns:
-            list(AppFeedbackReportModel). A list of IDs corresponding to
-            AppFeedbackReportModel entities that need to be scrubbed.
+            list(AppFeedbackReportModel). A list of AppFeedbackReportModel
+            entities that need to be scrubbed.
         """
         datetime_now = datetime.datetime.utcnow()
         datetime_before_which_to_scrub = datetime_now - (
@@ -299,13 +300,14 @@ class AppFeedbackReportModel(base_models.BaseModel):
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
         # the latter throws "Cannot filter a non-Node argument; received False".
-        return cls.query(
+        report_models = cls.query(
             cls.created_on < datetime_before_which_to_scrub,
             cls.scrubbed_by == None).fetch()  # pylint: disable=singleton-comparison
+        return cast(Sequence[AppFeedbackReportModel], report_models)
 
     @classmethod
     def get_filter_options_for_field(cls, filter_field):
-        # type: (FILTER_FIELD_NAMES) -> List[Text]
+        # type: (Text) -> List[Text]
         """Fetches values that can be used to filter reports by.
 
         Args:
@@ -315,7 +317,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_field.name], distinct=True)
+        query = cls.query(projection=[filter_field.name], distinct=True) # type: ignore[attr-defined]
         filter_values = []
         if filter_field == FILTER_FIELD_NAMES.report_type:
             filter_values = [model.report_type for model in query]
@@ -342,7 +344,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         else:
             raise utils.InvalidInputException(
                 'The field %s is not a valid field to filter reports on' % (
-                    filter_field.name))
+                    filter_field.name)) # type: ignore[attr-defined]
         return filter_values
 
     @staticmethod
