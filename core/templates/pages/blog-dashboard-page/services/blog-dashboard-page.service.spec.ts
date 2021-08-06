@@ -96,6 +96,16 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.blogPostAction).toEqual('delete');
   });
 
+  it('should set and retrieve imageUploaderIsNarrow property', () => {
+    blogDashboardPageService.imageUploaderIsNarrow = true;
+
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toEqual(true);
+
+    blogDashboardPageService.imageUploaderIsNarrow = false;
+
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toEqual(false);
+  });
+
   it('should display alert when unable to delete blog post data',
     fakeAsync(() => {
       spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')

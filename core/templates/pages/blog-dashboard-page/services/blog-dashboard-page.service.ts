@@ -38,6 +38,7 @@ export class BlogDashboardPageService {
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
   private _blogPostAction: string;
+  private _imageUploaderIsNarrow: boolean;
   private _updateViewEventEmitter= new EventEmitter<void>();
 
   constructor(
@@ -112,6 +113,14 @@ export class BlogDashboardPageService {
 
   set authorPictureUrl(url: string) {
     this._authorPictureUrl = url;
+  }
+
+  set imageUploaderIsNarrow(value: boolean) {
+    this._imageUploaderIsNarrow = value;
+  }
+
+  get imageUploaderIsNarrow(): boolean {
+    return this._imageUploaderIsNarrow;
   }
 
   get updateViewEventEmitter(): EventEmitter<void> {

@@ -196,6 +196,7 @@ describe('Blog Post Editor Component', () => {
     expect(component.thumbnailDataUrl).toEqual(
       '/assetsdevhandler/blog_post/sampleBlogId/assets/thumbnail' +
       '/image.png');
+    expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
     expect(component.dateTimeLastSaved).toEqual(
       'November 21, 2014 at 04:52 AM');
     expect(component.title).toEqual('sample_title');
@@ -237,7 +238,7 @@ describe('Blog Post Editor Component', () => {
     component.localEditedContent = '';
     component.updateLocalEditedContent('<p>Hello Worlds</p>');
 
-    expect(component.localEditedContent).toEqual(
+    expect(component.localEditedContent).toBe(
       '<p>Hello Worlds</p>');
     expect(detectChangesSpy).toHaveBeenCalled();
   });
@@ -508,6 +509,7 @@ describe('Blog Post Editor Component', () => {
 
       expect(blogPostEditorBackendApiService.postThumbnailDataAsync)
         .toHaveBeenCalled();
+      expect(blogDashboardPageService.imageUploaderIsNarrow).toBe(true);
       expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
         'Thumbnail Saved Successfully.');
     }));

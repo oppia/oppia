@@ -173,7 +173,8 @@ describe('Blog Dashboard Page Component', () => {
       .and.returnValue(Promise.resolve(blogDashboardData));
 
     component.initMainTab();
-
+    // As loading screen should be shown irrespective of the response
+    // of the async call, expect statement is before tick().
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
 
     tick();
