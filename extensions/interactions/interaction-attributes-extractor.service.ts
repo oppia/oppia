@@ -41,7 +41,6 @@ export class InteractionAttributesExtractorService {
     'NumericExpressionInput',
     'NumericInput',
     'InteractiveMap',
-    'LogicProof',
     'MultipleChoiceInput',
     'SetInput',
     'TextInput',
