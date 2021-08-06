@@ -89,8 +89,12 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_all_translation_opportunities(
-            cls, page_size, urlsafe_start_cursor, language_code):
-        # type: (int, Optional[Text], Text) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            language_code # type: Text
+    ):
+        # type: (...) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[Text], bool]
         """Returns a list of opportunities available for translation in a
         specific language.
 
@@ -107,7 +111,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(ExplorationOpportunitySummaryModel)|None. A list
+                results: list(ExplorationOpportunitySummaryModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -127,13 +131,17 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
                 cls.incomplete_translation_language_codes).fetch_page(
                     page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[ExplorationOpportunitySummaryModel]], results),
+            cast(List[ExplorationOpportunitySummaryModel], results),
             (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_all_voiceover_opportunities(
-            cls, page_size, urlsafe_start_cursor, language_code):
-        # type: (int, Optional[Text], Text) -> Tuple[Optional[List[ExplorationOpportunitySummaryModel]], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            language_code # type: Text
+    ):
+        # type: (...) -> Tuple[List[ExplorationOpportunitySummaryModel], Optional[Text], bool]
         """Returns a list of opportunities available for voiceover in a
         specific language.
 
@@ -150,7 +158,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(ExplorationOpportunitySummaryModel)|None. A list
+                results: list(ExplorationOpportunitySummaryModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -169,28 +177,30 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             cls.language_codes_needing_voice_artists == language_code).order(
                 cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[ExplorationOpportunitySummaryModel]], results),
+            cast(List[ExplorationOpportunitySummaryModel], results),
             (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def get_by_topic(cls, topic_id):
-        # type: (Text) -> Optional[List[ExplorationOpportunitySummaryModel]]
+        # type: (Text) -> List[ExplorationOpportunitySummaryModel]
         """Returns all the models corresponding to the specific topic.
 
         Returns:
-            list(ExplorationOpportunitySummaryModel)|None. A list of
+            list(ExplorationOpportunitySummaryModel). A list of
             ExplorationOpportunitySummaryModel having given topic_id.
         """
-        results = cls.query(cls.topic_id == topic_id).fetch()
-        return cast(Optional[List[ExplorationOpportunitySummaryModel]], results)
+        return cast(
+            List[ExplorationOpportunitySummaryModel],
+            cls.query(cls.topic_id == topic_id).fetch())
 
     @classmethod
     def delete_all(cls):
         # type: () -> None
         """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query().fetch(keys_only=True))
+        datastore_services.delete_multi(keys)
 
 
 class SkillOpportunityModel(base_models.BaseModel):
@@ -232,8 +242,12 @@ class SkillOpportunityModel(base_models.BaseModel):
         })
 
     @classmethod
-    def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
-        # type: (int, Optional[Text]) -> Tuple[Optional[List[SkillOpportunityModel]], Optional[Text], bool]
+    def get_skill_opportunities(
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor # type: Optional[Text]
+    ):
+        # type: (...) -> Tuple[List[SkillOpportunityModel], Optional[Text], bool]
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -247,7 +261,7 @@ class SkillOpportunityModel(base_models.BaseModel):
             3-tuple of (results, cursor, more). As described in fetch_page() at:
             https://developers.google.com/appengine/docs/python/ndb/queryclass,
             where:
-                results: list(SkillOpportunityModel)|None. A list
+                results: list(SkillOpportunityModel). A list
                     of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -265,13 +279,14 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (
-            cast(Optional[List[SkillOpportunityModel]], results),
+            cast(List[SkillOpportunityModel], results),
             (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
     def delete_all(cls):
         # type: () -> None
         """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(
-            cast(List[datastore_services.Key], keys))
+        keys = cast(
+            List[datastore_services.Key],
+            cls.query().fetch(keys_only=True))
+        datastore_services.delete_multi(keys)

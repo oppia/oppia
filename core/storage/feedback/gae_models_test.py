@@ -32,7 +32,7 @@ from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, feedback_models, user_models
+    from mypy_imports import base_models, feedback_models, user_models # pylint: disable=unused-import
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.feedback, models.NAMES.user])
@@ -221,6 +221,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         model = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
+        # Ruling out the possibility of None for mypy type checking.
         assert model is not None
         self.assertEqual(model.entity_type, 'exploration')
 
@@ -252,6 +253,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
 
         model1 = feedback_models.GeneralFeedbackMessageModel.get(
             thread_id, 0)
+        # Ruling out the possibility of None for mypy type checking.
         assert model1 is not None
         self.assertEqual(model1.entity_type, 'exploration')
 
@@ -410,6 +412,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 'user_id', 'exploration.exp_id.thread_id'))
 
+        # Ruling out the possibility of None for mypy type checking.
         assert feedback_thread_user_model is not None
         self.assertEqual(
             feedback_thread_user_model.id,
@@ -435,6 +438,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 'user_id', 'exploration.exp_id.thread_id'))
 
+        # Ruling out the possibility of None for mypy type checking.
         assert expected_model is not None
         assert actual_model is not None
         self.assertEqual(actual_model.id, expected_model.id)
@@ -471,6 +475,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         actual_model_1 = actual_models[0]
         actual_model_2 = actual_models[1]
 
+        # Ruling out the possibility of None for mypy type checking.
         assert actual_model_1 is not None
         assert actual_model_2 is not None
         self.assertEqual(actual_model_1.id, expected_model_1.id)

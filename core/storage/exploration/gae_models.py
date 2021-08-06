@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional, Text, Tuple, cast # isort:skip # p
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
+    from mypy_imports import datastore_services # pylint: disable=unused-import
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -99,8 +99,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
-    def get_multi(cls, exp_id, exp_versions): # type: ignore[override]
-        # type: (Text, List[int]) -> List[Optional[ExplorationCommitLogEntryModel]]
+    def get_multi( # type: ignore[override]
+            cls,
+            exp_id, # type: Text
+            exp_versions # type: List[int]
+    ):
+        # type: (...) -> List[Optional[ExplorationCommitLogEntryModel]]
         """Gets the ExplorationCommitLogEntryModels for the given exploration
         id and exploration versions.
 
@@ -136,8 +140,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        # type: (int, Optional[Text], Optional[datetime.timedelta]) -> Tuple[List[ExplorationCommitLogEntryModel], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            max_age=None # type: Optional[datetime.timedelta]
+    ):
+        # type: (...) -> Tuple[List[ExplorationCommitLogEntryModel], Optional[Text], bool]
         """Fetches a list of all the non-private commits sorted by their
         last updated attribute.
 
@@ -269,6 +277,8 @@ class ExplorationModel(base_models.VersionedModel):
         """Returns the total number of explorations."""
         return cls.get_all().count()
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -333,6 +343,7 @@ class ExplorationModel(base_models.VersionedModel):
             versioned_and_exp_rights_models = python_utils.ZIP(
                 versioned_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
+                # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
                 assert rights_model is not None
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
@@ -347,6 +358,8 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
 
+    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
+    # to remove Any used below.
     @staticmethod
     def convert_to_valid_dict(snapshot_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -375,6 +388,8 @@ class ExplorationModel(base_models.VersionedModel):
 
         return snapshot_dict
 
+    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
+    # to remove Any used below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> ExplorationModel
         """Populates the model instance with the snapshot.
@@ -584,6 +599,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def save(self, committer_id, commit_message, commit_cmds):
         # type: (Text, Text, List[Dict[Text, Any]]) -> None
         """Saves a new version of the exploration, updating the Exploration
@@ -606,6 +623,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
+    # to remove Any used below.
     @staticmethod
     def convert_to_valid_dict(model_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -656,6 +675,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         return model_dict
 
+    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
+    # to remove Any used below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> ExplorationRightsModel
         """Populates the model instance with the snapshot.
@@ -677,6 +698,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
+    # to remove Any used below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -719,6 +742,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
+        # Ruling out the possibility of None for mypy type checking.
         assert snapshot_metadata_model is not None
         snapshot_metadata_model.content_user_ids = list(sorted(
             set(self.owner_ids) |
@@ -900,13 +924,14 @@ class ExpSummaryModel(base_models.BaseModel):
         Returns:
             iterable. An iterable with non-private ExpSummary models.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_top_rated(cls, limit):
@@ -921,15 +946,16 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with the top rated exp summaries that are
             public in descending order of scaled_average_rating.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).order(
-            -ExpSummaryModel.scaled_average_rating
-        ).fetch(limit)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).order(
+                -ExpSummaryModel.scaled_average_rating
+            ).fetch(limit)
+        )
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -944,19 +970,20 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with private exp summaries that are at least
             viewable by the given user.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            datastore_services.any_of(
-                ExpSummaryModel.owner_ids == user_id,
-                ExpSummaryModel.editor_ids == user_id,
-                ExpSummaryModel.voice_artist_ids == user_id,
-                ExpSummaryModel.viewer_ids == user_id)
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
+            ).filter(
+                datastore_services.any_of(
+                    ExpSummaryModel.owner_ids == user_id,
+                    ExpSummaryModel.editor_ids == user_id,
+                    ExpSummaryModel.voice_artist_ids == user_id,
+                    ExpSummaryModel.viewer_ids == user_id)
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -970,15 +997,16 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with exp summaries that are at least
             editable by the given user.
         """
-        results = ExpSummaryModel.query().filter(
-            datastore_services.any_of(
-                ExpSummaryModel.owner_ids == user_id,
-                ExpSummaryModel.editor_ids == user_id)
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                datastore_services.any_of(
+                    ExpSummaryModel.owner_ids == user_id,
+                    ExpSummaryModel.editor_ids == user_id)
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_recently_published(cls, limit):
@@ -993,15 +1021,16 @@ class ExpSummaryModel(base_models.BaseModel):
             recently published. The returned list is sorted by the time of
             publication with latest being first in the list.
         """
-        results = ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).order(
-            -ExpSummaryModel.first_published_msec
-        ).fetch(limit)
-
-        return cast(List[ExpSummaryModel], results)
+        return cast(
+            List[ExpSummaryModel],
+            ExpSummaryModel.query().filter(
+                ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
+            ).filter(
+                ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ).order(
+                -ExpSummaryModel.first_published_msec
+            ).fetch(limit)
+        )
 
     @staticmethod
     def get_model_association_to_user():

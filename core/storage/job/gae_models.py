@@ -156,10 +156,12 @@ class JobModel(base_models.BaseModel):
         """
         earliest_time_msec = (
             utils.get_current_time_in_millisecs() - recency_msec)
-        results = cls.query().filter(
-            cls.time_queued_msec > earliest_time_msec
-        ).order(-cls.time_queued_msec).fetch(limit)
-        return cast(List[JobModel], results)
+        return cast(
+            List[JobModel],
+            cls.query().filter(
+                cls.time_queued_msec > earliest_time_msec
+            ).order(-cls.time_queued_msec).fetch(limit)
+        )
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):
@@ -173,10 +175,13 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
-        results = cls.query().filter(
-            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
-        ).order(-cls.time_queued_msec).fetch(limit)
-        return cast(List[JobModel], results)
+        return cast(
+            List[JobModel],
+            cls.query().filter(
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
+            ).order(-cls.time_queued_msec).fetch(limit)
+        )
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):

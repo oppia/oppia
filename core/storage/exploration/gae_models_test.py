@@ -34,7 +34,7 @@ from typing import Any, Dict, List, Text, cast # isort:skip # pylint: disable=un
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, exp_models, user_models
+    from mypy_imports import base_models, exp_models, user_models # pylint: disable=unused-import
 
 (base_models, exp_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
@@ -67,9 +67,10 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 1)
-        result = (
-            exp_models.ExplorationModel.get_all().fetch(limit=1)[0])
-        saved_exploration = cast(exp_models.ExplorationModel, result)
+        saved_exploration = cast(
+            exp_models.ExplorationModel,
+            exp_models.ExplorationModel.get_all().fetch(limit=1)[0]
+        )
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
@@ -275,6 +276,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
+        # Ruling out the possibility of None for mypy type checking.
         assert saved_model is not None
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
@@ -366,6 +368,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'cid', 'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}])
         saved_model = exp_models.ExplorationRightsModel.get('id_0')
+        # Ruling out the possibility of None for mypy type checking.
         assert saved_model is not None
 
         snapshot_dict = saved_model.compute_snapshot()
@@ -456,6 +459,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_all_viewer_ids_field_successful(self):
         # type: () -> None
+        # TODO(#13523): Use of Any in the type-annotation below will be
+        # removed when the snapshot of ExplorationRightsModel
+        # is converted to TypedDict/Domain Object.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['all_viewer_ids'] = [
             self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
@@ -483,6 +489,9 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
 
     def test_revert_to_version_with_invalid_status_is_successful(self):
         # type: () -> None
+        # TODO(#13523): Use of Any in the type-annotation below will be
+        # removed when the snapshot of ExplorationRightsModel
+        # is converted to TypedDict/Domain Object.
         broken_dict = dict(**self.original_dict) # type: Dict[Text, Any]
         broken_dict['status'] = 'publicized'
 
@@ -574,8 +583,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
-            # Here ignore[arg-type] is used to test method for invalid
-            # input type.
+            # TODO(#13528): Remove this test after the backend is fully
+            # type-annotated. Here ignore[arg-type] is used to test method
+            # get_all_non_private_commits() for invalid input type.
             results, _, more = (
                 exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1)) # type: ignore[arg-type]
@@ -606,6 +616,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_multi(
                 'a', [1, 2, 3]))
 
+        # Ruling out the possibility of None for mypy type checking.
         assert actual_models[0] is not None
         assert actual_models[1] is not None
         self.assertEqual(len(actual_models), 3)

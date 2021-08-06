@@ -36,8 +36,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
     Text, Tuple, TypeVar)
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, transaction_services # pylint: disable=unused-import
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -63,9 +63,7 @@ TYPE_MODEL_SUBCLASS = TypeVar('TYPE_MODEL_SUBCLASS', bound=Model)
 def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.StringProperty
     """Enforces requirement for models to use StringProperty(indexed=True)."""
-    # We use ‘ignore[call-overload]’ because this method includes a boolean arg
-    # which is not part of the signature of the overridden method.
-    if not kwargs.get('indexed', True): # type: ignore[call-overload]
+    if not kwargs.get(b'indexed', True):
         raise ValueError('StringProperty(indexed=False) is no longer supported')
     return ndb.StringProperty(*args, **kwargs)
 
@@ -74,9 +72,7 @@ def StringProperty(*args, **kwargs): # pylint: disable=invalid-name
 def TextProperty(*args, **kwargs): # pylint: disable=invalid-name
     # type: (*Any, **Any) -> ndb.TextProperty
     """Enforces requirement for models to use TextProperty(indexed=False)."""
-    # We use ‘ignore[call-overload]’ because this method includes a boolean arg
-    # which is not part of the signature of the overridden method.
-    if kwargs.get('indexed', False): # type: ignore[call-overload]
+    if kwargs.get(b'indexed', False):
         raise ValueError('TextProperty(indexed=True) is no longer supported')
     return ndb.TextProperty(*args, **kwargs)
 
@@ -235,8 +231,10 @@ def make_cursor(urlsafe_cursor=None):
     return datastore_query.Cursor(urlsafe=urlsafe_cursor)
 
 
-def fetch_multiple_entities_by_ids_and_models(ids_and_models):
-    # type: (List[Tuple[Text, List[Text]]]) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
+def fetch_multiple_entities_by_ids_and_models(
+        ids_and_models # type: List[Tuple[Text, List[Text]]]
+):
+    # type: (...) -> List[List[Optional[TYPE_MODEL_SUBCLASS]]]
     """Fetches the entities from the datastore corresponding to the given ids
     and models.
 
@@ -281,7 +279,7 @@ def make_instantaneous_global_consistency_policy():
 
 @contextlib.contextmanager
 def mock_datetime_for_datastore(mocked_now):
-    # type: (datetime.datetime) -> Iterator[Any]
+    # type: (datetime.datetime) -> Iterator[None]
     """Mocks parts of the datastore to accept a fake datetime type that always
     returns the same value for utcnow.
 
@@ -313,8 +311,14 @@ def mock_datetime_for_datastore(mocked_now):
             """Validates whether the given instance is a datetime instance."""
             return isinstance(other, old_datetime_type)
 
+    # TODO(#13534): Fix with_metaclass() and remove type: ignore after py3
+    # migration.
     # We use ‘ignore[misc]’ because MockDatetime subclasses a class created
-    # dynamically. These dynamic classes are not supported by mypy.
+    # dynamically.
+    # This can be fixed after py3 migration as this error is resolved when
+    # mypy is able to get return type of the function
+    # python_utils.with_metaclass and we will be removing python_utils
+    # in py3 migration.
     class MockDatetime( # pylint: disable=inherit-non-class
             python_utils.with_metaclass(MockDatetimeType, old_datetime_type)): # type: ignore[misc]
         """Always returns mocked_now as the current time."""

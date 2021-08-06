@@ -82,8 +82,8 @@ from webapp2_extras import routes
 from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -924,12 +924,12 @@ URLS = MAPREDUCE_HANDLERS + [
 ]
 
 # Adding redirects for topic landing pages.
-for subject in feconf.AVAILABLE_LANDING_PAGES:
-    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+for subject in constants.AVAILABLE_LANDING_PAGES:
+    for topic in constants.AVAILABLE_LANDING_PAGES[subject]:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
-                custom_landing_pages.TopicLandingPage))
+                oppia_root.OppiaRootPage))
 
 if constants.DEV_MODE:
     URLS.append(

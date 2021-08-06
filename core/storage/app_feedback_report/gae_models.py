@@ -27,8 +27,9 @@ import utils
 from typing import Any, Dict, List, Optional, Text, Union, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import ( # pylint: disable=unused-import
+        base_models, datastore_services, transaction_services)
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -139,6 +140,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
     web_report_info_schema_version = datastore_services.IntegerProperty(
         required=False, indexed=True)
 
+    # TODO(#13523): Change 'android_report_info' and 'web_report_info' to domain
+    # objects/TypedDict to remove Any from type-annotation below.
     @classmethod
     def create(
             cls,
@@ -318,9 +321,10 @@ class AppFeedbackReportModel(base_models.BaseModel):
             dict. Dictionary of the data from AppFeedbackReportModel.
         """
         user_data = dict()
-        report_models = cls.get_all().filter(
-            cls.scrubbed_by == user_id).fetch()
-        report_models = cast(List[AppFeedbackReportModel], report_models)
+        report_models = cast(
+            List[AppFeedbackReportModel],
+            cls.get_all().filter(cls.scrubbed_by == user_id).fetch()
+        )
         for report_model in report_models:
             submitted_on_msec = utils.get_time_in_millisecs(
                 report_model.submitted_on)
@@ -395,9 +399,14 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, ticket_name, github_issue_repo_name, github_issue_number,
-            newest_report_timestamp, report_ids):
-        # type: (Text, Optional[Text], Optional[int], datetime.datetime, List[Text]) -> Text
+            cls,
+            ticket_name, # type: Text
+            github_issue_repo_name, # type: Optional[Text]
+            github_issue_number, # type: Optional[int]
+            newest_report_timestamp, # type: datetime.datetime
+            report_ids # type: List[Text]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportTicketModel instance and returns its
         ID.
 
@@ -539,9 +548,14 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, platform, ticket_id, stats_tracking_date,
-            total_reports_submitted, daily_param_stats):
-        # type: (Text, Text, datetime.date, int, Dict[Text, Dict[Text, int]]) -> Text
+            cls,
+            platform, # type: Text
+            ticket_id, # type: Text
+            stats_tracking_date, # type: datetime.date
+            total_reports_submitted, # type: int
+            daily_param_stats # type: Dict[Text, Dict[Text, int]]
+    ):
+        # type: (...) -> Text
         """Creates a new AppFeedbackReportStatsModel instance and returns its
         ID.
 
@@ -611,8 +625,7 @@ class AppFeedbackReportStatsModel(base_models.BaseModel):
             ticket.
         """
         ticket_models = cls.query(cls.ticket_id == ticket_id).fetch()
-        ticket_models = cast(List[AppFeedbackReportStatsModel], ticket_models)
-        return ticket_models
+        return cast(List[AppFeedbackReportStatsModel], ticket_models)
 
     @staticmethod
     def get_deletion_policy():

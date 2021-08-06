@@ -32,7 +32,8 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
   profilePictureDataUrl: string;
   username: string;
   profileUrl: string;
-  logoutUrl: string = AppConstants.LOGOUT_URL;
+  logoutUrl: string = (
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
   profileDropdownIsActive: boolean = false;
   logoWebpImageSrc: string;
   logoPngImageSrc: string;

@@ -99,6 +99,9 @@ class MockDatetimeForDatastoreTests(test_utils.GenericTestBase):
     def test_exception_is_raised_when_passed_wrong_type(self):
         # type: () -> None
         with self.assertRaisesRegexp(Exception, 'mocked_now must be datetime'): # type: ignore[no-untyped-call]
+            # TODO(#13528): Remove this test after the backend is fully
+            # type-annotated. Here ignore[arg-type] is used to test method
+            # mock_datetime_for_datastore() for invalid input type.
             with gae_datastore_services.mock_datetime_for_datastore(2020): # type: ignore[arg-type]
                 pass
 

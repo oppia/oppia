@@ -22,7 +22,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, job_models
+    from mypy_imports import base_models, job_models # pylint: disable=unused-import
 
 (base_models, job_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.job])
@@ -33,7 +33,6 @@ class JobModelTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         # type: () -> None
-
         self.assertEqual(
             job_models.JobModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -91,6 +90,7 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
         self.assertTrue(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType2'))
         job2 = job_models.JobModel.get('MyJobId2', strict=True)
+        # Ruling out the possibility of None for mypy type checking.
         assert job2 is not None
         job2.status_code = job_models.STATUS_CODE_COMPLETED
         job2.update_timestamps()
