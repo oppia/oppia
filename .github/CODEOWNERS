@@ -135,7 +135,7 @@
 /core/templates/pages/license-page/ @vojtechjelinek
 /core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
-/core/templates/pages/privacy-page/privacy-page.component.html @seanlip
+/core/templates/pages/privacy-page/privacy-page.component.html @seanlip @BenHenning
 /core/templates/pages/privacy-page/privacy-page.component.ts @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep
 /core/templates/pages/terms-page/terms-page.component.html @seanlip @BenHenning
