@@ -68,9 +68,11 @@ var login = async function(email, useManualNavigation = true) {
   await action.sendKeys('Email input', emailInput, email);
 
   var signInButton = element(by.css('.protractor-test-sign-in-button'));
+  await browser.waitForAngularEnabled(false);
   await action.click('Sign in button', signInButton);
 
   await waitFor.pageToFullyLoad();
+  await browser.waitForAngularEnabled(true);
 };
 
 var logout = async function() {
