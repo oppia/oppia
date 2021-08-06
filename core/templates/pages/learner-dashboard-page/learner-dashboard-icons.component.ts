@@ -34,10 +34,10 @@ import { LearnerDashboardActivityIds } from
 export class LearnerDashboardIconsComponent implements OnInit {
   activityIsCurrentlyHoveredOver: boolean = true;
   playlistTooltipIsEnabled: boolean = false;
-  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   @Input() activityType!: string;
   @Input() activityId!: string;
   @Input() activityTitle!: string;

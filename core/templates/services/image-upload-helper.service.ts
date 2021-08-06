@@ -42,6 +42,7 @@ export class ImageUploadHelperService {
 
   // Image file returned will be null when blob is not of type
   // 'image', blob size is zero or dataURI does not exists.
+  // dataURI is null if filename is not present in local storage.
   convertImageDataToImageFile(dataURI: string | null): Blob | null {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.

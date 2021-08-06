@@ -108,6 +108,7 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     };
   }
 
+  // 'originalArray' will be null[] when the regions have invalid labels.
   private hasDuplicates(originalArray: (string | null)[]): boolean {
     const array = originalArray.slice(0).sort();
     for (let i = 1; i < array.length; i++) {

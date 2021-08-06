@@ -76,9 +76,10 @@ export class TextInputValidationService {
       let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
       let customizationArgSpecs = textSpecs.customization_arg_specs;
       let rowsSpecs = customizationArgSpecs[1];
-      if (rowsSpecs.schema.validators) {
-        let minRows = rowsSpecs.schema.validators[0].min_value;
-        let maxRows = rowsSpecs.schema.validators[1].max_value;
+      let validators = rowsSpecs.schema.validators;
+      if (validators) {
+        let minRows = validators[0].min_value;
+        let maxRows = validators[1].max_value;
         if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
