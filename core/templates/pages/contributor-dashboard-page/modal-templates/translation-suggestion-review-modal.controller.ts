@@ -59,6 +59,7 @@ angular.module('oppia').controller(
       $scope.HTML_SCHEMA = {
         type: 'html'
       };
+      $scope.UNICODE_SCHEMA = { type: 'unicode' };
       $scope.SET_OF_STRINGS_SCHEMA = {
         type: 'list',
         items: {
@@ -68,7 +69,7 @@ angular.module('oppia').controller(
       $scope.canEditTranslation = false;
 
       $scope.updateSuggestion = function() {
-        const updatedTranslation = $scope.editedContent.html;
+        const updatedTranslation = $scope.editedContent;
         const suggestionId = $scope.activeSuggestion.suggestion_id;
         ContributionAndReviewService.updateTranslationSuggestionAsync(
           suggestionId,
@@ -142,15 +143,19 @@ angular.module('oppia').controller(
         $scope.status = $scope.activeSuggestion.status;
         $scope.contentHtml = (
           $scope.activeSuggestion.change.content_html);
+        $scope.isHtmlContent = (
+          $scope.activeSuggestion.change.data_format === 'html'
+        );
+        $scope.isUnicodeContent = (
+          $scope.activeSuggestion.change.data_format === 'unicode'
+        );
         $scope.isSetOfStringsContent = (
           $scope.activeSuggestion.change.data_format ===
             'set_of_normalized_string' ||
           $scope.activeSuggestion.change.data_format ===
-            'set_of_unicode_string' ? true : false
+            'set_of_unicode_string'
         );
-        $scope.editedContent = {
-          html: $scope.translationHtml
-        };
+        $scope.editedContent = $scope.translationHtml;
         $scope.reviewMessage = '';
         if (!reviewable) {
           $scope.suggestionIsRejected = (
@@ -230,7 +235,7 @@ angular.module('oppia').controller(
 
       $scope.cancelEdit = function() {
         $scope.startedEditing = false;
-        $scope.editedContent.html = $scope.translationHtml;
+        $scope.editedContent = $scope.translationHtml;
       };
 
       $scope.cancel = function() {

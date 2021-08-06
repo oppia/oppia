@@ -29,6 +29,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { Status, TranslatableItem, TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -110,6 +111,7 @@ export class TranslationModalComponent {
   };
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
+  isActiveLanguageReviewer: boolean = false;
   hadCopyParagraphError = false;
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
@@ -130,6 +132,7 @@ export class TranslationModalComponent {
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
+    private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {
     this.contextService = OppiaAngularRootComponent.contextService;
@@ -156,6 +159,14 @@ export class TranslationModalComponent {
         this.updateActiveState(translatableItem);
         ({more: this.moreAvailable} = translatableItem);
         this.loadingData = false;
+      });
+    this.userService.getUserContributionRightsDataAsync().then(
+      userContributionRights => {
+        const reviewableLanguageCodes = (
+          userContributionRights.can_review_translation_for_language_codes);
+        if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
+          this.isActiveLanguageReviewer = true;
+        };
       });
     this.HTML_SCHEMA = {
       type: 'html',

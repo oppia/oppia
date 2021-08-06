@@ -29,6 +29,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
 import { TranslateTextService } from '../services/translate-text.service';
 
 class MockChangeDetectorRef {
@@ -42,6 +43,7 @@ describe('Translation Modal Component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let siteAnalyticsService: SiteAnalyticsService;
   let imageLocalStorageService: ImageLocalStorageService;
+  let userService: UserService;
   let activeModal: NgbActiveModal;
   let httpTestingController: HttpTestingController;
   let fixture: ComponentFixture<TranslationModalComponent>;
@@ -97,6 +99,17 @@ describe('Translation Modal Component', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationLanguageService.setActiveLanguageCode('es');
+    userService = TestBed.inject(UserService);
+    spyOn(
+      userService,
+      'getUserContributionRightsDataAsync').and.returnValue(
+        Promise.resolve(
+        {
+          'can_review_translation_for_language_codes': ['hi'],
+          'can_review_voiceover_for_language_codes': [],
+          'can_review_questions': false
+        }
+    ));
   });
 
   it('should invoke change detection when html is updated', () => {

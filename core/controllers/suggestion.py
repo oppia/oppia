@@ -418,10 +418,18 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
                 'The parameter \'translation_html\' is missing.'
             )
 
-        if not isinstance(
-                self.payload.get('translation_html'), python_utils.BASESTRING):
+        if (
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    python_utils.BASESTRING)
+                and
+                not isinstance(
+                    self.payload.get('translation_html'),
+                    list)
+        ):
             raise self.InvalidInputException(
-                'The parameter \'translation_html\' should be a string.'
+                'The parameter \'translation_html\' should be a string or a' +
+                ' list.'
             )
 
         suggestion_services.update_translation_suggestion(
