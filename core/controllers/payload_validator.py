@@ -30,7 +30,7 @@ from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= w
 def validate(
         handler_args, handler_args_schemas, allowed_extra_args,
         allow_string_to_bool_conversion):
-    # type: (Any, Any, bool) -> Tuple[Dict[Any, Any], List[Text]]
+    # type: (Any, Any, bool, bool) -> Tuple[Dict[Any, Any], List[Text]]
 
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
