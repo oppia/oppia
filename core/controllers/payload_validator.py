@@ -259,7 +259,6 @@ HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'CsrfTokenHandler',
     'Error404Handler',
     'FrontendErrorHandler',
-    'InternetConnectivityHandler',
     'WarmupPage',
     'HomePageRedirectPage',
     'SplashRedirectPage',

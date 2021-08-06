@@ -69,7 +69,8 @@ describe('Rte Helper Service', function() {
       isComplex: true,
       isBlockElement: true,
       requiresFs: false,
-      tooltip: 'Insert collapsible block'
+      tooltip: 'Insert collapsible block',
+      requiresInternet: false
     }, {
       backendId: 'Image',
       customizationArgSpecs: [{
@@ -109,7 +110,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: true,
       requiresFs: true,
-      tooltip: 'Insert image'
+      tooltip: 'Insert image',
+      requiresInternet: true
     }, {
       backendId: 'Link',
       customizationArgSpecs: [{
@@ -134,7 +136,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: false,
       requiresFs: false,
-      tooltip: 'Insert link'
+      tooltip: 'Insert link',
+      requiresInternet: false
     }, {
       backendId: 'Math',
       customizationArgSpecs: [{
@@ -154,7 +157,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: false,
       requiresFs: false,
-      tooltip: 'Insert mathematical formula'
+      tooltip: 'Insert mathematical formula',
+      requiresInternet: true
     }, {
       backendId: 'skillreview',
       customizationArgSpecs: [{
@@ -178,7 +182,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: false,
       requiresFs: false,
-      tooltip: 'Insert Concept Card Link'
+      tooltip: 'Insert Concept Card Link',
+      requiresInternet: true
     }, {
       backendId: 'Tabs',
       customizationArgSpecs: [{
@@ -203,7 +208,8 @@ describe('Rte Helper Service', function() {
       isComplex: true,
       isBlockElement: true,
       requiresFs: false,
-      tooltip: 'Insert tabs (e.g. for hints)'
+      tooltip: 'Insert tabs (e.g. for hints)',
+      requiresInternet: false
     }, {
       backendId: 'Video',
       customizationArgSpecs: [{
@@ -252,7 +258,8 @@ describe('Rte Helper Service', function() {
       isComplex: false,
       isBlockElement: true,
       requiresFs: false,
-      tooltip: 'Insert video'
+      tooltip: 'Insert video',
+      requiresInternet: true
     }]);
   });
 

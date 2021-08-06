@@ -23,6 +23,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 import { ConnectionService } from 'services/connection-service.service';
+import { Subscription } from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
@@ -53,10 +54,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
-  connectionStatus: string = AppConstants.CONNECTION_STATUS_ONLINE;
-  disableOnOfflineNames: string[] = [
-    'image', 'skillreview', 'svgdiagram', 'video'];
   currentValue: string;
+  internetRequiringComponents: string[] = [];
+  subscriptions: Subscription;
   // A RegExp for matching rich text components.
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
@@ -68,23 +68,19 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     private connectionService: ConnectionService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+    this.subscriptions = new Subscription();
   }
 
   ngOnInit(): void {
-    this.connectionService.onInternetStateChange.subscribe(currentState => {
-      let {hasNetworkConnection, hasInternetAccess} = currentState;
-      if (hasNetworkConnection && hasInternetAccess) {
-        if (this.connectionStatus === AppConstants.CONNECTION_STATUS_OFFLINE) {
-          this.enableRTEicons();
-        }
-        this.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
-      } else {
-        if (this.connectionStatus === AppConstants.CONNECTION_STATUS_ONLINE) {
-          this.disableRTEicons();
-        }
-        this.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
-      }
-    });
+    this.subscriptions.add(
+      this.connectionService.onInternetStateChange.subscribe(
+        internetAccessible => {
+          if (internetAccessible) {
+            this.enableRTEicons();
+          } else {
+            this.disableRTEicons();
+          }
+        }));
   }
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
@@ -221,6 +217,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
+    this.internetRequiringComponents = [];
 
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
@@ -234,6 +231,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
+      }
+      if (componentDefn.requiresInternet) {
+        this.internetRequiringComponents.push(componentDefn.id);
       }
     });
 
@@ -326,9 +326,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
 
     ck.on('instanceReady', () => {
-      if (this.connectionStatus === 'OFFLINE') {
-        this.disableRTEicons();
-      }
       // Show the editor now that it is fully loaded.
       (
         <HTMLElement> this.elementRef.nativeElement
@@ -351,10 +348,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
           .css('width', '24px')
           .css('padding', '0px 0px');
       });
-      $('.cke_inner').append(
-        '<span id="offline-warning">* Tools with dark background ' +
-        'can not be used when offline.<span>');
-      $('#offline-warning').css('display', 'none');
+      let offline = document.createElement('span');
+      offline.innerText = (
+        '* Tools with dark background can not be used when offline.');
+      offline.className = 'cke-offline-warning';
+      offline.style.display = 'none';
+      // eslint-disable-next-line max-len
+      this.elementRef.nativeElement.children[0].children[0].children[0].appendChild(offline);
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')
@@ -396,7 +396,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         $('.cke_combo_button')
           .css('display', 'none');
       }
-
+      if (!this.connectionService.isOnline()) {
+        this.disableRTEicons();
+      }
       ck.setData(this.wrapComponents(this.value));
     });
 
@@ -453,27 +455,34 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   disableRTEicons(): void {
     // Add disabled cursor pointer to the icons.
     // TODO(#12882): Remove the use of jQuery.
-    this.disableOnOfflineNames.forEach((name) => {
-      // TODO(#12882): Remove the use of jQuery.
+    this.internetRequiringComponents.forEach((name) => {
       $('.cke_button__oppia' + name)
         .css('background-color', '#cccccc')
         .css('pointer-events', 'none');
-      $('#offline-warning').css('display', '');
     });
+    let offline = this.elementRef.nativeElement.getElementsByClassName(
+      'cke-offline-warning');
+    for (let i = 0; i < offline.length; i++) {
+      offline[i].style.display = 'block';
+    }
   }
   enableRTEicons(): void {
     // TODO(#12882): Remove the use of jQuery.
-    this.disableOnOfflineNames.forEach((name) => {
-      // TODO(#12882): Remove the use of jQuery.
+    this.internetRequiringComponents.forEach((name) => {
       $('.cke_button__oppia' + name)
         .css('background-color', '')
         .css('pointer-events', '');
-      $('#offline-warning').css('display', 'none');
     });
+    let offline = this.elementRef.nativeElement.getElementsByClassName(
+      'cke-offline-warning');
+    for (let i = 0; i < offline.length; i++) {
+      offline[i].style.display = 'none';
+    }
   }
 
   ngOnDestroy(): void {
     this.ck.destroy();
+    this.subscriptions.unsubscribe();
   }
 }
 

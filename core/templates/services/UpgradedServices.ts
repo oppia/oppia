@@ -17,7 +17,7 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient, HttpXhrBackend,
@@ -91,7 +91,6 @@ import { CollectionRightsBackendApiService } from
 import { CollectionValidationService } from
   'domain/collection/collection-validation.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
-import { ConnectionService } from 'services/connection-service.service';
 import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
@@ -544,10 +543,6 @@ export class UpgradedServices {
     upgradedServices['CollectionValidationService'] =
       new CollectionValidationService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
-    upgradedServices['ConnectionService'] = new ConnectionService(
-      new WindowRef(),
-      upgradedServices['HttpClient'],
-      new NgZone({}));
     upgradedServices['ConstructTranslationIdsService'] =
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();

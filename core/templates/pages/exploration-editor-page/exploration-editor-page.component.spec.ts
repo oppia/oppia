@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { AppConstants } from 'app.constants';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
@@ -38,7 +37,7 @@ import { UserExplorationPermissionsService } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { AlertsService } from 'services/alerts.service';
-import { ConnectionService, ConnectionState } from 'services/connection-service.service';
+import { ConnectionService } from 'services/connection-service.service';
 import { ContextService } from 'services/context.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -105,7 +104,7 @@ describe('Exploration editor page component', function() {
   var refreshGraphEmitter = new EventEmitter();
 
   var autosaveIsInProgress = new EventEmitter();
-  var mockConnectionServiceEmitter = new EventEmitter<ConnectionState>();
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
   var mockOpenEditorTutorialEmitter = new EventEmitter();
   var mockOpenTranslationTutorialEmitter = new EventEmitter();
 
@@ -537,26 +536,15 @@ describe('Exploration editor page component', function() {
     });
 
     it('should change status to ONLINE when internet is connected', () => {
-      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
-      mockConnectionServiceEmitter.emit({
-        hasInternetAccess: true,
-        hasNetworkConnection: true
-      });
+      mockConnectionServiceEmitter.emit(true);
       $scope.$apply();
       expect(as.addSuccessMessage).toHaveBeenCalled();
-      expect(ctrl.connectionStatus).toBe(AppConstants.CONNECTION_STATUS_ONLINE);
     });
 
     it('should change status to OFFLINE when internet disconnects', () => {
-      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
-      mockConnectionServiceEmitter.emit({
-        hasInternetAccess: false,
-        hasNetworkConnection: false
-      });
+      mockConnectionServiceEmitter.emit(false);
       $scope.$apply();
       expect(as.addInfoMessage).toHaveBeenCalled();
-      expect(ctrl.connectionStatus).toBe(
-        AppConstants.CONNECTION_STATUS_OFFLINE);
     });
   });
 

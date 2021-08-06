@@ -16,12 +16,10 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
-import { AppConstants } from 'app.constants';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { ConnectionState } from 'services/connection-service.service';
 import { ContextService } from 'services/context.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateInteractionIdService } from
@@ -70,7 +68,7 @@ describe('Exploration save and publish buttons component', function() {
   var userExplorationPermissionsService = null;
 
   var mockExternalSaveEventEmitter = null;
-  var mockConnectionServiceEmitter = new EventEmitter<ConnectionState>();
+  var mockConnectionServiceEmitter = new EventEmitter<boolean>();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -393,27 +391,16 @@ describe('Exploration save and publish buttons component', function() {
 
   it('should change connnection status to ONLINE when internet is connected',
     () => {
-      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_OFFLINE;
       $scope.isOffline = true;
-      mockConnectionServiceEmitter.emit({
-        hasInternetAccess: true,
-        hasNetworkConnection: true
-      });
+      mockConnectionServiceEmitter.emit(true);
       $scope.$apply();
-      expect(ctrl.connectionStatus).toBe(AppConstants.CONNECTION_STATUS_ONLINE);
       expect($scope.isOffline).toBe(false);
     });
   it('should change connnection status to OFFLINE when internet disconnects',
     () => {
-      ctrl.connectionStatus = AppConstants.CONNECTION_STATUS_ONLINE;
       $scope.isOffline = false;
-      mockConnectionServiceEmitter.emit({
-        hasInternetAccess: false,
-        hasNetworkConnection: false
-      });
+      mockConnectionServiceEmitter.emit(false);
       $scope.$apply();
-      expect(ctrl.connectionStatus).toBe(
-        AppConstants.CONNECTION_STATUS_OFFLINE);
       expect($scope.isOffline).toBe(true);
     });
 });

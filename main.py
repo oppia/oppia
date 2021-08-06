@@ -94,12 +94,14 @@ class InternetConnectivityHandler(base.BaseHandler):
     frontend to check for internet connection."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {} # type: Dict[Text, Any]
+    HANDLER_ARGS_SCHEMAS = {'GET': {}} # type: Dict[Text, Any]
 
     @acl_decorators.open_access # type: ignore[misc]
     def get(self):
         # type: () -> None
         """Handles GET requests."""
-        self.render_json({'isInternetConnected': True}) # type: ignore[no-untyped-call]
+        self.render_json({'is_internet_connected': True}) # type: ignore[no-untyped-call]
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -237,7 +239,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
-        r'/connectivity/check', InternetConnectivityHandler),
+        r'/internetconnectivityhandler', InternetConnectivityHandler),
     get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
