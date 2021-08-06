@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for can access splash page guard.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -41,6 +42,9 @@ describe('Can access splash page guard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
       providers: [
         {
           provide: WindowRef,
