@@ -235,12 +235,6 @@ describe('AnswerGroupEditorComponent', () => {
       proof_string: '',
       target_string: ''
     });
-    expect(ctrl.getDefaultInputValue('LogicQuestion')).toEqual({
-      arguments: [],
-      dummies: [],
-      top_kind_name: '',
-      top_operator_name: ''
-    });
     expect(ctrl.getDefaultInputValue('Graph')).toEqual({
       edges: [],
       isDirected: false,
