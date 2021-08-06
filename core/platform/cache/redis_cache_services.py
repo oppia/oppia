@@ -24,7 +24,7 @@ import feconf
 import python_utils
 import redis
 
-from typing import Dict, List, Optional, Text, cast
+from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
 
 REDIS_CLIENT = redis.Redis(
     host=feconf.REDISHOST, port=feconf.REDISPORT)

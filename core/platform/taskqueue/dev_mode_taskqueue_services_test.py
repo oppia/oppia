@@ -28,7 +28,7 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional, Text
+from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
 
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):

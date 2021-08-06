@@ -24,7 +24,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-from typing import Dict, Text, Tuple
+from typing import Dict, Text, Tuple # isort:skip # pylint: disable=unused-import
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""

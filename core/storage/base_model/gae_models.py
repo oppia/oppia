@@ -1259,7 +1259,6 @@ class VersionedModel(BaseModel):
             if not strict:
                 return None
             python_utils.reraise_exception() # type: ignore[no-untyped-call]
-            return None
 
     @classmethod
     def get_multi_versions(

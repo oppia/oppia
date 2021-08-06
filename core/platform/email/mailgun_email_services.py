@@ -24,7 +24,7 @@ import base64
 import feconf
 import python_utils
 
-from typing import Any, Dict, List, Optional, Text
+from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
 
 def send_email_to_recipients(
         sender_email, # type: Text
