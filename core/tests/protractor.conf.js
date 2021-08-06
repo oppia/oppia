@@ -14,8 +14,8 @@ var suites = {
     // them. Therefore, we mention the complete directory
     // in 'full'.
     full: [
-      // 'protractor/*.js',
-      'protractor_desktop/additionalEditorFeatures.js'
+      'protractor/*.js',
+      'protractor_desktop/*.js'
     ],
 
     // Unfortunately, adding more than one file to a test suite results in

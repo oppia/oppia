@@ -798,109 +798,121 @@ describe('Full exploration editor', function() {
       await workflow.createExploration(true);
       await explorationEditorPage.navigateToMainTab();
       // Set network connection to offline.
-      await browser.driver.setNetworkConditions({offline: true,
-        latency: 1000,
-        download_throughput: 0,
-        upload_throughput: 0});
-      
+      await browser.driver.setNetworkConditions(
+        {
+          offline: true,
+          latency: 1000,
+          download_throughput: 0,
+          upload_throughput: 0});
+
       await waitFor.visibilityOf(
         element(by.css('.protractor-test-toast-message')),
         'Offline warning toast message taking too long to appear.');
       // Set network connection to online.
-      await browser.driver.setNetworkConditions({offline: false,
-        latency: 150,
-        download_throughput: 450*1024,
-        upload_throughput: 150*1024});
+      await browser.driver.setNetworkConditions(
+        {
+          offline: false,
+          latency: 150,
+          download_throughput: 450 * 1024,
+          upload_throughput: 150 * 1024});
       await waitFor.visibilityOf(
         element(by.css('.protractor-test-toast-message')),
         'Online warning toast message taking too long to appear.');
       await users.logout();
     });
 
-    it(
-      'should be able to save changes when offline',
-      async function() {
-        await users.createUser('user18@editor.com', 'user18Editor');
-  
-        // Create an exploration as user user11Editor with title, category, and
-        // objective set and add user user12Editor as a collaborator.
-        await users.login('user18@editor.com');
-        await workflow.createExploration(true);
-        await explorationEditorPage.navigateToMainTab();
-        // Set network connection to offline.
-        await browser.driver.setNetworkConditions({offline: true,
+  it(
+    'should be able to save changes when offline',
+    async function() {
+      await users.createUser('user17@editor.com', 'user17Editor');
+
+      // Create an exploration as user user11Editor with title, category, and
+      // objective set and add user user12Editor as a collaborator.
+      await users.login('user17@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
+      // Set network connection to offline.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: true,
           latency: 1000,
           download_throughput: 0,
           upload_throughput: 0});
-  
-        // Add a content change and does not save the draft.
-        await explorationEditorMainTab.setContent(async function(richTextEditor) {
-          await richTextEditor.appendPlainText('How are you feeling?');
-        });
-        // Set network connection to online.
-        await browser.driver.setNetworkConditions({offline: false,
-          latency: 150,
-          download_throughput: 450*1024,
-          upload_throughput: 150*1024});
-        await waitFor.visibilityOf(
-          element(by.css('.protractor-test-toast-message')),
-          'Online warning toast message taking too long to appear.');
-        await action.waitForAutosave();
-        await explorationEditorMainTab.expectContentToMatch(
-          async function(richTextChecker) {
-            await richTextChecker.readPlainText('How are you feeling?');
-          }
-        );
-        await users.logout();
+
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
       });
+      // Set network connection to online.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: false,
+          latency: 150,
+          download_throughput: 450 * 1024,
+          upload_throughput: 150 * 1024});
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Online warning toast message taking too long to appear.');
+      await action.waitForAutosave();
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
+      await users.logout();
+    });
 
-      it(
-        'should disable save changes buttons when offline',
-        async function() {
-          await users.createUser('user17@editor.com', 'user17Editor');
-    
-          // Create an exploration as user user11Editor with title, category, and
-          // objective set and add user user12Editor as a collaborator.
-          await users.login('user17@editor.com');
-          await workflow.createExploration(true);
-          await explorationEditorPage.navigateToMainTab();
+  it(
+    'should disable save changes buttons when offline',
+    async function() {
+      await users.createUser('user18@editor.com', 'user18Editor');
 
-          // Add a content change and does not save the draft.
-          await explorationEditorMainTab.setContent(async function(richTextEditor) {
-            await richTextEditor.appendPlainText('How are you feeling?');
-          });
-          await action.waitForAutosave();
-          var saveChangesButton = element(by.css('.protractor-test-save-changes'));
-          await waitFor.elementToBeClickable(
-            saveChangesButton, 
-            'Save changes button taking too long to be clickable.')
-          
-          // Set network connection to offline.
-          await browser.driver.setNetworkConditions({offline: true,
-            latency: 1000,
-            download_throughput: 0,
-            upload_throughput: 0});
-          expect(await saveChangesButton.isEnabled()).toEqual(false);
-          // Set network connection to online.
-          await browser.driver.setNetworkConditions({offline: false,
-            latency: 150,
-            download_throughput: 450*1024,
-            upload_throughput: 150*1024});
-          await waitFor.visibilityOf(
-            element(by.css('.protractor-test-toast-message')),
-            'Online warning toast message taking too long to appear.');
-          
-          await waitFor.elementToBeClickable(
-            saveChangesButton, 
-            'Save changes button taking too long to be clickable.')
+      // Create an exploration as user user11Editor with title, category, and
+      // objective set and add user user12Editor as a collaborator.
+      await users.login('user18@editor.com');
+      await workflow.createExploration(true);
+      await explorationEditorPage.navigateToMainTab();
 
-          await explorationEditorMainTab.expectContentToMatch(
-            async function(richTextChecker) {
-              await richTextChecker.readPlainText('How are you feeling?');
-            }
-          );
-          await users.logout();
-        });
+      // Add a content change and does not save the draft.
+      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+        await richTextEditor.appendPlainText('How are you feeling?');
+      });
+      await action.waitForAutosave();
+      var saveChangesButton = element(by.css('.protractor-test-save-changes'));
+      await waitFor.elementToBeClickable(
+        saveChangesButton,
+        'Save changes button taking too long to be clickable.');
+
+      // Set network connection to offline.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: true,
+          latency: 1000,
+          download_throughput: 0,
+          upload_throughput: 0});
+      expect(await saveChangesButton.isEnabled()).toEqual(false);
+      // Set network connection to online.
+      await browser.driver.setNetworkConditions(
+        {
+          offline: false,
+          latency: 150,
+          download_throughput: 450 * 1024,
+          upload_throughput: 150 * 1024});
+      await waitFor.visibilityOf(
+        element(by.css('.protractor-test-toast-message')),
+        'Online warning toast message taking too long to appear.');
+
+      await waitFor.elementToBeClickable(
+        saveChangesButton,
+        'Save changes button taking too long to be clickable.');
+
+      await explorationEditorMainTab.expectContentToMatch(
+        async function(richTextChecker) {
+          await richTextChecker.readPlainText('How are you feeling?');
+        }
+      );
+      await users.logout();
+    });
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
