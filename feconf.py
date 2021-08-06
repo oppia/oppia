@@ -25,7 +25,7 @@ import os
 
 from constants import constants
 
-from typing import Dict, Text # isort:skip # pylint: disable=unused-import
+from typing import Dict, List, Text, Union # isort:skip # pylint: disable=unused-import
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -1180,15 +1180,6 @@ RTE_CONTENT_SPEC = {
     }
 }
 
-# A dict representing available landing pages, having subject as a key and list
-# of topics as the value.
-# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
-# oppia constant defined in
-# core/templates/pages/landing-pages/TopicLandingPage.js file.
-AVAILABLE_LANDING_PAGES = {
-    'math': ['fractions', 'negative-numbers', 'ratios']
-}
-
 # Classroom page names for generating URLs. These need to be kept in sync with
 # CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
@@ -1311,10 +1302,11 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
     'required_attribute_names': [],
     'optional_attribute_names': [],
     'user_id_attribute_names': []
-}]
+}] # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS)
+    COMMON_RIGHTS_ALLOWED_COMMANDS
+) # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
