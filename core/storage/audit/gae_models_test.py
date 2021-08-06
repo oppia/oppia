@@ -23,6 +23,10 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import audit_models, base_models
+
 (audit_models, base_models) = models.Registry.import_models(
     [models.NAMES.audit, models.NAMES.base_model])
 
@@ -37,8 +41,9 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     ROLE = 'role'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(RoleQueryAuditModelUnitTests, self).setUp()
+        super(RoleQueryAuditModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
 
         audit_models.RoleQueryAuditModel(
             id=self.ID,
@@ -49,11 +54,13 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             audit_models.RoleQueryAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             audit_models.RoleQueryAuditModel
             .has_reference_to_user_id(self.USER_ID)
@@ -64,7 +71,10 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model(self):
+        # type: () -> None
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_ADD)
@@ -83,8 +93,9 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
     NEW_USERNAME = 'new_username'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UsernameChangeAuditModelUnitTests, self).setUp()
+        super(UsernameChangeAuditModelUnitTests, self).setUp() # type: ignore[no-untyped-call]
 
         audit_models.UsernameChangeAuditModel(
             id=self.ID,
@@ -94,11 +105,13 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             audit_models.UsernameChangeAuditModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             audit_models.UsernameChangeAuditModel
             .has_reference_to_user_id(self.COMMITTER_ID)
@@ -109,7 +122,10 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_model(self):
+        # type: () -> None
         audit_model = audit_models.UsernameChangeAuditModel.get(self.ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert audit_model is not None
 
         self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.committer_id, self.COMMITTER_ID)

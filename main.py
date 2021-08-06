@@ -81,7 +81,11 @@ from webapp2_extras import routes
 
 from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
 
-transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import transaction_services
+
+transaction_services = models.Registry.import_transaction_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -920,12 +924,12 @@ URLS = MAPREDUCE_HANDLERS + [
 ]
 
 # Adding redirects for topic landing pages.
-for subject in feconf.AVAILABLE_LANDING_PAGES:
-    for topic in feconf.AVAILABLE_LANDING_PAGES[subject]:
+for subject in constants.AVAILABLE_LANDING_PAGES:
+    for topic in constants.AVAILABLE_LANDING_PAGES[subject]:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
-                custom_landing_pages.TopicLandingPage))
+                oppia_root.OppiaRootPage))
 
 if constants.DEV_MODE:
     URLS.append(

@@ -75,14 +75,14 @@ describe('Admin roles tab component ', function() {
     demoCollections: [
       ['collectionId']
     ],
-    updatableRoles: {updatableRole: 'user1'},
+    updatableRoles: ['MODERATOR'],
     roleToActions: {
       Admin: ['Accept any suggestion', 'Access creator dashboard']
     },
     configProperties: {},
-    viewableRoles: {
-      MODERATOR: 'moderator',
-      TOPIC_MANAGER: 'topic manager'
+    viewableRoles: ['MODERATOR', 'TOPIC_MANAGER'],
+    humanReadableRoles: {
+      FULL_USER: 'full user'
     },
     topicSummaries: [
       sampleTopicSummary
@@ -357,10 +357,7 @@ describe('Admin roles tab component ', function() {
     it('should enable roleSelectorIsShown', () => {
       component.roleSelectorIsShown = false;
       component.userRoles = ['FULL_USER', 'MODERATOR'];
-      component.UPDATABLE_ROLES = {
-        MODERATOR: 'moderator',
-        TOPIC_MANAGER: 'topic manager'
-      };
+      component.UPDATABLE_ROLES = ['MODERATOR', 'TOPIC_MANAGER'];
 
       component.showNewRoleSelector();
 
@@ -369,10 +366,7 @@ describe('Admin roles tab component ', function() {
 
     it('should set correct value for possibleRolesToAdd', () => {
       component.userRoles = ['FULL_USER', 'MODERATOR'];
-      component.UPDATABLE_ROLES = {
-        MODERATOR: 'moderator',
-        TOPIC_MANAGER: 'topic manager'
-      };
+      component.UPDATABLE_ROLES = ['MODERATOR', 'TOPIC_MANAGER'];
       component.possibleRolesToAdd = [];
 
       component.showNewRoleSelector();
