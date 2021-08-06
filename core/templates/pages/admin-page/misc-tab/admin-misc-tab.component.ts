@@ -49,6 +49,9 @@ export class AdminMiscTabComponent {
   numAnswers: number;
   expId: string;
   topicIdForRegeneratingOpportunities: string;
+  blogPostId: string;
+  authorUsername: string;
+  publishedOn: string;
 
   constructor(
     private windowRef: WindowRef,
@@ -140,6 +143,18 @@ export class AdminMiscTabComponent {
         this.setStatusMessage.emit(
           'Successfully renamed ' + this.oldUsername + ' to ' +
               this.newUsername + '!');
+      }, errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      });
+  }
+
+  updateBlogPostData(): void {
+    this.setStatusMessage.emit('Updating blog post data...');
+    this.adminBackendApiService.updateBlogPostDataAsync(
+      this.blogPostId, this.authorUsername, this.publishedOn)
+      .then(() => {
+        this.setStatusMessage.emit(
+          'Successfully updated blog post data');
       }, errorResponse => {
         this.setStatusMessage.emit('Server error: ' + errorResponse);
       });

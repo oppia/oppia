@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
+
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import user_services
@@ -392,3 +394,32 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_summary.to_dict(), expected_blog_post_summary.to_dict())
         self.assertIsNone(blog_services.get_blog_post_summary_by_title('Hello'))
+
+    def test_update_blog_models_author_and_published_on_date(self):
+        model = (
+            blog_models.BlogPostModel.get_by_id(self.blog_post_a_id))
+        model.published_on = datetime.datetime.utcnow()
+        model.update_timestamps()
+        model.put()
+
+        blog_services.update_blog_models_author_and_published_on_date(
+            self.blog_post_a_id, self.user_id_b, '05/09/2000')
+
+        blog_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_a_id))
+        self.assertEqual(
+            blog_model.author_id, self.user_id_b)
+        self.assertEqual(
+            blog_model.published_on, self.blog_post_b_id)
+
+        blog_summary_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_a_id))
+        self.assertEqual(
+            blog_summary_model.author_id, self.user_id_b)
+        self.assertEqual(
+            blog_summary_model.published_on, self.blog_post_b_id)
+
+        blog_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(self.blog_post_a_id))
+        self.assertTrue(
+            self.blog_post_b_id in blog_rights_model)

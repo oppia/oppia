@@ -104,8 +104,8 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             author_id='user',
             url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            published_on=self.YEAR_AGO)
+            last_updated=self.YEAR_AGO,
+            published_on=self.NOW)
 
         output = (
             self.pipeline
