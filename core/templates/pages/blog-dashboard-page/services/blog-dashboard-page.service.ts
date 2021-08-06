@@ -31,14 +31,14 @@ import { BlogPostData } from 'domain/blog/blog-post.model';
   providedIn: 'root'
 })
 export class BlogDashboardPageService {
-  private _blogPostId: string;
-  private _authorPictureUrl: string;
-  private _blogPostData: BlogPostData;
+  private _blogPostId: string = '';
+  private _authorPictureUrl: string = '';
+  private _blogPostData: null | BlogPostData = null;
   private _BLOG_POST_EDITOR_URL_TEMPLATE = (
     BlogDashboardPageConstants.BLOG_DASHBOARD_TAB_URLS.BLOG_POST_EDITOR);
   private _activeTab = 'main';
-  private _blogPostAction: string;
-  private _imageUploaderIsNarrow: boolean;
+  private _blogPostAction: string = '';
+  private _imageUploaderIsNarrow: boolean = false;
   private _updateViewEventEmitter= new EventEmitter<void>();
 
   constructor(
@@ -99,11 +99,11 @@ export class BlogDashboardPageService {
     return this._blogPostId;
   }
 
-  set blogPostData(data: BlogPostData) {
+  set blogPostData(data: BlogPostData | null) {
     this._blogPostData = data;
   }
 
-  get blogPostData(): BlogPostData {
+  get blogPostData(): BlogPostData | null {
     return this._blogPostData;
   }
 

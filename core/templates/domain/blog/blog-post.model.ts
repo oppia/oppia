@@ -105,7 +105,7 @@ export class BlogPostData {
     return this._urlFragment;
   }
 
-  set thumbnailFilename(thumbnailFilename: string) {
+  set thumbnailFilename(thumbnailFilename: string | null) {
     this._thumbnailFilename = thumbnailFilename;
   }
 
