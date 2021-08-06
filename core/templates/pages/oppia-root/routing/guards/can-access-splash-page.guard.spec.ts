@@ -59,6 +59,8 @@ describe('Can access splash page guard', () => {
     }).compileComponents();
     caspg = TestBed.inject(CanAccessSplashPageGuard);
     windowRef = TestBed.inject(WindowRef);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService);
   });
 
   it('should redirect user to default dashboard', fakeAsync(() => {
