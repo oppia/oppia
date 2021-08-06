@@ -217,6 +217,8 @@ var StoryEditorPage = function() {
 
   this.navigateToStoryEditorTab = async function() {
     await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      backToStoryEditorButton, 'Back to story button is not visible');
     await general.scrollToTop();
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
