@@ -23,6 +23,10 @@ from constants import constants
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, activity_models
+
 (base_models, activity_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.activity])
 
@@ -31,11 +35,13 @@ class ActivityListModelTest(test_utils.GenericTestBase):
     """Tests the ActivityListModel class."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             activity_models.ActivityReferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_featured_activity_list_always_exists(self):
+        # type: () -> None
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertIsNotNone(featured_model_instance)
@@ -43,11 +49,13 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         self.assertEqual(featured_model_instance.activity_references, [])
 
     def test_retrieving_non_existent_list(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'):
+        # type: () -> None
+        with self.assertRaisesRegexp(Exception, 'Invalid ActivityListModel'): # type: ignore[no-untyped-call]
             activity_models.ActivityReferencesModel.get_or_create(
                 'nonexistent_key')
 
     def test_updating_featured_activity_list(self):
+        # type: () -> None
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertEqual(featured_model_instance.activity_references, [])
