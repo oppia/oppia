@@ -674,9 +674,6 @@ class StateYamlHandler(EditorHandler):
         state_dict = self.normalized_payload.get('state_dict')
         width = self.normalized_payload.get('width')
 
-        if not width or not state_dict:
-            raise self.PageNotFoundException
-
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
                 state_dict, width),

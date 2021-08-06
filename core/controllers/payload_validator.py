@@ -21,6 +21,7 @@ Also contains a list of handler class names which does not contain the schema.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import python_utils
 import schema_utils
 
 from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
@@ -58,6 +59,15 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
             elif 'default_value' not in arg_schema:
                 errors.append('Missing key in handler args: %s.' % arg_key)
                 continue
+
+        # Below normalization is for arguments which are expected to be boolean
+        # but from API request they are received as string type.
+        if (
+                arg_schema['schema']['type'] == 'bool' and
+                isinstance(handler_args[arg_key], python_utils.BASESTRING)
+        ):
+            handler_args[arg_key] = (
+                convert_string_to_bool(handler_args[arg_key]))
 
         try:
             normalized_value[arg_key] = schema_utils.normalize_against_schema(
