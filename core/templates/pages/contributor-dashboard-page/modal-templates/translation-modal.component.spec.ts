@@ -102,14 +102,14 @@ describe('Translation Modal Component', () => {
     userService = TestBed.inject(UserService);
     spyOn(
       userService,
-      'getUserContributionRightsDataAsync').and.returnValue(
-        Promise.resolve(
+      'getUserContributionRightsDataAsync')
+      .and.returnValue(Promise.resolve(
         {
-          'can_review_translation_for_language_codes': ['hi'],
-          'can_review_voiceover_for_language_codes': [],
-          'can_review_questions': false
+          can_review_translation_for_language_codes: ['hi'],
+          can_review_voiceover_for_language_codes: [],
+          can_review_questions: false
         }
-    ));
+      ));
   });
 
   it('should invoke change detection when html is updated', () => {

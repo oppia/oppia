@@ -161,12 +161,12 @@ export class TranslationModalComponent {
         this.loadingData = false;
       });
     this.userService.getUserContributionRightsDataAsync().then(
-      userContributionRights => {
+    userContributionRights => {
         const reviewableLanguageCodes = (
           userContributionRights.can_review_translation_for_language_codes);
         if (reviewableLanguageCodes.includes(this.activeLanguageCode)) {
           this.isActiveLanguageReviewer = true;
-        };
+        }
       });
     this.HTML_SCHEMA = {
       type: 'html',
