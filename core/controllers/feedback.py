@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
@@ -117,7 +118,7 @@ class ThreadHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'(exploration|collection)\.\w+\.\w+'
+                    'regex_pattern': constants.VALID_THREAD_ID_REGEX
                 }]
             }
         }
@@ -270,7 +271,7 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
                 'type': 'basestring',
                 'validators': [{
                     'id': 'is_regex_matched',
-                    'regex_pattern': r'(exploration|collection)\.\w+\.\w+'
+                    'regex_pattern': constants.VALID_THREAD_ID_REGEX
                 }]
             }
         }

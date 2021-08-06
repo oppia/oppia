@@ -563,7 +563,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_comment_on_feedback_thread/invalid_thread_id',
                 expected_status_int=400)
-            self.assertEqual(response['error'], 'Thread ID must contain a .')
+            self.assertEqual(response['error'], 'Not a valid thread id.')
         self.logout()
 
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
@@ -780,7 +780,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_view_feedback_thread/invalid_thread_id',
                 expected_status_int=400)
-            self.assertEqual(response['error'], 'Thread ID must contain a .')
+            self.assertEqual(response['error'], 'Not a valid thread id.')
         self.logout()
 
     def test_viewer_can_view_non_exploration_related_feedback(self):
