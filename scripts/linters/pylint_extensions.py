@@ -1370,7 +1370,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
     }
 
     # If import from any of these is made, it may not be a module.
-    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing']
+    EXCLUDED_IMPORT_MODULES = ['__future__', 'typing', 'mypy_imports']
 
     @checker_utils.check_messages('import-only-modules')
     def visit_importfrom(self, node):

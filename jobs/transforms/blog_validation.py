@@ -33,7 +33,11 @@ import apache_beam as beam
 
 from typing import Any # pylint: disable=unused-import
 
-(blog_models, user_models) = models.Registry.import_models(  # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import blog_models, user_models
+
+(blog_models, user_models) = models.Registry.import_models(
     [models.NAMES.blog, models.NAMES.user])
 
 

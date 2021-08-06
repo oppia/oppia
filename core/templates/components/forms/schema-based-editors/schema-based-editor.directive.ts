@@ -50,6 +50,7 @@ require('components/forms/validators/is-float.filter.ts');
 require('components/forms/validators/is-integer.filter.ts');
 require('components/forms/validators/is-nonempty.filter.ts');
 require('components/forms/validators/is-url-fragment.filter.ts');
+require('components/forms/validators/is-regex-matched.filter.ts');
 
 angular.module('oppia').directive('schemaBasedEditor', [
   function() {
