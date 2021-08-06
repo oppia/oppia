@@ -30,6 +30,9 @@ class MockWindowRef {
     },
     onoffline() {
       return;
+    },
+    navigator: {
+      onLine: true
     }
   };
 }

@@ -36,7 +36,7 @@ export class ConnectionService {
   private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
   private checkConnectionUrl: string = '/internetconnectivityhandler';
   private _internetAccessible: boolean = true;
-  private _connectedToNetwork = window.navigator.onLine;
+  private _connectedToNetwork: boolean;
 
   private _connectionStateChangeEventEmitter = (
     new EventEmitter<boolean>());
@@ -49,6 +49,7 @@ export class ConnectionService {
       private http: HttpClient,
       private ngZone: NgZone) {
     this.httpSubscription = new Subscription();
+    this._connectedToNetwork = this.windowRef.nativeWindow.navigator.onLine;
   }
 
   checkInternetState(): void {

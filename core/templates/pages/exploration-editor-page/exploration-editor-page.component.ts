@@ -511,8 +511,8 @@ angular.module('oppia').component('explorationEditorPage', {
         );
         ctrl.directiveSubscriptions.add(
           ConnectionService.onInternetStateChange.subscribe(
-            hasInternetAccess => {
-              if (hasInternetAccess) {
+            internetAccessible => {
+              if (internetAccessible) {
                 AlertsService.addSuccessMessage(
                   'Reconnected. Checking whether your changes are mergeable.',
                   reconnectedMessageTimeoutMilliseconds);

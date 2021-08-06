@@ -23,6 +23,7 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
 import { ConnectionService } from 'services/connection-service.service';
+import { Subscription } from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
@@ -53,9 +54,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
   ck: CKEDITOR.editor;
-  internetRequiringComponents: string[] = [
-    'image', 'skillreview', 'svgdiagram', 'video', 'math'];
   currentValue: string;
+  internetRequiringComponents: string[] = [];
+  subscriptions: Subscription;
   // A RegExp for matching rich text components.
   componentRe = (
     /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
@@ -67,17 +68,19 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     private connectionService: ConnectionService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+    this.subscriptions = new Subscription();
   }
 
   ngOnInit(): void {
-    this.connectionService.onInternetStateChange.subscribe(
-      internetAccessible => {
-        if (internetAccessible) {
-          this.enableRTEicons();
-        } else {
-          this.disableRTEicons();
-        }
-      });
+    this.subscriptions.add(
+      this.connectionService.onInternetStateChange.subscribe(
+        internetAccessible => {
+          if (internetAccessible) {
+            this.enableRTEicons();
+          } else {
+            this.disableRTEicons();
+          }
+        }));
   }
   ngOnChanges(changes: SimpleChanges): void {
     // Ckeditor 'change' event gets triggered when a user types. In the
@@ -214,6 +217,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     var names = [];
     var icons = [];
+    this.internetRequiringComponents = [];
 
     _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
       var hideComplexExtensionFlag = (
@@ -227,6 +231,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       if (!(hideComplexExtensionFlag || notSupportedOnAndroidFlag)) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
+      }
+      if (componentDefn.requiresInternet) {
+        this.internetRequiringComponents.push(componentDefn.id);
       }
     });
 
@@ -453,9 +460,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         .css('background-color', '#cccccc')
         .css('pointer-events', 'none');
     });
-    let offline = document.getElementsByClassName('cke-offline-warning');
+    let offline = this.elementRef.nativeElement.getElementsByClassName(
+      'cke-offline-warning');
     for (let i = 0; i < offline.length; i++) {
-      offline[i].setAttribute('style', 'display: block');
+      offline[i].style.display = 'block';
     }
   }
   enableRTEicons(): void {
@@ -465,14 +473,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         .css('background-color', '')
         .css('pointer-events', '');
     });
-    let offline = document.getElementsByClassName('cke-offline-warning');
+    let offline = this.elementRef.nativeElement.getElementsByClassName(
+      'cke-offline-warning');
     for (let i = 0; i < offline.length; i++) {
-      offline[i].setAttribute('style', 'display: none');
+      offline[i].style.display = 'none';
     }
   }
 
   ngOnDestroy(): void {
     this.ck.destroy();
+    this.subscriptions.unsubscribe();
   }
 }
 
