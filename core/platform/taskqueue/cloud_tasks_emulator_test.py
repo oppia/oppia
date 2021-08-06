@@ -25,20 +25,24 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
 import python_utils
 
+from typing import Any, Dict, List, Optional, Text
+
 
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
     """Tests for cloud tasks emulator."""
 
     def mock_task_handler(self, url, payload, queue_name, task_name=None):
+        # type: (Text, Dict[Text, Any], Text, Optional[Text]) -> None
         self.output.append(
             'Task %s in queue %s with payload %s is sent to %s.' % (
                 task_name if task_name else 'Default',
                 queue_name,
-                python_utils.convert_to_bytes(payload),
+                python_utils.convert_to_bytes(payload), # type: ignore[no-untyped-call]
                 url)
         )
 
     def setUp(self):
+        # type: () -> None
         super(CloudTasksEmulatorUnitTests, self).setUp()
         self.url = 'dummy_url'
         self.queue_name1 = 'queue_name1'
@@ -56,13 +60,14 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             },
             'param3': [1, 2, 3]
         }
-        self.output = []
+        self.output = [] # type: List[Text]
         self.unit_test_emulator = cloud_tasks_emulator.Emulator(
             task_handler=self.mock_task_handler, automatic_task_handling=False)
         self.dev_mode_emulator = cloud_tasks_emulator.Emulator(
             task_handler=self.mock_task_handler)
 
     def test_task_creation_is_handled_correctly(self):
+        # type: () -> None
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
@@ -83,6 +88,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(len(task_list), 2)
 
     def test_flushing_and_executing_tasks_produces_correct_behavior(self):
+        # type: () -> None
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
@@ -99,7 +105,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.convert_to_bytes(self.payload1),
+                    python_utils.convert_to_bytes(self.payload1), # type: ignore[no-untyped-call]
                     self.url)
             ]
         )
@@ -111,11 +117,11 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.convert_to_bytes(self.payload1),
+                    python_utils.convert_to_bytes(self.payload1), # type: ignore[no-untyped-call]
                     self.url),
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name2,
-                    python_utils.convert_to_bytes(self.payload2),
+                    python_utils.convert_to_bytes(self.payload2), # type: ignore[no-untyped-call]
                     self.url),
             ]
         )
@@ -123,6 +129,7 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
 
     def test_tasks_scheduled_for_immediate_execution_are_handled_correctly(
             self):
+        # type: () -> None
         self.dev_mode_emulator.create_task(
             self.queue_name1, self.url, self.payload1)
         self.dev_mode_emulator.create_task(
@@ -135,11 +142,11 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             [
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name1,
-                    python_utils.convert_to_bytes(self.payload1),
+                    python_utils.convert_to_bytes(self.payload1), # type: ignore[no-untyped-call]
                     self.url),
                 'Task Default in queue %s with payload %s is sent to %s.' % (
                     self.queue_name2,
-                    python_utils.convert_to_bytes(self.payload2),
+                    python_utils.convert_to_bytes(self.payload2), # type: ignore[no-untyped-call]
                     self.url),
             ]
         )

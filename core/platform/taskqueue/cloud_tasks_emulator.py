@@ -24,10 +24,13 @@ https://github.com/doitintl/Cloud-Tasks-In-Process-Emulator
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime # pylint: disable=unused-import
 import threading
 import time
 
 import python_utils
+
+from typing import Any, Callable, Dict, List, Optional, Text
 
 
 class Task(python_utils.OBJECT):
@@ -36,8 +39,14 @@ class Task(python_utils.OBJECT):
     """
 
     def __init__(
-            self, queue_name, url, payload=None, scheduled_for=None,
-            task_name=None):
+            self,
+            queue_name, # type: Text
+            url, # type: Text
+            payload=None, # type: Optional[Dict[Text, Any]]
+            scheduled_for=None, # type: Optional[float]
+            task_name=None # type: Optional[Text]
+    ):
+        # type: (...) -> None
         """Initialize a Task that can be executed by making a post request to
         the given url with the correct data payload.
 
@@ -79,6 +88,7 @@ class Emulator(python_utils.OBJECT):
     """
 
     def __init__(self, task_handler, automatic_task_handling=True):
+        # type: (Callable[..., Any], bool) -> None
         """Initializes the emulator with an empty task queue and the correct
         task_handler callback.
 
@@ -92,12 +102,13 @@ class Emulator(python_utils.OBJECT):
         """
         self._lock = threading.Lock()
         self._task_handler = task_handler
-        self._queues = {}
+        self._queues = {} # type: Dict[Text, List[Task]]
         self.automatic_task_handling = automatic_task_handling
 
-        self._queue_threads = {}
+        self._queue_threads = {} # type: Dict[Text, threading.Thread]
 
     def _process_queue(self, queue_name):
+        # type: (Text) -> None
         """The callback function for each individual queue thread. Each queue
         thread repeatedly queries the queue, pops tasks, and executes the tasks
         that need to be executed.
@@ -112,6 +123,7 @@ class Emulator(python_utils.OBJECT):
                 if queue:
                     peek = queue[0]
                     now = time.time()
+                    assert peek.scheduled_for is not None
                     if peek.scheduled_for <= now:
                         task = queue.pop(0)
             if task:
@@ -123,6 +135,7 @@ class Emulator(python_utils.OBJECT):
             time.sleep(0.01)
 
     def _launch_queue_thread(self, queue_name):
+        # type: (Text) -> None
         """Launches a persistent thread for an individual queue in the
         taskqueue.
 
@@ -137,6 +150,7 @@ class Emulator(python_utils.OBJECT):
         new_thread.start()
 
     def _execute_tasks(self, task_list):
+        # type: (List[Task]) -> None
         """Executes all of the tasks in the task list using the task handler
         callback.
 
@@ -150,6 +164,7 @@ class Emulator(python_utils.OBJECT):
                 task_name=task.task_name)
 
     def _total_enqueued_tasks(self):
+        # type: () -> int
         """Returns the total number of tasks across all of the queues in the
         taskqueue.
 
@@ -160,12 +175,14 @@ class Emulator(python_utils.OBJECT):
 
     def create_task(
             self,
-            queue_name,
-            url,
-            payload,
-            scheduled_for=None,
-            task_name=None,
-            retry=None):  # pylint: disable=unused-argument
+            queue_name, # type: Text
+            url, # type: Text
+            payload=None, # type: Optional[Dict[Text, Any]]
+            scheduled_for=None, # type: Optional[datetime.datetime]
+            task_name=None, # type: Optional[Text]
+            retry=None # type: None  # pylint: disable=unused-argument
+    ):
+        # type: (...) -> None
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' time is reached. If the queue doesn't exist yet,
         it will be created.
@@ -197,6 +214,7 @@ class Emulator(python_utils.OBJECT):
             queue.sort(key=lambda t: t.scheduled_for)
 
     def get_number_of_tasks(self, queue_name=None):
+        # type: (Optional[Text]) -> int
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
@@ -214,6 +232,7 @@ class Emulator(python_utils.OBJECT):
             return self._total_enqueued_tasks()
 
     def process_and_flush_tasks(self, queue_name=None):
+        # type: (Optional[Text]) -> None
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -231,6 +250,7 @@ class Emulator(python_utils.OBJECT):
                 self._queues[queue] = []
 
     def get_tasks(self, queue_name=None):
+        # type: (Optional[Text]) -> List[Task]
         """Returns a list of the tasks in a single queue if a queue name is
         specified or a list of all of the tasks in the taskqueue if no queue
         name is specified.

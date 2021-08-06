@@ -19,6 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime # pylint: disable=unused-import
 import json
 import logging
 
@@ -28,11 +29,19 @@ from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
+from typing import Any, Dict, Optional, Text
+
 CLIENT = tasks_v2.CloudTasksClient()
 
 
 def create_http_task(
-        queue_name, url, payload=None, scheduled_for=None, task_name=None):
+        queue_name, # type: Text
+        url, # type: Text
+        payload=None, # type: Optional[Dict[Text, Any]]
+        scheduled_for=None, # type: Optional[datetime.datetime]
+        task_name=None # type: Optional[Text]
+):
+    # type: (...) -> tasks_v2.Task
     """Creates an http task with the correct http headers/payload and sends
     that task to the Cloud Tasks API. An http task is an asynchronous task that
     consists of a post request to a specified url with the specified payload.
@@ -62,17 +71,17 @@ def create_http_task(
             'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
             'relative_uri': url,
         }
-    }
+    } # type: Dict[Text, Any]
 
     if payload is not None:
         if isinstance(payload, dict):
-            payload = json.dumps(payload)
+            payload_text = json.dumps(payload)
             task['app_engine_http_request']['headers'] = {
                 'Content-type': 'application/json'
             }
 
         # The API expects a payload of type bytes.
-        converted_payload = payload.encode()
+        converted_payload = payload_text.encode()
 
         # Add the payload to the request.
         task['app_engine_http_request']['body'] = converted_payload

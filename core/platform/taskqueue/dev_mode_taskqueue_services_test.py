@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
+
 from core.domain import taskqueue_services
 from core.platform.taskqueue import dev_mode_taskqueue_services
 from core.tests import test_utils
@@ -26,11 +28,14 @@ import feconf
 
 import requests
 
+from typing import Any, Dict, Optional, Text
+
 
 class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for dev_mode_taskqueue_services."""
 
     def test_creating_dev_mode_task_will_create_the_correct_post_request(self):
+        # type: () -> None
         correct_queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_payload = {
@@ -43,7 +48,13 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         correct_task_name = 'task1'
 
         def mock_create_task(
-                queue_name, url, payload, scheduled_for=None, task_name=None): # pylint: disable=unused-argument
+                queue_name, # type: Text
+                url, # type: Text
+                payload=None, # type: Optional[Dict[Text, Any]]
+                scheduled_for=None, # type: Optional[datetime.datetime] # pylint: disable=unused-argument
+                task_name=None, # type: Optional[Text]
+        ):
+            # type: (...) -> None
             self.assertEqual(queue_name, correct_queue_name)
             self.assertEqual(url, dummy_url)
             self.assertEqual(payload, correct_payload)
@@ -57,6 +68,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
                 task_name=correct_task_name)
 
     def test_task_handler_will_create_the_correct_post_request(self):
+        # type: () -> None
         queue_name = 'dummy_queue'
         dummy_url = '/dummy_handler'
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
@@ -78,6 +90,7 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
             'method': 'POST'
         }
         def mock_post(url, json, headers, timeout):
+            # type: (Text, Dict[Text, Any], Dict[Text, Text], int) -> None
             self.assertEqual(
                 url, 'http://localhost:%s%s' % (
                     correct_port, dummy_url))

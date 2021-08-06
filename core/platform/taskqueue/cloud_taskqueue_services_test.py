@@ -31,6 +31,8 @@ from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
+from typing import Any, Dict, Optional, Text
+
 
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
     """Tests for cloud_taskqueue_services."""
@@ -41,9 +43,11 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         """
 
         def __init__(self, name):
+            # type: (Text) -> None
             self.name = name
 
     def test_http_task_scheduled_immediately_sends_correct_request(self):
+        # type: () -> None
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
@@ -54,7 +58,12 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         }
         task_name = 'task1'
 
-        def mock_create_task(parent, task, retry=None):
+        def mock_create_task(
+                parent, # type: Text
+                task, # type: Dict[Text, Any]
+                retry=None # type: Optional[retry_lib.Retry]
+        ):
+            # type: (...) -> CloudTaskqueueServicesUnitTests.Response
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
@@ -82,6 +91,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
                 queue_name, dummy_url, payload=payload, task_name=task_name)
 
     def test_http_task_scheduled_for_later_sends_correct_request(self):
+        # type: () -> None
         queue_name = 'queue'
         dummy_url = '/task/dummy_handler'
         payload = {
@@ -97,7 +107,12 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
 
-        def mock_create_task(parent, task, retry):
+        def mock_create_task(
+                parent, # type: Text
+                task, # type: Dict[Text, Any]
+                retry=None # type: Optional[retry_lib.Retry]
+        ):
+            # type: (...) -> CloudTaskqueueServicesUnitTests.Response
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
