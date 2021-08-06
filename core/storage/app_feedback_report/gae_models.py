@@ -43,7 +43,7 @@ GITHUB_REPO_CHOICES = PLATFORM_CHOICES
 
 # The model field names that can be filtered / sorted for when maintainers
 # triage feedback reports.
-FILTER_FIELD_NAMES = python_utils.create_enum(
+FILTER_FIELD_NAMES = python_utils.create_enum( # type: ignore[no-untyped-call]
     'platform', 'report_type', 'entry_point', 'submitted_on',
     'android_device_model', 'android_sdk_version', 'text_language_code',
     'audio_language_code', 'platform_version',
@@ -285,6 +285,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_all_unscrubbed_expiring_report_models(cls):
+        # type: () -> List[AppFeedbackReportModel]
         """Fetches the reports that are past their 90-days in storage and must
         be scrubbed.
 
@@ -304,6 +305,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def get_filter_options_for_field(cls, filter_field):
+        # type: (FILTER_FIELD_NAMES) -> List[Text]
         """Fetches values that can be used to filter reports by.
 
         Args:

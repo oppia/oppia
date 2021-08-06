@@ -192,7 +192,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                     self.PLATFORM_ANDROID, self.REPORT_SUBMITTED_TIMESTAMP_2)
                 model_class.create(
                     report_id, self.PLATFORM_ANDROID,
-                    self.REPORT_SUBMITTED_TIMESTAMP_1,
+                    self.REPORT_SUBMITTED_TIMESTAMP_1, 0,
                     self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
                     self.PLATFORM_VERSION,
                     self.DEVICE_COUNTRY_LOCALE_CODE_INDIA,
@@ -235,6 +235,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(exported_data, expected_data)
 
     def test_get_all_unscrubbed_expiring_report_models(self):
+        # type: () -> None
         expired_timestamp = datetime.datetime.utcnow() - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN +
             datetime.timedelta(days=10))
@@ -299,9 +300,10 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertFalse(model_class.has_reference_to_user_id('id_x'))
 
     def test_get_filter_options_with_invalid_field_throws_exception(self):
+        # type: () -> None
         model_class = app_feedback_report_models.AppFeedbackReportModel
-        invalid_filter = python_utils.create_enum('invalid_field')
-        with self.assertRaisesRegexp(
+        invalid_filter = python_utils.create_enum('invalid_field') # type: ignore[no-untyped-call]
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             utils.InvalidInputException,
             'The field %s is not a valid field to filter reports on' % (
                 invalid_filter.invalid_field.name)
@@ -313,6 +315,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                     invalid_filter.invalid_field)
 
     def _mock_query_filters_returns_empy_list(self, projection, distinct): # pylint: disable=unused-argument
+        # type: () -> None
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the
         query function.
@@ -449,6 +452,7 @@ class AppFeedbackReportStatsModelTests(test_utils.GenericTestBase):
         self.assertEqual(stats_model.daily_param_stats, self.DAILY_STATS)
 
     def test_get_id_on_same_ticket_produces_same_id(self):
+        # type: () -> None
         model_class = (
             app_feedback_report_models.AppFeedbackReportStatsModel)
         entity_id = model_class.calculate_id(

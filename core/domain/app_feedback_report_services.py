@@ -29,9 +29,9 @@ import utils
 
 from typing import Dict, Text, Optional, Type, List, Any, cast # isort:skip # pylint: disable=unused-import
 
-(app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+(app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
-transaction_services = models.Registry.import_transaction_services() # type: ignore[no-untyped-call]
+transaction_services = models.Registry.import_transaction_services()
 
 PLATFORM_ANDROID = constants.PLATFORM_CHOICE_ANDROID
 PLATFORM_WEB = constants.PLATFORM_CHOICE_WEB

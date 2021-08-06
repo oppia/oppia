@@ -3558,15 +3558,20 @@ def is_from_oppia_android(handler):
         app_package_name = headers['app_package_name']
         app_version_name = headers['app_version_name']
         app_version_code = headers['app_version_code']
+
+        version_name_matches = (
+            android_validation_constants.APP_VERSION_WITH_HASH_REGEXP.match(
+                app_version_name))
+        version_code_is_positive_int = app_version_code.isdigit() and (
+            int(app_version_code) > 0)
         if (
                 api_key != android_validation_constants.ANDROID_API_KEY or
                 app_package_name != (
                     android_validation_constants.ANDROID_APP_PACKAGE_NAME) or
-                app_version_name not in (
-                    android_validation_constants.ALLOWED_ANDROID_APP_VERSION_NAMES) or # pylint: disable=line-too-long
-                app_version_code not in (
-                    android_validation_constants.ALLOWED_ANDROID_APP_VERSION_CODES)): # pylint: disable=line-too-long
-
+                not version_name_matches or
+                not version_code_is_positive_int):
+                # app_version_code not in (
+                #     android_validation_constants.ALLOWED_ANDROID_APP_VERSION_CODES)): # pylint: disable=line-too-long
             raise self.UnauthorizedUserException(
                 'The incoming request is not a valid Oppia Android request.')
         return handler(self, **kwargs)

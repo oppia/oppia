@@ -23,7 +23,7 @@ from core.platform import models
 
 import python_utils
 
-(base_models, app_feedback_report_models) = models.Registry.import_models( # type: ignore[no-untyped-call]
+(base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
 
 

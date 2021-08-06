@@ -32,7 +32,7 @@ import utils
 
 from typing import Text, List # isort:skip # pylint: disable=unused-import
 
-(app_feedback_report_models,) = models.Registry.import_models( # type: ignore[no-untyped-call]
+(app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
 
 
