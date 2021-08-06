@@ -33,8 +33,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
     Any, Dict, List, Optional, Text, Tuple, Union, cast)
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -99,7 +99,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_instance_id(cls, collection_id, version):
-        # type: (Text, Union[int, Text]) -> Text
+        # type: (Text, int) -> Text
         """This function returns the generated id for the get_commit function
         in the parent class.
 
@@ -114,8 +114,12 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        # type: (int, Optional[Text], Optional[datetime.timedelta]) -> Tuple[List[CollectionCommitLogEntryModel], Optional[Text], bool]
+            cls,
+            page_size, # type: int
+            urlsafe_start_cursor, # type: Optional[Text]
+            max_age=None # type: Optional[datetime.timedelta]
+    ):
+        # type: (...) -> Tuple[List[CollectionCommitLogEntryModel], Optional[Text], bool]
         """Fetches a list of all the non-private commits sorted by their last
         updated attribute.
 
@@ -222,6 +226,8 @@ class CollectionModel(base_models.VersionedModel):
         """Returns the total number of collections."""
         return cls.get_all().count()
 
+    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @staticmethod
     def convert_to_valid_dict(model_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -252,6 +258,8 @@ class CollectionModel(base_models.VersionedModel):
 
         return model_dict
 
+    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> CollectionModel
         """Populates the model instance with the snapshot.
@@ -273,6 +281,8 @@ class CollectionModel(base_models.VersionedModel):
             **CollectionModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -306,6 +316,9 @@ class CollectionModel(base_models.VersionedModel):
         collection_commit_log.update_timestamps()
         collection_commit_log.put()
 
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseModel.delete_multi().
+    # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def delete_multi( # type: ignore[override]
             cls, entity_ids, committer_id, commit_message,
@@ -503,6 +516,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def save(self, committer_id, commit_message, commit_cmds):
         # type: (Text, Text, List[Dict[Text, Any]]) -> None
         """Updates the collection rights model by applying the given
@@ -521,6 +536,8 @@ class CollectionRightsModel(base_models.VersionedModel):
         super(CollectionRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
+    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     @staticmethod
     def convert_to_valid_dict(model_dict):
         # type: (Dict[Text, Any]) -> Dict[Text, Any]
@@ -563,6 +580,8 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
+    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _reconstitute(self, snapshot_dict):
         # type: (Dict[Text, Any]) -> CollectionRightsModel
         """Populates the model instance with the snapshot.
@@ -584,6 +603,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
+    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
+    # remove Any from type-annotation below.
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         # type: (Text, Text, Text, List[Dict[Text, Any]]) -> None
@@ -842,8 +863,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-        summary_models = cast(List[CollectionSummaryModel], summary_models)
-        return summary_models
+        return cast(List[CollectionSummaryModel], summary_models)
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -869,8 +889,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-        summary_models = cast(List[CollectionSummaryModel], summary_models)
-        return summary_models
+        return cast(List[CollectionSummaryModel], summary_models)
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -893,5 +912,4 @@ class CollectionSummaryModel(base_models.BaseModel):
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
-        summary_models = cast(List[CollectionSummaryModel], summary_models)
-        return summary_models
+        return cast(List[CollectionSummaryModel], summary_models)

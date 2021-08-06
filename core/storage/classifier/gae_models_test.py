@@ -27,11 +27,11 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from typing import List # isort:skip # pylint: disable=unused-import
+from typing import List, cast # isort:skip # pylint: disable=unused-import
 
 MYPY = False
-if MYPY:
-    from mypy_imports import * # pragma: no cover # pylint: disable=import-only-modules,wildcard-import,unused-wildcard-import
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, classifier_models
 
 (base_models, classifier_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.classifier])
@@ -392,17 +392,20 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_multi_mappings(self):
         # type: () -> None
-        state_training_jobs_mappings = [] # type: List[classifier_models.StateTrainingJobsMappingModel]
+        state_training_jobs_mappings = [] # type: List[classifier_domain.StateTrainingJobsMapping]
         state_training_jobs_mappings.append(
-            classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call,arg-type]
+            classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
                 u'1', 1, 'Home', {'algorithm_id': 'job_id1'}))
         state_training_jobs_mappings.append(
-            classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call,arg-type]
+            classifier_domain.StateTrainingJobsMapping( # type: ignore[no-untyped-call]
                 u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
+        state_training_jobs_mappings_model = cast(
+            List[classifier_models.StateTrainingJobsMappingModel],
+            state_training_jobs_mappings)
         mapping_ids = (
             classifier_models.StateTrainingJobsMappingModel.create_multi(
-                state_training_jobs_mappings))
+                state_training_jobs_mappings_model))
         self.assertEqual(len(mapping_ids), 2)
 
         mapping1 = (

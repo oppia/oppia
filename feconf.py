@@ -1323,7 +1323,8 @@ COMMON_RIGHTS_ALLOWED_COMMANDS = [{
 }] # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
 
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
-    COMMON_RIGHTS_ALLOWED_COMMANDS) # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
+    COMMON_RIGHTS_ALLOWED_COMMANDS
+) # type: List[Dict[Text, Union[Text, List[Text], Dict[Text, Union[Text, List[Text]]]]]]
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'name': CMD_CHANGE_COLLECTION_STATUS,
     'required_attribute_names': ['old_status', 'new_status'],
