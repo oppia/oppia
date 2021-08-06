@@ -254,7 +254,8 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'SplashRedirectPage'
     ]
 
-# These handlers do not require any schema validation.
+# These handlers are not child classes of BaseHandlers, hence they
+# do not require schemas for validation.
 HANDLER_CLASS_NAMES_WHICH_DO_NOT_REQUIRE_SCHEMAS = [
     'SessionBeginHandler',
     'SessionEndHandler',
