@@ -27,7 +27,9 @@ import schema_utils
 from typing import Any, Dict, List, Text, Tuple # isort:skip  pylint: disable= wrong-import-order, wrong-import-position, unused-import, import-only-modules
 
 
-def validate(handler_args, handler_args_schemas, allowed_extra_args):
+def validate(
+        handler_args, handler_args_schemas, allowed_extra_args,
+        allow_string_to_bool_conversion):
     # type: (Any, Any, bool) -> Tuple[Dict[Any, Any], List[Text]]
 
     """Calls schema utils for normalization of object against its schema
@@ -37,6 +39,8 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
         handler_args: *. Object for normalization.
         handler_args_schemas: dict. Schema for args.
         allowed_extra_args: bool. Whether extra args are allowed in handler.
+        allow_string_to_bool_conversion: bool. Whether to allow string to
+            boolean coversion.
 
     Returns:
         *. A two tuple, where the first element represents the normalized value
@@ -63,6 +67,7 @@ def validate(handler_args, handler_args_schemas, allowed_extra_args):
         # Below normalization is for arguments which are expected to be boolean
         # but from API request they are received as string type.
         if (
+                allow_string_to_bool_conversion and
                 arg_schema['schema']['type'] == 'bool' and
                 isinstance(handler_args[arg_key], python_utils.BASESTRING)
         ):

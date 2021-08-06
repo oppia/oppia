@@ -367,6 +367,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
             request_method == 'GET')
 
+        # This flag is used to normalize string arguments which are expected to
+        # be boolean.
+        allow_string_to_bool_conversion = False
+
         if self.URL_PATH_ARGS_SCHEMAS is None:
             raise NotImplementedError(
                 'Missing schema for url path args in %s handler class.' % (
@@ -375,7 +379,8 @@ class BaseHandler(webapp2.RequestHandler):
         schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
         normalized_arg_values, errors = (
             payload_validator.validate(
-                url_path_args, schema_for_url_path_args, extra_args_are_allowed)
+                url_path_args, schema_for_url_path_args, extra_args_are_allowed,
+                allow_string_to_bool_conversion)
         )
 
         if errors:
@@ -397,9 +402,11 @@ class BaseHandler(webapp2.RequestHandler):
                 'Missing schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
+        allow_string_to_bool_conversion = request_method in ['GET', 'DELETE']
         normalized_arg_values, errors = (
             payload_validator.validate(
-                handler_args, schema_for_request_method, extra_args_are_allowed)
+                handler_args, schema_for_request_method, extra_args_are_allowed,
+                allow_string_to_bool_conversion)
         )
 
         self.normalized_payload = {
