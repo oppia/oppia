@@ -29,7 +29,8 @@ import redis
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.OPPIA_REDIS_DB_INDEX
+    db=feconf.OPPIA_REDIS_DB_INDEX,
+    decode_responses=True
 )
 
 # Redis client for the Cloud NDB cache.
@@ -76,11 +77,7 @@ def get_multi(keys):
         are passed in.
     """
     assert isinstance(keys, list)
-    # Redis saves data as bytes, so we need to decode them.
-    return [
-        None if value is None else value.decode('utf-8')
-        for value in OPPIA_REDIS_CLIENT.mget(keys)
-    ]
+    return OPPIA_REDIS_CLIENT.mget(keys)
 
 
 def set_multi(key_value_mapping):
@@ -95,11 +92,7 @@ def set_multi(key_value_mapping):
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    # Redis saves data as bytes, so we need to encode them first.
-    key_value_bytes_mapping = {
-        key: value.encode('utf-8') for key, value in key_value_mapping.items()
-    }
-    return OPPIA_REDIS_CLIENT.mset(key_value_bytes_mapping)
+    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
 
 
 def delete_multi(keys):

@@ -27,7 +27,11 @@ import webtest
 
 from typing import Any, ContextManager, Dict  # isort:skip
 
-datastore_services = models.Registry.import_datastore_services()  # type: ignore[no-untyped-call]
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):

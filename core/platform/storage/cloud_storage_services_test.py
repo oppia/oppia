@@ -17,6 +17,7 @@
 """Tests for cloud_storage_services."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import annotations  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.storage import cloud_storage_services
@@ -24,13 +25,16 @@ from core.tests import test_utils
 
 from google.cloud import storage
 
+from typing import ( # isort:skip # pylint: disable=unused-import
+    Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
+
 
 class MockClient:
 
-    def __init__(self):
-        self.buckets = {}
+    def __init__(self) -> None:
+        self.buckets: Dict[str, MockBucket] = {}
 
-    def get_bucket(self, bucket_name):
+    def get_bucket(self, bucket_name: str) -> MockBucket:
         """Gets mocked Cloud Storage bucket.
 
         Args:
@@ -41,7 +45,9 @@ class MockClient:
         """
         return self.buckets[bucket_name]
 
-    def list_blobs(self, bucket, prefix=None):
+    def list_blobs(
+            self, bucket: MockBucket, prefix: Optional[str] = None
+    ) -> List[MockBlob]:
         """Lists all blobs with some prefix.
 
         Args:
@@ -49,7 +55,7 @@ class MockClient:
             prefix: str|None. The prefix which the blobs should have.
 
         Returns:
-            list(EmulatorBlob). A list of blobs.
+            list(MockBlob). A list of blobs.
         """
         return [
             blob for name, blob in bucket.blobs.items()
@@ -59,10 +65,10 @@ class MockClient:
 
 class MockBucket:
 
-    def __init__(self):
-        self.blobs = {}
+    def __init__(self) -> None:
+        self.blobs: Dict[str, MockBlob] = {}
 
-    def get_blob(self, filepath):
+    def get_blob(self, filepath: str) -> MockBlob:
         """Gets a blob object by filepath. This will return None if the
         blob doesn't exist.
 
@@ -74,7 +80,12 @@ class MockBucket:
         """
         return self.blobs.get(filepath)
 
-    def copy_blob(self, src_blob, bucket, new_name=None):
+    def copy_blob(
+            self,
+            src_blob: MockBlob,
+            bucket: MockBucket,
+            new_name: Optional[str] = None
+    ) -> None:
         """Copies the given blob to the given bucket, optionally
         with a new name.
 
@@ -89,7 +100,7 @@ class MockBucket:
         blob.upload_from_string(
             src_blob.download_as_bytes(), content_type=src_blob.content_type)
 
-    def blob(self, filepath):
+    def blob(self, filepath: str) -> MockBlob:
         """Creates new blob in this bucket.
 
         Args:
@@ -107,13 +118,15 @@ class MockBlob:
 
     __slots__ = ('filepath', 'raw_bytes', 'content_type', 'deleted')
 
-    def __init__(self, filepath):
+    def __init__(self, filepath: str) -> None:
         self.filepath = filepath
         self.deleted = False
-        self.raw_bytes = None
-        self.content_type = None
+        self.raw_bytes = b''
+        self.content_type: Optional[str] = None
 
-    def upload_from_string(self, raw_bytes, content_type=None):
+    def upload_from_string(
+            self, raw_bytes: bytes, content_type: Optional[str] = None
+    ) -> None:
         """Sets the blob data.
 
         Args:
@@ -123,7 +136,7 @@ class MockBlob:
         self.raw_bytes = raw_bytes
         self.content_type = content_type
 
-    def download_as_bytes(self):
+    def download_as_bytes(self) -> bytes:
         """Gets the blob data as bytes.
 
         Returns:
@@ -131,14 +144,14 @@ class MockBlob:
         """
         return self.raw_bytes
 
-    def delete(self):
+    def delete(self) -> None:
         """Marks the blob as deleted."""
         self.deleted = True
 
 
 class CloudStorageServicesTests(test_utils.TestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.client = MockClient()
         self.bucket_1 = MockBucket()
@@ -153,18 +166,18 @@ class CloudStorageServicesTests(test_utils.TestBase):
             self.client.get_bucket
         )
 
-    def test_isfile_when_file_exists_returns_true(self):
+    def test_isfile_when_file_exists_returns_true(self) -> None:
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
         with self.get_client_swap:
             self.assertTrue(
                 cloud_storage_services.isfile('bucket_1', 'path/to/file.txt'))
 
-    def test_isfile_when_file_does_not_exist_returns_false(self):
+    def test_isfile_when_file_does_not_exist_returns_false(self) -> None:
         with self.get_bucket_swap:
             self.assertFalse(
                 cloud_storage_services.isfile('bucket_1', 'path/to/file.txt'))
 
-    def test_get_when_file_exists_returns_file_contents(self):
+    def test_get_when_file_exists_returns_file_contents(self) -> None:
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
         self.bucket_1.blobs['path/to/file.txt'].upload_from_string(b'abc')
         self.bucket_2.blobs['path/file.txt'] = MockBlob('path/file.txt')
@@ -179,7 +192,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
                 cloud_storage_services.get('bucket_2', 'path/file.txt'), b'xyz'
             )
 
-    def test_commit_saves_file_into_bucket(self):
+    def test_commit_saves_file_into_bucket(self) -> None:
         with self.get_bucket_swap:
             cloud_storage_services.commit(
                 'bucket_1', 'path/to/file.txt', b'abc', 'audio/mpeg')
@@ -195,7 +208,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.assertEqual(
             self.bucket_2.blobs['path/file.txt'].content_type, 'image/png')
 
-    def test_delete_removes_file_from_bucket(self):
+    def test_delete_removes_file_from_bucket(self) -> None:
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
         self.bucket_1.blobs['path/to/file.txt'].upload_from_string(b'abc')
         self.bucket_2.blobs['path/file.txt'] = MockBlob('path/file.txt')
@@ -217,7 +230,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.assertTrue(
             self.bucket_2.blobs['path/file.txt'].deleted)
 
-    def test_copy_creates_copy_in_the_bucket(self):
+    def test_copy_creates_copy_in_the_bucket(self) -> None:
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
         self.bucket_1.blobs['path/to/file.txt'].upload_from_string(
             b'abc', content_type='audio/mpeg')
@@ -244,7 +257,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
             'image/png'
         )
 
-    def test_listdir_lists_files_with_provided_prefix(self):
+    def test_listdir_lists_files_with_provided_prefix(self) -> None:
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
         self.bucket_1.blobs['path/to/file.txt'].upload_from_string(b'abc')
         self.bucket_1.blobs['pathto/file.txt'] = MockBlob('pathto/file.txt')
@@ -257,7 +270,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
             path_slash_blobs = (
                 cloud_storage_services.listdir('bucket_1', 'path/'))
 
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             path_blobs,
             [
                 self.bucket_1.blobs['path/to/file.txt'],
@@ -265,7 +278,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
                 self.bucket_1.blobs['path/to/file2.txt']
             ]
         )
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             path_slash_blobs,
             [
                 self.bucket_1.blobs['path/to/file.txt'],

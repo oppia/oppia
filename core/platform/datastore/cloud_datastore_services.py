@@ -26,8 +26,7 @@ from core.platform import models
 from google.cloud import ndb
 
 from typing import ( # isort:skip # pylint: disable=unused-import
-    Any, Callable, Iterator, List, Optional, Sequence,
-    Text, Tuple, TypeVar)
+    Any, Dict, List, Optional, Sequence, Text, Tuple, TypeVar)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -58,6 +57,7 @@ CLIENT = ndb.Client()
 
 
 def get_ndb_context(**kwargs):
+    # type: () -> ndb.context.Context
     """Get the context of the Cloud NDB. This context needs to be entered in
     order to do any Cloud NDB operations.
 
@@ -145,6 +145,7 @@ def delete_multi(keys):
 
 
 def query_everything(**kwargs):
+    # type: (**Dict[str, Any]) -> ndb.Query
     """Returns a query that targets every single entity in the datastore."""
     return ndb.Query(**kwargs)
 

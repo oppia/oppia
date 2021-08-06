@@ -83,15 +83,12 @@ from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import cache_services
     from mypy_imports import datastore_services
-    from mypy_imports import transaction_services
 
 T = TypeVar('T')  # pylint: disable=invalid-name
 
-cache_services = models.Registry.import_cache_services()  # type: ignore[no-untyped-call]
-datastore_services = models.Registry.import_datastore_services()  # type: ignore[no-untyped-call]
-transaction_services = models.Registry.import_transaction_services()  # type: ignore[no-untyped-call]
+cache_services = models.Registry.import_cache_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,

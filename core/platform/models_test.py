@@ -27,6 +27,9 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+from types import ModuleType  # isort:skip # pylint: disable=unused-import
+from typing import cast  # isort:skip # pylint: disable=unused-import
+
 
 class RegistryUnitTest(test_utils.TestBase):
     """Tests the Registry class interface."""
@@ -373,7 +376,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
         with self.swap(constants, 'EMULATOR_MODE', False):
             sys.modules['core.platform.taskqueue.cloud_taskqueue_services'] = (
-                MockCloudTaskqueue
+                cast(ModuleType, MockCloudTaskqueue)
             )
             self.assertEqual(
                 self.registry_instance.import_taskqueue_services(),
@@ -406,6 +409,7 @@ class RegistryUnitTest(test_utils.TestBase):
             elastic_search_services)
 
     def test_import_storage_services(self):
+        # type: () -> None
         """Tests import storage services function."""
 
         class MockCloudStorage():
@@ -414,7 +418,7 @@ class RegistryUnitTest(test_utils.TestBase):
         with self.swap(constants, 'EMULATOR_MODE', False):
             # Mock Cloud Storage since importing it fails in emulator env.
             sys.modules['core.platform.storage.cloud_storage_services'] = (
-                MockCloudStorage
+                cast(ModuleType, MockCloudStorage)
             )
             self.assertEqual(
                 self.registry_instance.import_storage_services(),

@@ -34,12 +34,12 @@ from typing import Any # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import blog_models, user_models
+    from mypy_imports import blog_models, datastore_services, user_models
 
 (blog_models, user_models) = models.Registry.import_models(
     [models.NAMES.blog, models.NAMES.user])
 
-datastore_services = models.Registry.import_datastore_services()  # type: ignore[no-untyped-call]
+datastore_services = models.Registry.import_datastore_services()
 
 
 @validation_decorators.AuditsExisting( # type: ignore[no-untyped-call]

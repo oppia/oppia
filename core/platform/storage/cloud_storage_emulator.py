@@ -17,7 +17,8 @@
 """An emulator that mocks the core.platform.storage API."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals # pylint: disable=import-only-modules
+from __future__ import annotations  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import mimetypes
 
@@ -26,17 +27,25 @@ import python_utils
 
 import redis
 
+from typing import Dict, List, Mapping, Optional, Union  # isort:skip # pylint: disable=unused-import
+
+
 REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX
+    db=feconf.STORAGE_EMULATOR_REDIS_DB_INDEX,
 )
 
 
 class EmulatorBlob(python_utils.OBJECT):
     """Object for storing the file data."""
 
-    def __init__(self, name, data, content_type):
+    def __init__(
+            self,
+            name: str,
+            data: Union[bytes, str],
+            content_type: Optional[str]
+    ):
         """Initialize blob.
 
         Args:
@@ -53,7 +62,12 @@ class EmulatorBlob(python_utils.OBJECT):
         self._raw_bytes = (
             data.encode('utf-8') if isinstance(data, str) else data)
         if content_type is None:
-            self._content_type, _ = mimetypes.guess_type(name)
+            guessed_content_type, _ = mimetypes.guess_type(name)
+            self._content_type = (
+                guessed_content_type
+                if guessed_content_type
+                else 'application/octet-stream'
+            )
         # TODO(#13480): In some places we set 'audio/mp3' as content type, but
         # it is not a valid MIME type. This needs to be fixed in our codebase
         # and we need to validate that existing files in storage do not have
@@ -66,7 +80,9 @@ class EmulatorBlob(python_utils.OBJECT):
             self._content_type = content_type
 
     @classmethod
-    def create_copy(cls, original_blob, new_name):
+    def create_copy(
+            cls, original_blob: EmulatorBlob, new_name: str
+    ) -> EmulatorBlob:
         """Create new instance of EmulatorBlob with the same values.
 
         Args:
@@ -82,7 +98,7 @@ class EmulatorBlob(python_utils.OBJECT):
             original_blob.content_type
         )
 
-    def to_dict(self):
+    def to_dict(self) -> Mapping[bytes, bytes]:
         """Transform the EmulatorBlob into dictionary that can be saved
         into Redis.
 
@@ -100,7 +116,7 @@ class EmulatorBlob(python_utils.OBJECT):
         return blob_dict
 
     @classmethod
-    def from_dict(cls, blob_dict):
+    def from_dict(cls, blob_dict: Dict[bytes, bytes]) -> EmulatorBlob:
         """Transform dictionary from Redis into EmulatorBlob.
 
         Args:
@@ -119,7 +135,7 @@ class EmulatorBlob(python_utils.OBJECT):
         )
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Get the filepath of the blob. This is called 'name' since this mimics
         the corresponding property in the Google Cloud Storage API.
 
@@ -129,7 +145,7 @@ class EmulatorBlob(python_utils.OBJECT):
         return self._name
 
     @property
-    def content_type(self):
+    def content_type(self) -> str:
         """Get the content type of the blob.
 
         Returns:
@@ -137,7 +153,7 @@ class EmulatorBlob(python_utils.OBJECT):
         """
         return self._content_type
 
-    def download_as_bytes(self):
+    def download_as_bytes(self) -> bytes:
         """Get the raw bytes of the blob.
 
         Returns:
@@ -145,15 +161,15 @@ class EmulatorBlob(python_utils.OBJECT):
         """
         return self._raw_bytes
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
         return self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             'EmulatorBlob(name=%s, content_type=%s)' % (
                 self.name, self.content_type))
@@ -162,11 +178,11 @@ class EmulatorBlob(python_utils.OBJECT):
 class CloudStorageEmulator(python_utils.OBJECT):
     """Emulator for the storage client."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the CloudStorageEmulator class.."""
         self.namespace = ''
 
-    def _get_redis_key(self, filepath):
+    def _get_redis_key(self, filepath: str) -> str:
         """Construct and return the Redis key for the given filepath. The key
         is the filepath prepended with namespace and ':'.
 
@@ -178,7 +194,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
         """
         return '%s:%s' % (self.namespace, filepath)
 
-    def get_blob(self, filepath):
+    def get_blob(self, filepath: str) -> Optional[EmulatorBlob]:
         """Get the blob located at the given filepath.
 
         Args:
@@ -190,7 +206,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
         blob_dict = REDIS_CLIENT.hgetall(self._get_redis_key(filepath))
         return EmulatorBlob.from_dict(blob_dict) if blob_dict else None
 
-    def upload_blob(self, filepath, blob):
+    def upload_blob(self, filepath: str, blob: EmulatorBlob) -> None:
         """Upload the given blob to the filepath.
 
         Args:
@@ -198,9 +214,9 @@ class CloudStorageEmulator(python_utils.OBJECT):
             blob: EmulatorBlob. The blob to upload.
         """
         REDIS_CLIENT.hset(
-            self._get_redis_key(filepath), mapping=blob.to_dict())
+            key=self._get_redis_key(filepath), mapping=blob.to_dict())
 
-    def delete_blob(self, filepath):
+    def delete_blob(self, filepath: str) -> None:
         """Delete the blob at the given filepath.
 
         Args:
@@ -208,7 +224,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
         """
         REDIS_CLIENT.delete(self._get_redis_key(filepath))
 
-    def copy_blob(self, blob, filepath):
+    def copy_blob(self, blob: EmulatorBlob, filepath: str) -> None:
         """Copy existing blob to new filepath.
 
         Args:
@@ -219,7 +235,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
             self._get_redis_key(filepath),
             mapping=EmulatorBlob.create_copy(blob, filepath).to_dict())
 
-    def list_blobs(self, prefix):
+    def list_blobs(self, prefix: str) -> List[EmulatorBlob]:
         """Get blobs whose filepaths start with the given prefix.
 
         Args:
@@ -242,7 +258,7 @@ class CloudStorageEmulator(python_utils.OBJECT):
             EmulatorBlob.from_dict(blob_dict) for blob_dict in blob_dicts
         ]
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the emulator and remove all blobs."""
         for key in REDIS_CLIENT.scan_iter(
                 match='%s*' % self._get_redis_key('')):

@@ -26,26 +26,26 @@ from core.tests import test_utils
 class BlobUnitTests(test_utils.TestBase):
     """Tests for EmulatorBlob."""
 
-    def test_init_blob_with_str_creates_blob(self):
+    def test_init_blob_with_str_creates_blob(self) -> None:
         blob = (
             cloud_storage_emulator.EmulatorBlob('name', 'string', 'image/png'))
         self.assertEqual(blob.name, 'name')
         self.assertEqual(blob.download_as_bytes(), b'string')
         self.assertEqual(blob.content_type, 'image/png')
 
-    def test_init_blob_with_bytes_creates_blob(self):
+    def test_init_blob_with_bytes_creates_blob(self) -> None:
         blob = (
             cloud_storage_emulator.EmulatorBlob('name', b'string', 'image/png'))
         self.assertEqual(blob.name, 'name')
         self.assertEqual(blob.download_as_bytes(), b'string')
         self.assertEqual(blob.content_type, 'image/png')
 
-    def test_init_blob_with_wrong_mimetype_raise_exception(self):
-        with self.assertRaisesRegexp(
+    def test_init_blob_with_wrong_mimetype_raise_exception(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
                 Exception, 'Content type contains unknown MIME type.'):
             cloud_storage_emulator.EmulatorBlob('name', b'string', 'png')
 
-    def test_create_copy_creates_identical_copy(self):
+    def test_create_copy_creates_identical_copy(self) -> None:
         orig_blob = (
             cloud_storage_emulator.EmulatorBlob('name', 'string', 'image/png'))
         copy_blob = (
@@ -56,7 +56,7 @@ class BlobUnitTests(test_utils.TestBase):
             orig_blob.download_as_bytes(), copy_blob.download_as_bytes())
         self.assertEqual(orig_blob.content_type, copy_blob.content_type)
 
-    def test_to_dict_returns_correct_dictionary(self):
+    def test_to_dict_returns_correct_dictionary(self) -> None:
         blob = (
             cloud_storage_emulator.EmulatorBlob('name', b'string', 'image/png'))
         self.assertEqual(
@@ -68,7 +68,7 @@ class BlobUnitTests(test_utils.TestBase):
             }
         )
 
-    def test_from_dict_returns_blob(self):
+    def test_from_dict_returns_blob(self) -> None:
         blob = (
             cloud_storage_emulator.EmulatorBlob('name', b'string', 'image/png'))
         self.assertEqual(
@@ -80,12 +80,12 @@ class BlobUnitTests(test_utils.TestBase):
             })
         )
 
-    def test_compare_blob_and_int_is_false(self):
+    def test_compare_blob_and_int_is_false(self) -> None:
         orig_blob = (
             cloud_storage_emulator.EmulatorBlob('name', 'string', 'image/png'))
         self.assertFalse(orig_blob == 1)
 
-    def test_repr_returns_correct_string_representation(self):
+    def test_repr_returns_correct_string_representation(self) -> None:
         orig_blob = (
             cloud_storage_emulator.EmulatorBlob('name', 'string', 'image/png'))
         self.assertEqual(
@@ -97,7 +97,7 @@ class BlobUnitTests(test_utils.TestBase):
 class CloudStorageEmulatorUnitTests(test_utils.TestBase):
     """Tests for CloudStorageEmulator."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(CloudStorageEmulatorUnitTests, self).setUp()
         self.emulator = cloud_storage_emulator.CloudStorageEmulator()
         self.emulator.namespace = 'namespace'
@@ -109,17 +109,17 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
         self.blob3 = cloud_storage_emulator.EmulatorBlob(
             '/different/path.png', b'data2', 'image/png')
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         super(CloudStorageEmulatorUnitTests, self).tearDown()
         self.emulator.reset()
 
-    def test_get_blob_retrieves_correct_blob_from_redis(self):
+    def test_get_blob_retrieves_correct_blob_from_redis(self) -> None:
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/file/path.png', mapping=self.blob1.to_dict())
 
         self.assertEqual(self.emulator.get_blob('/file/path.png'), self.blob1)
 
-    def test_upload_blob_saves_correct_blob_to_redis(self):
+    def test_upload_blob_saves_correct_blob_to_redis(self) -> None:
         self.emulator.upload_blob('/file/path.png', self.blob1)
 
         self.assertEqual(
@@ -129,7 +129,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
             self.blob1
         )
 
-    def test_delete_blob_removes_blob_from_redis(self):
+    def test_delete_blob_removes_blob_from_redis(self) -> None:
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/file/path.png', mapping=self.blob1.to_dict())
         self.emulator.delete_blob('/file/path.png')
@@ -137,7 +137,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
         self.assertIsNone(
             cloud_storage_emulator.REDIS_CLIENT.get('/file/path.png'))
 
-    def test_copy_blob_saves_copy_of_blob_to_redis(self):
+    def test_copy_blob_saves_copy_of_blob_to_redis(self) -> None:
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/file/path.png', mapping=self.blob1.to_dict())
         self.emulator.copy_blob(
@@ -154,7 +154,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
             orig_blob.download_as_bytes(), copy_blob.download_as_bytes())
         self.assertEqual(orig_blob.content_type, copy_blob.content_type)
 
-    def test_list_blobs_returns_list_of_blobs_with_prefix(self):
+    def test_list_blobs_returns_list_of_blobs_with_prefix(self) -> None:
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/file/path.png', mapping=self.blob1.to_dict())
         cloud_storage_emulator.REDIS_CLIENT.hset(
@@ -169,7 +169,7 @@ class CloudStorageEmulatorUnitTests(test_utils.TestBase):
         self.assertItemsEqual(
             self.emulator.list_blobs('/different'), [self.blob3])
 
-    def test_reset_removes_all_values_from_redis(self):
+    def test_reset_removes_all_values_from_redis(self) -> None:
         cloud_storage_emulator.REDIS_CLIENT.hset(
             'namespace:/file/path.png', mapping=self.blob1.to_dict())
         self.emulator.reset()

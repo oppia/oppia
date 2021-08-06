@@ -323,7 +323,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
             str. ID of the new Classifier Exploration Mapping instance.
         """
         new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return cast(Text, python_utils.convert_to_bytes(new_id)) # type: ignore[no-untyped-call]
+        return cast(Text, python_utils.convert_to_bytes(new_id))
 
     @classmethod
     def get_models(

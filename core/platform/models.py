@@ -95,84 +95,88 @@ class _Gae(Platform):
             Exception. Invalid model name.
         """
         returned_models = [] # type: List[ModuleType]
+        # There are a lot of ignore[no-redef] used here, since we import
+        # gae_models from different folders multiple times. It is fine to use it
+        # here since when we import modules using this function, we need to add
+        # separate imports for mypy anyway.
         for name in model_names:
             if name == NAMES.activity:
                 from core.storage.activity import gae_models
                 returned_models.append(gae_models)
             elif name == NAMES.app_feedback_report:
-                from core.storage.app_feedback_report import gae_models
+                from core.storage.app_feedback_report import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.audit:
-                from core.storage.audit import gae_models
+                from core.storage.audit import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.auth:
-                from core.storage.auth import gae_models
+                from core.storage.auth import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.base_model:
-                from core.storage.base_model import gae_models
+                from core.storage.base_model import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.beam_job:
-                from core.storage.beam_job import gae_models
+                from core.storage.beam_job import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.blog:
-                from core.storage.blog import gae_models
+                from core.storage.blog import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.classifier:
-                from core.storage.classifier import gae_models
+                from core.storage.classifier import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.collection:
-                from core.storage.collection import gae_models
+                from core.storage.collection import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.config:
-                from core.storage.config import gae_models
+                from core.storage.config import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.email:
-                from core.storage.email import gae_models
+                from core.storage.email import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.exploration:
-                from core.storage.exploration import gae_models
+                from core.storage.exploration import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.feedback:
-                from core.storage.feedback import gae_models
+                from core.storage.feedback import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.improvements:
-                from core.storage.improvements import gae_models
+                from core.storage.improvements import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.job:
-                from core.storage.job import gae_models
+                from core.storage.job import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.opportunity:
-                from core.storage.opportunity import gae_models
+                from core.storage.opportunity import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.question:
-                from core.storage.question import gae_models
+                from core.storage.question import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.recommendations:
-                from core.storage.recommendations import gae_models
+                from core.storage.recommendations import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.skill:
-                from core.storage.skill import gae_models
+                from core.storage.skill import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.statistics:
-                from core.storage.statistics import gae_models
+                from core.storage.statistics import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.story:
-                from core.storage.story import gae_models
+                from core.storage.story import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.subtopic:
-                from core.storage.subtopic import gae_models
+                from core.storage.subtopic import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.suggestion:
-                from core.storage.suggestion import gae_models
+                from core.storage.suggestion import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.topic:
-                from core.storage.topic import gae_models
+                from core.storage.topic import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.translation:
-                from core.storage.translation import gae_models
+                from core.storage.translation import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             elif name == NAMES.user:
-                from core.storage.user import gae_models
+                from core.storage.user import gae_models # type: ignore[no-redef]
                 returned_models.append(gae_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
@@ -370,6 +374,7 @@ class _Gae(Platform):
 
     @classmethod
     def import_storage_services(cls):
+        # type: () -> ModuleType
         """Imports and returns cloud_translate_services module.
 
         Returns:
@@ -550,6 +555,7 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def import_storage_services(cls):
+        # type: () -> ModuleType
         """Imports and returns storage_services module.
 
         Returns:

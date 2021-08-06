@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides translate_text functionality from Google Cloud Translate."""
+"""Provides file storage functionality from Google Cloud Storage."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -23,9 +23,11 @@ import functools
 
 from google.cloud import storage
 
+from typing import List, Optional, Union  # isort:skip # pylint: disable=unused-import
+
 
 @functools.lru_cache(maxsize=1)
-def _get_client():
+def _get_client() -> storage.Client:
     """Gets Cloud Storage client.
 
     Returns:
@@ -35,7 +37,7 @@ def _get_client():
 
 
 @functools.lru_cache(maxsize=1)
-def _get_bucket(bucket_name):
+def _get_bucket(bucket_name: str) -> storage.bucket.Bucket:
     """Gets Cloud Storage bucket.
 
     Args:
@@ -47,7 +49,7 @@ def _get_bucket(bucket_name):
     return _get_client().get_bucket(bucket_name)
 
 
-def isfile(bucket_name, filepath):
+def isfile(bucket_name: str, filepath: str) -> bool:
     """Checks if the file with the given filepath exists in the GCS.
 
     Args:
@@ -61,7 +63,7 @@ def isfile(bucket_name, filepath):
     return _get_bucket(bucket_name).get_blob(filepath) is not None
 
 
-def get(bucket_name, filepath):
+def get(bucket_name: str, filepath: str) -> bytes:
     """Gets a file as an unencoded stream of raw bytes.
 
     Args:
@@ -70,15 +72,19 @@ def get(bucket_name, filepath):
             assets folder.
 
     Returns:
-        FileStream or None. It returns FileStream domain object if the file
-        exists. Otherwise, it returns None.
+        bytes. Returns data a bytes.
     """
     blob = _get_bucket(bucket_name).get_blob(filepath)
     data = blob.download_as_bytes()
     return data
 
 
-def commit(bucket_name, filepath, raw_bytes, mimetype):
+def commit(
+        bucket_name: str,
+        filepath: str,
+        raw_bytes: Union[bytes, str],
+        mimetype: Optional[str]
+) -> None:
     """Commits raw_bytes to the relevant file in the entity's assets folder.
 
     Args:
@@ -94,7 +100,7 @@ def commit(bucket_name, filepath, raw_bytes, mimetype):
     blob.upload_from_string(raw_bytes, content_type=mimetype)
 
 
-def delete(bucket_name, filepath):
+def delete(bucket_name: str, filepath: str) -> None:
     """Deletes a file and the metadata associated with it.
 
     Args:
@@ -106,7 +112,9 @@ def delete(bucket_name, filepath):
     blob.delete()
 
 
-def copy(bucket_name, source_assets_path, dest_assets_path):
+def copy(
+        bucket_name: str, source_assets_path: str, dest_assets_path: str
+) -> None:
     """Copies images from source_path.
 
     Args:
@@ -122,7 +130,7 @@ def copy(bucket_name, source_assets_path, dest_assets_path):
     )
 
 
-def listdir(bucket_name, dir_name):
+def listdir(bucket_name: str, dir_name: str) -> List[storage.blob.Blob]:
     """Lists all files in a directory.
 
     Args:

@@ -21,10 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform.storage import cloud_storage_emulator
 
+from typing import Dict, List, Mapping, Optional, Union  # isort:skip # pylint: disable=unused-import
+
 CLIENT = cloud_storage_emulator.CloudStorageEmulator()
 
 
-def isfile(unused_bucket_name, filepath):
+def isfile(unused_bucket_name: str, filepath: str) -> bool:
     """Checks if the file with the given filepath exists.
 
     Args:
@@ -37,7 +39,7 @@ def isfile(unused_bucket_name, filepath):
     return CLIENT.get_blob(filepath) is not None
 
 
-def get(unused_bucket_name, filepath):
+def get(unused_bucket_name: str, filepath: str) -> bytes:
     """Gets a file data as bytes.
 
     Args:
@@ -48,10 +50,17 @@ def get(unused_bucket_name, filepath):
         bytes. Returns data of the file as bytes.
     """
     blob = CLIENT.get_blob(filepath)
+    if blob is None:
+        raise IOError("File at %s does not exist." % filepath)
     return blob.download_as_bytes()
 
 
-def commit(unused_bucket_name, filepath, raw_bytes, mimetype):
+def commit(
+        unused_bucket_name: str,
+        filepath: str,
+        raw_bytes: Union[bytes, str],
+        mimetype: str
+) -> None:
     """Commits bytes to the relevant file.
 
     Args:
@@ -67,7 +76,7 @@ def commit(unused_bucket_name, filepath, raw_bytes, mimetype):
     CLIENT.upload_blob(filepath, blob)
 
 
-def delete(unused_bucket_name, filepath):
+def delete(unused_bucket_name: str, filepath: str) -> None:
     """Deletes a file and the metadata associated with it.
 
     Args:
@@ -77,7 +86,9 @@ def delete(unused_bucket_name, filepath):
     CLIENT.delete_blob(filepath)
 
 
-def copy(unused_bucket_name, source_assets_path, dest_assets_path):
+def copy(
+        unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
+) -> None:
     """Copies images from source_path.
 
     Args:
@@ -93,7 +104,9 @@ def copy(unused_bucket_name, source_assets_path, dest_assets_path):
     CLIENT.copy_blob(src_blob, dest_assets_path)
 
 
-def listdir(unused_bucket_name, dir_name):
+def listdir(
+        unused_bucket_name: str, dir_name: str
+) -> List[cloud_storage_emulator.EmulatorBlob]:
     """Lists all files in a directory.
 
     Args:
