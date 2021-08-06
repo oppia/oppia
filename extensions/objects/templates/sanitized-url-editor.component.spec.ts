@@ -40,9 +40,15 @@ describe('SanitizedUrlEditorComponent', () => {
   it('should return SCHEMA when called', () => {
     expect(component.getSchema()).toEqual({
       type: 'unicode',
-      validators: [{
-        id: 'is_nonempty'
-      }],
+      validators: [
+        {
+          id: 'is_nonempty'
+        },
+        {
+          id: 'is_regex_matched',
+          regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
+        }
+      ],
       ui_config: {
         placeholder: 'https://www.example.com'
       }
