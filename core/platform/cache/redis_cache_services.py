@@ -64,8 +64,8 @@ def get_multi(keys):
         keys: list(str). A list of keys (strings) to look up.
 
     Returns:
-        list(str|None). A list of values in the cache corresponding to the keys that
-        are passed in.
+        list(str|None). A list of values in the cache corresponding to the keys
+        that are passed in.
     """
     assert isinstance(keys, list)
     return cast(

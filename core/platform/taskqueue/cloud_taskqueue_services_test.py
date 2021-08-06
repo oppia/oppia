@@ -31,7 +31,7 @@ from google.api_core import retry as retry_lib
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-from typing import Any, Dict, Optional, Text
+from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
 
 
 class CloudTaskqueueServicesUnitTests(test_utils.TestBase):

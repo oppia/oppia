@@ -19,7 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import datetime # pylint: disable=unused-ignore
+import datetime  # pylint: disable=unused-import
 import os
 
 from core.platform.taskqueue import cloud_tasks_emulator
@@ -27,7 +27,7 @@ import feconf
 
 import requests
 
-from typing import Any, Dict, Optional, Text
+from typing import Any, Dict, Optional, Text # isort:skip # pylint: disable=unused-import
 
 GOOGLE_APP_ENGINE_PORT = (
     os.environ[b'SERVER_PORT']
@@ -87,5 +87,5 @@ def create_http_task(
         task_name: str|None. Optional. The name of the task.
     """
     CLIENT.create_task(
-        queue_name, url, payload, scheduled_for=scheduled_for,
+        queue_name, url, payload=payload, scheduled_for=scheduled_for,
         task_name=task_name)

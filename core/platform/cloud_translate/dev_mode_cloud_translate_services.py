@@ -26,7 +26,7 @@ from __future__ import unicode_literals
 from core.platform.cloud_translate import cloud_translate_emulator
 from core.platform.cloud_translate import cloud_translate_services
 
-from typing import Text, cast
+from typing import Text, cast # isort:skip # pylint: disable=unused-import
 
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 

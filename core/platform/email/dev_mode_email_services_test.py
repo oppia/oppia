@@ -28,6 +28,7 @@ import feconf
 
 from typing import Text # isort:skip # pylint: disable=unused-import
 
+
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 

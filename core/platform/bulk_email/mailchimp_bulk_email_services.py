@@ -26,9 +26,9 @@ import feconf
 import mailchimp3
 from mailchimp3 import mailchimpclient
 
-from typing import Text
-
 import python_utils
+
+from typing import Text # isort:skip # pylint: disable=unused-import
 
 
 def _get_subscriber_hash(email):

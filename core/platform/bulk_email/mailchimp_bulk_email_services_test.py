@@ -22,9 +22,9 @@ from core.tests import test_utils
 import feconf
 from mailchimp3 import mailchimpclient
 
-from typing import Dict, Text
-
 import python_utils
+
+from typing import Dict, Text # isort:skip # pylint: disable=unused-import
 
 
 class MailchimpServicesUnitTests(test_utils.GenericTestBase):

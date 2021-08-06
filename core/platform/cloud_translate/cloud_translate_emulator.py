@@ -24,7 +24,8 @@ from __future__ import unicode_literals
 import python_utils
 import utils
 
-from typing import Text
+from typing import Text # isort:skip # pylint: disable=unused-import
+
 
 class CloudTranslateEmulator(python_utils.OBJECT):
     """The emulator mocks the translate_text function from the Cloud Translate

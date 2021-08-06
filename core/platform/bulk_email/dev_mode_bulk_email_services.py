@@ -20,7 +20,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-from typing import Text
+
+from typing import Text # isort:skip # pylint: disable=unused-import
 
 
 def permanently_delete_user_from_list(user_email):

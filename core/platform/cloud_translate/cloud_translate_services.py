@@ -23,7 +23,7 @@ from __future__ import unicode_literals
 # cloud_translate_emulator.
 from google.cloud import translate_v2 as translate
 
-from typing import Dict, Text, cast
+from typing import Dict, Text, cast # isort:skip # pylint: disable=unused-import
 
 CLIENT = translate.Client()
 
@@ -63,6 +63,7 @@ def translate_text(text, source_language, target_language):
     result = cast(
         Dict[Text, Text],
         CLIENT.translate(
-            text, target_language=target_language, source_language=source_language))
+            text, target_language=target_language,
+            source_language=source_language))
     translated_text = result['translatedText']
     return translated_text

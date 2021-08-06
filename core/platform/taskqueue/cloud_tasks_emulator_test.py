@@ -25,7 +25,7 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from core.tests import test_utils
 import python_utils
 
-from typing import Any, Dict, List, Optional, Text
+from typing import Any, Dict, List, Optional, Text # isort:skip # pylint: disable=unused-import
 
 
 class CloudTasksEmulatorUnitTests(test_utils.TestBase):
@@ -71,9 +71,9 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
-            self.queue_name1, self.url, self.payload1)
+            self.queue_name1, self.url, payload=self.payload1)
         self.unit_test_emulator.create_task(
-            self.queue_name2, self.url, self.payload2)
+            self.queue_name2, self.url, payload=self.payload2)
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 2)
         task_list = self.unit_test_emulator.get_tasks(
             queue_name=self.queue_name1)
@@ -92,9 +92,9 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
         self.unit_test_emulator.create_task(
-            self.queue_name1, self.url, self.payload1)
+            self.queue_name1, self.url, payload=self.payload1)
         self.unit_test_emulator.create_task(
-            self.queue_name2, self.url, self.payload2)
+            self.queue_name2, self.url, payload=self.payload2)
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 2)
 
         self.unit_test_emulator.process_and_flush_tasks(
@@ -131,9 +131,9 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
             self):
         # type: () -> None
         self.dev_mode_emulator.create_task(
-            self.queue_name1, self.url, self.payload1)
+            self.queue_name1, self.url, payload=self.payload1)
         self.dev_mode_emulator.create_task(
-            self.queue_name2, self.url, self.payload2)
+            self.queue_name2, self.url, payload=self.payload2)
         # Allow the threads to execute the tasks scheduled immediately.
         time.sleep(1)
 

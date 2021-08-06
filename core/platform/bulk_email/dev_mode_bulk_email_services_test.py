@@ -22,7 +22,8 @@ import logging
 from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils
 
-from typing import Any, Text
+from typing import Any, Text # isort:skip # pylint: disable=unused-import
+
 
 class DevModeBulkEmailServicesUnitTests(test_utils.GenericTestBase):
     """Tests for mailchimp services."""
