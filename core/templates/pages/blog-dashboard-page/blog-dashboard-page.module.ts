@@ -34,23 +34,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { ToastrModule } from 'ngx-toastr';
 
 
-// Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
-  allowHtml: false,
-  iconClasses: {
-    error: 'toast-error',
-    info: 'toast-info',
-    success: 'toast-success',
-    warning: 'toast-warning'
-  },
-  positionClass: 'toast-bottom-right',
-  messageClass: 'toast-message',
-  progressBar: false,
-  tapToDismiss: true,
-  titleClass: 'toast-title'
-};
-
-
 declare var angular: ng.IAngularStatic;
 
 @NgModule({
@@ -93,6 +76,7 @@ class BlogDashboardPageModule implements DoBootstrap {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { toastrConfig } from 'pages/oppia-root/app.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

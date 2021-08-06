@@ -20,7 +20,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
-const toastrConfig = {
+export const toastrConfig = {
   allowHtml: false,
   iconClasses: {
     error: 'toast-error',
