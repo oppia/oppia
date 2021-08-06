@@ -280,6 +280,10 @@ export class TranslationModalComponent {
   hasSomeDuplicateElements(
       originalElements: string[],
       translatedElements: string[]): boolean {
+    // This regular expression matches a number, optionally negative, with an
+    // optional decimal number followed by zero or more operator(including 
+    // equal)/number pairs. It also allows for whitespace between numbers 
+    // and operators.
     const mathEquationRegex = new RegExp(
       /(?:(?:^|[-+_*/=])(?:\s*-?\d+(\.\d+)?(?:[eE][+-]?\d+)?\s*))+$/);
     if (originalElements.length === 0) {
