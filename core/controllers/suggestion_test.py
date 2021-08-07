@@ -121,7 +121,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # Create some suggestions in the backend.
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,self.EXP_ID,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             self.exploration.version,
             self.author_id, {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
