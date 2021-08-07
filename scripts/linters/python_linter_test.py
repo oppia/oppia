@@ -77,7 +77,7 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
             [INVALID_DOCSTRING_FILEPATH]).lint_py_files()
         self.assert_same_list_elements(
-            ['W: 27, 0: Period is not used at the end of the docstring.'],
+            ['W9025: Period is not used at the end of the docstring.'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -117,8 +117,8 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
             [INVALID_PYTHON3_FILEPATH]
         ).lint_py_files_for_python3_compatibility()
         self.assert_same_list_elements(
-            ['W: 21, 0: import missing `from __future__ import '
-             'absolute_import` (no-absolute-import)'],
+            ['W1618: import missing `from __future__ import absolute_import` '
+             '(no-absolute-import)'],
             lint_task_report.get_report())
         self.assertEqual(
             'Pylint for Python 3 compatibility', lint_task_report.name)
@@ -151,7 +151,6 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         custom_linter, third_party_linter = python_linter.get_linters(
             [VALID_PY_FILEPATH])
         self.assertIsNone(custom_linter)
-        self.assertTrue(
-            isinstance(
-                third_party_linter,
-                python_linter.ThirdPartyPythonLintChecksManager))
+        self.assertIsInstance(
+            third_party_linter,
+            python_linter.ThirdPartyPythonLintChecksManager)

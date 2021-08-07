@@ -43,7 +43,7 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
-sys.path.insert(0, _YAML_PATH) # type: ignore[arg-type]
+sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
@@ -146,7 +146,7 @@ def get_exploration_components_from_dir(dir_path):
 
     for root, directories, files in os.walk(dir_path):
         for directory in directories:
-            if root == dir_path and directory != 'assets':
+            if root == dir_path and directory not in ('assets', '__pycache__'):
                 raise Exception(
                     'The only directory in %s should be assets/' % dir_path)
 
@@ -210,8 +210,9 @@ def to_ascii(input_string):
     Returns:
         str. String containing the ascii representation of the input string.
     """
-    return unicodedata.normalize(
-        'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
+    normalized_string = unicodedata.normalize(
+        'NFKD', python_utils.UNICODE(input_string))
+    return normalized_string.encode('ascii', 'ignore').decode('ascii')
 
 
 def dict_from_yaml(yaml_str):
@@ -293,7 +294,7 @@ def get_random_choice(alist):
 
 
 def convert_png_data_url_to_binary(image_data_url):
-    # type: (Text) -> Text
+    # type: (Text) -> bytes
     """Converts a PNG base64 data URL to a PNG binary data.
 
     Args:
@@ -301,21 +302,21 @@ def convert_png_data_url_to_binary(image_data_url):
             data URL.
 
     Returns:
-        str. Binary content of the PNG created from the data URL.
+        bytes. Binary content of the PNG created from the data URL.
 
     Raises:
         Exception. The given string does not represent a PNG data URL.
     """
     if image_data_url.startswith(PNG_DATA_URL_PREFIX):
         return base64.b64decode(
-            python_utils.urllib_unquote( # type: ignore[no-untyped-call]
+            python_utils.urllib_unquote(
                 image_data_url[len(PNG_DATA_URL_PREFIX):]))
     else:
         raise Exception('The given string does not represent a PNG data URL.')
 
 
 def convert_png_binary_to_data_url(content):
-    # type: (Text) -> Text
+    # type: (Union[str, bytes]) -> str
     """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
@@ -327,13 +328,13 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    # We accept unicode but imghdr.what(file, h) accept 'h' of type str.
-    # So we have casted content to be str.
-    content = cast(str, content)
+    # We accept unicode but imghdr.what(file, h) accepts 'h' of type bytes.
+    # So we have casted content to be bytes.
+    content = python_utils.convert_to_bytes(content)
     if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(content))  # type: ignore[no-untyped-call]
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -417,12 +418,12 @@ class JSONEncoderForHTML(json.JSONEncoder):
 
     # Ignoring error code [override] because JSONEncoder has return type str
     # but we are returning Union[str, unicode].
-    def encode(self, o): # type: ignore[override]
+    def encode(self, o):
         # type: (Text) -> Text
         chunks = self.iterencode(o, True)
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
-    def iterencode(self, o, _one_shot=False): # type: ignore[override]
+    def iterencode(self, o, _one_shot=False):
         # type: (Text, bool) -> Iterator[Text]
         chunks = super(
             JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
@@ -457,11 +458,11 @@ def convert_to_hash(input_string, max_length):
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
         hashlib.sha1(
-            python_utils.convert_to_bytes(input_string)).digest(), # type: ignore[no-untyped-call]
+            python_utils.convert_to_bytes(input_string)).digest(),
         altchars=b'ab'
-    ).replace('=', 'c')
+    ).replace(b'=', b'c')
 
-    return encoded_string[:max_length]
+    return encoded_string[:max_length].decode('utf-8')
 
 
 def base64_from_int(value):
@@ -472,10 +473,11 @@ def base64_from_int(value):
         value: int. Integer value for conversion into base64.
 
     Returns:
-        *. Returns the base64 representation of the number passed.
+        str. Returns the base64 representation of the number passed.
     """
-    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']' # type: ignore[no-untyped-call]
-    return base64.b64encode(byte_value)
+    byte_value = (
+        b'[' + python_utils.UNICODE(value).encode('utf-8') + b']')
+    return base64.b64encode(byte_value).decode('utf-8')
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -616,7 +618,7 @@ def generate_random_string(length):
     Returns:
         str. Random string of specified length.
     """
-    return base64.urlsafe_b64encode(os.urandom(length))[:length]
+    return base64.urlsafe_b64encode(os.urandom(length))[:length].decode('utf-8')
 
 
 def generate_new_session_id():
@@ -970,7 +972,7 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string).decode('utf-8') # type: ignore[no-any-return, no-untyped-call]
+    return python_utils.urllib_unquote(escaped_string)
 
 
 def snake_case_to_camel_case(snake_str):
@@ -1034,7 +1036,7 @@ def get_hashable_value(value):
 
 
 def compress_to_zlib(data):
-    # type: (Text) -> Text
+    # type: (bytes) -> bytes
     """Compress the data to zlib format for efficient storage and communication.
 
     Args:
@@ -1043,14 +1045,11 @@ def compress_to_zlib(data):
     Returns:
         str. Compressed data string.
     """
-    # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty. For details, refer to:
-    # https://github.com/oppia/oppia/wiki/Backend-Type-Annotations#1-use-typingtext-instead-of-str-and-unicode
-    return zlib.compress(data) # type: ignore[arg-type]
+    return zlib.compress(data)
 
 
 def decompress_from_zlib(data):
-    # type: (Text) -> Text
+    # type: (bytes) -> bytes
     """Decompress the zlib compressed data.
 
     Args:
@@ -1059,9 +1058,7 @@ def decompress_from_zlib(data):
     Returns:
         str. Decompressed data string.
     """
-    # Ignoring arg-type because we are preventing direct usage of 'str' for
-    # Python3 compatibilty.
-    return zlib.decompress(data) # type: ignore[arg-type]
+    return zlib.decompress(data)
 
 
 def compute_list_difference(list_a, list_b):
@@ -1075,7 +1072,7 @@ def compute_list_difference(list_a, list_b):
     Returns:
         list. List of the set difference of list_a - list_b.
     """
-    return list(set(list_a) - set(list_b))
+    return list(sorted(set(list_a) - set(list_b)))
 
 
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic

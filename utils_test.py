@@ -53,18 +53,18 @@ class UtilsTests(test_utils.GenericTestBase):
         # type: () -> None
         """Test to_ascii method."""
         parsed_str = utils.to_ascii('abc')
-        self.assertEqual(parsed_str, b'abc')
+        self.assertEqual(parsed_str, 'abc')
 
-        parsed_str = utils.to_ascii(u'¡Hola!')
-        self.assertEqual(parsed_str, b'Hola!')
+        parsed_str = utils.to_ascii('¡Hola!')
+        self.assertEqual(parsed_str, 'Hola!')
 
         parsed_str = utils.to_ascii(
             u'Klüft skräms inför på fédéral électoral große')
         self.assertEqual(
-            parsed_str, b'Kluft skrams infor pa federal electoral groe')
+            parsed_str, 'Kluft skrams infor pa federal electoral groe')
 
         parsed_str = utils.to_ascii('')
-        self.assertEqual(parsed_str, b'')
+        self.assertEqual(parsed_str, '')
 
     def test_yaml_dict_conversion(self):
         # type: () -> None
@@ -237,6 +237,12 @@ class UtilsTests(test_utils.GenericTestBase):
         random_string = utils.generate_random_string(12)
         self.assertTrue(isinstance(random_string, python_utils.BASESTRING))
         self.assertEqual(len(random_string), 12)
+
+    def test_convert_png_data_url_to_binary_with_incorrect_prefix(self) -> None:
+        with self.assertRaisesRegexp(  # type: ignore[no-untyped-call]
+            Exception, 'The given string does not represent a PNG data URL'
+        ):
+            utils.convert_png_data_url_to_binary('data:image/jpg;base64,')
 
     def test_get_thumbnail_icon_url_for_category(self):
         # type: () -> None
@@ -557,7 +563,8 @@ class UtilsTests(test_utils.GenericTestBase):
             Exception,
             'Found invalid non-asset file .+'
             'There should only be a single non-asset file, and it should have '
-            'a .yaml suffix.'):
+            'a .yaml suffix.'
+        ):
             utils.get_exploration_components_from_dir('core/tests/load_tests')
 
         with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
@@ -589,7 +596,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_base64_from_int(self):
         # type: () -> None
         base64_number = utils.base64_from_int(108)
-        self.assertEqual(base64.b64decode(base64_number), '[108]')
+        self.assertEqual(base64.b64decode(base64_number), b'[108]')
 
     def test_get_supported_audio_language_description_with_invalid_code(self):
         # type: () -> None
@@ -729,14 +736,14 @@ class UtilsTests(test_utils.GenericTestBase):
         # type: () -> None
         image_data_url = '%s%s' % (
             utils.PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode('test123'))) # type: ignore[no-untyped-call]
+            python_utils.url_quote(base64.b64encode(b'test123'))) # type: ignore[no-untyped-call]
 
         self.assertEqual(
-            utils.convert_png_data_url_to_binary(image_data_url), 'test123')
+            utils.convert_png_data_url_to_binary(image_data_url), b'test123')
 
     def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(self):
         # type: () -> None
-        image_data_url = python_utils.url_quote(base64.b64encode('test123')) # type: ignore[no-untyped-call]
+        image_data_url = python_utils.url_quote(base64.b64encode(b'test123')) # type: ignore[no-untyped-call]
 
         self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'The given string does not represent a PNG data URL.',
