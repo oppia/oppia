@@ -34,13 +34,13 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { SuggestionsService } from 'services/suggestions.service';
 
-type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
+export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
 interface NumberOfOpenThreads {
   'num_open_threads': number;
 }
 
-interface SuggestionAndFeedbackThreads {
+export interface SuggestionAndFeedbackThreads {
   feedbackThreads: FeedbackThread[];
   suggestionThreads: SuggestionThread[];
 }
@@ -130,9 +130,12 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
+  // 'suggestionBackendDict' will be undefined when threadId is invalid
+  // resulting the function to throw an error.
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
+      suggestionBackendDict: SuggestionBackendDict | undefined
+  ): SuggestionThread {
     if (!threadBackendDict || !suggestionBackendDict) {
       throw new Error('Missing input backend dicts');
     }
@@ -142,19 +145,23 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  getThread(threadId: string): SuggestionAndFeedbackThread {
+  // A null value will be returned if threadId is invalid.
+  getThread(threadId: string): SuggestionAndFeedbackThread | null {
     return this.threadsById.get(threadId) || null;
   }
 
   async getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
-    let suggestions$ = this.http.get(this.getSuggestionListHandlerUrl(), {
-      params: {
-        target_type: 'exploration',
-        target_id: this.contextService.getExplorationId()
+    let suggestions$ = this.http.get<SuggestionData>(
+      this.getSuggestionListHandlerUrl(), {
+        params: {
+          target_type: 'exploration',
+          target_id: this.contextService.getExplorationId()
+        }
       }
-    });
+    );
 
-    let threads$ = this.http.get(this.getThreadListHandlerUrl());
+    let threads$ = this.http.get<ThreadData>(
+      this.getThreadListHandlerUrl());
 
     return forkJoin([suggestions$, threads$])
       .toPromise()
@@ -165,11 +172,16 @@ export class ThreadDataBackendApiService {
         let feedbackThreadBackendDicts = threadData.feedback_thread_dicts;
         let suggestionThreadBackendDicts = threadData.suggestion_thread_dicts;
 
-        let suggestionBackendDictsByThreadId = new Map(
-          suggestionBackendDicts.map(dict => [
-            this.suggestionsService.getThreadIdFromSuggestionBackendDict(dict),
-            dict
-          ]));
+        // Key values for this property will be null if the thread is not found
+        // or threadId is invalid.
+        let suggestionBackendDictsByThreadId:
+          Map<string | null, SuggestionBackendDict> = new Map(
+            suggestionBackendDicts.map(dict => [
+              this.suggestionsService
+                .getThreadIdFromSuggestionBackendDict(dict),
+              dict
+            ])
+          );
 
         return {
           feedbackThreads: feedbackThreadBackendDicts.map(
@@ -183,27 +195,30 @@ export class ThreadDataBackendApiService {
       async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  async getMessagesAsync(thread: SuggestionAndFeedbackThread):
+  // A thread will be null if threadId is invalid.
+  async getMessagesAsync(thread: SuggestionAndFeedbackThread | null):
    Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
     let threadId = thread.threadId;
 
-    return this.http.get(this.getThreadHandlerUrl(threadId)).toPromise()
-      .then((response: ThreadMessages) => {
-        let threadMessageBackendDicts = response.messages;
-        thread.setMessages(threadMessageBackendDicts.map(
-          m => ThreadMessage.createFromBackendDict(m)));
-        return thread.getMessages();
-      });
+    return this.http.get<ThreadMessages>(
+      this.getThreadHandlerUrl(threadId)
+    ).toPromise().then((response: ThreadMessages) => {
+      let threadMessageBackendDicts = response.messages;
+      thread.setMessages(threadMessageBackendDicts.map(
+        m => ThreadMessage.createFromBackendDict(m)));
+      return thread.getMessages();
+    });
   }
 
   async getOpenThreadsCountAsync(): Promise<number> {
-    return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
-      .then((response: NumberOfOpenThreads) => {
-        return this.openThreadsCount = response.num_open_threads;
-      });
+    return this.http.get<NumberOfOpenThreads>(
+      this.getFeedbackStatsHandlerUrl()
+    ).toPromise().then((response: NumberOfOpenThreads) => {
+      return this.openThreadsCount = response.num_open_threads;
+    });
   }
 
   getOpenThreadsCount(): number {
@@ -212,11 +227,13 @@ export class ThreadDataBackendApiService {
 
   async createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
-    return this.http.post(this.getThreadListHandlerUrl(), {
-      state_name: null,
-      subject: newSubject,
-      text: newText
-    }).toPromise().then(async() => {
+    return this.http.post<void | SuggestionAndFeedbackThreads>(
+      this.getThreadListHandlerUrl(), {
+        state_name: null,
+        subject: newSubject,
+        text: newText
+      }
+    ).toPromise().then(async() => {
       this.openThreadsCount += 1;
       return this.getThreadsAsync();
     },
@@ -226,8 +243,9 @@ export class ThreadDataBackendApiService {
     });
   }
 
+  // A thread will be null if threadId is invalid.
   async markThreadAsSeenAsync(
-      thread: SuggestionAndFeedbackThread): Promise<void> {
+      thread: SuggestionAndFeedbackThread | null): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -238,8 +256,9 @@ export class ThreadDataBackendApiService {
     }).toPromise().then();
   }
 
+  // A thread will be null if threadId is invalid.
   async addNewMessageAsync(
-      thread: SuggestionAndFeedbackThread, newMessage: string,
+      thread: SuggestionAndFeedbackThread | null, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -248,7 +267,7 @@ export class ThreadDataBackendApiService {
     let oldStatus = thread.status;
     let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
-    return this.http.post(this.getThreadHandlerUrl(threadId), {
+    return this.http.post<ThreadMessages>(this.getThreadHandlerUrl(threadId), {
       updated_status: updatedStatus,
       updated_subject: null,
       text: newMessage
@@ -269,8 +288,11 @@ export class ThreadDataBackendApiService {
     });
   }
 
+  // A thread will be null if threadId is invalid.
   async resolveSuggestionAsync(
-      thread: SuggestionAndFeedbackThread, action: string, commitMsg: string,
+      thread: SuggestionAndFeedbackThread | null,
+      action: string,
+      commitMsg: string,
       reviewMsg: string): Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -286,8 +308,9 @@ export class ThreadDataBackendApiService {
     }).toPromise().then(async() => {
       thread.status = (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
-         ExplorationEditorPageConstants.STATUS_FIXED :
-          ExplorationEditorPageConstants.STATUS_IGNORED);
+        ExplorationEditorPageConstants.STATUS_FIXED :
+        ExplorationEditorPageConstants.STATUS_IGNORED
+      );
       this.openThreadsCount -= 1;
 
       return this.getMessagesAsync(thread);
