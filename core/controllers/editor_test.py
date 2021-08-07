@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import datetime
+import io
 import logging
 import os
 import zipfile
@@ -125,7 +126,7 @@ class EditorTests(BaseEditorControllerTests):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn(
-            '<exploration-editor-page></exploration-editor-page>',
+            b'<exploration-editor-page></exploration-editor-page>',
             response.body)
         self.assert_cannot_edit('0')
 
@@ -135,7 +136,7 @@ class EditorTests(BaseEditorControllerTests):
         # Check that it is now possible to access and edit the editor page.
         response = self.get_html_response('/create/0')
         self.assertIn(
-            '<exploration-editor-page></exploration-editor-page>',
+            b'<exploration-editor-page></exploration-editor-page>',
             response.body)
         self.assert_can_edit('0')
 
@@ -589,8 +590,7 @@ written_translations:
         self.assertEqual(
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
-        zf_saved = zipfile.ZipFile(
-            python_utils.string_io(buffer_value=response.body))
+        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
         self.assertEqual(
             zf_saved.namelist(),
             ['The title for ZIP download handler test!.yaml'])
@@ -602,8 +602,7 @@ written_translations:
         with python_utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
-        zf_gold = zipfile.ZipFile(
-            python_utils.string_io(buffer_value=golden_zipfile))
+        zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
         # Compare saved with golden file.
         self.assertEqual(
             zf_saved.open(
@@ -671,8 +670,7 @@ written_translations:
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
 
-        zf_saved = zipfile.ZipFile(
-            python_utils.string_io(buffer_value=response.body))
+        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
         self.assertEqual(zf_saved.namelist(), [u'¡Hola!.yaml'])
 
         self.logout()
@@ -700,8 +698,7 @@ written_translations:
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
 
-        zf_saved = zipfile.ZipFile(
-            python_utils.string_io(buffer_value=response.body))
+        zf_saved = zipfile.ZipFile(io.BytesIO(response.body))
         self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
 
         self.logout()
@@ -958,7 +955,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             self):
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg, *args, **unused_kwargs):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -981,7 +978,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             observed_log_messages[:2],
             [
                 'Could not find state: invalid_state_name',
-                'Available states: [u\'Introduction\']'
+                'Available states: [\'Introduction\']'
             ]
         )
         self.assertRaisesRegexp(Exception, 'Bad response: 503')
@@ -2069,7 +2066,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.assertEqual(
                 messages[0].subject,
                 'Your Oppia exploration "My Exploration" has been unpublished')
-            self.assertEqual(messages[0].body.decode(), (
+            self.assertEqual(messages[0].body, (
                 'Hi %s,\n\n'
                 '%s\n\n'
                 'Thanks!\n'
@@ -2079,7 +2076,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                     self.EDITOR_USERNAME,
                     new_email_body,
                     self.MODERATOR_USERNAME)))
-            self.assertEqual(messages[0].html.decode(), (
+            self.assertEqual(messages[0].html, (
                 'Hi %s,<br><br>'
                 '%s<br><br>'
                 'Thanks!<br>'
