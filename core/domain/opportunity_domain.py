@@ -199,7 +199,7 @@ class ExplorationOpportunitySummary(python_utils.OBJECT):
                 'Expected set of all languages available in '
                 'incomplete_translation, needs_voiceover and assigned_voiceover'
                 ' to be the same as the supported audio languages, '
-                'received %s' % list(expected_set_of_all_languages))
+                'received %s' % list(sorted(expected_set_of_all_languages)))
 
 
 class SkillOpportunity(python_utils.OBJECT):

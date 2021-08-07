@@ -174,8 +174,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ExplorationTitleService', 'ExplorationWarningsService',
     'FocusManagerService', 'GraphDataService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
-    'ParamSpecsObjectFactory', 'PreventPageUnloadEventService',
-    'RouterService', 'SiteAnalyticsService',
+    'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTutorialFirstTimeService',
@@ -198,8 +197,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ExplorationTitleService, ExplorationWarningsService,
         FocusManagerService, GraphDataService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
-        ParamSpecsObjectFactory, PreventPageUnloadEventService,
-        RouterService, SiteAnalyticsService,
+        ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTutorialFirstTimeService,
@@ -212,7 +210,6 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
       ctrl.connectionService = ConnectionService;
-      ctrl.preventPageUnloadEventService = PreventPageUnloadEventService;
 
       var setPageTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -519,14 +516,12 @@ angular.module('oppia').component('explorationEditorPage', {
                 AlertsService.addSuccessMessage(
                   'Reconnected. Checking whether your changes are mergeable.',
                   reconnectedMessageTimeoutMilliseconds);
-                ctrl.preventPageUnloadEventService.removeListener();
               } else {
                 AlertsService.addInfoMessage(
                   'Looks like you are offline. ' +
                   'You can continue working, and can save ' +
                   'your changes once reconnected.',
                   disconnectedMessageTimeoutMilliseconds);
-                ctrl.preventPageUnloadEventService.addListener();
               }
             })
         );

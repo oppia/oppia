@@ -891,6 +891,7 @@ describe('Full exploration editor', function() {
           download_throughput: 0,
           upload_throughput: 0});
       expect(await saveChangesButton.isEnabled()).toEqual(false);
+
       // Set network connection to online.
       await browser.driver.setNetworkConditions(
         {
