@@ -30,19 +30,19 @@ import { SubtopicViewerNavbarBreadcrumbComponent } from
   'pages/subtopic-viewer-page/navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
     SubtopicViewerNavbarBreadcrumbComponent
   ],
   providers: [

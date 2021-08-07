@@ -16,8 +16,8 @@
 
 """Tests for Blog Post models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import types
@@ -126,22 +126,19 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
-        user_data = blog_models.BlogPostModel.export_data(
-            self.USER_ID),
+        user_data = blog_models.BlogPostModel.export_data(self.USER_ID)
         blog_post_id = 'blog_one'
-        test_data = (
-            {
-                blog_post_id: {
-                    'content': self.CONTENT,
-                    'title': self.TITLE,
-                    'published_on': utils.get_time_in_millisecs(
-                        self.blog_post_model.published_on),
-                    'url_fragment': 'sample-url-fragment',
-                    'tags': self.TAGS,
-                    'thumbnail_filename': self.THUMBNAIL
-                }
-            },
-        )
+        test_data = {
+            blog_post_id: {
+                'title': self.TITLE,
+                'content': self.CONTENT,
+                'url_fragment': 'sample-url-fragment',
+                'tags': self.TAGS,
+                'thumbnail_filename': self.THUMBNAIL,
+                'published_on': utils.get_time_in_millisecs(
+                    self.blog_post_model.published_on)
+            }
+        }
         self.assertEqual(user_data, test_data)
 
 

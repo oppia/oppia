@@ -28,17 +28,22 @@
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <!-- textToTranslate contains the html content of an exploration state -->
-      <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                [rteString]="textToTranslate"
-                                (click)="onContentClick($event)"
-                                class="oppia-rte-editor">
-      </oppia-rte-output-display>
+      <angular-html-bind-wrapper [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                 (click)="onContentClick($event)"
+                                 [htmlData]="textToTranslate"
+                                 class="oppia-rte-editor">
+      </angular-html-bind-wrapper>
     </div>
     <div *ngIf="!isSubmitted()" class="oppia-translation-editor-section">
       <div class="protractor-test-state-translation-editor">
-        <ck-editor-copy-toolbar></ck-editor-copy-toolbar>
-        <schema-based-editor *ngIf="editorIsShown"
+        <ck-editor-copy-toolbar *ngIf="activeDataFormat === 'html'"></ck-editor-copy-toolbar>
+        <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'html'"
                              [schema]="getHtmlSchema.bind(this)"
+                             [localValue]="activeWrittenTranslation.html"
+                             (localValueChange)="updateHtml($event)">
+        </schema-based-editor>
+        <schema-based-editor *ngIf="editorIsShown && activeDataFormat === 'unicode'"
+                             [schema]="getUnicodeSchema.bind(this)"
                              [localValue]="activeWrittenTranslation.html"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
@@ -60,9 +65,9 @@
     </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">
-      <oppia-rte-output-display [rteString]="activeWrittenTranslation.html"
-                                class="oppia-rte-editor">
-      </oppia-rte-output-display>
+      <angular-html-bind-wrapper [htmlData]="activeWrittenTranslation.html"
+                                 class="oppia-rte-editor">
+      </angular-html-bind-wrapper>
     </div>
     <div *ngIf="TRANSLATION_TIPS[activeLanguageCode]" class="oppia-translation-tips-container">
       <ul>

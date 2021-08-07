@@ -16,49 +16,26 @@
  * @fileoverview Module for the teach page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-
+import { NgModule } from '@angular/core';
 import { TeachPageComponent } from './teach-page.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
 import { TeachPageRootComponent } from './teach-page-root.component';
+import { CommonModule } from '@angular/common';
+import { TeachPageRoutingModule } from './teach-page-routing.module';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    SharedComponentsModule
+    CommonModule,
+    SharedComponentsModule,
+    TeachPageRoutingModule
   ],
   declarations: [
     TeachPageComponent,
     TeachPageRootComponent,
-    OppiaAngularRootComponent
   ],
   entryComponents: [
     TeachPageComponent,
     TeachPageRootComponent,
-    OppiaAngularRootComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    }
-  ],
-  bootstrap: [TeachPageRootComponent]
+  ]
 })
 export class TeachPageModule {}

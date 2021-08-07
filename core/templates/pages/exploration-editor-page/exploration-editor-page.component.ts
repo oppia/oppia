@@ -17,12 +17,10 @@
  *               help tab in the navbar.
  */
 
-import { State } from 'domain/state/StateObjectFactory';
-
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
   'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'version-diff-visualization.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -151,6 +149,7 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
+require('services/user.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
@@ -176,10 +175,10 @@ angular.module('oppia').component('explorationEditorPage', {
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
-    'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'StateTutorialFirstTimeService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
-    'WindowDimensionsService',
+    'UserService', 'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $uibModal,
         AutosaveInfoModalsService, BottomNavbarStatusService,
@@ -199,10 +198,10 @@ angular.module('oppia').component('explorationEditorPage', {
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
-        StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        StateTutorialFirstTimeService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
-        WindowDimensionsService) {
+        UserService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.autosaveIsInProgress = false;
@@ -242,8 +241,10 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
             ContextService.getExplorationId()),
-          ThreadDataBackendApiService.getOpenThreadsCountAsync()
-        ]).then(async([explorationData, featuresData, openThreadsCount]) => {
+          ThreadDataBackendApiService.getOpenThreadsCountAsync(),
+          UserService.getUserInfoAsync()
+        ]).then(async(
+            [explorationData, featuresData, openThreadsCount, userInfo]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
@@ -281,8 +282,8 @@ angular.module('oppia').component('explorationEditorPage', {
           ctrl.explorationInitStateNameService = (
             ExplorationInitStateNameService);
 
-          ctrl.currentUserIsAdmin = explorationData.is_admin;
-          ctrl.currentUserIsModerator = explorationData.is_moderator;
+          ctrl.currentUserIsCurriculumAdmin = userInfo.isCurriculumAdmin();
+          ctrl.currentUserIsModerator = userInfo.isModerator();
 
           ctrl.currentUser = explorationData.user;
           ctrl.currentVersion = explorationData.version;
@@ -370,30 +371,8 @@ angular.module('oppia').component('explorationEditorPage', {
               .markTranslationTutorialNotSeenBefore();
           }
 
-          // Statistics and the improvement tasks derived from them are only
-          // relevant when an exploration is published and is being played by
-          // learners.
-          if (ExplorationRightsService.isPublic()) {
-            await StateTopAnswersStatsService.initAsync(
-              ctrl.explorationId, ExplorationStatesService.getStates());
-
-            ExplorationStatesService.registerOnStateAddedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateAdded(stateName);
-              });
-            ExplorationStatesService.registerOnStateDeletedCallback(
-              (stateName: string) => {
-                StateTopAnswersStatsService.onStateDeleted(stateName);
-              });
-            ExplorationStatesService.registerOnStateRenamedCallback(
-              (oldName: string, newName: string) => {
-                StateTopAnswersStatsService.onStateRenamed(oldName, newName);
-              });
-            ExplorationStatesService.registerOnStateInteractionSavedCallback(
-              (state: State) => {
-                StateTopAnswersStatsService.onStateInteractionSaved(state);
-              });
-          }
+          // TODO(#13352): Initialize StateTopAnswersStatsService and register
+          // relevant callbacks.
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService.flushUpdatedTasksToBackend();
@@ -442,8 +421,8 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeModalController',
@@ -494,8 +473,8 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-editor-page/modal-templates/' +
+          template: require(
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',

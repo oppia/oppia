@@ -19,8 +19,8 @@ version of Chrome for our CI tests and checks that the correct version
 was installed.
 """
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
 
@@ -65,7 +65,8 @@ def get_chrome_version():
     Returns:
         str. The version of Chrome we found.
     """
-    output = common.run_cmd(['google-chrome', '--version'])
+    output = python_utils.UNICODE(
+        common.run_cmd(['google-chrome', '--version']))
     chrome_version = ''.join(re.findall(r'([0-9]|\.)', output))
     return chrome_version
 

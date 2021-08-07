@@ -14,8 +14,8 @@
 
 """Tests for platform feature evaluation handler."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import caching_services
@@ -112,8 +112,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', True):
             result = self.get_json(
                 '/platform_features_evaluation_handler',
-                params={
-                }
+                params={}
             )
             self.assertEqual(
                 result,
@@ -132,7 +131,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 resp_dict['error'],
                 'Invalid version flavor \'invalid\', must be one of '
-                '[u\'test\', u\'alpha\', u\'beta\', u\'release\'] if specified.'
+                '[\'test\', \'alpha\', \'beta\', \'release\'] if specified.'
             )
 
 

@@ -50,6 +50,7 @@ require('components/forms/validators/is-float.filter.ts');
 require('components/forms/validators/is-integer.filter.ts');
 require('components/forms/validators/is-nonempty.filter.ts');
 require('components/forms/validators/is-url-fragment.filter.ts');
+require('components/forms/validators/is-regex-matched.filter.ts');
 
 angular.module('oppia').directive('schemaBasedEditor', [
   function() {
@@ -63,7 +64,8 @@ angular.module('oppia').directive('schemaBasedEditor', [
         localValue: '=',
         labelForFocusTarget: '&',
         onInputBlur: '=',
-        onInputFocus: '='
+        onInputFocus: '=',
+        headersEnabled: '&',
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
@@ -104,7 +106,7 @@ export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() labelForFocusTarget: () => string;
   @Input() onInputBlur: () => void;
   @Input() onInputFocus: () => void;
-
+  @Input() headersEnabled;
   constructor(
       elementRef: ElementRef,
       injector: Injector) {

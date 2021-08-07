@@ -16,8 +16,8 @@
 
 """Unit tests for jobs.base_jobs."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import re
 
@@ -33,9 +33,9 @@ class MockJobMetaclass(base_jobs.JobMetaclass):
     _JOB_REGISTRY = {}
 
     @classmethod
-    def clear(mcs):
+    def clear(cls):
         """Clears the registry of jobs."""
-        mcs._JOB_REGISTRY.clear()
+        cls._JOB_REGISTRY.clear()
 
 
 class JobMetaclassTests(test_utils.TestBase):

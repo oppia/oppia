@@ -16,8 +16,8 @@
 
 """Tests for Exploration models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import datetime
@@ -157,12 +157,12 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
             email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
@@ -539,9 +539,9 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(results), 1)
 
         with self.assertRaisesRegexp(
-            Exception,
-            'max_age must be a datetime.timedelta instance or None.'):
-            results, _, more = (
+            Exception, 'max_age must be a datetime.timedelta instance or None.'
+        ):
+            results, _, _ = (
                 exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1))
 
@@ -594,12 +594,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
             email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
 
     def test_get_deletion_policy(self):

@@ -14,8 +14,8 @@
 
 """Tests for the story viewer page"""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import logging
 
@@ -46,11 +46,11 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         super(BaseStoryViewerControllerTests, self).setUp()
         self.VIEWER_EMAIL = 'viewer@example.com'
         self.VIEWER_USERNAME = 'viewer'
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.TOPIC_ID = 'topic_id'
         self.STORY_ID = 'story_id'
         self.STORY_URL_FRAGMENT = 'title-one'
@@ -98,6 +98,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -114,6 +115,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_2.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -130,6 +132,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'image_3.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -178,7 +181,7 @@ class StoryPageTests(BaseStoryViewerControllerTests):
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
         self.logout()
@@ -188,7 +191,7 @@ class StoryPageTests(BaseStoryViewerControllerTests):
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT,
             expected_status_int=404)
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '/learn/staging/topic/story/%s' % self.STORY_URL_FRAGMENT)
         self.logout()
@@ -278,7 +281,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 response.headers['location'])
 
     def test_redirect_for_single_node_story(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.STORY_URL_FRAGMENT = 'story-two'
         self.NEW_USER_EMAIL = 'newUser@newUser.com'
         self.NEW_USER_USERNAME = 'newUser'
@@ -303,6 +306,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -355,10 +359,11 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
                     self.NODE_ID_2), expected_status_int=302)
             self.assertEqual(
-                'http://localhost/explore/1?topic_url_fragment=topic'
-                '&story_url_fragment=title-one&node_id=node_1'
-                '&classroom_url_fragment=staging',
-                response.headers['location'])
+                'http://localhost/explore/1?classroom_url_fragment=staging'
+                '&topic_url_fragment=topic&story_url_fragment=title-one'
+                '&node_id=node_1',
+                response.headers['location']
+            )
 
     def test_post_fails_when_new_structures_not_enabled(self):
         csrf_token = self.get_new_csrf_token()
@@ -555,6 +560,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'thumbnail_filename': 'image_1.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],

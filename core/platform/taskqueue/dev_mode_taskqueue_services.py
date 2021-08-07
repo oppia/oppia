@@ -16,8 +16,8 @@
 
 """Provides a taskqueue API for the platform layer in DEV_MODE."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 
@@ -26,9 +26,7 @@ import feconf
 
 import requests
 
-GOOGLE_APP_ENGINE_PORT = (
-    os.environ['SERVER_PORT']
-    if 'SERVER_PORT' in os.environ else '8181')
+GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 
 
 def _task_handler(url, payload, queue_name, task_name=None):

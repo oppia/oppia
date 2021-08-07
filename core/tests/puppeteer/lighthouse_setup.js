@@ -41,7 +41,7 @@ var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.protractor-test-create-activity';
-var dismissCreateModalSelector = '.protractor-test-dismiss-welcome-modal';
+var dismissWelcomeModalSelector = '.protractor-test-dismiss-welcome-modal';
 
 var createCollectionButtonSelector = '.protractor-test-create-collection';
 var addExplorationInput = '.protractor-test-add-exploration-input';
@@ -65,7 +65,6 @@ var storyDescriptionField = '.protractor-test-new-story-description-field';
 var storyThumbnailButton = '.protractor-test-photo-button';
 var storyUploadButton = '.protractor-test-photo-upload-input';
 var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
-var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmStoryCreationButton =
   '.protractor-test-confirm-story-creation-button';
 
@@ -77,10 +76,12 @@ var confirmSkillCreationButton =
 var skillReviewMaterialInput = '.oppia-rte';
 var skillCkEditor = '.protractor-test-ck-editor';
 
-var updateFormName = '.protractor-test-update-form-name';
-var updateFormSubmit = '.protractor-test-update-form-submit';
-var roleSelect = '.protractor-test-update-form-role-select';
-var statusMessage = '.protractor-test-status-message';
+var usernameInputFieldForRolesEditing = (
+  '.protractor-test-username-for-role-editor');
+var editUserRoleButton = '.protractor-test-role-edit-button';
+var roleEditorContainer = '.protractor-test-roles-editor-card-container';
+var addNewRoleButton = '.protractor-test-add-new-role-button';
+var roleSelect = '.protractor-test-new-role-selector';
 
 const login = async function(browser, page) {
   try {
@@ -115,21 +116,19 @@ const setRole = async function(browser, page, role) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
-    await page.waitForSelector(updateFormName);
-    await page.type(updateFormName, 'username1');
-    await page.select(roleSelect, role);
-    await page.waitForSelector(updateFormSubmit);
-    await page.click(updateFormSubmit);
-    await page.waitForSelector(statusMessage, {visible: true});
-    await page.waitForFunction(
-      'Array.prototype.slice.call(' +
-      '  document.querySelectorAll(".protractor-test-status-message")' +
-      ').some(' +
-      '  (statusMessageElem) => statusMessageElem.innerText.includes(' +
-      '    "' + role + '"))', {
-        polling: 250
-      }
-    );
+    await page.waitForSelector(usernameInputFieldForRolesEditing);
+    await page.type(usernameInputFieldForRolesEditing, 'username1');
+    await page.waitForSelector(editUserRoleButton);
+    await page.click(editUserRoleButton);
+    await page.waitForSelector(roleEditorContainer);
+
+    await page.waitForSelector(addNewRoleButton);
+    await page.click(addNewRoleButton);
+
+    await page.click(roleSelect);
+    var selector = `mat-option[ng-reflect-value="${role}"]`;
+    await page.click(selector);
+    await page.waitForTimeout(2000);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -146,7 +145,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
-      dismissCreateModalSelector, {visible: true});
+      dismissWelcomeModalSelector, {visible: true});
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console

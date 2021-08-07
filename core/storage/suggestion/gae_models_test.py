@@ -16,8 +16,8 @@
 
 """Tests for the suggestion gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 
@@ -181,7 +181,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         queries = [('suggestion_type', 'invalid_suggestion_type')]
 
         with self.assertRaisesRegexp(
-            Exception, 'Value u\'invalid_suggestion_type\' for property'
+            Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 

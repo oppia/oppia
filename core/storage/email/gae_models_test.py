@@ -16,8 +16,8 @@
 
 """Tests for core.storage.email.gae_models."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import types
@@ -150,7 +150,8 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected datetime, received Not a datetime object of type '
-                '<type \'unicode\'>'):
+                '<class \'str\'>'
+            ):
                 email_models.SentEmailModel.get_by_hash(
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object')

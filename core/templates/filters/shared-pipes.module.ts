@@ -21,20 +21,21 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
 import { TruncateAtFirstLinePipe } from './string-utility-filters/truncate-at-first-line.pipe';
+import { LimitToPipe } from './limit-to.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     FormsModule,
   ],
   declarations: [
+    LimitToPipe,
     TruncateAtFirstLinePipe
   ],
   entryComponents: [],
   exports: [
+    LimitToPipe,
     TruncateAtFirstLinePipe
   ],
 })

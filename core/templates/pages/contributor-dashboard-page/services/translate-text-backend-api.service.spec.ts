@@ -26,6 +26,13 @@ import { TranslateTextBackendApiService } from './translate-text-backend-api.ser
 describe('TranslateTextBackendApiService', () => {
   let translateTextBackendApiService: TranslateTextBackendApiService;
   let httpTestingController: HttpTestingController;
+  const getTranslatableItem = (text) => {
+    return {
+      data_format: 'html',
+      content: text,
+    };
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -47,8 +54,11 @@ describe('TranslateTextBackendApiService', () => {
       failHandler = jasmine.createSpy('error');
       const sampleDataResults = {
         state_names_to_content_id_mapping: {
-          stateName1: {contentId1: 'text1', contentId2: 'text2'},
-          stateName2: {contentId3: 'text3'}
+          stateName1: {
+            contentId1: getTranslatableItem('text1'),
+            contentId2: getTranslatableItem('text2')
+          },
+          stateName2: {contentId3: getTranslatableItem('text3')}
         },
         version: '1'
       };
@@ -118,7 +128,8 @@ describe('TranslateTextBackendApiService', () => {
         'languageCode',
         'contentHtml',
         'translationHtml',
-        imagesData).then(successHandler, failHandler);
+        imagesData,
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -139,7 +150,8 @@ describe('TranslateTextBackendApiService', () => {
         'languageCode',
         'contentHtml',
         'translationHtml',
-        imagesData).then(successHandler, failHandler);
+        imagesData,
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -171,7 +183,8 @@ describe('TranslateTextBackendApiService', () => {
         'languageCode',
         'contentHtml',
         'translationHtml',
-        imagesData).then(successHandler, failHandler);
+        imagesData,
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
@@ -201,7 +214,8 @@ describe('TranslateTextBackendApiService', () => {
         'languageCode',
         'contentHtml',
         'translationHtml',
-        imagesData).then(successHandler, failHandler);
+        imagesData,
+        'html').then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/suggestionhandler/');
       expect(req.request.method).toEqual('POST');

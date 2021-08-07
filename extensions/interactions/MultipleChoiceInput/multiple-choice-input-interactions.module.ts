@@ -20,7 +20,6 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { InteractiveMultipleChoiceInputComponent } from './directives/oppia-interactive-multiple-choice-input.component';
 import { ResponseMultipleChoiceInputComponent } from './directives/oppia-response-multiple-choice-input.component';
@@ -30,7 +29,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
-    BrowserModule,
     DynamicContentModule,
     TranslateModule
   ],

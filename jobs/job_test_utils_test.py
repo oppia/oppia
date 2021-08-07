@@ -16,8 +16,8 @@
 
 """Unit tests for jobs.job_test_utils."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.platform import models
 from core.tests import test_utils
@@ -76,13 +76,6 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 class JobTestBaseTests(job_test_utils.JobTestBase):
 
     JOB_CLASS = mock.Mock()
-
-    def setUp(self):
-        # TODO(#11475): Remove this hack. We need to set this up before calling
-        # super().setUp() because that method creates a job using JOB_CLASS.
-        self.JOB_CLASS.return_value.datastoreio_stub.context.return_value = (
-            python_utils.nullcontext())
-        super(JobTestBaseTests, self).setUp()
 
     def tearDown(self):
         self.JOB_CLASS.reset_mock()

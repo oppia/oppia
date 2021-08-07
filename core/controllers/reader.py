@@ -14,8 +14,8 @@
 
 """Controllers for the Oppia exploration learner view."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 import logging
@@ -789,8 +789,7 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        if not (fetch_by_difficulty_value == 'true' or
-                fetch_by_difficulty_value == 'false'):
+        if fetch_by_difficulty_value not in ('true', 'false'):
             raise self.InvalidInputException(
                 'fetch_by_difficulty must be true or false')
         fetch_by_difficulty = (fetch_by_difficulty_value == 'true')

@@ -14,8 +14,8 @@
 
 """Tests for the contributor dashboard controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from constants import constants
 from core.domain import config_services
@@ -58,13 +58,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionOpportunitiesHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -86,7 +86,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_3'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -201,7 +201,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -230,7 +229,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -245,7 +243,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             response['opportunities'], [
                 self.expected_opportunity_dict_1,
                 self.expected_opportunity_dict_2])
-
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))
@@ -259,7 +256,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response['opportunities'],
                 [self.expected_skill_opportunity_dict_0])
-            self.assertTrue(response['more'])
+            self.assertFalse(response['more'])
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
@@ -268,7 +265,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'cursor': next_cursor})
 
-            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_skill_opportunity_dict_1])
@@ -289,12 +286,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
 
-            next_cursor = response['next_cursor']
             next_response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi', 'cursor': next_cursor})
-
-            self.assertEqual(len(response['opportunities']), 1)
+                params={
+                    'language_code': 'hi',
+                    'cursor': response['next_cursor']
+                }
+            )
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
@@ -320,7 +319,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en', 'cursor': next_cursor})
 
-            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
                 [self.expected_opportunity_dict_2])
@@ -367,13 +366,13 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TranslatableTextHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -394,7 +393,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
@@ -474,10 +473,17 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 2,
             'state_names_to_content_id_mapping': {
                 'Introduction': {
-                    'content': '<p>A content to translate.</p>'
+                    'content': {
+                        'content': (
+                            '<p>A content to translate.</p>'),
+                        'data_format': 'html'
+                    }
                 },
                 'End State': {
-                    'content': ''
+                    'content': {
+                        'content': '',
+                        'data_format': 'html'
+                    }
                 }
             }
         }
@@ -508,7 +514,10 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'version': 1,
             'state_names_to_content_id_mapping': {
                 'End State': {
-                    'content': ''
+                    'content': {
+                        'content': '',
+                        'data_format': 'html'
+                    }
                 }
             }
         }
@@ -520,13 +529,13 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MachineTranslationStateTextsHandlerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.exp_id = exp_fetchers.get_new_exploration_id()
         exp = self.save_new_valid_exploration(

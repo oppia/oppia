@@ -16,8 +16,8 @@
 
 """Tests for the feedback controllers."""
 
-from __future__ import absolute_import  # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -612,7 +612,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         super(ThreadListHandlerForTopicsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -653,66 +653,16 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(RecentFeedbackMessagesHandlerTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.exp_id = 'exp_id'
-
-    def test_get_recently_posted_feedback_messages(self):
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_json(
-            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
-
-        self.assertEqual(response['results'], [])
-        self.assertFalse(response['more'])
-
-        self.save_new_valid_exploration(
-            self.exp_id, self.owner_id, title='Exploration title',
-            category='Architecture', language_code='en')
-        feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
-            'a subject', 'some text')
-
-        feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
-            'new subject', 'new text')
-
-        response = self.get_json(
-            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
-        results = response['results']
-
-        self.assertEqual(len(results), 2)
-
-        self.assertFalse(response['more'])
-        self.assertEqual(results[0]['text'], 'new text')
-        self.assertEqual(results[0]['updated_subject'], 'new subject')
-        self.assertEqual(results[0]['entity_type'], 'exploration')
-        self.assertEqual(results[0]['entity_id'], self.exp_id)
-
-        self.assertEqual(results[1]['text'], 'some text')
-        self.assertEqual(results[1]['updated_subject'], 'a subject')
-        self.assertEqual(results[1]['entity_type'], 'exploration')
-        self.assertEqual(results[1]['entity_id'], self.exp_id)
-
-        self.logout()
-
-
 class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'exp_id'
 
     def test_get_num_threads_after_creating_feedback_analytics(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id),
@@ -724,7 +674,6 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
-
         self.assertEqual(response['num_total_threads'], 0)
         self.assertEqual(response['num_open_threads'], 0)
 
@@ -733,8 +682,54 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
-
         self.assertEqual(response['num_total_threads'], 1)
         self.assertEqual(response['num_open_threads'], 1)
+
+        self.logout()
+
+
+class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(RecentFeedbackMessagesHandlerTests, self).setUp()
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.exp_id = 'exp_id'
+
+    def test_get_recently_posted_feedback_messages(self):
+        self.login(self.MODERATOR_EMAIL)
+
+        response = self.get_json(
+            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+
+        self.assertEqual(response['results'], [])
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.moderator_id, title='Exploration title',
+            category='Architecture', language_code='en')
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.moderator_id,
+            'a subject', 'some text')
+
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.moderator_id,
+            'new subject', 'new text')
+
+        response = self.get_json(
+            feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
+        results = response['results']
+
+        self.assertEqual(len(results), 2)
+
+        self.assertEqual(results[0]['text'], 'new text')
+        self.assertEqual(results[0]['updated_subject'], 'new subject')
+        self.assertEqual(results[0]['entity_type'], 'exploration')
+        self.assertEqual(results[0]['entity_id'], self.exp_id)
+
+        self.assertEqual(results[1]['text'], 'some text')
+        self.assertEqual(results[1]['updated_subject'], 'a subject')
+        self.assertEqual(results[1]['entity_type'], 'exploration')
+        self.assertEqual(results[1]['entity_id'], self.exp_id)
 
         self.logout()
