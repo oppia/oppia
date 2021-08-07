@@ -73,14 +73,15 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_perform_all_lint_checks_with_stderr(self):
         def mock_popen(unused_commands, stdout, stderr):  # pylint: disable=unused-argument
-            return scripts_test_utils.PopenStub(stdout='True', stderr='True')
+            return scripts_test_utils.PopenStub(stdout=b'True', stderr=b'True')
 
         popen_swap = self.swap_with_checks(subprocess, 'Popen', mock_popen)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH])
         with self.print_swap, popen_swap, self.assertRaisesRegexp(
-            Exception, 'True'):
+            Exception, 'True'
+        ):
             third_party_linter.perform_all_lint_checks()
 
     def test_perform_all_lint_checks_with_no_files(self):

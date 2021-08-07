@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from core.platform import models
 from jobs import job_test_utils
 from jobs.io import ndb_io
-from jobs.io import stub_io
 
 import apache_beam as beam
 
@@ -33,13 +32,10 @@ datastore_services = models.Registry.import_datastore_services()
 
 class NdbIoTests(job_test_utils.PipelinedTestBase):
 
-    def setUp(self):
-        super(NdbIoTests, self).setUp()
-        self.datastoreio_stub = stub_io.DatastoreioStub()
-
     def tearDown(self):
         datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
+            datastore_services.query_everything(namespace=self.namespace).iter(
+                keys_only=True))
         super(NdbIoTests, self).tearDown()
 
     def get_everything(self):
@@ -48,7 +44,9 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         Returns:
             list(Model). All of the models in the datastore.
         """
-        return list(datastore_services.query_everything().iter())
+        return list(
+            datastore_services.query_everything(namespace=self.namespace).iter()
+        )
 
     def put_multi(self, model_list, update_last_updated_time=False):
         """Puts the given models into the datastore.
@@ -72,14 +70,13 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_everything(), model_list)
 
-        with self.datastoreio_stub.context():
-            model_pcoll = (
-                self.pipeline
-                | ndb_io.GetModels(
-                    datastore_services.query_everything(),
-                    self.datastoreio_stub)
-            )
-            self.assert_pcoll_equal(model_pcoll, model_list)
+        model_pcoll = (
+            self.pipeline
+            | ndb_io.GetModels(
+                datastore_services.query_everything(namespace=self.namespace))
+        )
+
+        self.assert_pcoll_equal(model_pcoll, model_list)
 
     def test_write_to_datastore(self):
         model_list = [
@@ -90,12 +87,8 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_everything(), [])
 
-        with self.datastoreio_stub.context():
-            self.assert_pcoll_empty(
-                self.pipeline
-                | beam.Create(model_list)
-                | ndb_io.PutModels(self.datastoreio_stub)
-            )
+        self.assert_pcoll_empty(
+            self.pipeline | beam.Create(model_list) | ndb_io.PutModels())
 
         self.assertItemsEqual(self.get_everything(), model_list)
 
@@ -109,11 +102,9 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
 
         self.assertItemsEqual(self.get_everything(), model_list)
 
-        with self.datastoreio_stub.context():
-            self.assert_pcoll_empty(
-                self.pipeline
-                | beam.Create([model.key for model in model_list])
-                | ndb_io.DeleteModels(self.datastoreio_stub)
-            )
+        self.assert_pcoll_empty(
+            self.pipeline
+            | beam.Create([model.key for model in model_list])
+            | ndb_io.DeleteModels())
 
         self.assertItemsEqual(self.get_everything(), [])
