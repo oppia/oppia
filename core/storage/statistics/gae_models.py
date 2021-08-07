@@ -431,11 +431,14 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             exp_id,
             session_id))
 
+    # In the type annotation below, Dict[Text, Text] is used for 'params'.
+    # This is due to lack of information and this type of 'params' can be
+    # incorrect and can be changed in future.
     @classmethod
     def create(
             cls, exp_id, exp_version, state_name, session_id,
             params, play_type, unused_version=1):
-        # type: (Text, int, Text, Text, Dict[Text, Any], Text, int) -> Text
+        # type: (Text, int, Text, Text, Dict[Text, Text], Text, int) -> Text
         """Creates a new start exploration event and then writes it to
         the datastore.
 
@@ -726,7 +729,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     def create(
             cls, exp_id, exp_version, state_name, session_id,
             client_time_spent_in_secs, params, play_type):
-        # type: (Text, int, Text, Text, float, Dict[Text, Any], Text) -> Text
+        # type: (Text, int, Text, Text, float, Dict[Text, Text], Text) -> Text
         """Creates a new exploration completion event and then writes it
         to the datastore.
 
@@ -947,7 +950,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     def create(
             cls, exp_id, exp_version, state_name, session_id, params,
             play_type):
-        # type: (Text, int, Text, Text, Dict[Text, Any], Text) -> Text
+        # type: (Text, int, Text, Text, Dict[Text, Text], Text) -> Text
         """Creates a new state hit event entity and then writes
         it to the datastore.
 
