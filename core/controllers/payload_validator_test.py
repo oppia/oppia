@@ -69,7 +69,7 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
         for handler_args, handler_args_schema, error_msg in (
                 list_of_invalid_args_with_schema_and_errors):
             normalized_value, errors = payload_validator.validate(
-                handler_args, handler_args_schema, False)
+                handler_args, handler_args_schema, False, False)
 
             self.assertEqual(normalized_value, {})
             self.assertEqual(error_msg, errors)
@@ -109,13 +109,37 @@ class PayloadValidationUnitTests(test_utils.GenericTestBase):
                 }
             }, {
                 'exploration_id': 'any_exp_id'
+            }),
+            ({
+                'apply_draft': 'true'
+            }, {
+                'apply_draft': {
+                    'schema': {
+                        'type': 'bool'
+                    }
+                }
+            }, {
+                'apply_draft': True
             })
         ]
         for handler_args, handler_args_schema, normalized_value_for_args in (
                 list_of_valid_args_with_schmea):
-            normalized_value_for_args, errors = payload_validator.validate(
-                handler_args, handler_args_schema, False)
+            normalized_value, errors = payload_validator.validate(
+                handler_args, handler_args_schema, False, True)
 
-            self.assertEqual(
-                normalized_value_for_args, normalized_value_for_args)
+            self.assertEqual(normalized_value, normalized_value_for_args)
             self.assertEqual(errors, [])
+
+
+class CheckConversionOfStringToBool(test_utils.GenericTestBase):
+    """Test class to check behaviour of convert_string_to_bool method."""
+
+    def test_convert_string_to_bool(self):
+        # type: () -> None
+        """Test case to check behaviour of convert_string_to_bool method."""
+        self.assertTrue(
+            payload_validator.convert_string_to_bool('true'))
+        self.assertFalse(
+            payload_validator.convert_string_to_bool('false'))
+        self.assertFalse(
+            payload_validator.convert_string_to_bool('any_other_value'))
