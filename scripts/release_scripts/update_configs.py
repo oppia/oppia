@@ -24,13 +24,14 @@ Usage: Run this script from your oppia root folder:
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import argparse
 import getpass
 import os
 import re
 import sys
 
 import python_utils
-from scripts import common
+from .. import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(
@@ -46,6 +47,29 @@ CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
 TERMS_PAGE_FOLDER_URL = (
     'https://github.com/oppia/oppia/commits/develop/core/'
     'templates/pages/terms-page')
+
+_PARSER = argparse.ArgumentParser(description='Updates configs.')
+_PARSER.add_argument(
+    '--release_dir_path',
+    dest='release_dir_path',
+    help='Path of directory where all files are copied for release.',
+    required=True)
+_PARSER.add_argument(
+    '--deploy_data_path',
+    dest='deploy_data_path',
+    help='Path for deploy data directory.',
+    required=True)
+_PARSER.add_argument(
+    '--personal_access_token',
+    dest='personal_access_token',
+    help='The personal access token for the GitHub id of user.',
+    default=None)
+_PARSER.add_argument(
+    '--prompt_for_mailgun_and_terms_update',
+    action='store_true',
+    default=False,
+    dest='prompt_for_mailgun_and_terms_update',
+    help='Whether to update mailgun api and last updated time for terms page.')
 
 
 def apply_changes_based_on_config(
@@ -235,31 +259,24 @@ def add_mailchimp_api_key(release_feconf_path):
             f.write(line)
 
 
-def main(
-        release_dir_path, deploy_data_path, personal_access_token,
-        prompt_for_mailgun_and_terms_update):
+def main(args=None):
     """Updates the files corresponding to LOCAL_FECONF_PATH and
     LOCAL_CONSTANTS_PATH after doing the prerequisite checks.
-
-    Args:
-        release_dir_path: str. Path of directory where all files are copied
-            for release.
-        deploy_data_path: str. Path for deploy data directory.
-        personal_access_token: str. The personal access token for the
-            GitHub id of user.
-        prompt_for_mailgun_and_terms_update: bool. Whether to update mailgun api
-            and last updated time for terms page.
     """
+    options = _PARSER.parse_args(args=args)
+
     # Do prerequisite checks.
-    feconf_config_path = os.path.join(deploy_data_path, 'feconf_updates.config')
+    feconf_config_path = os.path.join(
+        options.deploy_data_path, 'feconf_updates.config')
     constants_config_path = os.path.join(
-        deploy_data_path, 'constants_updates.config')
+        options.deploy_data_path, 'constants_updates.config')
 
-    release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
+    release_feconf_path = os.path.join(
+        options.release_dir_path, common.FECONF_PATH)
     release_constants_path = os.path.join(
-        release_dir_path, common.CONSTANTS_FILE_PATH)
+        options.release_dir_path, common.CONSTANTS_FILE_PATH)
 
-    if prompt_for_mailgun_and_terms_update:
+    if options.prompt_for_mailgun_and_terms_update:
         try:
             python_utils.url_open(TERMS_PAGE_FOLDER_URL)
         except Exception:
@@ -267,10 +284,17 @@ def main(
         add_mailgun_api_key(release_feconf_path)
         add_mailchimp_api_key(release_feconf_path)
         check_updates_to_terms_of_service(
-            release_feconf_path, personal_access_token)
+            release_feconf_path, options.personal_access_token)
 
     apply_changes_based_on_config(
         release_feconf_path, feconf_config_path, FECONF_REGEX)
     apply_changes_based_on_config(
         release_constants_path, constants_config_path, CONSTANTS_REGEX)
-    verify_feconf(release_feconf_path, prompt_for_mailgun_and_terms_update)
+    verify_feconf(
+        release_feconf_path, options.prompt_for_mailgun_and_terms_update)
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when deploy.py is used as a script.
+if __name__ == '__main__':  # pragma: no cover
+    main()

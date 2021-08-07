@@ -1118,7 +1118,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
 
     feedback_report_models = model_class.query(
         model_class.scrubbed_by == user_id).fetch()
-    report_ids = set([model.id for model in feedback_report_models])
+    report_ids = set(model.id for model in feedback_report_models)
 
     # Fill in any missing keys in the category's
     # pseudonymizable_entity_mappings, using the same pseudonym for each entity
@@ -1179,13 +1179,13 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             feedback_thread_model_class.last_nonempty_message_author_id == (
                 user_id)
         )).fetch()
-    feedback_ids = set([model.id for model in feedback_thread_models])
+    feedback_ids = set(model.id for model in feedback_thread_models)
 
     feedback_message_model_class = feedback_models.GeneralFeedbackMessageModel
     feedback_message_models = feedback_message_model_class.query(
         feedback_message_model_class.author_id == user_id
     ).fetch()
-    feedback_ids |= set([model.thread_id for model in feedback_message_models])
+    feedback_ids |= set(model.thread_id for model in feedback_message_models)
 
     suggestion_model_class = suggestion_models.GeneralSuggestionModel
     general_suggestion_models = suggestion_model_class.query(
@@ -1193,7 +1193,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
             suggestion_model_class.author_id == user_id,
             suggestion_model_class.final_reviewer_id == user_id
         )).fetch()
-    feedback_ids |= set([model.id for model in general_suggestion_models])
+    feedback_ids |= set(model.id for model in general_suggestion_models)
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.feedback, feedback_ids)
@@ -1285,7 +1285,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             voiceover_application_class.author_id == user_id,
             voiceover_application_class.final_reviewer_id == user_id
         )).fetch()
-    suggestion_ids = set([model.id for model in voiceover_application_models])
+    suggestion_ids = set(model.id for model in voiceover_application_models)
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.suggestion, suggestion_ids)

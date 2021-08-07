@@ -36,6 +36,7 @@ export interface DraftAutoSaveResponse {
   'is_version_of_draft_valid': boolean;
   'changes_are_mergeable': boolean;
 }
+
 @Injectable({
   providedIn: 'root'
 })

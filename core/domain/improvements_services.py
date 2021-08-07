@@ -143,10 +143,12 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
         .order(-improvements_models.TaskEntryModel.resolved_on)
         .fetch_page(
             feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor))
+    # The urlsafe returns bytes and we need to decode them to string.
     return (
         [get_task_entry_from_model(model) for model in results],
-        cursor and cursor.urlsafe(),
-        more)
+        cursor and cursor.urlsafe().decode('utf-8'),
+        more
+    )
 
 
 def put_tasks(tasks, update_last_updated_time=True):

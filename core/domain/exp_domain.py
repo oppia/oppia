@@ -855,9 +855,8 @@ class Exploration(python_utils.OBJECT):
                 'Expected states to be a dict, received %s' % self.states)
         if not self.states:
             raise utils.ValidationError('This exploration has no states.')
-        for state_name in self.states:
+        for state_name, state in self.states.items():
             self._validate_state_name(state_name)
-            state = self.states[state_name]
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
@@ -1023,11 +1022,11 @@ class Exploration(python_utils.OBJECT):
                 interaction = state.interaction
                 if interaction.is_terminal:
                     if state_name != self.init_state_name:
-                        if self.states[state_name].card_is_checkpoint:
+                        if state.card_is_checkpoint:
                             raise utils.ValidationError(
                                 'Expected card_is_checkpoint of terminal state '
                                 'to be False but found it to be %s'
-                                % self.states[state_name].card_is_checkpoint
+                                % state.card_is_checkpoint
                             )
 
             # Check if checkpoint count is between 1 and 8, inclusive.
@@ -1473,8 +1472,7 @@ class Exploration(python_utils.OBJECT):
             self.update_init_state_name(new_state_name)
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
-        for other_state_name in self.states:
-            other_state = self.states[other_state_name]
+        for other_state in self.states.values():
             other_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in other_outcomes:
                 if outcome.dest == old_state_name:
@@ -1499,8 +1497,7 @@ class Exploration(python_utils.OBJECT):
 
         # Find all destinations in the exploration which equal the deleted
         # state, and change them to loop back to their containing state.
-        for other_state_name in self.states:
-            other_state = self.states[other_state_name]
+        for other_state_name, other_state in self.states.items():
             all_outcomes = other_state.interaction.get_all_outcomes()
             for outcome in all_outcomes:
                 if outcome.dest == state_name:
@@ -1551,8 +1548,7 @@ class Exploration(python_utils.OBJECT):
         }
         new_states = self.states
 
-        for new_state_name in new_states:
-            new_state = new_states[new_state_name]
+        for new_state_name, new_state in new_states.items():
             if not new_state.can_undergo_classification():
                 continue
 
@@ -2237,8 +2233,8 @@ class Exploration(python_utils.OBJECT):
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded utf-8 string encoding all of the information
-            composing the object.
+            str. JSON-encoded str encoding all of the information composing
+            the object.
         """
         exploration_dict = self.to_dict()
         # The only reason we add the version parameter separately is that our
@@ -2259,21 +2255,21 @@ class Exploration(python_utils.OBJECT):
             exploration_dict['last_updated'] = (
                 utils.convert_naive_datetime_to_string(self.last_updated))
 
-        return json.dumps(exploration_dict).encode('utf-8')
+        return json.dumps(exploration_dict)
 
     @classmethod
     def deserialize(cls, json_string):
         """Returns an Exploration domain object decoded from a JSON string.
 
         Args:
-            json_string: str. A JSON-encoded utf-8 string that can be
-                decoded into a dictionary representing an Exploration. Only call
-                on strings that were created using serialize().
+            json_string: str. A JSON-encoded string that can be
+                decoded into a dictionary representing a Exploration.
+                Only call on strings that were created using serialize().
 
         Returns:
             Exploration. The corresponding Exploration domain object.
         """
-        exploration_dict = json.loads(json_string.decode('utf-8'))
+        exploration_dict = json.loads(json_string)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 exploration_dict['created_on'])

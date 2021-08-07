@@ -23,9 +23,7 @@ from core.domain import beam_job_services
 from core.platform import models
 from jobs import job_test_utils
 from jobs.io import job_io
-from jobs.io import stub_io
 from jobs.types import job_run_result
-import python_utils
 
 import apache_beam as beam
 
@@ -43,15 +41,7 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
 
     JOB_ID = '123'
 
-    def setUp(self):
-        super(PutResultsTests, self).setUp()
-        self.datastoreio_stub = stub_io.DatastoreioStub()
-        with python_utils.ExitStack() as exit_stack:
-            exit_stack.enter_context(self.datastoreio_stub.context())
-            self.exit_stack = exit_stack.pop_all()
-
     def tearDown(self):
-        self.exit_stack.close()
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         super(PutResultsTests, self).tearDown()
@@ -65,7 +55,7 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_empty(
             self.pipeline
             | beam.Create(messages)
-            | job_io.PutResults(self.JOB_ID, self.datastoreio_stub)
+            | job_io.PutResults(self.JOB_ID)
         )
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)
@@ -83,7 +73,7 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
             self.assert_pcoll_empty(
                 self.pipeline
                 | beam.Create(messages)
-                | job_io.PutResults(self.JOB_ID, self.datastoreio_stub)
+                | job_io.PutResults(self.JOB_ID)
             )
 
         result = beam_job_services.get_beam_job_run_result(self.JOB_ID)

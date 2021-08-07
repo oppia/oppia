@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 
 import importlib
 import inspect
-import os
 import re
 
 from core.domain import value_generators_domain
@@ -53,30 +52,10 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
 
 class ValueGeneratorNameTests(test_utils.GenericTestBase):
 
-    def _get_all_python_files(self):
-        """Recursively collects all Python files in the core/ and extensions/
-        directory.
-
-        Returns:
-            list(str). A list of Python files.
-        """
-        current_dir = os.getcwd()
-        files_in_directory = []
-        for _dir, _, files in os.walk(current_dir):
-            for file_name in files:
-                filepath = os.path.relpath(
-                    os.path.join(_dir, file_name), current_dir)
-                if filepath.endswith('.py') and (
-                        filepath.startswith('core/') or (
-                            filepath.startswith('extensions/'))):
-                    module = filepath[:-3].replace('/', '.')
-                    files_in_directory.append(module)
-        return files_in_directory
-
     def test_value_generator_names(self):
         """This function checks for duplicate value generators."""
 
-        all_python_files = self._get_all_python_files()
+        all_python_files = self.get_all_python_files()
         all_value_generators = []
 
         for file_name in all_python_files:

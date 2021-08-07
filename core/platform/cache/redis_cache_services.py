@@ -22,10 +22,23 @@ from __future__ import unicode_literals
 from core.domain import caching_domain
 import feconf
 import python_utils
+
 import redis
 
-REDIS_CLIENT = redis.Redis(
-    host=feconf.REDISHOST, port=feconf.REDISPORT)
+# Redis client for our own implementation of caching.
+OPPIA_REDIS_CLIENT = redis.StrictRedis(
+    host=feconf.REDISHOST,
+    port=feconf.REDISPORT,
+    db=feconf.OPPIA_REDIS_DB_INDEX,
+    decode_responses=True
+)
+
+# Redis client for the Cloud NDB cache.
+CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
+    host=feconf.REDISHOST,
+    port=feconf.REDISPORT,
+    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+)
 
 
 def get_memory_cache_stats():
@@ -38,7 +51,7 @@ def get_memory_cache_stats():
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = REDIS_CLIENT.memory_stats()
+    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
     memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile.get('total.allocated'),
         redis_full_profile.get('peak.allocated'),
@@ -47,9 +60,10 @@ def get_memory_cache_stats():
     return memory_stats
 
 
-def flush_cache():
-    """Wipes the Redis cache clean."""
-    REDIS_CLIENT.flushdb()
+def flush_caches():
+    """Wipes the Redis caches clean."""
+    OPPIA_REDIS_CLIENT.flushdb()
+    CLOUD_NDB_REDIS_CLIENT.flushdb()
 
 
 def get_multi(keys):
@@ -63,7 +77,7 @@ def get_multi(keys):
         are passed in.
     """
     assert isinstance(keys, list)
-    return REDIS_CLIENT.mget(keys)
+    return OPPIA_REDIS_CLIENT.mget(keys)
 
 
 def set_multi(key_value_mapping):
@@ -78,7 +92,7 @@ def set_multi(key_value_mapping):
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return REDIS_CLIENT.mset(key_value_mapping)
+    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
 
 
 def delete_multi(keys):
@@ -92,5 +106,5 @@ def delete_multi(keys):
     """
     for key in keys:
         assert isinstance(key, python_utils.BASESTRING)
-    number_of_deleted_keys = REDIS_CLIENT.delete(*keys)
+    number_of_deleted_keys = OPPIA_REDIS_CLIENT.delete(*keys)
     return number_of_deleted_keys

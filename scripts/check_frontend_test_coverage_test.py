@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import os
-import re
 import subprocess
 import sys
 from core.tests import test_utils
@@ -27,10 +26,9 @@ import python_utils
 from . import check_frontend_test_coverage
 
 
-class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
-
+class CheckFrontendCoverageTests(test_utils.GenericTestBase):
     def setUp(self):
-        super(CheckFrontEndCoverageTests, self).setUp()
+        super(CheckFrontendCoverageTests, self).setUp()
         self.lcov_items_list = None
         self.check_function_calls = {
             'open_file_is_called': False,
@@ -41,27 +39,38 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'exists_is_called': True,
         }
         self.printed_messages = []
+
         class MockFile(python_utils.OBJECT):
             def __init__(self, lcov_items_list):
                 self.lcov_items_list = lcov_items_list
-            def read(self): # pylint: disable=missing-docstring
+
+            def read(self):  # pylint: disable=missing-docstring
                 return self.lcov_items_list
-        def mock_open_file(file_name, option): # pylint: disable=unused-argument
+
+        def mock_open_file(
+            file_name, option
+        ):  # pylint: disable=unused-argument
             self.check_function_calls['open_file_is_called'] = True
             return MockFile(self.lcov_items_list)
+
         def mock_exists(unused_path):
             self.check_function_calls['exists_is_called'] = True
             return True
+
         def mock_print(message):
             self.printed_messages.append(message)
-        def mock_check_call(command): # pylint: disable=unused-argument
+
+        def mock_check_call(command):  # pylint: disable=unused-argument
             self.check_function_calls['check_call_is_called'] = True
+
         self.open_file_swap = self.swap(
-            python_utils, 'open_file', mock_open_file)
+            python_utils, 'open_file', mock_open_file
+        )
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
         self.check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
+            subprocess, 'check_call', mock_check_call
+        )
 
     def test_get_stanzas_from_lcov_file(self):
         self.lcov_items_list = (
@@ -101,7 +110,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception,
                 'The test path is empty or null. '
-                'It\'s not possible to diff the test coverage correctly.'):
+                'It\'s not possible to diff the test coverage correctly.',
+            ):
                 check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_get_stanzas_from_lcov_file_total_lines_exception(self):
@@ -115,7 +125,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception,
                 'It wasn\'t possible to get the total lines of file.ts file.'
-                'It\'s not possible to diff the test coverage correctly.'):
+                'It\'s not possible to diff the test coverage correctly.',
+            ):
                 check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_get_stanzas_from_lcov_file_covered_lines_exception(self):
@@ -129,7 +140,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception,
                 'It wasn\'t possible to get the covered lines of file.ts file.'
-                'It\'s not possible to diff the test coverage correctly.'):
+                'It\'s not possible to diff the test coverage correctly.',
+            ):
                 check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_check_coverage_changes(self):
@@ -145,37 +157,35 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
-                'file.ts',
-                'file2.ts'
-            ]
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['file.ts', 'file2.ts'],
         )
 
-        check_function_calls = {
-            'sys_exit_is_called': False,
-        }
-        expected_check_function_calls = {
-            'sys_exit_is_called': False,
-        }
-        def mock_sys_exit(error_message): # pylint: disable=unused-argument
+        check_function_calls = {'sys_exit_is_called': False}
+        expected_check_function_calls = {'sys_exit_is_called': False}
+
+        def mock_sys_exit(error_message):  # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
+
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
-        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
+        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap:  # pylint: disable=line-too-long
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.check_coverage_changes()
             self.assertEqual(
-                check_function_calls,
-                expected_check_function_calls)
+                check_function_calls, expected_check_function_calls
+            )
 
     def test_check_coverage_changes_error(self):
         def mock_exists(unused_path):
             return False
+
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with exists_swap:
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected lcov file to be'
-                r' available at [A-Za-z\._/]+, but the file does not exist.'):
+                r' available at [A-Za-z\._/]+, but the file does not exist.',
+            ):
                 check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_for_covered_files(self):
@@ -190,18 +200,20 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'end_of_record\n'
         )
         not_fully_covered_files_swap = self.swap(
-            check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', []
+            check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with not_fully_covered_files_swap:
-                with self.assertRaisesRegexp(
-                    SystemExit,
-                    re.escape(
-                        '\033[1mfile.ts\033[0m seems to be not completely '
-                        'tested. Make sure it\'s fully covered.\n')):
+            with not_fully_covered_files_swap, self.capture_logging() as logs:
+                with self.assertRaisesRegexp(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
+                self.assertEqual(
+                    logs,
+                    [
+                        '\033[1mfile.ts\033[0m seems to be not completely '
+                        'tested. Make sure it\'s fully covered.'
+                    ],
+                )
 
     def test_check_coverage_changes_remove_file(self):
         self.lcov_items_list = (
@@ -212,16 +224,17 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
-                'file.ts'
-            ]
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['file.ts'],
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with not_fully_covered_files_swap:
-                with self.assertRaisesRegexp(
-                    SystemExit,
-                    re.escape(
+            with not_fully_covered_files_swap, self.capture_logging() as logs:
+                with self.assertRaisesRegexp(SystemExit, '1'):
+                    check_frontend_test_coverage.check_coverage_changes()
+                self.assertEqual(
+                    logs,
+                    [
                         '\033[1mfile.ts\033[0m seems to be fully covered! '
                         'Before removing it manually from the denylist '
                         'in the file '
@@ -229,8 +242,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                         'make sure you\'ve followed the unit tests rules '
                         'correctly on: '
                         'https://github.com/oppia/oppia/wiki/Frontend-unit'
-                        '-tests-guide#rules\n')):
-                    check_frontend_test_coverage.check_coverage_changes()
+                        '-tests-guide#rules'
+                    ],
+                )
 
     def test_check_coverage_changes_when_renaming_file(self):
         self.lcov_items_list = (
@@ -241,16 +255,17 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
-                'file.ts'
-            ]
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['file.ts'],
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with not_fully_covered_files_swap:
-                with self.assertRaisesRegexp(
-                    SystemExit,
-                    re.escape(
+            with not_fully_covered_files_swap, self.capture_logging() as logs:
+                with self.assertRaisesRegexp(SystemExit, '1'):
+                    check_frontend_test_coverage.check_coverage_changes()
+                self.assertEqual(
+                    logs,
+                    [
                         '\033[1mnewfilename.ts\033[0m seems to be not '
                         'completely tested. Make sure it\'s fully covered.\n'
                         '\033[1mfile.ts\033[0m is in the frontend test '
@@ -258,8 +273,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
                         'you have renamed it, please make sure to remove the '
                         'old file name and add the new file name in the '
                         'denylist in the file scripts/'
-                        'check_frontend_test_coverage.py.\n')):
-                    check_frontend_test_coverage.check_coverage_changes()
+                        'check_frontend_test_coverage.py.'
+                    ],
+                )
 
     def test_fully_covered_filenames_is_sorted(self):
         self.lcov_items_list = (
@@ -278,29 +294,26 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
-                'anotherfile.ts'
-                'file.ts',
-            ]
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['anotherfile.tsfile.ts'],
         )
 
-        check_function_calls = {
-            'sys_exit_is_called': False
-        }
-        expected_check_function_calls = {
-            'sys_exit_is_called': False
-        }
-        def mock_sys_exit(error_message): # pylint: disable=unused-argument
+        check_function_calls = {'sys_exit_is_called': False}
+        expected_check_function_calls = {'sys_exit_is_called': False}
+
+        def mock_sys_exit(error_message):  # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
+
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
-        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
-            with not_fully_covered_files_swap:
+        with sys_exit_swap, self.exists_swap, self.open_file_swap:
+            with self.print_swap, not_fully_covered_files_swap:
                 (
                     check_frontend_test_coverage
-                    .check_not_fully_covered_filenames_list_is_sorted())
+                    .check_not_fully_covered_filenames_list_is_sorted()
+                )
                 self.assertEqual(
-                    check_function_calls,
-                    expected_check_function_calls)
+                    check_function_calls, expected_check_function_calls
+                )
 
     def test_fully_covered_filenames_is_not_sorted(self):
         self.lcov_items_list = (
@@ -315,22 +328,24 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
-                'file.ts',
-                'anotherfile.ts'
-            ]
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['file.ts', 'anotherfile.ts'],
         )
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
-            with not_fully_covered_files_swap:
-                with self.assertRaisesRegexp(
-                    SystemExit,
-                    re.escape(
-                        'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list '
-                        'must be kept in alphabetical order.')):
+            with not_fully_covered_files_swap, self.capture_logging() as logs:
+                with self.assertRaisesRegexp(SystemExit, '1'):
                     (
                         check_frontend_test_coverage
-                        .check_not_fully_covered_filenames_list_is_sorted())
+                        .check_not_fully_covered_filenames_list_is_sorted()
+                    )
+                self.assertEqual(
+                    logs,
+                    [
+                        'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list '
+                        'must be kept in alphabetical order.'
+                    ],
+                )
 
     def test_function_calls(self):
         self.lcov_items_list = (
@@ -341,11 +356,12 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
-            'NOT_FULLY_COVERED_FILENAMES', [
-                'file.ts'
-            ])
+            'NOT_FULLY_COVERED_FILENAMES',
+            ['file.ts'],
+        )
         with self.check_call_swap, self.exists_swap, self.open_file_swap:
             with not_fully_covered_files_swap:
                 check_frontend_test_coverage.main()
             self.assertEqual(
-                self.check_function_calls, self.expected_check_function_calls)
+                self.check_function_calls, self.expected_check_function_calls
+            )

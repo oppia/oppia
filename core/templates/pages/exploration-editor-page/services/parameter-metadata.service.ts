@@ -225,7 +225,6 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
           if (tmpUnsetParameter) {
             unsetParametersInfo.push(angular.copy(tmpUnsetParameter));
-            continue;
           }
         }
 

@@ -18,8 +18,8 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import logging
-from constants import constants
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
 from core.controllers import android_e2e_config
@@ -35,6 +35,7 @@ from core.controllers import concept_card_viewer
 from core.controllers import contributor_dashboard
 from core.controllers import contributor_dashboard_admin
 from core.controllers import creator_dashboard
+from core.controllers import cron
 from core.controllers import custom_landing_pages
 from core.controllers import editor
 from core.controllers import email_dashboard
@@ -65,6 +66,7 @@ from core.controllers import story_viewer
 from core.controllers import subscriptions
 from core.controllers import subtopic_viewer
 from core.controllers import suggestion
+from core.controllers import tasks
 from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
@@ -74,18 +76,19 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 import feconf
 
-from mapreduce import main as mapreduce_main
-from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-from typing import Any, Dict, Optional, Text, Type # isort:skip # pylint: disable=unused-import
+from typing import Any, Dict, Optional, Text, Type, TypeVar  # isort:skip
 
 MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import transaction_services
+if MYPY:  # pragma: no cover
+    from mypy_imports import datastore_services
 
-transaction_services = models.Registry.import_transaction_services()
+T = TypeVar('T')  # pylint: disable=invalid-name
+
+cache_services = models.Registry.import_cache_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -99,8 +102,7 @@ class FrontendErrorHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.open_access # type: ignore[misc]
-    def post(self):
-        # type: () -> None
+    def post(self) -> None:
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
         self.render_json(self.values) # type: ignore[no-untyped-call]
@@ -110,8 +112,7 @@ class WarmupPage(base.BaseHandler):
     """Handles warmup requests."""
 
     @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    def get(self) -> None:
         """Handles GET warmup requests."""
         pass
 
@@ -121,9 +122,8 @@ class HomePageRedirectPage(base.BaseHandler):
     redirect them appropriately.
     """
 
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    @acl_decorators.open_access  # type: ignore[misc]
+    def get(self) -> None:
         if self.user_id and user_services.has_fully_registered_account( # type: ignore[no-untyped-call]
                 self.user_id):
             user_settings = user_services.get_user_settings(self.user_id) # type: ignore[no-untyped-call]
@@ -139,14 +139,16 @@ class HomePageRedirectPage(base.BaseHandler):
 class SplashRedirectPage(base.BaseHandler):
     """Redirect the old splash URL, '/splash' to the new one, '/'."""
 
-    @acl_decorators.open_access # type: ignore[misc]
-    def get(self):
-        # type: () -> None
+    @acl_decorators.open_access  # type: ignore[misc]
+    def get(self) -> None:
         self.redirect('/')
 
 
-def get_redirect_route(regex_route, handler, defaults=None):
-    # type: (Text, Type[base.BaseHandler], Optional[Dict[Any, Any]]) -> routes.RedirectRoute
+def get_redirect_route(
+        regex_route: Text,
+        handler: Type[base.BaseHandler],
+        defaults: Optional[Dict[Any, Any]] = None
+) -> routes.RedirectRoute:
     """Returns a route that redirects /foo/ to /foo.
 
     Warning: this method strips off parameters after the trailing slash. URLs
@@ -168,62 +170,8 @@ def get_redirect_route(regex_route, handler, defaults=None):
         regex_route, handler, name, strict_slash=True, defaults=defaults)
 
 
-def authorization_wrapper(self, *args, **kwargs):
-    # type: (Any, *Any, **Any) -> None
-    """This request handler wrapper only admits internal requests from
-    taskqueue workers. If the request is invalid, it leads to a 403 Error page.
-    """
-    # Internal requests should have an "X-AppEngine-TaskName" header
-    # (see cloud.google.com/appengine/docs/standard/python/taskqueue/push/).
-    if 'X-AppEngine-TaskName' not in self.request.headers:
-        self.response.out.write('Forbidden')
-        self.response.set_status(403)
-        return
-    self.real_dispatch(*args, **kwargs)
-
-
-def ui_access_wrapper(self, *args, **kwargs):
-    # type: (Any, *Any, **Any) -> None
-    """This request handler wrapper directly serves UI pages
-    for MapReduce dashboards.
-    """
-    self.real_dispatch(*args, **kwargs)
-
-
-MAPREDUCE_HANDLERS = []
-
-for path, handler_class in mapreduce_main.create_handlers_map():
-    if path.startswith('.*/pipeline'):
-        if 'pipeline/rpc/' in path or path == '.*/pipeline(/.+)':
-            path = path.replace('.*/pipeline', '/mapreduce/ui/pipeline')
-        else:
-            path = path.replace('.*/pipeline', '/mapreduce/worker/pipeline')
-    else:
-        if '_callback' in path:
-            path = path.replace('.*', '/mapreduce/worker', 1)
-        elif '/list_configs' in path:
-            continue
-        else:
-            path = path.replace('.*', '/mapreduce/ui', 1)
-
-    if '/ui/' in path or path.endswith('/ui'):
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = ui_access_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-    else:
-        if (hasattr(handler_class, 'dispatch') and
-                not hasattr(handler_class, 'real_dispatch')):
-            handler_class.real_dispatch = handler_class.dispatch
-            handler_class.dispatch = authorization_wrapper
-        MAPREDUCE_HANDLERS.append((path, handler_class))
-
-# Tell map/reduce internals that this is now the base path to use.
-mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
-
 # Register the URLs with the classes responsible for handling them.
-URLS = MAPREDUCE_HANDLERS + [
+URLS = [
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(r'/', HomePageRedirectPage),
     get_redirect_route(r'/splash', SplashRedirectPage),
@@ -533,9 +481,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
-    get_redirect_route(
-        r'/joboutputhandler', release_coordinator.JobOutputHandler),
-    get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
     get_redirect_route(
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
@@ -924,8 +869,8 @@ URLS = MAPREDUCE_HANDLERS + [
 ]
 
 # Adding redirects for topic landing pages.
-for subject in constants.AVAILABLE_LANDING_PAGES:
-    for topic in constants.AVAILABLE_LANDING_PAGES[subject]:
+for subject, topics in constants.AVAILABLE_LANDING_PAGES.items():
+    for topic in topics:
         URLS.append(
             get_redirect_route(
                 r'/%s/%s' % (subject, topic),
@@ -937,17 +882,68 @@ if constants.DEV_MODE:
             r'/initialize_android_test_data',
             android_e2e_config.InitializeAndroidTestDataHandler))
 
+# Add cron urls.
+URLS.extend((
+    get_redirect_route(
+        r'/cron/models/cleanup', cron.CronModelsCleanupHandler),
+    get_redirect_route(
+        r'/cron/mail/admins/contributor_dashboard_bottlenecks',
+        cron.CronMailAdminContributorDashboardBottlenecksHandler),
+    get_redirect_route(
+        r'/cron/mail/reviewers/contributor_dashboard_suggestions',
+        cron.CronMailReviewersContributorDashboardSuggestionsHandler),
+))
+
+# Add tasks urls.
+URLS.extend((
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS,
+        tasks.UnsentFeedbackEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_SUGGESTION_EMAILS,
+        tasks.SuggestionEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FLAG_EXPLORATION_EMAILS,
+        tasks.FlagExplorationEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
+        tasks.InstantFeedbackMessageEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
+        tasks.FeedbackThreadStatusChangeEmailHandler),
+    get_redirect_route(
+        r'%s' % feconf.TASK_URL_DEFERRED,
+        tasks.DeferredTasksHandler),
+))
+
+
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     URLS.append(
         get_redirect_route(
-            r'/%s' % page['ROUTE'],
-            oppia_root.OppiaRootPage))
+            r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
-    webapp2.WSGIApplication(URLS, debug=feconf.DEBUG))
 
-firebase_auth_services.establish_firebase_connection() # type: ignore[no-untyped-call]
+class NdbWsgiMiddleware:
+    """Wraps the WSGI application into the NDB client context."""
+
+    def __init__(self, wsgi_app: webapp2.WSGIApplication) -> None:
+        self.wsgi_app = wsgi_app
+
+    def __call__(
+            self,
+            environ: Dict[str, str],
+            start_response: webapp2.Response
+    ) -> Any:
+        global_cache = datastore_services.RedisCache(
+            cache_services.CLOUD_NDB_REDIS_CLIENT)  # type: ignore[attr-defined]
+        with datastore_services.get_ndb_context(global_cache=global_cache):
+            return self.wsgi_app(environ, start_response)
+
+
+app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
+app = NdbWsgiMiddleware(app_without_context)
+firebase_auth_services.establish_firebase_connection()  # type: ignore[no-untyped-call]

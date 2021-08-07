@@ -250,34 +250,34 @@ class HelperFunctionsUnitTests(test_utils.GenericTestBase):
 
     def test_get_variables(self):
         """Tests for get_variables method."""
-        self.assertEqual(expression_parser.get_variables(
-            'a^2.3'), ['a'])
-        self.assertEqual(
+        self.assertItemsEqual(expression_parser.get_variables('a^2.3'), ['a'])
+        self.assertItemsEqual(
             expression_parser.get_variables('abs(alpha)'), ['alpha'])
-        self.assertEqual(
+        self.assertItemsEqual(
             expression_parser.get_variables('alpha/gamma'), ['alpha', 'gamma'])
-        self.assertEqual(expression_parser.get_variables(
-            'A + 2/3'), ['A'])
-        self.assertEqual(expression_parser.get_variables(
-            'alphabetagamma'), ['alpha', 'beta', 'gamma'])
-        self.assertEqual(expression_parser.get_variables(
-            'betalphaa'), ['a', 'p', 'beta', 'l', 'h'])
-        self.assertEqual(expression_parser.get_variables(
-            'a+a*a/aa^a-a'), ['a'])
-        self.assertEqual(expression_parser.get_variables(
+        self.assertEqual(expression_parser.get_variables('A + 2/3'), ['A'])
+        self.assertItemsEqual(
+            expression_parser.get_variables('alphabetagamma'),
+            ['alpha', 'beta', 'gamma'])
+        self.assertItemsEqual(
+            expression_parser.get_variables('betalphaa'),
+            ['a', 'p', 'beta', 'l', 'h'])
+        self.assertItemsEqual(
+            expression_parser.get_variables('a+a*a/aa^a-a'), ['a'])
+        self.assertItemsEqual(expression_parser.get_variables(
             'sqrt(3+x^y)/abs(gamma)'), ['y', 'x', 'gamma'])
-        self.assertEqual(expression_parser.get_variables(
-            'a=3+4'), ['a'])
-        self.assertEqual(expression_parser.get_variables(
+        self.assertItemsEqual(
+            expression_parser.get_variables('a=3+4'), ['a'])
+        self.assertItemsEqual(expression_parser.get_variables(
             '(a-2)^beta = alpha/gamma'), ['a', 'alpha', 'beta', 'gamma'])
-        self.assertEqual(expression_parser.get_variables(
-            '4=abs(-4)'), [])
-        self.assertEqual(expression_parser.get_variables(
-            'a^pi + e/2'), ['a', 'pi', 'e'])
-        self.assertEqual(expression_parser.get_variables(
-            'pi-3.14e'), ['pi', 'e'])
-        self.assertEqual(expression_parser.get_variables(
-            'epi'), ['pi', 'e'])
+        self.assertItemsEqual(
+            expression_parser.get_variables('4=abs(-4)'), [])
+        self.assertItemsEqual(
+            expression_parser.get_variables('a^pi + e/2'), ['a', 'pi', 'e'])
+        self.assertItemsEqual(
+            expression_parser.get_variables('pi-3.14e'), ['pi', 'e'])
+        self.assertItemsEqual(
+            expression_parser.get_variables('epi'), ['pi', 'e'])
 
 
 class TokenUnitTests(test_utils.GenericTestBase):

@@ -41,7 +41,7 @@ var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.protractor-test-create-activity';
-var dismissCreateModalSelector = '.protractor-test-dismiss-welcome-modal';
+var dismissWelcomeModalSelector = '.protractor-test-dismiss-welcome-modal';
 
 var createCollectionButtonSelector = '.protractor-test-create-collection';
 var addExplorationInput = '.protractor-test-add-exploration-input';
@@ -65,7 +65,6 @@ var storyDescriptionField = '.protractor-test-new-story-description-field';
 var storyThumbnailButton = '.protractor-test-photo-button';
 var storyUploadButton = '.protractor-test-photo-upload-input';
 var storyPhotoSubmit = '.protractor-test-photo-upload-submit';
-var thumbnailContainer = '.protractor-test-thumbnail-container';
 var confirmStoryCreationButton =
   '.protractor-test-confirm-story-creation-button';
 
@@ -146,7 +145,7 @@ const getExplorationEditorUrl = async function(browser, page) {
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
-      dismissCreateModalSelector, {visible: true});
+      dismissWelcomeModalSelector, {visible: true});
     explorationEditorUrl = await page.url();
   } catch (e) {
     // eslint-disable-next-line no-console

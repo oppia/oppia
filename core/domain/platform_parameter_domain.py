@@ -34,9 +34,12 @@ FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
 DATA_TYPES = python_utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
 ALLOWED_SERVER_MODES = [
-    SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
+    SERVER_MODES.dev.value, SERVER_MODES.test.value, SERVER_MODES.prod.value]
 ALLOWED_FEATURE_STAGES = [
-    FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
+    FEATURE_STAGES.dev.value,
+    FEATURE_STAGES.test.value,
+    FEATURE_STAGES.prod.value
+]
 ALLOWED_PLATFORM_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
 ALLOWED_APP_VERSION_FLAVORS = (
@@ -157,10 +160,10 @@ class EvaluationContext(python_utils.OBJECT):
                     ' specified.' % (
                         match.group(2), ALLOWED_APP_VERSION_FLAVORS))
 
-        if self._server_mode not in ALLOWED_SERVER_MODES:
+        if self._server_mode.value not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
                 'Invalid server mode \'%s\', must be one of %s.' % (
-                    self._server_mode, ALLOWED_SERVER_MODES))
+                    self._server_mode.value, ALLOWED_SERVER_MODES))
 
     @classmethod
     def from_dict(cls, client_context_dict, server_context_dict):
@@ -287,8 +290,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
 
         if self._type == 'server_mode':
             for _, mode in self._conditions:
-                if not any([mode == server_mode.value
-                            for server_mode in ALLOWED_SERVER_MODES]):
+                if not any(
+                        mode == server_mode
+                        for server_mode in ALLOWED_SERVER_MODES
+                ):
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
@@ -724,8 +729,10 @@ class PlatformParameter(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Data type of feature flags must be bool, got \'%s\' '
                 'instead.' % self._data_type)
-        if not any([self._feature_stage == feature_stage.value
-                    for feature_stage in ALLOWED_FEATURE_STAGES]):
+        if not any(
+                self._feature_stage == feature_stage
+                for feature_stage in ALLOWED_FEATURE_STAGES
+        ):
             raise utils.ValidationError(
                 'Invalid feature stage, got \'%s\', expected one of %s.' % (
                     self._feature_stage, ALLOWED_FEATURE_STAGES))
@@ -799,7 +806,6 @@ class PlatformParameter(python_utils.OBJECT):
             the object.
         """
         platform_parameter_dict = self.to_dict()
-
         return json.dumps(platform_parameter_dict)
 
     @classmethod
@@ -817,8 +823,5 @@ class PlatformParameter(python_utils.OBJECT):
             object.
         """
         platform_parameter_dict = json.loads(json_string)
-
-        platform_parameter = cls.from_dict(
-            platform_parameter_dict)
-
+        platform_parameter = cls.from_dict(platform_parameter_dict)
         return platform_parameter

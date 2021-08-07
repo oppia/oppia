@@ -22,13 +22,18 @@ from __future__ import unicode_literals
 import json
 import logging
 
+from constants import constants
 import feconf
 
+from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
-CLIENT = tasks_v2.CloudTasksClient()
+CLIENT = tasks_v2.CloudTasksClient(
+    credentials=(
+        auth.credentials.AnonymousCredentials()
+        if constants.EMULATOR_MODE else auth.default()[0]))
 
 
 def create_http_task(
@@ -72,7 +77,7 @@ def create_http_task(
             }
 
         # The API expects a payload of type bytes.
-        converted_payload = payload.encode()
+        converted_payload = payload.encode('utf-8')
 
         # Add the payload to the request.
         task['app_engine_http_request']['body'] = converted_payload

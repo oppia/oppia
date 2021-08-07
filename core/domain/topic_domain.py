@@ -605,7 +605,7 @@ class Topic(python_utils.OBJECT):
         """Returns the object serialized as a JSON string.
 
         Returns:
-            str. JSON-encoded string encoding all of the information composing
+            str. JSON-encoded str encoding all of the information composing
             the object.
         """
         topic_dict = self.to_dict()
@@ -627,7 +627,7 @@ class Topic(python_utils.OBJECT):
             topic_dict['last_updated'] = utils.convert_naive_datetime_to_string(
                 self.last_updated)
 
-        return json.dumps(topic_dict).encode('utf-8')
+        return json.dumps(topic_dict)
 
     @classmethod
     def from_dict(
@@ -685,13 +685,13 @@ class Topic(python_utils.OBJECT):
 
         Args:
             json_string: str. A JSON-encoded string that can be
-                decoded into a dictionary representing a Topic. Only call
-                on strings that were created using serialize().
+                decoded into a dictionary representing a Topic.
+                Only call on strings that were created using serialize().
 
         Returns:
             Topic. The corresponding Topic domain object.
         """
-        topic_dict = json.loads(json_string.decode('utf-8'))
+        topic_dict = json.loads(json_string)
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(

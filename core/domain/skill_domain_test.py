@@ -500,6 +500,26 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             self.skill.generate_skill_misconception_id(1),
             '%s-%d' % (self.skill.id, 1))
 
+    def test_update_rubrics_from_model(self):
+        """Checks that skill misconception id is generated correctly."""
+        versioned_rubrics = {
+            'schema_version': 1,
+            'rubrics': [
+                {'explanation': 'explanation1'},
+                {'explanation': 'explanation2'}
+            ]
+        }
+
+        skill_domain.Skill.update_rubrics_from_model(versioned_rubrics, 1)
+
+        self.assertEqual(versioned_rubrics, {
+            'schema_version': 2,
+            'rubrics': [
+                {'explanations': ['explanation1']},
+                {'explanations': ['explanation2']}
+            ]
+        })
+
 
 class SkillChangeTests(test_utils.GenericTestBase):
 

@@ -8,96 +8,339 @@
 #
 #    pip-compile
 #
-apache-beam[gcp]==2.24.0  # via -r requirements.in
-avro==1.9.2               # via apache-beam
-backports.functools-lru-cache==1.6.1  # via -r requirements.in, soupsieve
-beautifulsoup4==4.9.1     # via -r requirements.in
-bleach==3.3.0             # via -r requirements.in
-cachecontrol==0.12.6      # via firebase-admin
-cachetools==3.1.1         # via apache-beam, google-auth
-callbacks==0.3.0          # via -r requirements.in
-certifi==2020.6.20        # via elasticsearch, requests
-chardet==3.0.4            # via requests
-contextlib2==0.6.0.post1  # via -r requirements.in
-crcmod==1.7               # via apache-beam, google-resumable-media
-dill==0.3.1.1             # via apache-beam
-docopt==0.6.2             # via hdfs
-elasticsearch==7.10.0     # via -r requirements.in
-enum34==1.1.10            # via google-cloud-bigquery, google-cloud-dlp, google-cloud-language, google-cloud-pubsub, google-cloud-tasks, google-cloud-vision, grpcio, pyarrow
-fastavro==0.23.6          # via apache-beam
-fasteners==0.16           # via google-apitools
-git+git://github.com/oppia/firebase-admin-python@8d6deee889733d09ef5327d78c09e4d7b17785ac#egg=firebase-admin  # via -r requirements.in
-funcsigs==1.0.2           # via apache-beam, mock
-future==0.18.2            # via -r requirements.in, apache-beam
-futures==3.3.0            # via apache-beam, google-api-core, grpcio, pyarrow
-google-api-core[grpc,grpcgcp]==1.22.4  # via firebase-admin, google-api-python-client, google-cloud-bigquery, google-cloud-bigtable, google-cloud-core, google-cloud-datastore, google-cloud-dlp, google-cloud-firestore, google-cloud-language, google-cloud-pubsub, google-cloud-spanner, google-cloud-tasks, google-cloud-translate, google-cloud-videointelligence, google-cloud-vision
-google-api-python-client==1.12.8  # via firebase-admin
-google-apitools==0.5.31   # via apache-beam
-google-auth-httplib2==0.0.4  # via google-api-python-client
-google-auth==1.22.1       # via apache-beam, google-api-core, google-api-python-client, google-auth-httplib2, google-cloud-storage
-google-cloud-bigquery==1.28.0  # via apache-beam
-google-cloud-bigtable==1.7.0  # via apache-beam
-google-cloud-core==1.5.0  # via apache-beam, google-cloud-bigquery, google-cloud-bigtable, google-cloud-datastore, google-cloud-firestore, google-cloud-spanner, google-cloud-storage, google-cloud-translate
-google-cloud-datastore==1.15.3  # via apache-beam
-google-cloud-dlp==1.0.0   # via apache-beam
-google-cloud-firestore==1.9.0  # via firebase-admin
-google-cloud-language==1.3.0  # via apache-beam
-google-cloud-pubsub==1.7.0  # via apache-beam
-google-cloud-spanner==1.19.1  # via apache-beam
-google-cloud-storage==1.35.0  # via firebase-admin
-google-cloud-tasks==1.5.0  # via -r requirements.in
-google-cloud-translate==2.0.1  # via -r requirements.in
-google-cloud-videointelligence==1.16.1  # via apache-beam
-google-cloud-vision==1.0.0  # via apache-beam
-google-resumable-media==1.2.0  # via google-cloud-bigquery, google-cloud-storage
-googleapis-common-protos[grpc]==1.52.0  # via -r requirements.in, google-api-core, grpc-google-iam-v1
-googleappenginecloudstorageclient==1.9.22.1  # via -r requirements.in, googleappenginemapreduce, googleappenginepipeline
-googleappenginemapreduce==1.9.22.0  # via -r requirements.in
-googleappenginepipeline==1.9.22.1  # via -r requirements.in, googleappenginemapreduce
-graphy==1.0.0             # via -r requirements.in, googleappenginemapreduce
-grpc-google-iam-v1==0.12.3  # via google-cloud-bigtable, google-cloud-pubsub, google-cloud-spanner, google-cloud-tasks
-grpcio-gcp==0.2.2         # via apache-beam, google-api-core
-grpcio==1.32.0            # via apache-beam, google-api-core, googleapis-common-protos, grpc-google-iam-v1, grpcio-gcp
-hdfs==2.5.8               # via apache-beam
-html5lib==1.0.1           # via -r requirements.in
-httplib2==0.17.4          # via apache-beam, google-api-python-client, google-apitools, google-auth-httplib2, oauth2client
-idna==2.10                # via requests
-mailchimp3==3.0.14        # via -r requirements.in
-mock==2.0.0               # via apache-beam, googleappenginemapreduce
-monotonic==1.5            # via fasteners
-mox==0.5.3                # via googleappenginemapreduce
-msgpack==1.0.2            # via cachecontrol
-mutagen==1.43.0           # via -r requirements.in
-numpy==1.16.6             # via apache-beam, pyarrow
-oauth2client==3.0.0       # via apache-beam, google-apitools
-packaging==20.4           # via -r requirements.in, bleach
-pbr==5.5.1                # via mock
-protobuf==3.13.0          # via apache-beam, google-api-core, googleapis-common-protos
-pyarrow==0.16.0           # via apache-beam
-pyasn1-modules==0.2.8     # via google-auth, oauth2client
-pyasn1==0.4.8             # via oauth2client, pyasn1-modules, rsa
-pydot==1.4.1              # via apache-beam
-pylatexenc==2.6           # via -r requirements.in
-pymongo==3.11.3           # via apache-beam
-pyparsing==2.4.7          # via packaging, pydot
-python-dateutil==2.8.1    # via apache-beam
-pytz==2020.1              # via apache-beam, fastavro, google-api-core, google-cloud-firestore
-pyvcf==0.6.8              # via apache-beam
-redis==3.5.3              # via -r requirements.in
-requests-mock==1.5.2      # via -r requirements.in
-requests-toolbelt==0.9.1  # via -r requirements.in
-requests==2.24.0          # via -r requirements.in, apache-beam, cachecontrol, google-api-core, google-cloud-storage, hdfs, mailchimp3, requests-mock, requests-toolbelt
-rsa==4.5                  # via google-auth, oauth2client
-simplejson==3.17.0        # via -r requirements.in, googleappenginemapreduce
-six==1.15.0               # via -r requirements.in, bleach, fasteners, firebase-admin, google-api-core, google-api-python-client, google-apitools, google-auth, google-auth-httplib2, google-cloud-bigquery, google-cloud-core, google-resumable-media, grpcio, hdfs, html5lib, mock, oauth2client, packaging, protobuf, pyarrow, python-dateutil, requests-mock, webapp2
-soupsieve==1.9.5          # via -r requirements.in, beautifulsoup4
-typing-extensions==3.7.4.3  # via apache-beam
-typing==3.7.4.3           # via -r requirements.in, apache-beam, typing-extensions
-uritemplate==3.0.1        # via google-api-python-client
-urllib3==1.25.11          # via elasticsearch, requests
-webapp2==3.0.0b1          # via -r requirements.in
-webencodings==0.5.1       # via -r requirements.in, bleach, html5lib
-webob==1.8.6              # via webapp2
+apache-beam[gcp]==2.24.0
+    # via -r requirements.in
+attrs==20.3.0
+    # via pytest
+avro-python3==1.9.2.1
+    # via apache-beam
+backports.functools-lru-cache==1.6.1
+    # via -r requirements.in
+beautifulsoup4==4.9.3
+    # via -r requirements.in
+bleach==3.3.0
+    # via -r requirements.in
+cachecontrol==0.12.6
+    # via firebase-admin
+cachetools==3.1.1
+    # via
+    #   apache-beam
+    #   google-auth
+callbacks==0.3.0
+    # via -r requirements.in
+certifi==2021.5.30
+    # via
+    #   -r requirements.in
+    #   elasticsearch
+    #   requests
+cffi==1.14.5
+    # via google-crc32c
+chardet==3.0.4
+    # via requests
+contextlib2==0.6.0.post1
+    # via -r requirements.in
+crcmod==1.7
+    # via apache-beam
+dill==0.3.1.1
+    # via apache-beam
+docopt==0.6.2
+    # via hdfs
+elasticsearch==7.10.0
+    # via -r requirements.in
+fastavro==0.23.6
+    # via apache-beam
+fasteners==0.16
+    # via google-apitools
+firebase-admin==5.0.0
+    # via -r requirements.in
+future==0.18.2
+    # via
+    #   -r requirements.in
+    #   apache-beam
+google-api-core[grpc,grpcgcp]==1.22.4
+    # via
+    #   firebase-admin
+    #   google-api-python-client
+    #   google-cloud-bigquery
+    #   google-cloud-bigtable
+    #   google-cloud-core
+    #   google-cloud-datastore
+    #   google-cloud-dlp
+    #   google-cloud-firestore
+    #   google-cloud-language
+    #   google-cloud-pubsub
+    #   google-cloud-spanner
+    #   google-cloud-tasks
+    #   google-cloud-translate
+    #   google-cloud-videointelligence
+    #   google-cloud-vision
+google-api-python-client==1.11.0
+    # via firebase-admin
+google-apitools==0.5.31
+    # via apache-beam
+google-auth-httplib2==0.0.4
+    # via google-api-python-client
+google-auth==1.28.1
+    # via
+    #   -r requirements.in
+    #   apache-beam
+    #   google-api-core
+    #   google-api-python-client
+    #   google-auth-httplib2
+    #   google-cloud-core
+    #   google-cloud-storage
+google-cloud-bigquery==1.28.0
+    # via apache-beam
+google-cloud-bigtable==1.7.0
+    # via apache-beam
+google-cloud-core==1.6.0
+    # via
+    #   apache-beam
+    #   google-cloud-bigquery
+    #   google-cloud-bigtable
+    #   google-cloud-datastore
+    #   google-cloud-firestore
+    #   google-cloud-spanner
+    #   google-cloud-storage
+    #   google-cloud-translate
+google-cloud-datastore==1.15.3
+    # via
+    #   apache-beam
+    #   google-cloud-ndb
+google-cloud-dlp==1.0.0
+    # via apache-beam
+google-cloud-firestore==2.1.0
+    # via firebase-admin
+google-cloud-language==1.3.0
+    # via apache-beam
+google-cloud-ndb==1.8.0
+    # via -r requirements.in
+google-cloud-pubsub==1.7.0
+    # via apache-beam
+google-cloud-spanner==1.19.1
+    # via apache-beam
+google-cloud-storage==1.37.1
+    # via
+    #   -r requirements.in
+    #   firebase-admin
+google-cloud-tasks==1.5.0
+    # via -r requirements.in
+google-cloud-translate==2.0.1
+    # via -r requirements.in
+google-cloud-videointelligence==1.16.1
+    # via apache-beam
+google-cloud-vision==1.0.0
+    # via apache-beam
+google-crc32c==1.1.2
+    # via google-resumable-media
+google-resumable-media==1.2.0
+    # via
+    #   google-cloud-bigquery
+    #   google-cloud-storage
+googleapis-common-protos[grpc]==1.52.0
+    # via
+    #   google-api-core
+    #   grpc-google-iam-v1
+    #   proto-google-cloud-datastore-v1
+googleappenginecloudstorageclient==1.9.22.1
+    # via googleappenginepipeline
+googleappenginepipeline==1.9.22.1
+    # via -r requirements.in
+googledatastore==7.0.0
+    # via -r requirements.in
+graphy==1.0.0
+    # via -r requirements.in
+grpc-google-iam-v1==0.12.3
+    # via
+    #   google-cloud-bigtable
+    #   google-cloud-pubsub
+    #   google-cloud-spanner
+    #   google-cloud-tasks
+grpcio-gcp==0.2.2
+    # via
+    #   apache-beam
+    #   google-api-core
+grpcio==1.32.0
+    # via
+    #   apache-beam
+    #   google-api-core
+    #   googleapis-common-protos
+    #   grpc-google-iam-v1
+    #   grpcio-gcp
+hdfs==2.6.0
+    # via apache-beam
+html5lib==1.0.1
+    # via -r requirements.in
+httplib2==0.9.2
+    # via
+    #   apache-beam
+    #   google-api-python-client
+    #   google-apitools
+    #   google-auth-httplib2
+    #   googledatastore
+    #   oauth2client
+idna==2.10
+    # via requests
+importlib-metadata==3.10.1
+    # via
+    #   pluggy
+    #   pytest
+iniconfig==1.1.1
+    # via pytest
+mailchimp3==3.0.14
+    # via -r requirements.in
+mock==2.0.0
+    # via apache-beam
+msgpack==1.0.2
+    # via cachecontrol
+mutagen==1.43.0
+    # via -r requirements.in
+numpy==1.20.2
+    # via
+    #   apache-beam
+    #   pyarrow
+oauth2client==3.0.0
+    # via
+    #   apache-beam
+    #   google-apitools
+    #   googledatastore
+    #   proto-google-cloud-datastore-v1
+packaging==20.4
+    # via
+    #   -r requirements.in
+    #   bleach
+    #   pytest
+pbr==5.5.1
+    # via mock
+pillow==8.2.0
+    # via -r requirements.in
+pluggy==0.13.1
+    # via pytest
+proto-google-cloud-datastore-v1==0.90.4
+    # via googledatastore
+proto-plus==1.18.1
+    # via google-cloud-firestore
+protobuf==3.13.0
+    # via
+    #   apache-beam
+    #   google-api-core
+    #   googleapis-common-protos
+    #   proto-plus
+py==1.10.0
+    # via pytest
+pyarrow==0.17.1
+    # via apache-beam
+pyasn1-modules==0.2.8
+    # via
+    #   google-auth
+    #   oauth2client
+pyasn1==0.4.8
+    # via
+    #   oauth2client
+    #   pyasn1-modules
+    #   rsa
+pycparser==2.20
+    # via cffi
+pydot==1.4.2
+    # via apache-beam
+pylatexenc==2.6
+    # via -r requirements.in
+pymemcache==3.4.1
+    # via google-cloud-ndb
+pymongo==3.11.3
+    # via apache-beam
+pyparsing==2.4.7
+    # via
+    #   packaging
+    #   pydot
+pytest==6.2.3
+    # via -r requirements.in
+python-dateutil==2.8.1
+    # via apache-beam
+pytz==2020.1
+    # via
+    #   apache-beam
+    #   fastavro
+    #   google-api-core
+    #   google-cloud-firestore
+pyyaml==5.4.1
+    # via -r requirements.in
+redis==3.5.3
+    # via
+    #   -r requirements.in
+    #   google-cloud-ndb
+requests-mock==1.5.2
+    # via -r requirements.in
+requests-toolbelt==0.9.1
+    # via -r requirements.in
+requests==2.24.0
+    # via
+    #   -r requirements.in
+    #   apache-beam
+    #   cachecontrol
+    #   google-api-core
+    #   google-cloud-storage
+    #   hdfs
+    #   mailchimp3
+    #   requests-mock
+    #   requests-toolbelt
+rsa==4.5
+    # via
+    #   google-auth
+    #   oauth2client
+simplejson==3.17.0
+    # via -r requirements.in
+six==1.15.0
+    # via
+    #   -r requirements.in
+    #   bleach
+    #   fasteners
+    #   google-api-core
+    #   google-api-python-client
+    #   google-apitools
+    #   google-auth
+    #   google-auth-httplib2
+    #   google-cloud-bigquery
+    #   google-cloud-core
+    #   google-resumable-media
+    #   grpcio
+    #   hdfs
+    #   html5lib
+    #   mock
+    #   oauth2client
+    #   packaging
+    #   protobuf
+    #   pymemcache
+    #   python-dateutil
+    #   requests-mock
+    #   webapp2
+soupsieve==1.9.5
+    # via
+    #   -r requirements.in
+    #   beautifulsoup4
+toml==0.10.2
+    # via pytest
+typing-extensions==3.7.4.3
+    # via
+    #   apache-beam
+    #   importlib-metadata
+uritemplate==3.0.1
+    # via google-api-python-client
+urllib3==1.25.11
+    # via
+    #   elasticsearch
+    #   requests
+webapp2==3.0.0b1
+    # via -r requirements.in
+webencodings==0.5.1
+    # via
+    #   -r requirements.in
+    #   bleach
+    #   html5lib
+webob==1.8.7
+    # via webapp2
+zipp==3.4.1
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

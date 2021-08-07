@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
 import logging
 
 from constants import constants
@@ -92,8 +93,7 @@ class AssetDevHandler(base.BaseHandler):
             content_type = (
                 'image/svg+xml' if file_format == 'svg' else '%s/%s' % (
                     asset_type, file_format))
-            self.response.headers[b'Content-Type'] = (
-                python_utils.convert_to_bytes(content_type))
+            self.response.headers['Content-Type'] = content_type
 
             if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
                 raise self.InvalidInputException
@@ -105,7 +105,7 @@ class AssetDevHandler(base.BaseHandler):
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True
             self.response.cache_control.max_age = 600
-            self.response.write(raw)
+            self.response.body_file = io.BytesIO(raw)
         except Exception as e:
             logging.exception(
                 'File not found: %s. %s' % (encoded_filename, e))

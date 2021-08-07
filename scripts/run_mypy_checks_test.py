@@ -63,6 +63,17 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.popen_swap_failure = self.swap(
             subprocess, 'Popen', mock_popen_failure)
 
+        self.install_mypy_prereq_swap_success = self.swap(
+            run_mypy_checks,
+            'install_mypy_prerequisites',
+            lambda _: (0, 'exec')
+        )
+        self.install_mypy_prereq_swap_failure = self.swap(
+            run_mypy_checks,
+            'install_mypy_prerequisites',
+            lambda _: (1, 'exec')
+        )
+
         self.files_swap = self.swap(
             run_mypy_checks, 'NOT_FULLY_COVERED_FILES',
             ['file1.py', 'file2.py'])
@@ -89,7 +100,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                         self.returncode = 1
                 def communicate(self):
                     """Return user-prefix error as stderr."""
-                    return '', 'can\'t combine user with prefix'
+                    return b'', b'can\'t combine user with prefix'
             return Ret()
 
         self.popen_swap_user_prefix_error = self.swap(
@@ -160,8 +171,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_install_mypy_prerequisites_with_wrong_script(self):
         with self.popen_swap_failure:
             with self.swap(
-                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH',
-                'scripts.wrong'):
+                run_mypy_checks, 'MYPY_REQUIREMENTS_FILE_PATH', 'scripts.wrong'
+            ):
                 code, _ = run_mypy_checks.install_mypy_prerequisites(False)
                 self.assertEqual(code, 1)
 
@@ -170,37 +181,37 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             process = subprocess.Popen(
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
-            self.assertEqual(output[0], 'test\n')
+            self.assertEqual(output[0], b'test\n')
 
     def test_running_script_with_mypy_errors(self):
         with self.popen_swap_failure:
             process = subprocess.Popen(
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
-            self.assertEqual(output[0], '')
+            self.assertEqual(output[0], b'')
 
     def test_main_with_files_without_mypy_errors(self):
         with self.popen_swap_success:
-            with self.swap_install_success, self.install_swap:
+            with self.install_swap, self.install_mypy_prereq_swap_success:
                 process = run_mypy_checks.main(args=['--files', 'file1.py'])
                 self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self):
         with self.popen_swap_success:
-            with self.swap_install_success, self.install_swap:
+            with self.install_swap, self.install_mypy_prereq_swap_success:
                 process = run_mypy_checks.main(args=[])
                 self.assertEqual(process, 0)
 
     def test_main_with_files_with_mypy_errors(self):
-        with self.popen_swap_failure:
-            with self.swap_install_success, self.install_swap:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+        with self.install_mypy_prereq_swap_success:
+            with self.install_swap, self.popen_swap_failure:
+                with self.assertRaisesRegexp(SystemExit, '2'):
                     run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self):
         with self.popen_swap_failure:
-            with self.swap_install_success, self.install_swap:
-                with self.assertRaisesRegexp(SystemExit, '1'):
+            with self.install_swap, self.install_mypy_prereq_swap_success:
+                with self.assertRaisesRegexp(SystemExit, '2'):
                     run_mypy_checks.main(args=[])
 
     def test_main_with_install_prerequisites_success(self):

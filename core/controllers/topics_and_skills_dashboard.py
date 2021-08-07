@@ -215,8 +215,8 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
 
         if (keywords is not None and (not isinstance(keywords, list) or (
                 not all(
-                    [isinstance(keyword, python_utils.BASESTRING)
-                     for keyword in keywords])))):
+                    isinstance(keyword, python_utils.BASESTRING)
+                    for keyword in keywords)))):
             raise self.InvalidInputException(
                 'Keywords should be a list of strings.')
 

@@ -18,7 +18,7 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
-const ADMIN_URL = 'http://127.0.0.1:8181/admin';
+const LOGIN_URL = 'http://127.0.0.1:8181/login';
 const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
@@ -40,9 +40,8 @@ module.exports = async(browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
-  if (context.url.includes('admin')) {
-    await login(context, page);
-  } else if (context.url.includes('moderator')) {
+  await login(context, page);
+  if (context.url.includes('moderator')) {
     await setRole(page, 'MODERATOR');
   } else if (context.url.includes('emaildashboard')) {
     await setRole(page, 'ADMIN');
@@ -58,7 +57,11 @@ module.exports = async(browser, context) => {
 const login = async function(context, page) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(ADMIN_URL, {waitUntil: networkIdle});
+    await page.goto(LOGIN_URL, {waitUntil: networkIdle});
+    // The user is already logged in.
+    if (!page.url().includes('login')) {
+      return;
+    }
     await page.waitForSelector(emailInput, {visible: true});
     await page.type(emailInput, 'testadmin@example.com');
     await page.click(signInButton);
@@ -104,7 +107,6 @@ const setRole = async function(page, role) {
     console.log(e);
   }
 };
-
 
 const createCollections = async function(context, page) {
   try {

@@ -44,7 +44,7 @@ ALL_FEATURES_LIST = (
     platform_feature_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET = set([feature.value for feature in ALL_FEATURES_LIST])
+ALL_FEATURES_NAMES_SET = set(feature.value for feature in ALL_FEATURES_LIST)
 
 
 class FeatureFlagNotFoundException(Exception):

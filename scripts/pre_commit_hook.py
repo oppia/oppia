@@ -42,18 +42,18 @@ from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 FECONF_FILEPATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
 KEYS_UPDATED_IN_FECONF = [
-    'INCOMING_EMAILS_DOMAIN_NAME', 'ADMIN_EMAIL_ADDRESS',
-    'SYSTEM_EMAIL_ADDRESS', 'NOREPLY_EMAIL_ADDRESS', 'CAN_SEND_EMAILS',
-    'CAN_SEND_EDITOR_ROLE_EMAILS', 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS',
-    'CAN_SEND_SUBSCRIPTION_EMAILS', 'DEFAULT_EMAIL_UPDATES_PREFERENCE',
-    'REQUIRE_EMAIL_ON_MODERATOR_ACTION', 'EMAIL_SERVICE_PROVIDER',
-    'SYSTEM_EMAIL_NAME', 'MAILGUN_DOMAIN_NAME']
+    b'INCOMING_EMAILS_DOMAIN_NAME', b'ADMIN_EMAIL_ADDRESS',
+    b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
+    b'CAN_SEND_EDITOR_ROLE_EMAILS', b'CAN_SEND_FEEDBACK_MESSAGE_EMAILS',
+    b'CAN_SEND_SUBSCRIPTION_EMAILS', b'DEFAULT_EMAIL_UPDATES_PREFERENCE',
+    b'REQUIRE_EMAIL_ON_MODERATOR_ACTION', b'EMAIL_SERVICE_PROVIDER',
+    b'SYSTEM_EMAIL_NAME', b'MAILGUN_DOMAIN_NAME']
 KEYS_UPDATED_IN_CONSTANTS = [
-    'CAN_SEND_ANALYTICS_EVENTS', 'SITE_FEEDBACK_FORM_URL',
-    'ANALYTICS_ID', 'SITE_NAME_FOR_ANALYTICS', 'FIREBASE_CONFIG_API_KEY',
-    'FIREBASE_CONFIG_APP_ID', 'FIREBASE_CONFIG_AUTH_DOMAIN',
-    'FIREBASE_CONFIG_MESSAGING_SENDER_ID', 'FIREBASE_CONFIG_PROJECT_ID',
-    'FIREBASE_CONFIG_STORAGE_BUCKET', 'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
+    b'CAN_SEND_ANALYTICS_EVENTS', b'SITE_FEEDBACK_FORM_URL',
+    b'ANALYTICS_ID', b'SITE_NAME_FOR_ANALYTICS', b'FIREBASE_CONFIG_API_KEY',
+    b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
+    b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
+    b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
 
 
 def install_hook():
@@ -119,8 +119,8 @@ def does_diff_include_package_lock_file():
     out, err = start_subprocess_for_result(git_cmd)
 
     if not err:
-        files_changed = out.split('\n')
-        return 'package-lock.json' in files_changed
+        files_changed = out.split(b'\n')
+        return b'package-lock.json' in files_changed
     else:
         raise ValueError(err)
 
@@ -146,17 +146,17 @@ def check_changes(filetype):
     """
     if filetype == 'feconf':
         filepath = FECONF_FILEPATH
-        keys_to_check = ['%s = ' % key for key in KEYS_UPDATED_IN_FECONF]
+        keys_to_check = [b'%s = ' % key for key in KEYS_UPDATED_IN_FECONF]
     elif filetype == 'constants':
         filepath = CONSTANTS_FILEPATH
-        keys_to_check = ['"%s": ' % key for key in KEYS_UPDATED_IN_CONSTANTS]
+        keys_to_check = [b'"%s": ' % key for key in KEYS_UPDATED_IN_CONSTANTS]
     else:
         return True
 
     diff_output = subprocess.check_output([
-        'git', 'diff', filepath])[:-1].split('\n')
+        'git', 'diff', filepath])[:-1].split(b'\n')
     for line in diff_output:
-        if (line.startswith('-') or line.startswith('+')) and any(
+        if (line.startswith(b'-') or line.startswith(b'+')) and any(
                 key in line for key in keys_to_check):
             return False
     return True

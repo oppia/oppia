@@ -61,7 +61,7 @@
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
       </div>
-      <div ng-if="recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
+      <div ng-if="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lession-text-container">
           <span class="conversation-skin-next-lesson-text">Next Lesson</span>
           <span><[recommendedExplorationSummaries[0].title]></span>
@@ -110,7 +110,7 @@
     </div>
   </div>
 
-  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries !== null && recommendedExplorationSummaries.length > 0"
+  <div ng-if="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
       <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"

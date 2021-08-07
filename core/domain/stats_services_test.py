@@ -384,6 +384,14 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 2)
         self.assertEqual(exploration_stats.num_completions_v2, 1)
 
+    def test_get_stats_for_new_exp_creates_new_stats(self):
+        new_stats = stats_services.get_stats_for_new_exp_version(
+            'exp_id', 1, [], None, None)
+
+        self.assertEqual(new_stats.exp_id, 'exp_id')
+        self.assertEqual(new_stats.exp_version, 1)
+        self.assertEqual(new_stats.state_stats_mapping, {})
+
     def test_get_stats_for_new_exp_version(self):
         """Test the get_stats_for_new_exp_version method."""
         # Create exploration object in datastore.
@@ -802,6 +810,25 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[0].exp_version, 1)
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id_2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
+
+    def test_update_exp_issues_for_new_exp_version(self):
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        exp = self.save_new_valid_exploration('exp_id', admin_id)
+
+        stats_models.ExplorationIssuesModel.delete_by_id(
+            '%s.%s' % ('exp_id', 1))
+        self.assertIsNone(
+            stats_models.ExplorationIssuesModel.get(
+                '%s.%s' % ('exp_id', 1), strict=False))
+
+        exp.version += 1
+        stats_services.update_exp_issues_for_new_exp_version(
+            exp, exp_domain.ExplorationVersionsDiff([]), None)
+
+        exploration_issues_model = (
+            stats_models.ExplorationIssuesModel.get('%s.%s' % ('exp_id', 1)))
+        self.assertEqual(exploration_issues_model.unresolved_issues, [])
 
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):

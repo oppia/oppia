@@ -24,7 +24,7 @@ from core.domain import translation_services
 from core.platform import models
 from core.tests import test_utils
 
-cloud_translate_services = models.Registry.import_cloud_translate_services()
+translate_services = models.Registry.import_translate_services()
 
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
@@ -75,9 +75,8 @@ class TranslationServiceTests(test_utils.GenericTestBase):
 
     def test_get_machine_translation_checks_datastore_first(self):
         with self.swap_to_always_raise(
-            cloud_translate_services.CLIENT,
-            'translate',
-            error=AssertionError):
+            translate_services.CLIENT, 'translate', error=AssertionError
+        ):
             self.assertEqual(
                 translation_services.get_and_cache_machine_translation(
                     'en', 'es', 'text to translate'),

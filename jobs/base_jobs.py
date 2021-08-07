@@ -57,7 +57,6 @@ Dataflow service: https://cloud.google.com/dataflow.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from jobs.io import stub_io
 import python_utils
 
 
@@ -73,7 +72,7 @@ class JobMetaclass(type):
 
     _JOB_REGISTRY = {}
 
-    def __new__(mcs, name, bases, namespace):
+    def __new__(cls, name, bases, namespace):
         """Creates a new job class with type `JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
@@ -88,7 +87,6 @@ class JobMetaclass(type):
         from third party linters to be enforced.
 
         Args:
-            mcs: JobMetaclass. The metaclass.
             name: str. The name of the class.
             bases: tuple(type). The sequence of base classes for the new class.
             namespace: dict(str: *). The namespace of the class. This is where
@@ -97,39 +95,33 @@ class JobMetaclass(type):
         Returns:
             class. The new class instance.
         """
-        job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
-        if name in mcs._JOB_REGISTRY:
-            collision = mcs._JOB_REGISTRY[name]
+        job_cls = super(JobMetaclass, cls).__new__(cls, name, bases, namespace)
+        if name in cls._JOB_REGISTRY:
+            collision = cls._JOB_REGISTRY[name]
             raise TypeError('%s name is already used by %s.%s' % (
                 name, collision.__module__, name))
         if not name.endswith('Base'):
-            mcs._JOB_REGISTRY[job_cls.__name__] = job_cls
+            cls._JOB_REGISTRY[job_cls.__name__] = job_cls
         return job_cls
 
     @classmethod
-    def get_all_jobs(mcs):
+    def get_all_jobs(cls):
         """Returns all jobs that have inherited from the JobBase class.
-
-        Args:
-            mcs: JobMetaclass. The metaclass.
 
         Returns:
             list(class). The classes that have inherited from JobBase.
         """
-        return list(mcs._JOB_REGISTRY.values())
+        return list(cls._JOB_REGISTRY.values())
 
     @classmethod
-    def get_all_job_names(mcs):
+    def get_all_job_names(cls):
         """Returns the names of all jobs that have inherited from the JobBase
         class.
-
-        Args:
-            mcs: JobMetaclass. The metaclass.
 
         Returns:
             list(str). The names of all classes that hae inherited from JobBase.
         """
-        return list(mcs._JOB_REGISTRY.keys())
+        return list(cls._JOB_REGISTRY.keys())
 
 
 class JobBase(python_utils.with_metaclass(JobMetaclass)):
@@ -162,7 +154,6 @@ class JobBase(python_utils.with_metaclass(JobMetaclass)):
             pipeline: beam.Pipeline. The pipeline that manages the job.
         """
         self.pipeline = pipeline
-        self.datastoreio_stub = stub_io.DatastoreioStub()
 
     def run(self):
         """Runs PTransforms with self.pipeline to compute/process PValues.

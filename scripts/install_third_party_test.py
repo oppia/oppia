@@ -20,6 +20,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import os
+import re
 import subprocess
 import tarfile
 import tempfile
@@ -138,6 +139,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 return True
             exists_arr.append(False)
             return False
+
         def mock_url_open(unused_url):
             self.check_function_calls['url_open_is_called'] = True
             # The function is used as follows: python_utils.url_open(req).read()
@@ -156,7 +158,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             with self.remove_swap, self.rename_swap, self.extract_swap:
                 with url_open_swap, string_io_swap:
                     install_third_party.download_and_unzip_files(
-                        'source url', 'target dir', 'zip root', 'target root')
+                        'http://src', 'target dir', 'zip root', 'target root')
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls)
         self.assertEqual(exists_arr, [False, True])
@@ -293,10 +295,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             install_third_party, 'return_json', mock_return_json)
         with return_json_swap, self.assertRaisesRegexp(
             Exception,
-            'downloadFormat not specified in \\{u\'url\': '
-            'u\'https://github.com/yui/v2.4.8\', u\'files\': '
-            '\\[u\'yuicompressor-2.4.8.jar\'\\], u\'version\': u\'2.4.8\', '
-            'u\'targetDirPrefix\': u\'yuicompressor-\'\\}'):
+            re.escape(
+                'downloadFormat not specified in {\'url\': '
+                '\'https://github.com/yui/v2.4.8\', \'files\': '
+                '[\'yuicompressor-2.4.8.jar\'], \'version\': \'2.4.8\', '
+                '\'targetDirPrefix\': \'yuicompressor-\'}'
+            )
+        ):
             install_third_party.validate_manifest('filepath')
 
     def test_function_calls(self):

@@ -1381,7 +1381,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
                 'snapshot models [\'CollectionSnapshotMetadataModel\', '
                 '\'CollectionRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
+                'commit logs without snapshots: [\'%s\'].' % self.COL_2_ID,
             ]
         )
 
@@ -1775,7 +1775,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
                 'snapshot models [\'ExplorationSnapshotMetadataModel\', '
                 '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'%s\'].' % self.EXP_2_ID
+                'commit logs without snapshots: [\'%s\'].' % self.EXP_2_ID
             ]
         )
 
@@ -2507,7 +2507,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             ['[WIPEOUT] The commit log model \'QuestionCommitLogEntryModel\' '
              'and snapshot models [\'QuestionSnapshotMetadataModel\'] IDs '
              'differ. Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.QUESTION_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.QUESTION_2_ID])
 
         # Verify user is deleted.
         question_mappings = (
@@ -2897,7 +2897,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             ['[WIPEOUT] The commit log model \'SkillCommitLogEntryModel\' and '
              'snapshot models [\'SkillSnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.SKILL_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.SKILL_2_ID])
 
         # Verify user is deleted.
         skill_mappings = (
@@ -3201,7 +3201,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             ['[WIPEOUT] The commit log model \'StoryCommitLogEntryModel\' and '
              'snapshot models [\'StorySnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.STORY_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.STORY_2_ID])
 
         # Verify user is deleted.
         story_mappings = (
@@ -3521,7 +3521,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
              '\'SubtopicPageCommitLogEntryModel\' and snapshot models '
              '[\'SubtopicPageSnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
-             'commit logs without snapshots: [u\'%s\'].' % self.SUBTOP_2_ID])
+             'commit logs without snapshots: [\'%s\'].' % self.SUBTOP_2_ID])
 
         # Verify user is deleted.
         subtopic_mappings = (
@@ -4079,7 +4079,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
                 'and snapshot models [\'TopicSnapshotMetadataModel\', '
                 '\'TopicRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'%s\'].' % self.TOP_2_ID
+                'commit logs without snapshots: [\'%s\'].' % self.TOP_2_ID
             ]
         )
 

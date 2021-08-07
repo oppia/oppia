@@ -1046,7 +1046,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
             with self.swap(
                 exp_domain.Exploration, 'get_content_html',
-                self.MockExploration.get_content_html):
+                self.MockExploration.get_content_html
+            ):
                 translation_suggestion = suggestion_services.create_suggestion(
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                     feconf.ENTITY_TYPE_EXPLORATION,
@@ -1355,7 +1356,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
         for i in python_utils.RANGE(len(suggestions) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
     def test_get_translation_suggestions_waiting_longest_for_review_wrong_lang(
@@ -1386,7 +1387,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_id, suggestion_1.suggestion_id)
         self.assertEqual(
             suggestions[1].suggestion_id, suggestion_2.suggestion_id)
-        self.assertLess(
+        self.assertLessEqual(
             suggestions[0].last_updated, suggestions[1].last_updated)
 
         # Reject the suggestion that was created first since it is the one that
@@ -1426,7 +1427,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestions[0].suggestion_id, suggestion_2.suggestion_id)
         self.assertEqual(
             suggestions[1].suggestion_id, suggestion_1.suggestion_id)
-        self.assertLess(
+        self.assertLessEqual(
             suggestions[0].last_updated, suggestions[1].last_updated)
 
     def test_get_question_suggestions_waiting_longest_for_review(self):
@@ -1448,7 +1449,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[2].suggestion_id, suggestion_3.suggestion_id)
         for i in python_utils.RANGE(len(suggestions) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 suggestions[i].last_updated, suggestions[i + 1].last_updated)
 
     def test_query_suggestions_that_can_be_reviewed_by_user(self):
@@ -2684,7 +2685,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                     index].submission_datetime)
         for index in python_utils.RANGE(
                 len(reviewable_suggestion_email_infos) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
                     index + 1].submission_datetime
@@ -3795,7 +3796,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                     index].submission_datetime)
         for index in python_utils.RANGE(
                 len(reviewable_suggestion_email_infos) - 1):
-            self.assertLess(
+            self.assertLessEqual(
                 reviewable_suggestion_email_infos[index].submission_datetime,
                 reviewable_suggestion_email_infos[
                     index + 1].submission_datetime

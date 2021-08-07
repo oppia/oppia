@@ -56,23 +56,23 @@ class ValidateDeletedModel(beam.DoFn):
     not existing ones.
     """
 
-    def process(self, input_model):
+    def process(self, entity):
         """Yields audit errors that are discovered in the input model.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            entity: datastore_services.Model. Entity to validate.
 
         Yields:
             ModelExpiredError. An error class for expired models.
         """
-        model = job_utils.clone_model(input_model)
+        cloned_entity = job_utils.clone_model(entity)
 
         expiration_date = (
             datetime.datetime.utcnow() -
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
-        if model.last_updated < expiration_date:
-            yield base_validation_errors.ModelExpiredError(model)
+        if cloned_entity.last_updated < expiration_date:
+            yield base_validation_errors.ModelExpiredError(cloned_entity)
 
 
 @validation_decorators.AuditsExisting(base_models.BaseModel)
@@ -94,42 +94,42 @@ class ValidateBaseModelId(beam.DoFn):
         # https://docs.python.org/3/library/pickle.html#what-can-be-pickled-and-unpickled
         self._pattern = BASE_MODEL_ID_PATTERN
 
-    def process(self, input_model):
-        """Function that defines how to process each element in a pipeline of
+    def process(self, entity):
+        """Function that defines how to process each entity in a pipeline of
         models.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            entity: datastore_services.Model. Entity to validate.
 
         Yields:
             ModelIdRegexError. An error class for models with invalid IDs.
         """
-        model = job_utils.clone_model(input_model)
+        cloned_entity = job_utils.clone_model(entity)
 
-        if not re.match(self._pattern, model.id):
-            yield base_validation_errors.ModelIdRegexError(model, self._pattern)
+        if not re.match(self._pattern, cloned_entity.id):
+            yield base_validation_errors.ModelIdRegexError(
+                cloned_entity, self._pattern)
 
 
 @validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitStatus(beam.DoFn):
     """DoFn to validate post_commit_status."""
 
-    def process(self, input_model):
+    def process(self, entity):
         """Function validates that post_commit_status is either public or
         private
 
         Args:
-            input_model: base_models.BaseCommitLogEntryModel.
-                Entity to validate.
+            entity: base_models.BaseCommitLogEntryModel. Entity to validate.
 
         Yields:
             InvalidCommitStatusError. Error for commit_type validation.
         """
-        model = job_utils.clone_model(input_model)
-        if model.post_commit_status not in [
+        cloned_entity = job_utils.clone_model(entity)
+        if cloned_entity.post_commit_status not in [
                 feconf.POST_COMMIT_STATUS_PUBLIC,
                 feconf.POST_COMMIT_STATUS_PRIVATE]:
-            yield base_validation_errors.InvalidCommitStatusError(model)
+            yield base_validation_errors.InvalidCommitStatusError(cloned_entity)
 
 
 @validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
@@ -138,24 +138,31 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
     post_commit_is_private is true and vice-versa.
     """
 
-    def process(self, input_model):
+    def process(self, entity):
         """Function validates that post_commit_is_private is true iff
         post_commit_status is private
 
         Args:
-            input_model: base_models.BaseCommitLogEntryModel.
+            entity: base_models.BaseCommitLogEntryModel.
                 Entity to validate.
 
         Yields:
             InvalidPrivateCommitStatusError. Error for private commit_type
             validation.
         """
-        model = job_utils.clone_model(input_model)
+        cloned_entity = job_utils.clone_model(entity)
 
         expected_post_commit_is_private = (
-            model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
-        if model.post_commit_is_private != expected_post_commit_is_private:
-            yield base_validation_errors.InvalidPrivateCommitStatusError(model)
+            cloned_entity.post_commit_status ==
+            feconf.POST_COMMIT_STATUS_PRIVATE
+        )
+        if (
+                cloned_entity.post_commit_is_private !=
+                expected_post_commit_is_private
+        ):
+            yield base_validation_errors.InvalidPrivateCommitStatusError(
+                cloned_entity
+            )
 
 
 @validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
@@ -164,24 +171,30 @@ class ValidatePostCommitIsPublic(beam.DoFn):
     post_commit_is_public is true and vice-versa.
     """
 
-    def process(self, input_model):
+    def process(self, entity):
         """Function validates that post_commit_is_public is true iff
         post_commit_status is public.
 
         Args:
-            input_model: base_models.BaseCommitLogEntryModel.
-                Entity to validate.
+            entity: base_models.BaseCommitLogEntryModel. Entity to validate.
 
         Yields:
             InvalidPublicCommitStatusError. Error for public commit_type
             validation.
         """
-        model = job_utils.clone_model(input_model)
+        cloned_entity = job_utils.clone_model(entity)
 
         expected_post_commit_is_public = (
-            model.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC)
-        if model.post_commit_community_owned != expected_post_commit_is_public:
-            yield base_validation_errors.InvalidPublicCommitStatusError(model)
+            cloned_entity.post_commit_status ==
+            feconf.POST_COMMIT_STATUS_PUBLIC
+        )
+        if (
+                cloned_entity.post_commit_community_owned !=
+                expected_post_commit_is_public
+        ):
+            yield base_validation_errors.InvalidPublicCommitStatusError(
+                cloned_entity
+            )
 
 
 @validation_decorators.AuditsExisting(base_models.BaseModel)
@@ -189,25 +202,31 @@ class ValidateModelTimestamps(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are valid.
     """
 
-    def process(self, input_model):
-        """Function that defines how to process each element in a pipeline of
+    def process(self, entity):
+        """Function that defines how to process each entity in a pipeline of
         models.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            entity: datastore_services.Model. Entity to validate.
 
         Yields:
             ModelMutatedDuringJobError. Error for models mutated during the job.
             InconsistentTimestampsError. Error for models with inconsistent
             timestamps.
         """
-        model = job_utils.clone_model(input_model)
-        if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
-            yield base_validation_errors.InconsistentTimestampsError(model)
+        cloned_entity = job_utils.clone_model(entity)
+        last_updated_corrected = (
+            cloned_entity.last_updated + MAX_CLOCK_SKEW_SECS)
+        if cloned_entity.created_on > last_updated_corrected:
+            yield base_validation_errors.InconsistentTimestampsError(
+                cloned_entity)
 
         current_datetime = datetime.datetime.utcnow()
-        if (model.last_updated - MAX_CLOCK_SKEW_SECS) > current_datetime:
-            yield base_validation_errors.ModelMutatedDuringJobError(model)
+        last_updated_corrected = (
+                cloned_entity.last_updated - MAX_CLOCK_SKEW_SECS)
+        if last_updated_corrected > current_datetime:
+            yield base_validation_errors.ModelMutatedDuringJobError(
+                cloned_entity)
 
 
 @validation_decorators.AuditsExisting(base_models.BaseModel)
@@ -248,20 +267,19 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         """
         return VALIDATION_MODES.neutral
 
-    def process(self, input_model):
-        """Function that defines how to process each element in a pipeline of
+    def process(self, entity):
+        """Function that defines how to process each entity in a pipeline of
         models.
 
         Args:
-            input_model: datastore_services.Model. A domain object to validate.
+            entity: datastore_services.Model. A domain object to validate.
 
         Yields:
             ModelDomainObjectValidateError. Error for domain object validation.
         """
         try:
-            domain_object = self._get_model_domain_object_instance(input_model)
-            validation_type = self._get_domain_object_validation_type(
-                input_model)
+            domain_object = self._get_model_domain_object_instance(entity)  # pylint: disable=assignment-from-none
+            validation_type = self._get_domain_object_validation_type(entity)
             if domain_object is None:
                 return
             if validation_type == VALIDATION_MODES.neutral:
@@ -276,7 +294,7 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                         validation_type))
         except Exception as e:
             yield base_validation_errors.ModelDomainObjectValidateError(
-                input_model, e)
+                entity, e)
 
 
 class BaseValidateCommitCmdsSchema(beam.DoFn):
@@ -305,33 +323,33 @@ class BaseValidateCommitCmdsSchema(beam.DoFn):
             'The _get_change_domain_class() method is missing from the derived '
             'class. It should be implemented in the derived class.')
 
-    def process(self, input_model):
+    def process(self, entity):
         """Validates schema of commit commands in commit_cmds dict.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            entity: datastore_services.Model. Entity to validate.
 
         Yields:
             CommitCmdsNoneError. Error for invalid commit cmds id.
             CommitCmdsValidateError. Error for wrong commit cmds.
         """
-        change_domain_object = self._get_change_domain_class(input_model)
+        change_domain_object = self._get_change_domain_class(entity)
         if change_domain_object is None:
             # This is for cases where id of the entity is invalid
             # and no commit command domain object is found for the entity.
             # For example, if a CollectionCommitLogEntryModel does
             # not have id starting with collection/rights, there is
             # no commit command domain object defined for this model.
-            yield base_validation_errors.CommitCmdsNoneError(input_model)
+            yield base_validation_errors.CommitCmdsNoneError(entity)
             return
-        for commit_cmd_dict in input_model.commit_cmds:
+        for commit_cmd_dict in entity.commit_cmds:
             if not commit_cmd_dict:
                 continue
             try:
                 change_domain_object(commit_cmd_dict)
             except Exception as e:
                 yield base_validation_errors.CommitCmdsValidateError(
-                    input_model, commit_cmd_dict, e)
+                    entity, commit_cmd_dict, e)
 
 
 @validation_decorators.AuditsExisting(
@@ -339,18 +357,18 @@ class BaseValidateCommitCmdsSchema(beam.DoFn):
 class ValidateCommitType(beam.DoFn):
     """DoFn to check whether commit type is valid."""
 
-    def process(self, input_model):
-        """Function that defines how to process each element in a pipeline of
+    def process(self, entity):
+        """Function that defines how to process each entity in a pipeline of
         models.
 
         Args:
-            input_model: datastore_services.Model. Entity to validate.
+            entity: datastore_services.Model. Entity to validate.
 
         Yields:
             ModelCommitTypeError. Error for commit_type validation.
         """
-        model = job_utils.clone_model(input_model)
+        cloned_entity = job_utils.clone_model(entity)
 
-        if (model.commit_type not in
+        if (cloned_entity.commit_type not in
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
-            yield base_validation_errors.InvalidCommitTypeError(model)
+            yield base_validation_errors.InvalidCommitTypeError(cloned_entity)

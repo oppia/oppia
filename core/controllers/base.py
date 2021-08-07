@@ -254,8 +254,7 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect(
-                b'https://oppiatestserver.appspot.com', permanent=True)
+            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
         if not self._is_requested_path_currently_accessible_to_user():
@@ -355,7 +354,7 @@ class BaseHandler(webapp2.RequestHandler):
             elif arg == 'payload':
                 payload_args = self.payload
                 if payload_args is not None:
-                    payload_arg_keys = payload_args.keys()
+                    payload_arg_keys = list(payload_args.keys())
                     handler_args.update(payload_args)
             else:
                 request_arg_keys.append(arg)
@@ -459,7 +458,6 @@ class BaseHandler(webapp2.RequestHandler):
         self._render_exception(
             404, {
                 'error': 'Could not find the page %s.' % self.request.uri})
-        return
 
     def post(self, *args):  # pylint: disable=unused-argument
         """Base method to handle POST requests.
@@ -491,31 +489,35 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = b'application/json; charset=utf-8'
-        self.response.headers[b'Content-Disposition'] = (
-            b'attachment; filename="oppia-attachment.txt"')
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
+        self.response.content_type = 'application/json; charset=utf-8'
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename="oppia-attachment.txt"')
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
-        self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
+        # Write expects bytes, thus we need to encode the JSON output.
+        self.response.write(
+            b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
-    def render_downloadable_file(self, values, filename, content_type):
+    def render_downloadable_file(self, file, filename, content_type):
         """Prepares downloadable content to be sent to the client.
 
         Args:
-            values: dict. The key-value pairs to include in the response.
+            file: BytesIO. The data of the downloadable file.
             filename: str. The name of the file to be rendered.
             content_type: str. The type of file to be rendered.
         """
-        self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
-            content_type)
-        self.response.headers[
-            b'Content-Disposition'] = python_utils.convert_to_bytes(
-                'attachment; filename=%s' % filename)
-        self.response.write(values)
+        self.response.headers['Content-Type'] = content_type
+        self.response.headers['Content-Disposition'] = (
+            'attachment; filename=%s' % filename)
+        self.response.charset = 'utf-8'
+        # We use this super in order to bypass the write method
+        # in webapp2.Response, since webapp2.Response doesn't support writing
+        # bytes.
+        super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
@@ -534,16 +536,15 @@ class BaseHandler(webapp2.RequestHandler):
         # deploy a new version, using only 'no-cache' doesn't work properly.
         self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers[b'Strict-Transport-Security'] = (
-            b'max-age=31536000; includeSubDomains')
-        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
-        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
+        self.response.headers['Strict-Transport-Security'] = (
+            'max-age=31536000; includeSubDomains')
+        self.response.headers['X-Content-Type-Options'] = 'nosniff'
+        self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers[
-                    b'X-Frame-Options'] = python_utils.convert_to_bytes(
-                        iframe_restriction)
+                self.response.headers['X-Frame-Options'] = (
+                    python_utils.UNICODE(iframe_restriction))
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -579,8 +580,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.render_template(
                     'error-page-%s.mainpage.html' % values['status_code'])
         else:
-            if return_type != feconf.HANDLER_TYPE_JSON and (
-                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
+            if return_type not in (
+                    feconf.HANDLER_TYPE_JSON, feconf.HANDLER_TYPE_DOWNLOADABLE):
                 logging.warning(
                     'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
@@ -654,31 +655,31 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                401, {'error': python_utils.UNICODE(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                400, {'error': python_utils.UNICODE(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                500, {'error': python_utils.UNICODE(exception)})
             return
 
         if isinstance(exception, self.TemporaryMaintenanceException):
             self.error(503)
-            self._render_exception(503, {'error': python_utils.convert_to_bytes(
-                exception)})
+            self._render_exception(
+                503, {'error': python_utils.UNICODE(exception)})
             return
 
         self.error(500)
         self._render_exception(
-            500, {'error': python_utils.convert_to_bytes(exception)})
+            500, {'error': python_utils.UNICODE(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -736,15 +737,18 @@ class CsrfTokenManager(python_utils.OBJECT):
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = int(issued_on)
+        issued_on = python_utils.UNICODE(int(issued_on))
 
-        digester = hmac.new(python_utils.convert_to_bytes(CSRF_SECRET.value))
-        digester.update(python_utils.convert_to_bytes(user_id))
-        digester.update(':')
-        digester.update(python_utils.convert_to_bytes(issued_on))
+        digester = hmac.new(CSRF_SECRET.value.encode('utf-8'))
+        digester.update(user_id.encode('utf-8'))
+        digester.update(b':')
+        digester.update(issued_on.encode('utf-8'))
 
         digest = digester.digest()
-        token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))
+        # The b64encode returns bytes, so we first need to decode the returned
+        # bytes to string.
+        token = '%s/%s' % (
+            issued_on, base64.urlsafe_b64encode(digest).decode('utf-8'))
 
         return token
 

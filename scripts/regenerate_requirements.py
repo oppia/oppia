@@ -56,8 +56,7 @@ def main():
     # directory to the python system path in order to import the required
     # libraries correctly.
     sys.argv[0] = re.sub(
-        r'(-script\.pyw|\.exe)?$', '',
-        common.REQUIREMENTS_FILE_PATH)
+        r'(-script\.pyw|\.exe)?$', '', common.REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 

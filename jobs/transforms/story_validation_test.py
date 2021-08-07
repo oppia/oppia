@@ -28,7 +28,8 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, story_models
+    from mypy_imports import base_models
+    from mypy_imports import story_models
 
 (base_models, story_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.story])
@@ -162,8 +163,11 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             output, [
                 base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
                     invalid_commit_cmd_model,
-                    '{u\'node_id\': u\'node_id\', u\'cmd\': '
-                    'u\'add_story_node\', u\'invalid\': u\'invalid\'}',
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_id',
+                        'invalid': 'invalid'
+                    },
                     'The following required attributes are missing: title, '
                     'The following extra attributes are present: invalid')
             ])
@@ -224,14 +228,17 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
                 story_validation.ValidateStorySnapshotMetadataModel())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(  # type: ignore[no-untyped-call]
             output, [
-                base_validation_errors.CommitCmdsValidateError( # type: ignore[no-untyped-call]
+                base_validation_errors.CommitCmdsValidateError(  # type: ignore[no-untyped-call]
                     invalid_commit_cmd_model,
-                    '{u\'node_id\': u\'node_id\', u\'new_value\': '
-                    'u\'new_value\', u\'cmd\': '
-                    'u\'update_story_node_property\', u\'old_value\': '
-                    'u\'old_value\', u\'property_name\': u\'invalid\'}',
+                    {
+                        'cmd': 'update_story_node_property',
+                        'node_id': 'node_id',
+                        'property_name': 'invalid',
+                        'old_value': 'old_value',
+                        'new_value': 'new_value'
+                    },
                     'Value for property_name in cmd '
                     'update_story_node_property: invalid is not allowed')
             ])

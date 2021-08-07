@@ -887,7 +887,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
           $scope.initializePage = function() {
             hasInteractedAtLeastOnce = false;
-            $scope.recommendedExplorationSummaries = null;
+            $scope.recommendedExplorationSummaries = [];
             PlayerPositionService.init(_navigateToDisplayedCard);
             if (questionPlayerConfig) {
               ExplorationPlayerStateService.initializeQuestionPlayer(
@@ -1229,7 +1229,7 @@ angular.module('oppia').directive('conversationSkin', [
             $timeout(function() {
               var tutorCard = $('.conversation-skin-main-tutor-card');
 
-              if (tutorCard.length === 0) {
+              if (tutorCard && tutorCard.length === 0) {
                 return;
               }
               var tutorCardBottom = (
@@ -1341,7 +1341,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.isIframed = UrlService.isIframed();
             LoaderService.showLoadingScreen('Loading');
             $scope.hasFullyLoaded = false;
-            $scope.recommendedExplorationSummaries = null;
+            $scope.recommendedExplorationSummaries = [];
             $scope.answerIsCorrect = false;
             $scope.nextCard = null;
             $scope.pendingCardWasSeenBefore = false;

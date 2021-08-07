@@ -28,6 +28,8 @@ import apache_beam as beam
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 @beam.typehints.with_input_types(job_run_result.JobRunResult)
 @beam.typehints.with_output_types(beam.pvalue.PDone)
@@ -36,43 +38,53 @@ class PutResults(beam.PTransform):
 
     _MAX_RESULT_INSTANCES_PER_MODEL = 1000
 
-    def __init__(self, job_id, datastoreio_stub, label=None):
+    def __init__(self, job_id, label=None):
         """Initializes the GetModels PTransform.
 
         Args:
             job_id: str. The Oppia ID associated with the current pipeline.
-            datastoreio_stub: stub_io.DatastoreioStub. The stub responsible for
-                handling datastoreio operations.
             label: str|None. The label of the PTransform.
         """
         super(PutResults, self).__init__(label=label)
         self.job_id = job_id
-        self.datastoreio_stub = datastoreio_stub
 
-    def expand(self, results):
-        """Writes the given job results to the NDB datastore."""
+    def expand(self, entities):
+        """Writes the given job results to the NDB datastore.
+
+        This overrides expand from parent class.
+
+        Args:
+            entities: PCollection. Models, can also contain just one model.
+
+        Returns:
+            PCollection. An empty PCollection.
+        """
         return (
-            results
+            entities
             # NOTE: Pylint is wrong. WithKeys() is a decorated function with a
             # different signature than the one it's defined with.
-            | beam.WithKeys(None) # pylint: disable=no-value-for-parameter
+            | beam.WithKeys(None)  # pylint: disable=no-value-for-parameter
             # GroupIntoBatches() requires (key, value) pairs as input, so we
             # give everything None keys and then immediately discard them.
             | beam.GroupIntoBatches(self._MAX_RESULT_INSTANCES_PER_MODEL)
             | beam.Values()
             | beam.FlatMap(job_run_result.JobRunResult.accumulate)
-            | beam.Map(self.create_beam_job_run_result_model)
-            | ndb_io.PutModels(self.datastoreio_stub)
+            | beam.Map(
+                self.create_beam_job_run_result_model,
+                entities.pipeline.options.namespace)
+            | ndb_io.PutModels()
         )
 
-    def create_beam_job_run_result_model(self, result):
+    def create_beam_job_run_result_model(self, result, namespace):
         """Returns an NDB model for storing the given JobRunResult.
 
         Args:
             result: job_run_result.JobRunResult. The result.
+            namespace: str. The namespace in which models should be created.
 
         Returns:
             BeamJobRunResultModel. The NDB model.
         """
-        return beam_job_services.create_beam_job_run_result_model(
-            self.job_id, result.stdout, result.stderr)
+        with datastore_services.get_ndb_context(namespace=namespace):
+            return beam_job_services.create_beam_job_run_result_model(
+                self.job_id, result.stdout, result.stderr)

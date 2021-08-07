@@ -1,0 +1,167 @@
+# Various compiled, temporary, and hidden files
+*~
+*.pyc
+*.pyo
+*.swp
+*.swo
+*.bak
+.*
+# Typescript files in core
+core/**.ts
+# Typescript output log file
+tsc_output_log.txt
+# Python test files
+*_test.py
+# Other folders to ignore
+core/tests/
+node_modules/
+scripts/
+third_party/python3_libs/
+# Some third_party static scripts are directly imported, namely: jquery,
+# jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
+# ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
+# We exclude some of the scripts that are not directly imported in order to
+# reduce deployed file count.
+# TODO(sll): Find a more structured way of doing this.
+#
+# Please do not remove line below this, as it is used for testing purpose.
+# Third party files:
+third_party/static/angular-audio-1.7.4/
+third_party/static/angular-toastr-1.7.0/
+third_party/static/bootstrap-4.3.1/
+third_party/static/bower-angular-translate-2.18.1/
+third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
+third_party/static/bower-angular-translate-loader-partial-2.18.1/
+third_party/static/bower-angular-translate-loader-static-files-2.18.1/
+third_party/static/bower-angular-translate-storage-cookie-2.18.1/
+third_party/static/bower-material-1.1.19/
+third_party/python_libs/google/appengine/
+third_party/python_libs/google/net/
+third_party/python_libs/google/pyglib/
+third_party/python_libs/grpc/
+# CKEditor-4.12.1 plugins in the download from the CKEditor website include
+# only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
+# find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,
+# pastefromword, preview, scayt, showblocks, smiley, specialchar, table,
+# tableselection, tabletools, templates, widget and wsc. Our code is also using
+# the sharedspace plugin. So, for now, we exclude all others, as well as flash,
+# a11yhelp, about, colordialog, iframe, and anything related to tables, which
+# we definitely don't use.
+third_party/static/ckeditor-4.12.1/plugins/a11yhelp/
+third_party/static/ckeditor-4.12.1/plugins/about/
+third_party/static/ckeditor-4.12.1/plugins/adobeair/
+third_party/static/ckeditor-4.12.1/plugins/ajax/
+third_party/static/ckeditor-4.12.1/plugins/autocomplete/
+third_party/static/ckeditor-4.12.1/plugins/autoembed/
+third_party/static/ckeditor-4.12.1/plugins/autogrow/
+third_party/static/ckeditor-4.12.1/plugins/autolink/
+third_party/static/ckeditor-4.12.1/plugins/balloonpanel/
+third_party/static/ckeditor-4.12.1/plugins/balloontoolbar/
+third_party/static/ckeditor-4.12.1/plugins/bbcode/
+third_party/static/ckeditor-4.12.1/plugins/bidi/
+third_party/static/ckeditor-4.12.1/plugins/cloudservices/
+third_party/static/ckeditor-4.12.1/plugins/codesnippet/
+third_party/static/ckeditor-4.12.1/plugins/codesnippetgeshi/
+third_party/static/ckeditor-4.12.1/plugins/colorbutton/
+third_party/static/ckeditor-4.12.1/plugins/colordialog/
+third_party/static/ckeditor-4.12.1/plugins/devtools/
+third_party/static/ckeditor-4.12.1/plugins/dialogadvtab/
+third_party/static/ckeditor-4.12.1/plugins/divarea/
+third_party/static/ckeditor-4.12.1/plugins/docprops/
+third_party/static/ckeditor-4.12.1/plugins/easyimage/
+third_party/static/ckeditor-4.12.1/plugins/embed/
+third_party/static/ckeditor-4.12.1/plugins/embedbase/
+third_party/static/ckeditor-4.12.1/plugins/embedsemantic/
+third_party/static/ckeditor-4.12.1/plugins/emoji/
+third_party/static/ckeditor-4.12.1/plugins/flash/
+third_party/static/ckeditor-4.12.1/plugins/font/
+third_party/static/ckeditor-4.12.1/plugins/iframe/
+third_party/static/ckeditor-4.12.1/plugins/iframedialog/
+third_party/static/ckeditor-4.12.1/plugins/image2/
+third_party/static/ckeditor-4.12.1/plugins/imagebase/
+third_party/static/ckeditor-4.12.1/plugins/indentblock/
+third_party/static/ckeditor-4.12.1/plugins/justify/
+third_party/static/ckeditor-4.12.1/plugins/language/
+third_party/static/ckeditor-4.12.1/plugins/mathjax/
+third_party/static/ckeditor-4.12.1/plugins/mentions/
+third_party/static/ckeditor-4.12.1/plugins/newpage/
+third_party/static/ckeditor-4.12.1/plugins/panelbutton/
+third_party/static/ckeditor-4.12.1/plugins/placeholder/
+third_party/static/ckeditor-4.12.1/plugins/print/
+third_party/static/ckeditor-4.12.1/plugins/save/
+third_party/static/ckeditor-4.12.1/plugins/selectall/
+third_party/static/ckeditor-4.12.1/plugins/sourcedialog/
+third_party/static/ckeditor-4.12.1/plugins/stylesheetparser/
+third_party/static/ckeditor-4.12.1/plugins/table/
+third_party/static/ckeditor-4.12.1/plugins/tableresize/
+third_party/static/ckeditor-4.12.1/plugins/tabletools/
+third_party/static/ckeditor-4.12.1/plugins/textmatch/
+third_party/static/ckeditor-4.12.1/plugins/textwatcher/
+third_party/static/ckeditor-4.12.1/plugins/uicolor/
+third_party/static/ckeditor-4.12.1/plugins/uploadfile/
+third_party/static/ckeditor-4.12.1/plugins/xml/
+third_party/static/ckeditor-4.12.1/samples/
+third_party/static/ckeditor-4.12.1/skins/kama/
+third_party/static/ckeditor-4.12.1/skins/moono/
+third_party/static/ckeditor-bootstrapck-1.0.0/core/
+third_party/static/ckeditor-bootstrapck-1.0.0/lang/
+third_party/static/ckeditor-bootstrapck-1.0.0/plugins/
+third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck-dev/
+third_party/static/ckeditor-bootstrapck-1.0.0/skins/moono/
+third_party/static/ckeditor-bootstrapck-1.0.0/skins/ckbuilder.jar/
+third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/sample/
+third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/scss/
+third_party/static/fontawesome-free-5.9.0-web/
+third_party/static/guppy-7509f3/site/
+third_party/static/guppy-7509f3/test/
+third_party/static/MathJax-2.7.5/docs/
+third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Pagella/
+third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Gyre-Termes/
+third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Latin-Modern/
+third_party/static/MathJax-2.7.5/fonts/HTML-CSS/Neo-Euler/
+third_party/static/MathJax-2.7.5/fonts/HTML-CSS/TeX/png/
+third_party/static/MathJax-2.7.5/localization/ast/
+third_party/static/MathJax-2.7.5/localization/bcc/
+third_party/static/MathJax-2.7.5/localization/bg/
+third_party/static/MathJax-2.7.5/localization/br/
+third_party/static/MathJax-2.7.5/localization/ca/
+third_party/static/MathJax-2.7.5/localization/cdo/
+third_party/static/MathJax-2.7.5/localization/cs/
+third_party/static/MathJax-2.7.5/localization/cy/
+third_party/static/MathJax-2.7.5/localization/da/
+third_party/static/MathJax-2.7.5/localization/de/
+third_party/static/MathJax-2.7.5/localization/eo/
+third_party/static/MathJax-2.7.5/localization/es/
+third_party/static/MathJax-2.7.5/localization/fa/
+third_party/static/MathJax-2.7.5/localization/fi/
+third_party/static/MathJax-2.7.5/localization/fr/
+third_party/static/MathJax-2.7.5/localization/gl/
+third_party/static/MathJax-2.7.5/localization/he/
+third_party/static/MathJax-2.7.5/localization/ia/
+third_party/static/MathJax-2.7.5/localization/it/
+third_party/static/MathJax-2.7.5/localization/ja/
+third_party/static/MathJax-2.7.5/localization/kn/
+third_party/static/MathJax-2.7.5/localization/ko/
+third_party/static/MathJax-2.7.5/localization/lb/
+third_party/static/MathJax-2.7.5/localization/lki/
+third_party/static/MathJax-2.7.5/localization/lt/
+third_party/static/MathJax-2.7.5/localization/mk/
+third_party/static/MathJax-2.7.5/localization/nl/
+third_party/static/MathJax-2.7.5/localization/oc/
+third_party/static/MathJax-2.7.5/localization/pl/
+third_party/static/MathJax-2.7.5/localization/pt/
+third_party/static/MathJax-2.7.5/localization/pt-br/
+third_party/static/MathJax-2.7.5/localization/qqq/
+third_party/static/MathJax-2.7.5/localization/ru/
+third_party/static/MathJax-2.7.5/localization/scn/
+third_party/static/MathJax-2.7.5/localization/sco/
+third_party/static/MathJax-2.7.5/localization/sl/
+third_party/static/MathJax-2.7.5/localization/sv/
+third_party/static/MathJax-2.7.5/localization/tr/
+third_party/static/MathJax-2.7.5/localization/uk/
+third_party/static/MathJax-2.7.5/localization/vi/
+third_party/static/MathJax-2.7.5/localization/zh-hans/
+third_party/static/MathJax-2.7.5/test/
+third_party/static/MathJax-2.7.5/unpacked/
+third_party/static/messageformat-2.0.5/
+third_party/static/popperJs-1.15.0/

@@ -17,28 +17,23 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import datetime
+import logging
 
 from constants import constants
 from core.controllers import creator_dashboard
 from core.domain import collection_services
-from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
-from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 
 (user_models, stats_models, suggestion_models, feedback_models) = (
     models.Registry.import_models(
@@ -84,378 +79,6 @@ class HomePageTests(test_utils.GenericTestBase):
         response = self.get_html_response('/')
         self.assertEqual(response.status_int, 200)
         self.assertIn('</oppia-splash-page-root>', response)
-
-
-class CreatorDashboardStatisticsTests(test_utils.GenericTestBase):
-    OWNER_EMAIL_1 = 'owner1@example.com'
-    OWNER_USERNAME_1 = 'owner1'
-    OWNER_EMAIL_2 = 'owner2@example.com'
-    OWNER_USERNAME_2 = 'owner2'
-
-    EXP_ID_1 = 'exp_id_1'
-    EXP_TITLE_1 = 'Exploration title 1'
-    EXP_ID_2 = 'exp_id_2'
-    EXP_TITLE_2 = 'Exploration title 2'
-
-    EXP_DEFAULT_VERSION = 1
-
-    USER_SESSION_ID = 'session1'
-    USER_IMPACT_SCORE_DEFAULT = 0.0
-
-    def setUp(self):
-        super(CreatorDashboardStatisticsTests, self).setUp()
-        self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
-        self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
-
-        self.owner_id_1 = self.get_user_id_from_email(self.OWNER_EMAIL_1)
-        self.owner_id_2 = self.get_user_id_from_email(self.OWNER_EMAIL_2)
-        self.owner_1 = user_services.get_user_actions_info(self.owner_id_1)
-
-    def _record_start(self, exp_id, exp_version, state):
-        """Record start event to an exploration.
-        Completing the exploration is not necessary here since the total_plays
-        are currently being counted taking into account only the # of starts.
-        """
-        event_services.StartExplorationEventHandler.record(
-            exp_id, exp_version, state, self.USER_SESSION_ID, {},
-            feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(
-            exp_id, exp_version, {
-                'num_starts': 1,
-                'num_actual_starts': 0,
-                'num_completions': 0,
-                'state_stats_mapping': {}
-            })
-        self.process_and_flush_pending_tasks()
-
-    def _rate_exploration(self, exp_id, ratings):
-        """Create num_ratings ratings for exploration with exp_id,
-        of values from ratings.
-        """
-        # Generate unique user ids to rate an exploration. Each user id needs
-        # to be unique since each user can only give an exploration one rating.
-        user_ids = ['user%d' % i for i in python_utils.RANGE(len(ratings))]
-        self.process_and_flush_pending_tasks()
-        for ind, user_id in enumerate(user_ids):
-            rating_services.assign_rating_to_exploration(
-                user_id, exp_id, ratings[ind])
-        self.process_and_flush_pending_tasks()
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        job_id = user_jobs_one_off.DashboardStatsOneOffJob.create_new()
-        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-    def test_stats_no_explorations(self):
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(response['explorations_list'], [])
-        self.assertIsNone(user_models.UserStatsModel.get(
-            self.owner_id_1, strict=False))
-        self.logout()
-
-    def test_one_play_for_single_exploration(self):
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-
-        exp_version = self.EXP_DEFAULT_VERSION
-        exp_id = self.EXP_ID_1
-        state = exploration.init_state_name
-
-        self._record_start(exp_id, exp_version, state)
-
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(user_model.total_plays, 1)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model.impact_score)
-        self.assertEqual(user_model.num_ratings, 0)
-        self.assertIsNone(user_model.average_ratings)
-        self.logout()
-
-    def test_one_rating_for_single_exploration(self):
-        self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-
-        exp_id = self.EXP_ID_1
-        self._rate_exploration(exp_id, [4])
-
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(user_model.total_plays, 0)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model.impact_score)
-        self.assertEqual(user_model.num_ratings, 1)
-        self.assertEqual(user_model.average_ratings, 4)
-        self.logout()
-
-    def test_one_play_and_rating_for_single_exploration(self):
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-
-        exp_id = self.EXP_ID_1
-
-        exp_version = self.EXP_DEFAULT_VERSION
-        state = exploration.init_state_name
-
-        self._record_start(exp_id, exp_version, state)
-
-        self._rate_exploration(exp_id, [3])
-
-        def _mock_get_date_after_one_week():
-            """Returns the date of the next week."""
-            return (
-                (datetime.datetime.utcnow() + datetime.timedelta(7)).strftime(
-                    feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT))
-
-        # Test to see if last week stats get updated by setting the date to the
-        # next week.
-        with self.swap(
-            user_services, 'get_current_date_as_string',
-            _mock_get_date_after_one_week):
-            self._run_one_off_job()
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(
-            response['last_week_stats']
-            [_mock_get_date_after_one_week()]['average_ratings'], 3)
-
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(user_model.total_plays, 1)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model.impact_score)
-        self.assertEqual(user_model.num_ratings, 1)
-        self.assertEqual(user_model.average_ratings, 3)
-
-        def _mock_get_last_week_dashboard_stats(user_id):
-            """Mocks 'get_last_week_dashboard_stats()' to return more than one
-            key-value pair.
-            """
-            return {
-                'date1': {user_id: 'stats1'}, 'date2': {user_id: 'stats2'}
-            }
-
-        # 'last_week_stats' is None if 'get_last_week_dashboard_stats()' returns
-        # more than one key-value pair.
-        with self.swap(
-            user_services, 'get_last_week_dashboard_stats',
-            _mock_get_last_week_dashboard_stats):
-            response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-            self.assertIsNone(response['last_week_stats'])
-        self.logout()
-
-    def test_multiple_plays_and_ratings_for_single_exploration(self):
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-
-        exp_version = self.EXP_DEFAULT_VERSION
-        exp_id = self.EXP_ID_1
-        state = exploration.init_state_name
-
-        self._record_start(exp_id, exp_version, state)
-        self._record_start(exp_id, exp_version, state)
-        self._record_start(exp_id, exp_version, state)
-        self._record_start(exp_id, exp_version, state)
-
-        self._rate_exploration(exp_id, [3, 4, 5])
-
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(user_model.total_plays, 4)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model.impact_score)
-        self.assertEqual(user_model.num_ratings, 3)
-        self.assertEqual(user_model.average_ratings, 4)
-        self.logout()
-
-    def test_one_play_and_rating_for_multiple_explorations(self):
-        exploration_1 = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        self.save_new_default_exploration(
-            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 2)
-
-        exp_version = self.EXP_DEFAULT_VERSION
-        exp_id_1 = self.EXP_ID_1
-        state_1 = exploration_1.init_state_name
-
-        self._record_start(exp_id_1, exp_version, state_1)
-
-        self._rate_exploration(exp_id_1, [4])
-
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(user_model.total_plays, 1)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model.impact_score)
-        self.assertEqual(user_model.num_ratings, 1)
-        self.assertEqual(user_model.average_ratings, 4)
-        self.logout()
-
-    def test_multiple_plays_and_ratings_for_multiple_explorations(self):
-        exploration_1 = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-        exploration_2 = self.save_new_default_exploration(
-            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 2)
-
-        exp_version = self.EXP_DEFAULT_VERSION
-
-        exp_id_1 = self.EXP_ID_1
-        state_1 = exploration_1.init_state_name
-        exp_id_2 = self.EXP_ID_2
-        state_2 = exploration_2.init_state_name
-
-        self._record_start(exp_id_1, exp_version, state_1)
-        self._record_start(exp_id_2, exp_version, state_2)
-        self._record_start(exp_id_2, exp_version, state_2)
-
-        self._rate_exploration(exp_id_1, [4])
-        self._rate_exploration(exp_id_2, [3, 3])
-
-        user_model = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(user_model.total_plays, 3)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model.impact_score)
-        self.assertEqual(user_model.num_ratings, 3)
-        self.assertEqual(
-            user_model.average_ratings, python_utils.divide(10, 3.0))
-        self.logout()
-
-    def test_stats_for_single_exploration_with_multiple_owners(self):
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-
-        rights_manager.assign_role_for_exploration(
-            self.owner_1, self.EXP_ID_1, self.owner_id_2,
-            rights_domain.ROLE_OWNER)
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-
-        exp_version = self.EXP_DEFAULT_VERSION
-        exp_id = self.EXP_ID_1
-        state = exploration.init_state_name
-
-        self._record_start(exp_id, exp_version, state)
-        self._record_start(exp_id, exp_version, state)
-
-        self._rate_exploration(exp_id, [3, 4, 5])
-        self.logout()
-
-        self.login(self.OWNER_EMAIL_2)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 1)
-
-        self._rate_exploration(exp_id, [3, 4, 5])
-
-        user_model_1 = user_models.UserStatsModel.get(
-            self.owner_id_1)
-        self.assertEqual(user_model_1.total_plays, 2)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model_1.impact_score)
-        self.assertEqual(user_model_1.num_ratings, 3)
-        self.assertEqual(user_model_1.average_ratings, 4)
-
-        user_model_2 = user_models.UserStatsModel.get(
-            self.owner_id_2)
-        self.assertEqual(user_model_2.total_plays, 2)
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model_2.impact_score)
-        self.assertEqual(user_model_2.num_ratings, 3)
-        self.assertEqual(user_model_2.average_ratings, 4)
-        self.logout()
-
-    def test_stats_for_multiple_explorations_with_multiple_owners(self):
-        exploration_1 = self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id_1, title=self.EXP_TITLE_1)
-        exploration_2 = self.save_new_default_exploration(
-            self.EXP_ID_2, self.owner_id_1, title=self.EXP_TITLE_2)
-
-        rights_manager.assign_role_for_exploration(
-            self.owner_1, self.EXP_ID_1, self.owner_id_2,
-            rights_domain.ROLE_OWNER)
-        rights_manager.assign_role_for_exploration(
-            self.owner_1, self.EXP_ID_2, self.owner_id_2,
-            rights_domain.ROLE_OWNER)
-
-        self.login(self.OWNER_EMAIL_2)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 2)
-
-        exp_version = self.EXP_DEFAULT_VERSION
-
-        exp_id_1 = self.EXP_ID_1
-        state_1 = exploration_1.init_state_name
-        exp_id_2 = self.EXP_ID_2
-        state_2 = exploration_2.init_state_name
-
-        self._record_start(exp_id_1, exp_version, state_1)
-        self._record_start(exp_id_1, exp_version, state_1)
-        self._record_start(exp_id_2, exp_version, state_2)
-        self._record_start(exp_id_2, exp_version, state_2)
-        self._record_start(exp_id_2, exp_version, state_2)
-
-        self._rate_exploration(exp_id_1, [5, 3])
-        self._rate_exploration(exp_id_2, [5, 5])
-
-        expected_results = {
-            'total_plays': 5,
-            'num_ratings': 4,
-            'average_ratings': python_utils.divide(18, 4.0)
-        }
-
-        user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)
-        self.assertEqual(
-            user_model_2.total_plays, expected_results['total_plays'])
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model_2.impact_score)
-        self.assertEqual(
-            user_model_2.num_ratings, expected_results['num_ratings'])
-        self.assertEqual(
-            user_model_2.average_ratings, expected_results['average_ratings'])
-        self.logout()
-
-        self.login(self.OWNER_EMAIL_1)
-        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['explorations_list']), 2)
-
-        user_model_1 = user_models.UserStatsModel.get(self.owner_id_1)
-        self.assertEqual(
-            user_model_1.total_plays, expected_results['total_plays'])
-        # TODO(#11475): Calculate impact_score with an Apache Beam job.
-        self.assertIsNone(user_model_2.impact_score)
-        self.assertEqual(
-            user_model_1.num_ratings, expected_results['num_ratings'])
-        self.assertEqual(
-            user_model_1.average_ratings, expected_results['average_ratings'])
-        self.logout()
 
 
 class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
@@ -624,10 +247,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['explorations_list']), 1)
-        self.assertEqual(
-            response['explorations_list'][0]['num_open_threads'], 0)
-        self.assertEqual(
-            response['explorations_list'][0]['num_total_threads'], 0)
 
         def mock_get_thread_analytics_multi(unused_exploration_ids):
             return [feedback_domain.FeedbackAnalytics(
@@ -639,10 +258,6 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['explorations_list']), 1)
-            self.assertEqual(
-                response['explorations_list'][0]['num_open_threads'], 2)
-            self.assertEqual(
-                response['explorations_list'][0]['num_total_threads'], 3)
 
         self.logout()
 
@@ -718,6 +333,71 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.language_code, constants.DEFAULT_LANGUAGE_CODE)
         self.logout()
+
+    def test_get_dashboard_stats(self):
+        user_models.UserStatsModel(
+            id=self.owner_id,
+            total_plays=10,
+            num_ratings=2,
+            average_ratings=3.1111
+        ).put()
+
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+        dashboard_stats = self.get_json(
+            feconf.CREATOR_DASHBOARD_DATA_URL)['dashboard_stats']
+        self.assertEqual(dashboard_stats, {
+            'total_plays': 10,
+            'num_ratings': 2,
+            'average_ratings': 3.11,
+            'total_open_feedback': 0
+        })
+
+    def test_last_week_stats_produce_exception(self):
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {
+                'key_2': {
+                    'num_ratings': 2,
+                    'average_ratings': 3.1111,
+                    'total_plays': 10
+                }
+            }
+        )
+
+        with get_last_week_dashboard_stats_swap:
+            last_week_stats = self.get_json(
+                feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
+
+        self.assertEqual(last_week_stats, {
+            'key_2': {
+                'num_ratings': 2,
+                'average_ratings': 3.11,
+                'total_plays': 10
+            }
+        })
+
+    def test_broken_last_week_stats_produce_exception(self):
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {'key_1': 1, 'key_2': 2}
+        )
+
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            with get_last_week_dashboard_stats_swap:
+                last_week_stats = self.get_json(
+                    feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
+            self.assertEqual(logs, [
+                '\'last_week_stats\' should contain only one key-value pair'
+                ' denoting last week dashboard stats of the user keyed by a'
+                ' datetime string.\nNoneType: None'
+            ])
+        self.assertIsNone(last_week_stats)
 
     def test_get_collections_list(self):
         self.set_collection_editors([self.OWNER_USERNAME])
@@ -815,7 +495,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        self.assertIn('Creator Dashboard | Oppia', response.body)
+        self.assertIn(b'Creator Dashboard | Oppia', response.body)
 
         self.logout()
 
@@ -862,10 +542,10 @@ class CreationButtonsTests(test_utils.GenericTestBase):
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             self.assertEqual(explorations_list, [])
             exp_a_id = self.post_json(
-                '%s?yaml_file=%s' % (
-                    feconf.UPLOAD_EXPLORATION_URL,
-                    self.SAMPLE_YAML_CONTENT), {},
-                csrf_token=csrf_token)[creator_dashboard.EXPLORATION_ID_KEY]
+                feconf.UPLOAD_EXPLORATION_URL,
+                {'yaml_file': self.SAMPLE_YAML_CONTENT},
+                csrf_token=csrf_token
+            )[creator_dashboard.EXPLORATION_ID_KEY]
             explorations_list = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['explorations_list']
             exploration = exp_fetchers.get_exploration_by_id(exp_a_id)
@@ -879,9 +559,10 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '%s?yaml_file=%s' % (
-                feconf.UPLOAD_EXPLORATION_URL,
-                self.SAMPLE_YAML_CONTENT), {}, csrf_token=csrf_token,
-            expected_status_int=400)
+            feconf.UPLOAD_EXPLORATION_URL,
+            {'yaml_file': self.SAMPLE_YAML_CONTENT},
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
 
         self.logout()

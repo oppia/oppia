@@ -19,10 +19,10 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import ast
 import collections
 import contextlib
 import copy
+import datetime
 import functools
 import inspect
 import itertools
@@ -54,7 +54,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -63,27 +62,27 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
-import main_taskqueue
 from proto_files import text_classifier_pb2
 import python_utils
 import schema_utils
 import utils
 
 import elasticsearch
-from google.appengine.ext import deferred
-from google.appengine.ext import testbed
 import requests_mock
 import webtest
 
 (
-    auth_models, exp_models, feedback_models, question_models, skill_models,
-    story_models, suggestion_models, topic_models,) = (
-        models.Registry.import_models([
-            models.NAMES.auth, models.NAMES.exploration, models.NAMES.feedback,
-            models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic]))
+    auth_models, base_models, exp_models,
+    feedback_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models
+) = models.Registry.import_models([
+    models.NAMES.auth, models.NAMES.base_model, models.NAMES.exploration,
+    models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic
+])
 
 datastore_services = models.Registry.import_datastore_services()
+storage_services = models.Registry.import_storage_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_auth_services = models.Registry.import_auth_services()
@@ -331,7 +330,7 @@ class ElasticSearchStub(python_utils.OBJECT):
         """
         if index_name not in self._DB:
             raise self._generate_index_not_found_error(index_name)
-        return any([d['id'] == doc_id for d in self._DB[index_name]])
+        return any(d['id'] == doc_id for d in self._DB[index_name])
 
     def mock_delete(self, index_name, doc_id):
         """Deletes a document from an index in the mock database. Does nothing
@@ -403,7 +402,7 @@ class ElasticSearchStub(python_utils.OBJECT):
             AssertionError. The query is not in the correct form.
             elasticsearch.NotFoundError. The given index name was not found.
         """
-        assert query.keys() == ['query']
+        assert list(query.keys()) == ['query']
         assert query['query'] == {
             'match_all': {}
         }
@@ -478,7 +477,7 @@ class ElasticSearchStub(python_utils.OBJECT):
                         words = []
                         for s in strs:
                             words += s.split(' ')
-                        if all([value in words for value in values]):
+                        if all(value in words for value in values):
                             filtered_docs.append(doc)
             result_docs = filtered_docs
 
@@ -790,12 +789,13 @@ class TaskqueueServicesStub(python_utils.OBJECT):
             queue_name: str. The name of the queue to add the task to.
             task_name: str|None. Optional. The name of the task.
         """
+        # Header values need to be bytes, thus we encode our strings to bytes.
         headers = {
-            'X-Appengine-QueueName': python_utils.convert_to_bytes(queue_name),
+            'X-AppEngine-Fake-Is-Admin': b'1',
+            'X-Appengine-QueueName': queue_name.encode('utf-8'),
+            # Maps empty strings to None so the output can become 'None'.
             'X-Appengine-TaskName': (
-                # Maps empty strings to None so the output can become 'None'.
-                python_utils.convert_to_bytes(task_name or None)),
-            'X-AppEngine-Fake-Is-Admin': python_utils.convert_to_bytes(1),
+                task_name.encode('utf-8') if task_name else b'None')
         }
         csrf_token = self._test_base.get_new_csrf_token()
         self._test_base.post_task(url, payload, headers, csrf_token=csrf_token)
@@ -882,7 +882,7 @@ class MemoryCacheServicesStub(python_utils.OBJECT):
         """
         return caching_domain.MemoryCacheStats(0, 0, len(self._CACHE_DICT))
 
-    def flush_cache(self):
+    def flush_caches(self):
         """Wipes the cache dictionary clean."""
         self._CACHE_DICT.clear()
 
@@ -938,6 +938,33 @@ class TestBase(unittest.TestCase):
     # A test unicode string.
     UNICODE_TEST_STRING = 'unicode ¡马!'
 
+    @property
+    def namespace(self):
+        """Returns a namespace for isolating the NDB operations of each test.
+
+        Returns:
+            str. The namespace.
+        """
+        return self.id()[-100:]
+
+    def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        Reference URL:
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        GenericTestBase's override of run() wraps super().run() in swap
+        contexts to mock out the cache and taskqueue services.
+
+        Args:
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
+        """
+
+        with datastore_services.get_ndb_context(namespace=self.namespace):
+            super(TestBase, self).run(result=result)
+
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
         given suffix. This is used to test that functions behave correctly when
@@ -963,7 +990,7 @@ class TestBase(unittest.TestCase):
         """
         # We are using the b' prefix as all the stdouts are in bytes.
         python_utils.PRINT(
-            b'%s%s' % (LOG_LINE_PREFIX, python_utils.convert_to_bytes(line)))
+            b'%s%s' % (LOG_LINE_PREFIX, line.encode()))
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
@@ -1251,17 +1278,40 @@ class TestBase(unittest.TestCase):
             'self.assertRaises should not be used in these tests. Please use '
             'self.assertRaisesRegexp instead.')
 
-    def assertRaisesRegexp(  # pylint: disable=keyword-arg-before-vararg
-            self, expected_exception, expected_regexp, callable_obj=None,
-            *args, **kwargs):
-        if not expected_regexp:
+    def assertRaisesRegexp(  # pylint: disable=invalid-name
+            self, expected_exception, expected_regex, *args, **kwargs):
+        """Asserts that the message in a raised exception matches a regex.
+        This is a wrapper around assertRaisesRegex in unittest that enforces
+        strong regex.
+
+        Args:
+            expected_exception: Exception. Exception class expected
+                to be raised.
+            expected_regex: re.Pattern|str. Regex expected to be found in
+                error message.
+            *args: list(*). Function to be called and extra positional args.
+            **kwargs: dict(str, Any). Extra kwargs.
+
+        Returns:
+            bool. Whether the code raised exception in the expected format.
+        """
+        if not expected_regex:
             raise Exception(
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
         return super(TestBase, self).assertRaisesRegexp(
-            expected_exception, expected_regexp,
-            callable_obj=callable_obj, *args, **kwargs)
+            expected_exception, expected_regex, *args, **kwargs)
+
+    def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
+        """Compares unordered sequences if they contain the same elements,
+        regardless of order. If the same element occurs more than once,
+        it verifies that the elements occur the same number of times.
+
+        Returns:
+            bool. Whether the items are equal.
+        """
+        return super().assertCountEqual(*args, **kwargs)
 
     def assert_matches_regexps(self, items, regexps, full_match=False):
         """Asserts that each item matches the corresponding regexp.
@@ -1285,7 +1335,7 @@ class TestBase(unittest.TestCase):
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
             for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
-            if get_match(regexp, item, re.DOTALL) is None
+            if get_match(regexp, item, flags=re.DOTALL) is None
         ]
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]
@@ -1335,41 +1385,15 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self):
         super(AppEngineTestBase, self).setUp()
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-
-        self.testbed.setup_env(
-            overwrite=True,
-            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
-            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
-            default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
-
-        # Google App Engine service stubs.
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_search_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_user_stub()
-
-        policy = (
-            datastore_services.make_instantaneous_global_consistency_policy())
-        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self._testbed_taskqueue_stub = (
-            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
-
+        # Initialize namespace for the storage emulator.
+        storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
-        self.testapp = webtest.TestApp(main.app)
-        self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
+        self.testapp = webtest.TestApp(main.app_without_context)
 
     def tearDown(self):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
-        self.testbed.deactivate()
+        storage_services.CLIENT.reset()
         super(AppEngineTestBase, self).tearDown()
 
     def run(self, result=None):
@@ -1391,10 +1415,6 @@ class AppEngineTestBase(TestBase):
             self._platform_taskqueue_services_stub.create_http_task)
         with platform_taskqueue_services_swap:
             super(AppEngineTestBase, self).run(result=result)
-
-    def _get_all_queue_names(self):
-        """Returns a list of all queue names."""
-        return [q['name'] for q in self._testbed_taskqueue_stub.GetQueues()]
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
@@ -1439,80 +1459,6 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.get_pending_tasks(
             queue_name=queue_name)
 
-    def count_jobs_in_mapreduce_taskqueue(self, queue_name):
-        """Counts the jobs in the given MapReduce taskqueue."""
-        return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
-
-    def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given MapReduce taskqueue. If queue_name is
-        None, defaults to returning the jobs in all available queues.
-        """
-        queue_names = None if queue_name is None else [queue_name]
-        return self._testbed_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
-
-    def _execute_mapreduce_tasks(self, tasks):
-        """Execute MapReduce queued tasks.
-
-        Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
-                queued tasks.
-        """
-        for task in tasks:
-            if task.url == '/_ah/queue/deferred':
-                deferred.run(task.payload)
-            else:
-                # All other tasks will be for MapReduce or taskqueue.
-                params = task.payload or ''
-                headers = {
-                    'Content-Length': python_utils.convert_to_bytes(len(params))
-                }
-                headers.update(
-                    (key, python_utils.convert_to_bytes(val))
-                    for key, val in task.headers.items())
-
-                app = (
-                    self.taskqueue_testapp if task.url.startswith('/task') else
-                    self.testapp)
-                response = app.post(
-                    task.url, params=params, headers=headers,
-                    expect_errors=True)
-
-                if response.status_code != 200:
-                    raise RuntimeError('MapReduce task failed: %r' % task)
-
-    def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
-        """Runs and flushes pending MapReduce tasks. If queue_name is None, does
-        so for all queues; otherwise, this only runs and flushes tasks for the
-        specified queue.
-
-        For more information on taskqueue_stub, see:
-        https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
-        """
-        queue_names = (
-            self._get_all_queue_names() if queue_name is None else [queue_name])
-
-        get_enqueued_tasks = lambda: list(
-            self._testbed_taskqueue_stub.get_filtered_tasks(
-                queue_names=queue_names))
-
-        # Loops until get_enqueued_tasks() returns an empty list.
-        for tasks in iter(get_enqueued_tasks, []):
-            for queue in queue_names:
-                self._testbed_taskqueue_stub.FlushQueue(queue)
-            self._execute_mapreduce_tasks(tasks)
-
-    def run_but_do_not_flush_pending_mapreduce_tasks(self):
-        """"Runs, but does not flush, the pending MapReduce tasks."""
-        queue_names = self._get_all_queue_names()
-        tasks = self._testbed_taskqueue_stub.get_filtered_tasks(
-            queue_names=queue_names)
-
-        for queue in queue_names:
-            self._testbed_taskqueue_stub.FlushQueue(queue)
-
-        self._execute_mapreduce_tasks(tasks)
-
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -1528,10 +1474,6 @@ class GenericTestBase(AppEngineTestBase):
     # NOTE: For tests that do not/can not use the default super admin, authors
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
-
-    # This is the value that gets returned by default when
-    # app_identity.get_application_id() is called during tests.
-    EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
 
     SUPER_ADMIN_EMAIL = 'tmpsuperadmin@example.com'
     SUPER_ADMIN_USERNAME = 'tmpsuperadm1n'
@@ -1872,7 +1814,7 @@ title: Title
                 defaultTestResult() method) and used instead.
         """
         memory_cache_services_stub = MemoryCacheServicesStub()
-        memory_cache_services_stub.flush_cache()
+        memory_cache_services_stub.flush_caches()
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
@@ -1897,8 +1839,8 @@ title: Title
                 elastic_search_services.ES, 'search',
                 es_stub.mock_search))
             stack.enter_context(self.swap(
-                memory_cache_services, 'flush_cache',
-                memory_cache_services_stub.flush_cache))
+                memory_cache_services, 'flush_caches',
+                memory_cache_services_stub.flush_caches))
             stack.enter_context(self.swap(
                 memory_cache_services, 'get_multi',
                 memory_cache_services_stub.get_multi))
@@ -1926,37 +1868,61 @@ title: Title
             email: str. The email of the user who is to be logged in.
             is_super_admin: bool. Whether the user is a super admin.
         """
-        self.testbed.setup_env(
-            overwrite=True,
-            user_email=email, user_id=self.get_auth_id_from_email(email),
-            user_is_admin=('1' if is_super_admin else '0'))
+        os.environ['USER_ID'] = self.get_auth_id_from_email(email)
+        os.environ['USER_EMAIL'] = email
+        os.environ['USER_IS_ADMIN'] = ('1' if is_super_admin else '0')
 
     def logout(self):
         """Simulates a logout by resetting the environment variables."""
-        self.testbed.setup_env(
-            overwrite=True, user_email='', user_id='', user_is_admin='0')
+        os.environ['USER_ID'] = ''
+        os.environ['USER_EMAIL'] = ''
+        os.environ['USER_IS_ADMIN'] = '0'
 
     @contextlib.contextmanager
-    def mock_datetime_utcnow(self, mocked_datetime):
-        """Mocks response from datetime.datetime.utcnow method.
+    def mock_datetime_utcnow(self, mocked_now):
+        """Mocks parts of the datastore to accept a fake datetime type that
+        always returns the same value for utcnow.
 
-        Example usage:
+        Example:
             import datetime
-            mocked_datetime_utcnow = (
-                datetime.datetime.utcnow() - datetime.timedelta(days=1))
-            with self.mock_datetime_utcnow(mocked_datetime_utcnow):
-                print datetime.datetime.utcnow() # prints time reduced by 1 day
-            print datetime.datetime.utcnow() # prints current time.
+            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            with mock_datetime_utcnow(mocked_now):
+                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+            actual_now = datetime.datetime.utcnow() # Returns actual time.
 
         Args:
-            mocked_datetime: datetime.datetime. The datetime which will be used
+            mocked_now: datetime.datetime. The datetime which will be used
                 instead of the current UTC datetime.
 
         Yields:
             None. Empty yield statement.
         """
-        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+        if not isinstance(mocked_now, datetime.datetime):
+            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+        old_datetime = datetime.datetime
+
+        class MockDatetimeType(type):
+            """Overrides isinstance() behavior."""
+
+            @classmethod
+            def __instancecheck__(cls, instance):
+                return isinstance(instance, old_datetime)
+
+        class MockDatetime(old_datetime, metaclass=MockDatetimeType):
+            """Always returns mocked_now as the current UTC time."""
+
+            @classmethod
+            def utcnow(cls):
+                # type: () -> datetime.datetime
+                """Returns the mocked datetime."""
+                return mocked_now
+
+        setattr(datetime, 'datetime', MockDatetime)
+        try:
             yield
+        finally:
+            setattr(datetime, 'datetime', old_datetime)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
@@ -2139,7 +2105,30 @@ title: Title
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
-        return python_utils.convert_to_bytes(abs(hash(email)))
+        return python_utils.UNICODE(abs(hash(email)))
+
+    def get_all_python_files(self):
+        """Recursively collects all Python files in the core/ and extensions/
+        directory.
+
+        Returns:
+            list(str). A list of Python files.
+        """
+        current_dir = os.getcwd()
+        files_in_directory = []
+        for _dir, _, files in os.walk(current_dir):
+            for file_name in files:
+                filepath = os.path.relpath(
+                    os.path.join(_dir, file_name), start=current_dir)
+                if (
+                        filepath.endswith('.py') and (
+                            filepath.startswith('core/') or
+                            filepath.startswith('extensions/')
+                        )
+                ):
+                    module = filepath[:-3].replace('/', '.')
+                    files_in_directory.append(module)
+        return files_in_directory
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -2167,8 +2156,11 @@ title: Title
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
             response = self.testapp.get(
-                url, params=params, expect_errors=expect_errors,
-                status=expected_status_int)
+                url,
+                params=params,
+                expect_errors=expect_errors,
+                status=expected_status_int
+            )
 
         if expect_errors:
             self.assertTrue(response.status_int >= 400)
@@ -2268,7 +2260,7 @@ title: Title
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expected_status_int=200):
+    def get_json(self, url, params=None, expected_status_int=200, headers=None):
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
             self.assertIsInstance(params, dict)
@@ -2277,7 +2269,8 @@ title: Title
 
         json_response = self.testapp.get(
             url, params=params, expect_errors=expect_errors,
-            status=expected_status_int)
+            status=expected_status_int, headers=headers
+        )
 
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
@@ -2391,8 +2384,11 @@ title: Title
         # Convert the files to bytes.
         if upload_files is not None:
             upload_files = tuple(
-                tuple(python_utils.convert_to_bytes(f) for f in upload_file)
-                for upload_file in upload_files)
+                tuple(
+                    f.encode('utf-8') if isinstance(f, str) else f
+                    for f in upload_file
+                ) for upload_file in upload_files
+            )
 
         return app.post(
             url, params=data, headers=headers, status=expected_status_int,
@@ -2406,7 +2402,7 @@ title: Title
         """
         if csrf_token:
             payload['csrf_token'] = csrf_token
-        return self.taskqueue_testapp.post(
+        return self.testapp.post(
             url, params=json.dumps(payload), headers=headers,
             status=expected_status_int, expect_errors=expect_errors,
             content_type='application/json')
@@ -2499,7 +2495,7 @@ title: Title
             elif schema['type'] == schema_utils.SCHEMA_TYPE_DICT:
                 for schema_property in schema['properties']:
                     traverse_schema_and_assign_content_ids(
-                        x[schema_property.name],
+                        schema['properties'][schema_property.name],
                         schema_property['schema'],
                         '%s_%s' % (contentId, schema_property.name))
 
@@ -3392,59 +3388,6 @@ class LinterTestBase(GenericTestBase):
         self.assertEqual(failed_count, expected_failed_count)
 
 
-class AuditJobsTestBase(GenericTestBase):
-    """Base class for audit jobs tests."""
-
-    def run_job_and_check_output(
-            self, expected_output, sort=False, literal_eval=False):
-        """Helper function to run job and compare output.
-
-        Args:
-            expected_output: list(*). The expected result of the job.
-            sort: bool. Whether to sort the outputs before comparison.
-            literal_eval: bool. Whether to use ast.literal_eval before
-                comparison.
-        """
-        self.process_and_flush_pending_tasks()
-        job_id = self.job_class.create_new()
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        self.job_class.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        self.process_and_flush_pending_tasks()
-        actual_output = self.job_class.get_output(job_id)
-
-        if literal_eval:
-            actual_output_dict = {}
-            expected_output_dict = {}
-
-            for item in (ast.literal_eval(value) for value in actual_output):
-                value = item[1]
-                if isinstance(value, list):
-                    value = sorted(value)
-                actual_output_dict[item[0]] = value
-
-            for item in (ast.literal_eval(value) for value in expected_output):
-                value = item[1]
-                if isinstance(value, list):
-                    value = sorted(value)
-                expected_output_dict[item[0]] = value
-
-            self.assertItemsEqual(actual_output_dict, expected_output_dict)
-
-            for key in actual_output_dict:
-                self.assertEqual(
-                    actual_output_dict[key], expected_output_dict[key])
-        elif sort:
-            self.assertEqual(sorted(actual_output), sorted(expected_output))
-        else:
-            self.assertEqual(actual_output, expected_output)
-
-
 class EmailMessageMock(python_utils.OBJECT):
     """Mock for core.platform.models email services messages."""
 
@@ -3628,7 +3571,7 @@ class ClassifierTestBase(GenericEmailTestBase):
         response = self._send_post_request(
             self.testapp, url, data,
             expect_errors, expected_status_int=expected_status_int,
-            headers={b'content-type': b'application/octet-stream'})
+            headers={'content-type': 'application/octet-stream'})
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
@@ -3785,7 +3728,7 @@ class FailingFunction(FunctionWrapper):
             self._num_tries_before_success == FailingFunction.INFINITY)
         self._times_called = 0
 
-        if not (self._num_tries_before_success >= 0 or self._always_fail):
+        if not self._always_fail and self._num_tries_before_success < 0:
             raise ValueError(
                 'num_tries_before_success should either be an '
                 'integer greater than or equal to 0, '
@@ -3801,6 +3744,7 @@ class FailingFunction(FunctionWrapper):
         """
         self._times_called += 1
         call_should_fail = (
+            self._always_fail or
             self._num_tries_before_success >= self._times_called)
-        if call_should_fail or self._always_fail:
+        if call_should_fail:
             raise self._exception

@@ -29,7 +29,8 @@ from typing import ( # isort:skip # pylint: disable=unused-import
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()
@@ -205,12 +206,19 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             A tuple containing the list of the ClassifierTrainingJobModels
             with status new or pending and the offset value.
         """
-        query = cls.query(cls.status.IN([
-            feconf.TRAINING_JOB_STATUS_NEW,
-            feconf.TRAINING_JOB_STATUS_PENDING])).filter(
-                cls.next_scheduled_check_time <= (
-                    datetime.datetime.utcnow())).order(
-                        cls.next_scheduled_check_time, cls._key)
+        query = (
+            cls.get_all()
+            .filter(
+                datastore_services.all_of(
+                    cls.status.IN([
+                        feconf.TRAINING_JOB_STATUS_NEW,
+                        feconf.TRAINING_JOB_STATUS_PENDING
+                    ]),
+                    cls.next_scheduled_check_time <= datetime.datetime.utcnow()
+                )
+            )
+            .order(cls.next_scheduled_check_time)
+        )
 
         classifier_job_models = cast(
             List[ClassifierTrainingJobModel],
@@ -301,7 +309,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
-        # type: (Text, int, Text) -> Text
+        # type: (Text, int, Text) -> str
         """Generates a unique ID for the Classifier Exploration Mapping of the
         form [exp_id].[exp_version].[state_name].
 
@@ -315,8 +323,7 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
         Returns:
             str. ID of the new Classifier Exploration Mapping instance.
         """
-        new_id = '%s.%s.%s' % (exp_id, exp_version, state_name)
-        return cast(Text, python_utils.convert_to_bytes(new_id)) # type: ignore[no-untyped-call]
+        return '%s.%s.%s' % (exp_id, exp_version, state_name)
 
     @classmethod
     def get_models(

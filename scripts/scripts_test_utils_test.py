@@ -33,8 +33,8 @@ class PopenStubTests(test_utils.TestBase):
         popen = scripts_test_utils.PopenStub()
 
         self.assertEqual(popen.pid, 1)
-        self.assertEqual(popen.stdout.getvalue(), '')
-        self.assertEqual(popen.stderr.getvalue(), '')
+        self.assertEqual(popen.stdout.getvalue(), b'')
+        self.assertEqual(popen.stderr.getvalue(), b'')
         self.assertEqual(popen.poll_count, 0)
         self.assertEqual(popen.signals_received, [])
         self.assertEqual(popen.terminate_count, 0)
@@ -51,13 +51,13 @@ class PopenStubTests(test_utils.TestBase):
     def test_explicit_attributes(self):
         child = scripts_test_utils.PopenStub()
         popen = scripts_test_utils.PopenStub(
-            pid=123, name='foo', stdout='abc', stderr='def',
+            pid=123, name='foo', stdout=b'abc', stderr=b'def',
             reject_signal=True, reject_terminate=True, reject_kill=True,
             unresponsive=True, return_code=1, child_procs=[child])
 
         self.assertEqual(popen.pid, 123)
-        self.assertEqual(popen.stdout.getvalue(), 'abc')
-        self.assertEqual(popen.stderr.getvalue(), 'def')
+        self.assertEqual(popen.stdout.getvalue(), b'abc')
+        self.assertEqual(popen.stderr.getvalue(), b'def')
         self.assertEqual(popen.poll_count, 0)
         self.assertEqual(popen.signals_received, [])
         self.assertEqual(popen.terminate_count, 0)
@@ -212,37 +212,37 @@ class PopenStubTests(test_utils.TestBase):
         self.assertEqual(popen.returncode, 0)
 
     def test_communicate(self):
-        popen = scripts_test_utils.PopenStub(stdout='abc', stderr='def')
+        popen = scripts_test_utils.PopenStub(stdout=b'abc', stderr=b'def')
 
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        self.assertEqual(popen.communicate(), ('abc', 'def'))
+        self.assertEqual(popen.communicate(), (b'abc', b'def'))
 
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        self.assertEqual(popen.communicate(), ('abc', 'def'))
+        self.assertEqual(popen.communicate(), (b'abc', b'def'))
 
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
     def test_communicate_with_input(self):
-        popen = scripts_test_utils.PopenStub(stdout='abc', stderr='def')
+        popen = scripts_test_utils.PopenStub(stdout=b'abc', stderr=b'def')
 
-        self.assertEqual(popen.stdin.getvalue(), '')
+        self.assertEqual(popen.stdin.getvalue(), b'')
         self.assertTrue(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        self.assertEqual(popen.communicate(input='ghi'), ('abc', 'def'))
+        self.assertEqual(popen.communicate(input=b'ghi'), (b'abc', b'def'))
 
-        self.assertEqual(popen.stdin.getvalue(), 'ghi')
+        self.assertEqual(popen.stdin.getvalue(), b'ghi')
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 
-        self.assertEqual(popen.communicate(input='ghi'), ('abc', 'def'))
+        self.assertEqual(popen.communicate(input=b'ghi'), (b'abc', b'def'))
 
-        self.assertEqual(popen.stdin.getvalue(), 'ghi')
+        self.assertEqual(popen.stdin.getvalue(), b'ghi')
         self.assertFalse(popen.is_running())
         self.assertEqual(popen.returncode, 0)
 

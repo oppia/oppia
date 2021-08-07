@@ -20,11 +20,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '2.x'
+          python-version: '3.7'
           architecture: 'x64'
-      - name: Setup python by installing wheel
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: pip install wheel==0.35.0
       - uses: ./.github/actions/merge
       - name: Install Third Party Dependencies
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

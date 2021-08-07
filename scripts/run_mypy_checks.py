@@ -30,7 +30,6 @@ import python_utils
 from scripts import common
 from scripts import install_third_party_libs
 
-
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
     'proto_files/',
@@ -433,9 +432,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_jobs_one_off_test.py',
     'core/domain/wipeout_service.py',
     'core/domain/wipeout_service_test.py',
-    'core/jobs.py',
-    'core/jobs_registry.py',
-    'core/jobs_test.py',
     'core/platform/app_identity/gae_app_identity_services.py',
     'core/platform/app_identity/gae_app_identity_services_test.py',
     'core/platform/auth/firebase_auth_services.py',
@@ -446,12 +442,14 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/bulk_email/mailchimp_bulk_email_services_test.py',
     'core/platform/cache/redis_cache_services.py',
     'core/platform/cache/redis_cache_services_test.py',
-    'core/platform/cloud_translate/cloud_translate_emulator.py',
-    'core/platform/cloud_translate/cloud_translate_emulator_test.py',
-    'core/platform/cloud_translate/cloud_translate_services.py',
-    'core/platform/cloud_translate/cloud_translate_services_test.py',
-    'core/platform/cloud_translate/dev_mode_cloud_translate_services.py',
-    'core/platform/cloud_translate/dev_mode_cloud_translate_services_test.py',
+    'core/platform/translate/cloud_translate_emulator.py',
+    'core/platform/translate/cloud_translate_emulator_test.py',
+    'core/platform/translate/cloud_translate_services.py',
+    'core/platform/translate/cloud_translate_services_test.py',
+    'core/platform/translate/dev_mode_translate_services.py',
+    'core/platform/translate/dev_mode_translate_services_test.py',
+    'core/platform/datastore/cloud_datastore_services.py',
+    'core/platform/datastore/cloud_datastore_services_test.py',
     'core/platform/email/dev_mode_email_services.py',
     'core/platform/email/dev_mode_email_services_test.py',
     'core/platform/email/mailgun_email_services.py',
@@ -460,12 +458,15 @@ NOT_FULLY_COVERED_FILES = [
     'core/platform/search/elastic_search_services_test.py',
     'core/platform/search/gae_search_services.py',
     'core/platform/search/gae_search_services_test.py',
+    'core/platform/storage/cloud_storage_emulator.py',
+    'core/platform/storage/cloud_storage_emulator_test.py',
     'core/platform/taskqueue/cloud_taskqueue_services.py',
     'core/platform/taskqueue/cloud_taskqueue_services_test.py',
     'core/platform/taskqueue/cloud_tasks_emulator.py',
     'core/platform/taskqueue/cloud_tasks_emulator_test.py',
     'core/platform/taskqueue/dev_mode_taskqueue_services.py',
     'core/platform/taskqueue/dev_mode_taskqueue_services_test.py',
+    'core/platform/transactions/cloud_transaction_services.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
     'core/storage/beam_job/gae_models.py',
@@ -576,8 +577,6 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/io/job_io_test.py',
     'jobs/io/ndb_io.py',
     'jobs/io/ndb_io_test.py',
-    'jobs/io/stub_io.py',
-    'jobs/io/stub_io_test.py',
     'jobs/job_options.py',
     'jobs/job_options_test.py',
     'jobs/job_test_utils.py',
@@ -746,7 +745,7 @@ _PARSER.add_argument(
 )
 
 
-def install_third_party_libraries(skip_install):
+def install_third_party_libraries(skip_install: bool) -> None:
     """Run the installation script.
 
     Args:
@@ -812,7 +811,7 @@ def install_mypy_prerequisites(install_globally):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
-    if 'can\'t combine user with prefix' in output[1]:
+    if b'can\'t combine user with prefix' in output[1]:
         uextention_text = ['--user', '--prefix=', '--system']
         new_process = subprocess.Popen(
             cmd + uextention_text, stdout=subprocess.PIPE,
@@ -863,8 +862,10 @@ def main(args=None):
     process = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = process.communicate()
-    python_utils.PRINT(stdout)
-    python_utils.PRINT(stderr)
+    # Standard and error output is in bytes, we need to decode the line to
+    # print it.
+    python_utils.PRINT(stdout.decode('utf-8'))
+    python_utils.PRINT(stderr.decode('utf-8'))
     if process.returncode == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
@@ -872,7 +873,7 @@ def main(args=None):
             'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
             'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
-        sys.exit(1)
+        sys.exit(2)
     return process.returncode
 
 

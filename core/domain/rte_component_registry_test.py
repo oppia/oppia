@@ -227,9 +227,12 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         """Test get_all_rte_components method."""
         obtained_components = list(
             rte_component_registry.Registry.get_all_rte_components().keys())
-        actual_components = [name for name in os.listdir(
-            './extensions/rich_text_components') if os.path.isdir(os.path.join(
-                './extensions/rich_text_components', name))]
+        actual_components = [
+            name for name in os.listdir('./extensions/rich_text_components')
+            if os.path.isdir(
+                os.path.join('./extensions/rich_text_components', name)
+            ) and name != '__pycache__'
+        ]
 
         self.assertEqual(set(obtained_components), set(actual_components))
 
@@ -249,10 +252,8 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(obtained_tag_list_with_attrs.keys()),
             set(actual_tag_list_with_attrs.keys()))
-        for key in obtained_tag_list_with_attrs:
-            self.assertEqual(
-                set(obtained_tag_list_with_attrs[key]),
-                set(actual_tag_list_with_attrs[key]))
+        for key, attrs in obtained_tag_list_with_attrs.items():
+            self.assertEqual(set(attrs), set(actual_tag_list_with_attrs[key]))
 
     def test_get_component_types_to_component_classes(self):
         """Test get_component_types_to_component_classes method."""

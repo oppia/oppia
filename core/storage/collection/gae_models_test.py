@@ -34,8 +34,9 @@ from typing import Any, Dict, List, Text # isort:skip # pylint: disable=unused-i
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import (
-        base_models, collection_models, user_models)
+    from mypy_imports import base_models
+    from mypy_imports import collection_models
+    from mypy_imports import user_models
 
 (base_models, collection_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
@@ -538,11 +539,11 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         private_commit.put()
         public_commit.update_timestamps()
         public_commit.put()
-        commits = (
+        results, _, more = (
             collection_models.CollectionCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=None))
-        self.assertEqual(False, commits[2])
-        self.assertEqual('collection-b-0', commits[0][0].id)
+        self.assertEqual('collection-b-0', results[0].id)
+        self.assertFalse(more)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self):
         # type: () -> None
@@ -580,9 +581,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         results, _, more = (
             collection_models.CollectionCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=max_age))
-        self.assertFalse(more)
         self.assertEqual(len(results), 1)
         self.assertEqual('collection-b-0', results[0].id)
+        self.assertFalse(more)
 
 
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):

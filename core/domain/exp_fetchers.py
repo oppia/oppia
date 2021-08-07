@@ -302,7 +302,7 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
     Returns:
         Exploration. The domain object corresponding to the given exploration.
     """
-    sub_namespace = python_utils.convert_to_bytes(version) if version else None
+    sub_namespace = python_utils.UNICODE(version) if version else None
     cached_exploration = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION,
         sub_namespace,
@@ -377,8 +377,8 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             % '\n'.join(not_found))
 
     cache_update = {
-        eid: db_results_dict[eid] for eid in db_results_dict
-        if db_results_dict[eid] is not None
+        eid: results for eid, results in db_results_dict.items()
+        if results is not None
     }
 
     if cache_update:

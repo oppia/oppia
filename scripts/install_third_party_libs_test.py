@@ -408,40 +408,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'tweak_yarn_executable',
             mock_tweak_yarn_executable)
 
-        py_actual_text = (
-            'ConverterMapping,\nLine ending with '
-            '"ConverterMapping",\nOther Line\n')
-        py_expected_text = ('Line ending with \nOther Line\n')
-        temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
-        with python_utils.open_file(temp_py_config_file, 'w') as f:
-            f.write(py_actual_text)
-
-        pq_actual_text = (
-            'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
-        pq_expected_text = ('Other Line\n')
-        temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
-        with python_utils.open_file(temp_pq_config_file, 'w') as f:
-            f.write(pq_actual_text)
-
-        py_config_swap = self.swap(
-            install_third_party_libs, 'PYLINT_CONFIGPARSER_FILEPATH',
-            temp_py_config_file)
-        pq_config_swap = self.swap(
-            install_third_party_libs, 'PQ_CONFIGPARSER_FILEPATH',
-            temp_pq_config_file)
-
         with ensure_pip_install_swap, check_call_swap, self.Popen_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
-                    with pre_push_hook_main_swap, py_config_swap:
-                        with pq_config_swap, tweak_yarn_executable_swap:
-                            with swap_is_dir, swap_mk_dir, swap_copy_tree:
-                                install_third_party_libs.main()
+                    with pre_push_hook_main_swap, tweak_yarn_executable_swap:
+                        with swap_is_dir, swap_mk_dir, swap_copy_tree:
+                            install_third_party_libs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
-        with python_utils.open_file(temp_py_config_file, 'r') as f:
-            self.assertEqual(f.read(), py_expected_text)
-        with python_utils.open_file(temp_pq_config_file, 'r') as f:
-            self.assertEqual(f.read(), pq_expected_text)
 
         self.assertEqual(
             copied_src_dst_tuples, correct_copied_src_dst_tuples)
@@ -509,34 +482,20 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         py_actual_text = (
             'ConverterMapping,\nLine ending with '
             '"ConverterMapping",\nOther Line\n')
-        py_expected_text = ('Line ending with \nOther Line\n')
         temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
         with python_utils.open_file(temp_py_config_file, 'w') as f:
             f.write(py_actual_text)
 
         pq_actual_text = (
             'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
-        pq_expected_text = ('Other Line\n')
         temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
         with python_utils.open_file(temp_pq_config_file, 'w') as f:
             f.write(pq_actual_text)
 
-        py_config_swap = self.swap(
-            install_third_party_libs, 'PYLINT_CONFIGPARSER_FILEPATH',
-            temp_py_config_file)
-        pq_config_swap = self.swap(
-            install_third_party_libs, 'PQ_CONFIGPARSER_FILEPATH',
-            temp_pq_config_file)
-
         with ensure_pip_install_swap, check_call_swap, self.Popen_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
-                    with pre_push_hook_main_swap, py_config_swap:
-                        with pq_config_swap, tweak_yarn_executable_swap:
-                            with os_name_swap:
-                                install_third_party_libs.main()
+                    with pre_push_hook_main_swap, tweak_yarn_executable_swap:
+                        with os_name_swap:
+                            install_third_party_libs.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
-        with python_utils.open_file(temp_py_config_file, 'r') as f:
-            self.assertEqual(f.read(), py_expected_text)
-        with python_utils.open_file(temp_pq_config_file, 'r') as f:
-            self.assertEqual(f.read(), pq_expected_text)

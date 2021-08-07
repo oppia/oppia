@@ -159,9 +159,12 @@ def get_previous_release_version(branch_type, current_release_version_number):
         Exception. Branch type is invalid.
         Exception. Previous release version is same as current release version.
     """
-    all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
+    all_tags = subprocess.check_output(
+        ['git', 'tag']
+    )[:-1].decode('utf-8').split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
+    # Standard output is in bytes, we need to decode the line to print it.
     if branch_type == constants.release_constants.BRANCH_TYPE_RELEASE:
         previous_release_version = all_tags[-1][1:]
     elif branch_type == constants.release_constants.BRANCH_TYPE_HOTFIX:

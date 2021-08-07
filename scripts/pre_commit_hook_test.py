@@ -192,23 +192,24 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'Popen', mock_popen):
             self.assertEqual(
                 pre_commit_hook.start_subprocess_for_result('cmd'),
-                ('test\n', ''))
+                (b'test\n', b''))
 
     def test_does_diff_include_package_lock_file_with_package_lock_in_diff(
             self):
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('package-lock.json\nfile.1py\nfile2.ts', None)
+            return (b'package-lock.json\nfile.1py\nfile2.ts', None)
 
         with self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result):
+            mock_start_subprocess_for_result
+        ):
             self.assertTrue(
                 pre_commit_hook.does_diff_include_package_lock_file())
 
     def test_does_diff_include_package_lock_file_with_no_package_lock_in_diff(
             self):
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('file.1py\nfile2.ts', None)
+            return (b'file.1py\nfile2.ts', None)
 
         with self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
@@ -218,7 +219,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
 
     def test_does_diff_include_package_lock_file_with_error(self):
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('file.1py\nfile2.ts', 'Error')
+            return (b'file.1py\nfile2.ts', b'Error')
 
         subprocess_swap = self.swap(
             pre_commit_hook, 'start_subprocess_for_result',
@@ -238,11 +239,11 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens):
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    '-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    '+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
-                '-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
-                '+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
+                b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
+                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
         with self.swap(subprocess, 'check_output', mock_check_output):
             pre_commit_hook.check_changes_in_config()
 
@@ -253,11 +254,11 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens):
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    '-SYSTEM_EMAIL_NAME = \'sys@email.com\'\n+'
-                    '+SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n')
+                    b'-SYSTEM_EMAIL_NAME = \'sys@email.com\'\n+'
+                    b'+SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n')
             return (
-                '-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
-                '+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
+                b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
+                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(
@@ -270,11 +271,11 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens):
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    '-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    '+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
-                '-  "ANALYTICS_ID": "",\n'
-                '+  "ANALYTICS_ID": "change",\n')
+                b'-  "ANALYTICS_ID": "",\n'
+                b'+  "ANALYTICS_ID": "change",\n')
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         with check_output_swap, self.assertRaisesRegexp(

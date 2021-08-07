@@ -369,7 +369,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             'choices': {'value': ['']}
         }
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Could not convert unicode to int: 1b'
+            utils.ValidationError, 'Could not convert str to int: 1b'
         ):
             customization_args_util.validate_customization_args_and_values(
                 'interaction',

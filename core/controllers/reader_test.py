@@ -369,9 +369,10 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
         url = '%s?question_count=%s&skill_ids=%s&fetch_by_difficulty=%s' % (
             feconf.QUESTIONS_URL_PREFIX,
-            python_utils.convert_to_bytes(
-                feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME),
-            skill_ids_for_url, 'true')
+            feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+            skill_ids_for_url,
+            'true'
+        )
         json_response = self.get_json(url)
         self.assertEqual(
             len(json_response['question_dicts']),
@@ -1058,12 +1059,8 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 self.MODERATOR_EMAIL)
             self.assertEqual(len(messages), 1)
-            self.assertEqual(
-                messages[0].html.decode(),
-                expected_email_html_body)
-            self.assertEqual(
-                messages[0].body.decode(),
-                expected_email_text_body)
+            self.assertEqual(messages[0].html, expected_email_html_body)
+            self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_non_logged_in_users_cannot_report(self):
         """Check that non-logged in users cannot report."""
@@ -2403,8 +2400,9 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
             }
         )
         self.assertIn(
-            '<exploration-player-page></exploration-player-page>',
-            response.body)
+            b'<exploration-player-page></exploration-player-page>',
+            response.body
+        )
 
         self.logout()
 

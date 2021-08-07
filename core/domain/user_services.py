@@ -210,9 +210,10 @@ def get_gravatar_url(email):
     Returns:
         str. The gravatar url for the specified email.
     """
+    # The md5 accepts only bytes, so we first need to encode the email to bytes.
     return (
         'https://www.gravatar.com/avatar/%s?d=identicon&s=%s' %
-        (hashlib.md5(email).hexdigest(), GRAVATAR_SIZE_PX))
+        (hashlib.md5(email.encode('utf-8')).hexdigest(), GRAVATAR_SIZE_PX))
 
 
 def fetch_gravatar(email):
@@ -503,6 +504,7 @@ def _update_reviewer_counts_in_community_contribution_stats_transactional(
     if not past_user_contribution_rights.can_review_questions and (
             future_user_contribution_rights.can_review_questions):
         stats_model.question_reviewer_count += 1
+
     # Update translation reviewer counts.
     for language_code in languages_that_reviewer_can_no_longer_review:
         stats_model.translation_reviewer_counts_by_lang_code[
@@ -1387,20 +1389,6 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
-def update_last_logged_in(user_settings, new_last_logged_in):
-    """Updates last_logged_in to the new given datetime for the user with
-    given user_settings. Should only be used by tests.
-
-    Args:
-        user_settings: UserSettings. The UserSettings domain object.
-        new_last_logged_in: datetime or None. The new datetime of the last
-            logged in session.
-    """
-
-    user_settings.last_logged_in = new_last_logged_in
-    _save_user_settings(user_settings)
-
-
 def record_user_edited_an_exploration(user_id):
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
@@ -1858,7 +1846,6 @@ def get_weekly_dashboard_stats(user_id):
         If the user doesn't exist, then this function returns None.
     """
     model = user_models.UserStatsModel.get(user_id, strict=False)
-
     if model and model.weekly_creator_stats_list:
         return model.weekly_creator_stats_list
     else:
@@ -2044,19 +2031,22 @@ def allow_user_to_review_translation_in_language(user_id, language_code):
     _save_user_contribution_rights(user_contribution_rights)
 
 
-def remove_translation_review_rights_in_language(user_id, language_code):
+def remove_translation_review_rights_in_language(
+        user_id, language_code_to_remove):
     """Removes the user's review rights to translation suggestions in the given
     language_code.
 
     Args:
         user_id: str. The unique ID of the user.
-        language_code: str. The code of the language. Callers should ensure that
-            the user already has rights to review translations in the given
-            language code.
+        language_code_to_remove: str. The code of the language. Callers should
+            ensure that the user already has rights to review translations in
+            the given language code.
     """
     user_contribution_rights = get_user_contribution_rights(user_id)
-    user_contribution_rights.can_review_translation_for_language_codes.remove(
-        language_code)
+    user_contribution_rights.can_review_translation_for_language_codes = [
+        lang_code for lang_code
+        in user_contribution_rights.can_review_translation_for_language_codes
+        if lang_code != language_code_to_remove]
     _update_user_contribution_rights(user_contribution_rights)
 
 

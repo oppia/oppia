@@ -29,11 +29,11 @@ import sys
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.4.1')
 sys.path.insert(0, _YAML_PATH)
 
 _CERTIFI_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'certifi-2020.12.5')
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.5.30')
 sys.path.insert(0, _CERTIFI_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -84,14 +84,14 @@ def SimpleXMLRPCServer( # pylint: disable=invalid-name
         SimpleXMLRPCServer. The SimpleXMLRPCServer object.
     """
     try:
-        from xmlrpc.server import SimpleXMLRPCServer as impl # pylint: disable=import-only-modules
+        from xmlrpc.server import SimpleXMLRPCServer as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from SimpleXMLRPCServer import SimpleXMLRPCServer as impl # pylint: disable=import-only-modules
+        from SimpleXMLRPCServer import SimpleXMLRPCServer as impl  # pylint: disable=import-only-modules
     if requestHandler is None:
         try:
-            from xmlrpc.server import SimpleXMLRPCRequestHandler # pylint: disable=import-only-modules
+            from xmlrpc.server import SimpleXMLRPCRequestHandler  # isort:skip pylint: disable=import-only-modules
         except ImportError:
-            from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler # pylint: disable=import-only-modules
+            from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler  # isort:skip pylint: disable=import-only-modules
         requestHandler = SimpleXMLRPCRequestHandler
     return impl(
         addr, requestHandler=requestHandler, logRequests=logRequests,
@@ -112,9 +112,9 @@ def redirect_stdout(new_target):
         redirect_stdout object.
     """
     try:
-        from contextlib import redirect_stdout as impl # pylint: disable=import-only-modules
+        from contextlib import redirect_stdout as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import redirect_stdout as impl # pylint: disable=import-only-modules
+        from contextlib2 import redirect_stdout as impl  # pylint: disable=import-only-modules
     return impl(new_target)
 
 
@@ -130,9 +130,9 @@ def nullcontext(enter_result=None):
         object.
     """
     try:
-        from contextlib import nullcontext as impl # pylint: disable=import-only-modules
+        from contextlib import nullcontext as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import nullcontext as impl # pylint: disable=import-only-modules
+        from contextlib2 import nullcontext as impl  # pylint: disable=import-only-modules
     return impl(enter_result=enter_result)
 
 
@@ -144,13 +144,13 @@ def ExitStack(): # pylint: disable=invalid-name
         contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
     """
     try:
-        from contextlib import ExitStack as impl # pylint: disable=import-only-modules
+        from contextlib import ExitStack as impl  # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import ExitStack as impl # pylint: disable=import-only-modules
+        from contextlib2 import ExitStack as impl  # pylint: disable=import-only-modules
     return impl()
 
 
-def string_io(buffer_value=b''):
+def string_io(buffer_value=''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
 
@@ -165,7 +165,7 @@ def string_io(buffer_value=b''):
         from StringIO import StringIO  # pylint: disable=import-only-modules
     except ImportError:
         from io import StringIO  # pylint: disable=import-only-modules
-    return StringIO(buffer_value) # pylint: disable=disallowed-function-calls
+    return StringIO(buffer_value)  # pylint: disable=disallowed-function-calls
 
 
 def get_args_of_function_node(function_node, args_to_ignore):
@@ -232,7 +232,7 @@ def url_join(base_url, relative_url):
         import urllib.parse as urlparse
     except ImportError:
         import urlparse
-    return urlparse.urljoin(base_url, relative_url) # pylint: disable=disallowed-function-calls
+    return urlparse.urljoin(base_url, relative_url)  # pylint: disable=disallowed-function-calls
 
 
 def url_split(urlstring):
@@ -249,7 +249,7 @@ def url_split(urlstring):
         import urllib.parse as urlparse
     except ImportError:
         import urlparse
-    return urlparse.urlsplit(urlstring) # pylint: disable=disallowed-function-calls
+    return urlparse.urlsplit(urlstring)  # pylint: disable=disallowed-function-calls
 
 
 def url_parse(urlstring):
@@ -268,7 +268,7 @@ def url_parse(urlstring):
         import urllib.parse as urlparse
     except ImportError:
         import urlparse
-    return urlparse.urlparse(urlstring) # pylint: disable=disallowed-function-calls
+    return urlparse.urlparse(urlstring)  # pylint: disable=disallowed-function-calls
 
 
 def url_unsplit(url_parts):
@@ -286,7 +286,7 @@ def url_unsplit(url_parts):
         import urllib.parse as urlparse
     except ImportError:
         import urlparse
-    return urlparse.urlunsplit(url_parts) # pylint: disable=disallowed-function-calls
+    return urlparse.urlunsplit(url_parts)  # pylint: disable=disallowed-function-calls
 
 
 def parse_query_string(query_string):
@@ -305,10 +305,10 @@ def parse_query_string(query_string):
         import urllib.parse as urlparse
     except ImportError:
         import urlparse
-    return urlparse.parse_qs(query_string) # pylint: disable=disallowed-function-calls
+    return urlparse.parse_qs(query_string)  # pylint: disable=disallowed-function-calls
 
 
-def urllib_unquote(content):
+def urllib_unquote(content) -> str:
     """Replace %xx escapes by their single-character equivalent using
     urllib.unquote if run under Python 2 and urllib.parse.unquote if run under
     Python 3.
@@ -378,7 +378,7 @@ def url_encode(query, doseq=False):
         import urllib.parse as urlparse
     except ImportError:
         import urllib as urlparse
-    return urlparse.urlencode(query, doseq)
+    return urlparse.urlencode(query, doseq=doseq)
 
 
 def url_retrieve(source_url, filename=None):
@@ -393,19 +393,18 @@ def url_retrieve(source_url, filename=None):
     Returns:
         urlretrieve. The 'urlretrieve' object.
     """
-    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib.request as urlrequest
     except ImportError:
         import urllib as urlrequest
-        # Change the User-Agent to prevent servers from blocking requests.
-        # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
-        urlrequest.URLopener.version = (
-            'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-            'Gecko/20100101 Firefox/47.0'
-        )
-    return urlrequest.urlretrieve(
-        source_url, filename=filename, context=context)
+
+    # Change the User-Agent to prevent servers from blocking requests.
+    # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
+    urlrequest.URLopener.version = (
+        'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
+        'Gecko/20100101 Firefox/47.0'
+    )
+    return urlrequest.urlretrieve(source_url, filename=filename)
 
 
 def url_open(source_url):
@@ -419,7 +418,9 @@ def url_open(source_url):
     Returns:
         urlopen. The 'urlopen' object.
     """
-    context = ssl.create_default_context(cafile=certifi.where())
+    # TODO(#12912): Remove pylint disable after the arg-name-for-non-keyword-arg
+    # check is refactored.
+    context = ssl.create_default_context(cafile=certifi.where())  # pylint: disable=arg-name-for-non-keyword-arg
     try:
         import urllib.request as urlrequest
     except ImportError:
@@ -490,7 +491,7 @@ def with_metaclass(meta, *bases):
     return future.utils.with_metaclass(meta, *bases)
 
 
-def convert_to_bytes(string_to_convert):
+def convert_to_bytes(string_to_convert) -> bytes:
     """Converts the string to bytes.
 
     Args:
@@ -502,6 +503,13 @@ def convert_to_bytes(string_to_convert):
     """
     if isinstance(string_to_convert, UNICODE):
         return string_to_convert.encode('utf-8')
+    elif isinstance(string_to_convert, int):
+        raise Exception(
+            'Passing int is not allowed, since it is insecure, because when a '
+            'big number is passed to the bytes function it can spend some time '
+            'generating an array with empty bytes. '
+            'See: https://beginnersbook.com/2019/05/python-bytes/'
+        )
     return bytes(string_to_convert)
 
 
@@ -527,14 +535,10 @@ def _recursively_convert_to_str(value):
         }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
-        temp = str(value.encode('utf-8')) # pylint: disable=disallowed-function-calls
-        # Remove the b'' prefix from the string.
-        return temp[2:-1].decode('utf-8')
-    elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
-        temp = bytes(value)
-        # Remove the b'' prefix from the string.
-        return temp[2:-1]
+    elif type(value) == UNICODE:  # pylint: disable=unidiomatic-typecheck
+        return value
+    elif type(value) == builtins.bytes:  # pylint: disable=unidiomatic-typecheck
+        return value.decode('utf-8')
     else:
         return value
 
@@ -601,9 +605,10 @@ def create_enum(*sequential):
     """
     enum_values = dict(ZIP(sequential, sequential))
     try:
-        from enum import Enum # pylint: disable=import-only-modules
+        from enum import Enum  # pylint: disable=import-only-modules
+
         # The type() of argument 1 in Enum must be str, not unicode.
-        return Enum(str('Enum'), enum_values) # pylint: disable=disallowed-function-calls
+        return Enum(str('Enum'), enum_values)  # pylint: disable=disallowed-function-calls
     except ImportError:
         _enums = {}
         for name, value in enum_values.items():
@@ -611,8 +616,8 @@ def create_enum(*sequential):
                 'name': name,
                 'value': value
             }
-            _enums[name] = type(b'Enum', (), _value)
-        return type(b'Enum', (), _enums)
+            _enums[name] = type('Enum', (), _value)
+        return type('Enum', (), _enums)
 
 
 def zip_longest(*args, **kwargs):

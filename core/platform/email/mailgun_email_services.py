@@ -84,12 +84,11 @@ def send_email_to_recipients(
     for email_list in recipient_email_lists:
         data = {
             'from': sender_email,
-            'subject': subject,
-            'text': plaintext_body,
-            'html': html_body
+            'subject': subject.encode('utf-8'),
+            'text': plaintext_body.encode('utf-8'),
+            'html': html_body.encode('utf-8'),
+            'to': email_list[0] if len(email_list) == 1 else email_list
         }
-
-        data['to'] = email_list[0] if len(email_list) == 1 else email_list
 
         if bcc:
             data['bcc'] = bcc[0] if len(bcc) == 1 else bcc
@@ -102,8 +101,13 @@ def send_email_to_recipients(
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
 
-        encoded = base64.b64encode(b'api:%s' % feconf.MAILGUN_API_KEY).strip()
-        auth_str = 'Basic %s' % encoded
+        # The b64encode accepts and returns bytes, so we first need to encode
+        # the MAILGUN_API_KEY to bytes, then decode the returned bytes back
+        # to string.
+        base64_mailgun_api_key = base64.b64encode(
+            b'api:%b' % feconf.MAILGUN_API_KEY.encode('utf-8')
+        ).strip().decode('utf-8')
+        auth_str = 'Basic %s' % base64_mailgun_api_key
         header = {'Authorization': auth_str}
         server = (
             ('https://api.mailgun.net/v3/%s/messages')

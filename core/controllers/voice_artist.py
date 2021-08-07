@@ -19,6 +19,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import io
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
@@ -27,7 +29,6 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 import feconf
-import python_utils
 
 import mutagen
 from mutagen import mp3
@@ -54,7 +55,7 @@ class AudioUploadHandler(base.BaseHandler):
         dot_index = filename.rfind('.')
         extension = filename[dot_index + 1:].lower()
 
-        if dot_index == -1 or dot_index == 0:
+        if dot_index in (-1, 0):
             raise self.InvalidInputException(
                 'No filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
@@ -63,7 +64,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = python_utils.string_io()
+        tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:

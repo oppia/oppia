@@ -73,7 +73,7 @@ export class ExplorationPropertyService {
     // determined by the frontend change list.
     this.savedMemento = cloneDeep(value);
 
-    this._explorationPropertyChangedEventEmitter.emit();
+    this._explorationPropertyChangedEventEmitter.emit(this.propertyName);
   }
 
   // Returns whether the current value has changed from the memento.

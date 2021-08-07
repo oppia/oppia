@@ -100,8 +100,10 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
-        linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
-        linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
+        # Standard and error output is in bytes, we need to decode the line to
+        # print it.
+        linter_stdout = encoded_linter_stdout.decode('utf-8')
+        linter_stderr = encoded_linter_stderr.decode('utf-8')
 
         if linter_stderr:
             raise Exception(linter_stderr)

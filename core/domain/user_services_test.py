@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 import datetime
 import logging
 import os
+import re
 
 from constants import constants
 from core.domain import auth_services
@@ -245,8 +246,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             (None, 'Expected email to be a string, received None'),
             (
                 ['a', '@', 'b.com'],
-                r'Expected email to be a string, received '
-                r'\[u\'a\', u\'@\', u\'b.com\'\]')]
+                re.escape(
+                    'Expected email to be a string, received '
+                    '[\'a\', \'@\', \'b.com\']'
+                )
+            )
+        ]
         for email, error_msg in bad_email_addresses_with_expected_error_message:
             with self.assertRaisesRegexp(utils.ValidationError, error_msg):
                 user_services.create_new_user('auth_id', email)
@@ -277,7 +282,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
             user_settings = user_services.create_new_user(
-                python_utils.convert_to_bytes(ind), actual_email)
+                python_utils.UNICODE(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_user_id_from_username(self):
@@ -1685,7 +1690,8 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
         with self.swap(
             user_services, 'get_current_date_as_string',
-            self.mock_get_current_date_as_string):
+            self.mock_get_current_date_as_string
+        ):
             user_services.update_dashboard_stats_log(self.owner_id)
 
         self.assertEqual(
@@ -1696,6 +1702,14 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                     'average_ratings': None
                 }
             }])
+        self.assertEqual(
+            user_services.get_last_week_dashboard_stats(self.owner_id), {
+                self.CURRENT_DATE_AS_STRING: {
+                    'total_plays': 1,
+                    'num_ratings': 0,
+                    'average_ratings': None
+                }
+            })
 
 
 class SubjectInterestsUnitTests(test_utils.GenericTestBase):
@@ -2252,6 +2266,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_1_id, 'hi')
+        self.process_and_flush_pending_tasks()
 
         stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)

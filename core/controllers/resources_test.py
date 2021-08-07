@@ -62,7 +62,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX, {},
@@ -90,7 +91,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -109,7 +111,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -159,8 +162,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -181,8 +184,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/topic/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, topic_id),
@@ -204,7 +207,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/story/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, story_id),
@@ -226,7 +230,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/skill/%s' % (self.IMAGE_UPLOAD_URL_PREFIX, skill_id),
@@ -253,7 +258,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         # Pass JPG extension even though raw_image data is PNG.
         # This test verifies that, when the filename extension differs from what
@@ -336,7 +342,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['error'],
             'Unsupported tags/attributes found in the SVG:\ntags: '
-            '[u\'badsvg\']\n')
+            '[\'badsvg\']\n')
 
         self.logout()
 
@@ -379,7 +385,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -398,7 +405,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -419,7 +427,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/exploration/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -486,7 +495,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         response = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
@@ -505,7 +515,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         self.post_json(
             '%s/invalid_exp_id' % (self.AUDIO_UPLOAD_URL_PREFIX),
@@ -522,13 +533,15 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
-            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+            upload_files=(
+                ('raw_audio_file', self.TEST_AUDIO_FILE_MP3, raw_audio),)
         )
         self.logout()
 
@@ -542,7 +555,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
 
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
@@ -552,7 +566,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                 '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
                 {'filename': self.TEST_AUDIO_FILE_FLAC},
                 csrf_token=csrf_token,
-                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+                upload_files=[
+                    ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
             )
 
         self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
@@ -568,7 +583,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         mismatched_filename = 'test.flac'
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
 
         with self.accepted_audio_extensions_swap:
@@ -577,7 +593,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                 {'filename': mismatched_filename},
                 csrf_token=csrf_token,
                 expected_status_int=400,
-                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+                upload_files=[
+                    ('raw_audio_file', mismatched_filename, raw_audio)]
             )
 
         self.logout()
@@ -596,7 +613,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
 
         with self.accepted_audio_extensions_swap:
@@ -618,7 +636,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         with python_utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MPEG_CONTAINER),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
@@ -641,7 +660,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         response_dict = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
@@ -702,7 +722,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         missing_extension_filename = 'test'
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         response_dict = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
@@ -728,7 +749,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         with python_utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_OVER_MAX_LENGTH),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
@@ -757,7 +779,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         with python_utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
@@ -780,7 +803,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
-            'rb', encoding=None) as f:
+            'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,

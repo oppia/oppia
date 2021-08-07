@@ -317,7 +317,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the skill passes strict validation."""
         with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.question.validate()
 
     def test_strict_validation(self):
@@ -383,7 +384,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             re.escape(
                 'Expected inapplicable_skill_misconception_ids to be a list of '
-                'strings, received [u\'Test\', 1]'))
+                'strings, received [\'Test\', 1]'))
 
     def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
             self):
@@ -406,7 +407,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             re.escape(
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings of the format <skill_id>-<misconception_id>, '
-                'received [u\'abc\', u\'def\']'))
+                'received [\'abc\', \'def\']'))
 
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
             self):
@@ -610,7 +611,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
-                'received [u\'Test\', 1]')):
+                'received [\'Test\', 1]')):
             self.observed_object.validate()
 
     def test_validate_invalid_type_of_misconception_ids(self):

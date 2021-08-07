@@ -148,7 +148,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertEqual(filenames, ['img.svg', 'img2.svg'])
+        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -1106,6 +1106,31 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.misconceptions[0].feedback, '<p>new feedback</p>')
 
+    def test_update_skill_schema(self):
+        orig_skill_dict = (
+            skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict())
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': (
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION),
+                'from_version': 1,
+                'to_version': 2,
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist, 'Update schema.')
+
+        new_skill_dict = skill_fetchers.get_skill_by_id(self.SKILL_ID).to_dict()
+
+        # Check version is updated.
+        self.assertEqual(new_skill_dict['version'], 2)
+
+        # Delete version and check that the two dicts are the same.
+        del orig_skill_dict['version']
+        del new_skill_dict['version']
+        self.assertEqual(orig_skill_dict, new_skill_dict)
+
     def test_cannot_update_skill_with_invalid_change_list(self):
         observed_log_messages = []
 
@@ -1115,7 +1140,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
         assert_raises_context_manager = self.assertRaisesRegexp(
-            Exception, '\'unicode\' object has no attribute \'cmd\'')
+            Exception, '\'str\' object has no attribute \'cmd\'')
 
         with logging_swap, assert_raises_context_manager:
             skill_services.update_skill(

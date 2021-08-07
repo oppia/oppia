@@ -23,10 +23,10 @@ import ast
 import hashlib
 
 import feconf
+import python_utils
+
 import mailchimp3
 from mailchimp3 import mailchimpclient
-
-import python_utils
 
 
 def _get_subscriber_hash(email):
@@ -45,7 +45,8 @@ def _get_subscriber_hash(email):
         raise Exception(
             'Invalid type for email. Expected string, received %s' % email)
     md5_hash = hashlib.md5()
-    md5_hash.update(email)
+    # The md5 accepts only bytes, so we first need to encode the email to bytes.
+    md5_hash.update(email.encode('utf-8'))
     return md5_hash.hexdigest()
 
 

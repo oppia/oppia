@@ -1247,8 +1247,8 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id0'
     DEMO_EXP_ID = '0'
-    TEST_ASSET_PATH = 'test_asset.file'
-    TEST_ASSET_CONTENT = 'Hello Oppia'
+    TEST_ASSET_PATH = 'test_asset.txt'
+    TEST_ASSET_CONTENT = b'Hello Oppia'
 
     INTRO_AUDIO_FILE = 'introduction_state.mp3'
     ANSWER_GROUP_AUDIO_FILE = 'correct_answer_feedback.mp3'
@@ -2119,13 +2119,15 @@ title: A title
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID))
         fs.commit('image/abc.png', raw_image)
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(
             zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
+        # Read function returns bytes, so we need to decode them before
+        # we compare.
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
+            zf.open('A title.yaml').read().decode('utf-8'),
+            self.SAMPLE_YAML_CONTENT)
 
     def test_export_to_zip_file_with_unpublished_exploration(self):
         """Test the export_to_zip_file() method."""
@@ -2133,8 +2135,7 @@ title: A title
             self.EXP_0_ID, self.owner_id, title='')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
 
@@ -2201,8 +2202,8 @@ title: A title
                 })], 'Add state name')
 
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -2210,19 +2211,21 @@ title: A title
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
         with python_utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'),
-            'rb', encoding=None) as f:
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
+        ) as f:
             raw_audio = f.read()
         fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
 
         self.assertEqual(
             zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
+        # Read function returns bytes, so we need to decode them before
+        # we compare.
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
+            zf.open('A title.yaml').read().decode('utf-8'),
+            self.SAMPLE_YAML_CONTENT)
         self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
 
     def test_export_by_versions(self):
@@ -2283,7 +2286,8 @@ title: A title
         })]
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
@@ -2307,18 +2311,22 @@ title: A title
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=2)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
+        # Read function returns bytes, so we need to decode them before
+        # we compare.
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
+            zf.open('A title.yaml').read().decode('utf-8'),
+            self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=3)
-        zf = zipfile.ZipFile(python_utils.string_io(
-            buffer_value=zip_file_output))
+        zf = zipfile.ZipFile(zip_file_output)
+        # Read function returns bytes, so we need to decode them before
+        # we compare.
         self.assertEqual(
-            zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
+            zf.open('A title.yaml').read().decode('utf-8'),
+            self.UPDATED_YAML_CONTENT)
 
 
 class YAMLExportUnitTests(ExplorationServicesUnitTests):
@@ -3091,13 +3099,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
-                {
-                    'property_name': 'next_content_id_index',
-                    'cmd': 'edit_state_property',
-                    'old_value': 3,
-                    'state_name': 'State 2',
-                    'new_value': 4
-                }) +
+                4) +
             _get_change_list(
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
@@ -3197,7 +3199,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'inputs']['x'] = 'abc'
         with self.assertRaisesRegexp(
             Exception,
-            'abc has the wrong type. It should be a NonnegativeInt.'):
+            'Value has the wrong type. It should be a NonnegativeInt. '
+            'The value is abc'
+        ):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_0_ID,
                 _get_change_list(
@@ -4476,9 +4480,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)
 
-        # This needs to be done in a toplevel wrapper because the datastore
-        # puts to the event log are asynchronous.
-        @transaction_services.toplevel_wrapper
         def populate_datastore():
             """Populates the database according to the sequence."""
             exploration_1 = self.save_new_valid_exploration(
@@ -4985,10 +4986,10 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
-        for exp_id in actual_summaries:
+        for exp_id, actual_summary in actual_summaries.items():
             for prop in simple_props:
                 self.assertEqual(
-                    getattr(actual_summaries[exp_id], prop),
+                    getattr(actual_summary, prop),
                     getattr(expected_summaries[exp_id], prop))
 
     def test_get_all_exploration_summaries(self):

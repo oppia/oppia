@@ -189,7 +189,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -216,7 +217,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -250,7 +252,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'), 'rb',
-            encoding=None) as f:
+            encoding=None
+        ) as f:
             raw_image = f.read()
 
         json_response = self.post_json(
@@ -447,9 +450,7 @@ class TopicEditorTests(
                 ' present in topic with id %s' % (
                     self.skill_id_2, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
 
         self.logout()
 
@@ -607,9 +608,7 @@ class TopicEditorTests(
                 ' present in topic with id %s' % (
                     self.skill_id_2, self.topic_id))
             self.assertEqual(len(messages), 1)
-            self.assertIn(
-                expected_email_html_body,
-                messages[0].html.decode())
+            self.assertIn(expected_email_html_body, messages[0].html)
 
         # Test if the corresponding subtopic pages were created.
         json_response = self.get_json(
@@ -865,9 +864,7 @@ class TopicPublishSendMailHandlerTests(
             ' and publish if it looks good.'
             % (feconf.TOPIC_EDITOR_URL_PREFIX + '/' + self.topic_id))
         self.assertEqual(len(messages), 1)
-        self.assertIn(
-            expected_email_html_body,
-            messages[0].html.decode())
+        self.assertIn(expected_email_html_body, messages[0].html)
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):

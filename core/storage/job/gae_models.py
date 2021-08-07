@@ -19,11 +19,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import random
-
 from core.platform import models
-import python_utils
-import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -41,22 +37,6 @@ STATUS_CODE_CANCELED = 'canceled'
 
 class JobModel(base_models.BaseModel):
     """Class representing a datastore entity for a long-running job."""
-
-    @classmethod
-    def get_new_id(cls, entity_name):
-        """Overwrites superclass method.
-
-        Args:
-            entity_name: str. The name of the entity to create a new job id for.
-
-        Returns:
-            str. A job id.
-        """
-        job_type = entity_name
-        current_time_str = python_utils.UNICODE(
-            int(utils.get_current_time_in_millisecs()))
-        random_int = random.randint(0, 1000)
-        return '%s-%s-%s' % (job_type, current_time_str, random_int)
 
     # The job type.
     job_type = datastore_services.StringProperty(indexed=True)
@@ -128,25 +108,6 @@ class JobModel(base_models.BaseModel):
         """
         # Whether the job is currently in 'queued' or 'started' status.
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
-
-    @classmethod
-    def get_recent_jobs(cls, limit, recency_msec):
-        """Gets at most limit jobs with respect to a time after recency_msec.
-
-        Args:
-            limit: int. A limit on the number of jobs to return.
-            recency_msec: int. The number of milliseconds earlier
-                than the current time.
-
-        Returns:
-            list(JobModel) or None. A list of at most `limit` jobs
-            that come after recency_msec time.
-        """
-        earliest_time_msec = (
-            utils.get_current_time_in_millisecs() - recency_msec)
-        return cls.query().filter(
-            cls.time_queued_msec > earliest_time_msec
-        ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
     def get_all_unfinished_jobs(cls, limit):

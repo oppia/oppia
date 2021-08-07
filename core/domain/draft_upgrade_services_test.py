@@ -109,10 +109,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         'to_version': '37'
     })]
 
-    # EXP_ID and USER_ID used to create default explorations.
-    EXP_ID = 'exp_id'
-    USER_ID = 'user_id'
-
     def create_and_migrate_new_exploration(
             self, current_schema_version, target_schema_version):
         """Creates an exploration and applies a state schema migration to it.
@@ -142,12 +138,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         # state schema version, so we set the latest schema version to be the
         # target_schema_version.
         with self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION',
-            int(target_schema_version)):
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', int(target_schema_version)):
 
             # Create and migrate the exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
-            exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
             exp_services.update_exploration(
                 self.USER_ID, self.EXP_ID, exp_migration_change_list,
                 'Ran Exploration Migration job.')
@@ -157,8 +151,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
             self.assertEqual(exploration.version, 2)
             self.assertEqual(
-                python_utils.UNICODE(
-                    exploration.states_schema_version),
+                python_utils.UNICODE(exploration.states_schema_version),
                 target_schema_version)
 
     def test_convert_to_latest_schema_version_implemented(self):
@@ -1328,7 +1321,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_v33_dict_list = [
             change.to_dict() for change in migrated_draft_change_list_v33
         ]
-        self.assertEqual(
+        self.assertItemsEqual(
             expected_draft_change_list_v33_dict_list,
             migrated_draft_change_list_v33_dict_list)
 

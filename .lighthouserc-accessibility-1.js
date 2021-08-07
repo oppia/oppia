@@ -1,0 +1,100 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Configuration for accessibility.
+ */
+
+const baseConfig = require('./.lighthouserc-base.js')
+
+module.exports = {
+  'ci': {
+    'collect': {
+      'numberOfRuns': baseConfig['numberOfRuns'],
+      'puppeteerScript': baseConfig['puppeteerScript'],
+      'url': baseConfig['urlShards'][1]
+    },
+    'assert': {
+      'assertMatrix': [
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/about$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/admin$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/community-library$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/contact$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/contributor-dashboard$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/creator-dashboard$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/delete-account$',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.99}]
+          }
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/donate$',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 0.98}]
+          }
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/emailDashboard$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/get-started$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/learner-dashboard$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/nonprofits$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/moderator$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/parents$',
+          'assertions': baseConfig['baseAccessibilityAssertions']
+        }
+      ]
+    },
+    'upload': {
+      'target': 'temporary-public-storage'
+    }
+  }
+};

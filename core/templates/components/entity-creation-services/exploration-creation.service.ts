@@ -84,8 +84,9 @@ export class ExplorationCreationService {
       this.loaderService.showLoadingScreen('Creating exploration');
 
       var form = new FormData();
-      form.append('yaml_file', yamlFile);
-      form.append('payload', JSON.stringify({}));
+      form.append('payload', JSON.stringify({
+        yaml_file: yamlFile
+      }));
       this.csrfTokenService.getTokenAsync().then((token) => {
         form.append('csrf_token', token);
         $.ajax({

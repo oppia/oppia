@@ -20,37 +20,16 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import feconf
-from jobs.io import stub_io
 
 from apache_beam.options import pipeline_options
-
-
-def validate_datastoreio_stub(obj):
-    """Asserts that the given object is an instance of DatastoreioStub.
-
-    Args:
-        obj: *. The object to validate.
-
-    Returns:
-        DatastoreioStub. The validated object, unchanged.
-
-    Raises:
-        TypeError. The object is not an instance of DatastoreioStub.
-    """
-    if not isinstance(obj, stub_io.DatastoreioStub):
-        raise TypeError('obj=%r is not an instance of DatastoreioStub' % obj)
-    return obj
 
 
 class JobOptions(pipeline_options.GoogleCloudOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
-        # TODO(#11475): Delete this option once we're able to use the real
-        # datastoreio module once we've finished migrating to Python 3.
-        'datastoreio_stub': (
-            validate_datastoreio_stub,
-            'Source of datastore operations for the pipeline to depend upon'),
+        'namespace': (
+            str, 'Namespace for isolating the NDB operations during tests.'),
     }
 
     def __init__(self, flags=None, **job_options):

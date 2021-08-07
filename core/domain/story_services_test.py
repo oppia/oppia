@@ -518,6 +518,39 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
+    def test_update_story_schema(self):
+        topic_id = topic_fetchers.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='A New Topic',
+            abbreviated_name='new-topic', url_fragment='new-topic',
+            description='A new topic description.',
+            canonical_story_ids=[story_id], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
+        self.save_new_story(story_id, self.USER_ID, topic_id)
+
+        orig_story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+                'from_version': 1,
+                'to_version': 2,
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, story_id, changelist, 'Update schema.')
+
+        new_story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
+
+        # Check version is updated.
+        self.assertEqual(new_story_dict['version'], 2)
+
+        # Delete version and check that the two dicts are the same.
+        del orig_story_dict['version']
+        del new_story_dict['version']
+        self.assertEqual(orig_story_dict, new_story_dict)
+
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
         self.assertEqual(story_fetchers.get_story_by_id(

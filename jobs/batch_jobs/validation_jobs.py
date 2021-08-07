@@ -77,15 +77,11 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         Returns:
             PCollection. A PCollection of audit errors discovered during the
             audit.
-
-        Raises:
-            ValueError. When the `datastoreio` option, which provides the
-                PTransforms for performing datastore IO operations, is None.
         """
         existing_models, deleted_models = (
             self.pipeline
-            | 'Get all models' >> ndb_io.GetModels(
-                datastore_services.query_everything(), self.datastoreio_stub)
+            | 'Get all models' >> (
+                ndb_io.GetModels(datastore_services.query_everything()))
             | 'Partition by model.deleted' >> (
                 beam.Partition(lambda model, _: int(model.deleted), 2))
         )
@@ -187,21 +183,22 @@ class ApplyAuditDoFns(beam.PTransform):
         self._kind = kind
         self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
 
-    def expand(self, models_of_kind):
+    def expand(self, inputs):
         """Returns audit errors from every Audit DoFn targeting the models.
 
         This is the method that PTransform requires us to override when
         implementing custom transforms.
 
         Args:
-            models_of_kind: PCollection. Models of self._kind.
+            inputs: PCollection. Models of self._kind, can also contain
+                just one model.
 
         Returns:
             iterable(PCollection). A chain of PCollections. Each individual one
             is the result of a specific DoFn, and is labeled as such.
         """
         return (
-            models_of_kind
+            inputs
             | 'Apply %s on %s' % (f.__name__, self._kind) >> beam.ParDo(f())
             for f in self._do_fn_types
         )
@@ -220,18 +217,18 @@ class GetExistingModelKeyCounts(beam.PTransform):
             label='Generate (key, count)s for all existing %ss' % kind)
         self._kind = kind
 
-    def expand(self, models_of_kind):
+    def expand(self, input_or_inputs):
         """Returns a PCollection of (key, count) pairs for each input model.
 
         Args:
-            models_of_kind: PCollection. The input models.
+            input_or_inputs: PCollection. The input models.
 
         Returns:
             PCollection. The (ModelKey, int) pairs correponding to the input
             models and their counts (always 1).
         """
         return (
-            models_of_kind
+            input_or_inputs
             | 'Generate (key, count) for %ss' % self._kind >> beam.Map(
                 lambda model: (ModelKey.from_model(model), 1))
         )
@@ -251,11 +248,11 @@ class GetMissingModelKeyErrors(beam.PTransform):
         self._id_referencing_properties = (
             ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR[kind])
 
-    def expand(self, models_of_kind):
+    def expand(self, input_or_inputs):
         """Returns PCollections of (key, error) pairs referenced by the models.
 
         Args:
-            models_of_kind: PCollection. The input models.
+            input_or_inputs: PCollection. The input models.
 
         Returns:
             iterable(PCollection). The (ModelKey, ModelRelationshipError) pairs
@@ -264,7 +261,7 @@ class GetMissingModelKeyErrors(beam.PTransform):
             missing.
         """
         return (
-            models_of_kind
+            input_or_inputs
             | 'Generate errors from %s' % property_of_model >> beam.FlatMap(
                 self._generate_missing_key_errors, property_of_model,
                 referenced_kinds)
@@ -294,7 +291,7 @@ class GetMissingModelKeyErrors(beam.PTransform):
             if property_value is None:
                 continue
             model_id = job_utils.get_model_id(model)
-            referenced_id = python_utils.convert_to_bytes(property_value)
+            referenced_id = property_value
             for referenced_kind in referenced_kinds:
                 error = base_validation_errors.ModelRelationshipError(
                     property_of_model, model_id, referenced_kind, referenced_id)

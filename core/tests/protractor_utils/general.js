@@ -59,7 +59,8 @@ var CONSOLE_ERRORS_TO_IGNORE = [
     'load resource: net::ERR_CERT_DATE_INVALID'),
 ];
 
-var checkForConsoleErrors = async function(errorsToIgnore) {
+var checkForConsoleErrors = async function(
+    errorsToIgnore, skipDebugging = true) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
