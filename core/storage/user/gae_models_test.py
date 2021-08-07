@@ -30,6 +30,12 @@ import feconf
 import python_utils
 import utils
 
+from typing import Dict, List, Set, Text, Union # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, user_models # pylint: disable=unused-import
+
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 
@@ -60,7 +66,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     GENERIC_DISPLAY_ALIAS = 'display_alias'
 
     def setUp(self):
-        super(UserSettingsModelTest, self).setUp()
+        # type: () -> None
+        super(UserSettingsModelTest, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
@@ -107,11 +114,13 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy_is_delete(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
+        # type: () -> None
         # Case for a full user.
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID))
@@ -127,6 +136,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.PROFILE_1_ID))
 
     def test_apply_deletion_policy_for_banned_user_deletes_them(self):
+        # type: () -> None
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
         user_models.UserSettingsModel.apply_deletion_policy(self.USER_2_ID)
@@ -134,12 +144,14 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_2_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        # type: () -> None
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.NONEXISTENT_USER_ID))
         user_models.UserSettingsModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_registered_user_id_is_true(self):
+        # type: () -> None
         # Case for a full user.
         self.assertTrue(
             user_models.UserSettingsModel.has_reference_to_user_id(
@@ -159,12 +171,14 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
+        # type: () -> None
         self.assertFalse(
             user_models.UserSettingsModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
     def test_get_by_role_for_admin_returns_admin_users(self):
+        # type: () -> None
         actual_users = [
             user_models.UserSettingsModel.get_by_id(self.USER_1_ID),
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
@@ -174,12 +188,14 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
                 feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
     def test_export_data_for_nonexistent_user_raises_exception(self):
-        with self.assertRaisesRegexp(
+        # type: () -> None
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user not found'):
             user_models.UserSettingsModel.export_data('fake_user')
 
     def test_export_data_for_trivial_case_returns_data_correctly(self):
+        # type: () -> None
         user = user_models.UserSettingsModel.get_by_id(self.USER_1_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -208,6 +224,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(expected_user_data, user_data)
 
     def test_export_data_for_nontrivial_case_returns_data_correctly(self):
+        # type: () -> None
         user = user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         user_data = user.export_data(user.id)
         expected_user_data = {
@@ -236,7 +253,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(expected_user_data, user_data)
 
     def test_get_new_id_under_normal_behaviour_returns_unique_ids(self):
-        ids = set([])
+        # type: () -> None
+        ids = set() # type: Set[Text]
         for _ in python_utils.RANGE(100):
             new_id = user_models.UserSettingsModel.get_new_id('')
             self.assertNotIn(new_id, ids)
@@ -245,24 +263,26 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             ids.add(new_id)
 
     def test_get_new_id_with_deleted_user_model(self):
+        # type: () -> None
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.DeletedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.DeletedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             user_models.UserSettingsModel.get_new_id('exploration')
 
     def test_get_new_id_for_too_many_collisions_raises_error(self):
+        # type: () -> None
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.UserSettingsModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.UserSettingsModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -281,8 +301,9 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
     TOPIC_IDS_1 = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(CompletedActivitiesModelTests, self).setUp()
+        super(CompletedActivitiesModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.CompletedActivitiesModel(
             id=self.USER_1_ID,
@@ -301,11 +322,13 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.CompletedActivitiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.CompletedActivitiesModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
@@ -316,6 +339,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.CompletedActivitiesModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -330,12 +354,14 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.CompletedActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
         self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
+        # type: () -> None
         """Test if export_data works as intended on a user in datastore."""
         user_data = (
             user_models.CompletedActivitiesModel.export_data(self.USER_1_ID))
@@ -361,8 +387,9 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
     TOPIC_IDS_1 = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(IncompleteActivitiesModelTests, self).setUp()
+        super(IncompleteActivitiesModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.IncompleteActivitiesModel(
             id=self.USER_1_ID,
@@ -381,11 +408,13 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.IncompleteActivitiesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.IncompleteActivitiesModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
@@ -396,6 +425,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.IncompleteActivitiesModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -410,12 +440,14 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.IncompleteActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
         self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
+        # type: () -> None
         """Test if export_data works as intended on a user in datastore."""
         user_data = (
             user_models.IncompleteActivitiesModel.export_data(self.USER_1_ID))
@@ -438,8 +470,9 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
     TOPIC_IDS = ['topic_1', 'topic_2', 'topic_3']
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(LearnerGoalsModelTests, self).setUp()
+        super(LearnerGoalsModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.LearnerGoalsModel(
             id=self.USER_1_ID,
@@ -454,11 +487,13 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.LearnerGoalsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.LearnerGoalsModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
@@ -469,6 +504,7 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.LearnerGoalsModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -483,12 +519,14 @@ class LearnerGoalsModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.LearnerGoalsModel.export_data(
             self.NONEXISTENT_USER_ID)
         self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
+        # type: () -> None
         """Test if export_data works as intended on a user in datastore."""
         user_data = (
             user_models.LearnerGoalsModel.export_data(self.USER_1_ID))
@@ -513,7 +551,8 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     EXP_VERSION = 1
 
     def setUp(self):
-        super(ExpUserLastPlaythroughModelTest, self).setUp()
+        # type: () -> None
+        super(ExpUserLastPlaythroughModelTest, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_ID_1, self.EXP_ID_0),
@@ -546,11 +585,13 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.ExpUserLastPlaythroughModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.ExpUserLastPlaythroughModel.apply_deletion_policy(
             self.USER_ID_1)
         self.assertIsNone(
@@ -561,6 +602,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.ExpUserLastPlaythroughModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -579,6 +621,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         )
 
     def test_create_success(self):
+        # type: () -> None
         user_models.ExpUserLastPlaythroughModel.create(
             self.USER_ID_1, self.EXP_ID_1).put()
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -588,9 +631,12 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_1)
 
     def test_get_success(self):
+        # type: () -> None
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID_1, self.EXP_ID_0)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_ID_1)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_0)
         self.assertEqual(
@@ -599,19 +645,22 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             retrieved_object.last_played_state_name, self.STATE_NAME_1)
 
     def test_get_failure(self):
+        # type: () -> None
         retrieved_object = user_models.ExpUserLastPlaythroughModel.get(
             self.USER_ID_1, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
 
     def test_export_data_none(self):
+        # type: () -> None
         """Test export data on a user with no explorations."""
         user_data = user_models.ExpUserLastPlaythroughModel.export_data(
             self.NONEXISTENT_USER_ID)
-        expected_data = {}
+        expected_data = {} # type: Dict[Text, Dict[Text, Text]]
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_single(self):
+        # type: () -> None
         """Test export data on a user with a single exploration."""
         user_data = user_models.ExpUserLastPlaythroughModel.export_data(
             self.USER_ID_1)
@@ -624,6 +673,7 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_multi(self):
+        # type: () -> None
         """Test export data on a user with multiple explorations."""
         user_data = user_models.ExpUserLastPlaythroughModel.export_data(
             self.USER_ID_2)
@@ -650,8 +700,9 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
     COLLECTION_IDS_1 = ['col_1', 'col_2', 'col_3']
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(LearnerPlaylistModelTests, self).setUp()
+        super(LearnerPlaylistModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.LearnerPlaylistModel(
             id=self.USER_ID_1,
@@ -666,11 +717,13 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.LearnerPlaylistModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.LearnerPlaylistModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.USER_ID_1))
@@ -680,6 +733,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.LearnerPlaylistModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -694,12 +748,14 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(
             self.NONEXISTENT_USER_ID)
         self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
+        # type: () -> None
         """Test if export_data works as intended on a user in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(self.USER_ID_1)
         expected_data = {
@@ -722,35 +778,38 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
     EXP_ID_2 = 'exp_2'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserContributionsModelTests, self).setUp()
+        super(UserContributionsModelTests, self).setUp() # type: ignore[no-untyped-call]
         # User A has no created explorations, one edited exploration.
         # User B has two created and edited explorations.
-        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME) # type: ignore[no-untyped-call]
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL) # type: ignore[no-untyped-call]
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME) # type: ignore[no-untyped-call]
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL) # type: ignore[no-untyped-call]
 
         # Note that creating an exploration counts as editing it.
-        self.save_new_valid_exploration(
+        self.save_new_valid_exploration( # type: ignore[no-untyped-call]
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
+        exp_services.update_exploration( # type: ignore[no-untyped-call]
+            self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange( # type: ignore[no-untyped-call]
+                {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'the objective'
+                })], 'Test edit')
 
-        self.save_new_valid_exploration(
+        self.save_new_valid_exploration( # type: ignore[no-untyped-call]
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
+        exp_services.update_exploration( # type: ignore[no-untyped-call]
+            self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange( # type: ignore[no-untyped-call]
+                {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'the objective'
+                })], 'Test edit')
 
         user_models.UserContributionsModel(
             id=self.USER_C_ID,
@@ -758,11 +817,13 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserContributionsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserContributionsModel.apply_deletion_policy(self.user_a_id)
         self.assertIsNone(
             user_models.UserContributionsModel.get_by_id(self.user_a_id))
@@ -772,6 +833,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserContributionsModel
             .has_reference_to_user_id(self.user_a_id)
@@ -786,12 +848,14 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.UserContributionsModel.export_data(
             self.NONEXISTENT_USER_ID)
         self.assertEqual({}, user_data)
 
     def test_export_data_on_partially_involved_user(self):
+        # type: () -> None
         """Test export_data on user with no creations and two edits."""
         user_data = user_models.UserContributionsModel.export_data(
             self.user_a_id)
@@ -802,6 +866,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_on_highly_involved_user(self):
+        # type: () -> None
         """Test export data on user with two creations and two edits."""
         user_data = user_models.UserContributionsModel.export_data(
             self.user_b_id)
@@ -821,8 +886,9 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
     USER_ID_3 = 'id_3'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserEmailPreferencesModelTests, self).setUp()
+        super(UserEmailPreferencesModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserEmailPreferencesModel(id=self.USER_ID_1).put()
         user_models.UserEmailPreferencesModel(
@@ -838,11 +904,13 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserEmailPreferencesModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserEmailPreferencesModel.apply_deletion_policy(
             self.USER_ID_1)
         self.assertIsNone(
@@ -853,6 +921,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserEmailPreferencesModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -867,6 +936,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_trivial(self):
+        # type: () -> None
         user_data = user_models.UserEmailPreferencesModel.export_data(
             self.USER_ID_1)
         self.assertEqual(
@@ -880,6 +950,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_nontrivial(self):
+        # type: () -> None
         user_data = user_models.UserEmailPreferencesModel.export_data(
             self.USER_ID_3)
         self.assertEqual(
@@ -911,8 +982,9 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserSubscriptionsModelTests, self).setUp()
+        super(UserSubscriptionsModelTests, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com'
@@ -946,11 +1018,13 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserSubscriptionsModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(
             user_models.UserSubscriptionsModel.get_by_id(self.USER_ID_1))
@@ -960,6 +1034,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserSubscriptionsModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -990,6 +1065,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_trivial(self):
+        # type: () -> None
         """Test if empty user data is properly exported."""
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
@@ -999,10 +1075,11 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'exploration_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked_msec': None
-        }
+        } # type: Dict[Text, Union[List[Text], None]]
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
+        # type: () -> None
         """Test if nonempty user data is properly exported."""
         user_data = (
             user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
@@ -1017,6 +1094,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if exception is raised on nonexistent UserSubscriptionsModel."""
         user_data = user_models.UserSubscriptionsModel.export_data(
             self.USER_ID_3)
@@ -1032,8 +1110,9 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
     USER_ID_3 = 'id_3'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserSubscribersModelTests, self).setUp()
+        super(UserSubscribersModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
@@ -1049,11 +1128,13 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
         user_models.UserSubscribersModel(id=self.USER_ID_2, deleted=True).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserSubscribersModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserSubscribersModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(
             user_models.UserSubscribersModel.get_by_id(self.USER_ID_1))
@@ -1063,6 +1144,7 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserSubscribersModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1089,8 +1171,9 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'id_2'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserRecentChangesBatchModelTests, self).setUp()
+        super(UserRecentChangesBatchModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserRecentChangesBatchModel(id=self.USER_ID_1).put()
         user_models.UserRecentChangesBatchModel(
@@ -1099,11 +1182,13 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserRecentChangesBatchModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserRecentChangesBatchModel.apply_deletion_policy(
             self.USER_ID_1)
         self.assertIsNone(
@@ -1114,6 +1199,7 @@ class UserRecentChangesBatchModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserRecentChangesBatchModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1175,8 +1261,9 @@ class UserStatsModelTest(test_utils.GenericTestBase):
     ]
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserStatsModelTest, self).setUp()
+        super(UserStatsModelTest, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserStatsModel(
             id=self.USER_ID_1,
@@ -1205,11 +1292,13 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserStatsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserStatsModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(user_models.UserStatsModel.get_by_id(self.USER_ID_1))
         # Test that calling apply_deletion_policy with no existing model
@@ -1218,6 +1307,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserStatsModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1232,6 +1322,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_existing_user(self):
+        # type: () -> None
         """Test if export_data works when user is in data store."""
         user_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
         test_data = {
@@ -1244,6 +1335,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_on_multiple_users(self):
+        # type: () -> None
         """Test if export_data works on multiple users in data store."""
         user_1_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
         test_1_data = {
@@ -1267,10 +1359,11 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user_2_data, test_2_data)
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test if export_data returns None when user is not in data store."""
         user_data = user_models.UserStatsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        test_data = {}
+        test_data = {} # type: Dict[Text, Text]
         self.assertEqual(user_data, test_data)
 
 
@@ -1287,7 +1380,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     EXP_ID_THREE = 'exp_id_three'
 
     def setUp(self):
-        super(ExplorationUserDataModelTest, self).setUp()
+        # type: () -> None
+        super(ExplorationUserDataModelTest, self).setUp() # type: ignore[no-untyped-call]
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_1_ID, self.EXP_ID_ONE),
             user_id=self.USER_1_ID,
@@ -1314,11 +1408,13 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.ExplorationUserDataModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.ExplorationUserDataModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
@@ -1332,6 +1428,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.ExplorationUserDataModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -1346,6 +1443,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         )
 
     def test_create_success(self):
+        # type: () -> None
         user_models.ExplorationUserDataModel.create(
             self.USER_1_ID, self.EXP_ID_TWO).put()
         retrieved_object = user_models.ExplorationUserDataModel.get_by_id(
@@ -1355,9 +1453,12 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_TWO)
 
     def test_get_success(self):
+        # type: () -> None
         retrieved_object = user_models.ExplorationUserDataModel.get(
             self.USER_1_ID, self.EXP_ID_ONE)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.exploration_id, self.EXP_ID_ONE)
         self.assertEqual(retrieved_object.rating, 2)
@@ -1371,17 +1472,20 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
     def test_get_failure(self):
+        # type: () -> None
         retrieved_object = user_models.ExplorationUserDataModel.get(
             self.USER_1_ID, 'unknown_exp_id')
 
         self.assertEqual(retrieved_object, None)
 
     def test_export_data_nonexistent_user(self):
+        # type: () -> None
         user_data = user_models.ExplorationUserDataModel.export_data(
             'fake_user')
         self.assertEqual(user_data, {})
 
     def test_export_data_one_exploration(self):
+        # type: () -> None
         """Test export data when user has one exploration."""
         user_data = user_models.ExplorationUserDataModel.export_data(
             self.USER_2_ID)
@@ -1402,6 +1506,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertDictEqual(expected_data, user_data)
 
     def test_export_data_multiple_explorations(self):
+        # type: () -> None
         """Test export data when user has multiple explorations."""
         # Add two more explorations.
         user_models.ExplorationUserDataModel(
@@ -1472,7 +1577,8 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
     COMPLETED_EXPLORATION_IDS_2 = ['exp_id_4', 'exp_id_5', 'exp_id_6']
 
     def setUp(self):
-        super(CollectionProgressModelTests, self).setUp()
+        # type: () -> None
+        super(CollectionProgressModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.CollectionProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.COLLECTION_ID_1),
@@ -1501,11 +1607,13 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.CollectionProgressModel.apply_deletion_policy(
             self.USER_ID_1)
         self.assertIsNone(
@@ -1519,6 +1627,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.CollectionProgressModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1537,13 +1646,15 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         """Test export data on nonexistent user."""
         user_data = user_models.CollectionProgressModel.export_data(
             self.NONEXISTENT_USER_ID)
-        expected_data = {}
+        expected_data = {} # type: Dict[Text, Text]
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_single_collection(self):
+        # type: () -> None
         """Test export data on user with a single collection."""
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_2)
@@ -1555,6 +1666,7 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_multiple_collections(self):
+        # type: () -> None
         """Test export data on user with multiple collections."""
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_1)
@@ -1582,7 +1694,8 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
     COMPLETED_NODE_IDS_2 = ['node_id_a']
 
     def setUp(self):
-        super(StoryProgressModelTests, self).setUp()
+        # type: () -> None
+        super(StoryProgressModelTests, self).setUp() # type: ignore[no-untyped-call]
         user_models.StoryProgressModel(
             id='%s.%s' % (self.USER_ID_1, self.STORY_ID_1),
             user_id=self.USER_ID_1,
@@ -1610,11 +1723,13 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.StoryProgressModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.StoryProgressModel.apply_deletion_policy(self.USER_ID_2)
         self.assertIsNone(
             user_models.StoryProgressModel.query(
@@ -1627,6 +1742,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.StoryProgressModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1645,12 +1761,14 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_on_nonexistent_user(self):
+        # type: () -> None
         user_data = user_models.StoryProgressModel.export_data(
             self.NONEXISTENT_USER_ID)
-        expected_data = {}
+        expected_data = {} # type: Dict[Text, Text]
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_on_single_story(self):
+        # type: () -> None
         user_data = user_models.StoryProgressModel.export_data(
             self.USER_ID_1)
         expected_data = {
@@ -1661,6 +1779,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
     def test_export_data_on_multi_story(self):
+        # type: () -> None
         user_data = user_models.StoryProgressModel.export_data(
             self.USER_ID_2)
         expected_data = {
@@ -1674,6 +1793,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         self.assertEqual(expected_data, user_data)
 
     def test_get_multi(self):
+        # type: () -> None
         model = user_models.StoryProgressModel.create(
             'user_id', 'story_id_1')
         model.update_timestamps()
@@ -1686,6 +1806,9 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
 
         story_progress_models = user_models.StoryProgressModel.get_multi(
             'user_id', ['story_id_1', 'story_id_2'])
+        # Ruling out the possibility of None for mypy type checking.
+        assert story_progress_models[0] is not None
+        assert story_progress_models[1] is not None
         self.assertEqual(len(story_progress_models), 2)
         self.assertEqual(story_progress_models[0].user_id, 'user_id')
         self.assertEqual(story_progress_models[0].story_id, 'story_id_1')
@@ -1705,8 +1828,9 @@ class UserQueryModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'submitter_id_2'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserQueryModelTests, self).setUp()
+        super(UserQueryModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
@@ -1723,11 +1847,13 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserQueryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserQueryModel.apply_deletion_policy(self.USER_ID_1)
         self.assertIsNone(
             user_models.UserQueryModel.query(
@@ -1740,6 +1866,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserQueryModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1754,6 +1881,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         )
 
     def test_instance_stores_correct_data(self):
+        # type: () -> None
         inactive_in_last_n_days = 5
         created_at_least_n_exps = 1
         created_fewer_than_n_exps = 3
@@ -1775,6 +1903,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             submitter_id=self.USER_ID_1).put()
 
         query_model = user_models.UserQueryModel.get(self.QUERY_1_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert query_model is not None
         self.assertEqual(query_model.submitter_id, self.USER_ID_1)
         self.assertEqual(
             query_model.inactive_in_last_n_days, inactive_in_last_n_days)
@@ -1795,6 +1925,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             used_logic_proof_interaction)
 
     def test_fetch_page(self):
+        # type: () -> None
         inactive_in_last_n_days = 5
         created_at_least_n_exps = 1
         created_fewer_than_n_exps = 3
@@ -1889,18 +2020,21 @@ class UserBulkEmailsModelTests(test_utils.GenericTestBase):
     USER_ID_2 = 'id_2'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserBulkEmailsModelTests, self).setUp()
+        super(UserBulkEmailsModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserBulkEmailsModel(id=self.USER_ID_1).put()
         user_models.UserBulkEmailsModel(id=self.USER_ID_2, deleted=True).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserBulkEmailsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserBulkEmailsModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -1926,7 +2060,8 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     DEGREE_OF_MASTERY = 0.5
 
     def setUp(self):
-        super(UserSkillMasteryModelTests, self).setUp()
+        # type: () -> None
+        super(UserSkillMasteryModelTests, self).setUp() # type: ignore[no-untyped-call]
         user_models.UserSkillMasteryModel(
             id=user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_1_ID, self.SKILL_ID_1),
@@ -1951,11 +2086,13 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserSkillMasteryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserSkillMasteryModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserSkillMasteryModel.query(
@@ -1968,6 +2105,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserSkillMasteryModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -1982,6 +2120,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         )
 
     def test_construct_model_id(self):
+        # type: () -> None
         constructed_model_id = (
             user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_1_ID, self.SKILL_ID_1))
@@ -1989,23 +2128,28 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(constructed_model_id, 'user_1_id.skill_id_1')
 
     def test_get_success(self):
+        # type: () -> None
         constructed_model_id = (
             user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_1_ID, self.SKILL_ID_1))
         retrieved_object = user_models.UserSkillMasteryModel.get(
             constructed_model_id)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_object is not None
         self.assertEqual(retrieved_object.user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object.skill_id, self.SKILL_ID_1)
         self.assertEqual(retrieved_object.degree_of_mastery, 0.5)
 
     def test_get_failure(self):
+        # type: () -> None
         retrieved_object = user_models.UserSkillMasteryModel.get(
             'unknown_model_id', strict=False)
 
         self.assertEqual(retrieved_object, None)
 
     def test_get_multi_success(self):
+        # type: () -> None
         skill_ids = [
             user_models.UserSkillMasteryModel.construct_model_id(
                 self.USER_1_ID, self.SKILL_ID_1),
@@ -2014,6 +2158,9 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         retrieved_object = user_models.UserSkillMasteryModel.get_multi(
             skill_ids)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_object[0] is not None
+        assert retrieved_object[1] is not None
         self.assertEqual(retrieved_object[0].user_id, self.USER_1_ID)
         self.assertEqual(retrieved_object[0].skill_id, self.SKILL_ID_1)
         self.assertEqual(retrieved_object[0].degree_of_mastery, 0.5)
@@ -2022,6 +2169,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object[1].degree_of_mastery, 0.5)
 
     def test_get_multi_failure(self):
+        # type: () -> None
         skill_ids = ['unknown_model_id_1', 'unknown_model_id_2']
         retrieved_object = user_models.UserSkillMasteryModel.get_multi(
             skill_ids)
@@ -2029,11 +2177,13 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object, [None, None])
 
     def test_export_data_trivial(self):
+        # type: () -> None
         user_data = user_models.UserSkillMasteryModel.export_data('fake_user')
-        test_data = {}
+        test_data = {} # type: Dict[Text, Text]
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self):
+        # type: () -> None
         user_data = user_models.UserSkillMasteryModel.export_data(
             self.USER_1_ID)
         test_data = {
@@ -2059,8 +2209,9 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
     SCORE_CATEGORY_2 = 'category_2'
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(UserContributionProficiencyModelTests, self).setUp()
+        super(UserContributionProficiencyModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.UserContributionProficiencyModel(
             id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
@@ -2086,12 +2237,14 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_export_data_trivial(self):
+        # type: () -> None
         user_data = user_models.UserContributionProficiencyModel.export_data(
             'USER_WITHOUT_DATA')
-        expected_data = {}
+        expected_data = {} # type: Dict[Text, Text]
         self.assertEqual(user_data, expected_data)
 
     def test_export_data_nontrivial(self):
+        # type: () -> None
         user_data = user_models.UserContributionProficiencyModel.export_data(
             self.USER_1_ID)
         expected_data = {
@@ -2107,11 +2260,13 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, expected_data)
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserContributionProficiencyModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
+        # type: () -> None
         user_models.UserContributionProficiencyModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
@@ -2126,6 +2281,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.UserContributionProficiencyModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -2140,6 +2296,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         )
 
     def test_create_model(self):
+        # type: () -> None
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
         score_models = (
@@ -2152,15 +2309,17 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertEqual(score_models[0].score, 1)
 
     def test_create_entry_already_exists_failure(self):
+        # type: () -> None
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'There is already a UserContributionProficiencyModel '
             'entry with the given id: category1.user1'):
             user_models.UserContributionProficiencyModel.create(
                 'user1', 'category1', 2)
 
     def test_get_all_users_with_score_above_minimum_for_category(self):
+        # type: () -> None
         # User scoring models for category 1.
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
@@ -2207,6 +2366,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
 
     def test_get_all_users_with_score_above_minimum_for_category_invalid_input(
             self):
+        # type: () -> None
         user_score_models = (
             user_models.UserContributionProficiencyModel
             .get_all_users_with_score_above_minimum_for_category(
@@ -2215,6 +2375,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_score_models, [])
 
     def test_get_all_scores_of_user_with_multiple_scores(self):
+        # type: () -> None
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', 1)
         user_models.UserContributionProficiencyModel.create(
@@ -2235,6 +2396,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
             'user1', 'category3'), user_score_models)
 
     def test_get_all_scores_of_user_with_an_invalid_user_id_is_empty(self):
+        # type: () -> None
         user_score_models = (
             user_models.UserContributionProficiencyModel
             .get_all_scores_of_user('invalid_user_id'))
@@ -2242,6 +2404,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_score_models, [])
 
     def test_get_categories_where_user_can_review(self):
+        # type: () -> None
         user_models.UserContributionProficiencyModel.create(
             'user1', 'category1', feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
         )
@@ -2261,6 +2424,7 @@ class UserContributionProficiencyModelTests(test_utils.GenericTestBase):
         self.assertNotIn('category2', score_categories)
 
     def test_get_categories_where_user_can_review_with_invalid_user_id(self):
+        # type: () -> None
         score_categories = (
             user_models.UserContributionProficiencyModel
             .get_all_categories_where_user_can_review('invalid_user_id'))
@@ -2276,11 +2440,13 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_3'
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.UserContributionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertFalse(
             user_models.UserContributionRightsModel
             .has_reference_to_user_id(self.USER_ID_1)
@@ -2319,9 +2485,10 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         )
 
     def test_export_data_trivial(self):
+        # type: () -> None
         user_data = user_models.UserContributionRightsModel.export_data(
             self.USER_ID_1)
-        expected_data = {}
+        expected_data = {} # type: Dict[Text, Union[bool, List[Text]]]
         self.assertEqual(user_data, expected_data)
 
         user_models.UserContributionRightsModel(
@@ -2341,6 +2508,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, expected_data)
 
     def test_get_translation_reviewer_user_ids(self):
+        # type: () -> None
         translation_reviewer_ids = (
             user_models.UserContributionRightsModel
             .get_translation_reviewer_user_ids('hi'))
@@ -2365,6 +2533,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_2 in translation_reviewer_ids)
 
     def test_get_voiceover_reviewer_user_ids(self):
+        # type: () -> None
         voiceover_reviewer_ids = (
             user_models.UserContributionRightsModel
             .get_voiceover_reviewer_user_ids('hi'))
@@ -2389,6 +2558,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_2 in voiceover_reviewer_ids)
 
     def test_get_question_reviewer_user_ids(self):
+        # type: () -> None
         question_reviewer_ids = (
             user_models.UserContributionRightsModel
             .get_question_reviewer_user_ids())
@@ -2413,6 +2583,7 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         self.assertTrue(self.USER_ID_2 in question_reviewer_ids)
 
     def test_get_question_submitter_user_ids(self):
+        # type: () -> None
         question_submitter_ids = (
             user_models.UserContributionRightsModel
             .get_question_submitter_user_ids())
@@ -2448,8 +2619,9 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     USER_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
 
     def setUp(self):
+        # type: () -> None
         """Set up user models in datastore for use in testing."""
-        super(PendingDeletionRequestModelTests, self).setUp()
+        super(PendingDeletionRequestModelTests, self).setUp() # type: ignore[no-untyped-call]
 
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
@@ -2457,17 +2629,20 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         ).put()
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        # type: () -> None
         user_models.PendingDeletionRequestModel.apply_deletion_policy(
             self.USER_1_ID)
         self.assertIsNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        # type: () -> None
         self.assertIsNone(
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.NONEXISTENT_USER_ID))
@@ -2475,6 +2650,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
+        # type: () -> None
         self.assertTrue(
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.USER_1_ID)
@@ -2489,6 +2665,7 @@ class DeletedUserModelTests(test_utils.GenericTestBase):
     """Tests for DeletedUserModel."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.DeletedUserModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP)
@@ -2498,17 +2675,19 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
     """Tests for PseudonymizedUserModel."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
+        # type: () -> None
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
             user_models.PseudonymizedUserModel, 'get_by_id', types.MethodType(
                 lambda _, __: True, user_models.PseudonymizedUserModel))
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp( # type: ignore[no-untyped-call]
             Exception, 'New id generator is producing too many collisions.')
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
@@ -2519,6 +2698,7 @@ class DeletedUsernameModelTests(test_utils.GenericTestBase):
     """Tests for DeletedUsernameModel."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             user_models.DeletedUsernameModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)

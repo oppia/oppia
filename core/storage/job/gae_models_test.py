@@ -20,6 +20,10 @@ from __future__ import unicode_literals
 from core.platform import models
 from core.tests import test_utils
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, job_models # pylint: disable=unused-import
+
 (base_models, job_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.job])
 
@@ -28,11 +32,13 @@ class JobModelTest(test_utils.GenericTestBase):
     """Tests for Oppia job models."""
 
     def test_get_deletion_policy(self):
+        # type: () -> None
         self.assertEqual(
             job_models.JobModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_is_cancelable(self):
+        # type: () -> None
         """The job is cancelable if its status is either queued or started."""
         job = job_models.JobModel(
             id='MyJobId', status_code=job_models.STATUS_CODE_NEW)
@@ -51,7 +57,8 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
     """Tests for Oppia job models with setUp."""
 
     def setUp(self):
-        super(JobModelSetUpJobsTest, self).setUp()
+        # type: () -> None
+        super(JobModelSetUpJobsTest, self).setUp() # type: ignore[no-untyped-call]
         job_models.JobModel(
             id='MyJobId1', job_type='JobType1',
             status_code=job_models.STATUS_CODE_FAILED).put()
@@ -63,11 +70,13 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
             status_code=job_models.STATUS_CODE_COMPLETED).put()
 
     def test_get_all_unfinished_jobs(self):
+        # type: () -> None
         self.assertEqual(
             job_models.JobModel.get_all_unfinished_jobs(3),
             [job_models.JobModel.get_by_id('MyJobId2')])
 
     def test_get_unfinished_jobs(self):
+        # type: () -> None
         self.assertEqual(
             job_models.JobModel.get_unfinished_jobs('JobType1').fetch(1), [])
         self.assertEqual(
@@ -75,11 +84,14 @@ class JobModelSetUpJobsTest(test_utils.GenericTestBase):
             [job_models.JobModel.get_by_id('MyJobId2')])
 
     def test_do_unfinished_jobs_exist(self):
+        # type: () -> None
         self.assertFalse(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType1'))
         self.assertTrue(job_models.JobModel.do_unfinished_jobs_exist(
             'JobType2'))
         job2 = job_models.JobModel.get('MyJobId2', strict=True)
+        # Ruling out the possibility of None for mypy type checking.
+        assert job2 is not None
         job2.status_code = job_models.STATUS_CODE_COMPLETED
         job2.update_timestamps()
         job2.put()

@@ -26,6 +26,12 @@ import feconf
 import python_utils
 import utils
 
+from typing import Dict, List, Optional, Text, cast # isort:skip # pylint: disable=unused-import
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, datastore_services, user_models # pylint: disable=unused-import
+
 (base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 
@@ -89,6 +95,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data corresponding to a user: recipient_id,
         recipient_email, sender_id, and sender_email, but this isn't deleted
         because this model is needed for auditing purposes.
@@ -97,6 +104,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Users already have access to this data since emails were sent
         to them.
         """
@@ -104,6 +112,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because users already have access to noteworthy details of this data
         (since emails were sent to them).
@@ -122,6 +131,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether SentEmailModel exists for user.
 
         Args:
@@ -137,6 +147,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, intent):
+        # type: (Text) -> Text
         """Generates an ID for a new SentEmailModel instance.
 
         Args:
@@ -168,8 +179,17 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, recipient_id, recipient_email, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
+            cls,
+            recipient_id, # type: Text
+            recipient_email, # type: Text
+            sender_id, # type: Text
+            sender_email, # type: Text
+            intent, # type: Text
+            subject, # type: Text
+            html_body, # type: Text
+            sent_datetime # type: datetime.datetime
+    ):
+        # type: (...) -> None
         """Creates a new SentEmailModel entry.
 
         Args:
@@ -194,6 +214,7 @@ class SentEmailModel(base_models.BaseModel):
         email_model_instance.put()
 
     def _pre_put_hook(self):
+        # type: () -> None
         """Operations to perform just before the model is `put` into storage."""
         super(SentEmailModel, self)._pre_put_hook()
         self.email_hash = self._generate_hash(
@@ -201,6 +222,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_by_hash(cls, email_hash, sent_datetime_lower_bound=None):
+        # type: (Text, Optional[datetime.datetime]) -> List[SentEmailModel]
         """Returns all messages with a given email_hash.
 
         This also takes an optional sent_datetime_lower_bound argument,
@@ -235,12 +257,13 @@ class SentEmailModel(base_models.BaseModel):
         if sent_datetime_lower_bound is not None:
             query = query.filter(cls.sent_datetime > sent_datetime_lower_bound)
 
-        messages = query.fetch()
+        messages = cast(List[SentEmailModel], query.fetch())
 
         return messages
 
     @classmethod
     def _generate_hash(cls, recipient_id, email_subject, email_body):
+        # type: (Text, Text, Text) -> Text
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
 
@@ -260,6 +283,7 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def check_duplicate_message(cls, recipient_id, email_subject, email_body):
+        # type: (Text, Text, Text) -> bool
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
@@ -330,6 +354,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
+        # type: () -> base_models.DELETION_POLICY
         """Model contains data corresponding to a user: recipient_ids,
         sender_id, and sender_email, but this isn't deleted because this model
         is needed for auditing purposes.
@@ -338,6 +363,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
+        # type: () -> base_models.MODEL_ASSOCIATION_TO_USER
         """Users already have access to this data since the emails were sent
         to them.
         """
@@ -345,6 +371,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
+        # type: () -> Dict[Text, base_models.EXPORT_POLICY]
         """Model contains data corresponding to a user, but this isn't exported
         because users already have access to noteworthy details of this data
         (since emails were sent to them).
@@ -361,6 +388,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
+        # type: (Text) -> bool
         """Check whether BulkEmailModel exists for user. Since recipient_ids
         can't be indexed it also can't be checked by this method, we can allow
         this because the deletion policy for this model is keep , thus even the
@@ -377,8 +405,17 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, instance_id, recipient_ids, sender_id, sender_email,
-            intent, subject, html_body, sent_datetime):
+            cls,
+            instance_id, # type: Text
+            recipient_ids, # type: Optional[List[Text]]
+            sender_id, # type: Text
+            sender_email, # type: Text
+            intent, # type: Text
+            subject, # type: Text
+            html_body, # type: Text
+            sent_datetime # type: datetime.datetime
+    ):
+        # type: (...) -> None
         """Creates a new BulkEmailModel entry.
 
         Args:
