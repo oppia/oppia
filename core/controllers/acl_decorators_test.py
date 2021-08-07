@@ -355,7 +355,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
     """Tests for does_classroom_exist decorator"""
 
-    class MockHandler(base.BaseHandler):
+    class MockDataHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'classroom_url_fragment': {
@@ -371,6 +371,22 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
         @acl_decorators.does_classroom_exist
         def get(self, _):
             self.render_json({'success': True})
+
+    class MockPageHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {
+            'classroom_url_fragment': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {}
+        }
+        @acl_decorators.does_classroom_exist
+        def get(self, _):
+            self.render_json('oppia-root.mainpage.html')
+
 
     def setUp(self):
         super(ClassroomExistDecoratorTests, self).setUp()
@@ -391,18 +407,28 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
             }])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
-                '/mock_classroom/<classroom_url_fragment>', self.MockHandler)],
+                '/mock_classroom_data/<classroom_url_fragment>',
+                self.MockDataHandler),
+            webapp2.Route(
+                '/mock_classroom_page/<classroom_url_fragment>',
+                self.MockPageHandler
+            )],
             debug=feconf.DEBUG
         ))
 
     def test_any_user_can_access_a_valid_classroom(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_classroom/math', expected_status_int=200)
+            self.get_json('/mock_classroom_data/math', expected_status_int=200)
 
     def test_redirects_user_to_default_classroom_if_given_not_available(
             self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_classroom/invalid', expected_status_int=404)
+            self.get_json('/mock_classroom_data/invalid', expected_status_int=404)
+
+    def test_raises_error_if_return_type_is_not_json(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_html_response('/mock_classroom_page/invalid',
+            expected_status_int=500)
 
 
 class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
