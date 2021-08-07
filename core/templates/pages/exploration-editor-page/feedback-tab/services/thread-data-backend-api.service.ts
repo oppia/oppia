@@ -130,11 +130,9 @@ export class ThreadDataBackendApiService {
     return thread;
   }
 
-  // 'suggestionBackendDict' will be 'undefined' when threadId is invalid
-  // resulting the function to throw an error.
   setSuggestionThreadFromBackendDicts(
       threadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict | undefined
+      suggestionBackendDict: SuggestionBackendDict
   ): SuggestionThread {
     if (!threadBackendDict || !suggestionBackendDict) {
       throw new Error('Missing input backend dicts');
@@ -188,7 +186,7 @@ export class ThreadDataBackendApiService {
             dict => this.setFeedbackThreadFromBackendDict(dict)),
           suggestionThreads: suggestionThreadBackendDicts.map(
             dict => this.setSuggestionThreadFromBackendDicts(
-              dict, suggestionBackendDictsByThreadId.get(
+              dict, <SuggestionBackendDict>suggestionBackendDictsByThreadId.get(
                 (dict === null ? null : dict.thread_id))))
         };
       },
